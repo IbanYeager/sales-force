@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPV Desktop - Manajemen Wiraniaga</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style_spv.css">
+  <link rel="stylesheet" href="../css/spv_wiraniaga.css">
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#CC0000">
+</head>
+
+<body>
+  <div class="spv-shell">
+    <aside class="spv-sidebar">
+      <div class="spv-brand-container">
+        <div class="spv-brand-logo">
+          <img
+            src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png"
+            alt="Tunas Toyota Logo" class="tunas-logo">
+        </div>
+        <div class="spv-brand-title">
+          <span class="panel-tag"><i class="fa-solid fa-user-tie"></i> SPV PANEL</span>
+          <p class="panel-sub">Desktop Supervisor</p>
+        </div>
+      </div>
+
+      <nav class="spv-nav">
+        <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+        <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target</a>
+        <a href="wiraniaga.html" id="navWiraniaga" class="active"><i class="fa-solid fa-users"></i>Wiraniaga</a>
+        <a href="approval.html" id="navApproval"><i class="fa-solid fa-check-to-slot"></i>Approval<span class="nav-badge" id="navApprovalBadge" style="display:none;">0</span></a>
+        <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+        <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-bullhorn"></i>Briefing Auto-Gen</a>
+        <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
+        <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
+        <a href="kelola_data.html" id="navKelola"><i class="fa-solid fa-database"></i>Kelola Data</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <main class="spv-main">
+      <div class="spv-topbar">
+        <div>
+          <h2 id="pageTitle">Manajemen Wiraniaga</h2>
+          <p class="page-sub" id="subTitleCount">Memuat data wiraniaga...</p>
+        </div>
+        <div class="spv-user">
+          <div class="avatar-status">
+            <img id="spvAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
+          </div>
+          <div class="meta">
+            <span class="name" id="spvNama">Memuat...</span>
+            <span class="role" id="spvRole">Memuat...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= CARD DAFTAR WIRANIAGA ================= -->
+      <section class="spv-card">
+        <div class="card-head">
+          <div>
+            <h1 class="title"><i class="fa-solid fa-users"></i> Daftar Akun Wiraniaga</h1>
+            <p class="subtitle">Kelola akun tim sales di bawah naungan Anda</p>
+          </div>
+          <div class="actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 8px 12px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12.5px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
+              <option value="Semua">👑 Semua Tim (Master - 42 Sales)</option>
+              <option value="Ryan">Tim Pak Ryan</option>
+              <option value="Riva">Tim Pak Riva</option>
+              <option value="Dani">Tim Pak Dani</option>
+              <option value="Hendra">Tim Pak Hendra</option>
+            </select>
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchWiraniaga" placeholder="Cari nama / username..."
+                oninput="filterWiraniaga()">
+            </div>
+            <button class="btn btn-primary" onclick="openModalCreate()">
+              <i class="fa-solid fa-user-plus"></i> Tambah Wiraniaga
+            </button>
+          </div>
+        </div>
+
+        <div class="mobile-swipe-hint"><i class="fa-solid fa-arrows-left-right"></i> Geser tabel ke samping untuk melihat semua kolom</div>
+        <div class="table-responsive">
+          <table class="table table-board">
+            <thead>
+              <tr>
+                <th class="num" style="width:44px;">No</th>
+                <th style="min-width:200px;">Nama Lengkap</th>
+                <th style="width:120px;">Username</th>
+                <th style="width:140px;">Conversion Rate</th>
+                <th class="num" style="width:90px;">Status</th>
+                <th class="num" style="width:110px;">Tingkatan</th>
+                <th style="width:140px;">AI Coaching Badge</th>
+                <th class="num" style="width:160px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="wiraniagaBody">
+              <tr>
+                <td colspan="8" class="loading-state">Memuat data wiraniaga...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ================= MODAL AI COACHING ADVICE ================= -->
+  <div class="modal-overlay" id="modalCoaching" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:20px; max-width:500px; width:90%; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+        <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin:0;" id="coachingModalTitle"><i class="fa-solid fa-lightbulb" style="color:#f59e0b;"></i> AI Coaching Advice</h3>
+        <button onclick="closeCoachingModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#64748b;">&times;</button>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:12px; font-weight:700; color:#64748b;">PERFORMA RATE</span>
+          <span style="font-size:14px; font-weight:800; color:#2563eb;" id="coachingRateText">Conversion Rate: 80%</span>
+        </div>
+        <div style="font-size:13px; color:#334155; line-height:1.6; background:white; padding:12px; border-radius:10px; border:1px solid #cbd5e1;" id="coachingAdviceBody">
+          Loading advice...
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end;">
+        <button class="btn" style="background:#2563eb; color:white; font-weight:700; border:none; padding:10px 18px; border-radius:10px; cursor:pointer;" onclick="closeCoachingModal()">Mengerti</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FORM MODAL (CREATE / EDIT) ================= -->
+  <div class="modal-overlay" id="modalWiraniaga">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Tambah Akun Wiraniaga</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="wiraniagaForm" onsubmit="saveWiraniaga(event)">
+          <input type="hidden" id="formAction" value="create">
+          <input type="hidden" id="formAccountId" value="0">
+
+          <div class="form-group">
+            <label><i class="fa-solid fa-user"></i> Nama Lengkap</label>
+            <input type="text" id="inputNamaLengkap" class="form-control" placeholder="Masukkan nama lengkap wiraniaga"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fa-solid fa-id-card"></i> Username</label>
+            <input type="text" id="inputUsername" class="form-control" placeholder="Masukkan username untuk login"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Password <span id="passwordHelp" class="label-hint"></span></label>
+            <input type="text" id="inputPassword" class="form-control" placeholder="Masukkan password">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fa-solid fa-ranking-star"></i> Tingkatan</label>
+              <select id="selectTingkatan" class="form-control">
+                <option value="Magang">Magang</option>
+                <option value="Junior" selected>Junior</option>
+                <option value="Executive">Executive</option>
+                <option value="Senior">Senior</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-toggle-on"></i> Status</label>
+              <select id="selectStatus" class="form-control">
+                <option value="Aktif" selected>Aktif</option>
+                <option value="Tidak Aktif">Tidak Aktif</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fa-solid fa-calendar-alt"></i> Tanggal Bergabung</label>
+              <input type="date" id="inputTanggalBergabung" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-user-tie"></i> Supervisor</label>
+              <select id="selectSpv" class="form-control">
+                <option value="Pak Riva">Pak Riva</option>
+                <option value="Pak Ryan">Pak Ryan</option>
+                <option value="Bu Rahma">Bu Rahma</option>
+                <option value="Pak Alvin">Pak Alvin</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">
+              <i class="fa-solid fa-save"></i> Simpan Akun
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <script src="../js/spv_wiraniaga.js?v=20260819_master"></script>
+
+  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/spv_global.js"></script>
+</body>
+
+</html>

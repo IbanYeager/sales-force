@@ -1,0 +1,135 @@
+/* css/cetak_testdrive.css — Exact Replica of Toyota TD Test Drive Official Form */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #cbd5e1;
+  color: #000000;
+  overflow-x: auto;
+}
+
+.print-container {
+  background: #ffffff;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 12mm 15mm 10mm 15mm;
+  box-sizing: border-box;
+  border-radius: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.no-print {
+  display: block;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.btn-print {
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  transition: all 0.15s ease;
+}
+
+.btn-print:hover {
+  background: #1e40af;
+}
+
+/* Form Tables Style */
+.td-form-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1.2px solid #000000;
+  margin-bottom: 7px;
+  font-size: 11px;
+}
+
+.td-form-table td {
+  border: 1px solid #000000;
+  padding: 3.5px 6px;
+  vertical-align: middle;
+}
+
+.td-label {
+  width: 32%;
+  font-weight: 500;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.td-colon {
+  width: 2%;
+  text-align: center;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}
+
+.td-val {
+  width: 66%;
+  font-weight: 600;
+  color: #000000;
+}
+
+.td-section-title {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  color: #000000;
+}
+
+/* Strict Single-Page A4 Print Configuration */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 15mm 8mm 15mm;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-container {
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .no-print,
+  #custom-install-container,
+  #aiCopilotFloatBtn,
+  #aiCopilotModal,
+  .pwa-prompt-container {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  table {
+    page-break-inside: avoid !important;
+  }
+}

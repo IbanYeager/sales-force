@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kacab Desktop - Kelola Target Cabang</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style_kacab.css">
+  <style>
+    /* Styling khusus Halaman Target Kacab */
+    .target-summary-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .ts-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .ts-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .ts-icon.gold {
+      background: var(--gold-soft);
+      color: var(--gold-deep);
+    }
+
+    .ts-icon.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .ts-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .ts-val {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .target-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .tc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .tc-spv-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tc-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1e1014, #3b141d);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .tc-spv-info h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .tc-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tc-stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .tc-stat-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .tc-stat-box .lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .tc-stat-box .val {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--text);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .tc-progress {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .tc-progress .fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .tc-stat-box .pct {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .tc-model-breakdown {
+      background: var(--surface-2);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .mb-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .model-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .model-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .model-chip .m-name {
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .model-chip .m-val {
+      font-weight: 900;
+      color: var(--gold-deep);
+      background: var(--gold-soft);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* Edit Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      max-width: 440px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    }
+  </style>
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#1e1014">
+</head>
+
+<body>
+  <div class="kcb-shell">
+    <!-- SIDEBAR -->
+    <aside class="kcb-sidebar">
+      <div class="kcb-brand-container">
+        <div class="kcb-brand-logo">
+          <img
+            src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png"
+            alt="Tunas Toyota Logo" class="tunas-logo">
+        </div>
+        <div class="kcb-brand-title">
+          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
+          <p class="panel-sub">Kepala Cabang</p>
+        </div>
+      </div>
+
+      <nav class="kcb-nav">
+        <a href="index_kacab.html" id="navDash"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
+        <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 42 Wiraniaga</a>
+        <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi & Approval</a>
+        <a href="target_kacab.html" id="navTarget" class="active"><i class="fa-solid fa-bullseye"></i>Target & Produktivitas</a>
+        <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
+        <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas & Riwayat Sales</a>
+        <a href="peta_kunjungan.html" id="navPeta"><i class="fa-solid fa-map-location-dot"></i>Peta GPS Kunjungan</a>
+        <a href="inventory.html" id="navStock"><i class="fa-solid fa-warehouse"></i>Live Stok (1.638 Unit)</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="kcb-main">
+      <div class="kcb-topbar">
+        <div>
+          <h2 id="pageTitle">Kelola Target Cabang</h2>
+          <p class="page-sub">Pengaturan & alokasi kuota target bulanan (SPK & DO) per tim SPV</p>
+        </div>
+        <div class="kcb-user">
+          <div class="avatar-status">
+            <img id="kcbAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
+          </div>
+          <div class="meta">
+            <span class="name" id="kcbNama">Memuat...</span>
+            <span class="role" id="kcbRole">Memuat...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERIODE MONTH FILTER -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:14px 18px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:18px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <i class="fa-solid fa-calendar-days" style="font-size:18px; color:var(--primary-blue, #2563eb);"></i>
+          <div>
+            <span style="font-size:13px; font-weight:800; color:#1e293b; display:block;">Pilih Periode Target</span>
+            <span style="font-size:11px; color:#64748b;" id="lblSelectedPeriod">Target &amp; Pencapaian per Bulan</span>
+          </div>
+        </div>
+        <select id="monthSelectKacab" class="input-modern" style="width:200px; font-size:13px; font-weight:700; padding:8px 12px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc;" onchange="fetchRealTargetData()">
+          <option value="1">Januari 2026</option>
+          <option value="2">Februari 2026</option>
+          <option value="3">Maret 2026</option>
+          <option value="4">April 2026</option>
+          <option value="5">Mei 2026</option>
+          <option value="6">Juni 2026</option>
+          <option value="7">Juli 2026</option>
+          <option value="8" selected>Agustus 2026</option>
+          <option value="9">September 2026</option>
+          <option value="10">Oktober 2026</option>
+          <option value="11">November 2026</option>
+          <option value="12">Desember 2026</option>
+        </select>
+      </div>
+
+      <!-- TARGET SUMMARY CARDS -->
+      <div class="target-summary-row">
+        <div class="ts-card">
+          <div class="ts-icon blue"><i class="fa-solid fa-bullseye"></i></div>
+          <div>
+            <span class="ts-title">Total Target SPK Cabang</span>
+            <div class="ts-val" id="summarySpkTarget">Memuat...</div>
+          </div>
+        </div>
+        <div class="ts-card">
+          <div class="ts-icon gold"><i class="fa-solid fa-truck-fast"></i></div>
+          <div>
+            <span class="ts-title" id="lblSummaryDoTitle">Total Target DO Cabang</span>
+            <div class="ts-val" id="summaryDoTarget">Memuat...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TARGET MATRIX LIST -->
+      <div id="targetMatrixContainer">
+        <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat matriks target cabang...</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- EDIT TARGET MODAL -->
+  <div class="modal-backdrop" id="editTargetModal">
+    <div class="modal-box">
+      <div style="margin-bottom: 16px;">
+        <h3 style="font-size:18px;font-weight:800;color:var(--text);">Edit Kuota Target SPV</h3>
+        <p style="font-size:12px;color:var(--muted);" id="modalSpvName">Nama SPV</p>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="font-size:12px;font-weight:700;color:var(--text-dark);display:block;margin-bottom:6px;">
+          Target SPK Bulanan (Unit)
+        </label>
+        <input type="number" id="inputTargetSpk" class="input-modern" style="width:100%;font-size:14px;" min="0">
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="font-size:12px;font-weight:700;color:var(--text-dark);display:block;margin-bottom:6px;">
+          Target DO Evaluasi (Unit)
+        </label>
+        <input type="number" id="inputTargetDo" class="input-modern" style="width:100%;font-size:14px;" min="0">
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button class="btn btn-ghost btn-sm" onclick="closeEditTargetModal()">Batal</button>
+        <button class="btn btn-primary btn-sm" onclick="saveTargetChanges()">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <script src="../js/kacab_global.js"></script>
+  <script src="../js/kacab_target.js?v=20260819_master"></script>
+
+  <script src="../js/pwa-app.js?v=3"></script>
+</body>
+
+</html>

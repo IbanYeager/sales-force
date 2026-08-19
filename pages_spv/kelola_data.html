@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPV Desktop - Kelola Data</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style_spv.css">
+  <link rel="stylesheet" href="../css/spv_kelola.css">
+
+  <!-- Leaflet GIS Map Library -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#CC0000">
+</head>
+
+<body>
+  <div class="spv-shell">
+    <aside class="spv-sidebar">
+      <div class="spv-brand-container">
+        <div class="spv-brand-logo">
+          <img
+            src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png"
+            alt="Tunas Toyota Logo" class="tunas-logo">
+        </div>
+        <div class="spv-brand-title">
+          <span class="panel-tag"><i class="fa-solid fa-user-tie"></i> SPV PANEL</span>
+          <p class="panel-sub">Desktop Supervisor</p>
+        </div>
+      </div>
+
+      <nav class="spv-nav">
+        <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+        <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Wiraniaga</a>
+        <a href="approval.html" id="navApproval"><i class="fa-solid fa-check-to-slot"></i>Approval<span class="nav-badge" id="navApprovalBadge" style="display:none;">0</span></a>
+        <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+        <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-bullhorn"></i>Briefing Auto-Gen</a>
+        <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
+        <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
+        <a href="kelola_data.html" id="navKelola" class="active"><i class="fa-solid fa-database"></i>Kelola Data</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <main class="spv-main">
+      <div class="spv-topbar">
+        <div>
+          <h2 id="pageTitle">Kelola Master Data</h2>
+          <p class="page-sub">Kelola pricelist, inventory, dan data pendukung lainnya</p>
+        </div>
+        <div class="spv-user">
+          <div class="avatar-status">
+            <img id="spvAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
+          </div>
+          <div class="meta">
+            <span class="name" id="spvNama">Memuat...</span>
+            <span class="role" id="spvRole">Memuat...</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="spv-card" style="padding: 24px;">
+        <!-- Data Tabs (Pill Style) -->
+        <div class="data-tabs-container" style="margin-bottom: 30px;">
+          <h3 style="font-size: 14px; color: var(--muted); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Kategori Data</h3>
+          <div class="data-tabs" style="display: flex; flex-wrap: wrap; gap: 12px; border-bottom: none; padding-bottom: 0;">
+            <button class="data-tab active" onclick="switchTab('pricelist', this)">
+              <i class="fa-solid fa-car"></i> Pricelist
+            </button>
+            <button class="data-tab" onclick="switchTab('polreg', this)">
+              <i class="fa-solid fa-chart-pie"></i> Polreg
+            </button>
+            <button class="data-tab" onclick="switchTab('testdrive', this)">
+              <i class="fa-solid fa-car-side"></i> Test Drive
+            </button>
+            <button class="data-tab" onclick="switchTab('inventory', this)">
+              <i class="fa-solid fa-warehouse"></i> Inventory
+            </button>
+            <button class="data-tab" onclick="switchTab('merchandise', this)">
+              <i class="fa-solid fa-shirt"></i> Merchandise
+            </button>
+            <button class="data-tab" onclick="switchTab('tco', this)">
+              <i class="fa-solid fa-gem"></i> TCO / Aksesoris
+            </button>
+            <button class="data-tab" onclick="switchTab('leasing', this)">
+              <i class="fa-solid fa-building-columns"></i> Leasing
+            </button>
+            <button class="data-tab" onclick="switchTab('provinsi', this)">
+              <i class="fa-solid fa-map-location-dot"></i> Bunga Wilayah
+            </button>
+            <button class="data-tab" onclick="switchTab('brosur', this)">
+              <i class="fa-solid fa-file-pdf"></i> Brosur PDF
+            </button>
+            <button class="data-tab" onclick="switchTab('heatmap', this)">
+              <i class="fa-solid fa-map-location-dot" style="color:var(--primary-red);"></i> Geo-Heatmap Prospek
+            </button>
+            <button class="data-tab" onclick="switchTab('biaya_iklan', this)">
+              <i class="fa-solid fa-rectangle-ad" style="color:var(--primary-red);"></i> Biaya Iklan & ROI
+            </button>
+          </div>
+        </div>
+
+        <!-- GEO HEATMAP MAP CONTENT -->
+        <div id="tab-heatmap" class="data-content" style="display:none;">
+          <div class="top-action-bar" style="margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: var(--navy);"><i class="fa-solid fa-earth-asia" style="color:var(--primary-red); margin-right:8px;"></i>Peta Sebaran Prospek & Territory Kanvasing</h3>
+              <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Monitoring wilayah hotspot prospek konsumen dan lokasi test drive tim wiraniaga secara real-time.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span style="font-size: 11px; font-weight: 700; background: #ecfdf5; color: #047857; padding: 6px 12px; border-radius: 8px; border: 1px solid #a7f3d0;">
+                <i class="fa-solid fa-circle" style="color:#10b981; font-size:9px;"></i> 24 Hot Prospek
+              </span>
+              <span style="font-size: 11px; font-weight: 700; background: #fff7ed; color: #c2410c; padding: 6px 12px; border-radius: 8px; border: 1px solid #fed7aa;">
+                <i class="fa-solid fa-car-side" style="color:#f97316;"></i> 8 Test Drive Active
+              </span>
+            </div>
+          </div>
+
+          <div style="height: 480px; width: 100%; border-radius: 16px; overflow: hidden; border: 1.5px solid var(--border); box-shadow: 0 4px 14px rgba(0,0,0,0.06); position: relative;">
+            <div id="spvGeoMap" style="height: 100%; width: 100%;"></div>
+          </div>
+        </div>
+
+        <!-- BIAYA IKLAN CONTENT -->
+        <div id="tab-biaya_iklan" class="data-content" style="display:none;">
+          <div class="top-action-bar" style="margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: var(--navy);"><i class="fa-solid fa-rectangle-ad" style="color:var(--primary-red); margin-right:8px;"></i>Biaya Iklan & Marketing Campaign ROI</h3>
+              <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Kelola pengeluaran iklan tim (FB/IG Ads, Google Ads, TikTok Ads, Pameran) dan evaluasi efektivitas ROI.</p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn" style="background:#16a34a; color:white; border:none; font-weight:700;" onclick="toggleBiayaIklanViewMode()" id="btnToggleSpreadsheet"><i class="fa-solid fa-table-cells"></i> Mode Spreadsheet (Live Edit)</button>
+              <a href="https://docs.google.com/spreadsheets/d/1QbMIXl5bKqQ517z96p7ZCRFnTzG7Y0_xUPXMNNdoZ2A/edit" target="_blank" class="btn" style="background:#059669; color:white; border:none; font-weight:700; text-decoration:none;"><i class="fa-solid fa-up-right-from-square"></i> Buka Google Sheets Utama</a>
+              <button class="btn" style="background:#0284c7; color:white; border:none; font-weight:700;" onclick="toggleEmbeddedGoogleSheetView()" id="btnToggleIframeSheet"><i class="fa-solid fa-file-contract"></i> Tampilkan Sheet Interaktif</button>
+              <button class="btn" style="background:#6366f1; color:white; border:none; font-weight:700;" onclick="openModalGoogleSheetsSync()"><i class="fa-solid fa-rotate"></i> Sync 2-Arah</button>
+              <a href="../api/api_spv_biaya_iklan.php?action=export_csv" class="btn" style="background:#f59e0b; color:white; border:none; font-weight:700; text-decoration:none;"><i class="fa-solid fa-file-excel"></i> Export Excel (.xlsx)</a>
+              <button class="btn btn-primary" onclick="openModalBiayaIklan()"><i class="fa-solid fa-plus"></i> Input Biaya Iklan</button>
+            </div>
+          </div>
+
+          <!-- Embedded Google Sheets Iframe Container (Hidden by default) -->
+          <div id="containerEmbeddedSheet" style="display:none; margin-bottom: 18px;">
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px 14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:13px; font-weight:700; color:#166534;"><i class="fa-solid fa-check-circle" style="color:#16a34a; margin-right:6px;"></i> Terhubung dengan Google Sheets: <code>1QbMIXl5bKqQ517z96p7ZCRFnTzG7Y0_xUPXMNNdoZ2A</code></span>
+              <button class="btn btn-sm" style="background:#16a34a; color:white;" onclick="refreshEmbeddedSheetIframe()"><i class="fa-solid fa-rotate"></i> Refresh Sheet</button>
+            </div>
+            <iframe id="iframeGoogleSheet" src="https://docs.google.com/spreadsheets/d/1QbMIXl5bKqQ517z96p7ZCRFnTzG7Y0_xUPXMNNdoZ2A/edit?widget=true&headers=false" style="width:100%; height:620px; border:1px solid #cbd5e1; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);"></iframe>
+          </div>
+
+          <!-- SPV Filter Bar -->
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:12px 16px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:11.5px; font-weight:800; color:#334155; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-user-group" style="color:var(--primary-red);"></i> Filter Tim SPV:
+              </span>
+              <div id="spvFilterButtonGroup" style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn-spv-pill active" onclick="filterBiayaIklanBySpv('ALL', this)" style="font-size:11.5px; font-weight:800; border-radius:20px; padding:6px 14px; background:#0d1b3e; color:white; border:none; cursor:pointer; transition:all 0.2s;">
+                  <i class="fa-solid fa-layer-group"></i> Semua Tim (Total)
+                </button>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="searchBiayaIklanInput" class="form-input" style="font-size:12px; padding:6px 12px; border-radius:10px; width:220px;" placeholder="Cari nama sales/media..." onkeyup="filterBiayaIklanSearch(this.value)">
+            </div>
+          </div>
+
+          <!-- SPV Breakdown Mini Cards (Per-Tim Overview) -->
+          <div id="containerSpvBreakdown" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; margin-bottom:16px;">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- KPI Cards ROI -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px;">
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+              <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Total Biaya Iklan</div>
+              <div style="font-size:20px; font-weight:800; color:#0f172a; margin-top:4px;" id="kpiBiayaTotal">Rp 0</div>
+              <div style="font-size:11px; color:#c8102e; margin-top:4px; font-weight:600;"><i class="fa-solid fa-bullhorn"></i> Pengeluaran Promosi</div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+              <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Total Leads Didapat</div>
+              <div style="font-size:20px; font-weight:800; color:#0f172a; margin-top:4px;" id="kpiBiayaLeads">0 Lead</div>
+              <div style="font-size:11px; color:#2563eb; margin-top:4px; font-weight:600;"><i class="fa-solid fa-users"></i> Calon Konsumen</div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+              <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Cost Per Lead (CPL)</div>
+              <div style="font-size:20px; font-weight:800; color:#0f172a; margin-top:4px;" id="kpiBiayaCPL">Rp 0</div>
+              <div style="font-size:11px; color:#059669; margin-top:4px; font-weight:600;"><i class="fa-solid fa-calculator"></i> Biaya / Lead</div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+              <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Cost Per SPK (CPS)</div>
+              <div style="font-size:20px; font-weight:800; color:#0f172a; margin-top:4px;" id="kpiBiayaCPS">Rp 0</div>
+              <div style="font-size:11px; color:#d97706; margin-top:4px; font-weight:600;"><i class="fa-solid fa-trophy"></i> Biaya / Closing SPK</div>
+            </div>
+          </div>
+
+          <!-- Table Biaya Iklan -->
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Sales</th>
+                  <th>Nama SPV</th>
+                  <th>Iklan di</th>
+                  <th>Budget / Hari</th>
+                  <th>Tanggal Iklan</th>
+                  <th>Berakhir Iklan</th>
+                  <th>Total Biaya 1 Bulan</th>
+                  <th>Result (Leads / SPK)</th>
+                  <th>Keterangan</th>
+                  <th style="width: 80px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableBiayaIklan">
+                <tr>
+                  <td colspan="10" style="text-align:center;">Memuat data biaya iklan...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PRICELIST CONTENT -->
+        <div id="tab-pricelist" class="data-content active">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-car"
+                style="color:var(--primary-red); margin-right:8px;"></i>Daftar Harga Mobil</h3>
+            <div style="display:flex; gap:10px;">
+              <div style="position:relative;">
+                <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+                <input type="text" class="form-input" placeholder="Cari mobil..." data-target="tablePricelist" onkeyup="filterTable(this)" style="padding-left:36px; width:220px;">
+              </div>
+              <button class="btn" style="background:#10b981; color:white; border:none;" onclick="openModalImport('pricelist')"><i class="fa-solid fa-file-excel"></i> Import</button>
+              <button class="btn btn-primary" onclick="openModalPricelist()"><i class="fa-solid fa-plus"></i> Tambah
+                Mobil</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Tipe</th>
+                  <th>Kategori</th>
+                  <th>Harga MT</th>
+                  <th>Harga AT</th>
+                  <th style="width: 120px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tablePricelist">
+                <tr>
+                  <td colspan="6" style="text-align:center;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- POLREG CONTENT -->
+        <div id="tab-polreg" class="data-content">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-chart-pie"
+                style="color:var(--accent-blue); margin-right:8px;"></i>Persaingan Wilayah (Polreg)</h3>
+            <div style="display:flex; gap:10px;">
+              <div style="position:relative;">
+                <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+                <input type="text" class="form-input" placeholder="Cari data polreg..." data-target="tablePolreg" onkeyup="filterTable(this)" style="padding-left:36px; width:220px;">
+              </div>
+              <button class="btn" style="background:#10b981; color:white; border:none;" onclick="openModalImport('polreg')"><i class="fa-solid fa-file-excel"></i> Import</button>
+              <button class="btn btn-primary" onclick="openModalPolreg()"><i class="fa-solid fa-plus"></i> Tambah
+                Polreg</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Kecamatan</th>
+                  <th>Tahun</th>
+                  <th>Merk</th>
+                  <th>Type</th>
+                  <th style="width: 120px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tablePolreg">
+                <tr>
+                  <td colspan="5" style="text-align:center;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TEST DRIVE CONTENT -->
+        <div id="tab-testdrive" class="data-content">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-car-side" style="color:#10b981; margin-right:8px;"></i>Ketersediaan Unit Test Drive</h3>
+            <button class="btn btn-primary" onclick="openModalTestDrive()"><i class="fa-solid fa-plus"></i> Tambah Unit</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Tipe</th>
+                  <th>Warna</th>
+                  <th>Tahun</th>
+                  <th>Ketersediaan</th>
+                  <th style="width: 150px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableTestDriveUnit">
+                <tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LEASING CONTENT -->
+        <div id="tab-leasing" class="data-content">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-building-columns"
+                style="color:var(--primary-red); margin-right:8px;"></i>Kelola Leasing</h3>
+            <div style="display:flex; gap:10px;">
+              <div style="position:relative;">
+                <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+                <input type="text" class="form-input" placeholder="Cari leasing..." data-target="tableLeasing" onkeyup="filterTable(this)" style="padding-left:36px; width:220px;">
+              </div>
+              <button class="btn btn-primary" onclick="openModalLeasing()"><i class="fa-solid fa-plus"></i> Tambah
+                Leasing</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Leasing</th>
+                  <th>Status</th>
+                  <th style="width: 150px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableLeasing">
+                <tr><td colspan="3" style="text-align:center;">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PROVINSI CONTENT -->
+        <div id="tab-provinsi" class="data-content">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-map-location-dot"
+                style="color:var(--accent-blue); margin-right:8px;"></i>Kelola Bunga & Wilayah</h3>
+            <div style="display:flex; gap:10px;">
+              <div style="position:relative;">
+                <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+                <input type="text" class="form-input" placeholder="Cari wilayah/bunga..." data-target="tableProvinsi" onkeyup="filterTable(this)" style="padding-left:36px; width:220px;">
+              </div>
+              <button class="btn btn-primary" onclick="openModalProvinsi()"><i class="fa-solid fa-plus"></i> Tambah
+                Bunga Wilayah</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Provinsi</th>
+                  <th>Bunga (%)</th>
+                  <th>Status</th>
+                  <th style="width: 120px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableProvinsi">
+                <tr>
+                  <td colspan="5" style="text-align:center;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- INVENTORY CONTENT -->
+        <div id="tab-inventory" class="data-content">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-warehouse"
+                style="color:var(--primary-blue); margin-right:8px;"></i>Stok Inventory Mobil</h3>
+            <div style="display:flex; gap:10px;">
+              <div style="position:relative;">
+                <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+                <input type="text" class="form-input" placeholder="Cari inventory..." data-target="tableInventory" onkeyup="filterTable(this)" style="padding-left:36px; width:220px;">
+              </div>
+              <button class="btn btn-primary" onclick="openModalInventory()"><i class="fa-solid fa-plus"></i> Tambah Unit</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Varian</th>
+                  <th>Warna</th>
+                  <th>Stok</th>
+                  <th>Status</th>
+                  <th style="width: 120px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableInventory">
+                <tr>
+                  <td colspan="6" style="text-align:center;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MERCHANDISE CONTENT -->
+        <div id="tab-merchandise" class="data-content">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-shirt"
+                style="color:var(--primary-blue); margin-right:8px;"></i>Merchandise</h3>
+            <button class="btn btn-primary" onclick="openModalMerchandise()"><i class="fa-solid fa-plus"></i> Tambah Merchandise</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Gambar</th>
+                  <th>Nama Produk</th>
+                  <th>Part No.</th>
+                  <th>Harga (Rp)</th>
+                  <th>Stok Cabang</th>
+                  <th style="width: 120px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableMerchandise">
+                <tr>
+                  <td colspan="6" style="text-align:center;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TCO CONTENT -->
+        <div id="tab-tco" class="data-content">
+          <div class="top-action-bar" style="display: flex; gap: 10px;">
+            <h3 style="font-size: 16px; font-weight: 800; flex:1;"><i class="fa-solid fa-gem"
+                style="color:var(--accent-blue); margin-right:8px;"></i>Toyota Customization Option (TCO)</h3>
+            <div style="position:relative;">
+              <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+              <input type="text" class="form-input" placeholder="Cari aksesoris TCO..." data-target="tableTco" onkeyup="filterTable(this)" style="padding-left:36px; width:220px;">
+            </div>
+            <button class="btn" style="border:1px solid var(--border); background:white;" onclick="openModalTcoModel()"><i class="fa-solid fa-car"></i> Kelola Model</button>
+            <button class="btn btn-primary" onclick="openModalTcoItem()"><i class="fa-solid fa-plus"></i> Tambah Item</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Part Number</th>
+                  <th>Nama Item / Aksesoris</th>
+                  <th>Tipe</th>
+                  <th>Harga Customer (RTCO)</th>
+                  <th>Harga Dealer (TPOS/TLS)</th>
+                  <th>Varian (Grade)</th>
+                  <th>Stok</th>
+                  <th style="width: 100px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableTco">
+                <tr>
+                  <td colspan="9" style="text-align:center;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BROSUR CONTENT -->
+        <div id="tab-brosur" class="data-content">
+          <div class="top-action-bar">
+            <h3 style="font-size: 16px; font-weight: 800;"><i class="fa-solid fa-file-pdf"
+                style="color:var(--primary-red); margin-right:8px;"></i>Brosur PDF (E-Library)</h3>
+            <div style="display:flex; gap:10px;">
+              <div style="position:relative;">
+                <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+                <input type="text" class="form-input" placeholder="Cari brosur..." data-target="tableBrosur" onkeyup="filterTable(this)" style="padding-left:36px; width:220px;">
+              </div>
+              <button class="btn btn-primary" onclick="openModalBrosur()"><i class="fa-solid fa-plus"></i> Tambah Brosur</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Brosur</th>
+                  <th>Deskripsi</th>
+                  <th>File PDF</th>
+                  <th style="width: 120px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableBrosur">
+                <tr>
+                  <td colspan="4" style="text-align:center;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Pricelist -->
+  <div class="modal-overlay" id="modalPricelist">
+    <div class="modal-box">
+      <h3 class="modal-title" id="titleModalPricelist">Tambah Mobil</h3>
+      <input type="hidden" id="formPriceId">
+
+      <div class="form-group">
+        <label>Kategori</label>
+        <select class="form-control" id="formPriceKategori">
+          <option value="MPV">MPV</option>
+          <option value="SUV">SUV</option>
+          <option value="Hatchback">Hatchback</option>
+          <option value="Sedan">Sedan</option>
+          <option value="Commercial">Commercial</option>
+          <option value="Electrified">Electrified</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Model (Cth: Avanza, Veloz)</label>
+        <input type="text" class="form-control" id="formPriceModel" placeholder="Nama Model">
+      </div>
+      <div class="form-group">
+        <label>Tipe Lengkap (Cth: 1.5 G CVT TSS)</label>
+        <input type="text" class="form-control" id="formPriceTipe" placeholder="Detail Tipe">
+      </div>
+      <div style="display:flex; gap:16px;">
+        <div class="form-group" style="flex:1;">
+          <label>Harga MT (Rp)</label>
+          <input type="number" class="form-control" id="formPriceMT" placeholder="Isi 0 jika tidak ada">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Harga AT / CVT (Rp)</label>
+          <input type="number" class="form-control" id="formPriceAT" placeholder="Isi 0 jika tidak ada">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Urutan Tampil (Cth: 1 untuk tampil pertama)</label>
+        <input type="number" class="form-control" id="formPriceOrder" value="99">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" style="background:#e2e8f0; color:var(--text-dark);"
+          onclick="closeModal('modalPricelist')">Batal</button>
+        <button class="btn btn-primary" onclick="savePricelist()">Simpan Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Polreg -->
+  <div class="modal-overlay" id="modalPolreg">
+    <div class="modal-box">
+      <h3 class="modal-title" id="titleModalPolreg">Tambah Data Polreg</h3>
+      <input type="hidden" id="formPolregId">
+
+      <div class="form-group">
+        <label>Kecamatan</label>
+        <input type="text" class="form-control" id="formPolregKecamatan" placeholder="Nama Kecamatan">
+      </div>
+      <div class="form-group" style="display:flex; gap:16px;">
+        <div style="flex:1;">
+          <label>Tahun</label>
+          <input type="text" class="form-control" id="formPolregTahun" value="2026">
+        </div>
+        <div style="flex:1;" id="wrapJumlahPolreg">
+          <label>Jumlah Unit</label>
+          <input type="number" class="form-control" id="formPolregJumlah" value="1" min="1">
+          <small style="font-size:10px; color:var(--muted); display:block; margin-top:4px;">*Akan menambah row sesuai
+            jumlah</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Merk Kendaraan</label>
+        <input type="text" class="form-control" id="formPolregMerk" placeholder="Toyota, Honda, dll">
+      </div>
+      <div class="form-group">
+        <label>Type / Segmen</label>
+        <input type="text" class="form-control" id="formPolregType" placeholder="MPV Low, dll">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" style="background:#e2e8f0; color:var(--text-dark);"
+          onclick="closeModal('modalPolreg')">Batal</button>
+        <button class="btn btn-primary" onclick="savePolreg()">Simpan Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Leasing -->
+  <div class="modal-overlay" id="modalLeasing">
+    <div class="modal-box">
+      <h3 class="modal-title" id="titleModalLeasing">Tambah Leasing</h3>
+      <input type="hidden" id="formLeasingId">
+      
+      <div class="form-group">
+        <label>Nama Leasing (Cth: TAF, ACC)</label>
+        <input type="text" class="form-control" id="formLeasingNama" placeholder="Masukkan nama leasing">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-control" id="formLeasingStatus">
+          <option value="Aktif">Aktif</option>
+          <option value="Nonaktif">Nonaktif</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" style="background:#e2e8f0; color:var(--text-dark);" onclick="closeModal('modalLeasing')">Batal</button>
+        <button class="btn btn-primary" onclick="saveLeasing()">Simpan Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Provinsi -->
+  <div class="modal-overlay" id="modalProvinsi">
+    <div class="modal-box">
+      <h3 class="modal-title" id="titleModalProvinsi">Tambah Provinsi</h3>
+      <input type="hidden" id="formProvinsiId">
+      
+      <div class="form-group">
+        <label>Nama Provinsi / Wilayah</label>
+        <input type="text" class="form-control" id="formProvinsiNama" placeholder="Cth: DKI Jakarta">
+      </div>
+      <div class="form-group">
+        <label>Suku Bunga (%)</label>
+        <input type="number" step="0.01" class="form-control" id="formProvinsiBunga" placeholder="Cth: 8.95">
+        <small style="font-size:10px; color:var(--text-muted); display:block; margin-top:4px;">*Masukkan dalam bentuk persen, misal 8.95 atau 9.20</small>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-control" id="formProvinsiStatus">
+          <option value="Aktif">Aktif</option>
+          <option value="Nonaktif">Nonaktif</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" style="background:#e2e8f0; color:var(--text-dark);" onclick="closeModal('modalProvinsi')">Batal</button>
+        <button class="btn btn-primary" onclick="saveProvinsi()">Simpan Data</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <!-- Modal Leasing & Provinsi... existing codes ... -->
+
+  <!-- Modal Test Drive -->
+  <div class="modal-overlay" id="modalTestDrive">
+    <div class="modal-box">
+      <h3 class="modal-title" id="titleModalTestDrive">Tambah Unit Test Drive</h3>
+      <input type="hidden" id="formTdId">
+      
+      <div class="form-group">
+        <label>Model (Cth: Avanza, Zenix)</label>
+        <input type="text" class="form-control" id="formTdModel" placeholder="Masukkan nama model" oninput="updateTdTypeDropdown()" list="tdModelOptions">
+        <datalist id="tdModelOptions"></datalist>
+      </div>
+      <div class="form-group">
+        <label>Type Lengkap (Pilih atau Ketik Manual)</label>
+        <input type="text" class="form-control" id="formTdType" placeholder="Pilih dari dropdown atau ketik" list="tdTypeOptions">
+        <datalist id="tdTypeOptions"></datalist>
+      </div>
+      <div style="display:flex; gap:16px;">
+        <div class="form-group" style="flex:1;">
+          <label>Warna</label>
+          <input type="text" class="form-control" id="formTdWarna" placeholder="Hitam, Putih, dll">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Tahun</label>
+          <input type="text" class="form-control" id="formTdTahun" value="2024">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Ketersediaan</label>
+        <select class="form-control" id="formTdKetersediaan">
+          <option value="tersedia">Tersedia</option>
+          <option value="tidak tersedia">Tidak Tersedia</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" style="background:#e2e8f0; color:var(--text-dark);" onclick="closeModal('modalTestDrive')">Batal</button>
+        <button class="btn btn-primary" onclick="saveTestDrive()">Simpan Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL INVENTORY -->
+  <div class="modal-overlay" id="modalInventory">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="modalInventoryTitle">Tambah Inventory</h3>
+        <button class="close-modal" onclick="closeModal('modalInventory')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="formInventory" onsubmit="saveInventory(event)">
+          <input type="hidden" id="inv_id" name="id">
+          <div class="form-group">
+            <label>Model Mobil</label>
+            <input type="text" id="inv_model" name="model" class="form-input" required placeholder="Avanza">
+          </div>
+          <div class="form-group">
+            <label>Varian</label>
+            <input type="text" id="inv_varian" name="varian" class="form-input" required placeholder="1.5 G CVT">
+          </div>
+          <div class="form-group">
+            <label>Warna</label>
+            <input type="text" id="inv_warna" name="warna" class="form-input" required placeholder="Putih">
+          </div>
+          <div class="form-group">
+            <label>Stok</label>
+            <input type="number" id="inv_stok" name="stok" class="form-input" required min="0">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="inv_status" name="status" class="form-input" required>
+              <option value="Tersedia">Tersedia</option>
+              <option value="Inden (1 Bulan)">Inden (1 Bulan)</option>
+              <option value="Inden (2 Bulan)">Inden (2 Bulan)</option>
+              <option value="Kosong">Kosong</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Simpan Inventory</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MERCHANDISE -->
+  <div class="modal-overlay" id="modalMerchandise">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="modalMerchandiseTitle">Tambah Merchandise</h3>
+        <button class="close-modal" onclick="closeModal('modalMerchandise')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="formMerchandise" onsubmit="saveMerchandise(event)" enctype="multipart/form-data">
+          <input type="hidden" id="merc_id" name="id">
+          <div class="form-group">
+            <label>Nama Produk</label>
+            <input type="text" id="merc_name" name="name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label>Part Number</label>
+            <input type="text" id="merc_part_number" name="part_number" class="form-input" required>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <div class="form-group" style="flex:1;">
+              <label>Ukuran</label>
+              <input type="text" id="merc_size" name="size" class="form-input">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Harga Ritel (Rp)</label>
+              <input type="number" id="merc_retail_price" name="retail_price" class="form-input" required min="0">
+            </div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <div class="form-group" style="flex:1;">
+              <label>Stok Cabang</label>
+              <input type="number" id="merc_stock_cabang" name="stock_cabang" class="form-input" required min="0">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Stok TAM</label>
+              <input type="number" id="merc_stock_tam" name="stock_tam" class="form-input" required min="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Upload Gambar Baru (opsional)</label>
+            <input type="file" id="merc_image_file" name="image_file" class="form-input" accept="image/*">
+            <input type="hidden" id="merc_image_existing" name="image_existing">
+            <small id="merc_image_help" style="color:var(--text-muted); font-size:11px;"></small>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Simpan Merchandise</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL BROSUR -->
+  <div class="modal-overlay" id="modalBrosur">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="modalBrosurTitle">Tambah Brosur</h3>
+        <button class="close-modal" onclick="closeModal('modalBrosur')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="formBrosur" onsubmit="saveBrosur(event)" enctype="multipart/form-data">
+          <input type="hidden" id="brosur_id" name="id">
+          <div class="form-group">
+            <label>Nama Brosur</label>
+            <input type="text" id="brosur_nama" name="nama" class="form-input" required placeholder="Brosur Avanza">
+          </div>
+          <div class="form-group">
+            <label>Deskripsi Singkat</label>
+            <input type="text" id="brosur_deskripsi" name="deskripsi" class="form-input" required placeholder="Spesifikasi & Harga">
+          </div>
+          <div class="form-group">
+            <label>Upload File PDF</label>
+            <input type="file" id="brosur_pdf_file" name="pdf_file" class="form-input" accept="application/pdf">
+            <input type="hidden" id="brosur_pdf_existing" name="pdf_existing">
+            <small id="brosur_pdf_help" style="color:var(--text-muted); font-size:11px;"></small>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Simpan Brosur</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TCO MODEL -->
+  <div class="modal-overlay" id="modalTcoModel">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="modalTcoModelTitle">Kelola Model TCO</h3>
+        <button class="close-modal" onclick="closeModal('modalTcoModel')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="formTcoModel" onsubmit="saveTcoModel(event)">
+          <input type="hidden" id="tco_model_id" name="id">
+          <div style="display:flex; gap:10px;">
+            <div class="form-group" style="flex:1;">
+              <label>Nama Model (Cth: All New Avanza)</label>
+              <input type="text" id="tco_model_name" name="name" class="form-input" required>
+            </div>
+            <div class="form-group" style="width: 100px;">
+              <label>PDF Page</label>
+              <input type="number" id="tco_model_pdfPage" name="pdfPage" class="form-input" value="1" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Simpan Model</button>
+        </form>
+        
+        <hr style="margin: 20px 0; border:none; border-top:1px solid var(--border);">
+        <div style="max-height: 250px; overflow-y:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Model</th>
+                <th>Page PDF</th>
+                <th style="width:80px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableTcoModelsList">
+              <tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TCO ITEM -->
+  <div class="modal-overlay" id="modalTcoItem">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="modalTcoItemTitle">Tambah Item TCO</h3>
+        <button class="close-modal" onclick="closeModal('modalTcoItem')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="formTcoItem" onsubmit="saveTcoItem(event)">
+          <input type="hidden" id="tco_item_id" name="id">
+          <div class="form-group">
+            <label>Pilih Model Mobil</label>
+            <select id="tco_item_model_id" name="model_id" class="form-input" required>
+              <option value="">-- Pilih Model --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Part Number (P/N)</label>
+            <input type="text" id="tco_item_part_number" name="part_number" class="form-input" placeholder="Cth: 45802TA560">
+          </div>
+          <div class="form-group">
+            <label>Nama Item / Aksesoris</label>
+            <input type="text" id="tco_item_name" name="name" class="form-input" required placeholder="Cth: Dashcam">
+          </div>
+          <div class="form-group">
+            <label>Kategori / Tipe (Opsional)</label>
+            <input type="text" id="tco_item_type" name="type" class="form-input" placeholder="Cth: Utility, Safety, Styling">
+          </div>
+          <div class="form-group">
+            <label>Harga Customer (RTCO After Tax)</label>
+            <input type="text" id="tco_item_price" name="price" class="form-input" required placeholder="Cth: Rp 845,000">
+          </div>
+          <div class="form-group">
+            <label>Harga Beli Dealer Via TPOS (Tipe 3 - WPBT)</label>
+            <input type="text" id="tco_item_price_tpos" name="price_tpos" class="form-input" placeholder="Cth: Rp 558,122">
+          </div>
+          <div class="form-group">
+            <label>Harga Beli Dealer Via TLS (RTCO - WPBT)</label>
+            <input type="text" id="tco_item_price_tls" name="price_tls" class="form-input" placeholder="Cth: Rp 570,375">
+          </div>
+          <div class="form-group">
+            <label>Berlaku Pada Grade / Varian</label>
+            <input type="text" id="tco_item_applicable_grade" name="applicable_grade" class="form-input" placeholder="Cth: G Gas, V Gas, G Hv">
+          </div>
+          <div class="form-group">
+            <label>Stok</label>
+            <input type="number" id="tco_item_stock" name="stock" class="form-input" value="99" required min="0">
+          </div>
+          <div class="form-group">
+            <label>Icon CSS (FontAwesome)</label>
+            <input type="text" id="tco_item_icon" name="icon" class="form-input" value="fa-solid fa-gem" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Simpan Item TCO</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL IMPORT EXCEL -->
+  <div class="modal-overlay" id="modalImport">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="titleModalImport"><i class="fa-solid fa-file-excel" style="color:#10b981; margin-right:8px;"></i> Import Data Cepat (Copy-Paste)</h3>
+        <button class="close-modal" onclick="closeModal('modalImport')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" style="background:#f8fafc;">
+        <div style="margin-bottom:15px;">
+          <label style="font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">Tipe Data</label>
+          <select id="importType" class="form-input" disabled style="background:#e2e8f0; font-weight:700;">
+            <option value="pricelist">Pricelist Mobil</option>
+            <option value="polreg">Data Polreg</option>
+          </select>
+        </div>
+
+        <div style="background:#fff; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:6px; margin-bottom:15px; font-size:12px; color:var(--muted); box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+          <strong style="color:var(--text-dark);">Panduan Copy-Paste:</strong>
+          <ol style="margin-top:5px; padding-left:18px; margin-bottom:0;">
+            <li>Buka file Excel Anda.</li>
+            <li>Pastikan urutan kolom sesuai dengan panduan di bawah kotak teks.</li>
+            <li>Blok baris data (tanpa *header* tabel) lalu tekan <code>Ctrl + C</code> (Copy).</li>
+            <li>Klik di dalam kotak teks besar di bawah ini lalu tekan <code>Ctrl + V</code> (Paste).</li>
+          </ol>
+        </div>
+
+        <div style="margin-bottom:15px;">
+          <label style="font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">Paste Data Excel di Sini:</label>
+          <textarea id="importData" class="form-input" rows="8" style="font-family:monospace; font-size:12px; white-space:pre; resize:vertical;" placeholder="Contoh:&#10;AGYA&#9;1.2 E M/T&#9;167900000&#9;0&#10;AGYA&#9;1.2 G M/T&#9;175400000&#9;0"></textarea>
+          <div id="importFormatGuide" style="margin-top:6px; font-size:11px; font-weight:700; color:var(--primary-red);"></div>
+        </div>
+
+        <div style="background:#fff; border:1px solid #e2e8f0; padding:12px; border-radius:6px; display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="importOverwrite" style="width:16px; height:16px; accent-color:var(--danger); cursor:pointer;">
+          <label for="importOverwrite" style="font-size:13px; font-weight:600; color:var(--danger); cursor:pointer; margin:0;">Hapus semua data lama (Timpa Total)</label>
+        </div>
+      </div>
+      <div class="modal-actions" style="padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; background:white; border-radius: 0 0 16px 16px;">
+        <button class="btn" style="background:var(--bg); color:var(--text-dark); border:1px solid var(--border);" onclick="closeModal('modalImport')">Batal</button>
+        <button class="btn btn-primary" onclick="processImportExcel()" id="btnProcessImport"><i class="fa-solid fa-cloud-arrow-up"></i> Mulai Import</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/spv_kelola.js"></script>
+
+  <!-- MODAL BIAYA IKLAN -->
+  <div class="modal-overlay" id="modalBiayaIklan">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="modalBiayaIklanTitle"><i class="fa-solid fa-rectangle-ad" style="color:var(--primary-red); margin-right:6px;"></i> Input Biaya Iklan & Promosi</h3>
+        <button class="close-modal" onclick="closeModal('modalBiayaIklan')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="formBiayaIklan" onsubmit="saveBiayaIklan(event)">
+          <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div>
+              <label>Nama Sales</label>
+              <input type="text" id="biaya_sales" name="nama_sales" class="form-input" required placeholder="Cth: Egy / Semua Tim">
+            </div>
+            <div>
+              <label>Nama SPV</label>
+              <input type="text" id="biaya_spv" name="nama_spv" class="form-input" value="Pak Ryan" required placeholder="Cth: Pak Ryan">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Iklan di (Platform)</label>
+            <select id="biaya_iklan_di" name="iklan_di" class="form-input" required>
+              <option value="Google Ads">Google Ads</option>
+              <option value="Meta Ads (FB/IG)">Meta Ads (FB/IG)</option>
+              <option value="TikTok Ads">TikTok Ads</option>
+              <option value="OLX / Marketplace">OLX / Marketplace</option>
+              <option value="Event / Pameran">Event / Pameran Showroom</option>
+              <option value="Flyering & Kanvasing">Flyering & Kanvasing</option>
+              <option value="Brosur & Spanduk">Brosur & Spanduk</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div>
+              <label>Budget Perhari (Rp)</label>
+              <input type="number" id="biaya_budget_perhari" name="budget_perhari" class="form-input" required min="0" placeholder="Cth: 50000" oninput="autoCalcTotal1Bulan()">
+            </div>
+            <div>
+              <label>Total Biaya 1 Bulan (Rp)</label>
+              <input type="number" id="biaya_total_1bulan" name="total_biaya_1bulan" class="form-input" required min="0" placeholder="Cth: 1500000">
+            </div>
+          </div>
+
+          <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div>
+              <label>Tanggal Iklan (Mulai)</label>
+              <input type="date" id="biaya_tanggal_mulai" name="tanggal_iklan" class="form-input" required>
+            </div>
+            <div>
+              <label>Berakhir Iklan (Selesai)</label>
+              <input type="date" id="biaya_tanggal_akhir" name="berakhir_iklan" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div>
+              <label>Leads Didapat</label>
+              <input type="number" id="biaya_leads" name="jumlah_lead" class="form-input" value="0" min="0">
+            </div>
+            <div>
+              <label>SPK Closing</label>
+              <input type="number" id="biaya_spk" name="jumlah_spk" class="form-input" value="0" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Keterangan</label>
+            <textarea id="biaya_keterangan" name="keterangan" class="form-input" rows="2" placeholder="Catatan promo / campaign..."></textarea>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <button type="button" class="btn" style="background:#cbd5e1; color:#334155;" onclick="closeModal('modalBiayaIklan')">Batal</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Simpan Data Iklan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Google Sheets Sync & Copy-Paste Import -->
+  <div class="modal-overlay" id="modalGoogleSheetsSync" style="display:none;">
+    <div class="modal-box" style="max-width: 680px;">
+      <h3 class="modal-title"><i class="fa-solid fa-table-cells" style="color:#16a34a; margin-right:8px;"></i>Sinkronisasi Google Sheets 2-Arah</h3>
+      
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px; margin-top:12px; font-size:12px; color:#166534;">
+        <strong><i class="fa-solid fa-link"></i> Terhubung dengan Google Sheets:</strong><br>
+        <a href="https://docs.google.com/spreadsheets/d/1QbMIXl5bKqQ517z96p7ZCRFnTzG7Y0_xUPXMNNdoZ2A/edit" target="_blank" style="color:#047857; font-weight:700; word-break:break-all;">https://docs.google.com/spreadsheets/d/1QbMIXl5bKqQ517z96p7ZCRFnTzG7Y0_xUPXMNNdoZ2A/edit</a>
+      </div>
+
+      <div class="form-group" style="margin-top: 14px;">
+        <label style="font-weight:700; color:#0f172a;">1. Import via Copy-Paste dari Google Sheets</label>
+        <p style="font-size:12px; color:#64748b; margin-bottom:6px;">Buka Google Sheets di atas, salin baris data (Tanggal | Kategori | Campaign | Biaya | Sales | Leads | SPK | Keterangan), lalu tempel di bawah:</p>
+        <textarea id="pasteSpreadsheetData" class="form-input" rows="4" placeholder="2026-08-08&#9;Google Search Ads&#9;Kata Kunci Sales Toyota&#9;1200000&#9;Semua Tim&#9;28&#9;3&#9;Search Intent High Buyer"></textarea>
+      </div>
+
+      <div class="form-group" style="margin-top: 14px;">
+        <label style="font-weight:700; color:#0f172a;">2. Live Sync URL (Publish CSV / Google Web App Webhook)</label>
+        <p style="font-size:12px; color:#64748b; margin-bottom:6px;">Masukan Link CSV Google Sheets (File -> Share -> Publish to Web -> CSV) atau Webhook Apps Script untuk sinkronisasi otomatis:</p>
+        <input type="url" id="urlGoogleSheetsCsv" class="form-input" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn" style="background:#e2e8f0; color:#475569;" onclick="closeModal('modalGoogleSheetsSync')">Batal</button>
+        <button class="btn" style="background:#16a34a; color:white; font-weight:700;" onclick="processSpreadsheetSync()"><i class="fa-solid fa-rotate"></i> Sinkronkan Data Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <script src="../js/spv_kelola.js?v=2"></script>
+  <script src="../js/pwa-app.js?v=3"></script>
+<script src="../js/spv_global.js"></script>
+</body>
+
+</html>

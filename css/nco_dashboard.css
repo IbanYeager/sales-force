@@ -1,0 +1,626 @@
+/* ══════════════════════════════════════════════════════════════════
+   NCO (NETT COST OF OWNERSHIP) & CAR COMPARISON DASHBOARD STYLES
+   ══════════════════════════════════════════════════════════════════ */
+
+.nco-dashboard-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 10px 30px rgba(13, 27, 62, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.nco-dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #d7123a 0%, #0284c7 50%, #10b981 100%);
+}
+
+.nco-header-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nco-title-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nco-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #d7123a 0%, #b91c1c 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(215, 18, 58, 0.25);
+}
+
+.nco-title-text h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0d1b3e;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nco-title-text p {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin: 2px 0 0 0;
+}
+
+.nco-live-badge {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nco-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: ncoPulse 1.5s infinite;
+}
+
+@keyframes ncoPulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Controls Grid */
+.nco-controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+@media (max-width: 768px) {
+    .nco-controls-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.nco-control-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nco-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nco-select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    background: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0f172a;
+    outline: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.nco-select:focus {
+    border-color: #d7123a;
+    box-shadow: 0 0 0 3px rgba(215, 18, 58, 0.15);
+}
+
+.nco-slider {
+    width: 100%;
+    accent-color: #d7123a;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+/* Side by Side Comparison Cards */
+.nco-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .nco-compare-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.nco-car-card {
+    border-radius: 16px;
+    padding: 18px;
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.nco-car-card.is-toyota {
+    border-color: #fecdd3;
+    background: linear-gradient(180deg, #fff5f5 0%, #ffffff 100%);
+}
+
+.nco-car-card.is-non-toyota {
+    border-color: #bae6fd;
+    background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+}
+
+.nco-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.nco-brand-badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.nco-brand-badge.toyota {
+    background: #d7123a;
+    color: #ffffff;
+}
+
+.nco-brand-badge.non-toyota {
+    background: #0284c7;
+    color: #ffffff;
+}
+
+.nco-car-name {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 4px 0 2px 0;
+}
+
+.nco-car-sub {
+    font-size: 0.74rem;
+    color: #64748b;
+}
+
+/* NCO KPI Main Metric Display */
+.nco-kpi-block {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 12px 0;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    text-align: center;
+}
+
+.is-toyota .nco-kpi-block {
+    border-color: #fda4af;
+    background: #fff;
+}
+
+.is-non-toyota .nco-kpi-block {
+    border-color: #7dd3fc;
+    background: #fff;
+}
+
+.nco-kpi-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.nco-kpi-value {
+    font-size: 1.35rem;
+    font-weight: 900;
+    margin: 4px 0;
+}
+
+.is-toyota .nco-kpi-value { color: #d7123a; }
+.is-non-toyota .nco-kpi-value { color: #0284c7; }
+
+.nco-kpi-subgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #e2e8f0;
+    font-size: 0.72rem;
+}
+
+.nco-sub-item span {
+    display: block;
+    color: #64748b;
+    font-size: 0.65rem;
+}
+.nco-sub-item strong {
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 0.78rem;
+}
+
+/* Breakdown Specs List */
+.nco-breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.78rem;
+}
+
+.nco-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nco-row:last-child {
+    border-bottom: none;
+}
+
+.nco-row-label {
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nco-row-val {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Progress bar fill for comparison */
+.nco-bar-wrap {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.nco-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.is-toyota .nco-bar-fill { background: #d7123a; }
+.is-non-toyota .nco-bar-fill { background: #0284c7; }
+
+/* Insight / Recommendation Box */
+.nco-insight-box {
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 16px;
+    transition: all 0.3s ease;
+}
+
+.nco-insight-box.is-toyota-win {
+    background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(6, 78, 59, 0.25);
+    border: 1px solid #059669;
+}
+
+.nco-insight-box.is-comp-win {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(30, 41, 59, 0.25);
+    border: 1px solid #334155;
+}
+
+.nco-insight-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #34d399;
+    margin-bottom: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nco-insight-box h4 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 4px 0 8px 0;
+}
+
+.nco-insight-box p {
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+    margin: 0 0 12px 0;
+}
+
+.highlight-green {
+    color: #34d399;
+    font-weight: 800;
+}
+
+.highlight-red {
+    color: #f87171;
+    font-weight: 800;
+}
+
+.nco-insight-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pill-green {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pill-blue {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NCO COMPARISON TABLE STYLES (Comparison Sheet)
+   ══════════════════════════════════════════════════════════════════ */
+
+.nco-table-section {
+    margin-top: 24px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(13, 27, 62, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.nco-table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.nco-tabs-header {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.nco-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nco-tab-btn.active {
+    background: #ffffff;
+    color: #d7123a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.nco-table-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nco-search-input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #cbd5e1;
+    font-size: 0.8rem;
+    outline: none;
+    width: 180px;
+    transition: border 0.2s ease;
+}
+
+.nco-search-input:focus {
+    border-color: #d7123a;
+}
+
+.nco-filter-btn {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+}
+
+.nco-filter-btn.active {
+    background: #0d1b3e;
+    color: #ffffff;
+    border-color: #0d1b3e;
+}
+
+.nco-tab-pane {
+    display: none;
+}
+
+.nco-tab-pane.active {
+    display: block;
+}
+
+.nco-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.nco-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.nco-data-table th {
+    background: #0d1b3e;
+    color: #ffffff;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.nco-data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+
+.nco-data-table tr:hover td {
+    background: #f8fafc;
+}
+
+.td-bold {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.td-price {
+    font-weight: 800;
+    color: #059669;
+}
+
+.td-highlight {
+    background: #ecfdf5 !important;
+    font-weight: 800;
+    color: #047857;
+}
+
+.td-warn {
+    background: #fff1f2 !important;
+    font-weight: 800;
+    color: #be123c;
+}
+
+.td-small {
+    font-size: 0.7rem;
+    color: #64748b;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tr-section-head td {
+    background: #f1f5f9 !important;
+    font-weight: 800;
+    color: #0d1b3e;
+    font-size: 0.75rem;
+    padding: 8px 12px;
+}
+
+.badge-type {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+
+.badge-hev { background: #d1fae5; color: #047857; }
+.badge-bev { background: #e0f2fe; color: #0369a1; }
+.badge-gasoline { background: #fef3c7; color: #b45309; }
+
+.badge-good {
+    background: #d1fae5;
+    color: #047857;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.badge-bad {
+    background: #ffe4e6;
+    color: #be123c;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+}

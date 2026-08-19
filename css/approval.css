@@ -1,0 +1,239 @@
+﻿.mobile-app {
+            padding-bottom: 40px;
+        }
+
+        .approval-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 14px;
+            transition: var(--transition);
+            animation: float-up 0.4s var(--ease-out) both;
+        }
+
+        .approval-card:nth-child(2) {
+            animation-delay: 0.06s;
+        }
+
+        .approval-card:nth-child(3) {
+            animation-delay: 0.12s;
+        }
+
+        .approval-card:active {
+            transform: scale(0.99);
+        }
+
+        .approval-card-header {
+            padding: 16px 18px 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .approval-info {
+            flex: 1;
+        }
+
+        .approval-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+            letter-spacing: -0.3px;
+        }
+
+        .approval-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .approval-meta span {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 999px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-waiting {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .status-approved {
+            background: #dcfce7;
+            color: #065f46;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .approval-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0 18px;
+        }
+
+        .approval-detail {
+            padding: 12px 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .detail-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .approval-actions {
+            padding: 14px 18px 16px 18px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-approve {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition-spring);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-approve:active {
+            transform: scale(0.95);
+            box-shadow: none;
+        }
+
+        .btn-reject {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            color: var(--primary-red);
+            border: 1.5px solid var(--primary-red);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition-spring);
+        }
+
+        .btn-reject:active {
+            background: var(--red-light);
+            transform: scale(0.95);
+        }
+
+        /* Filter tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-tab {
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1.5px solid var(--border-color);
+            background: white;
+            color: var(--text-muted);
+        }
+
+        .filter-tab.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-blue);
+        }
+
+        /* Stats row */
+        .approval-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .stat-chip {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px 12px;
+            text-align: center;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .stat-chip .num {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+            margin-bottom: 3px;
+        }
+
+        .stat-chip .lbl {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }

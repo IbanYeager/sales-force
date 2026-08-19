@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kacab Desktop - Aktivitas Sales</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style_kacab.css">
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#1e1014">
+</head>
+
+<body>
+  <div class="kcb-shell">
+    <!-- SIDEBAR -->
+    <aside class="kcb-sidebar">
+      <div class="kcb-brand-container">
+        <div class="kcb-brand-logo">
+          <img
+            src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png"
+            alt="Tunas Toyota Logo" class="tunas-logo">
+        </div>
+        <div class="kcb-brand-title">
+          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
+          <p class="panel-sub">Kepala Cabang</p>
+        </div>
+      </div>
+
+      <nav class="kcb-nav">
+        <a href="index_kacab.html" id="navDash"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
+        <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 42 Wiraniaga</a>
+        <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi & Approval</a>
+        <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target & Produktivitas</a>
+        <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
+        <a href="aktivitas.html" id="navAktivitas" class="active"><i class="fa-solid fa-list-check"></i>Aktivitas & Riwayat Sales</a>
+        <a href="peta_kunjungan.html" id="navPeta"><i class="fa-solid fa-map-location-dot"></i>Peta GPS Kunjungan</a>
+        <a href="inventory.html" id="navStock"><i class="fa-solid fa-warehouse"></i>Live Stok (1.638 Unit)</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="kcb-main">
+      <div class="kcb-topbar">
+        <div>
+          <h2 id="pageTitle">Aktivitas Sales</h2>
+          <p class="page-sub">Timeline aktivitas harian seluruh sales cabang</p>
+        </div>
+        <div class="kcb-user">
+          <div class="avatar-status">
+            <img id="kcbAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
+          </div>
+          <div class="meta">
+            <span class="name" id="kcbNama">Memuat...</span>
+            <span class="role" id="kcbRole">Memuat...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kcb-card">
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchActivity" placeholder="Cari nama sales, keterangan, atau lokasi..."
+              oninput="applyTimelineFilters()">
+          </div>
+          <div class="select-box">
+            <i class="fa-solid fa-user-tie"></i>
+            <select id="filterSpv" onchange="applyTimelineFilters()">
+              <option value="">Semua SPV</option>
+            </select>
+          </div>
+          <div class="select-box">
+            <i class="fa-solid fa-tag"></i>
+            <select id="filterTipe" onchange="applyTimelineFilters()">
+              <option value="">Semua Tipe</option>
+            </select>
+          </div>
+          <div class="select-box">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+            <select id="filterStatus" onchange="applyTimelineFilters()">
+              <option value="">Semua Status</option>
+              <option value="Rencana">Rencana</option>
+              <option value="Sedang Dilakukan">Sedang Dilakukan</option>
+              <option value="Selesai">Selesai</option>
+            </select>
+          </div>
+          <div class="spacer"></div>
+          <span class="result-count" id="activityCount"></span>
+        </div>
+
+        <div id="timelineContainer" class="timeline">
+          <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat timeline aktivitas...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Image Zoom Modal -->
+  <div id="imageZoomModal" class="zoom-overlay">
+    <button class="zoom-close" onclick="closeImageZoom()" aria-label="Tutup foto"><i
+        class="fa-solid fa-xmark"></i></button>
+    <img id="zoomedImg" src="" alt="Foto aktivitas">
+  </div>
+
+  <!-- Activity Detail Modal -->
+  <div id="activityDetailModal" class="detail-overlay">
+    <div class="detail-modal">
+      <div class="detail-header">
+        <div class="detail-header-left">
+          <div class="detail-header-icon"><i id="detIcon" class="fa-solid fa-list-check"></i></div>
+          <div>
+            <h3 id="detTitle">Detail Aktivitas</h3>
+            <span class="detail-header-sub">Informasi detail perekaman sales</span>
+          </div>
+        </div>
+        <button class="detail-close" onclick="closeActivityDetail()" aria-label="Tutup detail"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="detail-body">
+        <div class="detail-status-row">
+          <span id="detStatusBadge" class="badge badge-approved">Selesai</span>
+          <span id="detTime" class="detail-time"><i class="fa-regular fa-clock"></i> -</span>
+        </div>
+
+        <div id="detPhotoArea" class="detail-photo-area">
+          <div class="detail-photo-main">
+            <img id="detMainPhoto" src="" onclick="zoomMainPhoto()" alt="Foto aktivitas">
+          </div>
+          <div id="detThumbs" class="detail-thumbs"></div>
+        </div>
+
+        <div class="detail-info-list">
+          <div class="detail-info-row">
+            <div class="detail-info-icon violet"><i class="fa-solid fa-user"></i></div>
+            <div>
+              <div class="detail-info-label">Nama Sales</div>
+              <div class="detail-info-value" id="detNamaSalesVal">-</div>
+            </div>
+          </div>
+
+          <div class="detail-info-row">
+            <div class="detail-info-icon gold"><i class="fa-solid fa-user-tie"></i></div>
+            <div>
+              <div class="detail-info-label">SPV Pembina</div>
+              <div class="detail-info-value" id="detSpvVal">-</div>
+            </div>
+          </div>
+
+          <div class="detail-info-row">
+            <div class="detail-info-icon blue"><i class="fa-solid fa-tag"></i></div>
+            <div>
+              <div class="detail-info-label">Tipe Aktivitas</div>
+              <div class="detail-info-value" id="detTipeVal">-</div>
+            </div>
+          </div>
+
+          <div class="detail-info-row">
+            <div class="detail-info-icon blue"><i class="fa-solid fa-align-left"></i></div>
+            <div style="flex:1;">
+              <div class="detail-info-label">Keterangan</div>
+              <div class="detail-info-value" id="detKeteranganVal" style="white-space:pre-wrap; font-weight:500;">-
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-info-row" style="flex-direction:column; align-items:stretch; gap:10px;">
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+              <div class="detail-info-icon green"><i class="fa-solid fa-location-dot"></i></div>
+              <div>
+                <div class="detail-info-label">Lokasi</div>
+                <div class="detail-info-value" id="detLokasiVal">-</div>
+              </div>
+            </div>
+            <a id="detMapBtn" href="#" target="_blank" class="detail-map-btn">
+              <i class="fa-solid fa-map-location-dot"></i> Buka Lokasi di Google Maps
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <script src="../js/kacab_global.js"></script>
+  <script src="../js/kacab_aktivitas.js?v=20260819_master"></script>
+
+  <script src="../js/pwa-app.js?v=3"></script>
+</body>
+
+</html>

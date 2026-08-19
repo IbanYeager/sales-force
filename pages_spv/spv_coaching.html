@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPV Desktop - Sales Coaching Radar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style_spv.css">
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#CC0000">
+  <style>
+    .sales-coaching-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 18px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+        margin-bottom: 14px;
+    }
+
+    .metric-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .ai-coaching-box {
+        background: #f8fafc;
+        border-left: 4px solid #3b82f6;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 12px;
+        font-size: 12.5px;
+        line-height: 1.5;
+        color: #1e293b;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="spv-shell">
+    <aside class="spv-sidebar">
+      <div class="spv-brand-container">
+        <div class="spv-brand-logo">
+          <img
+            src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png"
+            alt="Tunas Toyota Logo" class="tunas-logo">
+        </div>
+        <div class="spv-brand-title">
+          <span class="panel-tag"><i class="fa-solid fa-user-tie"></i> SPV PANEL</span>
+          <p class="panel-sub">Desktop Supervisor</p>
+        </div>
+      </div>
+
+      <nav class="spv-nav">
+        <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+        <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Wiraniaga</a>
+        <a href="approval.html" id="navApproval"><i class="fa-solid fa-check-to-slot"></i>Approval<span class="nav-badge" id="navApprovalBadge" style="display:none;">0</span></a>
+        <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+        <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-bullhorn"></i>Briefing Auto-Gen</a>
+        <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
+        <a href="spv_coaching.html" id="navCoaching" class="active"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
+        <a href="kelola_data.html" id="navKelola"><i class="fa-solid fa-database"></i>Kelola Data</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <main class="spv-main">
+      <div class="spv-topbar">
+        <div>
+          <h2>SPV Sales Coaching Radar</h2>
+          <p class="page-sub">Analisis rasio konversi tim wiraniaga (Prospek → SPK → DO) &amp; panduan AI Coaching presisi bagi SPV!</p>
+        </div>
+        <div class="spv-user">
+          <div class="avatar-status">
+            <img id="spvAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
+          </div>
+          <div class="meta">
+            <span class="name" id="spvNama">Memuat...</span>
+            <span class="role" id="spvRole">Supervisor</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Card -->
+      <div class="card" style="padding: 20px; background:#fff; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="margin:0; font-size:15px; font-weight:800; color:var(--primary-blue, #0d1b3e);">
+            <i class="fa-solid fa-chart-column" style="color:#2563eb;"></i> Matriks Performa Tim &amp; Panduan AI Coaching
+          </h3>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <select id="filterSpvSelect" onchange="onSpvFilterChange()" style="padding:6px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px; font-weight:700; color:#0f172a; background:#f8fafc; cursor:pointer;">
+              <option value="auto">Tim Saya (Otomatis)</option>
+              <option value="Pak Riva">Tim Pak Riva</option>
+              <option value="Pak Alvin">Tim Pak Alvin</option>
+              <option value="Pak Ryan">Tim Pak Ryan</option>
+              <option value="Bu Rahma">Tim Bu Rahma</option>
+              <option value="Semua">Semua Wiraniaga</option>
+            </select>
+            <button type="button" onclick="loadSpvCoachingData()" class="btn btn-secondary" style="padding:6px 12px; border-radius:8px; font-size:12px; font-weight:700;">
+              <i class="fa-solid fa-rotate"></i> Pembaruan Data
+            </button>
+          </div>
+        </div>
+
+        <div id="spvCoachingListContainer" style="display:flex; flex-direction:column; gap:14px;">
+          <p style="text-align:center; font-size:12px; color:#64748b; padding:20px;">Memuat data analisis performa tim...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <script src="../js/spv_coaching.js"></script>
+  <script src="../js/spv_global.js"></script>
+</body>
+
+</html>

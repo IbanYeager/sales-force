@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPV Desktop - Target</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style_spv.css">
+  <link rel="stylesheet" href="../css/spv_target.css">
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#CC0000">
+</head>
+
+<body>
+  <div class="spv-shell">
+    <aside class="spv-sidebar">
+      <div class="spv-brand-container">
+        <div class="spv-brand-logo">
+          <img
+            src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png"
+            alt="Tunas Toyota Logo" class="tunas-logo">
+        </div>
+        <div class="spv-brand-title">
+          <span class="panel-tag"><i class="fa-solid fa-user-tie"></i> SPV PANEL</span>
+          <p class="panel-sub">Desktop Supervisor</p>
+        </div>
+      </div>
+
+      <nav class="spv-nav">
+        <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+        <a href="target.html" id="navTarget" class="active"><i class="fa-solid fa-bullseye"></i>Target</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Wiraniaga</a>
+        <a href="approval.html" id="navApproval"><i class="fa-solid fa-check-to-slot"></i>Approval<span class="nav-badge" id="navApprovalBadge" style="display:none;">0</span></a>
+        <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+        <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-bullhorn"></i>Briefing Auto-Gen</a>
+        <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
+        <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
+        <a href="kelola_data.html" id="navKelola"><i class="fa-solid fa-database"></i>Kelola Data</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <main class="spv-main">
+      <div class="spv-topbar">
+        <div>
+          <h2 id="pageTitle">Monitoring Target SPK &amp; DO</h2>
+          <p class="page-sub" id="boardPeriode">Memuat periode...</p>
+        </div>
+        <div class="spv-user">
+          <div class="avatar-status">
+            <img id="spvAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
+          </div>
+          <div class="meta">
+            <span class="name" id="spvNama">Memuat...</span>
+            <span class="role" id="spvRole">Memuat...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= BOARD MONITORING UTAMA ================= -->
+      <section class="spv-card">
+        <!-- ================= PODIUM SALES RACE CONTEST ================= -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius:16px; padding:20px; color:white; margin-bottom:20px; box-shadow:0 10px 25px rgba(0,0,0,0.15);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="background:rgba(217,119,6,0.2); color:#fbbf24; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">
+                <i class="fa-solid fa-trophy"></i> Sales Race Contest
+              </span>
+              <h2 style="font-size:18px; font-weight:800; color:white; margin:6px 0 2px;">Klasemen Top Sales Tim SPV</h2>
+              <p style="font-size:12px; color:#94a3b8; margin:0;">Kompetisi performa pencapaian SPK & Trade-In OLX teratas bulan ini</p>
+            </div>
+            <button class="btn" style="background:#d97706; color:white; font-weight:700; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;" onclick="apresiasiPemenang()">
+              <i class="fa-solid fa-gift"></i> Beri Bonus Apresiasi
+            </button>
+          </div>
+
+          <div id="podiumCardsContainer" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+            <!-- Dynamic Podium Cards from DB -->
+          </div>
+        </div>
+
+        <div class="card-head">
+          <div>
+            <h1 class="title"><i class="fa-solid fa-chalkboard-user"></i> Papan Pencapaian SPK &amp; DO</h1>
+            <p class="subtitle">Klik "Atur" untuk mengubah target &amp; realisasi tiap wiraniaga</p>
+          </div>
+          <div class="actions">
+            <span class="branch-chip"><i class="fa-solid fa-building"></i> Tunas Toyota Kiara Condong</span>
+          </div>
+        </div>
+
+        <!-- Baris Filter & Pencarian -->
+        <div class="toolbar">
+          <div class="select-box">
+            <i class="fa-solid fa-crown" style="color: #f59e0b;"></i>
+            <span class="lbl">Tim:</span>
+            <select id="selectFilterSpvTarget" onchange="loadMonitoringBoard()" style="font-weight:700;">
+              <option value="Semua">👑 Semua Tim (Master - 42 Sales)</option>
+              <option value="Ryan">Tim Pak Ryan</option>
+              <option value="Riva">Tim Pak Riva</option>
+              <option value="Dani">Tim Pak Dani</option>
+              <option value="Hendra">Tim Pak Hendra</option>
+            </select>
+          </div>
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchSalesMonitoring" placeholder="Cari nama wiraniaga..."
+              onkeyup="filterSalesMonitoring()">
+          </div>
+          <div class="select-box">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span class="lbl">Bulan:</span>
+            <select id="selectBulanMonitoring" onchange="loadMonitoringBoard()">
+              <option value="1">Januari</option>
+              <option value="2">Februari</option>
+              <option value="3">Maret</option>
+              <option value="4">April</option>
+              <option value="5">Mei</option>
+              <option value="6">Juni</option>
+              <option value="7">Juli</option>
+              <option value="8">Agustus</option>
+              <option value="9">September</option>
+              <option value="10">Oktober</option>
+              <option value="11">November</option>
+              <option value="12">Desember</option>
+            </select>
+          </div>
+          <div class="spacer"></div>
+          <!-- Legenda kelompok kolom -->
+          <div class="board-legend">
+            <span class="lg lg-target">Target</span>
+            <span class="lg lg-actual">Actual</span>
+            <span class="lg lg-eval">Evaluasi 4 Bulan</span>
+          </div>
+        </div>
+
+        <div class="mobile-swipe-hint"><i class="fa-solid fa-arrows-left-right"></i> Geser tabel ke samping untuk melihat semua kolom</div>
+        <div class="table-responsive">
+          <table class="table table-board">
+            <thead>
+              <tr>
+                <th rowspan="2" class="num" style="width:44px;">No</th>
+                <th rowspan="2" style="min-width:170px;">Wiraniaga</th>
+                <th rowspan="2" style="width:150px;">Tingkatan</th>
+                <th colspan="2" class="th-group th-target">Target Bulan Ini</th>
+                <th colspan="3" class="th-group th-actual">Actual Bulan Ini</th>
+                <th colspan="2" class="th-group th-eval">Evaluasi (4 Bulan)</th>
+                <th rowspan="2" style="min-width:220px;">Plan SPK</th>
+                <th rowspan="2" class="num" style="width:96px;">Aksi</th>
+              </tr>
+              <tr>
+                <th class="num th-sub th-target" style="width:60px;">SPK</th>
+                <th class="num th-sub th-target" style="width:60px;">DO</th>
+                <th class="num th-sub th-actual" style="width:60px;">SPK</th>
+                <th class="num th-sub th-actual" style="width:60px;">DO</th>
+                <th class="num th-sub th-actual" style="width:88px;">% SPK</th>
+                <th class="num th-sub th-eval" style="width:80px;">Target DO</th>
+                <th class="num th-sub th-eval" style="width:80px;">Actual DO</th>
+              </tr>
+            </thead>
+            <tbody id="boardBody">
+              <tr>
+                <td colspan="12" class="loading-state">Memuat data papan monitoring...</td>
+              </tr>
+            </tbody>
+            <tfoot id="boardFooter" style="display: none;">
+              <tr>
+                <td colspan="5" style="text-align:right; font-weight:700;">Total Keseluruhan</td>
+                <td id="totActualSPKBulan" class="num" style="color:var(--green);">0</td>
+                <td id="totActualDOBulan" class="num" style="color:var(--green);">0</td>
+                <td></td>
+                <td></td>
+                <td id="totActualDOEval" class="num" style="color:var(--blue);">0</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ================= DETAIL/EDIT MODAL ================= -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-content" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3 id="modalTitle">Atur Target &amp; Realisasi</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height: 85vh; overflow-y: auto;">
+        <form id="targetForm" onsubmit="saveTargetForm(event)">
+          <input type="hidden" id="formIdTargetBulanan">
+          <input type="hidden" id="formSalesAccountId">
+
+          <div class="form-group">
+            <label><i class="fa-solid fa-calendar-days"></i> Pilih Bulan</label>
+            <select id="selectBulanTarget" class="form-control" onchange="changeBulanTarget()">
+              <option value="1">Januari</option>
+              <option value="2">Februari</option>
+              <option value="3">Maret</option>
+              <option value="4">April</option>
+              <option value="5">Mei</option>
+              <option value="6">Juni</option>
+              <option value="7">Juli</option>
+              <option value="8">Agustus</option>
+              <option value="9">September</option>
+              <option value="10">Oktober</option>
+              <option value="11">November</option>
+              <option value="12">Desember</option>
+            </select>
+          </div>
+
+          <div id="loadingDataTarget" class="loading-state" style="display: none;">
+            <i class="fa-solid fa-spinner fa-spin"></i>Memuat data...
+          </div>
+
+          <div id="formTargetContainer">
+            <!-- Target Bulanan -->
+            <div class="field-section fs-target">
+              <h4><i class="fa-solid fa-bullseye"></i> Target Bulanan</h4>
+              <div class="field-grid">
+                <div>
+                  <label>Target SPK (unit)</label>
+                  <input type="number" id="modalTargetSPK" class="form-control num-input" value="0">
+                </div>
+                <div>
+                  <label>Target DO (unit)</label>
+                  <input type="number" id="modalTargetDO" class="form-control num-input" value="0">
+                </div>
+              </div>
+              <span class="field-hint">Dapat diubah manual — mengabaikan nilai default tingkatan</span>
+            </div>
+
+            <!-- Actual / Realisasi -->
+            <div class="field-section fs-actual">
+              <h4><i class="fa-solid fa-chart-line"></i> Actual / Realisasi</h4>
+              <div class="field-grid">
+                <div>
+                  <label>Actual SPK (unit)</label>
+                  <input type="number" id="modalRealisasiSPK" class="form-control num-input" value="0">
+                </div>
+                <div>
+                  <label>Actual DO (unit)</label>
+                  <input type="number" id="modalRealisasiDO" class="form-control num-input" value="0">
+                </div>
+              </div>
+              <span class="field-hint">Isi sesuai pencapaian aktual wiraniaga</span>
+            </div>
+
+            <!-- Plan SPK -->
+            <div class="field-section fs-plan">
+              <h4><i class="fa-solid fa-note-sticky"></i> Plan SPK / Rencana Unit</h4>
+              <label>Tulis rencana model/tipe mobil</label>
+              <input type="text" id="modalPlanSPK" class="form-control"
+                placeholder="Contoh: Avanza / Veloz / Calya / Rush">
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
+              <button type="submit" class="btn btn-primary" id="saveBtn">
+                <i class="fa-solid fa-save"></i> Simpan
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <script src="../js/spv_target.js?v=20260819_master"></script>
+
+  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/spv_global.js"></script>
+</body>
+
+</html>

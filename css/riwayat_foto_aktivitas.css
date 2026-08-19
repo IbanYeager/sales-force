@@ -1,0 +1,397 @@
+/* css/riwayat_foto_aktivitas.css — Modern Premium Photo Gallery (Google/Apple Photos Style) */
+
+:root {
+  --gallery-bg: #f8fafc;
+  --card-radius: 14px;
+  --primary-accent: #c8102e;
+  --navy-dark: #0d1b3e;
+}
+
+/* Gallery Header Hero Bar */
+.gallery-top-hero {
+  background: linear-gradient(135deg, #0d1b3e 0%, #1e293b 100%);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(13, 27, 62, 0.15);
+}
+
+.hero-left h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+}
+
+.hero-left p {
+  margin: 3px 0 0 0;
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.hero-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-mode-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-mode-btn:hover, .view-mode-btn.active {
+  background: #c8102e;
+  color: #ffffff;
+  border-color: #c8102e;
+}
+
+/* Compact Filter Bar */
+.gallery-filter-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Date Pills Scroll */
+.date-scroll-wrapper {
+  display: flex;
+  overflow-x: auto;
+  gap: 6px;
+  padding: 2px 0 4px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.date-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.date-pill-btn {
+  flex: 0 0 auto;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.date-pill-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.date-pill-btn.active {
+  background: #0d1b3e;
+  color: #ffffff;
+  border-color: #0d1b3e;
+  box-shadow: 0 2px 8px rgba(13, 27, 62, 0.25);
+}
+
+.date-pill-count {
+  background: rgba(0, 0, 0, 0.07);
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 10px;
+}
+
+.date-pill-btn.active .date-pill-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Session Buttons Row */
+.session-filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.session-pill-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.session-pill-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.session-pill-btn.active {
+  background: #c8102e;
+  color: #ffffff;
+  border-color: #c8102e;
+  box-shadow: 0 2px 8px rgba(200, 16, 46, 0.25);
+}
+
+/* Date Timeline Section Header */
+.timeline-date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px 10px 4px;
+  margin-top: 14px;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 12px;
+}
+
+.timeline-date-title {
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.timeline-date-count {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+
+/* Photo Grid Layouts */
+.compact-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Wide Desktop: 5-6 columns */
+@media (min-width: 1200px) {
+  .compact-photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .compact-photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .compact-photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+/* Modern Photo Card Tile (Pure & Integrated) */
+.gallery-photo-card {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  background: #e2e8f0;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.gallery-photo-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(13, 27, 62, 0.18);
+  border-color: #cbd5e1;
+  z-index: 2;
+}
+
+.gallery-photo-card img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+  display: block;
+}
+
+.gallery-photo-card:hover img {
+  transform: scale(1.08);
+}
+
+/* Clean Hover Effect without text overlay covering the photo */
+.photo-clean-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(13, 27, 62, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.gallery-photo-card:hover .photo-clean-hover {
+  opacity: 1;
+}
+
+.hover-expand-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0d1b3e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transform: scale(0.85);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gallery-photo-card:hover .hover-expand-circle {
+  transform: scale(1);
+}
+
+/* Fullscreen Lightbox Modal */
+.gallery-lightbox-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 10, 20, 0.96);
+  backdrop-filter: blur(12px);
+  z-index: 99999;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 20px;
+  box-sizing: border-box;
+}
+
+.gallery-lightbox-modal.active {
+  display: flex;
+}
+
+.lightbox-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+}
+
+.lightbox-img-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.lightbox-img-stage img {
+  max-width: 100%;
+  max-height: 76vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  user-select: none;
+}
+
+.lightbox-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.lightbox-nav-btn:hover {
+  background: #c8102e;
+  border-color: #c8102e;
+}
+
+.lightbox-nav-btn.prev { left: 15px; }
+.lightbox-nav-btn.next { right: 15px; }
+
+.lightbox-bottom-info {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+  flex-wrap: wrap;
+  gap: 10px;
+}

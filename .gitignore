@@ -1,0 +1,26 @@
+# Temporary and Scratch Files
+scratch/
+*.tmp
+*.log
+
+# Large / Installer / Archive Files
+*.zip
+*.rar
+*.7z
+*.msi
+*.exe
+*.bat
+Chat WhatsApp*
+update ai.xlsx
+"TD Test Drive (1).pdf"
+
+# User Uploads (Upload manual 1x ke Hostinger agar Git super cepat & tidak bentrok)
+uploads/*
+!uploads/.gitkeep
+!uploads/*/.gitkeep
+
+# IDE & Configs
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

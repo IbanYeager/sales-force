@@ -1,0 +1,471 @@
+/* ================================================================
+   KELOLA DATA — tab kategori, tabel master data, modal
+   Nama class dipertahankan agar spv_kelola.js tetap bekerja.
+   ================================================================ */
+
+/* ---------------- Tab kategori (pill) ---------------- */
+.data-tabs-container h3 {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.data-tab {
+  padding: 9px 15px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-2);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-tab i {
+  font-size: 13px;
+  color: var(--faint);
+  transition: var(--transition);
+}
+
+.data-tab.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.data-tab.active i {
+  color: #fff;
+}
+
+.data-tab:hover:not(.active) {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--faint);
+}
+
+.data-content {
+  display: none;
+}
+
+.data-content.active {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------- Toolbar atas tabel ---------------- */
+.top-action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.top-action-bar h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* ---------------- Tabel ---------------- */
+.data-table-wrapper {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  max-height: calc(100vh - 320px);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 11px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.data-table th {
+  background: var(--surface-2);
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.data-table td {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.data-table tbody tr:nth-child(even) td {
+  background: #fafbfd;
+}
+
+.data-table tbody tr:hover td {
+  background: var(--blue-soft);
+}
+
+/* ---------------- Tombol aksi baris ---------------- */
+.action-btn {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-edit {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-color: var(--blue-border);
+}
+
+.btn-edit:hover {
+  background: var(--blue);
+  color: #fff;
+}
+
+.btn-del {
+  background: var(--red-soft);
+  color: var(--red);
+  border-color: var(--red-border);
+  margin-left: 4px;
+}
+
+.btn-del:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ---------------- Accordion (grup model) ---------------- */
+.accordion-header {
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+  padding: 13px 16px !important;
+  font-size: 12.5px !important;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+.accordion-header i {
+  color: var(--muted) !important;
+  transition: transform 0.25s;
+}
+
+.accordion-header:hover {
+  background: var(--border) !important;
+}
+
+/* ================================================================
+   INPUT — search & form
+   ================================================================ */
+.form-input {
+  width: 100%;
+  padding: 0 14px;
+  height: 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  transition: var(--transition);
+  box-sizing: border-box;
+}
+
+textarea.form-input {
+  height: auto;
+  padding: 12px 14px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(36, 88, 197, 0.12);
+}
+
+.form-input::placeholder {
+  color: var(--faint);
+}
+
+/* Ikon search di dalam field (posisi absolut dari HTML inline) */
+.top-action-bar .fa-search {
+  color: var(--faint) !important;
+}
+
+/* ================================================================
+   MODAL — dua varian (modal-box lama & modal-content baru)
+   ================================================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+  z-index: 1000;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Varian modal-box */
+.modal-box {
+  background: var(--surface);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(14px);
+  transition: 0.25s;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-overlay.show .modal-box {
+  transform: translateY(0);
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+/* Varian modal-content (header + body) */
+.modal-content {
+  background: var(--surface);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(14px);
+  transition: 0.25s;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-overlay.show .modal-content {
+  transform: translateY(0);
+}
+
+.modal-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface-2);
+}
+
+.modal-body {
+  padding: 22px;
+  overflow-y: auto;
+}
+
+.close-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.close-modal:hover {
+  color: var(--brand);
+  background: var(--red-soft);
+  border-color: var(--red-border);
+}
+
+/* ---------------- Form group di modal ---------------- */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-2);
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  box-sizing: border-box;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(36, 88, 197, 0.12);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+@media (max-width: 800px) {
+  .data-table-wrapper {
+    max-height: none;
+  }
+
+  .top-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .top-action-bar > div {
+    width: 100%;
+  }
+}
+
+/* ================================================================
+   MOBILE — field pencarian penuh, modal jadi bottom-sheet
+   ================================================================ */
+@media (max-width: 900px) {
+  /* Field search inline (width:220px dari HTML) dipaksa penuh */
+  .top-action-bar [style*="position:relative"] {
+    width: 100%;
+  }
+
+  .top-action-bar .form-input {
+    width: 100% !important;
+  }
+
+  .top-action-bar .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .top-action-bar > div[style*="display:flex"] {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px !important;
+  }
+
+  .data-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .data-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .data-tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal-box,
+  .modal-content {
+    max-width: 100% !important;
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    max-height: 92dvh;
+  }
+
+  .modal-body,
+  .modal-box {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom));
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+}

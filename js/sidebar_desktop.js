@@ -1,0 +1,603 @@
+/**
+ * sidebar_desktop.js
+ * Injects the desktop sidebar HTML into any page and populates user info.
+ * Works on both root (index.html) and sub-pages (pages/*.html).
+ */
+(function initDesktopSidebar() {
+
+    // ── Determine path prefix ───────────────────────────────
+    const path = window.location.pathname;
+    const isRoot = !path.includes('/pages/') && !path.includes('/pages_spv/') && !path.includes('/pages_kacab/');
+    const prefix = isRoot ? '' : '../';
+
+    // ── Build sidebar HTML based on Role ────────────────────
+    function buildSidebar() {
+        const role = localStorage.getItem('peranSales');
+        if (role === 'Kepala Cabang') {
+            return buildSidebarKacab();
+        }
+        if (role === 'Supervisor') {
+            return buildSidebarSPV();
+        }
+        return buildSidebarSales();
+    }
+
+    // ── Kacab Sidebar Builder ───────────────────────────────
+    function buildSidebarKacab() {
+        const nav = document.createElement('nav');
+        nav.className = 'desktop-sidebar desktop-sidebar-kacab';
+        nav.id = 'desktopSidebar';
+
+        let curPage = path.split('/').pop().split('?')[0].split('#')[0] || 'index_kacab';
+        curPage = curPage.replace('.html', '');
+
+        function navLinkKacab(href, icon, label) {
+            const fullHref = prefix + href;
+            let hrefPage = href.split('/').pop().replace('.html', '');
+            const isActive = (curPage === hrefPage) ? ' active' : '';
+            return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
+        }
+
+        nav.innerHTML = `
+            <div class="sidebar-brand">
+                <a href="${prefix}pages_kacab/index_kacab.html" class="sidebar-brand-logo" title="Tunas Toyota">
+                    <img src="${prefix}image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
+                </a>
+                <div style="font-size:10px; font-weight:800; color:#d8a437; background:rgba(216,164,55,0.15); padding:2px 8px; border-radius:6px; margin-top:6px; display:inline-block; border:1px solid rgba(216,164,55,0.3);">
+                    <i class="fa-solid fa-building-user"></i> KACAB PANEL
+                </div>
+            </div>
+
+            <a href="${prefix}pages_kacab/index_kacab.html" class="sidebar-user-card">
+                <img src="https://ui-avatars.com/api/?name=KC&background=1e1014&color=d8a437&bold=true"
+                    alt="Profile" class="sidebar-user-avatar" id="sidebarAvatar">
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name" id="sidebarNama">Kepala Cabang</span>
+                    <span class="sidebar-user-role" id="sidebarRole" style="color:#d8a437;">Kepala Cabang</span>
+                </div>
+                <div class="sidebar-user-dot" style="background:#d8a437;"></div>
+            </a>
+
+            <div class="sidebar-nav">
+                <p class="sidebar-nav-label">Menu Kepala Cabang</p>
+                ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
+                ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
+                ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data 42 Wiraniaga')}
+                ${navLinkKacab('pages_kacab/approval_kacab.html', 'fa-solid fa-clipboard-check', 'Otorisasi & Approval')}
+                ${navLinkKacab('pages_kacab/target_kacab.html', 'fa-solid fa-bullseye', 'Target & Produktivitas')}
+                ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}
+                ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
+                ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
+                ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
+            </div>
+
+            <div class="sidebar-bottom">
+                <button onclick="logoutUser()" class="sidebar-notif-btn" style="background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.2); width:100%; justify-content:center; cursor:pointer;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                </button>
+            </div>
+        `;
+        return nav;
+    }
+
+    // ── SPV Sidebar Builder ─────────────────────────────────
+    function buildSidebarSPV() {
+        const nav = document.createElement('nav');
+        nav.className = 'desktop-sidebar desktop-sidebar-spv';
+        nav.id = 'desktopSidebar';
+
+        let curPage = path.split('/').pop().split('?')[0].split('#')[0] || 'index_spv';
+        curPage = curPage.replace('.html', '');
+
+        function navLinkSPV(href, icon, label) {
+            const fullHref = prefix + href;
+            let hrefPage = href.split('/').pop().replace('.html', '');
+            const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv')) ? ' active' : '';
+            return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
+        }
+
+        nav.innerHTML = `
+            <div class="sidebar-brand">
+                <a href="${prefix}pages_spv/index_spv.html" class="sidebar-brand-logo" title="Tunas Toyota">
+                    <img src="${prefix}image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
+                </a>
+                <div style="font-size:10px; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.15); padding:2px 8px; border-radius:6px; margin-top:6px; display:inline-block; border:1px solid rgba(56,189,248,0.3);">
+                    <i class="fa-solid fa-user-tie"></i> SPV PANEL
+                </div>
+            </div>
+
+            <a href="${prefix}pages_spv/index_spv.html" class="sidebar-user-card">
+                <img src="https://ui-avatars.com/api/?name=SPV&background=1c2740&color=ffffff&bold=true"
+                    alt="Profile" class="sidebar-user-avatar" id="sidebarAvatar">
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name" id="sidebarNama">Supervisor</span>
+                    <span class="sidebar-user-role" id="sidebarRole">Supervisor</span>
+                </div>
+                <div class="sidebar-user-dot"></div>
+            </a>
+
+            <div class="sidebar-nav">
+                <p class="sidebar-nav-label">Menu Supervisor</p>
+                ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
+                ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
+                ${navLinkSPV('pages_spv/wiraniaga.html', 'fa-solid fa-users', 'Wiraniaga')}
+                ${navLinkSPV('pages_spv/approval.html', 'fa-solid fa-check-to-slot', 'Approval <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
+                ${navLinkSPV('pages_spv/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas <span class="sidebar-notif-badge" id="sidebarAktivitasBadge" style="display:none; margin-left:auto; background:#2563eb;">0</span>')}
+                ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-bullhorn', 'Briefing Auto-Gen')}
+                ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
+                ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
+                ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
+                ${navLinkSPV('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
+            </div>
+
+            <div class="sidebar-bottom">
+                <button onclick="logoutUser()" class="sidebar-notif-btn" style="background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.2); width:100%; justify-content:center; cursor:pointer;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                </button>
+            </div>
+        `;
+        return nav;
+    }
+
+    // ── Sales Sidebar Builder ───────────────────────────────
+    function buildSidebarSales() {
+        const nav = document.createElement('nav');
+        nav.className = 'desktop-sidebar';
+        nav.id = 'desktopSidebar';
+
+        // Active link detection
+        let curPage = path.split('/').pop() || 'index';
+        curPage = curPage.replace('.html', '');
+
+        function navLink(href, icon, label) {
+            const fullHref = prefix + href;
+            let hrefPage = href.split('/').pop();
+            hrefPage = hrefPage.replace('.html', '');
+            const isActive = (curPage === hrefPage || (curPage === '' && hrefPage === 'index')) ? ' active' : '';
+            return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
+        }
+
+        nav.innerHTML = `
+            <div class="sidebar-brand">
+                <a href="${prefix}index.html" class="sidebar-brand-logo" title="Tunas Toyota">
+                    <img src="${prefix}image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
+                </a>
+            </div>
+
+            <a href="${prefix}pages/profil.html" class="sidebar-user-card">
+                <img src="https://ui-avatars.com/api/?name=S&background=f4f7f6&color=c8102e&bold=true"
+                    alt="Profile" class="sidebar-user-avatar" id="sidebarAvatar">
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name" id="sidebarNama">Memuat...</span>
+                    <span class="sidebar-user-role" id="sidebarRole">Sales</span>
+                </div>
+                <div class="sidebar-user-dot"></div>
+            </a>
+
+            <div class="sidebar-nav">
+                <p class="sidebar-nav-label">Menu Utama</p>
+                ${navLink('index.html', 'fa-solid fa-house', 'Dashboard')}
+                ${navLink('pages/input.html', 'fa-solid fa-camera', 'Input Aktivitas')}
+                ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas')}
+                ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian')}
+                ${navLink('pages/checkin.html', 'fa-solid fa-location-crosshairs', 'Check-In Canvassing GPS')}
+                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Jadwal Aktivitas')}
+
+                <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
+                ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR')}
+                ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Multi-Leasing')}
+                ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)')}
+                ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar')}
+                ${navLink('pages/spk.html', 'fa-solid fa-file-signature', 'Form SPK')}
+                ${navLink('pages/quotation.html', 'fa-solid fa-file-contract', 'Smart Digital Quotation')}
+                ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor')}
+                ${navLink('pages/order_tracker.html', 'fa-solid fa-truck-ramp-box', 'Live Delivery Tracker')}
+                ${navLink('pages/tradein.html', 'fa-solid fa-right-left', 'Trade-In & Over-Kredit')}
+                ${navLink('pages/leasing_matrix.html', 'fa-solid fa-scale-balanced', 'Leasing Approval Odds')}
+
+                <p class="sidebar-nav-label">Tier 2: AI Tools, Komunikasi & Delivery</p>
+                ${navLink('pages/wa_studio.html', 'fa-brands fa-whatsapp', 'WA Broadcast Studio')}
+                ${navLink('pages/ai_copilot.html', 'fa-solid fa-wand-magic-sparkles', 'AI Sales Copilot')}
+                ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)')}
+                ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub')}
+                ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony')}
+                ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)')}
+                ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline')}
+                ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Test Drive Showroom')}
+                ${navLink('pages/rental_testdrive.html', 'fa-solid fa-handshake-simple', 'Test Drive Rekanan Rental')}
+                ${navLink('pages/approval.html', 'fa-solid fa-check-to-slot', 'Approval Diskon <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
+                ${navLink('pages/dokumen.html', 'fa-solid fa-receipt', 'Manajemen Dokumen')}
+
+                <p class="sidebar-nav-label">Tier 3: Product Knowledge & Pasar</p>
+                ${navLink('pages/eco_calculator.html', 'fa-solid fa-leaf', 'Toyota Eco Calc (Hybrid)')}
+                ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°')}
+                ${navLink('pages/brosur.html', 'fa-solid fa-book-open', 'Brosur Digital')}
+                ${navLink('pages/elibrary.html', 'fa-solid fa-book-medical', 'E-Library Panduan Sales')}
+                ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Analisis Pasar Kecamatan')}
+                ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Wilayah Polreg')}
+                ${navLink('pages/kecamatan.html', 'fa-solid fa-map-pin', 'Lookup Kecamatan & Kodepos')}
+                ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong')}
+
+                <p class="sidebar-nav-label">Tier 4: Trade-In, Aksesoris & Merch</p>
+                ${navLink('pages/olx.html', 'fa-solid fa-exchange-alt', 'OLX Appraisal')}
+                ${navLink('pages/inspeksi.html', 'fa-solid fa-car-rear', 'Prospek Inspeksi Mobil')}
+                ${navLink('pages/jadwal_inspeksi.html', 'fa-solid fa-calendar-check', 'Jadwal Inspeksi Showroom')}
+                ${navLink('pages/tco.html', 'fa-solid fa-car-tunnel', 'Aksesoris TCO & Builder')}
+                ${navLink('pages/velg.html', 'fa-solid fa-compact-disc', 'Velg & Ban Customizer')}
+                ${navLink('pages/merchandise.html', 'fa-solid fa-shirt', 'Merchandise Toyota')}
+
+                <p class="sidebar-nav-label">Tier 5: Refreshment & Arcade Games</p>
+                ${navLink('pages/game.html', 'fa-solid fa-gamepad', 'Toyota Arcade Center')}
+                ${navLink('pages/drag_race.html', 'fa-solid fa-gauge-high', 'Toyota Drag Strip')}
+                ${navLink('pages/valet_park.html', 'fa-solid fa-square-parking', 'Valet Parking VIP')}
+                ${navLink('pages/hybrid_flow.html', 'fa-solid fa-bolt', 'Hybrid Energy Flow')}
+                ${navLink('pages/pitstop.html', 'fa-solid fa-wrench', 'GR Pit Stop Challenge')}
+                ${navLink('pages/memory_match.html', 'fa-solid fa-clone', 'Toyota Memory Match')}
+                ${navLink('pages/catur.html', 'fa-solid fa-chess-knight', 'Toyota Catur Master')}
+                ${navLink('pages/balap.html', 'fa-solid fa-flag-checkered', 'Toyota GR Racing')}
+                ${navLink('pages/snake.html', 'fa-solid fa-gas-pump', 'Parkir Drift & Fuel Rush')}
+                ${navLink('pages/tebak.html', 'fa-solid fa-brain', 'Tebak Otomotif')}
+                ${navLink('pages/tts.html', 'fa-solid fa-puzzle-piece', 'TTS Otomotif')}
+                ${navLink('pages/tss-simulator.html', 'fa-solid fa-shield-halved', 'Simulator TSS 3.0')}
+            </div>
+
+            <div class="sidebar-bottom">
+                <a href="${prefix}pages/notifikasi.html" class="sidebar-notif-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    Notifikasi
+                    <span class="sidebar-notif-badge" id="sidebarBellBadge" style="display:none;">0</span>
+                </a>
+                <a href="${prefix}pages/profil.html" class="sidebar-notif-btn" style="margin-top:4px;">
+                    <i class="fa-solid fa-user"></i>
+                    Profil Saya
+                </a>
+            </div>
+        `;
+        return nav;
+    }
+
+    // ── Inject sidebar & wrap layout ────────────────────────
+    function injectSidebar() {
+        // Skip on login pages and public card / tracking pages
+        if (path.includes('login') || path.includes('public_card') || path.includes('track_public')) {
+            if (document.body) document.body.classList.add('sidebar-loaded');
+            return;
+        }
+
+        // If this page already has a #desktopSidebar (e.g. index.html), update content to ensure menu is sync'd
+        let existingSidebar = document.getElementById('desktopSidebar');
+        if (existingSidebar) {
+            const newSidebar = buildSidebar();
+            existingSidebar.innerHTML = newSidebar.innerHTML;
+            populate();
+            if (document.body) document.body.classList.add('sidebar-loaded');
+            return;
+        }
+
+        // Wrap body content in desktop-shell > desktop-content
+        const body = document.body;
+        const children = Array.from(body.childNodes);
+
+        const shell = document.createElement('div');
+        shell.className = 'desktop-shell';
+
+        const sidebar = buildSidebar();
+        shell.appendChild(sidebar);
+
+        const contentWrap = document.createElement('div');
+        contentWrap.className = 'desktop-content';
+
+        // Move existing children into contentWrap
+        children.forEach(child => contentWrap.appendChild(child));
+
+        shell.appendChild(contentWrap);
+        body.appendChild(shell);
+
+        populate();
+        body.classList.add('sidebar-loaded');
+    }
+
+    // ── Populate user data ──────────────────────────────────
+    function populate() {
+        const roleSales = localStorage.getItem('peranSales') || 'Sales';
+        const namaSales = localStorage.getItem('namaSales') || (roleSales === 'Kepala Cabang' ? 'Kepala Cabang' : (roleSales === 'Supervisor' ? 'Supervisor' : 'Sales'));
+        const cabangSales = localStorage.getItem('cabangSales') || '';
+        const idSales = localStorage.getItem('idSales') || 0;
+
+        const elNama = document.getElementById('sidebarNama');
+        if (elNama) elNama.textContent = namaSales;
+
+        const elRole = document.getElementById('sidebarRole');
+        if (elRole) elRole.textContent = cabangSales ? `${roleSales} · ${cabangSales}` : roleSales;
+
+        const elAvatar = document.getElementById('sidebarAvatar');
+        if (elAvatar) {
+            const foto = localStorage.getItem('fotoSales');
+            if (foto && foto.trim() !== '') {
+                elAvatar.src = foto;
+            } else {
+                const initials = namaSales.split(' ').slice(0, 2).map(w => w[0]).join('');
+                const bg = roleSales === 'Kepala Cabang' ? '1e1014' : (roleSales === 'Supervisor' ? '1c2740' : 'f4f7f6');
+                const fg = roleSales === 'Kepala Cabang' ? 'd8a437' : (roleSales === 'Supervisor' ? 'ffffff' : 'c8102e');
+                elAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials || namaSales)}&background=${bg}&color=${fg}&bold=true`;
+            }
+        }
+
+        window.logoutUser = function() {
+            const role = localStorage.getItem('peranSales');
+            localStorage.clear();
+            if (role === 'Kepala Cabang') {
+                window.location.href = prefix + 'pages/login_kacab.html';
+            } else if (role === 'Supervisor') {
+                window.location.href = prefix + 'pages/login_spv.html';
+            } else {
+                window.location.href = prefix + 'pages/login.html';
+            }
+        };
+
+        // ── Visual Notification Toast ──────────────────────────
+        window.showToastNotification = function (msg) {
+            let toastContainer = document.getElementById('toast-container-global');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container-global';
+                toastContainer.style.cssText = 'position:fixed;top:20px;right:20px;z-index:999999;display:flex;flex-direction:column;gap:10px;pointer-events:none;';
+                document.body.appendChild(toastContainer);
+            }
+            const toast = document.createElement('div');
+            toast.style.cssText = 'background:#1e293b;color:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.3);font-family:Inter,sans-serif;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(-20px);transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:auto;border-left:4px solid #ef4444;';
+            toast.innerHTML = `<i class="fa-solid fa-bell" style="color:#ef4444;font-size:18px;"></i> <span>${msg}</span>`;
+            toastContainer.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateY(0)';
+            });
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 5000);
+        };
+
+        // ── Audio Notification Function (Ding-Dong) ────────────
+        window.sharedAudioCtx = null;
+        function initAudio() {
+            if (!window.sharedAudioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) window.sharedAudioCtx = new AudioContext();
+            }
+        }
+
+        // Unlock audio on first interaction
+        document.addEventListener('click', () => {
+            initAudio();
+            if (window.sharedAudioCtx && window.sharedAudioCtx.state === 'suspended') {
+                window.sharedAudioCtx.resume();
+            }
+        }, { once: true });
+
+        window.playNotificationSound = function () {
+            try {
+                initAudio();
+                const ctx = window.sharedAudioCtx;
+                if (!ctx) return;
+                if (ctx.state === 'suspended') ctx.resume();
+
+                function playTone(freq, type, startTime, duration, vol) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, startTime);
+
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(vol, startTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                }
+
+                const t = ctx.currentTime;
+                playTone(1318.51, 'sine', t, 0.4, 0.8);
+                playTone(1318.51, 'triangle', t, 0.4, 0.3);
+                playTone(1046.50, 'sine', t + 0.3, 0.6, 0.8);
+                playTone(1046.50, 'triangle', t + 0.3, 0.6, 0.3);
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        };
+
+        // Restore saved badge count instantly on load
+        (function restoreSalesBadges() {
+            const savedUnread = localStorage.getItem('salesNotifBadgeCount');
+            if (savedUnread !== null && parseInt(savedUnread, 10) > 0) {
+                const count = parseInt(savedUnread, 10);
+                const displayVal = count > 99 ? '99+' : count;
+
+                setTimeout(() => {
+                    const bellBadge = document.getElementById('sidebarBellBadge');
+                    const approvalBadge = document.getElementById('sidebarApprovalBadge');
+                    const headerBadge = document.getElementById('navNotifBadge') || document.getElementById('mobileNotifBadge');
+
+                    if (bellBadge) { bellBadge.textContent = displayVal; bellBadge.style.display = 'flex'; }
+                    if (approvalBadge) { approvalBadge.textContent = displayVal; approvalBadge.style.display = 'inline-flex'; }
+                    if (headerBadge) { headerBadge.textContent = displayVal; headerBadge.style.display = 'inline-flex'; }
+                }, 50);
+            }
+        })();
+
+        // Notification polling
+        const apiBase = prefix + 'api/';
+        let lastUnreadCount = parseInt(localStorage.getItem('salesNotifBadgeCount') || 0, 10);
+        let isFirstLoad = true;
+
+        function checkNotifications() {
+            const params = new URLSearchParams();
+            if (idSales) params.append('sales_account_id', idSales);
+            if (namaSales) params.append('nama_sales', namaSales);
+
+            fetch(`${apiBase}api_notifikasi.php?${params.toString()}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success' && Array.isArray(res.data)) {
+                        const unread = res.data.filter(n => n.unread).length;
+                        localStorage.setItem('salesNotifBadgeCount', unread);
+
+                        const displayVal = unread > 99 ? '99+' : unread;
+                        const bellBadge = document.getElementById('sidebarBellBadge');
+                        const approvalBadge = document.getElementById('sidebarApprovalBadge');
+                        const headerBadge = document.getElementById('navNotifBadge') || document.getElementById('mobileNotifBadge');
+
+                        if (!isFirstLoad) {
+                            if (unread !== lastUnreadCount) {
+                                if (unread > lastUnreadCount) {
+                                    if (typeof window.playNotificationSound === 'function') window.playNotificationSound();
+                                    if (typeof window.showToastNotification === 'function') window.showToastNotification("Notifikasi Baru! Terdapat pembaruan status pengajuan dari Supervisor.");
+                                }
+
+                                // Auto-refresh views
+                                if (typeof window.fetchApprovalList === 'function') window.fetchApprovalList();
+                                if (typeof window.loadTradeInList === 'function') window.loadTradeInList();
+                                if (typeof window.loadDashboardTradeIn === 'function') window.loadDashboardTradeIn();
+                                if (typeof window.loadSpkList === 'function') window.loadSpkList();
+                                if (typeof window.fetchNotifications === 'function') window.fetchNotifications();
+                            }
+                        }
+
+                        lastUnreadCount = unread;
+                        isFirstLoad = false;
+
+                        if (unread > 0) {
+                            if (bellBadge) { bellBadge.textContent = displayVal; bellBadge.style.display = 'flex'; }
+                            if (approvalBadge) { approvalBadge.textContent = displayVal; approvalBadge.style.display = 'inline-flex'; }
+                            if (headerBadge) { headerBadge.textContent = displayVal; headerBadge.style.display = 'inline-flex'; }
+                        } else {
+                            if (bellBadge) bellBadge.style.display = 'none';
+                            if (approvalBadge) approvalBadge.style.display = 'none';
+                            if (headerBadge) headerBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(() => { });
+        }
+
+        checkNotifications();
+        setInterval(checkNotifications, 10000); // Poll every 10 seconds
+
+        // ── Restore & Save Sidebar Scroll Position ──────────────
+        const sidebarNav = document.querySelector('#desktopSidebar .sidebar-nav');
+        if (sidebarNav) {
+            const savedScroll = parseInt(localStorage.getItem('sidebarScrollTop') || 0, 10);
+            if (savedScroll > 0) {
+                sidebarNav.scrollTop = savedScroll;
+                setTimeout(() => { sidebarNav.scrollTop = savedScroll; }, 10);
+            }
+            sidebarNav.addEventListener('scroll', () => {
+                localStorage.setItem('sidebarScrollTop', sidebarNav.scrollTop);
+            });
+        }
+
+        // ── Highlight Active Menu Link ──────────────────────────
+        const navLinks = document.querySelectorAll('#desktopSidebar .sidebar-nav-link');
+        const currentPath = window.location.pathname;
+        let currentClean = currentPath.split('/').pop().split('?')[0].split('#')[0];
+        if (!currentClean) currentClean = 'index';
+        currentClean = currentClean.replace('.html', '');
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            const linkHref = link.getAttribute('href');
+            if (linkHref) {
+                const linkClean = linkHref.split('/').pop().split('?')[0].split('#')[0].replace('.html', '');
+                if (currentClean === linkClean || (currentClean === '' && linkClean === 'index')) {
+                    link.classList.add('active');
+                }
+            }
+        });
+
+        // ── Global Executive Header Upgrader ────────────────────
+        (function upgradeHeaders() {
+            const headers = document.querySelectorAll('.header-page');
+            headers.forEach(header => {
+                if (header.classList.contains('header-upgraded')) return;
+                header.classList.add('header-upgraded');
+
+                // Find title element
+                const h2 = header.querySelector('h2, h1, .header-title');
+                let titleText = h2 ? h2.textContent.trim() : document.title.replace(/^Sales App\s*-\s*/i, '').trim();
+                let titleId = h2 ? h2.id : '';
+
+                // Find back link
+                const backBtn = header.querySelector('a');
+                let backHref = prefix + 'index.html';
+                let backId = backBtn ? backBtn.id : '';
+                if (backBtn && backBtn.getAttribute('href')) {
+                    const hrefVal = backBtn.getAttribute('href');
+                    if (hrefVal && hrefVal !== '#' && !hrefVal.startsWith('javascript:')) {
+                        backHref = hrefVal;
+                    }
+                }
+
+                // Collect non-title & non-backbtn nodes (e.g. right side buttons, badges)
+                const otherNodes = Array.from(header.childNodes).filter(node => {
+                    if (node === h2 || node === backBtn) return false;
+                    if (node.nodeType === 3 && !node.textContent.trim()) return false;
+                    return true;
+                });
+
+                // Re-build inner HTML cleanly
+                header.innerHTML = `
+                    <div class="header-nav-group">
+                        <a href="${backHref}" ${backId ? `id="${backId}"` : ''} class="header-back-btn" title="Kembali ke Dashboard">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                        <div class="header-breadcrumb">
+                            <a href="${prefix}index.html">Dashboard</a>
+                            <span class="header-breadcrumb-sep">/</span>
+                            <span class="active-crumb" ${titleId ? `id="${titleId}"` : ''}>${titleText}</span>
+                        </div>
+                    </div>
+                    <div class="header-right-group"></div>
+                `;
+
+                const rightGroup = header.querySelector('.header-right-group');
+                otherNodes.forEach(node => rightGroup.appendChild(node));
+            });
+        })();
+
+        // Class active untuk bottom-nav sudah diatur langsung dari masing-masing file HTML.
+    }
+
+    // ── Run ────────────────────────────────────────────────
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectSidebar);
+    } else {
+        injectSidebar();
+    }
+
+    // Automatically load AI Copilot Assistant Script for Sales pages only
+    (function loadAiCopilotScript() {
+        const pathLower = path.toLowerCase();
+        if (pathLower.includes('login') || pathLower.includes('spv') || pathLower.includes('kacab') || pathLower.includes('pages_spv') || pathLower.includes('pages_kacab') || pathLower.includes('ai_copilot')) {
+            return;
+        }
+        if (window.aiCopilotLoaded || document.querySelector('script[src*="ai_copilot.js"]')) {
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = prefix + 'js/ai_copilot.js?v=20260819_tstock_wa_share';
+        (document.head || document.documentElement).appendChild(script);
+    })();
+
+    // Safety fallback to ensure page is always visible
+    setTimeout(() => {
+        if (document.body && !document.body.classList.contains('sidebar-loaded')) {
+            document.body.classList.add('sidebar-loaded');
+        }
+    }, 300);
+})();

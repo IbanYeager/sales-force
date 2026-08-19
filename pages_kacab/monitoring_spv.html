@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kacab Desktop - Monitoring SPV</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style_kacab.css">
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#1e1014">
+</head>
+
+<body>
+  <div class="kcb-shell">
+    <!-- SIDEBAR -->
+    <aside class="kcb-sidebar">
+      <div class="kcb-brand-container">
+        <div class="kcb-brand-logo">
+          <img
+            src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png"
+            alt="Tunas Toyota Logo" class="tunas-logo">
+        </div>
+        <div class="kcb-brand-title">
+          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
+          <p class="panel-sub">Kepala Cabang</p>
+        </div>
+      </div>
+
+      <nav class="kcb-nav">
+        <a href="index_kacab.html" id="navDash"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
+        <a href="monitoring_spv.html" id="navMonitoring" class="active"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 42 Wiraniaga</a>
+        <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi & Approval</a>
+        <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target & Produktivitas</a>
+        <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
+        <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas & Riwayat Sales</a>
+        <a href="peta_kunjungan.html" id="navPeta"><i class="fa-solid fa-map-location-dot"></i>Peta GPS Kunjungan</a>
+        <a href="inventory.html" id="navStock"><i class="fa-solid fa-warehouse"></i>Live Stok (1.638 Unit)</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="kcb-main">
+      <div class="kcb-topbar">
+        <div>
+          <h2 id="pageTitle">Monitoring SPV</h2>
+          <p class="page-sub" id="monPeriode">Hierarki tim: klik baris SPV untuk membuka daftar sales-nya</p>
+        </div>
+        <div class="kcb-user">
+          <div class="avatar-status">
+            <img id="kcbAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
+          </div>
+          <div class="meta">
+            <span class="name" id="kcbNama">Memuat...</span>
+            <span class="role" id="kcbRole">Memuat...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kcb-card">
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchHier" placeholder="Cari nama SPV atau sales..." oninput="applyHierFilters()">
+          </div>
+          <div class="select-box">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+            <select id="filterStatusSales" onchange="applyHierFilters()">
+              <option value="">Semua Status</option>
+              <option value="Aktif">Aktif</option>
+              <option value="Tidak Aktif">Tidak Aktif</option>
+            </select>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="toggleAllGroups()" id="btnToggleAll">
+            <i class="fa-solid fa-angles-down"></i> Buka Semua
+          </button>
+          <div class="spacer"></div>
+          <span class="result-count" id="hierCount"></span>
+        </div>
+
+        <div class="hier-cols">
+          <span>SPV / Sales</span>
+          <span>SPK Bulan Ini</span>
+          <span>DO per Evaluasi</span>
+          <span>Pencapaian</span>
+          <span></span>
+        </div>
+
+        <div id="hierContainer" class="hier-table">
+          <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data hierarki...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Drill-down Detail Sales -->
+  <div id="salesDrillModal" class="detail-overlay">
+    <div class="detail-modal wide">
+      <div class="detail-header">
+        <div class="detail-header-left">
+          <div class="detail-header-icon"><i class="fa-solid fa-user"></i></div>
+          <div>
+            <h3 id="drillNama">Detail Sales</h3>
+            <span class="detail-header-sub" id="drillSub">-</span>
+          </div>
+        </div>
+        <button class="detail-close" onclick="closeSalesDrill()" aria-label="Tutup detail"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="detail-body">
+        <div class="detail-status-row">
+          <span id="drillStatusBadge" class="badge badge-approved">Aktif</span>
+          <span class="detail-time" id="drillSpvLabel"><i class="fa-solid fa-user-tie"></i> -</span>
+        </div>
+
+        <div class="drill-stats">
+          <div class="drill-stat">
+            <div class="lbl"><i class="fa-solid fa-file-signature" style="color:var(--blue);"></i> SPK Bulan Ini</div>
+            <div class="val" id="drillSpkVal">0 <small>/ 0 unit</small></div>
+            <div class="track">
+              <div class="fill blue" id="drillSpkBar"></div>
+            </div>
+          </div>
+          <div class="drill-stat">
+            <div class="lbl"><i class="fa-solid fa-truck-fast" style="color:var(--red);"></i> <span
+                id="drillDoLabel">DO per Evaluasi</span></div>
+            <div class="val" id="drillDoVal">0 <small>/ 0 unit</small></div>
+            <div class="track">
+              <div class="fill red" id="drillDoBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="drill-section-title"><i class="fa-solid fa-file-lines"></i> SPK Terbaru</div>
+        <div class="drill-mini-list" id="drillSpkList">
+          <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat...</p>
+        </div>
+
+        <div class="drill-section-title"><i class="fa-solid fa-bolt"></i> Aktivitas Terbaru</div>
+        <div class="drill-mini-list" id="drillActList">
+          <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../custom_alert.js"></script>
+  <script src="../js/kacab_global.js"></script>
+  <script src="../js/kacab_monitoring.js?v=20260819_master"></script>
+
+  <script src="../js/pwa-app.js?v=3"></script>
+</body>
+
+</html>

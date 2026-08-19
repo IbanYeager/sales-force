@@ -1,0 +1,408 @@
+/* ==========================================================================
+   STATISTIK PENJUALAN KIARA CONDONG - STYLESHEET
+   ========================================================================== */
+
+.kircon-hero-card {
+    background: var(--navy-grad, linear-gradient(160deg, #16305f 0%, #0d1b3e 55%, #081029 100%));
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(13, 27, 62, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.kircon-hero-card::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(215, 18, 58, 0.3) 0%, rgba(215, 18, 58, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.kircon-hero-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.kircon-hero-sub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+}
+
+.kircon-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.kircon-kpi-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e8ecf4);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.kircon-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.kircon-kpi-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.kircon-kpi-icon.red {
+    background: rgba(215, 18, 58, 0.1);
+    color: var(--primary-red, #d7123a);
+}
+
+.kircon-kpi-icon.blue {
+    background: rgba(53, 101, 224, 0.1);
+    color: var(--accent-blue, #3565e0);
+}
+
+.kircon-kpi-icon.emerald {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.kircon-kpi-icon.amber {
+    background: rgba(217, 119, 6, 0.1);
+    color: #d97706;
+}
+
+.kircon-kpi-icon.purple {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.kircon-kpi-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted, #66738f);
+    margin-bottom: 4px;
+}
+
+.kircon-kpi-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-dark, #0f1830);
+    line-height: 1.2;
+}
+
+.kircon-kpi-detail {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted, #66738f);
+    margin-top: 6px;
+}
+
+.kircon-filter-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e8ecf4);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+.kircon-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
+.kircon-filter-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted, #66738f);
+    margin-bottom: 6px;
+}
+
+.kircon-filter-group select,
+.kircon-filter-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color, #e8ecf4);
+    background: var(--card-bg, #ffffff);
+    color: var(--text-dark, #0f1830);
+    font-size: 13px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.kircon-filter-group select:focus,
+.kircon-filter-group input:focus {
+    border-color: var(--primary-red, #d7123a);
+    box-shadow: 0 0 0 3px rgba(215, 18, 58, 0.12);
+}
+
+.kircon-btn-reset {
+    background: #f1f5f9;
+    color: var(--text-dark, #0f1830);
+    border: 1px solid var(--border-color, #e8ecf4);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.kircon-btn-reset:hover {
+    background: #e2e8f0;
+}
+
+.kircon-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.kircon-chart-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e8ecf4);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+.kircon-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.kircon-chart-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-dark, #0f1830);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.kircon-chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 260px;
+}
+
+.kircon-table-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e8ecf4);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    margin-bottom: 40px;
+}
+
+.kircon-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border-color, #e8ecf4);
+}
+
+.kircon-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+.kircon-table th {
+    background: #f8fafc;
+    color: var(--text-muted, #66738f);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color, #e8ecf4);
+    white-space: nowrap;
+}
+
+.kircon-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color, #e8ecf4);
+    color: var(--text-dark, #0f1830);
+    white-space: nowrap;
+}
+
+.kircon-table tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.kircon-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.kircon-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.kircon-badge.cash {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.kircon-badge.kredit {
+    background: rgba(53, 101, 224, 0.12);
+    color: #2563eb;
+}
+
+.kircon-badge.leasing {
+    background: rgba(217, 119, 6, 0.12);
+    color: #d97706;
+}
+
+.kircon-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(13, 27, 62, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.kircon-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.kircon-modal-box {
+    background: var(--card-bg, #ffffff);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    transform: translateY(20px);
+    transition: transform 0.25s ease;
+}
+
+.kircon-modal-overlay.active .kircon-modal-box {
+    transform: translateY(0);
+}
+
+.kircon-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color, #e8ecf4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kircon-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-dark, #0f1830);
+}
+
+.kircon-modal-close {
+    background: #f1f5f9;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted, #66738f);
+    transition: background 0.2s;
+}
+
+.kircon-modal-close:hover {
+    background: #e2e8f0;
+    color: var(--text-dark, #0f1830);
+}
+
+.kircon-modal-body {
+    padding: 24px;
+}
+
+.kircon-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.kircon-detail-item {
+    background: #f8fafc;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+}
+
+.kircon-detail-item.full {
+    grid-column: 1 / -1;
+}
+
+.kircon-detail-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted, #66738f);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.kircon-detail-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark, #0f1830);
+    word-break: break-word;
+}

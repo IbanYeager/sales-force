@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales App - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=5.0">
+    <link rel="stylesheet" href="css/index_dashboard.css?v=5.0">
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="image/icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d1b3e">
+</head>
+
+<body>
+
+    <!-- ═══════════════ DESKTOP SHELL ═══════════════ -->
+    <div class="desktop-shell">
+
+        <!-- ═══ SIDEBAR NAVY (desktop/tablet — tersembunyi di mobile) ═══ -->
+        <nav class="desktop-sidebar" id="desktopSidebar">
+
+            <!-- Brand -->
+            <div class="sidebar-brand">
+                <a href="index.html" class="sidebar-brand-logo" title="Tunas Toyota">
+                    <img src="image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
+                </a>
+            </div>
+
+            <!-- User Glass Card -->
+            <a href="pages/profil.html" class="sidebar-user-card">
+                <img src="https://ui-avatars.com/api/?name=Sales&background=eef4fd&color=0d1b3e&bold=true" alt="Profile"
+                    class="sidebar-user-avatar" id="sidebarAvatar">
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name" id="sidebarNama">Memuat...</span>
+                    <span class="sidebar-user-role" id="sidebarRole">Sales</span>
+                </div>
+                <div class="sidebar-user-dot"></div>
+            </a>
+
+            <!-- Navigasi -->
+            <div class="sidebar-nav">
+                <p class="sidebar-nav-label">Menu Utama</p>
+                <a href="index.html" class="sidebar-nav-link active">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+                <a href="pages/input.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-camera"></i> Input Aktivitas
+                </a>
+                <a href="pages/riwayat_foto_aktivitas.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-images"></i> Riwayat Foto Aktivitas
+                </a>
+                <a href="pages/target.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-bullseye"></i> Target &amp; Pencapaian
+                </a>
+
+                <p class="sidebar-nav-label">Tools &amp; AI Superpowers</p>
+                <a href="pages/digital_card.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-address-card"></i> Kartu Nama Digital (vCard)
+                </a>
+                <a href="pages/order_tracker.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-truck-ramp-box"></i> Live Delivery Tracker
+                </a>
+                <a href="pages/leasing_matrix.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-scale-balanced"></i> Leasing Approval Odds
+                </a>
+                <a href="pages/tradein.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-right-left"></i> Trade-In &amp; Over-Kredit
+                </a>
+                <a href="pages/ai_copilot.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Sales Copilot
+                </a>
+                <a href="pages/quotation.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-file-signature"></i> Smart Quotation
+                </a>
+                <a href="pages/wa_studio.html" class="sidebar-nav-link">
+                    <i class="fa-brands fa-whatsapp"></i> WA Studio
+                </a>
+                <a href="pages/komparasi.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-scale-balanced"></i> Komparasi Mobil &amp; NCO
+                </a>
+                <a href="pages/eco_calculator.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-leaf"></i> Toyota Eco Calc (Hybrid)
+                </a>
+                <a href="pages/elibrary.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-book-medical"></i> E-Library
+                </a>
+                <a href="pages/pricelist.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-clipboard-list"></i> Pricelist
+                </a>
+                <a href="pages/promo.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-percent"></i> Promo
+                </a>
+                <a href="pages/kalkulator.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-calculator"></i> Kalkulator Multi-Leasing
+                </a>
+                <a href="pages/inventory.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-warehouse"></i> Live Inventory
+                </a>
+                <a href="pages/polreg.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-map-location-dot"></i> Polreg
+                </a>
+                <a href="pages/penjualan_kircon.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-chart-line"></i> Penjualan Kiara Condong
+                </a>
+                <a href="pages/market_analysis.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-chart-pie"></i> Analisis Pasar Kecamatan
+                </a>
+                <a href="pages/velg.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-compact-disc"></i> Velg &amp; Ban
+                </a>
+
+                <p class="sidebar-nav-label">Customer &amp; Dokumen</p>
+                <a href="pages/customer.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-users"></i> Customer CRM &amp; Radar
+                </a>
+                <a href="pages/retention.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-heart-pulse"></i> After-Sales &amp; Retention
+                </a>
+                <a href="pages/delivery_ceremony.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-award"></i> Delivery Ceremony
+                </a>
+                <a href="pages/testdrive.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-car-side"></i> Test Drive
+                </a>
+                <a href="pages/dokumen.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-receipt"></i> Dokumen
+                </a>
+                <a href="pages/approval.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-check-to-slot"></i> Approval
+                </a>
+                <a href="pages/spk.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-file-signature"></i> Form SPK
+                </a>
+                <a href="pages/deal.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-handshake"></i> Deal
+                </a>
+
+                <p class="sidebar-nav-label">Lainnya</p>
+                <a href="pages/catur.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-chess-knight"></i> Minigame Catur
+                </a>
+                <a href="pages/tts.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-puzzle-piece"></i> TTS
+                </a>
+                <a href="pages/balap.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-car-side"></i> Balap
+                </a>
+                <a href="pages/tebak.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-lightbulb"></i> Tebak
+                </a>
+                <a href="pages/merchandise.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-shirt"></i> Merchandise
+                </a>
+                <a href="pages/tco.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-car-tunnel"></i> Aksesoris TCO
+                </a>
+                <a href="pages/olx.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-exchange-alt"></i> Trade In
+                </a>
+                <a href="pages/brosur.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-book-open"></i> Brosur
+                </a>
+            </div>
+
+            <!-- Bawah: Notifikasi & Profil -->
+            <div class="sidebar-bottom">
+                <a href="pages/notifikasi.html" class="sidebar-notif-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    Notifikasi
+                    <span class="sidebar-notif-badge" id="sidebarBellBadge" style="display:none;">0</span>
+                </a>
+                <a href="pages/profil.html" class="sidebar-notif-btn" style="margin-top:4px;">
+                    <i class="fa-solid fa-user"></i>
+                    Profil Saya
+                </a>
+            </div>
+        </nav>
+
+        <!-- ═══════════════ KONTEN UTAMA ═══════════════ -->
+        <div class="desktop-content">
+
+            <div class="mobile-app">
+
+                <!-- ═══ HERO HEADER ═══ -->
+                <header class="header-home">
+                    <div class="user-info">
+                        <div class="profile-wrap">
+                            <div class="avatar-container" onclick="window.location.href='pages/profil.html'">
+                                <img src="https://ui-avatars.com/api/?name=Sales&background=eef4fd&color=0d1b3e&bold=true"
+                                    alt="Profile" class="avatar" id="dashAvatar">
+                                <div class="status-dot"></div>
+                            </div>
+                            <div class="greeting">
+                                <p id="dashGreeting">Selamat Pagi,</p>
+                                <h2 id="dashNama">
+                                    <div class="skeleton-box skeleton-title" style="margin: 0;"></div>
+                                </h2>
+                                <span class="role" id="dashRole">
+                                    <div class="skeleton-box skeleton-text-short" style="margin: 2px 0;"></div>
+                                </span>
+                                <div class="greeting-meta">
+                                    <span class="spv-label" id="dashSPV">
+                                        <div class="skeleton-box skeleton-text-short" style="margin: 2px 0;"></div>
+                                    </span>
+                                    <span class="location"><i class="fa-solid fa-location-dot"></i> <span
+                                            id="dashCabang">
+                                            <div class="skeleton-box skeleton-text-short"
+                                                style="display:inline-block; margin: 0; vertical-align: middle;"></div>
+                                        </span></span>
+                                    <span class="location"><i class="fa-regular fa-clock"></i> <span
+                                            id="dashClock">00:00:00</span> WIB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bell-icon" onclick="window.location.href='pages/notifikasi.html'">
+                            <a href="pages/notifikasi.html" style="color: inherit;">
+                                <i class="fa-regular fa-bell"></i>
+                            </a>
+                            <div class="badge badge-count-red" id="bellBadge" style="display:none;">0</div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="container">
+
+                    <!-- ═══ KARTU TARGET SPK & DO ═══ -->
+                    <a href="pages/target.html" class="target-link">
+                        <div class="card target-card tgt-card">
+                            <div class="target-header tgt-head">
+                                <span class="tgt-title"><i class="fa-solid fa-bullseye"></i>Target &amp; Pencapaian SPK
+                                    &amp; DO</span>
+                                <span class="target-period" id="dashPeriode">Memuat...</span>
+                            </div>
+
+                            <!-- Grid 3 Metrik -->
+                            <div class="tgt-grid">
+                                <!-- SPK Bulanan -->
+                                <div class="tgt-metric is-blue">
+                                    <span class="tgt-metric-label"><i class="fa-solid fa-file-invoice"></i><span
+                                            id="dashPeriodeSpk">SPK BLN INI</span></span>
+                                    <div class="progress-circle tgt-circle" id="dashCircleSpk">
+                                        <span id="dashPersentaseSpk">0%</span>
+                                    </div>
+                                    <span class="tgt-metric-value"><span id="dashRealisasiSpk">0</span><span
+                                            class="tgt-metric-total"> / <span id="dashTargetSpk">0</span></span></span>
+                                    <div class="linear-progress-bar">
+                                        <div class="linear-progress-fill" id="dashLinearSpk"></div>
+                                    </div>
+                                    <span class="tgt-metric-note" id="dashSisaPesanSpk">Memuat...</span>
+                                </div>
+
+                                <!-- DO Bulanan -->
+                                <div class="tgt-metric is-green">
+                                    <span class="tgt-metric-label"><i class="fa-solid fa-boxes-packing"></i><span>DO BLN
+                                            INI</span></span>
+                                    <div class="progress-circle tgt-circle" id="dashCircleDoBulan">
+                                        <span id="dashPersentaseDoBulan">0%</span>
+                                    </div>
+                                    <span class="tgt-metric-value"><span id="dashRealisasiDoBulan">0</span><span
+                                            class="tgt-metric-total"> / <span
+                                                id="dashTargetDoBulan">0</span></span></span>
+                                    <div class="linear-progress-bar">
+                                        <div class="linear-progress-fill" id="dashLinearDoBulan"></div>
+                                    </div>
+                                    <span class="tgt-metric-note" id="dashSisaPesanDoBulan">Memuat...</span>
+                                </div>
+
+                                <!-- DO Evaluasi -->
+                                <div class="tgt-metric is-teal">
+                                    <span class="tgt-metric-label"><i class="fa-solid fa-truck-ramp-box"></i><span>DO (4
+                                            BLN)</span></span>
+                                    <div class="progress-circle tgt-circle" id="dashCircleDo">
+                                        <span id="dashPersentaseDo">0%</span>
+                                    </div>
+                                    <span class="tgt-metric-value"><span id="dashRealisasiDo">0</span><span
+                                            class="tgt-metric-total"> / <span id="dashTargetDo">0</span></span></span>
+                                    <div class="linear-progress-bar">
+                                        <div class="linear-progress-fill" id="dashLinearDo"></div>
+                                    </div>
+                                    <span class="tgt-metric-note" id="dashSisaPesanDo">Memuat...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- ═══ CTA UTAMA ═══ -->
+                    <a href="pages/input.html" class="btn-input-aktivitas">
+                        <div class="btn-input-left">
+                            <div class="btn-icon-wrapper">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <div class="btn-input-text">
+                                <h4>Input Aktivitas Hari Ini</h4>
+                                <p>Laporkan kegiatan Anda sekarang</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <a href="#" onclick="openModal('spkDoModal', event)" class="btn-input-spk">
+                        <div class="btn-input-left">
+                            <div class="btn-icon-wrapper">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                            <div class="btn-input-text">
+                                <h4>Input Pencapaian SPK &amp; DO</h4>
+                                <p>Laporkan SPK &amp; DO Anda</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <!-- ═══ FITUR UTAMA (PERMANEN: 4 Fitur Paling Kritis & Penting untuk Sales Consultant) ═══ -->
+                    <div class="section-header-row">
+                        <h3 class="section-title"><i class="fa-solid fa-grid-2"
+                                style="color: var(--primary-red); margin-right: 4px;"></i> Fitur Utama</h3>
+                        <a href="#" class="link-lihat-semua" onclick="openFeatureModal(event)">Lihat semua</a>
+                    </div>
+
+                    <!-- 
+                    ══════════════════════════════════════════════════════════════════════════════════════
+                    ⚠️ NOTE PENTING (JANGAN DIUBAH): 
+                    Bagian 'Fitur Utama' ini sengaja dikunci & dibatasi HANYA MENAMPILKAN 4 FITUR UTAMA PALING 
+                    PENTING & KRITIS UNTUK SALES (Pricelist OTR, Kalkulator Kredit, Live Inventory, Customer CRM) 
+                    dengan TEMA ICON MERAH SERAGAM (Toyota Red Gradient) agar efisiensi kerja sales maksimal dan 
+                    tampilan dashboard selalu presisi serta rapi. 
+                    Semua fitur lainnya dapat diakses melalui tombol 'Lihat semua' (pop-up modal featureModal).
+                    ══════════════════════════════════════════════════════════════════════════════════════ 
+                    -->
+                    <div class="card category-card">
+                        <div class="category-grid" style="max-height: none; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <a href="pages/pricelist.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                                <span class="category-text">Pricelist OTR</span>
+                            </a>
+                            <a href="pages/kalkulator.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-calculator"></i></div>
+                                <span class="category-text">Kalkulator Kredit</span>
+                            </a>
+                            <a href="pages/inventory.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-warehouse"></i></div>
+                                <span class="category-text">Live Inventory</span>
+                            </a>
+                            <a href="pages/customer.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-users"></i></div>
+                                <span class="category-text">Customer CRM</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ═══ RINGKASAN ═══ -->
+                    <div class="section-header-row">
+                        <h3 class="section-title">Ringkasan</h3>
+                    </div>
+                    <div class="grid-2">
+                        <div class="summary-card" style="--accent-color: var(--green-success);">
+                            <div class="icon-circle bg-light-green"><i class="fa-solid fa-phone"></i></div>
+                            <div class="summary-info">
+                                <p class="summary-label">Follow Up</p>
+                                <h4 id="summaryFollowUp">0</h4>
+                                <span class="summary-sub">Aktivitas</span>
+                            </div>
+                        </div>
+                        <div class="summary-card" style="--accent-color: var(--accent-blue);">
+                            <div class="icon-circle bg-light-blue"><i class="fa-solid fa-car-side"></i></div>
+                            <div class="summary-info">
+                                <p class="summary-label">Test Drive</p>
+                                <h4 id="summaryTestDrive">0</h4>
+                                <span class="summary-sub">Aktivitas</span>
+                            </div>
+                        </div>
+                        <div class="summary-card" style="--accent-color: var(--yellow-warn);">
+                            <div class="icon-circle bg-light-yellow"><i class="fa-solid fa-file-signature"></i></div>
+                            <div class="summary-info">
+                                <p class="summary-label">SPK</p>
+                                <h4 id="summarySPK">0</h4>
+                                <span class="summary-sub">Aktivitas</span>
+                            </div>
+                        </div>
+                        <div class="summary-card" style="--accent-color: var(--purple-accent);">
+                            <div class="icon-circle bg-light-purple"><i class="fa-solid fa-camera"></i></div>
+                            <div class="summary-info">
+                                <p class="summary-label">Foto Aktivitas</p>
+                                <h4 id="summaryFoto">0</h4>
+                                <span class="summary-sub">Aktivitas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ═══ MARKET RESEARCH & CUSTOMER PROFILE (YTD 2025) ═══ -->
+                    <div class="section-header-row" style="margin-top: 20px;">
+                        <h3 class="section-title"><i class="fa-solid fa-magnifying-glass-chart"
+                                style="color: var(--primary-red); margin-right: 4px;"></i> Market Research &amp; Profil Konsumen</h3>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">YTD 2025</span>
+                    </div>
+
+                    <div class="mr-container" style="margin-bottom: 20px;">
+                        <!-- Left: Dealer Network Radius Map -->
+                        <div class="mr-card">
+                            <div class="mr-header">
+                                <div class="mr-title">
+                                    <i class="fa-solid fa-compass" style="color: var(--primary-red); font-size: 15px;"></i>
+                                    Pemetaan Network Dealer &amp; Radius
+                                </div>
+                                <span style="font-size: 10.5px; font-weight: 700; color: var(--text-muted);">Bandung Raya</span>
+                            </div>
+
+                            <div class="mr-ring-grid">
+                                <div class="mr-ring-box mr-ring-1">
+                                    <div class="mr-ring-head">
+                                        <span><i class="fa-solid fa-circle-dot"></i> RING 1 (&lt; 5 KM)</span>
+                                        <span>5 Dealer</span>
+                                    </div>
+                                    <div class="mr-ring-tags">
+                                        <span class="mr-ring-tag">1. Tunas Toyota Gatsu</span>
+                                        <span class="mr-ring-tag">2. Plaza Toyota Bandung</span>
+                                        <span class="mr-ring-tag">3. Wijaya Toyota A. Yani</span>
+                                        <span class="mr-ring-tag">4. A2000 Bandung Suci</span>
+                                        <span class="mr-ring-tag">5. A2000 Asia Afrika</span>
+                                    </div>
+                                </div>
+
+                                <div class="mr-ring-box mr-ring-2">
+                                    <div class="mr-ring-head">
+                                        <span><i class="fa-solid fa-circle-dot"></i> RING 2 (&lt; 10 KM)</span>
+                                        <span>5 Dealer</span>
+                                    </div>
+                                    <div class="mr-ring-tags">
+                                        <span class="mr-ring-tag">6. Wijaya Toyota Dago</span>
+                                        <span class="mr-ring-tag">7. A2000 Cibiru</span>
+                                        <span class="mr-ring-tag">8. A2000 Soetta</span>
+                                        <span class="mr-ring-tag">9. A2000 Setia Budi</span>
+                                        <span class="mr-ring-tag">10. A2000 Pasteur</span>
+                                    </div>
+                                </div>
+
+                                <div class="mr-ring-box mr-ring-3">
+                                    <div class="mr-ring-head">
+                                        <span><i class="fa-solid fa-circle-dot"></i> RING 3 (&gt; 10 KM)</span>
+                                        <span>4 Dealer</span>
+                                    </div>
+                                    <div class="mr-ring-tags">
+                                        <span class="mr-ring-tag">11. Tunas Toyota Cimindi</span>
+                                        <span class="mr-ring-tag">12. A2000 Soreang</span>
+                                        <span class="mr-ring-tag">13. A2000 Rancaekek</span>
+                                        <span class="mr-ring-tag">14. Wijaya Toyota Padalarang</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Customer Profile Grid -->
+                        <div class="mr-card">
+                            <div class="mr-header">
+                                <div class="mr-title">
+                                    <i class="fa-solid fa-user-gear" style="color: var(--accent-blue); font-size: 15px;"></i>
+                                    Profil Pelanggan (Customer Profile)
+                                </div>
+                                <span style="font-size: 10.5px; font-weight: 700; color: #059669; background: #d1fae5; padding: 2px 8px; border-radius: 6px;">Demografi</span>
+                            </div>
+
+                            <div class="cp-grid">
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #ffe4e6; color: #d7123a;"><i class="fa-solid fa-car"></i></div>
+                                    <div>
+                                        <div class="cp-label">Car Segment</div>
+                                        <div class="cp-val">55%</div>
+                                        <div class="cp-sub">Middle - Low</div>
+                                    </div>
+                                </div>
+
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #dbeafe; color: #2563eb;"><i class="fa-solid fa-car-side"></i></div>
+                                    <div>
+                                        <div class="cp-label">Car Type</div>
+                                        <div class="cp-val">21%</div>
+                                        <div class="cp-sub">Avanza</div>
+                                    </div>
+                                </div>
+
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #fef3c7; color: #d97706;"><i class="fa-solid fa-share-nodes"></i></div>
+                                    <div>
+                                        <div class="cp-label">Source of Sales</div>
+                                        <div class="cp-val">38%</div>
+                                        <div class="cp-sub">Digital Channel</div>
+                                    </div>
+                                </div>
+
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #d1fae5; color: #059669;"><i class="fa-solid fa-cart-plus"></i></div>
+                                    <div>
+                                        <div class="cp-label">Demand Structure</div>
+                                        <div class="cp-val">46%</div>
+                                        <div class="cp-sub">Additional Unit</div>
+                                    </div>
+                                </div>
+
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #f3e8ff; color: #7c3aed;"><i class="fa-solid fa-user-clock"></i></div>
+                                    <div>
+                                        <div class="cp-label">Rentang Usia</div>
+                                        <div class="cp-val">49%</div>
+                                        <div class="cp-sub">30 – 40 Tahun</div>
+                                    </div>
+                                </div>
+
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-users"></i></div>
+                                    <div>
+                                        <div class="cp-label">Customer Type</div>
+                                        <div class="cp-val">81%</div>
+                                        <div class="cp-sub">Retail Customer</div>
+                                    </div>
+                                </div>
+
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #ffedd5; color: #ea580c;"><i class="fa-solid fa-briefcase"></i></div>
+                                    <div>
+                                        <div class="cp-label">Pekerjaan Utama</div>
+                                        <div class="cp-val">31%</div>
+                                        <div class="cp-sub">Employee / Karyawan</div>
+                                    </div>
+                                </div>
+
+                                <div class="cp-item">
+                                    <div class="cp-icon" style="background: #fce7f3; color: #db2777;"><i class="fa-solid fa-mars"></i></div>
+                                    <div>
+                                        <div class="cp-label">Jenis Kelamin</div>
+                                        <div class="cp-val">72%</div>
+                                        <div class="cp-sub">Pria (Male)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ═══ LEADERBOARD ═══ -->
+                    <div class="card leaderboard-card">
+                        <div class="leaderboard-head">
+                            <div class="leaderboard-title-wrap">
+                                <div class="leaderboard-trophy">
+                                    <i class="fa-solid fa-trophy"></i>
+                                </div>
+                                <div>
+                                    <span class="leaderboard-title">Top 3 Sales</span>
+                                    <p class="leaderboard-sub">PERINGKAT BULAN INI</p>
+                                </div>
+                            </div>
+                            <select id="leaderboardMode" class="leaderboard-select" onchange="renderLeaderboard()">
+                                <option value="all">Semua Tim</option>
+                                <option value="team">Tim Saya</option>
+                            </select>
+                        </div>
+                        <div id="leaderboardList" class="leaderboard-list">
+                            <p class="mini-loading">Memuat data...</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Access: Inspeksi Customer & Jadwal Showroom -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+                        <a href="pages/inspeksi.html" style="text-decoration: none;">
+                            <div class="card" style="padding: 16px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; border-radius: 16px; height: 100%; box-shadow: 0 6px 20px rgba(15,23,42,0.2);">
+                                <div style="width: 40px; height: 40px; border-radius: 12px; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px;">
+                                    <i class="fa-solid fa-car-rear"></i>
+                                </div>
+                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Prospek Inspeksi Mobil</h4>
+                                <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Upload data & estimasi otomatis</p>
+                            </div>
+                        </a>
+
+                        <a href="pages/jadwal_inspeksi.html" style="text-decoration: none;">
+                            <div class="card" style="padding: 16px; background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%); color: #fff; border-radius: 16px; height: 100%; box-shadow: 0 6px 20px rgba(49,46,129,0.2);">
+                                <div style="width: 40px; height: 40px; border-radius: 12px; background: #6366f1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px;">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Jadwal Inspeksi Showroom</h4>
+                                <p style="font-size: 0.75rem; color: #a5b4fc; margin: 0;">Monitoring janji temu customer</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- ═══ PENCAPAIAN TRADE-IN OLX (PER SPV) ═══ -->
+                    <div class="olx-achieve-card edge-pad" style="margin-top: 20px;">
+                        <div class="olx-achieve-header">
+                            <div class="olx-achieve-title-wrap">
+                                <div class="olx-achieve-icon">
+                                    <i class="fa-solid fa-handshake-simple"></i>
+                                </div>
+                                <div>
+                                    <h3 class="olx-achieve-title">Pencapaian OLX (Per SPV)</h3>
+                                    <p class="olx-achieve-subtitle">Rekap Trade-In unit per Supervisor &amp; Hasil Deal</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label for="olxAchievementMonthSelect" style="font-size: 11px; font-weight: 700; color: #64748b;"><i class="fa-regular fa-calendar"></i> Periode:</label>
+                                <select id="olxAchievementMonthSelect" class="olx-month-select" onchange="loadOlxAchievementData()">
+                                    <option value="all">Semua Bulan (Total)</option>
+                                    <option value="Januari 2026">Januari 2026</option>
+                                    <option value="Februari 2026">Februari 2026</option>
+                                    <option value="Maret 2026">Maret 2026</option>
+                                    <option value="April 2026">April 2026</option>
+                                    <option value="Mei 2026">Mei 2026</option>
+                                    <option value="Juni 2026">Juni 2026</option>
+                                    <option value="Juli 2026" selected>Juli 2026</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Ringkasan Statistik OLX Global -->
+                        <div class="olx-overview-grid">
+                            <div class="olx-ov-card">
+                                <div class="olx-ov-icon" style="background: #e0f2fe; color: #0284c7;">
+                                    <i class="fa-solid fa-car-tunnel"></i>
+                                </div>
+                                <div>
+                                    <div class="olx-ov-label">Total Unit</div>
+                                    <div class="olx-ov-val" id="olxOvTotalUnit">0 Unit</div>
+                                    <div class="olx-ov-sub" style="color: #64748b;" id="olxOvSubUnit">Trade-In</div>
+                                </div>
+                            </div>
+
+                            <div class="olx-ov-card">
+                                <div class="olx-ov-icon" style="background: #d1fae5; color: #059669;">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </div>
+                                <div>
+                                    <div class="olx-ov-label">Unit Deal</div>
+                                    <div class="olx-ov-val" id="olxOvTotalDeal">0 Deal</div>
+                                    <div class="olx-ov-sub" id="olxOvWinRate">Win Rate: 0%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Container Daftar SPV -->
+                        <div id="olxSpvContainer" class="olx-spv-list">
+                            <p class="mini-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data pencapaian per SPV...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ AKTIVITAS TERAKHIR ═══ -->
+                <div class="edge-pad">
+                    <div class="section-header-row">
+                        <h3 class="section-title">Aktivitas Terakhir</h3>
+                        <a href="#" class="link-lihat-semua" onclick="openModal('aktivitasModal', event)">Lihat
+                            Semua</a>
+                    </div>
+                </div>
+                <div id="latestActivityContainer" class="edge-pad latest-activity-wrap">
+                    <!-- Dimuat dinamis dari database -->
+                    <div class="card activity-card" style="opacity: 0.7;">
+                        <div class="activity-details">
+                            <p class="activity-desc" style="margin: 0;"><i class="fa-solid fa-spinner fa-spin"
+                                    style="margin-right: 6px;"></i> Memuat aktivitas terbaru...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ UPDATE TRADE-IN ═══ -->
+                <div class="edge-pad">
+                    <div class="section-header-row">
+                        <h3 class="section-title">Update Trade-In OLX</h3>
+                        <a href="#" class="link-lihat-semua" onclick="openModal('olxModal', event)">Lihat Semua</a>
+                    </div>
+                </div>
+                <div class="card tradein-card">
+                    <div id="dashboardTradeInList" class="tradein-list">
+                        <p class="mini-loading">Memuat data...</p>
+                    </div>
+                </div>
+
+                <!-- ═══ BOTTOM NAV — Floating Glass Dock (mobile) ═══ -->
+                <nav class="bottom-nav">
+                    <a href="index.html" class="nav-item active"><i class="fa-solid fa-house"></i><span
+                            class="nav-text">Home</span></a>
+                    <a href="pages/pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span
+                            class="nav-text">Harga</span></a>
+                    <a href="pages/input.html" class="nav-item center-btn">
+                        <div class="center-btn-inner">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                    </a>
+                    <a href="pages/testdrive.html" class="nav-item"><i class="fa-solid fa-car-side"></i><span
+                            class="nav-text">Tes Drive</span></a>
+                    <a href="pages/profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span
+                            class="nav-text">Profil</span></a>
+                </nav>
+
+
+                <!-- ═══ MODAL: SEMUA FITUR ═══ -->
+                <div class="modal-overlay" id="featureModal" onclick="closeFeatureModal()">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <div class="modal-drag-handle"></div>
+                        <div class="modal-header">
+                            <h3>Semua Fitur</h3>
+                            <button type="button" class="btn-close-modal" onclick="closeFeatureModal()"><i
+                                    class="fa-solid fa-xmark"></i></button>
+                        </div>
+
+                        <div class="category-grid feature-modal-grid">
+                            <!-- Tier 1: Operasional Harian & Closing Transaksi (Paling Kritis) -->
+                            <a href="pages/pricelist.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                                <span class="category-text">Pricelist OTR</span>
+                            </a>
+                            <a href="pages/kalkulator.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-calculator"></i></div>
+                                <span class="category-text">Kalkulator Kredit</span>
+                            </a>
+                            <a href="pages/inventory.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-warehouse"></i></div>
+                                <span class="category-text">Live Inventory</span>
+                            </a>
+                            <a href="pages/customer.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-users"></i></div>
+                                <span class="category-text">Customer CRM</span>
+                            </a>
+                            <a href="pages/spk.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>
+                                <span class="category-text">Form SPK</span>
+                            </a>
+                            <a href="pages/quotation.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>
+                                <span class="category-text">Smart Quotation</span>
+                            </a>
+                            <a href="pages/promo.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-percent"></i></div>
+                                <span class="category-text">Promo &amp; Tenor</span>
+                            </a>
+                            <a href="pages/order_tracker.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                                <span class="category-text">Live Tracker</span>
+                            </a>
+                            <a href="pages/tradein.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-right-left"></i></div>
+                                <span class="category-text">Trade-In Calc</span>
+                            </a>
+                            <a href="pages/leasing_matrix.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                                <span class="category-text">Leasing Odds</span>
+                            </a>
+
+                            <!-- Tier 2: Komunikasi, AI Superpowers, Purna Jual & Delivery -->
+                            <a href="pages/wa_studio.html" class="category-item">
+                                <div class="category-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                                <span class="category-text">WA Studio</span>
+                            </a>
+                            <a href="pages/ai_copilot.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <span class="category-text">AI Copilot</span>
+                            </a>
+                            <a href="pages/digital_card.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-address-card"></i></div>
+                                <span class="category-text">Kartu Digital</span>
+                            </a>
+                            <a href="pages/retention.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                                <span class="category-text">After-Sales Hub</span>
+                            </a>
+                            <a href="pages/delivery_ceremony.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-award"></i></div>
+                                <span class="category-text">Delivery Ceremony</span>
+                            </a>
+                            <a href="pages/deal.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-handshake"></i></div>
+                                <span class="category-text">Deal Pipeline</span>
+                            </a>
+                            <a href="pages/testdrive.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-car-side"></i></div>
+                                <span class="category-text">Test Drive</span>
+                            </a>
+                            <a href="pages/rental_testdrive.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-handshake-simple"></i></div>
+                                <span class="category-text">TD Rental</span>
+                            </a>
+                            <a href="pages/approval.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-check-to-slot"></i></div>
+                                <span class="category-text">Approval</span>
+                            </a>
+                            <a href="pages/dokumen.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-receipt"></i></div>
+                                <span class="category-text">Dokumen</span>
+                            </a>
+
+                            <!-- Tier 3: Product Knowledge, Hybrid & Analisis Pasar -->
+                            <a href="pages/eco_calculator.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-leaf"></i></div>
+                                <span class="category-text">Eco Calc (Hybrid)</span>
+                            </a>
+                            <a href="pages/komparasi.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                                <span class="category-text">Komparasi 360°</span>
+                            </a>
+                            <a href="pages/brosur.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
+                                <span class="category-text">Brosur Digital</span>
+                            </a>
+                            <a href="pages/elibrary.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-book-medical"></i></div>
+                                <span class="category-text">E-Library</span>
+                            </a>
+                            <a href="pages/market_analysis.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                                <span class="category-text">Analisis Pasar</span>
+                            </a>
+                            <a href="pages/polreg.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                                <span class="category-text">Peta Polreg</span>
+                            </a>
+                            <a href="pages/penjualan_kircon.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                <span class="category-text">Penjualan Kircon</span>
+                            </a>
+
+                            <!-- Tier 4: Trade-In, Inspeksi, Aksesoris & Merchandise -->
+                            <a href="pages/olx.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-exchange-alt"></i></div>
+                                <span class="category-text">OLX Appraisal</span>
+                            </a>
+                            <a href="pages/inspeksi.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-car-rear"></i></div>
+                                <span class="category-text">Inspeksi Unit</span>
+                            </a>
+                            <a href="pages/jadwal_inspeksi.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                                <span class="category-text">Jadwal Inspeksi</span>
+                            </a>
+                            <a href="pages/tco.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-car-tunnel"></i></div>
+                                <span class="category-text">Aksesoris TCO</span>
+                            </a>
+                            <a href="pages/velg.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-compact-disc"></i></div>
+                                <span class="category-text">Velg &amp; Ban</span>
+                            </a>
+                            <a href="pages/merchandise.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-shirt"></i></div>
+                                <span class="category-text">Merchandise</span>
+                            </a>
+
+                            <!-- Tier 5: Refreshment & Arcade Games (11 Games) -->
+                            <a href="pages/game.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-gamepad"></i></div>
+                                <span class="category-text">Arcade Center</span>
+                            </a>
+                            <a href="pages/drag_race.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                                <span class="category-text">Toyota Drag Strip</span>
+                            </a>
+                            <a href="pages/valet_park.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-square-parking"></i></div>
+                                <span class="category-text">Valet Parking VIP</span>
+                            </a>
+                            <a href="pages/hybrid_flow.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-bolt"></i></div>
+                                <span class="category-text">Hybrid Flow</span>
+                            </a>
+                            <a href="pages/pitstop.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-wrench"></i></div>
+                                <span class="category-text">GR Pit Stop</span>
+                            </a>
+                            <a href="pages/memory_match.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-clone"></i></div>
+                                <span class="category-text">Memory Match</span>
+                            </a>
+                            <a href="pages/catur.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-chess-knight"></i></div>
+                                <span class="category-text">Catur Master</span>
+                            </a>
+                            <a href="pages/balap.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+                                <span class="category-text">Balap Mobil</span>
+                            </a>
+                            <a href="pages/snake.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-gas-pump"></i></div>
+                                <span class="category-text">Parkir Drift</span>
+                            </a>
+                            <a href="pages/tebak.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-brain"></i></div>
+                                <span class="category-text">Tebak Otomotif</span>
+                            </a>
+                            <a href="pages/tts.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+                                <span class="category-text">TTS Otomotif</span>
+                            </a>
+                            <a href="pages/tss-simulator.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                                <span class="category-text">Simulator TSS</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL: AKTIVITAS TERAKHIR (Premium Redesign) ═══ -->
+                <div class="modal-overlay" id="aktivitasModal">
+                    <div class="modal-content jm-content premium-modal-aktivitas">
+                        <div class="jm-drag-handle"></div>
+
+                        <!-- Premium Header -->
+                        <div class="pm-header pm-header-red">
+                            <div class="pm-header-deco"></div>
+                            <div class="pm-header-deco-ring"></div>
+                            <div class="pm-header-content">
+                                <div class="pm-header-icon">
+                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                </div>
+                                <div class="pm-header-text">
+                                    <h3>Aktivitas Terakhir</h3>
+                                    <p>Daftar aktivitas sales yang telah terekam</p>
+                                </div>
+                                <button class="pm-close-btn" onclick="closeModal('aktivitasModal')">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="pm-header-stats" id="aktivitasModalStats">
+                                <div class="pm-stat">
+                                    <span class="pm-stat-num" id="amStatTotal">0</span>
+                                    <span class="pm-stat-label">Total</span>
+                                </div>
+                                <div class="pm-stat-divider"></div>
+                                <div class="pm-stat">
+                                    <span class="pm-stat-num" id="amStatHariIni">0</span>
+                                    <span class="pm-stat-label">Hari Ini</span>
+                                </div>
+                                <div class="pm-stat-divider"></div>
+                                <div class="pm-stat">
+                                    <span class="pm-stat-num" id="amStatVerified">0</span>
+                                    <span class="pm-stat-label">Terverifikasi</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="pm-body">
+                            <div class="pm-section-label">
+                                <i class="fa-solid fa-list-timeline"></i>
+                                <span>Riwayat Aktivitas</span>
+                            </div>
+                            <div class="activity-list pm-card-list" id="modalActivityList">
+                                <div class="pm-loading-state">
+                                    <div class="pm-loading-spinner"></div>
+                                    <p>Memuat data aktivitas...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL: TRADE-IN OLX (Premium Redesign) ═══ -->
+                <div class="modal-overlay" id="olxModal">
+                    <div class="modal-content jm-content premium-modal-olx">
+                        <div class="jm-drag-handle"></div>
+
+                        <!-- Premium Header -->
+                        <div class="pm-header pm-header-blue">
+                            <div class="pm-header-deco"></div>
+                            <div class="pm-header-deco-ring"></div>
+                            <div class="pm-header-content">
+                                <div class="pm-header-icon">
+                                    <i class="fa-solid fa-car-side"></i>
+                                </div>
+                                <div class="pm-header-text">
+                                    <h3>Data Trade-In OLX</h3>
+                                    <p>Daftar semua pengajuan Trade-In</p>
+                                </div>
+                                <button class="pm-close-btn" onclick="closeModal('olxModal')">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="pm-header-stats" id="olxModalStats">
+                                <div class="pm-stat">
+                                    <span class="pm-stat-num" id="olxStatTotal">0</span>
+                                    <span class="pm-stat-label">Total</span>
+                                </div>
+                                <div class="pm-stat-divider"></div>
+                                <div class="pm-stat">
+                                    <span class="pm-stat-num" id="olxStatApproved">0</span>
+                                    <span class="pm-stat-label">Disetujui</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="pm-body">
+                            <div class="pm-section-label">
+                                <i class="fa-solid fa-car"></i>
+                                <span>Daftar Kendaraan</span>
+                            </div>
+                            <div id="modalOlxList" class="tradein-list pm-card-list" style="max-height:none;">
+                                <div class="pm-loading-state">
+                                    <div class="pm-loading-spinner"></div>
+                                    <p>Memuat data trade-in...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL: VIEWER FOTO ═══ -->
+                <div class="modal-overlay photo-viewer" id="photoViewerModal">
+                    <div class="modal-content photo-viewer-content">
+                        <button class="btn-close-modal-white pv-close" onclick="closeModal('photoViewerModal')"><i
+                                class="fa-solid fa-xmark"></i></button>
+
+                        <button id="btnPhotoPrev" class="pv-nav pv-prev" onclick="prevPhotoViewer()"><i
+                                class="fa-solid fa-chevron-left"></i></button>
+
+                        <img id="photoViewerImg" src="" alt="Detail Foto" class="pv-img">
+
+                        <button id="btnPhotoNext" class="pv-nav pv-next" onclick="nextPhotoViewer()"><i
+                                class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL: DETAIL AKTIVITAS ═══ -->
+                <div class="modal-overlay" id="activityDetailModal" style="z-index: 9500;">
+                    <div id="adm-sheet">
+                        <!-- Header Strip -->
+                        <div id="adm-header-strip">
+                            <div class="adm-drag-row">
+                                <div class="adm-drag-pill"></div>
+                            </div>
+
+                            <div class="adm-header-content">
+                                <div class="adm-header-icon-box">
+                                    <i id="adm-header-icon" class="fa-solid fa-clipboard-list"></i>
+                                </div>
+                                <div class="adm-header-text">
+                                    <h3 id="adm-title">Detail Aktivitas</h3>
+                                    <p id="adm-subtitle">Informasi lengkap aktivitas</p>
+                                </div>
+                                <button id="adm-btn-back" class="adm-circle-btn" onclick="closeDetailGoBack()"
+                                    style="display:none;"><i class="fa-solid fa-arrow-left"></i></button>
+                                <button class="adm-circle-btn" onclick="closeActivityDetail()"><i
+                                        class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Body -->
+                        <div class="adm-body">
+
+                            <!-- Foto Gallery -->
+                            <div id="adm-gallery" style="display: none;">
+                                <div class="adm-gallery-main">
+                                    <img id="adm-main-photo" src="" alt="Foto Aktivitas"
+                                        onclick="openPhotoFromDetail()">
+                                    <div class="adm-gallery-fade"></div>
+                                    <div id="adm-photo-counter">1 / 1</div>
+                                    <button id="adm-btn-prev" class="adm-gallery-nav prev" onclick="prevPhoto()">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </button>
+                                    <button id="adm-btn-next" class="adm-gallery-nav next" onclick="nextPhoto()">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div id="adm-thumbnails"></div>
+                            </div>
+
+                            <!-- Info Section -->
+                            <div class="adm-info-section">
+                                <!-- Status + Waktu -->
+                                <div class="adm-status-row">
+                                    <div class="adm-status-left">
+                                        <span class="adm-status-label">Status</span>
+                                        <span id="adm-status-badge"></span>
+                                    </div>
+                                    <span id="adm-datetime">
+                                        <i class="fa-regular fa-clock"></i>
+                                    </span>
+                                </div>
+
+                                <!-- Info Cards -->
+                                <div class="adm-cards-col">
+
+                                    <div class="adm-info-card" style="border-left-color:#7048d6;">
+                                        <div class="adm-info-icon ic-violet">
+                                            <i class="fa-solid fa-user-tie"></i>
+                                        </div>
+                                        <div class="adm-info-content">
+                                            <span class="adm-info-label">Nama Sales</span>
+                                            <span class="adm-info-value" id="adm-nama-sales">-</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="adm-info-card" style="border-left-color:#d7123a;">
+                                        <div class="adm-info-icon ic-red">
+                                            <i class="fa-solid fa-tag"></i>
+                                        </div>
+                                        <div class="adm-info-content">
+                                            <span class="adm-info-label">Tipe Aktivitas</span>
+                                            <span class="adm-info-value" id="adm-tipe">-</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="adm-info-card" style="border-left-color:#3565e0;">
+                                        <div class="adm-info-icon ic-blue">
+                                            <i class="fa-solid fa-align-left"></i>
+                                        </div>
+                                        <div class="adm-info-content">
+                                            <span class="adm-info-label">Keterangan</span>
+                                            <span class="adm-info-value adm-pre" id="adm-keterangan">-</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="adm-info-card adm-card-lokasi" style="border-left-color:#0d9268;">
+                                        <div class="adm-lokasi-top">
+                                            <div class="adm-info-icon ic-green">
+                                                <i class="fa-solid fa-location-dot"></i>
+                                            </div>
+                                            <div class="adm-info-content">
+                                                <span class="adm-info-label">Lokasi</span>
+                                                <span class="adm-info-value" id="adm-lokasi">-</span>
+                                            </div>
+                                        </div>
+                                        <a id="adm-map-btn" href="#" target="_blank" class="adm-map-btn">
+                                            <i class="fa-solid fa-map-location-dot"></i> Buka di Google Maps
+                                        </a>
+                                    </div>
+
+                                    <div class="adm-info-card" id="adm-row-foto"
+                                        style="display:none;border-left-color:#7048d6;">
+                                        <div class="adm-info-icon ic-violet">
+                                            <i class="fa-solid fa-images"></i>
+                                        </div>
+                                        <div class="adm-info-content">
+                                            <span class="adm-info-label">Foto Terupload</span>
+                                            <span class="adm-info-value" id="adm-foto-count">-</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="adm-info-card" style="border-left-color:#b45309;">
+                                        <div class="adm-info-icon ic-amber">
+                                            <i class="fa-regular fa-calendar-alt"></i>
+                                        </div>
+                                        <div class="adm-info-content">
+                                            <span class="adm-info-label">Waktu Rekam</span>
+                                            <span class="adm-info-value" id="adm-created">-</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL: SPK & DO ═══ -->
+                <div class="modal-overlay" id="spkDoModal" onclick="closeModal('spkDoModal')">
+                    <div class="modal-content spkdo-content" onclick="event.stopPropagation()">
+
+                        <div class="spkdo-head">
+                            <h3>Input Pencapaian<br>Terotomatisasi</h3>
+                            <button type="button" class="spkdo-x" onclick="closeModal('spkDoModal')"><i
+                                    class="fa-solid fa-xmark"></i></button>
+                        </div>
+
+                        <div class="spkdo-info">
+                            <i class="fa-solid fa-database"></i>
+                            <h4>Integrasi Data Real-Time</h4>
+                            <p>
+                                Pencapaian <strong>Actual SPK</strong> dan <strong>Actual DO</strong> kini terhubung
+                                secara real-time. Anda dapat membuat pengajuan SPK baru atau menginput DO langsung
+                                melalui form pencapaian.
+                            </p>
+                        </div>
+
+                        <div class="spkdo-actions">
+                            <a href="pages/spk.html" class="spkdo-btn">
+                                <i class="fa-solid fa-file-invoice"></i>
+                                <span>Buat<br>Pengajuan<br>SPK</span>
+                            </a>
+                            <a href="pages/do.html" class="spkdo-btn">
+                                <i class="fa-solid fa-boxes-packing"></i>
+                                <span>Input DO<br>Langsung</span>
+                            </a>
+                        </div>
+
+                        <button class="spkdo-close" onclick="closeModal('spkDoModal')">Tutup</button>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL: DETAIL OLX ═══ -->
+                <div id="olxDetailModal" class="modal-overlay" style="z-index: 20000;" onclick="closeOlxDetail()">
+                    <div class="modal-content olxdet-content" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h3>Detail Kendaraan</h3>
+                            <button type="button" class="btn-close-modal" onclick="closeOlxDetail()"><i
+                                    class="fa-solid fa-xmark"></i></button>
+                        </div>
+
+                        <div id="detPhotoContainer" class="olxdet-photos">
+                            <!-- Photos will be inserted here -->
+                        </div>
+
+                        <div class="olxdet-body">
+                            <h4 id="detNamaKendaraan">Nama Kendaraan</h4>
+                            <div class="olxdet-meta">
+                                <span class="olxdet-sales-chip">
+                                    <i class="fa-solid fa-user"></i><span id="detNamaSales">Sales</span>
+                                </span>
+                                <span class="olxdet-date" id="detTanggal">Tanggal</span>
+                            </div>
+
+                            <div class="olxdet-grid">
+                                <div>
+                                    <span class="olxdet-label">JENIS/TYPE</span>
+                                    <span class="olxdet-value" id="detJenis"></span>
+                                </div>
+                                <div>
+                                    <span class="olxdet-label">TAHUN</span>
+                                    <span class="olxdet-value" id="detTahun"></span>
+                                </div>
+                                <div>
+                                    <span class="olxdet-label">WARNA</span>
+                                    <span class="olxdet-value" id="detWarna"></span>
+                                </div>
+                                <div>
+                                    <span class="olxdet-label">LOKASI</span>
+                                    <span class="olxdet-value" id="detLokasi"></span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <span class="olxdet-label">DESKRIPSI KONDISI</span>
+                                <p id="detDeskripsi" class="olxdet-desc"></p>
+                            </div>
+                        </div>
+
+                        <div class="olxdet-price">
+                            <span class="olxdet-price-label">Harga Estimasi Disetujui</span>
+                            <span id="detHarga">Rp 0</span>
+                        </div>
+
+                        <button id="detBtnHubungiSales" class="btn-main olxdet-wa" style="display: none;">
+                            <i class="fa-brands fa-whatsapp"></i> Hubungi Sales
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- /mobile-app -->
+
+        </div><!-- /desktop-content -->
+    </div><!-- /desktop-shell -->
+
+    <script src="js/sidebar_desktop.js"></script>
+    <script src="js/ai_copilot.js"></script>
+    <script src="js/script.js?v=20260808_07"></script>
+    <script src="js/index_dashboard.js?v=20260808_07"></script>
+
+    <script src="./js/pwa-app.js?v=3"></script>
+</body>
+
+</html>
