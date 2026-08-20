@@ -220,69 +220,71 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     ];
 }
 
-// Handle Requests
-$action = isset($_GET['action']) ? $_GET['action'] : (isset($_POST['action']) ? $_POST['action'] : 'pull');
+// Execute Routing only if this file is called directly as an HTTP endpoint
+if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'api_sheets_sync.php') {
+    $action = isset($_GET['action']) ? $_GET['action'] : (isset($_POST['action']) ? $_POST['action'] : 'pull');
 
-if ($action === 'pull' || $action === 'sync') {
-    $month = isset($_GET['bulan']) ? intval($_GET['bulan']) : intval(date('n'));
-    $year = isset($_GET['tahun']) ? intval($_GET['tahun']) : intval(date('Y'));
-    $res = syncGoogleSheetsToDb($conn, $month, $year);
-    echo json_encode($res);
-    if ($conn) $conn->close();
-    exit();
-}
+    if ($action === 'pull' || $action === 'sync') {
+        $month = isset($_GET['bulan']) ? intval($_GET['bulan']) : intval(date('n'));
+        $year = isset($_GET['tahun']) ? intval($_GET['tahun']) : intval(date('Y'));
+        $res = syncGoogleSheetsToDb($conn, $month, $year);
+        echo json_encode($res);
+        if ($conn) $conn->close();
+        exit();
+    }
 
-if ($action === 'status') {
-    $res_cfg = $conn->query("SELECT * FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
-    $cfg = $res_cfg ? $res_cfg->fetch_assoc() : [];
-    echo json_encode([
-        'status' => 'success',
-        'config' => $cfg
-    ]);
-    if ($conn) $conn->close();
-    exit();
-}
-
-// Push ke Webhook Google Apps Script jika disetel
-if ($action === 'push') {
-    $raw = file_get_contents("php://input");
-    $postData = json_decode($raw, true);
-
-    $res_cfg = $conn->query("SELECT apps_script_webhook_url FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
-    $webhook_url = $res_cfg ? $res_cfg->fetch_assoc()['apps_script_webhook_url'] : '';
-
-    if (empty($webhook_url)) {
+    if ($action === 'status') {
+        $res_cfg = $conn->query("SELECT * FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+        $cfg = $res_cfg ? $res_cfg->fetch_assoc() : [];
         echo json_encode([
-            'status' => 'info',
-            'message' => 'Google Apps Script Webhook URL belum dikonfigurasi. Data tersimpan di web SFT.',
-            'app_script_guide' => 'Gunakan template Google Apps Script yang disediakan di WhatsApp Studio untuk menghubungkan push otomatis.'
+            'status' => 'success',
+            'config' => $cfg
         ]);
         if ($conn) $conn->close();
         exit();
     }
 
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $webhook_url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode($postData),
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 20
-    ]);
-    $resp = curl_exec($ch);
-    curl_close($ch);
+    // Push ke Webhook Google Apps Script jika disetel
+    if ($action === 'push') {
+        $raw = file_get_contents("php://input");
+        $postData = json_decode($raw, true);
 
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Data berhasil dikirim ke Google Spreadsheet via Apps Script Webhook!',
-        'response' => $resp
-    ]);
+        $res_cfg = $conn->query("SELECT apps_script_webhook_url FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+        $webhook_url = $res_cfg ? $res_cfg->fetch_assoc()['apps_script_webhook_url'] : '';
+
+        if (empty($webhook_url)) {
+            echo json_encode([
+                'status' => 'info',
+                'message' => 'Google Apps Script Webhook URL belum dikonfigurasi. Data tersimpan di web SFT.',
+                'app_script_guide' => 'Gunakan template Google Apps Script yang disediakan di WhatsApp Studio untuk menghubungkan push otomatis.'
+            ]);
+            if ($conn) $conn->close();
+            exit();
+        }
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $webhook_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($postData),
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 20
+        ]);
+        $resp = curl_exec($ch);
+        curl_close($ch);
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Data berhasil dikirim ke Google Spreadsheet via Apps Script Webhook!',
+            'response' => $resp
+        ]);
+        if ($conn) $conn->close();
+        exit();
+    }
+
+    echo json_encode(['status' => 'error', 'message' => 'Aksi tidak valid']);
     if ($conn) $conn->close();
     exit();
 }
-
-echo json_encode(['status' => 'error', 'message' => 'Aksi tidak valid']);
-if ($conn) $conn->close();
-exit();

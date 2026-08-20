@@ -82,10 +82,10 @@ async function fetchBranchHierarchy() {
       foto: s.foto || '',
       status: s.status || 'Aktif',
       nama_spv: spv,
-      target_spk: Number(t.target_spk_bulan || t.target_spk || 0),
-      real_spk: Number(t.realisasi_spk_bulan || t.realisasi_spk || 0),
-      target_do: Number(t.target_do_eval || t.target_do || 0),
-      real_do: Number(t.realisasi_do_eval || t.realisasi_do || 0),
+      target_spk: (t.target_spk_bulan !== undefined) ? Number(t.target_spk_bulan) : Number(t.target_spk || 0),
+      real_spk: (t.realisasi_spk_bulan !== undefined) ? Number(t.realisasi_spk_bulan) : Number(t.realisasi_spk || 0),
+      target_do: (t.target_do_bulan !== undefined) ? Number(t.target_do_bulan) : Number(t.target_do || t.target_do_eval || 0),
+      real_do: (t.realisasi_do_bulan !== undefined) ? Number(t.realisasi_do_bulan) : Number(t.realisasi_do || t.realisasi_do_eval || 0),
       evaluasi_do_label: t.evaluasi_do_label || ''
     });
   });

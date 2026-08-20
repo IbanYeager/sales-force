@@ -10,6 +10,7 @@ scratch/
 *.msi
 *.exe
 *.bat
+*.sql
 Chat WhatsApp*
 update ai.xlsx
 "TD Test Drive (1).pdf"

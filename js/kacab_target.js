@@ -37,12 +37,13 @@ function renderTargetMatrix() {
   const lblPeriod = document.getElementById('lblSelectedPeriod');
   if (lblPeriod) lblPeriod.textContent = `Target & Pencapaian Periode ${selectedMonthName}`;
 
-  // Total Agregat Target & Realisasi Cabang (Agustus 2026: 53 Target SPK, 38 Target DO)
-  const totalSpkTarget = 53;
-  const totalDoTarget = 38;
-
+  // Total Agregat Target & Realisasi Cabang (Dihitung Dinamis dari Data Spreadsheet)
+  let totalSpkTarget = 0, totalDoTarget = 0;
   let totalSpkReal = 0, totalDoReal = 0;
+
   branchHierarchyData.forEach(item => {
+    totalSpkTarget += Number(item.target_spk_bulan || item.target_spk || 0);
+    totalDoTarget += Number(item.target_do_bulan || item.target_do || 0);
     totalSpkReal += Number(item.realisasi_spk_bulan || item.realisasi_spk || 0);
     totalDoReal += Number(item.realisasi_do_bulan || item.realisasi_do || 0);
   });

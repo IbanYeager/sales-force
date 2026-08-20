@@ -47,6 +47,24 @@ if ($method === 'GET') {
     ];
     $periode_str = $nama_bulan_list[$current_month] . " " . $current_year;
 
+    // Auto Sinkronisasi Real-Time dengan Google Spreadsheet (Throttled 15s)
+    if (function_exists('syncGoogleSheetsToDb') || file_exists(__DIR__ . '/api_sheets_sync.php')) {
+        require_once __DIR__ . '/api_sheets_sync.php';
+        if ($conn) {
+            $q_chk = $conn->query("SELECT last_sync_at FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+            $should_sync = true;
+            if ($q_chk && $c_row = $q_chk->fetch_assoc()) {
+                $last_time = strtotime($c_row['last_sync_at'] ?? '2000-01-01');
+                if (time() - $last_time < 15) {
+                    $should_sync = false;
+                }
+            }
+            if ($should_sync) {
+                syncGoogleSheetsToDb($conn, $current_month, $current_year);
+            }
+        }
+    }
+
     // Active Sales Consultants (Semua Sales Tim Ryan, Alvin, Riva)
     $active_usernames = [
         'reza','egy','erick','erik','deno','yani','denia','jajang','juarna','galih_ryan','fanny','fani','dadan','igo','denis','hady','tama','agus_ryan','irvan','wendy','rahma','aji','aghti','fia',
