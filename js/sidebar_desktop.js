@@ -61,8 +61,9 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
+                ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
-                ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data 42 Wiraniaga')}
+                ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data 46 Wiraniaga')}
                 ${navLinkKacab('pages_kacab/approval_kacab.html', 'fa-solid fa-clipboard-check', 'Otorisasi & Approval')}
                 ${navLinkKacab('pages_kacab/target_kacab.html', 'fa-solid fa-bullseye', 'Target & Produktivitas')}
                 ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}
@@ -119,6 +120,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
+                ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
                 ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
                 ${navLinkSPV('pages_spv/wiraniaga.html', 'fa-solid fa-users', 'Wiraniaga')}
                 ${navLinkSPV('pages_spv/approval.html', 'fa-solid fa-check-to-slot', 'Approval <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
@@ -177,6 +179,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Utama</p>
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard')}
+                ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Input Aktivitas')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian')}

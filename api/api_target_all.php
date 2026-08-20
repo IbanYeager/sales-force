@@ -47,11 +47,11 @@ if ($method === 'GET') {
     ];
     $periode_str = $nama_bulan_list[$current_month] . " " . $current_year;
 
-    // Active Sales Consultants
+    // Active Sales Consultants (Semua Sales Tim Ryan, Alvin, Riva)
     $active_usernames = [
-        'indah','dadi','topik','andri','abdian','fadhil','rizky','udu','nova','cici',
-        'galih_riva','deni_rv','mustofa','sinta','rizal','reni','nuri',
-        'egy','deno','erik','denia','yani','jajang','juarna','galih_ryan','reza','dadan','fani','igo','fia','rahma'
+        'reza','egy','erick','erik','deno','yani','denia','jajang','juarna','galih_ryan','fanny','fani','dadan','igo','denis','hady','tama','agus_ryan','irvan','wendy','rahma','aji','aghti','fia',
+        'dadi','topik','indah','andri','rizky','ardian','abdian','fadil','fadhil','ahmad','arif','arief','udil','andrius','luvita','kurnia','intan','erlan','yeni','nova','dean','hingki','yoni','novi','cici',
+        'galih_riva','dery','giono','giyono','rizal','gugum','shovia','mustofa','reni','nuri','uki','ridwan','agus','dian','debi','wawan','syahril','wulan','sinta','deni_rv'
     ];
     $user_filter_sql = "'" . implode("','", $active_usernames) . "'";
 

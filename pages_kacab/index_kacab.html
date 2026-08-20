@@ -30,6 +30,7 @@
 
       <nav class="kcb-nav">
         <a href="index_kacab.html" id="navDash" class="active"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
+        <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
         <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
         <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 42 Wiraniaga</a>
         <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi & Approval</a>
@@ -115,6 +116,64 @@
           </div>
         </div>
       </div>
+
+      <!-- ===== AREA OPERATION (AO) REPORT EXECUTIVE COCKPIT ===== -->
+      <section class="kcb-card" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:16px; padding:20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, #1e1014, #3b1d28); color:#d8a437; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 12px rgba(30,16,20,0.2);">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
+                  Papan Area Operation (AO) Report Cabang
+                </h3>
+                <span style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; font-weight:800; padding:3px 10px; border-radius:20px; font-size:11px;">
+                  <i class="fa-solid fa-circle-check"></i> Matching Ratio: 86%
+                </span>
+              </div>
+              <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">
+                Tunas Toyota Kiara Condong &middot; Sinkronisasi Stock Matching, Ritme SPK 5-Harian, dan Estimasi Closing 104 Unit.
+              </p>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="btn btn-sm" onclick="location.href='ao_report_kacab.html'" style="background:linear-gradient(135deg, #1e1014, #4a1525); color:#d8a437; border:1px solid rgba(216,164,55,0.4); font-weight:800; font-size:12px; padding:9px 16px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 4px 14px rgba(30,16,20,0.25);">
+              <i class="fa-solid fa-expand"></i> Buka Papan AO Report Eksekutif
+            </button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap:12px; text-align:center;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#64748b;">Full Stock Cabang</div>
+            <div style="font-size:22px; font-weight:900; color:#0f172a; margin:3px 0;">124</div>
+            <div style="font-size:10.5px; font-weight:700; color:#0284c7;">Free: 82 | Match: 42</div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#64748b;">OS Order &lt;30d</div>
+            <div style="font-size:22px; font-weight:900; color:#2563eb; margin:3px 0;">48</div>
+            <div style="font-size:10.5px; font-weight:700; color:#1d4ed8;">Firmed: 18 | Match: 30</div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#64748b;">SPK Gross Actual</div>
+            <div style="font-size:22px; font-weight:900; color:#d97706; margin:3px 0;">54</div>
+            <div style="font-size:10.5px; font-weight:700; color:#b45309;">Ritme 1-10: +14 Gap</div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#64748b;">DO Target Cabang</div>
+            <div style="font-size:22px; font-weight:900; color:#059669; margin:3px 0;">92</div>
+            <div style="font-size:10.5px; font-weight:700; color:#047857;">Potensi fr OS: 52 (Gap 40)</div>
+          </div>
+          <div style="background:linear-gradient(135deg, #fef3c7, #fde68a); border:1.5px solid #f59e0b; border-radius:12px; padding:12px 10px;">
+            <div style="font-size:11px; font-weight:800; color:#92400e;">Est. Closing Bulan</div>
+            <div style="font-size:24px; font-weight:900; color:#78350f; margin:2px 0;">104</div>
+            <div style="font-size:10.5px; font-weight:800; color:#b45309;">+12 Over Target (113%) 🎉</div>
+          </div>
+        </div>
+      </section>
 
       <!-- ===== AI SENTINEL EARLY WARNING (STANDAR 5-HARIAN SPK/DO) ===== -->
       <section class="kcb-card" id="aiSentinelContainer" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">

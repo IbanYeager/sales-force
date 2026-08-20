@@ -86,10 +86,14 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     $res_sales = $conn->query("SELECT id, username, nama_lengkap, nama_spv, tingkatan FROM sales_accounts");
     if ($res_sales) {
         while ($row = $res_sales->fetch_assoc()) {
+            $spv_key = normalizeName($row['nama_spv']);
             $norm = normalizeName($row['nama_lengkap']);
-            $sales_map[$norm] = $row;
             $user_norm = normalizeName($row['username']);
-            $sales_map[$user_norm] = $row;
+
+            $sales_map[$spv_key . '_' . $norm] = $row;
+            $sales_map[$spv_key . '_' . $user_norm] = $row;
+            if (!isset($sales_map[$norm])) $sales_map[$norm] = $row;
+            if (!isset($sales_map[$user_norm])) $sales_map[$user_norm] = $row;
         }
     }
 
@@ -139,42 +143,22 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         $total_target_spk += $target_spk;
         $total_target_do += $target_do;
 
-        // Cari sales di database
+        // Cari sales di database (prioritas kecocokan dengan SPV saat ini)
         $norm_name = normalizeName($nama_sales);
+        $cur_spv_key = normalizeName($current_spv);
         $sales_id = null;
 
-        // Alias & Typos matching
-        $alias_map = [
-            'erick' => 'erik',
-            'fanny' => 'fani',
-            'ardian' => 'abdian',
-            'fadil' => 'fadhil',
-            'giono' => 'giyono',
-            'shovia' => 'sinta',
-            'udil' => 'udu',
-            'kurnia' => 'cici',
-            'dery' => 'deni_rv',
-            'denia' => 'denia',
-            'denis' => 'deni'
-        ];
-        if (isset($alias_map[$norm_name]) && isset($sales_map[$alias_map[$norm_name]])) {
-            $matched = $sales_map[$alias_map[$norm_name]];
+        if (isset($sales_map[$cur_spv_key . '_' . $norm_name])) {
+            $matched = $sales_map[$cur_spv_key . '_' . $norm_name];
             $sales_id = intval($matched['id']);
         } elseif (isset($sales_map[$norm_name])) {
             $matched = $sales_map[$norm_name];
             $sales_id = intval($matched['id']);
         } else {
             // Coba pencarian LIKE
-            $q_find = $conn->query("SELECT id FROM sales_accounts WHERE nama_lengkap LIKE '%$nama_sales%' OR username LIKE '%$nama_sales%' LIMIT 1");
+            $q_find = $conn->query("SELECT id FROM sales_accounts WHERE (nama_lengkap LIKE '%$nama_sales%' OR username LIKE '%$nama_sales%') AND (nama_spv = '$current_spv' OR nama_spv LIKE '%" . str_replace('Pak ', '', $current_spv) . "%') LIMIT 1");
             if ($q_find && $f = $q_find->fetch_assoc()) {
                 $sales_id = intval($f['id']);
-            } else {
-                // Auto create akun jika benar-benar belum ada di database
-                $uname = strtolower(preg_replace('/[^a-z0-9]/', '_', $nama_sales));
-                $pass_hash = password_hash('123456', PASSWORD_DEFAULT);
-                $conn->query("INSERT INTO sales_accounts (username, password, nama_lengkap, tingkatan, nama_spv) 
-                              VALUES ('$uname', '$pass_hash', '$nama_sales', 'Executive', '$current_spv')");
-                $sales_id = $conn->insert_id;
             }
         }
 

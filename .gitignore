@@ -24,3 +24,6 @@ uploads/*
 .idea/
 .DS_Store
 Thumbs.db
+api/config_db.php
+config_db.php
+scratch/

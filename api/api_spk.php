@@ -8,6 +8,38 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 require 'koneksi.php';
 
+function triggerSheetsPush($conn, $sales_id, $tambah_spk = 0, $tambah_do = 0) {
+    if (!$conn || ($tambah_spk == 0 && $tambah_do == 0)) return;
+    $res_sales = $conn->query("SELECT nama_lengkap, username FROM sales_accounts WHERE id = " . intval($sales_id) . " LIMIT 1");
+    if (!$res_sales || $res_sales->num_rows === 0) return;
+    $sales_row = $res_sales->fetch_assoc();
+    $sales_name = $sales_row['nama_lengkap'];
+
+    $res_cfg = $conn->query("SELECT apps_script_webhook_url FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+    if (!$res_cfg || $res_cfg->num_rows === 0) return;
+    $webhook_url = $res_cfg->fetch_assoc()['apps_script_webhook_url'];
+    if (empty($webhook_url)) return;
+
+    $payload = [
+        'nama_sales' => $sales_name,
+        'tambah_spk' => $tambah_spk,
+        'tambah_do' => $tambah_do
+    ];
+
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $webhook_url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT => 5
+    ]);
+    @curl_exec($ch);
+    @curl_close($ch);
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
@@ -136,6 +168,11 @@ if ($method === 'GET') {
                     $n_stmt->close();
                 }
 
+                // Auto Push ke Google Spreadsheet jika Webhook terhubung
+                $tambah_spk = ($jenis_input === 'SPK') ? 1 : 0;
+                $tambah_do = ($jenis_input === 'DO') ? 1 : 0;
+                triggerSheetsPush($conn, $sales_id, $tambah_spk, $tambah_do);
+
                 $msg = ($jenis_input === 'DO') ? "DO berhasil ditambahkan!" : "SPK berhasil diajukan ke Supervisor!";
                 echo json_encode(["status" => "success", "message" => $msg, "id" => $spk_id]);
             } else {
@@ -190,6 +227,9 @@ if ($method === 'GET') {
                         $n_stmt->execute();
                         $n_stmt->close();
                     }
+
+                    // Auto Push DO ke Google Spreadsheet
+                    triggerSheetsPush($conn, $s_id, 0, 1);
                 }
                 echo json_encode(["status" => "success", "message" => "SPK berhasil dikonversi menjadi DO (Disetujui)."]);
             } else {
