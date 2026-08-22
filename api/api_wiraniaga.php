@@ -41,31 +41,57 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     $spv = isset($_GET['spv']) ? $conn->real_escape_string(trim($_GET['spv'])) : '';
     
-    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, status, DATE_FORMAT(created_at, '%d %b %Y') as created_at, DATE_FORMAT(created_at, '%Y-%m-%d') as created_at_raw FROM sales_accounts";
-    if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
-        $spv_clean = str_replace('Pak ', '', $spv);
-        $query_spv = $query . " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%') ORDER BY id ASC";
-        $result = $conn->query($query_spv);
-        $data = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $data[] = $row;
-            }
-        }
-        echo json_encode(["status" => "success", "data" => $data]);
-        $conn->close();
-        exit();
+    // Update online status threshold (2 minutes)
+    $conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
+    $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
+
+    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, status, last_active,
+                     CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE) THEN 1 ELSE 0 END as is_online,
+                     DATE_FORMAT(created_at, '%d %b %Y') as created_at, 
+                     DATE_FORMAT(created_at, '%Y-%m-%d') as created_at_raw 
+              FROM sales_accounts";
+    
+    function formatRelTime($datetimeStr) {
+        if (!$datetimeStr) return "Belum pernah aktif";
+        $time = strtotime($datetimeStr);
+        $diff = time() - $time;
+        if ($diff < 90) return "Online Sekarang";
+        if ($diff < 3600) return floor($diff / 60) . " mnt lalu";
+        if ($diff < 86400) return "Hari ini " . date('H:i', $time);
+        if ($diff < 172800) return "Kemarin " . date('H:i', $time);
+        return date('d M Y H:i', $time);
     }
 
-    // Jika SPV kosong (misal superadmin/login bukan SPV)
-    $result = $conn->query($query . " ORDER BY id ASC");
+    if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
+        $spv_clean = str_replace('Pak ', '', $spv);
+        $query .= " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+    }
+    $query .= " ORDER BY id ASC";
+
+    $result = $conn->query($query);
     $data = [];
+    $total_online = 0;
+    $total_offline = 0;
+
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $is_on = intval($row['is_online']) === 1;
+            if ($is_on) $total_online++;
+            else $total_offline++;
+
+            $row['is_online'] = $is_on;
+            $row['status_online'] = $is_on ? "Online" : "Offline";
+            $row['last_active_formatted'] = formatRelTime($row['last_active']);
             $data[] = $row;
         }
     }
-    echo json_encode(["status" => "success", "data" => $data]);
+    echo json_encode([
+        "status" => "success", 
+        "total" => count($data),
+        "total_online" => $total_online,
+        "total_offline" => $total_offline,
+        "data" => $data
+    ]);
     $conn->close();
     exit();
 }

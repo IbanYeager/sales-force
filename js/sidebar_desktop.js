@@ -380,6 +380,16 @@
 
         window.logoutUser = function() {
             const role = localStorage.getItem('peranSales');
+            const idSales = localStorage.getItem('idSales') || localStorage.getItem('sales_id');
+            const username = localStorage.getItem('usernameSales') || localStorage.getItem('userSales') || localStorage.getItem('username');
+
+            if (idSales || username) {
+                if (navigator.sendBeacon) {
+                    const blob = new Blob([JSON.stringify({ action: 'offline', id_sales: idSales || 0, username: username || '' })], { type: 'application/json' });
+                    navigator.sendBeacon(prefix + 'api/api_heartbeat.php', blob);
+                }
+            }
+
             localStorage.clear();
             if (role === 'Kepala Cabang') {
                 window.location.href = prefix + 'pages/login_kacab.html';
@@ -389,6 +399,59 @@
                 window.location.href = prefix + 'pages/login.html';
             }
         };
+
+        // ── Real-Time Online Presence / Heartbeat Signal ────────
+        (function initOnlineHeartbeat() {
+            const idSales = localStorage.getItem('idSales') || localStorage.getItem('sales_id');
+            const username = localStorage.getItem('usernameSales') || localStorage.getItem('userSales') || localStorage.getItem('username');
+
+            // Hanya kirim heartbeat jika user sedang login
+            if (!idSales && !username) return;
+
+            function sendHeartbeat(action = 'ping') {
+                const apiHeartbeat = prefix + 'api/api_heartbeat.php';
+                const payload = {
+                    action: action,
+                    id_sales: idSales || 0,
+                    username: username || ''
+                };
+
+                if (action === 'offline' && navigator.sendBeacon) {
+                    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+                    navigator.sendBeacon(apiHeartbeat, blob);
+                    return;
+                }
+
+                fetch(apiHeartbeat, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    keepalive: true
+                }).catch(() => {});
+            }
+
+            // Kirim heartbeat saat halaman dimuat
+            sendHeartbeat('ping');
+
+            // Kirim heartbeat berkala setiap 35 detik selama tab aktif
+            setInterval(() => {
+                if (!document.hidden) {
+                    sendHeartbeat('ping');
+                }
+            }, 35000);
+
+            // Kirim heartbeat saat tab kembali aktif
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    sendHeartbeat('ping');
+                }
+            });
+
+            // Kirim sinyal offline saat tab/browser ditutup
+            window.addEventListener('beforeunload', () => {
+                sendHeartbeat('offline');
+            });
+        })();
 
         // ── Visual Notification Toast ──────────────────────────
         window.showToastNotification = function (msg) {

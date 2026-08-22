@@ -126,16 +126,70 @@
   color: var(--fu-crimson);
 }
 
+/* Danger Outline Button (Reset DB) */
+.btn-fu-danger-outline {
+  background: #ffffff;
+  color: #ef4444 !important;
+  border: 1.5px solid #fecaca;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.06);
+}
+
+.btn-fu-danger-outline:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #dc2626 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.12);
+}
+
+.btn-fu-danger-outline i {
+  color: #ef4444;
+}
+
+/* --- MASTER ACTION TOOLBAR --- */
+.fu-master-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 18px -2px rgba(13, 27, 62, 0.05);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fu-toolbar-left,
+.fu-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .fu-master-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .fu-toolbar-left,
+  .fu-toolbar-right {
+    justify-content: flex-start;
+  }
+}
+
 /* --- HIGH-END FORM CONTROLS & FILTERS --- */
 .fu-filter-card {
   background: #ffffff;
   border: 1.5px solid #e2e8f0;
   border-radius: var(--fu-radius-lg);
-  padding: 16px 20px;
-  margin-bottom: 20px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
   box-shadow: var(--fu-shadow-card);
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(260px, 2fr) 1.2fr 1.2fr 1fr;
   gap: 12px;
   align-items: center;
 }

@@ -129,39 +129,40 @@
       <div id="quotaRefillNotificationBar" style="display:none; margin-bottom:18px;"></div>
 
       <!-- MASTER ACTION TOOLBAR -->
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; padding:16px 20px; margin-bottom:18px; flex-wrap:wrap; gap:12px; box-shadow:var(--fu-shadow-card);">
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div class="fu-master-toolbar">
+        <div class="fu-toolbar-left">
           <!-- Hidden File Input for Excel Import -->
           <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display:none;" onchange="handleExcelUpload(this)">
           
           <button class="btn-fu btn-fu-emerald" onclick="document.getElementById('excelFileInput').click()">
-            <i class="fa-solid fa-file-excel"></i> Impor File Excel / CSV
+            <i class="fa-solid fa-file-excel"></i> Impor Excel / CSV
           </button>
 
           <!-- SMART QUOTA DISTRIBUTION BUTTON -->
           <button class="btn-fu btn-fu-crimson" onclick="openSmartDistributionModal()">
-            <i class="fa-solid fa-bolt-lightning"></i> Bagi Kuota Leads (50 / 100 per Sales)
+            <i class="fa-solid fa-bolt-lightning"></i> Bagi Kuota (50 / 100)
           </button>
 
           <button class="btn-fu btn-fu-secondary" onclick="openAddCustomerModal()">
-            <i class="fa-solid fa-user-plus"></i> + Tambah Customer
+            <i class="fa-solid fa-user-plus"></i> + Customer
           </button>
+        </div>
 
+        <div class="fu-toolbar-right">
           <button class="btn-fu btn-fu-secondary" onclick="openTemplateManagerModal()">
             <i class="fa-solid fa-comment-dots"></i> Template WA
           </button>
 
           <button class="btn-fu btn-fu-secondary" onclick="openSyncSettingsModal()">
-            <i class="fa-solid fa-arrows-rotate"></i> Sync Google Sheet
+            <i class="fa-solid fa-arrows-rotate"></i> Sync Sheet
           </button>
-        </div>
 
-        <div style="display:flex; align-items:center; gap:8px;">
-          <a href="../api/api_followup_sync.php?action=export_csv" class="btn-fu btn-fu-secondary" style="font-size:12px;">
+          <a href="../api/api_followup_sync.php?action=export_csv" class="btn-fu btn-fu-secondary">
             <i class="fa-solid fa-download" style="color:#0284c7;"></i> Ekspor CSV
           </a>
-          <button class="btn-fu btn-fu-secondary" style="color:#ef4444 !important; border-color:#fecaca;" onclick="confirmResetDatabase()" title="Kosongkan seluruh data customer">
-            <i class="fa-solid fa-trash-can" style="color:#ef4444;"></i> Reset DB
+
+          <button class="btn-fu btn-fu-danger-outline" onclick="confirmResetDatabase()" title="Kosongkan seluruh data customer">
+            <i class="fa-solid fa-trash-can"></i> Reset DB
           </button>
         </div>
       </div>
@@ -286,7 +287,9 @@
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="../custom_alert.js?v=24"></script>
-  <script src="../js/followup_master.js?v=24"></script>
+  <script src="../custom_alert.js?v=25"></script>
+  <script src="../js/spv_global.js"></script>
+  <script src="../js/followup_master.js?v=25"></script>
+  <script src="../js/pwa-app.js?v=3"></script>
 </body>
 </html>

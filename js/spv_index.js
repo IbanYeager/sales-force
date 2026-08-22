@@ -123,20 +123,17 @@ function logoutUser() {
           const elSalesCount = document.getElementById('dashSalesCount');
           if (elSalesCount) elSalesCount.textContent = wirJson.data.length;
           
-          let activeCount = 0;
-          let inactiveCount = 0;
-          wirJson.data.forEach(s => {
-            if (s.status === 'Tidak Aktif') {
-              inactiveCount++;
-            } else {
-              activeCount++;
-            }
-          });
+          const totalOnline = wirJson.total_online || 0;
+          const totalOffline = (wirJson.data.length - totalOnline);
           
           const elActive = document.getElementById('dashSalesActive');
           const elInactive = document.getElementById('dashSalesInactive');
-          if(elActive) elActive.textContent = `${activeCount} Aktif`;
-          if(elInactive) elInactive.textContent = `${inactiveCount} Inaktif`;
+          if (elActive) {
+            elActive.innerHTML = `<span style="color:#10b981; font-weight:800;"><i class="fa-solid fa-circle" style="font-size:8px;"></i> ${totalOnline} Online</span>`;
+          }
+          if (elInactive) {
+            elInactive.innerHTML = `<span style="color:#94a3b8;">${totalOffline} Offline</span>`;
+          }
         }
       } catch (e) {
         console.error('Error fetching pending approvals:', e);

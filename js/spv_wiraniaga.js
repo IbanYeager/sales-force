@@ -135,14 +135,18 @@ let listDataWiraniaga = [];
       const subTitleCount = document.getElementById('subTitleCount');
       const q = (document.getElementById('searchWiraniaga')?.value || '').toLowerCase().trim();
 
-      const aktif = listDataWiraniaga.filter(r => r.status !== 'Tidak Aktif').length;
-      const inaktif = listDataWiraniaga.length - aktif;
-      subTitleCount.textContent = `${listDataWiraniaga.length} wiraniaga · ${aktif} aktif · ${inaktif} tidak aktif`;
+      const totalOnline = listDataWiraniaga.filter(r => r.is_online).length;
+      const totalOffline = listDataWiraniaga.length - totalOnline;
+      if (subTitleCount) {
+        subTitleCount.innerHTML = `<strong>${listDataWiraniaga.length}</strong> wiraniaga &middot; <span style="color:#10b981; font-weight:800;"><i class="fa-solid fa-circle" style="font-size:8px;"></i> ${totalOnline} Online</span> &middot; <span style="color:#94a3b8;">${totalOffline} Offline</span>`;
+      }
 
       const rows = q
         ? listDataWiraniaga.filter(r =>
             (r.nama_lengkap || '').toLowerCase().includes(q) ||
-            (r.username || '').toLowerCase().includes(q))
+            (r.username || '').toLowerCase().includes(q) ||
+            (q === 'online' && r.is_online) ||
+            (q === 'offline' && !r.is_online))
         : listDataWiraniaga;
 
       if (listDataWiraniaga.length === 0) {
@@ -159,6 +163,7 @@ let listDataWiraniaga = [];
       rows.forEach((row) => {
         const globalIndex = listDataWiraniaga.indexOf(row);
         const isOff = row.status === 'Tidak Aktif';
+        const isOn = row.is_online === true || row.is_online === 1;
         const avatar = (row.foto && row.foto.trim() !== '')
           ? row.foto
           : `https://ui-avatars.com/api/?name=${encodeURIComponent(row.nama_lengkap)}&background=eef4fd&color=2458c5`;
@@ -185,16 +190,44 @@ let listDataWiraniaga = [];
           badgeHtml = '<span style="font-size:11px; font-weight:800; background:#ffe4e6; color:#be123c; padding:3px 8px; border-radius:6px;">💡 Need Coaching</span>';
         }
 
+        let statusHtml = '';
+        if (isOn) {
+          statusHtml = `
+            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+              <span class="status-pill on" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">
+                <i class="fa-solid fa-circle" style="font-size:7px;"></i> Online
+              </span>
+              <span style="font-size:10px; color:#15803d; font-weight:600;">Aktif di Web</span>
+            </div>
+          `;
+        } else {
+          statusHtml = `
+            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+              <span class="status-pill off" style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;">
+                <i class="fa-solid fa-circle" style="font-size:7px; opacity:0.6;"></i> Offline
+              </span>
+              <span style="font-size:10px; color:#94a3b8;">${row.last_active_formatted || 'Belum aktif'}</span>
+            </div>
+          `;
+        }
+
+        const dotStyle = isOn
+          ? 'background:#10b981; box-shadow:0 0 0 2px white, 0 0 6px #10b981;'
+          : (isOff ? 'background:#ef4444;' : 'background:#94a3b8;');
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="num" style="color:var(--muted);">${globalIndex + 1}</td>
           <td>
             <div class="wira-name">
-              <div class="wira-avatar">
+              <div class="wira-avatar" style="position:relative;">
                 <img src="${avatar}" alt="Foto ${row.nama_lengkap}">
-                <span class="dot ${isOff ? 'off' : ''}"></span>
+                <span class="dot" style="${dotStyle} position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; border:2px solid white;" title="${isOn ? 'Online Sekarang' : 'Offline'}"></span>
               </div>
-              <span class="n">${row.nama_lengkap}</span>
+              <div style="display:flex; flex-direction:column;">
+                <span class="n" style="font-weight:800; color:#0f172a;">${row.nama_lengkap}</span>
+                <span style="font-size:11px; color:#64748b;">${row.nama_spv || 'Tim SPV'}</span>
+              </div>
             </div>
           </td>
           <td class="wira-username">${row.username}</td>
@@ -204,7 +237,7 @@ let listDataWiraniaga = [];
               <div style="height:100%; width:${conversionRate}; background:#2563eb;"></div>
             </div>
           </td>
-          <td class="num"><span class="status-pill ${isOff ? 'off' : 'on'}">${isOff ? 'Tidak Aktif' : 'Aktif'}</span></td>
+          <td class="num">${statusHtml}</td>
           <td class="num"><span class="badge-tingkatan">${row.tingkatan || 'Junior'}</span></td>
           <td>${badgeHtml}</td>
           <td class="num">
@@ -224,6 +257,9 @@ let listDataWiraniaga = [];
         wiraniagaBody.appendChild(tr);
       });
     }
+
+    // Auto-refresh presence every 20 seconds
+    setInterval(loadWiraniaga, 20000);
 
     function filterWiraniaga() {
       renderWiraniagaRows();
