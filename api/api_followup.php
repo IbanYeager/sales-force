@@ -35,14 +35,19 @@ function clean_phone_number($phone) {
 }
 
 // Helper to fetch list of sales from SFT database or defaults
-function get_sales_list() {
+function get_sales_list($spv = '') {
     global $is_mysql, $conn;
     $salesList = [];
 
     // Try fetching from SFT sales_accounts if MySQL is active
     if ($is_mysql && $conn) {
         try {
-            $res = $conn->query("SELECT id, nama_lengkap as name, no_hp as phone, tingkatan as role, nama_spv FROM sales_accounts WHERE status = 'Aktif' OR status IS NULL");
+            $where = "(status = 'Aktif' OR status IS NULL)";
+            if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
+                $spvClean = str_replace('Pak ', '', $conn->real_escape_string($spv));
+                $where .= " AND (nama_spv = '" . $conn->real_escape_string($spv) . "' OR nama_spv LIKE '%$spvClean%')";
+            }
+            $res = $conn->query("SELECT id, nama_lengkap as name, no_hp as phone, tingkatan as role, nama_spv FROM sales_accounts WHERE $where ORDER BY nama_lengkap ASC");
             if ($res && $res->num_rows > 0) {
                 while ($r = $res->fetch_assoc()) {
                     $salesList[] = [
@@ -82,6 +87,7 @@ if ($action === 'customers') {
     $sales_id = isset($_GET['sales_id']) ? trim($_GET['sales_id']) : '';
     $status = isset($_GET['status']) ? trim($_GET['status']) : '';
     $category = isset($_GET['category']) ? trim($_GET['category']) : '';
+    $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
 
     $where = [];
     $params = [];
@@ -93,7 +99,15 @@ if ($action === 'customers') {
     }
 
     if ($sales_id === 'all') {
-        // SPV Master view: show all database leads
+        // If specific SPV view, show their team's leads + unassigned leads
+        if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
+            $spvSales = get_sales_list($spv);
+            $spvSalesIds = array_map(fn($s) => (int)$s['id'], $spvSales);
+            if (!empty($spvSalesIds)) {
+                $idList = implode(',', $spvSalesIds);
+                $where[] = "(assigned_sales_id IN ($idList) OR assigned_sales_id IS NULL OR assigned_sales_id = 0)";
+            }
+        }
     } elseif ($sales_id === 'unassigned') {
         $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
     } elseif ($sales_id !== '') {
@@ -232,7 +246,8 @@ if ($action === 'stats') {
 // ROUTE: GET /api_followup.php?action=sales
 // -------------------------------------------------------------
 if ($action === 'sales') {
-    $salesList = get_sales_list();
+    $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
+    $salesList = get_sales_list($spv);
     $allCust = followup_query("SELECT assigned_sales_id, followup_status FROM followup_customers");
 
     foreach ($salesList as &$s) {

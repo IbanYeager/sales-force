@@ -76,14 +76,47 @@
       }).join('');
     }
 
+    function setupSpvTeamLock() {
+      const peran = localStorage.getItem('peranSales') || 'Supervisor';
+      const namaSpv = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
+      const filterSpvEl = document.getElementById('selectFilterSpvTarget');
+      
+      if (filterSpvEl) {
+        if (peran === 'Supervisor' || peran === 'SPV') {
+          filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>👑 Tim ${namaSpv}</option>`;
+          filterSpvEl.disabled = true;
+          filterSpvEl.style.background = '#f8fafc';
+          filterSpvEl.style.cursor = 'default';
+          filterSpvEl.style.fontWeight = '800';
+          filterSpvEl.style.color = '#0f172a';
+        } else {
+          // Kepala Cabang / Branch Manager can see all teams
+          filterSpvEl.innerHTML = `
+            <option value="Semua">👑 Semua Tim (Master - 46 Sales)</option>
+            <option value="Pak Ryan">Tim Pak Ryan</option>
+            <option value="Pak Alvin">Tim Pak Alvin</option>
+            <option value="Pak Riva">Tim Pak Riva</option>
+          `;
+        }
+      }
+    }
+
     async function loadMonitoringBoard() {
       const boardBody = document.getElementById('boardBody');
       const boardPeriode = document.getElementById('boardPeriode');
       const selectBulan = document.getElementById('selectBulanMonitoring');
       const bulanParam = selectBulan ? selectBulan.value : (new Date().getMonth() + 1);
 
-      const filterSpvEl = document.getElementById('selectFilterSpvTarget');
-      const spvParam = filterSpvEl ? filterSpvEl.value : (localStorage.getItem('spv_target_filter') || 'Semua');
+      const peran = localStorage.getItem('peranSales') || 'Supervisor';
+      const namaSpv = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
+
+      let spvParam = '';
+      if (peran === 'Supervisor' || peran === 'SPV') {
+        spvParam = namaSpv;
+      } else {
+        const filterSpvEl = document.getElementById('selectFilterSpvTarget');
+        spvParam = filterSpvEl ? filterSpvEl.value : 'Semua';
+      }
       localStorage.setItem('spv_target_filter', spvParam);
 
       try {
@@ -393,6 +426,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       guardSPV();
       renderUser();
+      setupSpvTeamLock();
       const selectBulanMon = document.getElementById('selectBulanMonitoring');
       if (selectBulanMon) {
         selectBulanMon.value = new Date().getMonth() + 1;

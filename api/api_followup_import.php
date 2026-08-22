@@ -122,144 +122,236 @@ if ($fileExt === 'csv') {
         fclose($handle);
     }
 } else {
-    // XLSX Parser (Uses fast node parser if available, or PHP ZipArchive XML fallback)
-    $nodeScript = __DIR__ . '/parse_excel_fast.js';
-    if (!file_exists($nodeScript)) {
-        $helperCode = <<< 'JS'
-const xlsx = require('c:/laragon/www/followup-sales/server/node_modules/xlsx');
-const fs = require('fs');
+    // 100% Pure PHP Native XLSX Parser (Works flawlessly on Hostinger, cPanel & Linux hosting without node/shell_exec)
+    $zip = new ZipArchive();
+    if ($zip->open($savedFilePath) === TRUE) {
+        $sheetUsed = 'Excel Native Engine';
 
-const filePath = process.argv[2];
-if (!filePath) {
-    console.log(JSON.stringify({ success: false, message: 'File path missing' }));
-    process.exit(1);
-}
-
-try {
-    const buf = fs.readFileSync(filePath);
-    const wbMeta = xlsx.read(buf, { type: 'buffer', bookSheets: true });
-    const sheetNames = wbMeta.SheetNames || [];
-
-    let targetSheet = sheetNames.find(s => /attack\s*list|database|customer|data\s*repurchase|pelanggan/i.test(s));
-    if (!targetSheet) {
-        targetSheet = sheetNames.find(s => !/petunjuk|summary|competition|cluster$/i.test(s)) || sheetNames[0];
-    }
-
-    const wb = xlsx.read(buf, { type: 'buffer', sheets: [targetSheet], dense: true, cellDates: true });
-    const ws = wb.Sheets[targetSheet];
-    const rawRows = xlsx.utils.sheet_to_json(ws, { header: 1, defval: '' });
-
-    if (!rawRows || rawRows.length === 0) {
-        console.log(JSON.stringify({ success: true, sheet: targetSheet, data: [] }));
-        process.exit(0);
-    }
-
-    let headerRowIdx = 0;
-    let maxMatch = 0;
-    const keywords = ['nama', 'customer', 'telepon', 'phone', 'wa', 'mobil', 'model', 'vin', 'cluster', 'priority'];
-
-    for (let r = 0; r < Math.min(10, rawRows.length); r++) {
-        let matches = 0;
-        if (Array.isArray(rawRows[r])) {
-            for (const cell of rawRows[r]) {
-                const s = String(cell || '').trim().toLowerCase();
-                if (keywords.some(k => s === k || s.includes(k))) matches++;
+        // 1. Read Shared Strings (xl/sharedStrings.xml)
+        $sharedStrings = [];
+        $sharedStringsXml = $zip->getFromName('xl/sharedStrings.xml');
+        if ($sharedStringsXml) {
+            $xml = @simplexml_load_string($sharedStringsXml);
+            if ($xml && isset($xml->si)) {
+                foreach ($xml->si as $si) {
+                    if (isset($si->t)) {
+                        $sharedStrings[] = (string)$si->t;
+                    } elseif (isset($si->r)) {
+                        $tVal = '';
+                        foreach ($si->r as $rPart) {
+                            $tVal .= (string)$rPart->t;
+                        }
+                        $sharedStrings[] = $tVal;
+                    } else {
+                        $sharedStrings[] = '';
+                    }
+                }
             }
         }
-        if (matches > maxMatch) {
-            maxMatch = matches;
-            headerRowIdx = r;
+
+        // 2. Identify target sheet (check sheet names in xl/workbook.xml)
+        $sheetFile = 'xl/worksheets/sheet1.xml';
+        $wbXml = $zip->getFromName('xl/workbook.xml');
+        if ($wbXml) {
+            $wbObj = @simplexml_load_string($wbXml);
+            if ($wbObj && isset($wbObj->sheets->sheet)) {
+                $sIdx = 1;
+                foreach ($wbObj->sheets->sheet as $s) {
+                    $sName = (string)$s['name'];
+                    if (preg_match('/attack\s*list|database|customer|data\s*repurchase|pelanggan/i', $sName)) {
+                        $rId = (string)$s['id'] ?? ('rId' . $sIdx);
+                        $sheetFile = "xl/worksheets/sheet{$sIdx}.xml";
+                        $sheetUsed = $sName;
+                        break;
+                    }
+                    $sIdx++;
+                }
+            }
         }
-    }
 
-    const headers = (rawRows[headerRowIdx] || []).map((h, i) => {
-        let clean = String(h || '').trim().toLowerCase().replace(/[\r\n\t]+/g, ' ');
-        return clean || ('col_' + i);
-    });
-
-    const findColIdx = (patterns) => {
-        for (const pat of patterns) {
-            const idx = headers.findIndex(h => pat.test(h));
-            if (idx !== -1) return idx;
+        $sheetXmlContent = $zip->getFromName($sheetFile);
+        if (!$sheetXmlContent) {
+            // Fallback try sheet1, sheet2, sheet3...
+            for ($i = 1; $i <= 10; $i++) {
+                if ($zip->locateName("xl/worksheets/sheet$i.xml") !== false) {
+                    $sheetXmlContent = $zip->getFromName("xl/worksheets/sheet$i.xml");
+                    break;
+                }
+            }
         }
-        return -1;
-    };
+        $zip->close();
 
-    const nameIdx = findColIdx([/^nama customer/, /^nama_customer/, /^nama/, /customer/, /pelanggan/]);
-    const phoneIdx = findColIdx([/wa/, /telepon/, /phone/, /no_hp/, /hp/]);
-    const carIdx = findColIdx([/target.*repurchase/, /tipe.*mobil/, /model.*mobil/, /unit/, /mobil/]);
-    const lastCarIdx = findColIdx([/unit.*saat ini/, /mobil.*saat ini/, /tipe.*lama/, /last.*car/]);
-    const ageIdx = findColIdx([/usia.*kendaraan/, /usia/, /tahun/]);
-    const clusterIdx = findColIdx([/cluster_name/, /cluster/, /klaster/]);
-    const priorityIdx = findColIdx([/priority/, /prioritas/]);
-    const distIdx = findColIdx([/kecamatan/, /wilayah/, /domisili/]);
-    const plateIdx = findColIdx([/no_polisi/, /no.*polisi/, /plat/]);
-    const vinIdx = findColIdx([/vin/, /rangka/]);
+        if ($sheetXmlContent) {
+            // 3. Fast streaming parse using XMLReader (extremely low memory footprint)
+            $reader = new XMLReader();
+            $reader->xml($sheetXmlContent);
 
-    const results = [];
-    for (let r = headerRowIdx + 1; r < rawRows.length; r++) {
-        const row = rawRows[r];
-        if (!row || row.length === 0) continue;
+            $rawRows = [];
+            $currentRow = [];
+            $colLetterToIdx = function($letters) {
+                $idx = 0;
+                for ($l = 0; $l < strlen($letters); $l++) {
+                    $idx = $idx * 26 + (ord($letters[$l]) - ord('A') + 1);
+                }
+                return $idx - 1;
+            };
 
-        let name = nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '';
-        let phone = phoneIdx !== -1 ? String(row[phoneIdx] || '').trim() : '';
-        let carModel = carIdx !== -1 ? String(row[carIdx] || '').trim() : 'Toyota Unit';
-        let lastCar = lastCarIdx !== -1 ? String(row[lastCarIdx] || '').trim() : '';
-        let age = ageIdx !== -1 ? String(row[ageIdx] || '').trim() : '';
-        let cluster = clusterIdx !== -1 ? String(row[clusterIdx] || '').trim() : '';
-        let priority = priorityIdx !== -1 ? String(row[priorityIdx] || '').trim() : '';
-        let district = distIdx !== -1 ? String(row[distIdx] || '').trim() : '';
-        let plate = plateIdx !== -1 ? String(row[plateIdx] || '').trim() : '';
-        let vin = vinIdx !== -1 ? String(row[vinIdx] || '').trim() : '';
+            while ($reader->read()) {
+                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'row') {
+                    $currentRow = [];
+                } elseif ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'c') {
+                    $cellRef = $reader->getAttribute('r') ?: 'A1';
+                    $cellType = $reader->getAttribute('t'); // 's' = shared string
 
-        // Clean phone
-        phone = phone.replace(/[^0-9]/g, '');
-        if (phone.startsWith('0')) phone = '62' + phone.substring(1);
-        else if (phone.startsWith('8')) phone = '62' + phone;
+                    preg_match('/^([A-Z]+)([0-9]+)$/', $cellRef, $m);
+                    $colLetters = $m[1] ?? 'A';
+                    $colIdx = $colLetterToIdx($colLetters);
 
-        // Clean car model
-        carModel = carModel.replace(/\(Target Repurchase\)/gi, '').trim();
+                    $val = '';
+                    $inner = $reader->readInnerXML();
+                    if (preg_match('/<v>(.*?)<\/v>/s', $inner, $vm)) {
+                        $rawVal = trim($vm[1]);
+                        if ($cellType === 's') {
+                            $sIdx = (int)$rawVal;
+                            $val = $sharedStrings[$sIdx] ?? '';
+                        } else {
+                            $val = $rawVal;
+                        }
+                    } elseif (preg_match('/<t.*?>(.*?)<\/t>/s', $inner, $tm)) {
+                        $val = trim($tm[1]);
+                    }
+                    $currentRow[$colIdx] = trim($val);
+                } elseif ($reader->nodeType == XMLReader::END_ELEMENT && $reader->name == 'row') {
+                    if (!empty($currentRow)) {
+                        $rawRows[] = $currentRow;
+                    }
+                }
+            }
+            $reader->close();
 
-        if (name && name !== '-' && phone) {
-            results.push({
-                name,
-                phone,
-                car_model: carModel,
-                last_car_model: lastCar || carModel,
-                car_age: age ? (isNaN(age) ? age : Number(age).toFixed(1) + ' Tahun') : '',
-                recommended_model: carModel,
-                cluster_name: cluster,
-                priority: priority,
-                district: district,
-                plate_number: plate,
-                vin: vin,
-                followup_category: 'Trade-in / Repurchase (' + carModel + ')'
-            });
-        }
-    }
+            // 4. Map columns & extract records
+            if (!empty($rawRows)) {
+                $headerRowIdx = 0;
+                $maxMatch = 0;
+                $keywords = ['nama', 'customer', 'contact', 'telepon', 'phone', 'wa', 'mobil', 'model', 'vin', 'cluster', 'priority'];
 
-    console.log(JSON.stringify({ success: true, sheet: targetSheet, data: results }));
-} catch (err) {
-    console.log(JSON.stringify({ success: false, message: err.message }));
-}
-JS;
-        @file_put_contents($nodeScript, $helperCode);
-    }
+                for ($r = 0; $r < min(10, count($rawRows)); $r++) {
+                    $matches = 0;
+                    if (is_array($rawRows[$r])) {
+                        foreach ($rawRows[$r] as $cell) {
+                            $s = strtolower(trim((string)$cell));
+                            foreach ($keywords as $k) {
+                                if (strpos($s, $k) !== false) {
+                                    $matches++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if ($matches > $maxMatch) {
+                        $maxMatch = $matches;
+                        $headerRowIdx = $r;
+                    }
+                }
 
-    // Execute node parser
-    $nodeCmd = "node \"" . addslashes($nodeScript) . "\" \"" . addslashes($savedFilePath) . "\" 2>&1";
-    $output = @shell_exec($nodeCmd);
-    $json = @json_decode($output, true);
+                $headers = [];
+                $rawHeaders = $rawRows[$headerRowIdx] ?? [];
+                foreach ($rawHeaders as $i => $h) {
+                    $clean = strtolower(trim(preg_replace('/[\r\n\t]+/', ' ', (string)$h)));
+                    $headers[$i] = $clean ?: ('col_' . $i);
+                }
 
-    if ($json && !empty($json['success']) && isset($json['data'])) {
-        $parsedCustomers = $json['data'];
-        $sheetUsed = $json['sheet'] ?? 'Data Attack List';
-    } else {
-        // Fallback ZipArchive XML extraction
-        $zip = new ZipArchive();
-        if ($zip->open($savedFilePath) === TRUE) {
-            $sheetUsed = 'Excel Zip Engine';
-            // In case node is not installed, parse via XML
+                $findColIdx = function($patterns) use ($headers) {
+                    foreach ($patterns as $pat) {
+                        foreach ($headers as $idx => $h) {
+                            if (preg_match($pat, $h)) return $idx;
+                        }
+                    }
+                    return -1;
+                };
+
+                $nameIdx = $findColIdx(['/nama by single vin/i', '/nama customer/i', '/nama/i', '/customer/i', '/pelanggan/i']);
+                $phoneIdx = $findColIdx(['/contact person 1/i', '/wa/i', '/telepon/i', '/phone/i', '/no_hp/i', '/hp/i']);
+                $vFilterIdx = $findColIdx(['/vehicle filter/i']);
+                $rec1Idx = $findColIdx(['/alternative_recommendation_model_1/i', '/1\.\s*model/i']);
+                $rec2Idx = $findColIdx(['/alternative_recommendation_model_2/i', '/2\.\s*model/i']);
+                $rec3Idx = $findColIdx(['/alternative_recommendation_model_3/i', '/3\.\s*model/i']);
+                $lastCarIdx = $findColIdx(['/latest_model/i', '/model_kendaraan_terakhir/i', '/mobil.*saat ini/i', '/unit.*saat ini/i']);
+                $ageIdx = $findColIdx(['/vehicle age/i', '/usia_kendaraan_terakhir/i', '/usia.*kendaraan/i', '/usia/i', '/tahun/i']);
+                $clusterIdx = $findColIdx(['/cluster_name/i', '/cluster/i', '/klaster/i']);
+                $priorityIdx = $findColIdx(['/priority/i', '/prioritas/i']);
+                $distIdx = $findColIdx(['/alamat_kecamatan/i', '/kecamatan/i', '/wilayah/i', '/domisili/i']);
+                $plateIdx = $findColIdx(['/no_polisi/i', '/no.*polisi/i', '/plat/i']);
+                $vinIdx = $findColIdx(['/latest_vin/i', '/vin_kendaraan_terakhir/i', '/vin/i', '/no_rangka/i']);
+                $custTypeIdx = $findColIdx(['/cust\.\s*type/i', '/fleet_or_retail/i', '/tipe.*customer/i']);
+                $doOutletIdx = $findColIdx(['/do_oleh_tunas/i', '/nama_outlet_do/i', '/outlet.*do/i']);
+                $srvOutletIdx = $findColIdx(['/service_di_tunas/i', '/nama_outlet_service/i']);
+                $srvComplianceIdx = $findColIdx(['/rasio_kepatuhan_service/i', '/kepatuhan_service/i']);
+
+                for ($r = $headerRowIdx + 1; $r < count($rawRows); $r++) {
+                    $row = $rawRows[$r];
+                    if (empty($row)) continue;
+
+                    $name = $nameIdx !== -1 ? trim((string)($row[$nameIdx] ?? '')) : '';
+                    $phone = $phoneIdx !== -1 ? clean_phone_number((string)($row[$phoneIdx] ?? '')) : '';
+
+                    if (!$name || $name === '-' || !$phone) continue;
+
+                    $lastCar = $lastCarIdx !== -1 ? trim((string)($row[$lastCarIdx] ?? '')) : '';
+                    if ($lastCar === 'NO DATA' || $lastCar === '-') $lastCar = '';
+
+                    $vFilter = $vFilterIdx !== -1 ? trim((string)($row[$vFilterIdx] ?? '')) : '';
+                    if ($vFilter === 'OTHERS' || $vFilter === 'NO DATA') $vFilter = '';
+
+                    $rec1 = $rec1Idx !== -1 ? trim(str_replace('(Target Repurchase)', '', (string)($row[$rec1Idx] ?? ''))) : '';
+                    if ($rec1 === 'NO DATA' || $rec1 === '-') $rec1 = '';
+
+                    $rec2 = $rec2Idx !== -1 ? trim((string)($row[$rec2Idx] ?? '')) : '';
+                    if ($rec2 === 'NO DATA' || $rec2 === '-') $rec2 = '';
+
+                    $rec3 = $rec3Idx !== -1 ? trim((string)($row[$rec3Idx] ?? '')) : '';
+                    if ($rec3 === 'NO DATA' || $rec3 === '-') $rec3 = '';
+
+                    $age = $ageIdx !== -1 ? trim((string)($row[$ageIdx] ?? '')) : '';
+                    if ($age === 'NO DATA' || $age === '-') $age = '';
+                    if ($age && is_numeric($age)) $age = number_format((float)$age, 1) . ' Tahun';
+
+                    $cluster = $clusterIdx !== -1 ? trim((string)($row[$clusterIdx] ?? '')) : '';
+                    $priority = $priorityIdx !== -1 ? trim((string)($row[$priorityIdx] ?? '')) : '';
+                    $district = $distIdx !== -1 ? trim((string)($row[$distIdx] ?? '')) : '';
+                    if ($district === 'NO DATA' || $district === '-') $district = '';
+
+                    $plate = $plateIdx !== -1 ? trim((string)($row[$plateIdx] ?? '')) : '';
+                    $vin = $vinIdx !== -1 ? trim((string)($row[$vinIdx] ?? '')) : '';
+                    $custType = $custTypeIdx !== -1 ? trim((string)($row[$custTypeIdx] ?? 'RETAIL')) : 'RETAIL';
+                    $outletDo = $doOutletIdx !== -1 ? trim((string)($row[$doOutletIdx] ?? '')) : '';
+                    $outletSrv = $srvOutletIdx !== -1 ? trim((string)($row[$srvOutletIdx] ?? '')) : '';
+                    $srvComp = $srvComplianceIdx !== -1 ? trim((string)($row[$srvComplianceIdx] ?? '')) : '';
+
+                    $targetCar = $rec1 ?: ($vFilter ?: ($lastCar ?: 'Toyota Unit'));
+
+                    $parsedCustomers[] = [
+                        'name' => $name,
+                        'phone' => $phone,
+                        'car_model' => $targetCar,
+                        'last_car_model' => $lastCar,
+                        'car_age' => $age,
+                        'recommended_model' => $targetCar,
+                        'alt_model_2' => $rec2,
+                        'alt_model_3' => $rec3,
+                        'cluster_name' => $cluster,
+                        'priority' => $priority,
+                        'district' => $district,
+                        'plate_number' => $plate,
+                        'vin' => $vin,
+                        'customer_type' => $custType,
+                        'outlet_do' => $outletDo,
+                        'outlet_service' => $outletSrv,
+                        'service_compliance' => $srvComp,
+                        'followup_category' => 'Trade-in / Repurchase (' . $targetCar . ')'
+                    ];
+                }
+            }
         }
     }
 }

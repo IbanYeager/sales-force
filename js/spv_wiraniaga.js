@@ -51,7 +51,31 @@ let listDataWiraniaga = [];
       }
     }
 
-    window.currentWiraniagaSpvFilter = localStorage.getItem('spv_wiraniaga_filter') || 'Semua';
+    function setupWiraniagaSpvLock() {
+      const peran = localStorage.getItem('peranSales') || 'Supervisor';
+      const namaSpv = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
+      const filterSpvEl = document.getElementById('selectFilterSpvWiraniaga');
+      
+      if (filterSpvEl) {
+        if (peran === 'Supervisor' || peran === 'SPV') {
+          filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>👑 Tim ${namaSpv}</option>`;
+          filterSpvEl.disabled = true;
+          filterSpvEl.style.background = '#f8fafc';
+          filterSpvEl.style.cursor = 'default';
+          filterSpvEl.style.fontWeight = '800';
+          filterSpvEl.style.color = '#0f172a';
+          window.currentWiraniagaSpvFilter = namaSpv;
+        } else {
+          // Kepala Cabang / Branch Manager can see all teams
+          filterSpvEl.innerHTML = `
+            <option value="Semua">👑 Semua Tim (Master - 46 Sales)</option>
+            <option value="Pak Ryan">Tim Pak Ryan</option>
+            <option value="Pak Alvin">Tim Pak Alvin</option>
+            <option value="Pak Riva">Tim Pak Riva</option>
+          `;
+        }
+      }
+    }
 
     function changeWiraniagaSpvFilter(val) {
       window.currentWiraniagaSpvFilter = val;
@@ -64,8 +88,14 @@ let listDataWiraniaga = [];
       const subTitleCount = document.getElementById('subTitleCount');
       const month = new Date().getMonth() + 1;
 
+      const peran = localStorage.getItem('peranSales') || 'Supervisor';
+      const namaSpv = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
+
       try {
-        const spv = window.currentWiraniagaSpvFilter || 'Semua';
+        let spv = window.currentWiraniagaSpvFilter || 'Semua';
+        if (peran === 'Supervisor' || peran === 'SPV') {
+          spv = namaSpv;
+        }
         const res = await fetch(`../api/api_wiraniaga.php?spv=${encodeURIComponent(spv)}`);
         const result = await res.json();
 
@@ -364,6 +394,7 @@ let listDataWiraniaga = [];
     document.addEventListener('DOMContentLoaded', () => {
       guardSPV();
       renderUser();
+      setupWiraniagaSpvLock();
       loadWiraniaga();
       loadPendingApprovals();
 

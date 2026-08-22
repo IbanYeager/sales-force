@@ -30,9 +30,18 @@ async function initMasterDashboard() {
   ]);
 }
 
+function getLoggedInSpvName() {
+  const peran = localStorage.getItem('peranSales') || 'Supervisor';
+  if (peran === 'Supervisor' || peran === 'SPV') {
+    return localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
+  }
+  return '';
+}
+
 async function loadSalesList() {
   try {
-    const res = await fetch('../api/api_followup.php?action=sales');
+    const spv = getLoggedInSpvName();
+    const res = await fetch(`../api/api_followup.php?action=sales&spv=${encodeURIComponent(spv)}`);
     const data = await res.json();
     if (data.success) {
       masterState.salesList = data.data || [];
@@ -237,7 +246,8 @@ async function loadMasterCustomers() {
 
   try {
     const { search, sales_id, status, category } = masterState.filters;
-    const url = `../api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}`;
+    const spv = getLoggedInSpvName();
+    const url = `../api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&spv=${encodeURIComponent(spv)}`;
     const res = await fetch(url);
     const data = await res.json();
 

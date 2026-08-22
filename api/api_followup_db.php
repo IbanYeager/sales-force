@@ -178,7 +178,10 @@ function init_followup_tables() {
             'remarks' => "VARCHAR(100) DEFAULT ''",
             'sales_fu_status' => "VARCHAR(50) DEFAULT 'Open'",
             'reason_followup' => "TEXT",
-            'followup_date' => "DATETIME"
+            'followup_date' => "DATETIME",
+            'is_orphan' => "TINYINT(1) DEFAULT 0",
+            'ex_sales_name' => "VARCHAR(150) NULL",
+            'released_at' => "DATETIME NULL"
         ];
         foreach ($cols as $colName => $colDef) {
             $check = followup_query("SHOW COLUMNS FROM followup_customers LIKE '$colName'");

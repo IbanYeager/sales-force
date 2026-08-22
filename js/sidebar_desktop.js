@@ -61,6 +61,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
+                ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
                 ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data 46 Wiraniaga')}
@@ -70,6 +71,7 @@
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
+                ${navLinkKacab('pages/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
             </div>
 
             <div class="sidebar-bottom">
@@ -120,16 +122,18 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
+                ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
                 ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
                 ${navLinkSPV('pages_spv/wiraniaga.html', 'fa-solid fa-users', 'Wiraniaga')}
                 ${navLinkSPV('pages_spv/approval.html', 'fa-solid fa-check-to-slot', 'Approval <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
                 ${navLinkSPV('pages_spv/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas <span class="sidebar-notif-badge" id="sidebarAktivitasBadge" style="display:none; margin-left:auto; background:#2563eb;">0</span>')}
-                ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-bullhorn', 'Briefing Auto-Gen')}
+                ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-wand-magic-sparkles', 'Briefing Auto-Gen')}
                 ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
                 ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
-                ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
                 ${navLinkSPV('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
+                ${navLinkSPV('pages/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
             </div>
 
             <div class="sidebar-bottom">
