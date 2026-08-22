@@ -45,8 +45,10 @@ function applyHierFilters() {
     const spvMatch = g.spv.toLowerCase().includes(q);
 
     let team = g.team;
-    if (statusFilter) {
-      team = team.filter(s => statusFilter === 'Aktif' ? s.status !== 'Tidak Aktif' : s.status === 'Tidak Aktif');
+    if (statusFilter === 'Online') {
+      team = team.filter(s => s.is_online);
+    } else if (statusFilter === 'Offline') {
+      team = team.filter(s => !s.is_online);
     }
     // Jika query cocok dengan nama SPV, tampilkan seluruh timnya;
     // jika tidak, saring sales berdasar query.
@@ -65,11 +67,10 @@ function applyHierFilters() {
     const salesRows = team.map(s => {
       const pSpk = s.target_spk > 0 ? Math.round((s.real_spk / s.target_spk) * 100) : 0;
       const pDo = s.target_do > 0 ? Math.round((s.real_do / s.target_do) * 100) : 0;
-      const isActive = s.status !== 'Tidak Aktif';
       const isSalesOnline = s.is_online === true || s.is_online === 1;
       const salesDotStyle = isSalesOnline
         ? 'background:#10b981; box-shadow:0 0 6px #10b981;'
-        : (isActive ? 'background:#94a3b8;' : 'background:#ef4444;');
+        : 'background:#94a3b8;';
 
       return `
         <div class="hier-sale" onclick="openSalesDrill(${s.id})" role="button" tabindex="0"
@@ -85,7 +86,7 @@ function applyHierFilters() {
               </div>
               <div class="sd" style="display:flex; align-items:center; gap:6px;">
                 <span>${escapeHtml(s.tingkatan)}</span>
-                <span style="color:#94a3b8; font-size:10px;">&middot; ${s.last_active_formatted}</span>
+                <span style="color:#94a3b8; font-size:10px;">&middot; ${s.last_active_formatted || 'Offline'}</span>
               </div>
             </div>
           </div>
@@ -121,10 +122,10 @@ function applyHierFilters() {
             <div class="info">
               <div class="nm" style="display:flex; align-items:center; gap:8px;">
                 <span style="font-weight:800;">${escapeHtml(g.spv)}</span>
-                ${isSpvOn ? '<span style="font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:6px; border:1px solid #86efac;">🟢 SPV Online</span>' : '<span style="font-size:10px; font-weight:600; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:6px;">⚪ Offline (' + g.last_active_formatted + ')</span>'}
+                ${isSpvOn ? '<span style="font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:6px; border:1px solid #86efac;">🟢 SPV Online</span>' : '<span style="font-size:10px; font-weight:600; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:6px;">⚪ Offline</span>'}
               </div>
               <div class="sd">
-                ${g.total_sales} sales &middot; <span style="color:#10b981; font-weight:700;">🟢 ${onlineSalesInTeam} Sales Online</span> &middot; ${g.active} aktif
+                ${g.total_sales} sales &middot; <span style="color:#10b981; font-weight:700;">🟢 ${onlineSalesInTeam} Online</span>
               </div>
             </div>
           </div>

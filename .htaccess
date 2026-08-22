@@ -1,26 +1,50 @@
 # .htaccess for Hostinger & Laragon SFT Web Application
 
-# 1. Clean HTML URLs & Automatic .html Removal in Address Bar
+# 1. Clean HTML URLs & Modern Short Routing
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /sft/
 
-    # Default directory index
-    DirectoryIndex index.html index.php
+    # Prevent rewriting actual files or directories
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
 
-    # Redirect /sft/index.html -> /sft/
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /sft/index\.html [NC]
-    RewriteRule ^index\.html$ /sft/ [R=301,L]
+    # Don't touch API or Static Asset Folders
+    RewriteCond %{REQUEST_URI} ^/(api|assets|css|js|uploads|image|styles|scratch)/ [NC]
+    RewriteRule ^ - [L]
 
-    # Redirect /sft/pages/xxx.html -> /sft/pages/xxx
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /sft/(.+)\.html [NC]
-    RewriteRule ^(.+)\.html$ /sft/$1 [R=301,L]
+    # Direct custom clean shortcuts
+    RewriteRule ^wiraniaga/?$ pages_spv/wiraniaga.html [L,NC]
+    RewriteRule ^monitoring/?$ pages_kacab/monitoring_spv.html [L,NC]
+    RewriteRule ^monitoring-spv/?$ pages_kacab/monitoring_spv.html [L,NC]
+    RewriteRule ^spv/?$ pages_spv/index_spv.html [L,NC]
+    RewriteRule ^kacab/?$ pages_kacab/index_kacab.html [L,NC]
+    RewriteRule ^dashboard-spv/?$ pages_spv/index_spv.html [L,NC]
+    RewriteRule ^dashboard-kacab/?$ pages_kacab/index_kacab.html [L,NC]
+    RewriteRule ^database-followup/?$ pages_spv/followup_database.html [L,NC]
+    RewriteRule ^crm/?$ pages_spv/followup_database.html [L,NC]
+    RewriteRule ^approval/?$ pages_spv/approval.html [L,NC]
+    RewriteRule ^target-spv/?$ pages_spv/target.html [L,NC]
+    RewriteRule ^target-kacab/?$ pages_kacab/target_kacab.html [L,NC]
 
-    # Internal rewrite: serve .html transparently
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # Check directly if file.html exists
     RewriteCond %{REQUEST_FILENAME}.html -f
     RewriteRule ^(.*)$ $1.html [L]
+
+    # Check inside pages_spv/
+    RewriteCond %{DOCUMENT_ROOT}/pages_spv/$1.html -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/sft/pages_spv/$1.html -f
+    RewriteRule ^([^/]+)/?$ pages_spv/$1.html [L]
+
+    # Check inside pages_kacab/
+    RewriteCond %{DOCUMENT_ROOT}/pages_kacab/$1.html -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/sft/pages_kacab/$1.html -f
+    RewriteRule ^([^/]+)/?$ pages_kacab/$1.html [L]
+
+    # Check inside pages/
+    RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/sft/pages/$1.html -f
+    RewriteRule ^([^/]+)/?$ pages/$1.html [L]
 </IfModule>
 
 # 2. Add Proper MIME Types for PWA

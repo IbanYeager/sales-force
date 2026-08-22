@@ -76,11 +76,11 @@
             <input type="text" id="searchHier" placeholder="Cari nama SPV atau sales..." oninput="applyHierFilters()">
           </div>
           <div class="select-box">
-            <i class="fa-solid fa-circle-half-stroke"></i>
+            <i class="fa-solid fa-signal"></i>
             <select id="filterStatusSales" onchange="applyHierFilters()">
-              <option value="">Semua Status</option>
-              <option value="Aktif">Aktif</option>
-              <option value="Tidak Aktif">Tidak Aktif</option>
+              <option value="">Semua Kehadiran</option>
+              <option value="Online">🟢 Online Saja</option>
+              <option value="Offline">⚪ Offline Saja</option>
             </select>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="toggleAllGroups()" id="btnToggleAll">
