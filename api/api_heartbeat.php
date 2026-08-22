@@ -1,6 +1,6 @@
 <?php
 // api/api_heartbeat.php
-// Real-time Sales Online Presence & Heartbeat Engine
+// Real-time Presence Engine for Sales & SPVs
 error_reporting(0);
 mysqli_report(MYSQLI_REPORT_OFF);
 
@@ -28,7 +28,7 @@ function formatRelativeTime($datetimeStr) {
     $diff = time() - $time;
 
     if ($diff < 90) return "Online Sekarang";
-    if ($diff < 3600) return floor($diff / 60) . " menit lalu";
+    if ($diff < 3600) return floor($diff / 60) . " mnt lalu";
     if ($diff < 86400) return "Hari ini " . date('H:i', $time);
     if ($diff < 172800) return "Kemarin " . date('H:i', $time);
     return date('d M Y H:i', $time);
@@ -43,97 +43,123 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ── 1. PING / HEARTBEAT KETIKA SALES MEMBUKA & BERAKTIVITAS DI WEB ──
+$role = strtolower(trim($_GET['role'] ?? $data['role'] ?? 'sales'));
+$id_user = intval($_GET['id_sales'] ?? $_GET['id_user'] ?? $data['id_sales'] ?? $data['id_user'] ?? 0);
+$username = $conn->real_escape_string(trim($_GET['username'] ?? $data['username'] ?? ''));
+$nama = $conn->real_escape_string(trim($_GET['nama'] ?? $data['nama'] ?? ''));
+
+// ── 1. PING / HEARTBEAT KETIKA USER MEMBUKA WEB ──
 if ($action === 'ping') {
-    $id_sales = intval($_GET['id_sales'] ?? $data['id_sales'] ?? 0);
-    $username = $conn->real_escape_string(trim($_GET['username'] ?? $data['username'] ?? ''));
-
-    if ($id_sales > 0 || !empty($username)) {
-        $where = $id_sales > 0 ? "id = $id_sales" : "username = '$username'";
+    if (strpos($role, 'spv') !== false || strpos($role, 'supervisor') !== false) {
+        // Heartbeat untuk SPV
+        $where = $id_user > 0 ? "id = $id_user" : (!empty($username) ? "username = '$username'" : "nama_lengkap LIKE '%$nama%'");
+        $conn->query("UPDATE spv_accounts SET last_active = NOW(), is_online = 1 WHERE $where");
+        $conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
+    } else {
+        // Heartbeat untuk Sales
+        $where = $id_user > 0 ? "id = $id_user" : (!empty($username) ? "username = '$username'" : "nama_lengkap = '$nama'");
         $conn->query("UPDATE sales_accounts SET last_active = NOW(), is_online = 1 WHERE $where");
-        
-        // Auto-cleanup user yang sudah tidak aktif lebih dari 2 menit
         $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
-
-        echo json_encode([
-            "status" => "success",
-            "is_online" => true,
-            "timestamp" => date('Y-m-d H:i:s'),
-            "message" => "Heartbeat recorded"
-        ]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Invalid sales ID"]);
     }
+
+    echo json_encode([
+        "status" => "success",
+        "is_online" => true,
+        "role" => $role,
+        "timestamp" => date('Y-m-d H:i:s'),
+        "message" => "Heartbeat recorded"
+    ]);
     $conn->close();
     exit();
 }
 
-// ── 2. OFFLINE SIGNAL KETIKA SALES LOGOUT ATAU MENUTUP TAB ──
+// ── 2. OFFLINE SIGNAL KETIKA USER LOGOUT / TUTUP TAB ──
 if ($action === 'offline') {
-    $id_sales = intval($_GET['id_sales'] ?? $data['id_sales'] ?? 0);
-    $username = $conn->real_escape_string(trim($_GET['username'] ?? $data['username'] ?? ''));
-
-    if ($id_sales > 0 || !empty($username)) {
-        $where = $id_sales > 0 ? "id = $id_sales" : "username = '$username'";
-        $conn->query("UPDATE sales_accounts SET is_online = 0, last_active = DATE_SUB(NOW(), INTERVAL 3 MINUTE) WHERE $where");
-
-        echo json_encode([
-            "status" => "success",
-            "is_online" => false,
-            "message" => "User marked offline"
-        ]);
+    if (strpos($role, 'spv') !== false || strpos($role, 'supervisor') !== false) {
+        $where = $id_user > 0 ? "id = $id_user" : (!empty($username) ? "username = '$username'" : "nama_lengkap LIKE '%$nama%'");
+        $conn->query("UPDATE spv_accounts SET is_online = 0, last_active = DATE_SUB(NOW(), INTERVAL 3 MINUTE) WHERE $where");
     } else {
-        echo json_encode(["status" => "error", "message" => "Invalid sales ID"]);
+        $where = $id_user > 0 ? "id = $id_user" : (!empty($username) ? "username = '$username'" : "nama_lengkap = '$nama'");
+        $conn->query("UPDATE sales_accounts SET is_online = 0, last_active = DATE_SUB(NOW(), INTERVAL 3 MINUTE) WHERE $where");
     }
+
+    echo json_encode([
+        "status" => "success",
+        "is_online" => false,
+        "message" => "User marked offline"
+    ]);
     $conn->close();
     exit();
 }
 
-// ── 3. STATUS DAFTAR SALES ONLINE UNTUK SPV & KACAB ──
-$spv = $conn->real_escape_string(trim($_GET['spv'] ?? ''));
-
-// Update status online berdasarkan threshold 2 menit
+// ── 3. QUERY DAFTAR STATUS SPV & SALES UNTUK KACAB & SPV ──
+// Auto-update thresholds
 $conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
 $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
 
-$query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, status,
-                 last_active, 
-                 CASE 
-                    WHEN last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE) THEN 1 
-                    ELSE 0 
-                 END AS is_online
-          FROM sales_accounts";
+$conn->query("UPDATE spv_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
+$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
 
+// Ambil SPVs
+$spvQuery = $conn->query("SELECT id, username, nama_lengkap, foto, last_active, is_online FROM spv_accounts ORDER BY id ASC");
+$spv_list = [];
+$spv_online_count = 0;
+$spv_offline_count = 0;
+
+if ($spvQuery && $spvQuery->num_rows > 0) {
+    while ($spvRow = $spvQuery->fetch_assoc()) {
+        $isOn = intval($spvRow['is_online']) === 1;
+        if ($isOn) $spv_online_count++;
+        else $spv_offline_count++;
+
+        $spvRow['is_online'] = $isOn;
+        $spvRow['status_online'] = $isOn ? "Online" : "Offline";
+        $spvRow['last_active_formatted'] = formatRelativeTime($spvRow['last_active']);
+        $spv_list[] = $spvRow;
+    }
+}
+
+// Ambil Sales
+$spv = $conn->real_escape_string(trim($_GET['spv'] ?? ''));
+$salesQuery = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, status, last_active, is_online FROM sales_accounts";
 if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
     $spv_clean = str_replace('Pak ', '', $spv);
-    $query .= " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+    $salesQuery .= " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
 }
-$query .= " ORDER BY is_online DESC, id ASC";
+$salesQuery .= " ORDER BY is_online DESC, id ASC";
 
-$res = $conn->query($query);
+$salesRes = $conn->query($salesQuery);
 $sales_list = [];
-$total_online = 0;
-$total_offline = 0;
+$sales_online_count = 0;
+$sales_offline_count = 0;
 
-if ($res && $res->num_rows > 0) {
-    while ($r = $res->fetch_assoc()) {
-        $online = intval($r['is_online']) === 1;
-        if ($online) $total_online++;
-        else $total_offline++;
+if ($salesRes && $salesRes->num_rows > 0) {
+    while ($sRow = $salesRes->fetch_assoc()) {
+        $isOn = intval($sRow['is_online']) === 1;
+        if ($isOn) $sales_online_count++;
+        else $sales_offline_count++;
 
-        $r['is_online'] = $online;
-        $r['status_label'] = $online ? "Online Sekarang" : "Offline";
-        $r['last_active_formatted'] = formatRelativeTime($r['last_active']);
-        $sales_list[] = $r;
+        $sRow['is_online'] = $isOn;
+        $sRow['status_online'] = $isOn ? "Online" : "Offline";
+        $sRow['last_active_formatted'] = formatRelativeTime($sRow['last_active']);
+        $sales_list[] = $sRow;
     }
 }
 
 echo json_encode([
     "status" => "success",
-    "total" => count($sales_list),
-    "total_online" => $total_online,
-    "total_offline" => $total_offline,
-    "data" => $sales_list
+    "spv" => [
+        "total" => count($spv_list),
+        "total_online" => $spv_online_count,
+        "total_offline" => $spv_offline_count,
+        "data" => $spv_list
+    ],
+    "sales" => [
+        "total" => count($sales_list),
+        "total_online" => $sales_online_count,
+        "total_offline" => $sales_offline_count,
+        "data" => $sales_list
+    ]
 ]);
 
 $conn->close();

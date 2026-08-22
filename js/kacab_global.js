@@ -59,8 +59,15 @@ async function fetchBranchHierarchy() {
   const tgtJson = await tgtRes.json();
 
   const spvNames = (spvJson.ok && Array.isArray(spvJson.data)) ? spvJson.data : [];
+  const spvDetails = (spvJson.ok && Array.isArray(spvJson.details)) ? spvJson.details : [];
   const salesList = (wirJson.status === 'success' && Array.isArray(wirJson.data)) ? wirJson.data : [];
   const targetList = (tgtJson.status === 'success' && Array.isArray(tgtJson.data)) ? tgtJson.data : [];
+
+  // Map SPV details (is_online, last_active, etc.)
+  const spvDetailMap = {};
+  spvDetails.forEach(d => {
+    spvDetailMap[d.nama_lengkap] = d;
+  });
 
   // Index target per sales_account_id
   const targetById = {};
@@ -70,10 +77,17 @@ async function fetchBranchHierarchy() {
   const groups = {};
   spvNames.forEach(nm => { groups[nm] = []; });
 
+  let totalSalesOnline = 0;
+  let totalSalesOffline = 0;
+
   salesList.forEach(s => {
     const spv = (s.nama_spv || '').trim() || 'Tanpa SPV';
     if (!groups[spv]) groups[spv] = [];
     const t = targetById[String(s.id)] || {};
+    const isOn = s.is_online === true || s.is_online === 1;
+    if (isOn) totalSalesOnline++;
+    else totalSalesOffline++;
+
     groups[spv].push({
       id: Number(s.id),
       nama: s.nama_lengkap,
@@ -81,6 +95,9 @@ async function fetchBranchHierarchy() {
       tingkatan: s.tingkatan || 'Magang',
       foto: s.foto || '',
       status: s.status || 'Aktif',
+      is_online: isOn,
+      status_online: isOn ? 'Online' : 'Offline',
+      last_active_formatted: s.last_active_formatted || 'Belum pernah aktif',
       nama_spv: spv,
       target_spk: (t.target_spk_bulan !== undefined) ? Number(t.target_spk_bulan) : Number(t.target_spk || 0),
       real_spk: (t.realisasi_spk_bulan !== undefined) ? Number(t.realisasi_spk_bulan) : Number(t.realisasi_spk || 0),
@@ -90,20 +107,32 @@ async function fetchBranchHierarchy() {
     });
   });
 
+  let totalSpvOnline = 0;
+  let totalSpvOffline = 0;
+
   // Susun array group + agregat per SPV
   const hierarchy = Object.keys(groups).map(nm => {
     const team = groups[nm];
+    const spvInfo = spvDetailMap[nm] || {};
+    const isSpvOn = spvInfo.is_online === true || spvInfo.is_online === 1;
+    if (isSpvOn) totalSpvOnline++;
+    else totalSpvOffline++;
+
     const agg = team.reduce((a, s) => {
       a.target_spk += s.target_spk;
       a.real_spk += s.real_spk;
       a.target_do += s.target_do;
       a.real_do += s.real_do;
+      if (s.is_online) a.online_sales++;
       if (s.status === 'Tidak Aktif') a.inactive++; else a.active++;
       return a;
-    }, { target_spk: 0, real_spk: 0, target_do: 0, real_do: 0, active: 0, inactive: 0 });
+    }, { target_spk: 0, real_spk: 0, target_do: 0, real_do: 0, active: 0, inactive: 0, online_sales: 0 });
 
     return {
       spv: nm,
+      is_online: isSpvOn,
+      status_online: isSpvOn ? 'Online' : 'Offline',
+      last_active_formatted: spvInfo.last_active_formatted || 'Belum pernah aktif',
       team,
       total_sales: team.length,
       ...agg,
@@ -115,7 +144,17 @@ async function fetchBranchHierarchy() {
   // Urutkan: pencapaian DO tertinggi dulu, lalu jumlah tim
   hierarchy.sort((a, b) => (b.pct_do - a.pct_do) || (b.total_sales - a.total_sales));
 
-  return { hierarchy, periode: tgtJson.periode || '', evaluasi_do_label: tgtJson.evaluasi_do_label || '' };
+  return { 
+    hierarchy, 
+    periode: tgtJson.periode || '', 
+    evaluasi_do_label: tgtJson.evaluasi_do_label || '',
+    spv_total: spvNames.length,
+    spv_online: totalSpvOnline,
+    spv_offline: totalSpvOffline,
+    sales_total: salesList.length,
+    sales_online: totalSalesOnline,
+    sales_offline: totalSalesOffline
+  };
 }
 
 function pctClass(pct) {

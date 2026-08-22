@@ -402,18 +402,23 @@
 
         // ── Real-Time Online Presence / Heartbeat Signal ────────
         (function initOnlineHeartbeat() {
-            const idSales = localStorage.getItem('idSales') || localStorage.getItem('sales_id');
-            const username = localStorage.getItem('usernameSales') || localStorage.getItem('userSales') || localStorage.getItem('username');
+            const role = localStorage.getItem('peranSales') || 'Sales';
+            const idUser = localStorage.getItem('idSales') || localStorage.getItem('sales_id') || localStorage.getItem('id_spv') || localStorage.getItem('id_user') || 0;
+            const username = localStorage.getItem('usernameSales') || localStorage.getItem('userSales') || localStorage.getItem('username') || '';
+            const nama = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || '';
 
             // Hanya kirim heartbeat jika user sedang login
-            if (!idSales && !username) return;
+            if (!idUser && !username && !nama) return;
 
             function sendHeartbeat(action = 'ping') {
                 const apiHeartbeat = prefix + 'api/api_heartbeat.php';
                 const payload = {
                     action: action,
-                    id_sales: idSales || 0,
-                    username: username || ''
+                    role: role,
+                    id_sales: idUser,
+                    id_user: idUser,
+                    username: username,
+                    nama: nama
                 };
 
                 if (action === 'offline' && navigator.sendBeacon) {

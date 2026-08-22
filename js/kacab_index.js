@@ -23,10 +23,29 @@ async function loadDashboard() {
       return a;
     }, { sales: 0, active: 0, inactive: 0, target_spk: 0, real_spk: 0, target_do: 0, real_do: 0 });
 
-    document.getElementById('kpiSpv').textContent = hierarchy.filter(g => g.spv !== 'Tanpa SPV').length;
-    document.getElementById('kpiSales').textContent = totals.sales;
-    document.getElementById('kpiSalesActive').textContent = `${totals.active} Aktif`;
-    document.getElementById('kpiSalesInactive').textContent = `${totals.inactive} Inaktif`;
+    const totalSpv = hierarchy.filter(g => g.spv !== 'Tanpa SPV').length;
+    const spvOnline = hierarchy.filter(g => g.spv !== 'Tanpa SPV' && g.is_online).length;
+    const spvOffline = totalSpv - spvOnline;
+    
+    const salesOnline = hierarchy.reduce((sum, g) => sum + (g.online_sales || 0), 0);
+    const salesOffline = totals.sales - salesOnline;
+
+    const elSpv = document.getElementById('kpiSpv');
+    if (elSpv) elSpv.textContent = totalSpv;
+
+    const elSpvCard = elSpv ? elSpv.closest('.kpi-card') : null;
+    const elSpvSub = elSpvCard ? elSpvCard.querySelector('.kpi-sub') : null;
+    if (elSpvSub) {
+      elSpvSub.innerHTML = `<span style="color:#10b981; font-weight:800;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> ${spvOnline} Online</span> &middot; <span style="color:#94a3b8;">${spvOffline} Offline</span>`;
+    }
+
+    const elSales = document.getElementById('kpiSales');
+    if (elSales) elSales.textContent = totals.sales;
+    
+    const elSalesActive = document.getElementById('kpiSalesActive');
+    const elSalesInactive = document.getElementById('kpiSalesInactive');
+    if (elSalesActive) elSalesActive.innerHTML = `<span style="color:#10b981; font-weight:800;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> ${salesOnline} Online</span>`;
+    if (elSalesInactive) elSalesInactive.innerHTML = `<span style="color:#94a3b8;">${salesOffline} Offline</span>`;
 
     const pctSpk = totals.target_spk > 0 ? Math.round((totals.real_spk / totals.target_spk) * 100) : 0;
     const pctDo = totals.target_do > 0 ? Math.round((totals.real_do / totals.target_do) * 100) : 0;
@@ -95,12 +114,25 @@ function renderSpvBoard(hierarchy) {
     return;
   }
 
-  board.innerHTML = groups.map((g, i) => `
+  board.innerHTML = groups.map((g, i) => {
+    const isSpvOn = g.is_online;
+    const spvDotStyle = isSpvOn
+      ? 'background:#10b981; box-shadow:0 0 6px #10b981;'
+      : 'background:#94a3b8;';
+    const onlineSalesInTeam = (g.online_sales || 0);
+
+    return `
     <div class="spv-board-row" onclick="location.href='monitoring_spv.html?spv=${encodeURIComponent(g.spv)}'">
       <div class="rank-no ${i === 0 ? 'r1' : ''}">${i + 1}</div>
       <div class="who">
-        <div class="nm">${escapeHtml(g.spv)}</div>
-        <div class="sd">${g.total_sales} sales &middot; ${g.active} aktif</div>
+        <div class="nm" style="display:flex; align-items:center; gap:6px;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; ${spvDotStyle}" title="${isSpvOn ? 'SPV Online Sekarang' : 'SPV Offline'}"></span>
+          ${escapeHtml(g.spv)}
+          ${isSpvOn ? '<span style="font-size:10px; background:#dcfce7; color:#15803d; padding:1px 6px; border-radius:6px; font-weight:800;">Online</span>' : ''}
+        </div>
+        <div class="sd">
+          ${g.total_sales} sales &middot; <span style="color:#10b981; font-weight:700;">🟢 ${onlineSalesInTeam} Online</span> &middot; <span style="color:#64748b;">${g.last_active_formatted}</span>
+        </div>
       </div>
       <div class="mini-meter">
         <div class="mm-head"><span>SPK</span><b>${g.real_spk}/${g.target_spk}</b></div>
@@ -111,8 +143,8 @@ function renderSpvBoard(hierarchy) {
         <div class="track"><div class="fill red" style="width:${Math.min(g.pct_do, 100)}%"></div></div>
       </div>
       <span class="ach-chip ${pctClass(g.pct_do)}"><i class="fa-solid fa-truck-fast"></i> ${g.pct_do}%</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 async function loadFeed() {

@@ -66,6 +66,11 @@ function applyHierFilters() {
       const pSpk = s.target_spk > 0 ? Math.round((s.real_spk / s.target_spk) * 100) : 0;
       const pDo = s.target_do > 0 ? Math.round((s.real_do / s.target_do) * 100) : 0;
       const isActive = s.status !== 'Tidak Aktif';
+      const isSalesOnline = s.is_online === true || s.is_online === 1;
+      const salesDotStyle = isSalesOnline
+        ? 'background:#10b981; box-shadow:0 0 6px #10b981;'
+        : (isActive ? 'background:#94a3b8;' : 'background:#ef4444;');
+
       return `
         <div class="hier-sale" onclick="openSalesDrill(${s.id})" role="button" tabindex="0"
           onkeydown="if(event.key==='Enter')openSalesDrill(${s.id})"
@@ -73,8 +78,15 @@ function applyHierFilters() {
           <div class="sale-ident">
             <img class="sale-avatar" src="${salesAvatarUrl(s)}" alt="" loading="lazy">
             <div class="info">
-              <div class="nm"><span class="status-dot ${isActive ? 'on' : 'off'}"></span>${escapeHtml(s.nama)}</div>
-              <div class="sd">${escapeHtml(s.tingkatan)}</div>
+              <div class="nm" style="display:flex; align-items:center; gap:6px;">
+                <span class="status-dot" style="${salesDotStyle} width:8px; height:8px;" title="${isSalesOnline ? 'Sales Online Sekarang' : 'Offline'}"></span>
+                <span>${escapeHtml(s.nama)}</span>
+                ${isSalesOnline ? '<span style="font-size:9.5px; font-weight:800; background:#dcfce7; color:#15803d; padding:1px 5px; border-radius:4px;">Online</span>' : ''}
+              </div>
+              <div class="sd" style="display:flex; align-items:center; gap:6px;">
+                <span>${escapeHtml(s.tingkatan)}</span>
+                <span style="color:#94a3b8; font-size:10px;">&middot; ${s.last_active_formatted}</span>
+              </div>
             </div>
           </div>
           <div class="mini-meter">
@@ -91,15 +103,29 @@ function applyHierFilters() {
         </div>`;
     }).join('');
 
+    const isSpvOn = g.is_online === true || g.is_online === 1;
+    const spvDotStyle = isSpvOn
+      ? 'background:#10b981; box-shadow:0 0 8px #10b981;'
+      : 'background:#94a3b8;';
+    const onlineSalesInTeam = (g.online_sales || 0);
+
     return `
       <div class="hier-group ${openClass}" data-spv="${escapeHtml(g.spv)}">
         <div class="hier-spv" onclick="toggleGroup(this)" role="button" tabindex="0"
           onkeydown="if(event.key==='Enter')toggleGroup(this)" aria-label="Buka tim ${escapeHtml(g.spv)}">
           <div class="spv-ident">
-            <div class="spv-avatar">${spvInitials(g.spv)}</div>
+            <div class="spv-avatar" style="position:relative;">
+              ${spvInitials(g.spv)}
+              <span style="position:absolute; bottom:0; right:0; width:9px; height:9px; border-radius:50%; border:2px solid white; ${spvDotStyle}"></span>
+            </div>
             <div class="info">
-              <div class="nm">${escapeHtml(g.spv)}</div>
-              <div class="sd">${g.total_sales} sales &middot; ${g.active} aktif${g.inactive ? ' &middot; ' + g.inactive + ' inaktif' : ''}</div>
+              <div class="nm" style="display:flex; align-items:center; gap:8px;">
+                <span style="font-weight:800;">${escapeHtml(g.spv)}</span>
+                ${isSpvOn ? '<span style="font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:6px; border:1px solid #86efac;">🟢 SPV Online</span>' : '<span style="font-size:10px; font-weight:600; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:6px;">⚪ Offline (' + g.last_active_formatted + ')</span>'}
+              </div>
+              <div class="sd">
+                ${g.total_sales} sales &middot; <span style="color:#10b981; font-weight:700;">🟢 ${onlineSalesInTeam} Sales Online</span> &middot; ${g.active} aktif
+              </div>
             </div>
           </div>
           <div class="mini-meter">
@@ -252,9 +278,12 @@ async function loadDrillActivities(s) {
     }).join('');
   } catch (e) {
     console.error(e);
-    list.innerHTML = '<div class="drill-empty">Gagal memuat aktivitas.</div>';
+      list.innerHTML = '<div class="drill-empty">Gagal memuat aktivitas.</div>';
+    }
   }
-}
+
+  // Auto-refresh live presence & data every 20 seconds
+  setInterval(loadHierarchy, 20000);
 
 function activityIcon(tipe) {
   if (tipe === 'Live Tiktok') return 'fa-video';
