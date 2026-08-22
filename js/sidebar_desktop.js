@@ -32,15 +32,16 @@
         curPage = curPage.replace('.html', '');
 
         function navLinkKacab(href, icon, label) {
-            const fullHref = prefix + href;
-            let hrefPage = href.split('/').pop().replace('.html', '');
+            const cleanHref = href.replace(/\.html$/, '');
+            const fullHref = prefix + cleanHref;
+            let hrefPage = cleanHref.split('/').pop();
             const isActive = (curPage === hrefPage) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
         nav.innerHTML = `
             <div class="sidebar-brand">
-                <a href="${prefix}pages_kacab/index_kacab.html" class="sidebar-brand-logo" title="Tunas Toyota">
+                <a href="${prefix}pages_kacab/index_kacab" class="sidebar-brand-logo" title="Tunas Toyota">
                     <img src="${prefix}image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
                 </a>
                 <div style="font-size:10px; font-weight:800; color:#d8a437; background:rgba(216,164,55,0.15); padding:2px 8px; border-radius:6px; margin-top:6px; display:inline-block; border:1px solid rgba(216,164,55,0.3);">
@@ -48,7 +49,7 @@
                 </div>
             </div>
 
-            <a href="${prefix}pages_kacab/index_kacab.html" class="sidebar-user-card">
+            <a href="${prefix}pages_kacab/index_kacab" class="sidebar-user-card">
                 <img src="https://ui-avatars.com/api/?name=KC&background=1e1014&color=d8a437&bold=true"
                     alt="Profile" class="sidebar-user-avatar" id="sidebarAvatar">
                 <div class="sidebar-user-info">
@@ -109,15 +110,16 @@
         curPage = curPage.replace('.html', '');
 
         function navLinkSPV(href, icon, label) {
-            const fullHref = prefix + href;
-            let hrefPage = href.split('/').pop().replace('.html', '');
+            const cleanHref = href.replace(/\.html$/, '');
+            const fullHref = prefix + cleanHref;
+            let hrefPage = cleanHref.split('/').pop();
             const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv')) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
         nav.innerHTML = `
             <div class="sidebar-brand">
-                <a href="${prefix}pages_spv/index_spv.html" class="sidebar-brand-logo" title="Tunas Toyota">
+                <a href="${prefix}pages_spv/index_spv" class="sidebar-brand-logo" title="Tunas Toyota">
                     <img src="${prefix}image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
                 </a>
                 <div style="font-size:10px; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.15); padding:2px 8px; border-radius:6px; margin-top:6px; display:inline-block; border:1px solid rgba(56,189,248,0.3);">
@@ -125,7 +127,7 @@
                 </div>
             </div>
 
-            <a href="${prefix}pages_spv/index_spv.html" class="sidebar-user-card">
+            <a href="${prefix}pages_spv/index_spv" class="sidebar-user-card">
                 <img src="https://ui-avatars.com/api/?name=SPV&background=1c2740&color=ffffff&bold=true"
                     alt="Profile" class="sidebar-user-avatar" id="sidebarAvatar">
                 <div class="sidebar-user-info">
@@ -188,21 +190,21 @@
         curPage = curPage.replace('.html', '');
 
         function navLink(href, icon, label, tags = '') {
-            const fullHref = prefix + href;
-            let hrefPage = href.split('/').pop();
-            hrefPage = hrefPage.replace('.html', '');
-            const isActive = (curPage === hrefPage || (curPage === '' && hrefPage === 'index')) ? ' active' : '';
+            const cleanHref = href.replace(/\.html$/, '');
+            const fullHref = prefix + cleanHref;
+            let hrefPage = cleanHref.split('/').pop();
+            const isActive = (curPage === hrefPage || (curPage === '' && (hrefPage === 'index' || hrefPage === ''))) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}" data-tags="${tags}"><i class="${icon}"></i> ${label}</a>`;
         }
 
         nav.innerHTML = `
             <div class="sidebar-brand">
-                <a href="${prefix}index.html" class="sidebar-brand-logo" title="Tunas Toyota">
+                <a href="${prefix}index" class="sidebar-brand-logo" title="Tunas Toyota">
                     <img src="${prefix}image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
                 </a>
             </div>
 
-            <a href="${prefix}pages/profil.html" class="sidebar-user-card">
+            <a href="${prefix}pages/profil" class="sidebar-user-card">
                 <img src="https://ui-avatars.com/api/?name=S&background=f4f7f6&color=c8102e&bold=true"
                     alt="Profile" class="sidebar-user-avatar" id="sidebarAvatar">
                 <div class="sidebar-user-info">

@@ -448,3 +448,14 @@ window.showErrorState = function(target, options = {}) {
     `;
 };
 
+// ── Clean Address Bar .html Extension Remover ──────────────────────────
+(function initCleanHtmlRemover() {
+    try {
+        const path = window.location.pathname;
+        if (path.endsWith('.html')) {
+            const cleanPath = path.replace(/\.html$/, '');
+            window.history.replaceState(null, document.title, cleanPath + window.location.search + window.location.hash);
+        }
+    } catch (e) {}
+})();
+
