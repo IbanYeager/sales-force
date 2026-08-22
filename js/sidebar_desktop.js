@@ -82,7 +82,7 @@
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
-                ${navLinkKacab('pages/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -159,8 +159,8 @@
                 ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-wand-magic-sparkles', 'Briefing Auto-Gen')}
                 ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
                 ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
-                ${navLinkSPV('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
-                ${navLinkSPV('pages/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
+                ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
                 ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
