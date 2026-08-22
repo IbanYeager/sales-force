@@ -44,7 +44,7 @@ if ($method === 'GET') {
     $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, status, DATE_FORMAT(created_at, '%d %b %Y') as created_at, DATE_FORMAT(created_at, '%Y-%m-%d') as created_at_raw FROM sales_accounts";
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_clean = str_replace('Pak ', '', $spv);
-        $query_spv = $query . " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%') ORDER BY id DESC";
+        $query_spv = $query . " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%') ORDER BY id ASC";
         $result = $conn->query($query_spv);
         $data = [];
         if ($result && $result->num_rows > 0) {
@@ -58,7 +58,7 @@ if ($method === 'GET') {
     }
 
     // Jika SPV kosong (misal superadmin/login bukan SPV)
-    $result = $conn->query($query . " ORDER BY id DESC");
+    $result = $conn->query($query . " ORDER BY id ASC");
     $data = [];
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {

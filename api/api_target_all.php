@@ -65,15 +65,8 @@ if ($method === 'GET') {
         }
     }
 
-    // Active Sales Consultants (Semua Sales Tim Ryan, Alvin, Riva)
-    $active_usernames = [
-        'reza','egy','erick','erik','deno','yani','denia','jajang','juarna','galih_ryan','fanny','fani','dadan','igo','denis','hady','tama','agus_ryan','irvan','wendy','rahma','aji','aghti','fia',
-        'dadi','topik','indah','andri','rizky','ardian','abdian','fadil','fadhil','ahmad','arif','arief','udil','andrius','luvita','kurnia','intan','erlan','yeni','nova','dean','hingki','yoni','novi','cici',
-        'galih_riva','dery','giono','giyono','rizal','gugum','shovia','mustofa','reni','nuri','uki','ridwan','agus','dian','debi','wawan','syahril','wulan','sinta','deni_rv'
-    ];
-    $user_filter_sql = "'" . implode("','", $active_usernames) . "'";
-
-    $where_clause = "WHERE username IN ($user_filter_sql)";
+    // Active Sales Consultants
+    $where_clause = "WHERE (status = 'Aktif' OR status IS NULL OR status = '')";
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_clean = str_replace('Pak ', '', $spv);
         $where_clause .= " AND (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
@@ -114,7 +107,7 @@ if ($method === 'GET') {
         'rahma'      => ['target_spk' => 3, 'target_do' => 2],
     ];
 
-    $q_sales = $conn->query("SELECT id as sales_account_id, username, nama_lengkap as nama_sales, tingkatan, nama_spv, created_at FROM sales_accounts $where_clause ORDER BY nama_lengkap ASC");
+    $q_sales = $conn->query("SELECT id as sales_account_id, username, nama_lengkap as nama_sales, tingkatan, nama_spv, created_at FROM sales_accounts $where_clause ORDER BY id ASC");
 
     $data = [];
     if ($q_sales && $q_sales->num_rows > 0) {
@@ -314,7 +307,14 @@ if ($method === 'POST') {
         }
 
         if ($conn->query($sql)) {
-            echo json_encode(["status" => "success", "message" => "Target & Actual bulanan berhasil disimpan!"]);
+            // Push ke Google Spreadsheet secara otomatis (Two-Way Sync)
+            if (file_exists(__DIR__ . '/api_sheets_sync.php')) {
+                require_once __DIR__ . '/api_sheets_sync.php';
+                if (function_exists('pushTargetToGoogleSheets')) {
+                    pushTargetToGoogleSheets($conn, $sales_account_id, $target_spk, $target_do, $realisasi_spk, $realisasi_do);
+                }
+            }
+            echo json_encode(["status" => "success", "message" => "Target & Actual bulanan berhasil disimpan & disinkronkan ke Google Spreadsheet!"]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal menyimpan: " . $conn->error]);
         }
@@ -338,7 +338,21 @@ if ($method === 'POST') {
             $cur_m = intval(date('n'));
             $conn->query("UPDATE target_do_bulanan SET target_spk = $tgt_spk, target_do = $tgt_do WHERE sales_account_id = $sales_account_id AND periode_bulan = $cur_m AND (is_manual_target_spk = 0 OR is_manual_target_spk IS NULL)");
 
-            echo json_encode(["status" => "success", "message" => "Tingkatan wiraniaga dan target berhasil diperbarui!"]);
+            // Push ke Google Spreadsheet
+            if (file_exists(__DIR__ . '/api_sheets_sync.php')) {
+                require_once __DIR__ . '/api_sheets_sync.php';
+                if (function_exists('pushTargetToGoogleSheets')) {
+                    $q_chk = $conn->query("SELECT realisasi_spk, realisasi_do FROM target_do_bulanan WHERE sales_account_id = $sales_account_id AND periode_bulan = $cur_m LIMIT 1");
+                    $r_spk = 0; $r_do = 0;
+                    if ($q_chk && $c_r = $q_chk->fetch_assoc()) {
+                        $r_spk = intval($c_r['realisasi_spk']);
+                        $r_do = intval($c_r['realisasi_do']);
+                    }
+                    pushTargetToGoogleSheets($conn, $sales_account_id, $tgt_spk, $tgt_do, $r_spk, $r_do);
+                }
+            }
+
+            echo json_encode(["status" => "success", "message" => "Tingkatan wiraniaga dan target berhasil diperbarui & disinkronkan ke Google Spreadsheet!"]);
         } else {
             echo json_encode(["status" => "error", "message" => "ID sales tidak valid!"]);
         }

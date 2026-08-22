@@ -124,25 +124,19 @@
         const result = await res.json();
 
         if (result.status === 'success') {
-          boardPeriode.textContent = `Periode ${result.periode} · DO: ${result.evaluasi_do_label || 'Per Evaluasi (4 Bulan)'}`;
+          boardPeriode.textContent = `Periode ${result.periode}`;
           boardBody.innerHTML = '';
           renderPodiumCards(result.data || []);
 
           if (result.data.length > 0) {
             let sumTargetSPKBulan = 0, sumTargetDOBulan = 0;
             let sumActualSPKBulan = 0, sumActualDOBulan = 0;
-            let sumTargetSPKEval = 0, sumTargetDOEval = 0;
-            let sumActualSPKEval = 0, sumActualDOEval = 0;
 
             result.data.forEach((row, index) => {
               sumTargetSPKBulan += (row.target_spk_bulan || 0);
               sumTargetDOBulan += (row.target_do_bulan || 0);
               sumActualSPKBulan += (row.realisasi_spk_bulan || 0);
               sumActualDOBulan += (row.realisasi_do_bulan || 0);
-              sumTargetSPKEval += (row.target_spk_eval || 0);
-              sumTargetDOEval += (row.target_do_eval || 0);
-              sumActualSPKEval += (row.realisasi_spk_eval || 0);
-              sumActualDOEval += (row.realisasi_do_eval || 0);
 
               // Persentase pencapaian SPK bulan ini
               const pctSpk = (row.target_spk_bulan > 0)
@@ -177,8 +171,6 @@
                 <td class="num cell-actual" style="font-weight:800;">${row.realisasi_spk_bulan}</td>
                 <td class="num cell-actual" style="font-weight:800;">${row.realisasi_do_bulan}</td>
                 <td class="num cell-actual"><span class="pct-chip ${pctCls}">${pctSpk}%</span></td>
-                <td class="num cell-eval">${row.target_do_eval ?? 20}</td>
-                <td class="num cell-eval" style="font-weight:800;">${row.realisasi_do_eval ?? row.realisasi_do_bulan ?? 0}</td>
                 <td>
                   <input type="text" class="plan-input" value="${row.plan_spk || ''}" placeholder="Tulis rencana unit..."
                     onblur="savePlanNote(this, ${row.id_target_bulanan || 0}, ${row.sales_account_id})">
@@ -192,21 +184,33 @@
               boardBody.appendChild(tr);
             });
 
-            document.getElementById('totActualSPKBulan').textContent = sumActualSPKBulan;
-            document.getElementById('totActualDOBulan').textContent = sumActualDOBulan;
-            document.getElementById('totActualDOEval').textContent = sumActualDOEval;
+            const totTargetElSPK = document.getElementById('totTargetSPKBulan');
+            const totTargetElDO = document.getElementById('totTargetDOBulan');
+            const totActualElSPK = document.getElementById('totActualSPKBulan');
+            const totActualElDO = document.getElementById('totActualDOBulan');
+            const totPctEl = document.getElementById('totPctSPKBulan');
+
+            if (totTargetElSPK) totTargetElSPK.textContent = sumTargetSPKBulan;
+            if (totTargetElDO) totTargetElDO.textContent = sumTargetDOBulan;
+            if (totActualElSPK) totActualElSPK.textContent = sumActualSPKBulan;
+            if (totActualElDO) totActualElDO.textContent = sumActualDOBulan;
+            if (totPctEl) {
+              const totalPct = sumTargetSPKBulan > 0 ? Math.round((sumActualSPKBulan / sumTargetSPKBulan) * 100) : 0;
+              totPctEl.textContent = totalPct + '%';
+            }
+
             document.getElementById('boardFooter').style.display = 'table-footer-group';
           } else {
-            boardBody.innerHTML = `<tr><td colspan="12"><div class="empty-state"><div class="es-icon"><i class="fa-solid fa-bullseye"></i></div><div class="es-title">Belum ada data target</div><div class="es-text">Target wiraniaga untuk bulan ini belum diatur.</div></div></td></tr>`;
+            boardBody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="es-icon"><i class="fa-solid fa-bullseye"></i></div><div class="es-title">Belum ada data target</div><div class="es-text">Target wiraniaga untuk bulan ini belum diatur.</div></div></td></tr>`;
             document.getElementById('boardFooter').style.display = 'none';
           }
         } else {
-          boardBody.innerHTML = `<tr><td colspan="12" class="loading-state" style="color:var(--red);">Gagal memuat: ${result.message}</td></tr>`;
+          boardBody.innerHTML = `<tr><td colspan="10" class="loading-state" style="color:var(--red);">Gagal memuat: ${result.message}</td></tr>`;
           document.getElementById('boardFooter').style.display = 'none';
         }
       } catch (e) {
         console.error(e);
-        boardBody.innerHTML = `<tr><td colspan="12" class="loading-state" style="color:var(--red);">Error koneksi ke API.</td></tr>`;
+        boardBody.innerHTML = `<tr><td colspan="10" class="loading-state" style="color:var(--red);">Error koneksi ke API.</td></tr>`;
         document.getElementById('boardFooter').style.display = 'none';
       }
     }
@@ -420,6 +424,38 @@
     async function loadPendingApprovals() {
       if (typeof window.checkPendingApprovalsGlobal === 'function') {
         window.checkPendingApprovalsGlobal();
+      }
+    }
+
+    async function syncSheetsNow() {
+      const btn = document.getElementById('btnSyncSheets');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sinkronisasi...';
+      }
+      try {
+        const selectBulan = document.getElementById('selectBulanMonitoring');
+        const m = selectBulan ? selectBulan.value : (new Date().getMonth() + 1);
+        const res = await fetch(`../api/api_sheets_sync.php?action=pull&bulan=${m}`);
+        const result = await res.json();
+        if (result.status === 'success') {
+          if (typeof showCustomAlert === 'function') {
+            showCustomAlert(result.message || 'Sinkronisasi 2 arah berhasil!', 'success');
+          } else {
+            alert(result.message || 'Sinkronisasi 2 arah berhasil!');
+          }
+          loadMonitoringBoard();
+        } else {
+          alert('Gagal sinkron: ' + (result.message || 'Terjadi kesalahan'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Gagal menghubungkan ke server sinkronisasi.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Sinkron Spreadsheet';
+        }
       }
     }
 

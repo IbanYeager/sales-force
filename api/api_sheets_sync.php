@@ -2,6 +2,7 @@
 // api/api_sheets_sync.php
 // Engine Sinkronisasi 2 Arah Google Spreadsheet (SPK & DO) <-> SFT MySQL Database
 // Spreadsheet ID: 1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs
+// Apps Script Webhook: https://script.google.com/macros/s/AKfycbzBG8ZTlJ2qR-7NY2uZvKqdiu9c43DgEKOZbU3ig19XvU1D9VxvzxMx3-ZWfD3r9QpT/exec
 
 error_reporting(0);
 mysqli_report(MYSQLI_REPORT_OFF);
@@ -20,12 +21,13 @@ require_once __DIR__ . '/koneksi.php';
 
 $SPREADSHEET_ID = "1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs";
 $CSV_EXPORT_URL = "https://docs.google.com/spreadsheets/d/{$SPREADSHEET_ID}/export?format=csv";
+$APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec";
 
 // Pastikan tabel sync log & config ada
 if ($conn && !$conn->connect_error) {
     $conn->query("CREATE TABLE IF NOT EXISTS tabel_sheets_sync_config (
         id INT PRIMARY KEY DEFAULT 1,
-        spreadsheet_url VARCHAR(255) DEFAULT 'https://docs.google.com/spreadsheets/d/1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs/edit?usp=sharing',
+        spreadsheet_url VARCHAR(255) DEFAULT 'https://docs.google.com/spreadsheets/d/1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs/edit?gid=0#gid=0',
         spreadsheet_id VARCHAR(100) DEFAULT '1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs',
         apps_script_webhook_url TEXT,
         auto_sync_enabled INT DEFAULT 1,
@@ -34,8 +36,9 @@ if ($conn && !$conn->connect_error) {
         last_sync_summary TEXT
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    $conn->query("INSERT IGNORE INTO tabel_sheets_sync_config (id, spreadsheet_id, auto_sync_enabled) 
-                  VALUES (1, '1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs', 1)");
+    $conn->query("INSERT INTO tabel_sheets_sync_config (id, spreadsheet_id, apps_script_webhook_url, auto_sync_enabled) 
+                  VALUES (1, '$SPREADSHEET_ID', '$APPS_SCRIPT_URL', 1)
+                  ON DUPLICATE KEY UPDATE apps_script_webhook_url = '$APPS_SCRIPT_URL'");
 }
 
 // Helper: Normalisasi Nama untuk Matching
@@ -45,7 +48,7 @@ function normalizeName($str) {
     return $str;
 }
 
-// Function Utama: Tarik Data dari Google Spreadsheet dan Simpan ke DB
+// Function 1: TARIK DATA DARI GOOGLE SPREADSHEET KE DATABASE SFT (PULL)
 function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     global $CSV_EXPORT_URL;
     if (!$month) $month = intval(date('n'));
@@ -129,7 +132,6 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         }
 
         // Baris data wiraniaga (Format: No, Sales, Target SPK, Target DO, Actual SPK, Actual DO)
-        $no = intval($col0);
         $nama_sales = trim($cols[1] ?? '');
         if (empty($nama_sales)) continue;
 
@@ -220,6 +222,133 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     ];
 }
 
+// Function 2: KIRIM DATA DARI SFT WEB KE GOOGLE SPREADSHEET (PUSH SATU SALES)
+function pushTargetToGoogleSheets($conn, $sales_id, $target_spk, $target_do, $realisasi_spk, $realisasi_do) {
+    global $APPS_SCRIPT_URL;
+    if (!$conn || !$sales_id) return false;
+    
+    $q_sales = $conn->query("SELECT nama_lengkap, username, nama_spv FROM sales_accounts WHERE id = " . intval($sales_id) . " LIMIT 1");
+    if (!$q_sales || $q_sales->num_rows === 0) return false;
+    
+    $sales = $q_sales->fetch_assoc();
+    $nama_sales = $sales['nama_lengkap'];
+    $nama_spv = $sales['nama_spv'];
+    
+    // Clean name matching (e.g. 'Agus (Ryan)' -> 'Agus', 'Galih (Riva)' -> 'Galih')
+    $clean_nama = preg_replace('/\s*\(.*?\)\s*/', '', $nama_sales);
+
+    $webhook_url = $APPS_SCRIPT_URL;
+    $res_cfg = $conn->query("SELECT apps_script_webhook_url FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+    if ($res_cfg && $c_row = $res_cfg->fetch_assoc()) {
+        if (!empty($c_row['apps_script_webhook_url'])) {
+            $webhook_url = $c_row['apps_script_webhook_url'];
+        }
+    }
+    
+    $payload = [
+        'action' => 'update_sales',
+        'spv' => $nama_spv,
+        'nama_sales' => $clean_nama,
+        'full_name' => $nama_sales,
+        'username' => $sales['username'],
+        'target_spk' => intval($target_spk),
+        'target_do' => intval($target_do),
+        'actual_spk' => intval($realisasi_spk),
+        'actual_do' => intval($realisasi_do),
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+    
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $webhook_url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_TIMEOUT => 10
+    ]);
+    $resp = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    return [
+        'success' => ($code === 200),
+        'response' => $resp
+    ];
+}
+
+// Function 3: KIRIM SELURUH DATA DATABASE KE GOOGLE SPREADSHEET (PUSH ALL)
+function pushAllTargetsToGoogleSheets($conn, $month = null, $year = null) {
+    global $APPS_SCRIPT_URL;
+    if (!$month) $month = intval(date('n'));
+    if (!$year) $year = intval(date('Y'));
+
+    $webhook_url = $APPS_SCRIPT_URL;
+    $res_cfg = $conn->query("SELECT apps_script_webhook_url FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+    if ($res_cfg && $c_row = $res_cfg->fetch_assoc()) {
+        if (!empty($c_row['apps_script_webhook_url'])) {
+            $webhook_url = $c_row['apps_script_webhook_url'];
+        }
+    }
+
+    $q_all = $conn->query("SELECT s.id, s.nama_lengkap, s.nama_spv, s.username, 
+                           COALESCE(t.target_spk, 0) as target_spk, 
+                           COALESCE(t.target_do, 0) as target_do, 
+                           COALESCE(t.realisasi_spk, 0) as realisasi_spk, 
+                           COALESCE(t.realisasi_do, 0) as realisasi_do 
+                           FROM sales_accounts s 
+                           LEFT JOIN target_do_bulanan t ON s.id = t.sales_account_id AND t.periode_bulan = $month 
+                           WHERE s.status = 'Aktif' OR s.status IS NULL 
+                           ORDER BY s.nama_spv, s.nama_lengkap ASC");
+
+    $sales_data = [];
+    if ($q_all) {
+        while ($r = $q_all->fetch_assoc()) {
+            $clean_nama = preg_replace('/\s*\(.*?\)\s*/', '', $r['nama_lengkap']);
+            $sales_data[] = [
+                'spv' => $r['nama_spv'],
+                'nama_sales' => $clean_nama,
+                'full_name' => $r['nama_lengkap'],
+                'username' => $r['username'],
+                'target_spk' => intval($r['target_spk']),
+                'target_do' => intval($r['target_do']),
+                'actual_spk' => intval($r['realisasi_spk']),
+                'actual_do' => intval($r['realisasi_do'])
+            ];
+        }
+    }
+
+    $payload = [
+        'action' => 'bulk_update',
+        'sales_data' => $sales_data,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $webhook_url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_TIMEOUT => 25
+    ]);
+    $resp = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return [
+        'status' => ($code === 200) ? 'success' : 'error',
+        'message' => ($code === 200) ? 'Seluruh target berhasil di-push ke Google Spreadsheet!' : "Gagal push ke Spreadsheet (HTTP $code)",
+        'count' => count($sales_data),
+        'response' => $resp
+    ];
+}
+
 // Execute Routing only if this file is called directly as an HTTP endpoint
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'api_sheets_sync.php') {
     $action = isset($_GET['action']) ? $_GET['action'] : (isset($_POST['action']) ? $_POST['action'] : 'pull');
@@ -229,6 +358,29 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'api_sheets_sync.php') {
         $year = isset($_GET['tahun']) ? intval($_GET['tahun']) : intval(date('Y'));
         $res = syncGoogleSheetsToDb($conn, $month, $year);
         echo json_encode($res);
+        if ($conn) $conn->close();
+        exit();
+    }
+
+    if ($action === 'push_all') {
+        $month = isset($_GET['bulan']) ? intval($_GET['bulan']) : intval(date('n'));
+        $year = isset($_GET['tahun']) ? intval($_GET['tahun']) : intval(date('Y'));
+        $res = pushAllTargetsToGoogleSheets($conn, $month, $year);
+        echo json_encode($res);
+        if ($conn) $conn->close();
+        exit();
+    }
+
+    if ($action === 'push_single') {
+        $data = json_decode(file_get_contents("php://input"), true) ?: $_POST;
+        $sales_id = intval($data['sales_id'] ?? 0);
+        $target_spk = intval($data['target_spk'] ?? 0);
+        $target_do = intval($data['target_do'] ?? 0);
+        $actual_spk = intval($data['actual_spk'] ?? 0);
+        $actual_do = intval($data['actual_do'] ?? 0);
+
+        $res = pushTargetToGoogleSheets($conn, $sales_id, $target_spk, $target_do, $actual_spk, $actual_do);
+        echo json_encode(['status' => $res ? 'success' : 'error', 'data' => $res]);
         if ($conn) $conn->close();
         exit();
     }
@@ -244,47 +396,8 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'api_sheets_sync.php') {
         exit();
     }
 
-    // Push ke Webhook Google Apps Script jika disetel
-    if ($action === 'push') {
-        $raw = file_get_contents("php://input");
-        $postData = json_decode($raw, true);
-
-        $res_cfg = $conn->query("SELECT apps_script_webhook_url FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
-        $webhook_url = $res_cfg ? $res_cfg->fetch_assoc()['apps_script_webhook_url'] : '';
-
-        if (empty($webhook_url)) {
-            echo json_encode([
-                'status' => 'info',
-                'message' => 'Google Apps Script Webhook URL belum dikonfigurasi. Data tersimpan di web SFT.',
-                'app_script_guide' => 'Gunakan template Google Apps Script yang disediakan di WhatsApp Studio untuk menghubungkan push otomatis.'
-            ]);
-            if ($conn) $conn->close();
-            exit();
-        }
-
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $webhook_url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($postData),
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT => 20
-        ]);
-        $resp = curl_exec($ch);
-        curl_close($ch);
-
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Data berhasil dikirim ke Google Spreadsheet via Apps Script Webhook!',
-            'response' => $resp
-        ]);
-        if ($conn) $conn->close();
-        exit();
-    }
-
     echo json_encode(['status' => 'error', 'message' => 'Aksi tidak valid']);
     if ($conn) $conn->close();
     exit();
 }
+

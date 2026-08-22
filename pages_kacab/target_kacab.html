@@ -285,8 +285,8 @@
         </div>
       </div>
 
-      <!-- PERIODE MONTH FILTER -->
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:14px 18px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:18px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+      <!-- PERIODE MONTH FILTER & SINKRON SPREADSHEET -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:14px 18px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:18px; box-shadow:0 4px 12px rgba(0,0,0,0.03); flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:10px;">
           <i class="fa-solid fa-calendar-days" style="font-size:18px; color:var(--primary-blue, #2563eb);"></i>
           <div>
@@ -294,20 +294,25 @@
             <span style="font-size:11px; color:#64748b;" id="lblSelectedPeriod">Target &amp; Pencapaian per Bulan</span>
           </div>
         </div>
-        <select id="monthSelectKacab" class="input-modern" style="width:200px; font-size:13px; font-weight:700; padding:8px 12px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc;" onchange="fetchRealTargetData()">
-          <option value="1">Januari 2026</option>
-          <option value="2">Februari 2026</option>
-          <option value="3">Maret 2026</option>
-          <option value="4">April 2026</option>
-          <option value="5">Mei 2026</option>
-          <option value="6">Juni 2026</option>
-          <option value="7">Juli 2026</option>
-          <option value="8" selected>Agustus 2026</option>
-          <option value="9">September 2026</option>
-          <option value="10">Oktober 2026</option>
-          <option value="11">November 2026</option>
-          <option value="12">Desember 2026</option>
-        </select>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button type="button" id="btnSyncSheetsKacab" class="btn" style="background:#10b981; color:white; font-weight:700; border:none; padding:8px 14px; border-radius:10px; cursor:pointer; font-size:12.5px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(16,185,129,0.25);" onclick="syncSheetsNowKacab()">
+            <i class="fa-solid fa-arrows-rotate"></i> Sinkron Spreadsheet
+          </button>
+          <select id="monthSelectKacab" class="input-modern" style="width:180px; font-size:13px; font-weight:700; padding:8px 12px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc;" onchange="fetchRealTargetData()">
+            <option value="1">Januari 2026</option>
+            <option value="2">Februari 2026</option>
+            <option value="3">Maret 2026</option>
+            <option value="4">April 2026</option>
+            <option value="5">Mei 2026</option>
+            <option value="6">Juni 2026</option>
+            <option value="7">Juli 2026</option>
+            <option value="8" selected>Agustus 2026</option>
+            <option value="9">September 2026</option>
+            <option value="10">Oktober 2026</option>
+            <option value="11">November 2026</option>
+            <option value="12">Desember 2026</option>
+          </select>
+        </div>
       </div>
 
       <!-- TARGET SUMMARY CARDS -->

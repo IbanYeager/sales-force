@@ -58,6 +58,16 @@
                 <div class="sidebar-user-dot" style="background:#d8a437;"></div>
             </a>
 
+            <div class="sidebar-search-wrap">
+                <div class="sidebar-search-box">
+                    <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+                    <input type="text" class="sidebar-search-input" id="sidebarSearchInput" placeholder="Cari fitur / menu..." autocomplete="off" spellcheck="false">
+                    <button type="button" class="sidebar-search-clear" id="sidebarSearchClear" style="display:none;" title="Bersihkan pencarian">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
@@ -72,6 +82,12 @@
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
                 ${navLinkKacab('pages/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+
+                <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <div style="font-weight:700; color:#fff; margin-bottom:2px;">Fitur tidak ditemukan</div>
+                    <div style="font-size:11px; opacity:0.8;">Coba gunakan kata kunci lain</div>
+                </div>
             </div>
 
             <div class="sidebar-bottom">
@@ -119,6 +135,16 @@
                 <div class="sidebar-user-dot"></div>
             </a>
 
+            <div class="sidebar-search-wrap">
+                <div class="sidebar-search-box">
+                    <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+                    <input type="text" class="sidebar-search-input" id="sidebarSearchInput" placeholder="Cari fitur / menu..." autocomplete="off" spellcheck="false">
+                    <button type="button" class="sidebar-search-clear" id="sidebarSearchClear" style="display:none;" title="Bersihkan pencarian">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
@@ -134,6 +160,12 @@
                 ${navLinkSPV('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
                 ${navLinkSPV('pages/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
                 ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
+
+                <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <div style="font-weight:700; color:#fff; margin-bottom:2px;">Fitur tidak ditemukan</div>
+                    <div style="font-size:11px; opacity:0.8;">Coba gunakan kata kunci lain</div>
+                </div>
             </div>
 
             <div class="sidebar-bottom">
@@ -155,12 +187,12 @@
         let curPage = path.split('/').pop() || 'index';
         curPage = curPage.replace('.html', '');
 
-        function navLink(href, icon, label) {
+        function navLink(href, icon, label, tags = '') {
             const fullHref = prefix + href;
             let hrefPage = href.split('/').pop();
             hrefPage = hrefPage.replace('.html', '');
             const isActive = (curPage === hrefPage || (curPage === '' && hrefPage === 'index')) ? ' active' : '';
-            return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
+            return `<a href="${fullHref}" class="sidebar-nav-link${isActive}" data-tags="${tags}"><i class="${icon}"></i> ${label}</a>`;
         }
 
         nav.innerHTML = `
@@ -180,72 +212,88 @@
                 <div class="sidebar-user-dot"></div>
             </a>
 
+            <div class="sidebar-search-wrap">
+                <div class="sidebar-search-box">
+                    <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+                    <input type="text" class="sidebar-search-input" id="sidebarSearchInput" placeholder="Cari fitur / menu..." autocomplete="off" spellcheck="false">
+                    <button type="button" class="sidebar-search-clear" id="sidebarSearchClear" style="display:none;" title="Bersihkan pencarian">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Utama</p>
-                ${navLink('index.html', 'fa-solid fa-house', 'Dashboard')}
-                ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
-                ${navLink('pages/input.html', 'fa-solid fa-camera', 'Input Aktivitas')}
-                ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas')}
-                ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian')}
-                ${navLink('pages/checkin.html', 'fa-solid fa-location-crosshairs', 'Check-In Canvassing GPS')}
-                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Jadwal Aktivitas')}
+                ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
+                ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
+                ${navLink('pages/input.html', 'fa-solid fa-camera', 'Input Aktivitas', 'input aktivitas laporan suara mic voice spm')}
+                ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
+                ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
+                ${navLink('pages/checkin.html', 'fa-solid fa-location-crosshairs', 'Check-In Canvassing GPS', 'gps checkin absen lokasi canvassing')}
+                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Jadwal Aktivitas', 'kalender jadwal agenda aktivitas')}
 
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
-                ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR')}
-                ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Multi-Leasing')}
-                ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)')}
-                ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar')}
-                ${navLink('pages/spk.html', 'fa-solid fa-file-signature', 'Form SPK')}
-                ${navLink('pages/quotation.html', 'fa-solid fa-file-contract', 'Smart Digital Quotation')}
-                ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor')}
-                ${navLink('pages/order_tracker.html', 'fa-solid fa-truck-ramp-box', 'Live Delivery Tracker')}
-                ${navLink('pages/tradein.html', 'fa-solid fa-right-left', 'Trade-In & Over-Kredit')}
-                ${navLink('pages/leasing_matrix.html', 'fa-solid fa-scale-balanced', 'Leasing Approval Odds')}
+                ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR', 'harga pricelist otr brosur daftar')}
+                ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Multi-Leasing', 'kalkulator leasing kredit dp cicilan angsuran tenor')}
+                ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)', 'stok stock live inventory unit mobil t-stock')}
+                ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar', 'customer crm radar prospek data database')}
+                ${navLink('pages/spk.html', 'fa-solid fa-file-signature', 'Form SPK', 'spk pesanan form surat tanda jadi')}
+                ${navLink('pages/quotation.html', 'fa-solid fa-file-contract', 'Smart Digital Quotation', 'quotation penawaran harga simulasi pdf')}
+                ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor', 'promo diskon paket kredit tenor program')}
+                ${navLink('pages/order_tracker.html', 'fa-solid fa-truck-ramp-box', 'Live Delivery Tracker', 'tracking status mobil tracker delivery')}
+                ${navLink('pages/tradein.html', 'fa-solid fa-right-left', 'Trade-In & Over-Kredit', 'trade in tukar tambah over kredit mobil bekas')}
+                ${navLink('pages/leasing_matrix.html', 'fa-solid fa-scale-balanced', 'Leasing Approval Odds', 'leasing matrix peluang approval acc taf bca bsi')}
 
                 <p class="sidebar-nav-label">Tier 2: AI Tools, Komunikasi & Delivery</p>
-                ${navLink('pages/wa_studio.html', 'fa-brands fa-whatsapp', 'WA Broadcast Studio')}
-                ${navLink('pages/ai_copilot.html', 'fa-solid fa-wand-magic-sparkles', 'AI Sales Copilot')}
-                ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)')}
-                ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub')}
-                ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony')}
-                ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)')}
-                ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline')}
-                ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Test Drive Showroom')}
-                ${navLink('pages/rental_testdrive.html', 'fa-solid fa-handshake-simple', 'Test Drive Rekanan Rental')}
-                ${navLink('pages/approval.html', 'fa-solid fa-check-to-slot', 'Approval Diskon <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
-                ${navLink('pages/dokumen.html', 'fa-solid fa-receipt', 'Manajemen Dokumen')}
+                ${navLink('pages/wa_studio.html', 'fa-brands fa-whatsapp', 'WA Broadcast Studio', 'wa whatsapp broadcast blast pesan template')}
+                ${navLink('pages/ai_copilot.html', 'fa-solid fa-wand-magic-sparkles', 'AI Sales Copilot', 'ai copilot asisten chatbot tanya script closing')}
+                ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)', 'kartu nama digital vcard qr kontak profil')}
+                ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub', 'after sales servis stnk bpkb retention loyalitas')}
+                ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony', 'handover ceremony serah terima piagam')}
+                ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
+                ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
+                ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Test Drive Showroom', 'test drive uji coba mobil showroom')}
+                ${navLink('pages/rental_testdrive.html', 'fa-solid fa-handshake-simple', 'Test Drive Rekanan Rental', 'rental rekanan test drive')}
+                ${navLink('pages/approval.html', 'fa-solid fa-check-to-slot', 'Approval Diskon <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>', 'approval diskon persetujuan spv')}
+                ${navLink('pages/dokumen.html', 'fa-solid fa-receipt', 'Manajemen Dokumen', 'dokumen berkas ktp kk berkas leasing')}
 
                 <p class="sidebar-nav-label">Tier 3: Product Knowledge & Pasar</p>
-                ${navLink('pages/eco_calculator.html', 'fa-solid fa-leaf', 'Toyota Eco Calc (Hybrid)')}
-                ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°')}
-                ${navLink('pages/brosur.html', 'fa-solid fa-book-open', 'Brosur Digital')}
-                ${navLink('pages/elibrary.html', 'fa-solid fa-book-medical', 'E-Library Panduan Sales')}
-                ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Analisis Pasar Kecamatan')}
-                ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Wilayah Polreg')}
-                ${navLink('pages/kecamatan.html', 'fa-solid fa-map-pin', 'Lookup Kecamatan & Kodepos')}
-                ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong')}
+                ${navLink('pages/eco_calculator.html', 'fa-solid fa-leaf', 'Toyota Eco Calc (Hybrid)', 'eco hybrid bbm hemat emisi')}
+                ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°', 'komparasi lawan rival competitor banding')}
+                ${navLink('pages/brosur.html', 'fa-solid fa-book-open', 'Brosur Digital', 'brosur pdf katalog spesifikasi')}
+                ${navLink('pages/elibrary.html', 'fa-solid fa-book-medical', 'E-Library Panduan Sales', 'library panduan tips trik materi pelatihan')}
+                ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Analisis Pasar Kecamatan', 'pasar market analisis wilayah pangsa')}
+                ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Wilayah Polreg', 'polreg plat nomor d z bbn stnk')}
+                ${navLink('pages/kecamatan.html', 'fa-solid fa-map-pin', 'Lookup Kecamatan & Kodepos', 'kecamatan kodepos kelurahan bandung')}
+                ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong', 'penjualan kircon kiara condong rekap cabang')}
 
                 <p class="sidebar-nav-label">Tier 4: Trade-In, Aksesoris & Merch</p>
-                ${navLink('pages/olx.html', 'fa-solid fa-exchange-alt', 'OLX Appraisal')}
-                ${navLink('pages/inspeksi.html', 'fa-solid fa-car-rear', 'Prospek Inspeksi Mobil')}
-                ${navLink('pages/jadwal_inspeksi.html', 'fa-solid fa-calendar-check', 'Jadwal Inspeksi Showroom')}
-                ${navLink('pages/tco.html', 'fa-solid fa-car-tunnel', 'Aksesoris TCO & Builder')}
-                ${navLink('pages/velg.html', 'fa-solid fa-compact-disc', 'Velg & Ban Customizer')}
-                ${navLink('pages/merchandise.html', 'fa-solid fa-shirt', 'Merchandise Toyota')}
+                ${navLink('pages/olx.html', 'fa-solid fa-exchange-alt', 'OLX Appraisal', 'olx appraisal taksir harga pasaran mobil bekas')}
+                ${navLink('pages/inspeksi.html', 'fa-solid fa-car-rear', 'Prospek Inspeksi Mobil', 'inspeksi cek kondisi fisik appraisal')}
+                ${navLink('pages/jadwal_inspeksi.html', 'fa-solid fa-calendar-check', 'Jadwal Inspeksi Showroom', 'jadwal booking inspeksi')}
+                ${navLink('pages/tco.html', 'fa-solid fa-car-tunnel', 'Aksesoris TCO & Builder', 'tco aksesoris custom bodykit kaca film karpet')}
+                ${navLink('pages/velg.html', 'fa-solid fa-compact-disc', 'Velg & Ban Customizer', 'velg ban wheel variasi')}
+                ${navLink('pages/merchandise.html', 'fa-solid fa-shirt', 'Merchandise Toyota', 'merch baju kaos topi gantungan payung jaket')}
 
                 <p class="sidebar-nav-label">Tier 5: Refreshment & Arcade Games</p>
-                ${navLink('pages/game.html', 'fa-solid fa-gamepad', 'Toyota Arcade Center')}
-                ${navLink('pages/drag_race.html', 'fa-solid fa-gauge-high', 'Toyota Drag Strip')}
-                ${navLink('pages/valet_park.html', 'fa-solid fa-square-parking', 'Valet Parking VIP')}
-                ${navLink('pages/hybrid_flow.html', 'fa-solid fa-bolt', 'Hybrid Energy Flow')}
-                ${navLink('pages/pitstop.html', 'fa-solid fa-wrench', 'GR Pit Stop Challenge')}
-                ${navLink('pages/memory_match.html', 'fa-solid fa-clone', 'Toyota Memory Match')}
-                ${navLink('pages/catur.html', 'fa-solid fa-chess-knight', 'Toyota Catur Master')}
-                ${navLink('pages/balap.html', 'fa-solid fa-flag-checkered', 'Toyota GR Racing')}
-                ${navLink('pages/snake.html', 'fa-solid fa-gas-pump', 'Parkir Drift & Fuel Rush')}
-                ${navLink('pages/tebak.html', 'fa-solid fa-brain', 'Tebak Otomotif')}
-                ${navLink('pages/tts.html', 'fa-solid fa-puzzle-piece', 'TTS Otomotif')}
-                ${navLink('pages/tss-simulator.html', 'fa-solid fa-shield-halved', 'Simulator TSS 3.0')}
+                ${navLink('pages/game.html', 'fa-solid fa-gamepad', 'Toyota Arcade Center', 'game arcade main santai')}
+                ${navLink('pages/drag_race.html', 'fa-solid fa-gauge-high', 'Toyota Drag Strip', 'drag race balap gr')}
+                ${navLink('pages/valet_park.html', 'fa-solid fa-square-parking', 'Valet Parking VIP', 'valet parkir park')}
+                ${navLink('pages/hybrid_flow.html', 'fa-solid fa-bolt', 'Hybrid Energy Flow', 'hybrid simulator baterai')}
+                ${navLink('pages/pitstop.html', 'fa-solid fa-wrench', 'GR Pit Stop Challenge', 'pit stop montir bengkel ban')}
+                ${navLink('pages/memory_match.html', 'fa-solid fa-clone', 'Toyota Memory Match', 'memory tebak kartu match')}
+                ${navLink('pages/catur.html', 'fa-solid fa-chess-knight', 'Toyota Catur Master', 'catur chess strategi')}
+                ${navLink('pages/balap.html', 'fa-solid fa-flag-checkered', 'Toyota GR Racing', 'racing balapan sirkuit')}
+                ${navLink('pages/snake.html', 'fa-solid fa-gas-pump', 'Parkir Drift & Fuel Rush', 'snake ular drift pom bensin')}
+                ${navLink('pages/tebak.html', 'fa-solid fa-brain', 'Tebak Otomotif', 'tebak kuis trivia')}
+                ${navLink('pages/tts.html', 'fa-solid fa-puzzle-piece', 'TTS Otomotif', 'tts teka teki silang')}
+                ${navLink('pages/tss-simulator.html', 'fa-solid fa-shield-halved', 'Simulator TSS 3.0', 'tss safety toyota safety sense radar')}
+
+                <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <div style="font-weight:700; color:#fff; margin-bottom:2px;">Fitur tidak ditemukan</div>
+                    <div style="font-size:11px; opacity:0.8;">Coba gunakan kata kunci lain</div>
+                </div>
             </div>
 
             <div class="sidebar-bottom">
@@ -495,6 +543,77 @@
 
         checkNotifications();
         setInterval(checkNotifications, 10000); // Poll every 10 seconds
+
+        // ── Sidebar Instant Search Feature Filter ──────────────
+        (function initSidebarSearchFilter() {
+            const searchInput = document.getElementById('sidebarSearchInput');
+            const searchClear = document.getElementById('sidebarSearchClear');
+            const sidebarNav = document.querySelector('#desktopSidebar .sidebar-nav');
+            const emptyState = document.getElementById('sidebarSearchEmpty');
+
+            if (!searchInput || !sidebarNav) return;
+
+            function filterMenu() {
+                const q = searchInput.value.toLowerCase().trim();
+                if (searchClear) {
+                    searchClear.style.display = q ? 'flex' : 'none';
+                }
+
+                const links = sidebarNav.querySelectorAll('.sidebar-nav-link');
+                const labels = sidebarNav.querySelectorAll('.sidebar-nav-label');
+                let totalVisible = 0;
+
+                links.forEach(link => {
+                    const text = (link.textContent || '').toLowerCase();
+                    const href = (link.getAttribute('href') || '').toLowerCase();
+                    const tags = (link.getAttribute('data-tags') || '').toLowerCase();
+                    const isMatch = !q || text.includes(q) || href.includes(q) || tags.includes(q);
+
+                    link.style.display = isMatch ? 'flex' : 'none';
+                    if (isMatch) totalVisible++;
+                });
+
+                // Hide category labels if no links in that section match
+                labels.forEach(label => {
+                    if (!q) {
+                        label.style.display = '';
+                        return;
+                    }
+                    let nextEl = label.nextElementSibling;
+                    let hasVisibleLink = false;
+                    while (nextEl && !nextEl.classList.contains('sidebar-nav-label')) {
+                        if (nextEl.classList.contains('sidebar-nav-link') && nextEl.style.display !== 'none') {
+                            hasVisibleLink = true;
+                            break;
+                        }
+                        nextEl = nextEl.nextElementSibling;
+                    }
+                    label.style.display = hasVisibleLink ? '' : 'none';
+                });
+
+                if (emptyState) {
+                    emptyState.style.display = (totalVisible === 0 && q) ? 'block' : 'none';
+                }
+            }
+
+            searchInput.addEventListener('input', filterMenu);
+
+            if (searchClear) {
+                searchClear.addEventListener('click', () => {
+                    searchInput.value = '';
+                    filterMenu();
+                    searchInput.focus();
+                });
+            }
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    filterMenu();
+                    searchInput.blur();
+                }
+            });
+        })();
 
         // ── Restore & Save Sidebar Scroll Position ──────────────
         const sidebarNav = document.querySelector('#desktopSidebar .sidebar-nav');

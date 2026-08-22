@@ -176,6 +176,38 @@ async function saveTargetChanges() {
   }
 }
 
+async function syncSheetsNowKacab() {
+  const btn = document.getElementById('btnSyncSheetsKacab');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sinkronisasi...';
+  }
+  try {
+    const monthSelect = document.getElementById('monthSelectKacab');
+    const m = monthSelect ? monthSelect.value : (new Date().getMonth() + 1);
+    const res = await fetch(`../api/api_sheets_sync.php?action=pull&bulan=${m}`);
+    const result = await res.json();
+    if (result.status === 'success') {
+      if (typeof customAlert === 'function') {
+        customAlert('Sinkronisasi Berhasil', result.message || 'Data target berhasil disinkronkan dengan Google Spreadsheet.', 'success');
+      } else {
+        alert(result.message || 'Data target berhasil disinkronkan!');
+      }
+      fetchRealTargetData();
+    } else {
+      alert('Gagal sinkron: ' + (result.message || 'Terjadi kesalahan'));
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Gagal menghubungi server sinkronisasi.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Sinkron Spreadsheet';
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   guardKacab();
   renderKacabUser();
