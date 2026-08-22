@@ -448,29 +448,3 @@ window.showErrorState = function(target, options = {}) {
     `;
 };
 
-// ── Universal Clean URL Beautifier ──────────────────────────
-(function initCleanUrlBeautifier() {
-    try {
-        const path = window.location.pathname;
-        if (path.includes('.html') || path.includes('/pages_') || path.includes('/pages/')) {
-            const fileName = path.split('/').pop().replace('.html', '');
-            if (!fileName || fileName === 'index') return;
-
-            let cleanSlug = fileName;
-            if (fileName === 'wiraniaga') cleanSlug = 'wiraniaga';
-            else if (fileName === 'monitoring_spv') cleanSlug = 'monitoring';
-            else if (fileName === 'index_spv') cleanSlug = 'spv';
-            else if (fileName === 'index_kacab') cleanSlug = 'kacab';
-            else if (fileName === 'followup_database') cleanSlug = 'database-followup';
-            else if (fileName === 'approval_kacab') cleanSlug = 'approval-kacab';
-            else if (fileName === 'target_kacab') cleanSlug = 'target-kacab';
-
-            const isLocalSft = path.startsWith('/sft/');
-            const basePath = isLocalSft ? '/sft/' : '/';
-            const cleanUrl = basePath + cleanSlug + window.location.search + window.location.hash;
-
-            window.history.replaceState(null, document.title, cleanUrl);
-        }
-    } catch (e) {}
-})();
-
