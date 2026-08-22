@@ -140,6 +140,11 @@ if ($method === 'POST') {
         }
 
         if ($conn->query($sql)) {
+            // If status changed to Nonaktif / Resign, release unfinished database leads to the Open Pool (Rebutan)
+            if ($status === 'Nonaktif' || $status === 'Resign') {
+                $escName = $conn->real_escape_string($nama_lengkap);
+                @$conn->query("UPDATE followup_customers SET assigned_sales_id = NULL, is_orphan = 1, ex_sales_name = '$escName', released_at = NOW() WHERE assigned_sales_id = $id AND (followup_status != 'Deal / Selesai' OR followup_status IS NULL)");
+            }
             echo json_encode(["status" => "success", "message" => "Data wiraniaga berhasil diperbarui!"]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal mengupdate database: " . $conn->error]);
@@ -156,9 +161,19 @@ if ($method === 'POST') {
             exit();
         }
 
+        // Get sales name before deleting
+        $salesName = "Ex-Sales #$id";
+        $qOld = $conn->query("SELECT nama_lengkap FROM sales_accounts WHERE id = $id LIMIT 1");
+        if ($qOld && $rOld = $qOld->fetch_assoc()) {
+            $salesName = $conn->real_escape_string($rOld['nama_lengkap']);
+        }
+
+        // 1. Release unfinished database leads to the Open Pool (Rebutan) so other active sales can claim them
+        @$conn->query("UPDATE followup_customers SET assigned_sales_id = NULL, is_orphan = 1, ex_sales_name = '$salesName', released_at = NOW() WHERE assigned_sales_id = $id AND (followup_status != 'Deal / Selesai' OR followup_status IS NULL)");
+
         $sql = "DELETE FROM sales_accounts WHERE id = $id";
         if ($conn->query($sql)) {
-            echo json_encode(["status" => "success", "message" => "Akun wiraniaga berhasil dihapus!"]);
+            echo json_encode(["status" => "success", "message" => "Akun wiraniaga berhasil dihapus dan prospek yang belum selesai telah dilepas ke Pool Rebutan!"]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal menghapus dari database: " . $conn->error]);
         }

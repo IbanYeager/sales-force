@@ -1,4 +1,7 @@
 <?php
+// Set default timezone to Asia/Jakarta (WIB - UTC+7)
+date_default_timezone_set('Asia/Jakarta');
+
 // Disable display of raw PHP errors in production to prevent information disclosure
 error_reporting(0);
 ini_set('display_errors', 0);
@@ -25,8 +28,9 @@ if (!$conn || $conn->connect_error) {
     $conn = null;
 }
 
-// Set charset to utf8mb4 for secure Unicode handling
+// Set charset to utf8mb4 and timezone for secure Unicode & accurate time handling
 if ($conn instanceof mysqli) {
     $conn->set_charset("utf8mb4"); 
+    @$conn->query("SET time_zone = '+07:00'");
 }
 ?>

@@ -1,0 +1,1816 @@
+let followupState = {
+  activeTab: 'kanban', // 'kanban' or 'followup'
+  subTab: 'my_tasks',  // 'my_tasks' or 'orphan_pool'
+  viewMode: 'cards',   // 'cards' or 'table'
+  customers: [],
+  orphanLeads: [],
+  templates: [],
+  activeCategory: 'all',
+  activeStatus: 'all',
+  searchQuery: '',
+  selectedCustomer: null,
+  salesInfo: null,
+  renderLimit: 24,
+  filteredList: [],
+  saveTimeouts: {}
+};
+
+// Initialize module on page load
+document.addEventListener('DOMContentLoaded', () => {
+  initFollowupTabs();
+  loadSalesProfile();
+  loadTemplates();
+});
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeJs(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+function loadSalesProfile() {
+  try {
+    const userStr = localStorage.getItem('sales_user') || localStorage.getItem('user_data');
+    if (userStr) {
+      followupState.salesInfo = JSON.parse(userStr);
+    }
+  } catch (e) {
+    console.error('Error loading sales profile', e);
+  }
+
+  // Ensure salesInfo is always populated with active sales consultant identity
+  if (!followupState.salesInfo || !followupState.salesInfo.id) {
+    const idSales = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 1;
+    const namaSales = localStorage.getItem('namaSales') || 'Egy';
+    const peranSales = localStorage.getItem('peranSales') || 'Sales Consultant';
+    followupState.salesInfo = {
+      id: parseInt(idSales, 10) || 1,
+      name: namaSales,
+      role: peranSales
+    };
+  }
+}
+
+function initFollowupTabs() {
+  const container = document.querySelector('.mobile-app .container');
+  if (!container) return;
+
+  // Insert Tab Switcher at the very top of container if not exists
+  if (!document.getElementById('followupNavTabs')) {
+    const tabsHtml = `
+      <div class="followup-nav-tabs" id="followupNavTabs">
+        <button class="followup-tab-btn active" id="tabBtnKanban" onclick="switchCustomerTab('kanban')">
+          <i class="fa-solid fa-table-columns"></i> Pipeline Prospek
+        </button>
+        <button class="followup-tab-btn" id="tabBtnFollowup" onclick="switchCustomerTab('followup')">
+          <i class="fa-solid fa-bullhorn"></i> Database Follow-Up (Attack List)
+          <span id="followupBadgeCount" style="display:none; font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; background:#d7123a; color:#fff; box-shadow:0 2px 6px rgba(215,18,58,0.4);">0</span>
+        </button>
+      </div>
+
+      <!-- CONTAINER UNTUK TAB DATABASE FOLLOW-UP -->
+      <div id="followupSectionView" style="display:none;">
+        
+        <!-- 1. HERO SUMMARY BANNER -->
+        <div class="followup-hero-banner">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.12); padding:3px 10px; border-radius:9999px; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">
+                <i class="fa-solid fa-fire" style="color:#f43f5e;"></i> Repurchase Attack List
+              </div>
+              <h3 style="font-size:18px; font-weight:900; margin:0; line-height:1.2; letter-spacing:-0.3px;">Database Follow-Up Pelanggan</h3>
+              <p style="font-size:11.5px; color:rgba(255,255,255,0.8); margin:3px 0 0 0;">Tunas Toyota Kiara Condong • Target Upgrade &amp; Servis Berkala</p>
+            </div>
+            <button class="btn-fu btn-fu-crimson" style="padding:8px 14px; font-size:11.5px; border-radius:10px;" onclick="loadFollowupCustomers()">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+            </button>
+          </div>
+
+          <!-- Hero KPI Mini Chips -->
+          <div class="hero-kpi-grid">
+            <div class="hero-kpi-chip">
+              <div class="num" id="heroTotalCount">0</div>
+              <div class="lbl">Tugas Saya</div>
+            </div>
+            <div class="hero-kpi-chip" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3);">
+              <div class="num" style="color:#fbbf24;" id="heroPendingCount">0</div>
+              <div class="lbl">Belum Dihubungi</div>
+            </div>
+            <div class="hero-kpi-chip" style="background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3);">
+              <div class="num" style="color:#93c5fd;" id="heroWaitingCount">0</div>
+              <div class="lbl">Respon / Servis</div>
+            </div>
+            <div class="hero-kpi-chip" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3);">
+              <div class="num" style="color:#6ee7b7;" id="heroDealCount">0</div>
+              <div class="lbl">Deal / Selesai</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1.5 SUB-NAVIGATION: DATABASE TUGAS SAYA vs POOL REBUTAN PROSPEK -->
+        <div class="sub-nav-fu-wrapper" id="fuSubNavWrapper">
+          <button type="button" class="sub-nav-fu-btn active" id="subBtnMyTasks" onclick="switchFollowupSubTab('my_tasks')">
+            <i class="fa-solid fa-bullseye" style="color:#2563eb;"></i>
+            <span>🎯 Database Tugas Saya</span>
+            <span id="badgeMyTasksCount" style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:#eff6ff; color:#1d4ed8;">0</span>
+          </button>
+          <button type="button" class="sub-nav-fu-btn pool-tab" id="subBtnOrphanPool" onclick="switchFollowupSubTab('orphan_pool')">
+            <i class="fa-solid fa-fire" style="color:#ea580c;"></i>
+            <span>🔥 Pool Rebutan Prospek (Ex-Sales)</span>
+            <span id="badgeOrphanPoolCount" class="badge-pulse-fire">⚡ Cek Rebutan</span>
+          </button>
+        </div>
+
+        <!-- 2. SEARCH, FILTER & VIEW TOGGLE BAR -->
+        <div class="card" style="padding:16px; margin-bottom:16px; border-radius:var(--fu-radius-lg);">
+          <!-- Top Row: Search & View Mode Switcher -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+            <div class="fu-input-with-icon" style="flex:1; min-width:240px; margin-bottom:0;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" class="fu-input" id="followupSearchInput" placeholder="Cari nama pelanggan, nomor WA, plat nomor, atau model mobil..." oninput="handleFollowupSearch(this.value)">
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="view-toggle-btn active" id="btnViewCards" onclick="switchViewMode('cards')">
+                <i class="fa-solid fa-grip"></i> Kartu Prospek
+              </button>
+              <button class="view-toggle-btn" id="btnViewTable" onclick="switchViewMode('table')">
+                <i class="fa-solid fa-table-list"></i> Tabel Database
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Chips Horizontal Scroll -->
+          <div style="margin-bottom:10px;">
+            <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; margin-bottom:6px; letter-spacing:0.5px;">
+              <i class="fa-solid fa-filter" style="color:#d7123a;"></i> Kategori Repurchase &amp; Layanan:
+            </div>
+            <div class="category-chips-scroll" id="followupCategoryPills">
+              <button class="category-pill-btn active" onclick="handleCategoryFilter('all', this)">
+                <i class="fa-solid fa-grid-2"></i> Semua Kategori
+              </button>
+            </div>
+          </div>
+
+          <!-- Status Filter Tabs -->
+          <div style="display:flex; gap:6px; overflow-x:auto; padding-top:4px;" id="followupStatusTabs">
+            <button class="btn-fu btn-fu-secondary active" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('all', this)">Semua Status</button>
+            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Belum Dihubungi', this)">⚪ Belum Dihubungi</button>
+            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Menunggu Respon', this)">🟡 Menunggu Respon</button>
+            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Tertarik / Jadwal Servis', this)">🔵 Tertarik / Servis</button>
+            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Deal / Selesai', this)">🟢 Deal / Selesai</button>
+          </div>
+        </div>
+
+        <!-- 3. CUSTOMER DATA VIEW CONTAINER (CARDS OR TABLE) -->
+        <div id="followupDataContainer">
+          <!-- Cards Grid -->
+          <div class="followup-cards-grid" id="followupCardsGrid">
+            <div style="grid-column: 1 / -1; text-align:center; padding:50px 20px; color:#64748b; font-size:13px;">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size:28px; margin-bottom:12px; color:#d7123a;"></i><br>
+              <strong>Memuat database customer...</strong>
+            </div>
+          </div>
+
+          <!-- Table View (Spreadsheet Mode) -->
+          <div class="sales-table-wrapper" id="followupTableWrapper" style="display:none;">
+            <table class="sales-fu-table">
+              <thead>
+                <tr>
+                  <th style="min-width:200px;">Customer &amp; Kontak</th>
+                  <th style="min-width:190px;">Unit Mobil &amp; Usia</th>
+                  <th style="min-width:170px;">Klaster &amp; Dealer</th>
+                  <th style="min-width:260px;">Hasil Respon TAM (4 Pertanyaan)</th>
+                  <th style="min-width:180px;">Remarks &amp; Status FU</th>
+                  <th style="min-width:120px; text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="followupTableTbody">
+                <tr>
+                  <td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.insertAdjacentHTML('afterbegin', tabsHtml);
+  }
+}
+
+function switchViewMode(mode) {
+  followupState.viewMode = mode;
+  const btnCards = document.getElementById('btnViewCards');
+  const btnTable = document.getElementById('btnViewTable');
+  const grid = document.getElementById('followupCardsGrid');
+  const table = document.getElementById('followupTableWrapper');
+
+  if (mode === 'table') {
+    btnTable?.classList.add('active');
+    btnCards?.classList.remove('active');
+    if (grid) grid.style.display = 'none';
+    if (table) table.style.display = 'block';
+  } else {
+    btnCards?.classList.add('active');
+    btnTable?.classList.remove('active');
+    if (table) table.style.display = 'none';
+    if (grid) grid.style.display = 'grid';
+  }
+
+  renderCustomerCards();
+}
+
+function switchCustomerTab(tab) {
+  followupState.activeTab = tab;
+  const tabKanban = document.getElementById('tabBtnKanban');
+  const tabFollowup = document.getElementById('tabBtnFollowup');
+  const followupView = document.getElementById('followupSectionView');
+  
+  const kanbanElements = Array.from(document.querySelectorAll('.mobile-app .container > .card, #kanbanBoard'));
+
+  if (tab === 'followup') {
+    tabKanban?.classList.remove('active');
+    tabFollowup?.classList.add('active');
+    followupView.style.display = 'block';
+
+    kanbanElements.forEach(el => {
+      if (el.id !== 'followupSectionView') el.style.display = 'none';
+    });
+
+    loadFollowupCustomers();
+  } else {
+    tabFollowup?.classList.remove('active');
+    tabKanban?.classList.add('active');
+    followupView.style.display = 'none';
+
+    kanbanElements.forEach(el => {
+      if (el.id !== 'followupSectionView') el.style.display = '';
+    });
+  }
+}
+
+async function switchFollowupSubTab(subTab) {
+  followupState.subTab = subTab;
+  const btnMy = document.getElementById('subBtnMyTasks');
+  const btnPool = document.getElementById('subBtnOrphanPool');
+
+  if (subTab === 'orphan_pool') {
+    if (btnMy) btnMy.className = 'sub-nav-fu-btn';
+    if (btnPool) btnPool.className = 'sub-nav-fu-btn pool-tab active';
+    await loadOrphanLeads();
+  } else {
+    if (btnMy) btnMy.className = 'sub-nav-fu-btn active';
+    if (btnPool) btnPool.className = 'sub-nav-fu-btn pool-tab';
+    renderCustomerCards();
+  }
+}
+
+async function loadTemplates() {
+  try {
+    const res = await fetch('../api/api_followup.php?action=templates');
+    const data = await res.json();
+    if (data.success) {
+      followupState.templates = data.data || [];
+    }
+  } catch (e) {
+    console.error('Error loading templates', e);
+  }
+}
+
+async function loadFollowupCustomers() {
+  const grid = document.getElementById('followupCardsGrid');
+  if (grid) {
+    // High-performance Skeleton Shimmer Cards during network loading
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; display:grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap:18px;">
+        ${[1, 2, 3, 4].map(() => `
+          <div class="skeleton-card-fu">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; gap:12px; align-items:center;">
+                <div style="width:44px; height:44px; border-radius:50%; background:#e2e8f0;"></div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div class="skeleton-line" style="width:140px; height:16px;"></div>
+                  <div class="skeleton-line" style="width:90px;"></div>
+                </div>
+              </div>
+              <div class="skeleton-line" style="width:70px; height:20px; border-radius:8px;"></div>
+            </div>
+            <div class="skeleton-line" style="width:100%; height:45px; border-radius:12px;"></div>
+            <div class="skeleton-line" style="width:100%; height:120px; border-radius:14px;"></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  try {
+    loadSalesProfile();
+    let salesId = (followupState.salesInfo && followupState.salesInfo.id) ? followupState.salesInfo.id : 1;
+    const res = await fetch(`../api/api_followup.php?action=customers&sales_id=${salesId}`);
+    const data = await res.json();
+
+    if (data.success) {
+      followupState.customers = data.data || [];
+      updateHeroStats();
+      renderCategoryPills();
+      
+      if (followupState.subTab === 'orphan_pool') {
+        loadOrphanLeads();
+      } else {
+        renderCustomerCards();
+      }
+
+      // Fetch live orphan count in background
+      fetchOrphanCountBadge();
+
+      // Update badge count
+      const pendingCount = followupState.customers.filter(c => c.followup_status === 'Belum Dihubungi').length;
+      const badge = document.getElementById('followupBadgeCount');
+      if (badge) {
+        if (pendingCount > 0) {
+          badge.style.display = 'inline-block';
+          badge.textContent = pendingCount;
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+  } catch (e) {
+    if (grid) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding:40px; color:red; font-size:13px;">
+          <i class="fa-solid fa-circle-exclamation" style="font-size:24px; margin-bottom:10px;"></i><br>
+          Gagal memuat data customer. Silakan periksa koneksi server.
+        </div>
+      `;
+    }
+  }
+}
+
+async function fetchOrphanCountBadge() {
+  try {
+    const res = await fetch('../api/api_followup.php?action=orphan_leads');
+    const data = await res.json();
+    if (data && data.success) {
+      updateOrphanBadgeCount(data.count || 0);
+    }
+  } catch (e) {
+    // Non-blocking background fetch
+  }
+}
+
+function updateOrphanBadgeCount(count) {
+  const badge = document.getElementById('badgeOrphanPoolCount');
+  if (badge) {
+    badge.textContent = `⚡ ${count} Siap Rebut`;
+  }
+}
+
+async function loadOrphanLeads() {
+  const grid = document.getElementById('followupCardsGrid');
+  if (grid) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align:center; padding:50px 20px; color:#ea580c;">
+        <i class="fa-solid fa-fire fa-fade" style="font-size:32px; margin-bottom:12px;"></i><br>
+        <strong>Mencari prospek yang tersedia di Pool Rebutan...</strong>
+      </div>
+    `;
+  }
+
+  try {
+    const { searchQuery, activeCategory } = followupState;
+    const url = `../api/api_followup.php?action=orphan_leads&search=${encodeURIComponent(searchQuery)}&category=${encodeURIComponent(activeCategory)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.success) {
+      followupState.orphanLeads = data.data || [];
+      updateOrphanBadgeCount(data.count || 0);
+      renderOrphanPoolCards();
+    }
+  } catch (e) {
+    console.error('Error loading orphan leads:', e);
+  }
+}
+
+function renderOrphanPoolCards() {
+  const grid = document.getElementById('followupCardsGrid');
+  if (!grid) return;
+
+  const list = followupState.orphanLeads || [];
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px; background:#fff; border-radius:var(--fu-radius-lg); border:1.5px dashed #fed7aa; box-shadow:var(--fu-shadow-card);">
+        <div style="width:64px; height:64px; border-radius:50%; background:#ffedd5; color:#ea580c; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:26px;">
+          <i class="fa-solid fa-fire-extinguisher"></i>
+        </div>
+        <h3 style="font-size:17px; font-weight:900; color:#431407; margin-bottom:6px;">Semua Prospek Sudah Terbagi / Belum Ada Rebutan</h3>
+        <p style="font-size:13px; color:#9a3412; max-width:480px; margin:0 auto 18px; line-height:1.5;">
+          Saat ini tidak ada database ex-sales atau prospek yang terbengkalai. Jika ada sales yang resign atau database dilepas oleh SPV, prospek tersebut akan otomatis muncul di sini untuk diperebutkan.
+        </p>
+        <button type="button" class="btn-fu btn-fu-secondary" onclick="loadOrphanLeads()" style="padding:10px 20px; font-size:12px;">
+          <i class="fa-solid fa-arrows-rotate"></i> Cek Ulang Pool Rebutan
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  let html = `
+    <div style="grid-column: 1 / -1;" class="pool-rebutan-hero">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:22px;">🔥</span>
+          <h3 style="font-size:17px; font-weight:900; margin:0; line-height:1.2;">Pool Rebutan Prospek (Ex-Sales &amp; Unassigned Leads)</h3>
+        </div>
+        <p style="font-size:12px; color:rgba(255,255,255,0.9); margin:4px 0 0 0;">
+          <strong>Siapa Cepat Dia Dapat!</strong> Prospek ini pernah diisi oleh sales sebelumnya (atau dilepas SPV). Klik tombol <strong>Ambil Alih Prospek</strong> untuk memindahkan customer ke daftar tugas Anda.
+        </p>
+      </div>
+      <div style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); padding:8px 16px; border-radius:12px; font-weight:800; font-size:14px; text-align:center;">
+        ⚡ ${list.length} Prospek Siap Rebut
+      </div>
+    </div>
+  `;
+
+  list.forEach(c => {
+    const rawName = (c.name || 'Customer').trim();
+    const parts = rawName.split(/\s+/);
+    let initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : rawName.substring(0, 2).toUpperCase();
+    const isConn = (c.connected === 'TRUE' || c.connected === 'IYA');
+    const isCont = (c.contacted === 'TRUE' || c.contacted === 'IYA');
+    const isProsp = (c.prospect === 'TRUE' || c.prospect === 'IYA');
+    const isSpk = (c.spk === 'TRUE' || c.spk === 'IYA');
+
+    html += `
+      <div class="followup-card" style="border: 2px solid #fdba74; box-shadow: 0 4px 16px rgba(234, 88, 12, 0.08);" id="orphan_card_${c.id}">
+        <div>
+          <!-- Top Rebutan Banner Inside Card -->
+          <div class="orphan-card-banner">
+            <div class="orphan-fire-tag">
+              <i class="fa-solid fa-fire" style="color:#ea580c;"></i>
+              <span>Siap Direbut (Ex-Sales)</span>
+            </div>
+            <div class="orphan-ready-pill">
+              <i class="fa-solid fa-bolt"></i> Siap Diklaim
+            </div>
+          </div>
+
+          <!-- Header Row: Customer Identity & Category -->
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="cust-avatar-circle" style="width:44px; height:44px; font-size:15px; flex-shrink:0; background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color:#fff;">
+                ${initials}
+              </div>
+              <div>
+                <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2;">${escapeHtml(c.name || 'Customer')}</div>
+                <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
+                  <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link">
+                    <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${escapeHtml(c.phone || '-')}
+                  </a>
+                  <button type="button" onclick="navigator.clipboard.writeText('${c.phone}'); showToastCopy('${c.phone}');" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; padding:2px 4px; font-size:11px;" title="Salin No. WA">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+              <span class="badge-cluster-pill" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-size:10px; font-weight:800;">
+                ${escapeHtml(c.followup_category || 'Trade-in / Repurchase')}
+              </span>
+              <span style="font-size:9.5px; font-family:monospace; color:#94a3b8; font-weight:700;">
+                ${escapeHtml(c.customer_code || `CUST-${c.id}`)}
+              </span>
+            </div>
+          </div>
+
+          <!-- Vehicle Upgrade Journey Flow -->
+          <div class="vehicle-journey-box" style="margin:10px 0 12px 0; padding:12px 14px;">
+            <div class="vehicle-journey-row">
+              <!-- Left: Current Vehicle -->
+              <div class="vehicle-unit-side">
+                <div class="sub-lbl" style="font-size:10px;"><i class="fa-solid fa-car-side"></i> Mobil Saat Ini</div>
+                <div class="model-name" style="font-size:13.5px; color:#0f172a;">${escapeHtml(c.last_car_model || c.car_model || '-')}</div>
+                ${c.car_age ? `<div style="font-size:10.5px; color:#b45309; font-weight:700; margin-top:2px;"><i class="fa-solid fa-clock"></i> Usia: ${c.car_age}</div>` : ''}
+              </div>
+
+              <!-- Center: Arrow Icon -->
+              <div class="journey-arrow" style="font-size:13px; color:#ea580c;">
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+
+              <!-- Right: Recommended Target Model -->
+              <div class="vehicle-unit-side" style="text-align:right;">
+                <div class="sub-lbl" style="color:#ea580c; font-size:10px;"><i class="fa-solid fa-bullseye"></i> Target Upgrade TAM</div>
+                <div class="model-name" style="color:#c2410c; font-size:13.5px; font-weight:900;">${escapeHtml(c.recommended_model || c.car_model || '-')}</div>
+                ${(c.alt_model_2 || c.alt_model_3) ? `<div style="font-size:10px; color:#64748b; margin-top:2px;">Alt: <strong style="color:#334155;">${[c.alt_model_2, c.alt_model_3].filter(Boolean).join(', ')}</strong></div>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <!-- Badges Line: Cluster, Priority, Location & DO -->
+          <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px;">
+            ${c.cluster_name ? `<span class="badge-cluster-pill" style="font-size:10.5px;">🏷️ ${escapeHtml(c.cluster_name)}</span>` : ''}
+            ${c.priority ? `<span class="badge-priority-pill" style="font-size:10.5px;">⚡ ${escapeHtml(c.priority)}</span>` : ''}
+            ${c.district ? `<span class="badge-loc-pill" style="font-size:10.5px;">📍 Kec. ${escapeHtml(c.district)}</span>` : ''}
+            ${c.outlet_do ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:10px;"><i class="fa-solid fa-building"></i> ${escapeHtml(c.outlet_do)}</span>` : ''}
+          </div>
+
+          <!-- Prior Progress Dossier Box -->
+          <div class="ex-sales-dossier-card">
+            <div class="dossier-header">
+              <span style="display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-clock-rotate-left"></i> Histori Follow-Up dari Sales Sebelumnya
+              </span>
+              ${c.remarks ? `<span style="font-size:10px; font-weight:800; background:#ffedd5; color:#c2410c; padding:2px 7px; border-radius:6px;">${escapeHtml(c.remarks)}</span>` : ''}
+            </div>
+
+            <div class="dossier-chips-grid">
+              <div class="dossier-chip">
+                <div class="chip-lbl">Connected</div>
+                <div class="chip-val" style="color:${isConn ? '#16a34a' : '#dc2626'};">${isConn ? '✅ Iya' : '❌ Tidak'}</div>
+              </div>
+              <div class="dossier-chip">
+                <div class="chip-lbl">Contacted</div>
+                <div class="chip-val" style="color:${isCont ? '#16a34a' : '#dc2626'};">${isCont ? '✅ Iya' : '❌ Tidak'}</div>
+              </div>
+              <div class="dossier-chip">
+                <div class="chip-lbl">Prospect</div>
+                <div class="chip-val" style="color:${isProsp ? '#2563eb' : '#64748b'};">${isProsp ? '🔥 Minat' : '⚪ Belum'}</div>
+              </div>
+              <div class="dossier-chip">
+                <div class="chip-lbl">SPK Deal</div>
+                <div class="chip-val" style="color:${isSpk ? '#16a34a' : '#64748b'};">${isSpk ? '🏆 SPK' : '⚪ Belum'}</div>
+              </div>
+            </div>
+
+            ${c.reason_followup ? `
+              <div class="dossier-quote-box">
+                <i class="fa-solid fa-comment-dots" style="color:#ea580c; margin-top:2px;"></i>
+                <div>
+                  <strong style="color:#9a3412; font-size:10.5px;">Catatan Terakhir:</strong>
+                  <div style="font-style:italic; margin-top:1px;">"${escapeHtml(c.reason_followup)}"</div>
+                </div>
+              </div>
+            ` : `
+              <div style="font-size:11px; color:#78716c; font-style:italic; padding-top:2px;">
+                Belum ada catatan detail. Prospek segar siap Anda follow-up.
+              </div>
+            `}
+          </div>
+
+          <!-- Big Action Button: AMBIL ALIH PROSPEK INI -->
+          <div style="margin-top:14px; display:flex; gap:8px;">
+            <button type="button" class="btn-claim-lead-premium" onclick="claimOrphanLead(${c.id}, '${escapeJs(c.name)}')">
+              <i class="fa-solid fa-bolt" style="font-size:16px;"></i>
+              <span>AMBIL ALIH PROSPEK INI (MILIK SAYA)</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="btn-sub" style="padding:12px 14px; font-size:12px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; cursor:pointer;" onclick="openSalesCustomerDetailModal(${c.id})" title="Lihat Detail Customer">
+              <i class="fa-solid fa-circle-info"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+}
+
+async function claimOrphanLead(customerId, customerName) {
+  loadSalesProfile();
+  const salesId = (followupState.salesInfo && followupState.salesInfo.id) ? followupState.salesInfo.id : 1;
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=claim_orphan_lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_id: customerId,
+        sales_id: salesId
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('🏆 Berhasil Diambil Alih!', data.message || `Customer ${customerName} resmi menjadi milik Anda.`, 'success');
+      } else if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'success',
+          title: '🏆 Berhasil Diambil Alih!',
+          text: data.message || `Customer ${customerName} resmi menjadi milik Anda.`,
+          confirmButtonColor: '#0d1b3e'
+        });
+      }
+
+      // If customer record returned, add to active customers list
+      if (data.customer) {
+        followupState.customers.unshift(data.customer);
+      }
+
+      // Remove from orphan pool
+      followupState.orphanLeads = followupState.orphanLeads.filter(x => String(x.id) !== String(customerId));
+      updateOrphanBadgeCount(followupState.orphanLeads.length);
+
+      // Auto switch to My Tasks so sales can immediately work on it
+      setTimeout(() => {
+        switchFollowupSubTab('my_tasks');
+        loadFollowupCustomers();
+      }, 1000);
+    } else {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal Mengambil Alih', data.message || 'Prospek telah diambil oleh sales lain.', 'warning');
+      } else if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Tidak Dapat Diambil',
+          text: data.message || 'Prospek telah diambil oleh sales lain.',
+          confirmButtonColor: '#0d1b3e'
+        });
+      }
+      loadOrphanLeads();
+    }
+  } catch (e) {
+    console.error('Error claiming lead:', e);
+  }
+}
+
+function updateHeroStats() {
+  const list = followupState.customers;
+  const total = list.length;
+  const pending = list.filter(c => c.followup_status === 'Belum Dihubungi').length;
+  const waiting = list.filter(c => c.followup_status === 'Menunggu Respon' || c.followup_status === 'Tertarik / Jadwal Servis').length;
+  const deal = list.filter(c => c.followup_status === 'Deal / Selesai').length;
+
+  const elTotal = document.getElementById('heroTotalCount');
+  const elPending = document.getElementById('heroPendingCount');
+  const elWaiting = document.getElementById('heroWaitingCount');
+  const elDeal = document.getElementById('heroDealCount');
+  const badgeMyTasks = document.getElementById('badgeMyTasksCount');
+
+  if (elTotal) elTotal.textContent = total;
+  if (elPending) elPending.textContent = pending;
+  if (elWaiting) elWaiting.textContent = waiting;
+  if (elDeal) elDeal.textContent = deal;
+  if (badgeMyTasks) badgeMyTasks.textContent = total;
+}
+
+function renderCategoryPills() {
+  const container = document.getElementById('followupCategoryPills');
+  if (!container) return;
+
+  const categories = Array.from(new Set(followupState.customers.map(c => c.followup_category).filter(Boolean)));
+  
+  let html = `
+    <button class="category-pill-btn ${followupState.activeCategory === 'all' ? 'active' : ''}" onclick="handleCategoryFilter('all', this)">
+      <i class="fa-solid fa-grid-2"></i> Semua Kategori (${followupState.customers.length})
+    </button>
+  `;
+
+  categories.forEach(cat => {
+    const count = followupState.customers.filter(c => c.followup_category === cat).length;
+    const isActive = followupState.activeCategory === cat;
+    html += `
+      <button class="category-pill-btn ${isActive ? 'active' : ''}" onclick="handleCategoryFilter('${cat}', this)">
+        ${cat} <span style="font-size:10px; opacity:0.8;">(${count})</span>
+      </button>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function handleFollowupSearch(query) {
+  followupState.searchQuery = query.toLowerCase().trim();
+  if (followupState.subTab === 'orphan_pool') {
+    loadOrphanLeads();
+  } else {
+    renderCustomerCards();
+  }
+}
+
+function handleCategoryFilter(cat, btn) {
+  followupState.activeCategory = cat;
+  document.querySelectorAll('#followupCategoryPills .category-pill-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (followupState.subTab === 'orphan_pool') {
+    loadOrphanLeads();
+  } else {
+    renderCustomerCards();
+  }
+}
+
+function handleStatusFilter(status, btn) {
+  followupState.activeStatus = status;
+  document.querySelectorAll('#followupStatusTabs button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCustomerCards();
+}
+
+function renderCustomerCards() {
+  let list = followupState.customers;
+
+  // Filter Search
+  if (followupState.searchQuery) {
+    const q = followupState.searchQuery;
+    list = list.filter(c => 
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.phone && c.phone.includes(q)) ||
+      (c.car_model && c.car_model.toLowerCase().includes(q)) ||
+      (c.last_car_model && c.last_car_model.toLowerCase().includes(q)) ||
+      (c.recommended_model && c.recommended_model.toLowerCase().includes(q)) ||
+      (c.plate_number && c.plate_number.toLowerCase().includes(q)) ||
+      (c.district && c.district.toLowerCase().includes(q))
+    );
+  }
+
+  // Filter Category
+  if (followupState.activeCategory !== 'all') {
+    list = list.filter(c => c.followup_category === followupState.activeCategory);
+  }
+
+  // Filter Status
+  if (followupState.activeStatus !== 'all') {
+    list = list.filter(c => c.followup_status === followupState.activeStatus);
+  }
+
+  followupState.filteredList = list;
+  followupState.renderLimit = 24;
+
+  if (followupState.viewMode === 'table') {
+    renderCustomerTableView(list);
+  } else {
+    renderCustomerCardsView(list, false);
+  }
+}
+
+// -------------------------------------------------------------
+// INDONESIAN WIB DATE FORMATTER HELPER
+// -------------------------------------------------------------
+function formatWibDate(dateStr) {
+  if (!dateStr || dateStr.startsWith('0000')) {
+    return { text: '⚪ Belum di-FU', isRecorded: false, formatted: '' };
+  }
+
+  try {
+    const cleanStr = String(dateStr).replace('T', ' ');
+    const parts = cleanStr.split(' ');
+    const datePart = parts[0]; // YYYY-MM-DD
+    const timePart = parts[1] ? parts[1].substring(0, 5) : ''; // HH:mm
+
+    const dArr = datePart.split('-');
+    if (dArr.length === 3) {
+      const year = parseInt(dArr[0], 10);
+      const month = parseInt(dArr[1], 10) - 1;
+      const day = parseInt(dArr[2], 10);
+
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      
+      const now = new Date();
+      const todayYear = now.getFullYear();
+      const todayMonth = now.getMonth();
+      const todayDay = now.getDate();
+
+      const isToday = (year === todayYear && month === todayMonth && day === todayDay);
+      
+      const yesterday = new Date();
+      yesterday.setDate(todayDay - 1);
+      const isYesterday = (year === yesterday.getFullYear() && month === yesterday.getMonth() && day === yesterday.getDate());
+
+      let formattedDate = '';
+      if (isToday) {
+        formattedDate = `Hari ini${timePart ? `, ${timePart} WIB` : ''}`;
+      } else if (isYesterday) {
+        formattedDate = `Kemarin${timePart ? `, ${timePart} WIB` : ''}`;
+      } else {
+        formattedDate = `${day} ${months[month]} ${year}${timePart ? `, ${timePart} WIB` : ''}`;
+      }
+
+      return { text: `📅 ${formattedDate}`, isRecorded: true, formatted: formattedDate };
+    }
+  } catch (e) {
+    console.error('Error formatting WIB date:', e);
+  }
+
+  return { text: `📅 ${dateStr.substring(0, 16)}`, isRecorded: true, formatted: dateStr };
+}
+
+// -------------------------------------------------------------
+// MODULAR SINGLE CUSTOMER CARD HTML GENERATOR
+// -------------------------------------------------------------
+function renderSingleCustomerCardHtml(c) {
+  const isPending = c.followup_status === 'Belum Dihubungi';
+  const isDeal = c.followup_status === 'Deal / Selesai';
+  const isInterested = c.followup_status === 'Tertarik / Jadwal Servis';
+
+  const statusClass = isPending ? 'pending' : (isDeal ? 'deal' : (isInterested ? 'interested' : ''));
+
+  // Generate Initials
+  const rawName = (c.name || 'Customer').trim();
+  const parts = rawName.split(/\s+/);
+  let initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : rawName.substring(0, 2).toUpperCase();
+
+  const dateInfo = formatWibDate(c.followup_date);
+
+  return `
+    <div class="followup-card ${statusClass}" id="customerCard_${c.id}">
+      <div>
+        <!-- Header Row -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cust-avatar-circle" style="width:44px; height:44px; font-size:15px; flex-shrink:0;">${initials}</div>
+            <div>
+              <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2;">${c.name}</div>
+              <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
+                <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link">
+                  <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${c.phone}
+                </a>
+                <button type="button" onclick="navigator.clipboard.writeText('${c.phone}'); showToastCopy('${c.phone}');" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; padding:2px 4px; font-size:11px;" title="Salin No. WA">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+            <span class="badge-cluster-pill" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-size:10px; font-weight:800;">
+              ${c.followup_category || 'Trade-in / Repurchase'}
+            </span>
+            <span style="font-size:9.5px; font-family:monospace; color:#94a3b8; font-weight:700;">
+              ${c.customer_code || `CUST-${c.id}`}
+            </span>
+          </div>
+        </div>
+
+        <!-- Interactive Vehicle Upgrade Journey Flow -->
+        <div class="vehicle-journey-box" style="margin:10px 0 12px 0; padding:12px 14px;">
+          <div class="vehicle-journey-row">
+            <!-- Left: Current Vehicle -->
+            <div class="vehicle-unit-side">
+              <div class="sub-lbl" style="font-size:10px;"><i class="fa-solid fa-car-side"></i> Mobil Saat Ini</div>
+              <div class="model-name" style="font-size:13.5px; color:#0f172a;">${c.last_car_model || '-'}</div>
+              ${c.car_age ? `<div style="font-size:10.5px; color:#b45309; font-weight:700; margin-top:2px;"><i class="fa-solid fa-clock"></i> Usia: ${c.car_age}</div>` : ''}
+            </div>
+
+            <!-- Center: Arrow Icon -->
+            <div class="journey-arrow" style="font-size:13px; color:#d7123a;">
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+
+            <!-- Right: Recommended Target Model -->
+            <div class="vehicle-unit-side" style="text-align:right;">
+              <div class="sub-lbl" style="color:#d7123a; font-size:10px;"><i class="fa-solid fa-bullseye"></i> Target Upgrade TAM</div>
+              <div class="model-name" style="color:#d7123a; font-size:13.5px; font-weight:900;">${c.recommended_model || c.car_model}</div>
+              ${(c.alt_model_2 || c.alt_model_3) ? `<div style="font-size:10px; color:#64748b; margin-top:2px;">Alt: <strong style="color:#334155;">${[c.alt_model_2, c.alt_model_3].filter(Boolean).join(', ')}</strong></div>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges Line: Cluster, Priority, Location & DO -->
+        <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px;">
+          ${c.cluster_name ? `<span class="badge-cluster-pill" style="font-size:10.5px;">🏷️ ${c.cluster_name}</span>` : ''}
+          ${c.priority ? `<span class="badge-priority-pill" style="font-size:10.5px;">⚡ ${c.priority}</span>` : ''}
+          ${c.district ? `<span class="badge-loc-pill" style="font-size:10.5px;">📍 Kec. ${c.district}</span>` : ''}
+          ${c.outlet_do ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:10px;"><i class="fa-solid fa-building"></i> ${c.outlet_do}</span>` : ''}
+          ${c.service_compliance ? `<span class="badge-cluster-pill" style="background:#ecfdf5; color:#059669; font-size:10px;"><i class="fa-solid fa-wrench"></i> Servis: ${c.service_compliance}</span>` : ''}
+          ${c.vin ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:9.5px; font-family:monospace;">🔑 VIN: ${c.vin}</span>` : ''}
+        </div>
+      </div>
+
+      <!-- Interactive TAM Follow-Up Response Form (Step Funnel) -->
+      <div class="tam-fu-box">
+        <div class="tam-fu-header">
+          <div class="tam-fu-title">
+            <i class="fa-solid fa-clipboard-check"></i> Hasil Follow-Up Sales (TAM 4-Pilar)
+          </div>
+          <span id="fuDateBadge_${c.id}" class="fu-date-badge ${dateInfo.isRecorded ? 'recorded' : 'empty'}">
+            ${dateInfo.text}
+          </span>
+        </div>
+
+        <!-- Stepped Funnel: 1. Connected -> 2. Contacted -> 3. Prospect -> 4. SPK -->
+        <div class="fu-funnel-grid">
+          <!-- Step 1: Connected -->
+          <div class="fu-step-card">
+            <div class="fu-step-top">
+              <div class="fu-step-num">1</div>
+              <div class="fu-step-text">
+                <div class="fu-step-name">Connected</div>
+                <div class="fu-step-desc">No. Aktif / Tersambung</div>
+              </div>
+            </div>
+            <div class="fu-segmented-btn-group" id="group_connected_${c.id}">
+              <button type="button" class="fu-tog-btn ${(c.connected === 'TRUE' || c.connected === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'connected', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${(c.connected === 'FALSE' || (!c.connected && c.connected !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'connected', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Contacted -->
+          <div class="fu-step-card">
+            <div class="fu-step-top">
+              <div class="fu-step-num">2</div>
+              <div class="fu-step-text">
+                <div class="fu-step-name">Contacted</div>
+                <div class="fu-step-desc">Respon / Komunikasi</div>
+              </div>
+            </div>
+            <div class="fu-segmented-btn-group" id="group_contacted_${c.id}">
+              <button type="button" class="fu-tog-btn ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'contacted', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${(c.contacted === 'FALSE' || (!c.contacted && c.contacted !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'contacted', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Prospect -->
+          <div class="fu-step-card">
+            <div class="fu-step-top">
+              <div class="fu-step-num">3</div>
+              <div class="fu-step-text">
+                <div class="fu-step-name">Prospect</div>
+                <div class="fu-step-desc">Minat Beli / Upgrade</div>
+              </div>
+            </div>
+            <div class="fu-segmented-btn-group" id="group_prospect_${c.id}">
+              <button type="button" class="fu-tog-btn ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'prospect', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${(c.prospect === 'FALSE' || (!c.prospect && c.prospect !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'prospect', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+            </div>
+          </div>
+
+          <!-- Step 4: SPK -->
+          <div class="fu-step-card">
+            <div class="fu-step-top">
+              <div class="fu-step-num" style="background:#d7123a;">4</div>
+              <div class="fu-step-text">
+                <div class="fu-step-name" style="color:#d7123a;">SPK Deal</div>
+                <div class="fu-step-desc">Closing Transaksi</div>
+              </div>
+            </div>
+            <div class="fu-segmented-btn-group" id="group_spk_${c.id}">
+              <button type="button" class="fu-tog-btn ${(c.spk === 'TRUE' || c.spk === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'spk', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${(c.spk === 'FALSE' || (!c.spk && c.spk !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'spk', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls: Remarks & Status Follow-Up -->
+        <div class="fu-controls-row">
+          <div>
+            <select id="remarks_${c.id}" class="fu-select-remarks" onchange="debouncedSaveSalesFu(${c.id}, 0, false)">
+              <option value="">-- Pilih Remarks Respon Customer --</option>
+              <optgroup label="🟢 RESPON POSITIF & PROSPEK">
+                <option value="Customer tertarik" ${c.remarks === 'Customer tertarik' ? 'selected' : ''}>🔵 Customer tertarik (Beri Info Unit)</option>
+                <option value="Customer janjian" ${c.remarks === 'Customer janjian' ? 'selected' : ''}>🟡 Customer janjian (Ketemu/Showroom)</option>
+                <option value="Minta simulasi kredit" ${c.remarks === 'Minta simulasi kredit' ? 'selected' : ''}>📝 Minta simulasi DP &amp; Angsuran</option>
+                <option value="Janjian test drive" ${c.remarks === 'Janjian test drive' ? 'selected' : ''}>🚗 Janjian Jadwal Test Drive</option>
+                <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>🏆 SPK Berhasil / Closing Deal</option>
+              </optgroup>
+              <optgroup label="🟡 FOLLOW-UP LANJUTAN">
+                <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>🟢 Customer pending (Follow-Up Lanjut)</option>
+                <option value="Tunggu gajian/dana" ${c.remarks === 'Tunggu gajian/dana' ? 'selected' : ''}>⏳ Menunggu Gajian / Dana Siap</option>
+                <option value="Cek harga mobil lama" ${c.remarks === 'Cek harga mobil lama' ? 'selected' : ''}>🔄 Proses Cek Harga Trade-In</option>
+              </optgroup>
+              <optgroup label="🔴 KEBERATAN / TIDAK MERESPON">
+                <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>🔴 Customer menolak / Belum Mau Ganti</option>
+                <option value="Beli di dealer/merk lain" ${c.remarks === 'Beli di dealer/merk lain' ? 'selected' : ''}>❌ Sudah ambil di dealer/merk lain</option>
+                <option value="Customer tidak aktif" ${c.remarks === 'Customer tidak aktif' ? 'selected' : ''}>⚪ No. WA / HP Tidak Aktif</option>
+                <option value="Customer tidak diangkat" ${c.remarks === 'Customer tidak diangkat' ? 'selected' : ''}>⚫ Telepon Tidak Diangkat / Centang 1</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div>
+            <select id="salesFuStatus_${c.id}" class="fu-select-status" onchange="debouncedSaveSalesFu(${c.id}, 0, false)" title="Status Tahapan Follow-Up">
+              <option value="Open" ${(c.sales_fu_status === 'Open' || !c.sales_fu_status) ? 'selected' : ''}>🔓 Open (Proses)</option>
+              <option value="Closed" ${c.sales_fu_status === 'Closed' ? 'selected' : ''}>🔒 Closed (Selesai)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Notes Preset Chips (1-Click Suggestions) -->
+        <div class="fu-quick-chips-wrapper">
+          <div class="fu-quick-chips-title">
+            <i class="fa-solid fa-bolt" style="color:#d7123a;"></i> Catatan Cepat (1-Klik):
+          </div>
+          <div class="fu-quick-chips-scroll">
+            <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Minta simulasi TDP & Angsuran')">💬 Minta Simulasi DP</button>
+            <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Janjian ketemu weekend ini')">📅 Janjian Weekend</button>
+            <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Mau coba test drive unit')">🚗 Mau Test Drive</button>
+            <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Tunggu gajian tanggal 25')">⏳ Tunggu Gajian</button>
+            <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Taksiran harga mobil lama cocok')">🔄 Cek Trade-in</button>
+            <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Kirim brosur & pricelist via WA')">📄 Kirim Brosur WA</button>
+            <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'No. HP tidak aktif / centang 1')">❌ WA Tidak Aktif</button>
+          </div>
+        </div>
+
+        <!-- Note Input & Save Button Row -->
+        <div class="fu-note-row">
+          <input type="text" id="reasonFu_${c.id}" class="fu-note-input" placeholder="Tulis alasan follow up / catatan respon spesifik..." value="${escapeHtml(c.reason_followup || c.notes || '')}" oninput="handleReasonInput(${c.id}, this.value)" onblur="debouncedSaveSalesFu(${c.id}, 0, false)" onkeydown="if(event.key==='Enter') debouncedSaveSalesFu(${c.id}, 0, true)">
+          <button type="button" class="fu-btn-save" onclick="debouncedSaveSalesFu(${c.id}, 0, true)" title="Simpan Respon Follow-Up">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Action Bar (WhatsApp & Detail) -->
+      <div style="margin-top:4px; display:flex; gap:8px; align-items:center;">
+        <!-- Big WhatsApp Button -->
+        <button class="btn-wa-action" style="flex:1; padding:12px 14px;" onclick="openWhatsAppModal(${c.id})">
+          <i class="fa-brands fa-whatsapp" style="font-size:18px;"></i> Follow Up via WhatsApp
+        </button>
+
+        <button class="btn-sub" style="padding:12px 14px; font-size:12px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; cursor:pointer;" onclick="openSalesCustomerDetailModal(${c.id})" title="Lihat Informasi Lengkap Customer">
+          <i class="fa-solid fa-circle-info"></i> Detail
+        </button>
+        <a href="tel:${c.phone}" class="btn-sub" style="padding:12px 14px; font-size:13px; border-radius:12px; background:#f1f5f9; color:#0f172a; text-decoration:none; border:1.5px solid #e2e8f0; display:flex; align-items:center; justify-content:center;" title="Telepon Langsung">
+          <i class="fa-solid fa-phone" style="color:#10b981;"></i>
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+// -------------------------------------------------------------
+// PROGRESSIVE CHUNKED CARDS VIEW (INSTANT RENDER + INFINITE SCROLL)
+// -------------------------------------------------------------
+function renderCustomerCardsView(list, append = false) {
+  const grid = document.getElementById('followupCardsGrid');
+  if (!grid) return;
+
+  if (list.length === 0) {
+    if (followupState.customers.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px; background:#fff; border-radius:var(--fu-radius-lg); border:1.5px dashed #cbd5e1; box-shadow:var(--fu-shadow-card);">
+          <div style="width:64px; height:64px; border-radius:50%; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:26px; box-shadow:0 4px 12px rgba(37,99,235,0.15);">
+            <i class="fa-solid fa-user-clock"></i>
+          </div>
+          <h3 style="font-size:17px; font-weight:900; color:#0d1b3e; margin-bottom:6px;">Belum Ada Database Prospek yang Ditugaskan</h3>
+          <p style="font-size:13px; color:#64748b; max-width:480px; margin:0 auto 18px; line-height:1.5;">
+            Supervisor (SPV) belum membagikan tugas follow-up database ke akun Anda. Database prospek akan otomatis muncul di sini setelah ditugaskan oleh SPV melalui menu <strong>Database Follow-Up (CRM) SPV</strong>.
+          </p>
+          <button type="button" class="btn-fu btn-fu-secondary" onclick="loadFollowupCustomers()" style="padding:10px 20px; font-size:12px;">
+            <i class="fa-solid fa-rotate"></i> Cek Ulang Penugasan Database
+          </button>
+        </div>
+      `;
+    } else {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding:50px 20px; background:#fff; border-radius:var(--fu-radius-lg); border:1.5px solid #e2e8f0; box-shadow:var(--fu-shadow-card);">
+          <div style="width:54px; height:54px; border-radius:50%; background:#f1f5f9; color:#94a3b8; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:22px;">
+            <i class="fa-solid fa-check-double"></i>
+          </div>
+          <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:4px;">Tidak Ada Customer Pada Filter Ini</h4>
+          <p style="font-size:12px; color:#64748b; margin:0;">Semua customer telah diproses atau belum ada data yang sesuai.</p>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  // Remove existing load more container if appending
+  const oldLoadMore = document.getElementById('loadMoreCardsContainer');
+  if (oldLoadMore) oldLoadMore.remove();
+
+  const startIdx = append ? Math.max(0, followupState.renderLimit - 24) : 0;
+  const currentSlice = list.slice(startIdx, followupState.renderLimit);
+
+  let htmlChunk = currentSlice.map(c => renderSingleCustomerCardHtml(c)).join('');
+
+  if (append) {
+    grid.insertAdjacentHTML('beforeend', htmlChunk);
+  } else {
+    grid.innerHTML = htmlChunk;
+  }
+
+  // Add Load More trigger if there are remaining cards
+  if (list.length > followupState.renderLimit) {
+    const remaining = list.length - followupState.renderLimit;
+    const loadMoreHtml = `
+      <div class="load-more-container" id="loadMoreCardsContainer">
+        <button type="button" class="btn-load-more-fu" onclick="loadMoreCards()">
+          <i class="fa-solid fa-angles-down"></i> Tampilkan 24 Customer Berikutnya (Tersisa ${remaining})
+        </button>
+      </div>
+    `;
+    grid.insertAdjacentHTML('beforeend', loadMoreHtml);
+
+    // Setup auto-load on scroll via IntersectionObserver
+    initAutoScrollObserver();
+  }
+}
+
+let autoScrollObserver = null;
+function initAutoScrollObserver() {
+  const sentinel = document.getElementById('loadMoreCardsContainer');
+  if (!sentinel) return;
+
+  if (autoScrollObserver) {
+    autoScrollObserver.disconnect();
+  }
+
+  autoScrollObserver = new IntersectionObserver((entries) => {
+    if (entries[0] && entries[0].isIntersecting) {
+      loadMoreCards();
+    }
+  }, { rootMargin: '250px' });
+
+  autoScrollObserver.observe(sentinel);
+}
+
+function loadMoreCards() {
+  if (followupState.filteredList.length <= followupState.renderLimit) return;
+  followupState.renderLimit += 24;
+  renderCustomerCardsView(followupState.filteredList, true);
+}
+
+function showToastCopy(text) {
+  if (typeof showCustomAlert === 'function') {
+    showCustomAlert('Tersalin!', `Nomor ${text} telah disalin ke clipboard.`, 'info');
+  }
+}
+
+function applyQuickNote(customerId, text) {
+  const input = document.getElementById(`reasonFu_${customerId}`);
+  if (!input) return;
+
+  const currentVal = input.value.trim();
+  if (!currentVal) {
+    input.value = text;
+  } else if (!currentVal.toLowerCase().includes(text.toLowerCase())) {
+    input.value = `${currentVal}, ${text}`;
+  }
+
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (c) {
+    c.reason_followup = input.value;
+  }
+
+  debouncedSaveSalesFu(customerId, 100, false);
+}
+
+function renderCustomerTableView(list) {
+  const tbody = document.getElementById('followupTableTbody');
+  if (!tbody) return;
+
+  if (list.length === 0) {
+    if (followupState.customers.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:60px 20px; color:#64748b;">
+            <i class="fa-solid fa-user-clock" style="font-size:36px; margin-bottom:12px; color:#93c5fd;"></i><br>
+            <strong style="color:#0f172a; font-size:15px;">Belum Ada Database Prospek yang Ditugaskan</strong>
+            <p style="font-size:12px; color:#64748b; margin-top:4px;">Supervisor (SPV) belum membagikan tugas follow-up database ke akun Anda.</p>
+          </td>
+        </tr>
+      `;
+    } else {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:50px 20px; color:#94a3b8;">
+            <i class="fa-solid fa-folder-open" style="font-size:32px; margin-bottom:8px; color:#cbd5e1;"></i><br>
+            <strong style="color:#0f172a;">Tidak ada data customer yang sesuai filter</strong>
+          </td>
+        </tr>
+      `;
+    }
+    return;
+  }
+
+  let html = '';
+  list.forEach(c => {
+    const rawName = (c.name || 'Customer').trim();
+    const parts = rawName.split(/\s+/);
+    let initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : rawName.substring(0, 2).toUpperCase();
+    const dateInfo = formatWibDate(c.followup_date);
+
+    html += `
+      <tr>
+        <!-- 1. Customer & Kontak -->
+        <td>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="cust-avatar-circle" style="width:36px; height:36px; font-size:12.5px; flex-shrink:0;">${initials}</div>
+            <div>
+              <div style="font-weight:800; color:#0f172a; font-size:13.5px; line-height:1.2;">${c.name}</div>
+              <div style="font-family:monospace; font-size:11.5px; color:#059669; font-weight:700; margin-top:2px;">
+                <a href="https://wa.me/${c.phone}" target="_blank" style="color:inherit; text-decoration:none;">
+                  <i class="fa-brands fa-whatsapp"></i> +${c.phone}
+                </a>
+              </div>
+              ${c.district ? `<div style="font-size:10.5px; color:#64748b; margin-top:2px;"><i class="fa-solid fa-location-dot" style="font-size:9.5px;"></i> Kec. ${c.district}</div>` : ''}
+            </div>
+          </div>
+        </td>
+
+        <!-- 2. Unit Mobil & Usia -->
+        <td>
+          <div style="font-weight:900; color:#d7123a; font-size:13px;">
+            🎯 ${c.recommended_model || c.car_model}
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:3px;">
+            ${c.last_car_model ? `<span class="badge-last-car" style="font-size:9.5px;">Saat ini: <strong>${c.last_car_model}</strong></span>` : ''}
+            ${c.car_age ? `<span class="badge-car-age" style="font-size:9.5px;"><i class="fa-solid fa-clock"></i> ${c.car_age}</span>` : ''}
+          </div>
+          ${(c.alt_model_2 || c.alt_model_3) ? `
+            <div style="font-size:10px; color:#64748b; margin-top:2px;">
+              Alt: ${[c.alt_model_2, c.alt_model_3].filter(Boolean).join(', ')}
+            </div>
+          ` : ''}
+        </td>
+
+        <!-- 3. Klaster & Dealer -->
+        <td>
+          ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="font-size:10px; margin-bottom:2px;">🏷️ ${c.cluster_name}</span></div>` : ''}
+          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:9.5px; margin-bottom:2px;">⚡ ${c.priority}</span></div>` : ''}
+          ${c.outlet_do ? `<div style="font-size:9.5px; color:#64748b;"><i class="fa-solid fa-building"></i> ${c.outlet_do}</div>` : ''}
+        </td>
+
+        <!-- 4. 4 Pertanyaan TAM Stepped -->
+        <td>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px;">
+            <!-- Conn -->
+            <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
+              <span style="font-size:10px; font-weight:700;">1.Conn:</span>
+              <div class="fu-segmented-btn-group" id="tbl_group_connected_${c.id}" style="padding:1.5px;">
+                <button type="button" class="fu-tog-btn ${(c.connected === 'TRUE' || c.connected === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'connected', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${(c.connected === 'FALSE' || (!c.connected && c.connected !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'connected', 'FALSE')">Tidak</button>
+              </div>
+            </div>
+            <!-- Cont -->
+            <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
+              <span style="font-size:10px; font-weight:700;">2.Cont:</span>
+              <div class="fu-segmented-btn-group" id="tbl_group_contacted_${c.id}" style="padding:1.5px;">
+                <button type="button" class="fu-tog-btn ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'contacted', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${(c.contacted === 'FALSE' || (!c.contacted && c.contacted !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'contacted', 'FALSE')">Tidak</button>
+              </div>
+            </div>
+            <!-- Prosp -->
+            <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
+              <span style="font-size:10px; font-weight:700;">3.Prosp:</span>
+              <div class="fu-segmented-btn-group" id="tbl_group_prospect_${c.id}" style="padding:1.5px;">
+                <button type="button" class="fu-tog-btn ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'prospect', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${(c.prospect === 'FALSE' || (!c.prospect && c.prospect !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'prospect', 'FALSE')">Tidak</button>
+              </div>
+            </div>
+            <!-- SPK -->
+            <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
+              <span style="font-size:10px; font-weight:800; color:#d7123a;">4.SPK:</span>
+              <div class="fu-segmented-btn-group" id="tbl_group_spk_${c.id}" style="padding:1.5px;">
+                <button type="button" class="fu-tog-btn ${(c.spk === 'TRUE' || c.spk === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'spk', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${(c.spk === 'FALSE' || (!c.spk && c.spk !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'spk', 'FALSE')">Tidak</button>
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <!-- 5. Remarks & Status FU -->
+        <td>
+          <select class="form-control" style="font-size:11px; font-weight:700; padding:4px 6px; border-radius:6px; margin-bottom:4px;" onchange="setTableRemarks(${c.id}, this.value)">
+            <option value="">-- Remarks --</option>
+            <option value="Customer janjian" ${c.remarks === 'Customer janjian' ? 'selected' : ''}>🟡 Customer janjian</option>
+            <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>🔴 Customer menolak</option>
+            <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>🟢 Customer pending</option>
+            <option value="Customer tertarik" ${c.remarks === 'Customer tertarik' ? 'selected' : ''}>🔵 Customer tertarik</option>
+            <option value="Customer tidak aktif" ${c.remarks === 'Customer tidak aktif' ? 'selected' : ''}>⚪ Customer tidak aktif</option>
+            <option value="Customer tidak diangkat" ${c.remarks === 'Customer tidak diangkat' ? 'selected' : ''}>⚫ Customer tidak diangkat</option>
+            <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>🏆 SPK berhasil</option>
+          </select>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#64748b;">
+            <span>FU: <strong style="color:${c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb'};">${c.sales_fu_status || 'Open'}</strong></span>
+            <span>${dateInfo.isRecorded ? dateInfo.formatted : '-'}</span>
+          </div>
+        </td>
+
+        <!-- 6. Aksi -->
+        <td style="text-align:right;">
+          <div style="display:flex; justify-content:flex-end; gap:4px;">
+            <button class="btn-fu btn-fu-emerald" style="padding:6px 10px; font-size:11px; border-radius:8px;" onclick="openWhatsAppModal(${c.id})" title="Chat WA">
+              <i class="fa-brands fa-whatsapp"></i> WA
+            </button>
+            <button class="btn-fu btn-fu-secondary" style="padding:6px 8px; font-size:11px; border-radius:8px;" onclick="openSalesCustomerDetailModal(${c.id})" title="Detail Prospek">
+              <i class="fa-solid fa-circle-info"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function setTableRemarks(customerId, remarks) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (!c) return;
+  c.remarks = remarks;
+  autoSaveSalesFu(customerId, true);
+}
+
+// -------------------------------------------------------------
+// INTERACTIVE TAM FOLLOW-UP ACTIONS & AUTO-SAVE WITH SMART CASCADING
+// -------------------------------------------------------------
+function updateToggleButtonsUI(customerId, field, value) {
+  // Update card group
+  const group = document.getElementById(`group_${field}_${customerId}`);
+  if (group) {
+    const btns = group.querySelectorAll('.fu-tog-btn');
+    if (btns.length >= 2) {
+      if (value === 'TRUE') {
+        btns[0].className = 'fu-tog-btn active-yes';
+        btns[1].className = 'fu-tog-btn';
+      } else if (value === 'FALSE') {
+        btns[0].className = 'fu-tog-btn';
+        btns[1].className = 'fu-tog-btn active-no';
+      } else {
+        btns[0].className = 'fu-tog-btn';
+        btns[1].className = 'fu-tog-btn';
+      }
+    }
+  }
+
+  // Update table group
+  const tblGroup = document.getElementById(`tbl_group_${field}_${customerId}`);
+  if (tblGroup) {
+    const btns = tblGroup.querySelectorAll('.fu-tog-btn');
+    if (btns.length >= 2) {
+      if (value === 'TRUE') {
+        btns[0].className = 'fu-tog-btn active-yes';
+        btns[1].className = 'fu-tog-btn';
+      } else if (value === 'FALSE') {
+        btns[0].className = 'fu-tog-btn';
+        btns[1].className = 'fu-tog-btn active-no';
+      } else {
+        btns[0].className = 'fu-tog-btn';
+        btns[1].className = 'fu-tog-btn';
+      }
+    }
+  }
+}
+
+function handleReasonInput(customerId, value) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (c) {
+    c.reason_followup = value;
+  }
+  // Debounce background save while typing to ensure zero input lag
+  debouncedSaveSalesFu(customerId, 600, false);
+}
+
+function setFuToggle(customerId, field, value) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (!c) return;
+
+  c[field] = value;
+
+  // SMART CASCADING LOGIC:
+  if (field === 'spk' && value === 'TRUE') {
+    c.prospect = 'TRUE';
+    c.contacted = 'TRUE';
+    c.connected = 'TRUE';
+    c.remarks = 'SPK berhasil';
+    c.sales_fu_status = 'Closed';
+    const selRemarks = document.getElementById(`remarks_${customerId}`);
+    if (selRemarks) selRemarks.value = 'SPK berhasil';
+    const selStatus = document.getElementById(`salesFuStatus_${customerId}`);
+    if (selStatus) selStatus.value = 'Closed';
+  } else if (field === 'prospect' && value === 'TRUE') {
+    c.contacted = 'TRUE';
+    c.connected = 'TRUE';
+    if (!c.remarks || c.remarks === 'Customer tidak aktif' || c.remarks === 'Customer tidak diangkat') {
+      c.remarks = 'Customer tertarik';
+      const selRemarks = document.getElementById(`remarks_${customerId}`);
+      if (selRemarks) selRemarks.value = 'Customer tertarik';
+    }
+  } else if (field === 'contacted' && value === 'TRUE') {
+    c.connected = 'TRUE';
+  } else if (field === 'connected' && value === 'FALSE') {
+    c.contacted = 'FALSE';
+    c.prospect = 'FALSE';
+    c.spk = 'FALSE';
+    if (!c.remarks || c.remarks === 'SPK berhasil' || c.remarks === 'Customer tertarik') {
+      c.remarks = 'Customer tidak diangkat';
+      const selRemarks = document.getElementById(`remarks_${customerId}`);
+      if (selRemarks) selRemarks.value = 'Customer tidak diangkat';
+    }
+  }
+
+  // 1. INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms
+  ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
+    updateToggleButtonsUI(customerId, f, c[f]);
+  });
+
+  // 2. INSTANT OPTIMISTIC DATE BADGE
+  const badge = document.getElementById(`fuDateBadge_${customerId}`);
+  if (badge) {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    badge.textContent = `📅 Hari ini, ${h}:${m} WIB`;
+    badge.className = 'fu-date-badge recorded';
+  }
+
+  // 3. INSTANT HERO STATS UPDATE
+  updateHeroStats();
+
+  // 4. DEBOUNCED BACKGROUND SAVE (Non-blocking)
+  debouncedSaveSalesFu(customerId, 200, false);
+}
+
+function debouncedSaveSalesFu(customerId, delay = 250, showAlert = false) {
+  if (followupState.saveTimeouts[customerId]) {
+    clearTimeout(followupState.saveTimeouts[customerId]);
+  }
+
+  if (delay === 0) {
+    delete followupState.saveTimeouts[customerId];
+    sendSaveSalesFu(customerId, showAlert);
+    return;
+  }
+
+  followupState.saveTimeouts[customerId] = setTimeout(() => {
+    delete followupState.saveTimeouts[customerId];
+    sendSaveSalesFu(customerId, showAlert);
+  }, delay);
+}
+
+async function autoSaveSalesFu(customerId, showAlert = true) {
+  debouncedSaveSalesFu(customerId, 0, showAlert);
+}
+
+async function sendSaveSalesFu(customerId, showAlert = false) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (!c) return;
+
+  const remarks = document.getElementById(`remarks_${customerId}`)?.value ?? (c.remarks || '');
+  const salesFuStatus = document.getElementById(`salesFuStatus_${customerId}`)?.value ?? (c.sales_fu_status || 'Open');
+  const reasonFu = document.getElementById(`reasonFu_${customerId}`)?.value ?? (c.reason_followup || '');
+
+  c.remarks = remarks;
+  c.sales_fu_status = salesFuStatus;
+  c.reason_followup = reasonFu;
+
+  const payload = {
+    id: customerId,
+    sales_id: followupState.salesInfo ? followupState.salesInfo.id : null,
+    connected: c.connected || 'FALSE',
+    contacted: c.contacted || 'FALSE',
+    prospect: c.prospect || 'FALSE',
+    spk: c.spk || 'FALSE',
+    remarks: remarks,
+    sales_fu_status: salesFuStatus,
+    reason_followup: reasonFu
+  };
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=save_sales_followup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data && data.success) {
+      c.followup_date = data.followup_date;
+      c.followup_status = data.status;
+
+      // Update date badge with Indonesian WIB format
+      const badge = document.getElementById(`fuDateBadge_${customerId}`);
+      if (badge) {
+        const dateInfo = formatWibDate(data.followup_date);
+        badge.textContent = dateInfo.text;
+        badge.className = 'fu-date-badge recorded';
+      }
+
+      // Update hero KPI stats
+      updateHeroStats();
+
+      // Quick toast notification if user clicked explicit save
+      if (showAlert && typeof showCustomAlert === 'function') {
+        showCustomAlert('Respon Tersimpan!', `Data follow-up untuk ${c.name} berhasil disimpan. Waktu tercatat: ${formatWibDate(data.followup_date).formatted}`, 'success');
+      }
+    }
+  } catch (e) {
+    console.error('Error saving sales FU:', e);
+  }
+}
+
+// -------------------------------------------------------------
+// SALES CUSTOMER DETAIL MODAL
+// -------------------------------------------------------------
+function openSalesCustomerDetailModal(customerId) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (!c) {
+    console.error('Sales customer not found for id', customerId);
+    return;
+  }
+
+  if (!document.getElementById('modalSalesCustDetail')) {
+    const html = `
+      <div class="modal-overlay" id="modalSalesCustDetail" onclick="closeSalesCustDetailModal()">
+        <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
+          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:3px;">
+                <i class="fa-solid fa-id-badge"></i> Data Lengkap Pelanggan
+              </div>
+              <h3 style="font-size:17px; font-weight:900; color:#0d1b3e; margin:0;" id="scdName">-</h3>
+            </div>
+            <button class="btn-close-modal" onclick="closeSalesCustDetailModal()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div id="scdModalBody"></div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  document.getElementById('scdName').textContent = c.name;
+  const body = document.getElementById('scdModalBody');
+  body.innerHTML = `
+    <div style="background:linear-gradient(135deg, #0d1b3e 0%, #16305f 100%); color:#fff; border-radius:12px; padding:14px; margin-bottom:14px;">
+      <div style="font-size:11px; color:#93c5fd; font-weight:700; text-transform:uppercase;">Target Rekomendasi Upgrade TAM:</div>
+      <div style="font-size:17px; font-weight:900; color:#fff; margin-top:2px;">🚗 ${c.recommended_model || c.car_model}</div>
+      ${(c.alt_model_2 || c.alt_model_3) ? `
+        <div style="font-size:11.5px; color:#cbd5e1; margin-top:4px;">
+          Alternatif: <strong>${[c.alt_model_2, c.alt_model_3].filter(Boolean).join(' • ')}</strong>
+        </div>
+      ` : ''}
+    </div>
+
+    <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:12px; font-size:12px; color:#334155; margin-bottom:14px; display:flex; flex-direction:column; gap:6px;">
+      <div style="display:flex; justify-content:space-between;">
+        <span>Kendaraan Saat Ini:</span>
+        <strong style="color:#0f172a;">${c.last_car_model || '-'} ${c.car_age ? `(${c.car_age})` : ''}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>Nomor Rangka (VIN):</span>
+        <strong style="font-family:monospace; color:#0f172a;">${c.vin || '-'}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>Outlet DO Pembelian:</span>
+        <strong>${c.outlet_do || 'TUNAS TOYOTA KIARA CONDONG'}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>Kepatuhan Servis:</span>
+        <strong style="color:#059669;">${c.service_compliance || '0%'}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>Klaster Profil:</span>
+        <strong style="color:#1d4ed8;">${c.cluster_name || '-'}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>Kecamatan:</span>
+        <strong>${c.district ? `Kec. ${c.district}` : '-'}</strong>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px;">
+      <button class="btn-wa-action" style="flex:1; padding:11px;" onclick="closeSalesCustDetailModal(); openWhatsAppModal(${c.id});">
+        <i class="fa-brands fa-whatsapp"></i> Chat WhatsApp
+      </button>
+      <a href="tel:${c.phone}" class="btn-sub" style="padding:11px 16px; border-radius:10px; background:#f1f5f9; color:#0f172a; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+        <i class="fa-solid fa-phone" style="color:#10b981;"></i>
+      </a>
+      <button class="btn-sub" style="padding:11px 16px; border-radius:10px; background:#f1f5f9; font-weight:700;" onclick="closeSalesCustDetailModal()">
+        Tutup
+      </button>
+    </div>
+  `;
+
+  const modal = document.getElementById('modalSalesCustDetail');
+  if (modal) {
+    modal.classList.add('active');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+  }
+}
+
+function closeSalesCustDetailModal() {
+  const modal = document.getElementById('modalSalesCustDetail');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  }
+}
+
+// -------------------------------------------------------------
+// WHATSAPP SEND MODAL WITH LIVE CHAT PREVIEW & VARIABLE CHIPS
+// -------------------------------------------------------------
+let activeCustomerForWA = null;
+
+async function openWhatsAppModal(customerId) {
+  const cust = followupState.customers.find(c => c.id === customerId);
+  if (!cust) return;
+  activeCustomerForWA = cust;
+
+  if (!document.getElementById('modalWhatsAppFollowup')) {
+    const modalHtml = `
+      <div class="modal-overlay" id="modalWhatsAppFollowup" onclick="closeWhatsAppModal()">
+        <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
+          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+            <h3 style="display:flex; align-items:center; gap:8px; color:#059669; font-size:16px; font-weight:800;">
+              <i class="fa-brands fa-whatsapp" style="font-size:22px;"></i> Follow Up WhatsApp Customer
+            </h3>
+            <button class="btn-close-modal" onclick="closeWhatsAppModal()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <!-- Customer Banner Header -->
+          <div style="background:linear-gradient(135deg, #0d1b3e 0%, #16305f 100%); color:#fff; border-radius:14px; padding:14px 16px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:15px;" id="waCustName">-</strong>
+              <span style="font-family:monospace; color:#6ee7b7; font-weight:800; font-size:13px;" id="waCustPhone">-</span>
+            </div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.85); margin-top:4px;" id="waCustCar">-</div>
+          </div>
+
+          <!-- Template Selector -->
+          <div class="form-group" style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Pilih Template WhatsApp:</label>
+            <select class="form-control" id="waTemplateSelect" style="font-size:12.5px; font-weight:600; border-radius:10px;" onchange="applyWhatsAppTemplate(this.value)">
+            </select>
+          </div>
+
+          <!-- Variable Chips Quick Insert Bar -->
+          <div style="margin-bottom:10px;">
+            <div style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:4px;">Klik tag untuk menyisipkan variabel:</div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{nama_customer}')">{nama_customer}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kendaraan_terakhir}')">{kendaraan_terakhir}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{usia_kendaraan}')">{usia_kendaraan}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{model_rekomendasi}')">{model_rekomendasi}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{cluster}')">{cluster}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kecamatan}')">{kecamatan}</button>
+            </div>
+          </div>
+
+          <!-- Live WhatsApp Bubble Preview -->
+          <div class="wa-chat-preview">
+            <div class="wa-bubble-sent" id="waLiveBubble">-</div>
+          </div>
+
+          <!-- Message Textarea -->
+          <div class="form-group" style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Edit Isi Pesan WhatsApp:</label>
+            <textarea class="form-control" id="waMessageText" rows="5" style="font-size:12.5px; line-height:1.5; font-family:inherit; border-radius:10px;" oninput="updateLiveBubble(this.value)"></textarea>
+          </div>
+
+          <!-- Next Follow-up Status -->
+          <div class="form-group" style="margin-bottom:16px;">
+            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Perbarui Status Setelah Kirim:</label>
+            <select class="form-control" id="waNextStatus" style="font-size:12.5px; font-weight:700; border-radius:10px;">
+              <option value="Menunggu Respon" selected>🟡 Menunggu Respon</option>
+              <option value="Tertarik / Jadwal Servis">🔵 Tertarik / Jadwal Servis</option>
+              <option value="Deal / Selesai">🟢 Deal / Selesai</option>
+            </select>
+          </div>
+
+          <button class="btn-wa-action" style="padding:14px;" onclick="executeSendWhatsApp()">
+            <i class="fa-brands fa-whatsapp" style="font-size:20px;"></i> Buka WhatsApp &amp; Kirim Sekarang
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  // Populate Customer Data into Modal
+  document.getElementById('waCustName').textContent = cust.name;
+  document.getElementById('waCustPhone').textContent = `+${cust.phone}`;
+  document.getElementById('waCustCar').innerHTML = `🚗 Unit: <strong>${cust.car_model}</strong> ${cust.last_car_model ? `(Saat ini: ${cust.last_car_model})` : ''} ${cust.district ? `• Kec. ${cust.district}` : ''}`;
+
+  // Populate Templates Dropdown
+  const tmplSelect = document.getElementById('waTemplateSelect');
+  tmplSelect.innerHTML = '';
+  followupState.templates.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = t.title;
+    if (t.is_default) opt.selected = true;
+    tmplSelect.appendChild(opt);
+  });
+
+  applyWhatsAppTemplate(tmplSelect.value);
+  const modalWA = document.getElementById('modalWhatsAppFollowup');
+  if (modalWA) {
+    modalWA.classList.add('active');
+    modalWA.classList.add('show');
+    modalWA.style.display = 'flex';
+  }
+}
+
+function closeWhatsAppModal() {
+  const modalWA = document.getElementById('modalWhatsAppFollowup');
+  if (modalWA) {
+    modalWA.classList.remove('active');
+    modalWA.classList.remove('show');
+    modalWA.style.display = 'none';
+  }
+}
+
+function updateLiveBubble(text) {
+  const bubble = document.getElementById('waLiveBubble');
+  if (!bubble) return;
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  bubble.innerHTML = `${text}\n<div class="wa-bubble-footer"><span>${time}</span> <i class="fa-solid fa-check-double"></i></div>`;
+}
+
+function insertVariableToWA(tag) {
+  const textarea = document.getElementById('waMessageText');
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+  textarea.value = text.substring(0, start) + tag + text.substring(end);
+  textarea.focus();
+  updateLiveBubble(textarea.value);
+}
+
+async function applyWhatsAppTemplate(templateId) {
+  if (!activeCustomerForWA) return;
+  const tmpl = followupState.templates.find(t => String(t.id) === String(templateId));
+  if (!tmpl) return;
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=format_template', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_id: activeCustomerForWA.id,
+        template_id: tmpl.id,
+        sales_id: followupState.salesInfo ? followupState.salesInfo.id : null
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('waMessageText').value = data.formatted_text;
+      updateLiveBubble(data.formatted_text);
+    }
+  } catch (e) {
+    document.getElementById('waMessageText').value = tmpl.content;
+    updateLiveBubble(tmpl.content);
+  }
+}
+
+async function executeSendWhatsApp() {
+  if (!activeCustomerForWA) return;
+  const message = document.getElementById('waMessageText').value;
+  const nextStatus = document.getElementById('waNextStatus').value;
+
+  const cleanPhone = activeCustomerForWA.phone.replace(/[^0-9]/g, '');
+  const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+
+  // Open WhatsApp in new tab
+  window.open(waUrl, '_blank');
+
+  // Update Status in backend
+  try {
+    await fetch('../api/api_followup.php?action=update_status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: activeCustomerForWA.id,
+        status: nextStatus,
+        notes: `Follow up via WhatsApp`,
+        sales_id: followupState.salesInfo ? followupState.salesInfo.id : activeCustomerForWA.assigned_sales_id
+      })
+    });
+
+    closeWhatsAppModal();
+    loadFollowupCustomers();
+
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('WhatsApp Terbuka!', `Status ${activeCustomerForWA.name} berhasil diperbarui menjadi "${nextStatus}".`, 'success');
+    }
+  } catch (e) {
+    closeWhatsAppModal();
+  }
+}
+
+async function quickUpdateCustomerStatus(customerId, newStatus) {
+  try {
+    await fetch('../api/api_followup.php?action=update_status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: customerId,
+        status: newStatus,
+        sales_id: followupState.salesInfo ? followupState.salesInfo.id : null
+      })
+    });
+
+    loadFollowupCustomers();
+  } catch (e) {
+    console.error('Error updating status', e);
+  }
+}
