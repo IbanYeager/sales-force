@@ -8,9 +8,9 @@ ini_set('display_errors', 0);
 
 // Hostinger / Local Database Configuration
 $host = "localhost";
-$user = "root"; 
-$pass = "";     
-$db   = "db_sales_app";
+$user = "u253557905_kircon"; 
+$pass = "Kircon154";     
+$db   = "u253557905_db_sales";
 
 // Load external config_db.php if created by user on hosting server
 if (file_exists(__DIR__ . '/config_db.php')) {
