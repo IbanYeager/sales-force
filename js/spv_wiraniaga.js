@@ -275,7 +275,6 @@ let listDataWiraniaga = [];
       document.getElementById('inputPassword').required = true;
       document.getElementById('passwordHelp').textContent = '(Wajib diisi)';
       document.getElementById('selectTingkatan').value = 'Junior';
-      document.getElementById('selectStatus').value = 'Aktif';
       document.getElementById('inputTanggalBergabung').value = new Date().toISOString().split('T')[0];
 
       const currentSpv = localStorage.getItem('namaSales') || 'Pak Riva';
@@ -300,7 +299,6 @@ let listDataWiraniaga = [];
       document.getElementById('inputPassword').required = false;
       document.getElementById('passwordHelp').textContent = '(Kosongkan jika tidak ingin mengubah password)';
       document.getElementById('selectTingkatan').value = row.tingkatan || 'Junior';
-      document.getElementById('selectStatus').value = row.status || 'Aktif';
       document.getElementById('inputTanggalBergabung').value = row.created_at_raw || '';
 
       const selectSpv = document.getElementById('selectSpv');
@@ -328,7 +326,6 @@ let listDataWiraniaga = [];
       const username = document.getElementById('inputUsername').value.trim();
       const password = document.getElementById('inputPassword').value.trim();
       const tingkatan = document.getElementById('selectTingkatan').value;
-      const status = document.getElementById('selectStatus').value;
       const nama_spv = document.getElementById('selectSpv').value;
       const created_at = document.getElementById('inputTanggalBergabung').value;
 
@@ -343,7 +340,6 @@ let listDataWiraniaga = [];
             username,
             password,
             tingkatan,
-            status,
             nama_spv,
             created_at
           })

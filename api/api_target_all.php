@@ -65,11 +65,11 @@ if ($method === 'GET') {
         }
     }
 
-    // Active Sales Consultants
-    $where_clause = "WHERE (status = 'Aktif' OR status IS NULL OR status = '')";
+    // Sales Consultants Query
+    $where_clause = "";
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_clean = str_replace('Pak ', '', $spv);
-        $where_clause .= " AND (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+        $where_clause = "WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
     }
 
     $whiteboard_targets = [

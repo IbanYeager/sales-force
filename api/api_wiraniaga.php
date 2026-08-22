@@ -45,7 +45,7 @@ if ($method === 'GET') {
     $conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
     $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
 
-    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, status, last_active,
+    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, last_active,
                      CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE) THEN 1 ELSE 0 END as is_online,
                      DATE_FORMAT(created_at, '%d %b %Y') as created_at, 
                      DATE_FORMAT(created_at, '%Y-%m-%d') as created_at_raw 
@@ -107,7 +107,6 @@ if ($method === 'POST') {
         $password = $conn->real_escape_string(password_hash($raw_password, PASSWORD_DEFAULT));
         $tingkatan = $conn->real_escape_string(trim($data['tingkatan'] ?? 'Magang'));
         $nama_spv = $conn->real_escape_string(trim($data['nama_spv'] ?? 'Pak Riva'));
-        $status = $conn->real_escape_string(trim($data['status'] ?? 'Aktif'));
         $created_at = $conn->real_escape_string(trim($data['created_at'] ?? date('Y-m-d')));
 
         if (empty($nama_lengkap) || empty($username) || empty($raw_password)) {
@@ -124,7 +123,7 @@ if ($method === 'POST') {
             exit();
         }
 
-        $sql = "INSERT INTO sales_accounts (nama_lengkap, username, password, tingkatan, nama_spv, foto, status, created_at) VALUES ('$nama_lengkap', '$username', '$password', '$tingkatan', '$nama_spv', '', '$status', '$created_at')";
+        $sql = "INSERT INTO sales_accounts (nama_lengkap, username, password, tingkatan, nama_spv, foto, created_at) VALUES ('$nama_lengkap', '$username', '$password', '$tingkatan', '$nama_spv', '', '$created_at')";
         if ($conn->query($sql)) {
             echo json_encode(["status" => "success", "message" => "Akun wiraniaga berhasil ditambahkan!"]);
         } else {
@@ -141,7 +140,6 @@ if ($method === 'POST') {
         $raw_password = trim($data['password'] ?? '');
         $tingkatan = $conn->real_escape_string(trim($data['tingkatan'] ?? 'Magang'));
         $nama_spv = $conn->real_escape_string(trim($data['nama_spv'] ?? 'Pak Riva'));
-        $status = $conn->real_escape_string(trim($data['status'] ?? 'Aktif'));
         $created_at = $conn->real_escape_string(trim($data['created_at'] ?? date('Y-m-d')));
 
         if ($id === 0 || empty($nama_lengkap) || empty($username)) {
@@ -160,17 +158,12 @@ if ($method === 'POST') {
 
         if (!empty($raw_password)) {
             $password = $conn->real_escape_string(password_hash($raw_password, PASSWORD_DEFAULT));
-            $sql = "UPDATE sales_accounts SET nama_lengkap = '$nama_lengkap', username = '$username', password = '$password', tingkatan = '$tingkatan', nama_spv = '$nama_spv', status = '$status', created_at = '$created_at' WHERE id = $id";
+            $sql = "UPDATE sales_accounts SET nama_lengkap = '$nama_lengkap', username = '$username', password = '$password', tingkatan = '$tingkatan', nama_spv = '$nama_spv', created_at = '$created_at' WHERE id = $id";
         } else {
-            $sql = "UPDATE sales_accounts SET nama_lengkap = '$nama_lengkap', username = '$username', tingkatan = '$tingkatan', nama_spv = '$nama_spv', status = '$status', created_at = '$created_at' WHERE id = $id";
+            $sql = "UPDATE sales_accounts SET nama_lengkap = '$nama_lengkap', username = '$username', tingkatan = '$tingkatan', nama_spv = '$nama_spv', created_at = '$created_at' WHERE id = $id";
         }
 
         if ($conn->query($sql)) {
-            // If status changed to Nonaktif / Resign, release unfinished database leads to the Open Pool (Rebutan)
-            if ($status === 'Nonaktif' || $status === 'Resign') {
-                $escName = $conn->real_escape_string($nama_lengkap);
-                @$conn->query("UPDATE followup_customers SET assigned_sales_id = NULL, is_orphan = 1, ex_sales_name = '$escName', released_at = NOW() WHERE assigned_sales_id = $id AND (followup_status != 'Deal / Selesai' OR followup_status IS NULL)");
-            }
             echo json_encode(["status" => "success", "message" => "Data wiraniaga berhasil diperbarui!"]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal mengupdate database: " . $conn->error]);
