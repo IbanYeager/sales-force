@@ -239,6 +239,7 @@
                 ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Multi-Leasing', 'kalkulator leasing kredit dp cicilan angsuran tenor')}
                 ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)', 'stok stock live inventory unit mobil t-stock')}
                 ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar', 'customer crm radar prospek data database')}
+                ${navLink('pages/battle_card.html', 'fa-solid fa-shield-halved', 'Battle Card &amp; Objection', 'battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata')}
                 ${navLink('pages/spk.html', 'fa-solid fa-file-signature', 'Form SPK', 'spk pesanan form surat tanda jadi')}
                 ${navLink('pages/quotation.html', 'fa-solid fa-file-contract', 'Smart Digital Quotation', 'quotation penawaran harga simulasi pdf')}
                 ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor', 'promo diskon paket kredit tenor program')}

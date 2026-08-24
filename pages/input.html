@@ -11,6 +11,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/input.css">
+    <link rel="stylesheet" href="../css/sales_tools.css?v=1.0">
     <script src="../js/sidebar_desktop.js"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#CC0000">
@@ -114,8 +115,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Keterangan Aktivitas <span style="color: var(--primary-red);">*</span></label>
-                    <textarea id="keteranganAktivitas" class="form-control" placeholder="Tuliskan keterangan detail..." required rows="3"></textarea>
+                    <div class="voice-input-header">
+                        <label style="margin-bottom: 0; font-weight: 800; font-size: 13.5px; color: #1e293b;">
+                            <i class="fa-solid fa-pen-to-square" style="color: var(--primary-red); margin-right: 4px;"></i> Keterangan Aktivitas <span style="color: var(--primary-red);">*</span>
+                        </label>
+                        <button type="button" class="btn-voice-pill" id="btnVoiceAktivitas" title="Bicara untuk membuat laporan suara">
+                            <i class="fa-solid fa-microphone"></i>
+                            <span>Dikte Suara (Mic)</span>
+                        </button>
+                    </div>
+                    <textarea id="keteranganAktivitas" class="form-control" placeholder="Tuliskan detail aktivitas di lapangan atau klik tombol 'Dikte Suara' untuk bicara langsung..." required rows="3" style="font-size: 13.5px; line-height: 1.6;"></textarea>
+                    <div id="voiceStatusPillAktivitas" class="voice-live-status-box" style="display:none;"></div>
                 </div>
 
                 <div class="form-group">
@@ -437,7 +447,14 @@
           confirmButtonColor: '#10b981'
         });
       }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.SalesSuperpowers) {
+          SalesSuperpowers.initVoiceRecorder('keteranganAktivitas', 'btnVoiceAktivitas', 'voiceStatusPillAktivitas');
+        }
+      });
     </script>
+    <script src="../js/sales_superpowers.js?v=1.0"></script>
 </body>
 
 </html>

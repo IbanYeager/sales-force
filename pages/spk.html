@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/spk_game.css" />
+  <link rel="stylesheet" href="../css/sales_tools.css?v=1.0" />
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -115,12 +116,30 @@
       </div>
 
       <!-- ── FORM INPUT BIASA ──────────────────────────────────── -->
-      <div id="inputBiasaContainer" class="card" style="padding:18px;">
-        <h3 class="section-title" style="margin-bottom:6px;">Buat Pengajuan SPK</h3>
-        <p style="font-size:12px;color:var(--text-muted);line-height:1.6;">SPK yang diajukan akan berstatus Menunggu dan memerlukan persetujuan Supervisor.</p>
+      <div id="inputBiasaContainer" class="card" style="padding:22px;">
+        <h3 class="section-title" style="margin-bottom:4px;">Buat Pengajuan SPK</h3>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:18px;">SPK yang diajukan akan berstatus Menunggu dan memerlukan persetujuan Supervisor.</p>
+
+        <!-- LUXURY SMART AI KTP SCANNER BANNER -->
+        <input type="file" id="ocrKtpInputSpk" accept="image/*" style="display:none;" onchange="SalesSuperpowers.scanKtpFile(this, {nama:'namaCustomer'})">
+        <div class="ocr-scanner-banner" onclick="document.getElementById('ocrKtpInputSpk').click()">
+          <div class="ocr-banner-left">
+            <div class="ocr-icon-glow">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+            <div>
+              <div class="ocr-badge-chip"><i class="fa-solid fa-bolt"></i> SMART AI OCR SCANNER</div>
+              <h4 class="ocr-banner-title">Scan KTP &amp; Auto-Fill Data SPK</h4>
+              <p class="ocr-banner-sub">Foto KTP customer untuk mengisi Nama &amp; Identitas otomatis tanpa perlu ketik manual.</p>
+            </div>
+          </div>
+          <button type="button" class="btn-ocr-action">
+            <i class="fa-solid fa-camera"></i> Foto / Upload KTP
+          </button>
+        </div>
 
         <div class="form-group">
-          <label>Nama Customer</label>
+          <label>Nama Customer <span style="color:var(--primary-red);">*</span></label>
           <input class="form-control" type="text" id="namaCustomer" placeholder="Nama customer" />
         </div>
 
@@ -277,6 +296,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="../custom_alert.js"></script>
+  <script src="../js/sales_superpowers.js?v=1.0"></script>
   <script src="../js/spk.js?v=2"></script>
   <script src="../js/spk_arcade_game.js?v=1"></script>
 

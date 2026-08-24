@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css?v=5.0">
     <link rel="stylesheet" href="css/index_dashboard.css?v=5.0">
+    <link rel="stylesheet" href="css/sales_tools.css?v=1.0">
 
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="shortcut icon" href="favicon.ico">
@@ -96,6 +97,9 @@
                 </a>
                 <a href="pages/komparasi.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-scale-balanced"></i> Komparasi Mobil &amp; NCO
+                </a>
+                <a href="pages/battle_card.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-shield-halved"></i> Battle Card &amp; Objection
                 </a>
                 <a href="pages/eco_calculator.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-leaf"></i> Toyota Eco Calc (Hybrid)
@@ -241,6 +245,9 @@
                 </header>
 
                 <div class="container">
+
+                    <!-- ═══ WIDGET MORNING BRIEFING AGENDA FOLLOW-UP ═══ -->
+                    <div id="dailyFollowupBriefingContainer"></div>
 
                     <!-- ═══ KARTU TARGET SPK & DO ═══ -->
                     <a href="pages/target.html" class="target-link">
@@ -784,6 +791,10 @@
                                 <div class="category-icon"><i class="fa-solid fa-users"></i></div>
                                 <span class="category-text">Customer CRM</span>
                             </a>
+                            <a href="pages/battle_card.html" class="category-item">
+                                <div class="category-icon" style="background:linear-gradient(135deg, #d7123a, #8b0519); color:white;"><i class="fa-solid fa-shield-halved"></i></div>
+                                <span class="category-text">Battle Card</span>
+                            </a>
                             <a href="pages/spk.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>
                                 <span class="category-text">Form SPK</span>
@@ -1314,9 +1325,17 @@
     <script src="js/sidebar_desktop.js"></script>
     <script src="js/ai_copilot.js"></script>
     <script src="js/script.js?v=20260808_07"></script>
+    <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
     <script src="./js/pwa-app.js?v=3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SalesSuperpowers) {
+                SalesSuperpowers.checkDailyFollowupReminders();
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -10,6 +10,7 @@
   <script src="../js/sidebar_desktop.js"></script>
   <link rel="stylesheet" href="../css/customer.css">
   <link rel="stylesheet" href="../css/followup.css?v=26">
+  <link rel="stylesheet" href="../css/sales_tools.css?v=1.0">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
@@ -126,8 +127,15 @@
         <input type="datetime-local" class="form-control" id="followupTime">
       </div>
       <div class="form-group">
-        <label>Catatan</label>
-        <textarea class="form-control" id="followupNote" rows="2" placeholder="Contoh: Tanya jadi ambil warna merah/putih"></textarea>
+        <div class="voice-input-header">
+          <label style="margin-bottom:0; font-weight:700;">Catatan / Ringkasan</label>
+          <button type="button" class="btn-voice-pill" id="btnVoiceFollowup" title="Rekam Suara (Speech-to-Text)">
+            <i class="fa-solid fa-microphone"></i>
+            <span>Dikte Suara</span>
+          </button>
+        </div>
+        <textarea class="form-control" id="followupNote" rows="3" placeholder="Contoh: Tanya jadi ambil warna merah/putih (Bisa diketik atau gunakan tombol Dikte Suara)"></textarea>
+        <div id="voiceStatusPillFollowup" class="voice-live-status-box" style="display:none;"></div>
       </div>
       <button class="btn-main" style="width:100%; justify-content:center; margin-top:14px;" onclick="saveFollowup()">Simpan Pengingat</button>
     </div>
@@ -140,7 +148,27 @@
         <h3>Tambah Customer Baru</h3>
         <button class="btn-close-modal" onclick="closeAddCustomerModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="form-group" style="margin-top:14px;">
+
+      <!-- Quick OCR KTP Trigger -->
+      <div style="margin-top:14px; margin-bottom:14px;">
+        <input type="file" id="ocrKtpInputCustomer" accept="image/*" style="display:none;" onchange="SalesSuperpowers.scanKtpFile(this, {nama:'newCustomerName', alamat:'newCustomerAddress'})">
+        <div class="ocr-scanner-banner" style="padding:14px 16px; margin-bottom:0;" onclick="document.getElementById('ocrKtpInputCustomer').click()">
+          <div class="ocr-banner-left">
+            <div class="ocr-icon-glow" style="width:40px; height:40px; font-size:16px;">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+            <div>
+              <div class="ocr-badge-chip"><i class="fa-solid fa-bolt"></i> AI OCR</div>
+              <h4 class="ocr-banner-title" style="font-size:13.5px;">Scan KTP Otomatis</h4>
+            </div>
+          </div>
+          <button type="button" class="btn-ocr-action" style="padding:8px 14px; font-size:11.5px;">
+            <i class="fa-solid fa-camera"></i> Foto KTP
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>Nama Customer <span style="color:red;">*</span></label>
         <input type="text" class="form-control" id="newCustomerName" placeholder="Contoh: Budi Santoso">
       </div>
@@ -155,10 +183,18 @@
       <button class="btn-main" id="btnSaveNewCustomer" style="width:100%; justify-content:center; margin-top:14px;" onclick="saveNewCustomer()">Simpan Customer</button>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../custom_alert.js?v=25"></script>
   <script src="../js/customer.js?v=25"></script>
+  <script src="../js/sales_superpowers.js?v=1.0"></script>
   <script src="../js/followup_sales.js?v=20260824_cleancrm"></script>
   <script src="../js/pwa-app.js?v=25"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Voice Note for Follow-up modal
+      SalesSuperpowers.initVoiceRecorder('followupNote', 'btnVoiceFollowup', 'voiceStatusPillFollowup');
+    });
+  </script>
 </body>
 </html>

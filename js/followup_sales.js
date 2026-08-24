@@ -117,7 +117,7 @@ function initFollowupTabs() {
           </div>
         </div>
 
-        <!-- 1.5 SUB-NAVIGATION: DATABASE TUGAS SAYA vs POOL REBUTAN PROSPEK -->
+        <!-- 1.5 SUB-NAVIGATION: DATABASE TUGAS SAYA vs POOL REBUTAN PROSPEK vs RADAR GPS -->
         <div class="sub-nav-fu-wrapper" id="fuSubNavWrapper">
           <button type="button" class="sub-nav-fu-btn active" id="subBtnMyTasks" onclick="switchFollowupSubTab('my_tasks')">
             <i class="fa-solid fa-bullseye" style="color:#2563eb;"></i>
@@ -126,13 +126,18 @@ function initFollowupTabs() {
           </button>
           <button type="button" class="sub-nav-fu-btn pool-tab" id="subBtnOrphanPool" onclick="switchFollowupSubTab('orphan_pool')">
             <i class="fa-solid fa-fire" style="color:#ea580c;"></i>
-            <span>🔥 Pool Rebutan Prospek (Ex-Sales)</span>
+            <span>🔥 Pool Rebutan Prospek</span>
             <span id="badgeOrphanPoolCount" class="badge-pulse-fire">⚡ Cek Rebutan</span>
+          </button>
+          <button type="button" class="sub-nav-fu-btn radar-tab" id="subBtnRadar" onclick="switchFollowupSubTab('radar')">
+            <i class="fa-solid fa-location-crosshairs" style="color:#3b82f6;"></i>
+            <span>📍 Radar GPS Terdekat</span>
+            <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:rgba(215,18,58,0.12); color:#dc2626; border:1px solid rgba(215,18,58,0.25);">Live GPS</span>
           </button>
         </div>
 
         <!-- 2. SEARCH, FILTER & VIEW TOGGLE BAR -->
-        <div class="card" style="padding:16px; margin-bottom:16px; border-radius:var(--fu-radius-lg);">
+        <div class="card" id="fuFilterCard" style="padding:16px; margin-bottom:16px; border-radius:var(--fu-radius-lg);">
           <!-- Top Row: Search & View Mode Switcher -->
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
             <div class="fu-input-with-icon" style="flex:1; min-width:240px; margin-bottom:0;">
@@ -1910,3 +1915,45 @@ async function quickUpdateCustomerStatus(customerId, newStatus) {
     console.error('Error updating status', e);
   }
 }
+
+function switchFollowupSubTab(tab) {
+  followupState.subTab = tab;
+  
+  const btnMyTasks = document.getElementById('subBtnMyTasks');
+  const btnOrphan = document.getElementById('subBtnOrphanPool');
+  const btnRadar = document.getElementById('subBtnRadar');
+  const filterCard = document.getElementById('fuFilterCard');
+
+  if (btnMyTasks) btnMyTasks.classList.toggle('active', tab === 'my_tasks');
+  if (btnOrphan) btnOrphan.classList.toggle('active', tab === 'orphan_pool');
+  if (btnRadar) btnRadar.classList.toggle('active', tab === 'radar');
+
+  if (tab === 'radar') {
+    if (filterCard) filterCard.style.display = 'none';
+    if (window.SalesSuperpowers) {
+      SalesSuperpowers.renderRadarCockpit('followupDataContainer', 5);
+    }
+  } else {
+    if (filterCard) filterCard.style.display = 'block';
+    if (tab === 'orphan_pool') {
+      loadOrphanLeads();
+    } else {
+      renderCustomerCards();
+    }
+  }
+}
+
+function switchCustomerTab(tab) {
+  followupState.activeTab = tab;
+  const tabFu = document.getElementById('tabBtnFollowup');
+  const tabKb = document.getElementById('tabBtnKanban');
+  const viewFu = document.getElementById('followupSectionView');
+  const kanban = document.getElementById('kanbanBoard');
+
+  if (tabFu) tabFu.classList.toggle('active', tab === 'followup');
+  if (tabKb) tabKb.classList.toggle('active', tab === 'kanban');
+
+  if (viewFu) viewFu.style.display = tab === 'followup' ? 'block' : 'none';
+  if (kanban) kanban.style.display = tab === 'kanban' ? 'flex' : 'none';
+}
+
