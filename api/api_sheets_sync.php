@@ -300,7 +300,6 @@ function pushAllTargetsToGoogleSheets($conn, $month = null, $year = null) {
                            COALESCE(t.realisasi_do, 0) as realisasi_do 
                            FROM sales_accounts s 
                            LEFT JOIN target_do_bulanan t ON s.id = t.sales_account_id AND t.periode_bulan = $month 
-                           WHERE s.status = 'Aktif' OR s.status IS NULL 
                            ORDER BY s.nama_spv, s.nama_lengkap ASC");
 
     $sales_data = [];

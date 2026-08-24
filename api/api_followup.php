@@ -42,12 +42,12 @@ function get_sales_list($spv = '') {
     // Try fetching from SFT sales_accounts if MySQL is active
     if ($is_mysql && $conn) {
         try {
-            $where = "(status = 'Aktif' OR status IS NULL)";
+            $where = "1=1";
             if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
                 $spvClean = str_replace('Pak ', '', $conn->real_escape_string($spv));
                 $where .= " AND (nama_spv = '" . $conn->real_escape_string($spv) . "' OR nama_spv LIKE '%$spvClean%')";
             }
-            $res = $conn->query("SELECT id, nama_lengkap as name, no_hp as phone, tingkatan as role, nama_spv FROM sales_accounts WHERE $where ORDER BY nama_lengkap ASC");
+            $res = $conn->query("SELECT id, nama_lengkap as name, no_hp as phone, tingkatan as role, nama_spv FROM sales_accounts WHERE $where ORDER BY nama_spv ASC, nama_lengkap ASC");
             if ($res && $res->num_rows > 0) {
                 while ($r = $res->fetch_assoc()) {
                     $salesList[] = [
@@ -129,7 +129,7 @@ if ($action === 'customers') {
     }
 
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
-    $sql = "SELECT * FROM followup_customers $whereSql ORDER BY id DESC LIMIT 500";
+    $sql = "SELECT * FROM followup_customers $whereSql ORDER BY id DESC LIMIT 5000";
     
     $customers = followup_query($sql, $params);
     $salesList = get_sales_list();
@@ -734,18 +734,21 @@ if ($action === 'format_template') {
     }
 
     $salesList = get_sales_list();
-    $salesName = 'Sales Tunas Toyota';
+    $salesName = !empty($input['sales_name']) ? trim($input['sales_name']) : 'Sales Tunas Toyota';
     $salesPhone = '';
     foreach ($salesList as $s) {
         if ($sales_id && (int)$s['id'] === $sales_id) {
-            $salesName = $s['name'];
+            if (empty($input['sales_name'])) $salesName = $s['name'];
             $salesPhone = $s['phone'];
             break;
         } elseif (!$sales_id && (int)$s['id'] === (int)($c['assigned_sales_id'] ?? 0)) {
-            $salesName = $s['name'];
+            if (empty($input['sales_name'])) $salesName = $s['name'];
             $salesPhone = $s['phone'];
             break;
         }
+    }
+    if (!empty($input['sales_name'])) {
+        $salesName = trim($input['sales_name']);
     }
 
     $dealerName = 'Tunas Toyota Kiara Condong';

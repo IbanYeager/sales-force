@@ -70,15 +70,54 @@
         </div>
       </div>
 
-      <!-- ================= CARD DAFTAR WIRANIAGA ================= -->
-      <section class="spv-card" style="background:white; border-radius:16px; border:1px solid #e4e8f0; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
-        <div class="card-head" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
-          <div>
-            <h1 class="title" style="font-size:18px; font-weight:800; color:#17202e; margin:0;"><i class="fa-solid fa-users" style="color:#d8a437; margin-right:8px;"></i> Seluruh Wiraniaga Cabang (46 Sales)</h1>
-            <p class="subtitle" style="font-size:13px; color:#64748d; margin:4px 0 0;">Monitoring akun, konversi, dan performa tim sales seluruh SPV</p>
+      <!-- 4 EXECUTIVE KPI SUMMARY CARDS -->
+      <div class="wira-kpi-grid">
+        <div class="wira-kpi-card card-blue">
+          <div class="wira-kpi-head">
+            <span class="wira-kpi-label">Total Wiraniaga</span>
+            <div class="wira-kpi-icon icon-blue"><i class="fa-solid fa-users"></i></div>
           </div>
-          <div class="actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 8px 12px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12.5px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
+          <div class="wira-kpi-val" id="kpiTotalSales">46 Sales</div>
+          <div class="wira-kpi-sub"><i class="fa-solid fa-sitemap" style="color:#2563eb;"></i> 3 Tim SPV (Ryan, Alvin, Riva)</div>
+        </div>
+
+        <div class="wira-kpi-card card-emerald">
+          <div class="wira-kpi-head">
+            <span class="wira-kpi-label">Status Presensi</span>
+            <div class="wira-kpi-icon icon-emerald"><i class="fa-solid fa-signal"></i></div>
+          </div>
+          <div class="wira-kpi-val" id="kpiOnlineCount">0 Online</div>
+          <div class="wira-kpi-sub" id="kpiOfflineCount"><i class="fa-solid fa-moon" style="color:#94a3b8;"></i> 46 Wiraniaga Offline</div>
+        </div>
+
+        <div class="wira-kpi-card card-amber">
+          <div class="wira-kpi-head">
+            <span class="wira-kpi-label">High Conversion</span>
+            <div class="wira-kpi-icon icon-amber"><i class="fa-solid fa-bolt"></i></div>
+          </div>
+          <div class="wira-kpi-val" id="kpiHighCount">0 Sales</div>
+          <div class="wira-kpi-sub"><i class="fa-solid fa-award" style="color:#f59e0b;"></i> Konversi Target &ge; 50%</div>
+        </div>
+
+        <div class="wira-kpi-card card-rose">
+          <div class="wira-kpi-head">
+            <span class="wira-kpi-label">Need Coaching</span>
+            <div class="wira-kpi-icon icon-rose"><i class="fa-solid fa-lightbulb"></i></div>
+          </div>
+          <div class="wira-kpi-val" id="kpiCoachingCount">0 Sales</div>
+          <div class="wira-kpi-sub"><i class="fa-solid fa-circle-exclamation" style="color:#e11d48;"></i> Perlu Pendampingan SPV</div>
+        </div>
+      </div>
+
+      <!-- ================= CARD DAFTAR WIRANIAGA ================= -->
+      <section class="spv-card">
+        <div class="card-head">
+          <div>
+            <h1 class="title" style="font-size:18px; font-weight:800; color:#0f172a; margin:0;"><i class="fa-solid fa-users" style="color:#d7123a; margin-right:8px;"></i> Seluruh Wiraniaga Cabang (46 Sales)</h1>
+            <p class="subtitle" style="font-size:13px; color:#64748b; margin:4px 0 0;">Monitoring akun, konversi, presensi real-time, dan evaluasi AI coaching seluruh wiraniaga cabang</p>
+          </div>
+          <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 10px 14px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
               <option value="Semua">👑 Semua Tim (Master - 46 Sales)</option>
               <option value="Pak Ryan">Tim Pak Ryan</option>
               <option value="Pak Alvin">Tim Pak Alvin</option>
@@ -89,7 +128,7 @@
               <input type="text" id="searchWiraniaga" placeholder="Cari nama / username..."
                 oninput="filterWiraniaga()">
             </div>
-            <button class="btn btn-primary" style="background: linear-gradient(135deg, #1e1014, #3d1c24); color: #d8a437; border: 1px solid #d8a437;" onclick="openModalCreate()">
+            <button class="btn btn-primary" style="background: linear-gradient(135deg, #1e1014, #3d1c24); color: #d8a437; border: 1px solid #d8a437; font-weight:700; padding:10px 16px; border-radius:10px;" onclick="openModalCreate()">
               <i class="fa-solid fa-user-plus"></i> Tambah Wiraniaga
             </button>
           </div>
@@ -100,14 +139,14 @@
           <table class="table table-board">
             <thead>
               <tr>
-                <th class="num" style="width:44px;">No</th>
-                <th style="min-width:200px;">Nama Lengkap</th>
-                <th style="width:120px;">Username</th>
-                <th style="width:140px;">Conversion Rate</th>
-                <th class="num" style="width:100px;">Kehadiran</th>
-                <th class="num" style="width:110px;">Tingkatan</th>
-                <th style="width:140px;">AI Coaching Badge</th>
-                <th class="num" style="width:160px;">Aksi</th>
+                <th class="num" style="width:50px;">No</th>
+                <th style="min-width:240px;">Wiraniaga &amp; Tim SPV</th>
+                <th style="min-width:130px;">Username</th>
+                <th style="min-width:160px;">Conversion Rate</th>
+                <th class="num" style="min-width:140px;">Kehadiran</th>
+                <th class="num" style="min-width:120px;">Tingkatan</th>
+                <th style="min-width:160px;">AI Coaching Badge</th>
+                <th style="text-align:right; min-width:180px;">Aksi</th>
               </tr>
             </thead>
             <tbody id="wiraniagaBody">
@@ -153,45 +192,33 @@
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="formWiraniaga" onsubmit="saveWiraniaga(event)">
-          <input type="hidden" id="inputId" value="">
+        <form id="wiraniagaForm" onsubmit="saveWiraniaga(event)">
+          <input type="hidden" id="formAction" value="create">
+          <input type="hidden" id="formAccountId" value="0">
 
           <div class="form-group">
             <label><i class="fa-solid fa-user"></i> Nama Lengkap</label>
-            <input type="text" id="inputNama" class="form-control" placeholder="Contoh: Budi Santoso" required>
+            <input type="text" id="inputNamaLengkap" class="form-control" placeholder="Masukkan nama lengkap wiraniaga" required>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fa-solid fa-id-card"></i> Username</label>
+            <input type="text" id="inputUsername" class="form-control" placeholder="Masukkan username untuk login" required>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Password <span id="passwordHelp" class="label-hint"></span></label>
+            <input type="text" id="inputPassword" class="form-control" placeholder="Masukkan password">
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label><i class="fa-solid fa-at"></i> Username (Login)</label>
-              <input type="text" id="inputUsername" class="form-control" placeholder="Contoh: budi" required>
-            </div>
-            <div class="form-group">
-              <label><i class="fa-solid fa-key"></i> Password</label>
-              <input type="password" id="inputPassword" class="form-control"
-                placeholder="Kosongkan jika tidak diubah">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label><i class="fa-solid fa-envelope"></i> Email</label>
-              <input type="email" id="inputEmail" class="form-control" placeholder="budi@tunastoyota.co.id">
-            </div>
-            <div class="form-group">
-              <label><i class="fa-brands fa-whatsapp"></i> No. WhatsApp</label>
-              <input type="text" id="inputTelepon" class="form-control" placeholder="08123456789" required>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label><i class="fa-solid fa-layer-group"></i> Tingkatan</label>
+              <label><i class="fa-solid fa-ranking-star"></i> Tingkatan</label>
               <select id="selectTingkatan" class="form-control">
                 <option value="Magang">Magang</option>
-                <option value="Junior">Junior</option>
-                <option value="Senior">Senior</option>
+                <option value="Junior" selected>Junior</option>
                 <option value="Executive">Executive</option>
+                <option value="Senior">Senior</option>
               </select>
             </div>
             <div class="form-group">
@@ -221,8 +248,8 @@
   </div>
 
   <script src="../custom_alert.js"></script>
-  <script src="../js/kacab_global.js"></script>
-  <script src="../js/spv_wiraniaga.js?v=20260819_master"></script>
+  <script src="../js/kacab_global.js?v=20260824_dendi"></script>
+  <script src="../js/spv_wiraniaga.js?v=20260824_v2"></script>
   <script src="../js/pwa-app.js?v=3"></script>
 </body>
 

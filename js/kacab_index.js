@@ -197,12 +197,36 @@ function activityIcon(tipe) {
 
 let aiSentinelData = null;
 
-async function loadAiSentinelKacab(customDay = null) {
-  const dayParam = customDay !== null ? customDay : new Date().getDate();
+async function loadAiSentinelKacab(customDay = null, forceFresh = false) {
+  const selectEl = document.getElementById('selectSimulasiHari');
+  let dayParam;
+  if (customDay !== null) {
+    dayParam = parseInt(customDay);
+    if (selectEl) selectEl.value = String(customDay);
+  } else if (selectEl && selectEl.value) {
+    dayParam = parseInt(selectEl.value);
+  } else {
+    dayParam = new Date().getDate();
+  }
   const monthParam = new Date().getMonth() + 1;
 
   const sentinelCard = document.getElementById('aiSentinelContainer');
   if (!sentinelCard) return;
+
+  const cacheKey = `kacab_sentinel_cache_${dayParam}_${monthParam}`;
+  const cacheTimeKey = `kacab_sentinel_cache_time_${dayParam}_${monthParam}`;
+
+  if (!forceFresh) {
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      const cacheTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0');
+      if (cached && (Date.now() - cacheTime < 30000)) {
+        const json = JSON.parse(cached);
+        aiSentinelData = json;
+        renderAiSentinelUI(json);
+      }
+    } catch(e) {}
+  }
 
   try {
     const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${dayParam}&bulan=${monthParam}`);
@@ -211,6 +235,10 @@ async function loadAiSentinelKacab(customDay = null) {
     if (json.status === 'success') {
       aiSentinelData = json;
       renderAiSentinelUI(json);
+      try {
+        sessionStorage.setItem(cacheKey, JSON.stringify(json));
+        sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+      } catch(e) {}
     } else {
       sentinelCard.innerHTML = `<p style="color:var(--red); font-size:12px;">Gagal memuat audit AI Sentinel.</p>`;
     }

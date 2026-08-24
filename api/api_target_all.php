@@ -47,19 +47,11 @@ if ($method === 'GET') {
     ];
     $periode_str = $nama_bulan_list[$current_month] . " " . $current_year;
 
-    // Auto Sinkronisasi Real-Time dengan Google Spreadsheet (Throttled 15s)
-    if (function_exists('syncGoogleSheetsToDb') || file_exists(__DIR__ . '/api_sheets_sync.php')) {
-        require_once __DIR__ . '/api_sheets_sync.php';
-        if ($conn) {
-            $q_chk = $conn->query("SELECT last_sync_at FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
-            $should_sync = true;
-            if ($q_chk && $c_row = $q_chk->fetch_assoc()) {
-                $last_time = strtotime($c_row['last_sync_at'] ?? '2000-01-01');
-                if (time() - $last_time < 15) {
-                    $should_sync = false;
-                }
-            }
-            if ($should_sync) {
+    // Optional manual sync with Google Sheets (triggered explicitly via ?sync=1)
+    if (isset($_GET['sync']) && $_GET['sync'] === '1') {
+        if (function_exists('syncGoogleSheetsToDb') || file_exists(__DIR__ . '/api_sheets_sync.php')) {
+            require_once __DIR__ . '/api_sheets_sync.php';
+            if ($conn) {
                 syncGoogleSheetsToDb($conn, $current_month, $current_year);
             }
         }
@@ -106,6 +98,43 @@ if ($method === 'GET') {
         'fia'        => ['target_spk' => 5, 'target_do' => 2],
         'rahma'      => ['target_spk' => 3, 'target_do' => 2],
     ];
+
+    // BATCH PRE-FETCH ALL DATA IN 3 FAST QUERIES (Eliminating N+1 database roundtrips)
+    $target_map = [];
+    $q_tgt = $conn->query("SELECT id_target_bulanan, sales_account_id, target_spk, target_do, realisasi_spk, realisasi_do, plan_spk, is_manual_target_spk, is_manual_target_do, is_manual_spk, is_manual_do FROM target_do_bulanan WHERE periode_bulan = $current_month");
+    if ($q_tgt) {
+        while ($t = $q_tgt->fetch_assoc()) {
+            $target_map[intval($t['sales_account_id'])] = $t;
+        }
+    }
+
+    $dyn_map = [];
+    $q_dyn = $conn->query("SELECT sales_account_id, SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as dyn_spk, SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as dyn_do FROM tabel_spk WHERE (MONTH(created_at) = $current_month OR created_at IS NULL OR created_at = '') GROUP BY sales_account_id");
+    if ($q_dyn) {
+        while ($d = $q_dyn->fetch_assoc()) {
+            $dyn_map[intval($d['sales_account_id'])] = $d;
+        }
+    }
+
+    $all_eval_map = [];
+    $q_all_eval = $conn->query("SELECT sales_account_id, periode_bulan, target_do, realisasi_do, target_spk, realisasi_spk FROM target_do_bulanan");
+    if ($q_all_eval) {
+        while ($e = $q_all_eval->fetch_assoc()) {
+            $sid = intval($e['sales_account_id']);
+            $m = intval($e['periode_bulan']);
+            $all_eval_map[$sid][$m] = $e;
+        }
+    }
+
+    $dyn_eval_map = [];
+    $q_dyn_eval = $conn->query("SELECT sales_account_id, MONTH(created_at) as m, SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as dyn_spk, SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as dyn_do FROM tabel_spk GROUP BY sales_account_id, MONTH(created_at)");
+    if ($q_dyn_eval) {
+        while ($de = $q_dyn_eval->fetch_assoc()) {
+            $sid = intval($de['sales_account_id']);
+            $m = intval($de['m'] ?: $current_month);
+            $dyn_eval_map[$sid][$m] = $de;
+        }
+    }
 
     $q_sales = $conn->query("SELECT id as sales_account_id, username, nama_lengkap as nama_sales, tingkatan, nama_spv, created_at FROM sales_accounts $where_clause ORDER BY id ASC");
 
@@ -167,8 +196,8 @@ if ($method === 'GET') {
                 }
             }
 
-            // Read target & realisasi strictly PER BULAN for the requested $current_month
-            $q_target = $conn->query("SELECT id_target_bulanan, target_spk, target_do, realisasi_spk, realisasi_do, plan_spk, is_manual_target_spk, is_manual_target_do, is_manual_spk, is_manual_do FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan = $current_month");
+            // Read target & realisasi strictly from in-memory batch map
+            $t_row = $target_map[$sales_id] ?? null;
             
             $tgt_spk = 0;
             $tgt_do = 0;
@@ -181,8 +210,7 @@ if ($method === 'GET') {
             $is_manual_target_spk = 0;
             $is_manual_target_do = 0;
 
-            if ($q_target && $q_target->num_rows > 0) {
-                $t_row = $q_target->fetch_assoc();
+            if ($t_row) {
                 $tgt_spk = intval($t_row['target_spk']);
                 $tgt_do = intval($t_row['target_do']);
                 $real_spk = intval($t_row['realisasi_spk']);
@@ -199,12 +227,8 @@ if ($method === 'GET') {
             if ($tgt_do === 0) $tgt_do = $default_tgt_do;
 
             if (empty($is_manual_spk) && $real_spk === 0) {
-                $q_dyn_spk = $conn->query("SELECT 
-                    SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as dyn_spk,
-                    SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as dyn_do
-                    FROM tabel_spk WHERE sales_account_id = $sales_id AND (MONTH(created_at) = $current_month OR created_at IS NULL OR created_at = '')");
-
-                if ($q_dyn_spk && $d_row = $q_dyn_spk->fetch_assoc()) {
+                $d_row = $dyn_map[$sales_id] ?? null;
+                if ($d_row) {
                     $real_spk = max($real_spk, intval($d_row['dyn_spk'] ?? 0));
                     if (empty($is_manual_do) && $real_do === 0) {
                         $real_do = max($real_do, intval($d_row['dyn_do'] ?? 0));
@@ -212,29 +236,25 @@ if ($method === 'GET') {
                 }
             }
 
-            // Calculate 4-month evaluation sums
-            $cycle_sql = implode(',', $active_cycle);
-            $q_eval = $conn->query("SELECT SUM(target_do) as tot_target_do, SUM(realisasi_do) as tot_real_do, SUM(target_spk) as tot_target_spk, SUM(realisasi_spk) as tot_real_spk FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan IN ($cycle_sql)");
-
+            // Calculate 4-month evaluation sums from in-memory maps
             $target_do_eval = 0;
             $realisasi_do_eval = 0;
             $target_spk_eval = 0;
             $realisasi_spk_eval = 0;
 
-            if ($q_eval && $e_row = $q_eval->fetch_assoc()) {
-                $target_do_eval = intval($e_row['tot_target_do']);
-                $realisasi_do_eval = intval($e_row['tot_real_do']);
-                $target_spk_eval = intval($e_row['tot_target_spk']);
-                $realisasi_spk_eval = intval($e_row['tot_real_spk']);
-            }
-
-            $q_dyn_eval = $conn->query("SELECT 
-                SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as dyn_spk,
-                SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as dyn_do
-                FROM tabel_spk WHERE sales_account_id = $sales_id AND (MONTH(created_at) IN ($cycle_sql) OR created_at IS NULL OR created_at = '')");
-            if ($q_dyn_eval && $d_eval = $q_dyn_eval->fetch_assoc()) {
-                $realisasi_spk_eval = max($realisasi_spk_eval, intval($d_eval['dyn_spk'] ?? 0));
-                $realisasi_do_eval = max($realisasi_do_eval, intval($d_eval['dyn_do'] ?? 0));
+            foreach ($active_cycle as $m_c) {
+                if (isset($all_eval_map[$sales_id][$m_c])) {
+                    $e_c = $all_eval_map[$sales_id][$m_c];
+                    $target_do_eval += intval($e_c['target_do']);
+                    $realisasi_do_eval += intval($e_c['realisasi_do']);
+                    $target_spk_eval += intval($e_c['target_spk']);
+                    $realisasi_spk_eval += intval($e_c['realisasi_spk']);
+                }
+                if (isset($dyn_eval_map[$sales_id][$m_c])) {
+                    $de_c = $dyn_eval_map[$sales_id][$m_c];
+                    $realisasi_spk_eval = max($realisasi_spk_eval, intval($de_c['dyn_spk'] ?? 0));
+                    $realisasi_do_eval = max($realisasi_do_eval, intval($de_c['dyn_do'] ?? 0));
+                }
             }
 
             if ($target_do_eval <= 0) {

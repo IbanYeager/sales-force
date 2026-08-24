@@ -228,7 +228,7 @@ try {
                 if (!$check_empty || $check_empty->num_rows == 0) {
                     $defHash = password_hash('kacab123', PASSWORD_DEFAULT);
                     $conn->query("INSERT INTO kacab_accounts (username, password, nama_lengkap, foto) 
-                        VALUES ('kacab', '$defHash', 'Bapak H. Anton Raharjo', '')");
+                        VALUES ('kacab', '$defHash', 'Dendi Holius', '')");
                 }
             } catch (Throwable $db_init_err) {
                 // Abaikan error inisialisasi tabel
@@ -240,7 +240,7 @@ try {
                     "message" => "Login berhasil sebagai Kepala Cabang",
                     "sales" => [
                         "id" => 1,
-                        "name" => "Bapak H. Anton Raharjo",
+                        "name" => "Dendi Holius",
                         "foto" => "",
                         "spv" => "Kepala Cabang",
                         "peran" => "Kepala Cabang",

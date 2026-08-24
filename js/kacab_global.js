@@ -27,8 +27,15 @@ function guardKacab() {
 guardKacab();
 
 function renderKacabUser() {
-  const nama = localStorage.getItem('namaSales') || 'Kepala Cabang';
+  let nama = localStorage.getItem('namaSales') || 'Dendi Holius';
   const peran = localStorage.getItem('peranSales') || 'Kepala Cabang';
+
+  // Transparently migrate / ensure Kacab name is always Dendi Holius
+  if (peran === 'Kepala Cabang' || nama.includes('Anton') || nama === 'Kepala Cabang') {
+    nama = 'Dendi Holius';
+    localStorage.setItem('namaSales', 'Dendi Holius');
+  }
+
   const namaEl = document.getElementById('kcbNama');
   const roleEl = document.getElementById('kcbRole');
   if (namaEl) namaEl.textContent = nama;
@@ -48,7 +55,20 @@ document.addEventListener('DOMContentLoaded', renderKacabUser);
 // ── Data hierarki cabang: SPV → Sales (dengan target & realisasi) ──
 // Sumber: api_spv_list.php (daftar SPV), api_wiraniaga.php (semua sales),
 // api_target_all.php (target & realisasi per sales).
-async function fetchBranchHierarchy() {
+async function fetchBranchHierarchy(forceFresh = false) {
+  const cacheKey = 'kacab_hierarchy_cache';
+  const cacheTimeKey = 'kacab_hierarchy_cache_time';
+
+  if (!forceFresh) {
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      const cacheTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0');
+      if (cached && (Date.now() - cacheTime < 25000)) { // 25s cache
+        return JSON.parse(cached);
+      }
+    } catch(e) {}
+  }
+
   const [spvRes, wirRes, tgtRes] = await Promise.all([
     fetch('../api/api_spv_list.php'),
     fetch('../api/api_wiraniaga.php'),
@@ -144,7 +164,7 @@ async function fetchBranchHierarchy() {
   // Urutkan: pencapaian DO tertinggi dulu, lalu jumlah tim
   hierarchy.sort((a, b) => (b.pct_do - a.pct_do) || (b.total_sales - a.total_sales));
 
-  return { 
+  const result = { 
     hierarchy, 
     periode: tgtJson.periode || '', 
     evaluasi_do_label: tgtJson.evaluasi_do_label || '',
@@ -155,6 +175,13 @@ async function fetchBranchHierarchy() {
     sales_online: totalSalesOnline,
     sales_offline: totalSalesOffline
   };
+
+  try {
+    sessionStorage.setItem(cacheKey, JSON.stringify(result));
+    sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+  } catch(e) {}
+
+  return result;
 }
 
 function pctClass(pct) {

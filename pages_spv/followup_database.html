@@ -7,7 +7,7 @@
   <title>SPV Desktop - Database Follow-Up (CRM)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_spv.css">
-  <link rel="stylesheet" href="../css/followup.css">
+  <link rel="stylesheet" href="../css/followup.css?v=20260824_loader">
 
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="manifest" href="../manifest.json">
@@ -74,53 +74,68 @@
 
       <!-- 5 KPI TILES -->
       <div class="kpi-grid-5">
-        <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#eff6ff; color:#1d4ed8;">
-            <i class="fa-solid fa-users"></i>
+        <div class="kpi-card card-blue">
+          <div class="fu-kpi-head">
+            <span class="fu-kpi-lbl">Total Database</span>
+            <div class="fu-kpi-icon-wrap fu-kpi-icon-blue">
+              <i class="fa-solid fa-users"></i>
+            </div>
           </div>
-          <div>
-            <div class="kpi-val" id="kpiTotal">0</div>
-            <div class="kpi-lbl">Total Database</div>
-          </div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#fef3c7; color:#b45309;">
-            <i class="fa-solid fa-clock"></i>
-          </div>
-          <div>
-            <div class="kpi-val" id="kpiPending">0</div>
-            <div class="kpi-lbl">Belum Dihubungi</div>
+          <div class="fu-kpi-val" id="kpiTotal">0</div>
+          <div class="fu-kpi-sub">
+            <span class="fu-badge-pill pill-blue"><i class="fa-solid fa-building"></i> Tim Supervisi</span>
           </div>
         </div>
 
-        <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#e0f2fe; color:#0369a1;">
-            <i class="fa-solid fa-comment-dots"></i>
+        <div class="kpi-card card-amber">
+          <div class="fu-kpi-head">
+            <span class="fu-kpi-lbl">Belum Dihubungi</span>
+            <div class="fu-kpi-icon-wrap fu-kpi-icon-amber">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
           </div>
-          <div>
-            <div class="kpi-val" id="kpiWaiting">0</div>
-            <div class="kpi-lbl">Menunggu Respon</div>
-          </div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#dbeafe; color:#2563eb;">
-            <i class="fa-solid fa-thumbs-up"></i>
-          </div>
-          <div>
-            <div class="kpi-val" id="kpiInterested">0</div>
-            <div class="kpi-lbl">Tertarik / Servis</div>
+          <div class="fu-kpi-val" id="kpiPending">0</div>
+          <div class="fu-kpi-sub">
+            <span class="fu-badge-pill pill-amber"><i class="fa-solid fa-bolt"></i> Prioritas Kontak</span>
           </div>
         </div>
 
-        <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#dcfce7; color:#15803d;">
-            <i class="fa-solid fa-circle-check"></i>
+        <div class="kpi-card card-cyan">
+          <div class="fu-kpi-head">
+            <span class="fu-kpi-lbl">Menunggu Respon</span>
+            <div class="fu-kpi-icon-wrap fu-kpi-icon-cyan">
+              <i class="fa-solid fa-comments"></i>
+            </div>
           </div>
-          <div>
-            <div class="kpi-val" id="kpiDeal">0</div>
-            <div class="kpi-lbl">Deal / Selesai</div>
+          <div class="fu-kpi-val" id="kpiWaiting">0</div>
+          <div class="fu-kpi-sub">
+            <span class="fu-badge-pill pill-cyan"><i class="fa-solid fa-clock-rotate-left"></i> Dalam Progres</span>
+          </div>
+        </div>
+
+        <div class="kpi-card card-purple">
+          <div class="fu-kpi-head">
+            <span class="fu-kpi-lbl">Tertarik / Servis</span>
+            <div class="fu-kpi-icon-wrap fu-kpi-icon-purple">
+              <i class="fa-solid fa-thumbs-up"></i>
+            </div>
+          </div>
+          <div class="fu-kpi-val" id="kpiInterested">0</div>
+          <div class="fu-kpi-sub">
+            <span class="fu-badge-pill pill-purple"><i class="fa-solid fa-fire"></i> Hot Prospect</span>
+          </div>
+        </div>
+
+        <div class="kpi-card card-emerald">
+          <div class="fu-kpi-head">
+            <span class="fu-kpi-lbl">Deal / Selesai</span>
+            <div class="fu-kpi-icon-wrap fu-kpi-icon-emerald">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </div>
+          <div class="fu-kpi-val" id="kpiDeal">0</div>
+          <div class="fu-kpi-sub">
+            <span class="fu-badge-pill pill-emerald"><i class="fa-solid fa-trophy"></i> Closing Selesai</span>
           </div>
         </div>
       </div>
@@ -150,19 +165,19 @@
 
         <div class="fu-toolbar-right">
           <button class="btn-fu btn-fu-secondary" onclick="openTemplateManagerModal()">
-            <i class="fa-solid fa-comment-dots"></i> Template WA
+            <i class="fa-brands fa-whatsapp" style="color:#25D366; font-size:14px;"></i> Template WA
           </button>
 
           <button class="btn-fu btn-fu-secondary" onclick="openSyncSettingsModal()">
-            <i class="fa-solid fa-arrows-rotate"></i> Sync Sheet
+            <i class="fa-solid fa-arrows-rotate" style="color:#0f9d58; font-size:13px;"></i> Sync Sheet
           </button>
 
           <a href="../api/api_followup_sync.php?action=export_csv" class="btn-fu btn-fu-secondary">
-            <i class="fa-solid fa-download" style="color:#0284c7;"></i> Ekspor CSV
+            <i class="fa-solid fa-file-arrow-down" style="color:#0284c7; font-size:13px;"></i> Ekspor CSV
           </a>
 
           <button class="btn-fu btn-fu-danger-outline" onclick="confirmResetDatabase()" title="Kosongkan seluruh data customer">
-            <i class="fa-solid fa-trash-can"></i> Reset DB
+            <i class="fa-solid fa-trash-can" style="color:#ef4444; font-size:13px;"></i> Reset DB
           </button>
         </div>
       </div>
@@ -281,6 +296,9 @@
             </tbody>
           </table>
         </div>
+
+        <!-- PAGINATION BAR -->
+        <div id="paginationContainer" class="fu-pagination-bar"></div>
       </div>
     </main>
   </div>
@@ -289,7 +307,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../custom_alert.js?v=25"></script>
   <script src="../js/spv_global.js"></script>
-  <script src="../js/followup_master.js?v=25"></script>
+  <script src="../js/followup_master.js?v=20260824_customalert"></script>
   <script src="../js/pwa-app.js?v=3"></script>
 </body>
 </html>

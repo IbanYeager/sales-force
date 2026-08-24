@@ -95,7 +95,11 @@
     }
 
     function closeModal(id) {
-      document.getElementById(id).classList.remove('show');
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('show', 'active');
+        el.style.display = 'none';
+      }
     }
 
     // ==========================================

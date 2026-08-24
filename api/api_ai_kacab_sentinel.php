@@ -119,7 +119,27 @@ $nama_bulan_list = [
 $periode_str = $current_day . " " . $nama_bulan_list[$current_month] . " " . $current_year;
 
 // 2. Ambil Semua Data Sales dari database
-$q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts WHERE status != 'Inaktif' OR status IS NULL ORDER BY nama_spv ASC, nama_lengkap ASC");
+$q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts ORDER BY nama_spv ASC, nama_lengkap ASC");
+
+// BATCH PRE-FETCH TARGET & DYNAMIC DATA (Eliminates 92 loop queries)
+$target_map = [];
+$q_tgt = $conn->query("SELECT sales_account_id, target_spk, target_do, realisasi_spk, realisasi_do FROM target_do_bulanan WHERE periode_bulan = $current_month");
+if ($q_tgt) {
+    while ($t = $q_tgt->fetch_assoc()) {
+        $target_map[intval($t['sales_account_id'])] = $t;
+    }
+}
+
+$dyn_map = [];
+$q_dyn = $conn->query("SELECT sales_account_id, 
+    SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as dyn_spk,
+    SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as dyn_do
+    FROM tabel_spk WHERE (MONTH(created_at) = $current_month OR created_at IS NULL OR created_at = '') GROUP BY sales_account_id");
+if ($q_dyn) {
+    while ($d = $q_dyn->fetch_assoc()) {
+        $dyn_map[intval($d['sales_account_id'])] = $d;
+    }
+}
 
 $underperforming = [];
 $on_track = [];
@@ -140,26 +160,22 @@ if ($q_sales && $q_sales->num_rows > 0) {
             $tgt_do = $whiteboard_targets[$username_clean]['target_do'];
         }
 
-        // Baca target & realisasi di DB target_do_bulanan
-        $q_target = $conn->query("SELECT target_spk, target_do, realisasi_spk, realisasi_do, is_manual_spk, is_manual_do FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan = $current_month");
-
+        // Baca target & realisasi di in-memory batch map
         $real_spk = 0;
         $real_do = 0;
+        $t_row = $target_map[$sales_id] ?? null;
 
-        if ($q_target && $t_row = $q_target->fetch_assoc()) {
+        if ($t_row) {
             if (intval($t_row['target_spk']) > 0) $tgt_spk = intval($t_row['target_spk']);
             if (intval($t_row['target_do']) > 0) $tgt_do = intval($t_row['target_do']);
             $real_spk = intval($t_row['realisasi_spk']);
             $real_do = intval($t_row['realisasi_do']);
         }
 
-        // Jika dynamic SPK belum terisi manual dan nilai masih 0, hitung dari tabel_spk
+        // Jika dynamic SPK belum terisi manual dan nilai masih 0, ambil dari dyn_map
         if ($real_spk === 0) {
-            $q_dyn = $conn->query("SELECT 
-                SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as dyn_spk,
-                SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as dyn_do
-                FROM tabel_spk WHERE sales_account_id = $sales_id AND (MONTH(created_at) = $current_month OR created_at IS NULL OR created_at = '')");
-            if ($q_dyn && $d = $q_dyn->fetch_assoc()) {
+            $d = $dyn_map[$sales_id] ?? null;
+            if ($d) {
                 $real_spk = max($real_spk, intval($d['dyn_spk'] ?? 0));
                 $real_do = max($real_do, intval($d['dyn_do'] ?? 0));
             }

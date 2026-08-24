@@ -130,6 +130,17 @@ let listDataWiraniaga = [];
       }
     }
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      })[m]);
+    }
+
     function renderWiraniagaRows() {
       const wiraniagaBody = document.getElementById('wiraniagaBody');
       const subTitleCount = document.getElementById('subTitleCount');
@@ -141,10 +152,43 @@ let listDataWiraniaga = [];
         subTitleCount.innerHTML = `<strong>${listDataWiraniaga.length}</strong> wiraniaga &middot; <span style="color:#10b981; font-weight:800;"><i class="fa-solid fa-circle" style="font-size:8px;"></i> ${totalOnline} Online</span> &middot; <span style="color:#94a3b8;">${totalOffline} Offline</span>`;
       }
 
+      // Calculate KPI Stats
+      let countHigh = 0;
+      let countNeedCoaching = 0;
+
+      listDataWiraniaga.forEach(row => {
+        let rVal = 45;
+        const targetData = (window.realTargetMap && (window.realTargetMap[row.id] || window.realTargetMap[row.nama_lengkap]));
+        if (targetData) {
+          const targetSpk = Math.max(targetData.target_spk_bulan || 0, 1);
+          const actualSpk = targetData.realisasi_spk_bulan || 0;
+          rVal = Math.min(Math.round((actualSpk / targetSpk) * 100), 100);
+          if (rVal === 0 && actualSpk > 0) rVal = 25;
+        }
+        if (rVal >= 50) countHigh++;
+        if (rVal < 40) countNeedCoaching++;
+      });
+
+      const kpiTotalEl = document.getElementById('kpiTotalSales');
+      if (kpiTotalEl) kpiTotalEl.textContent = `${listDataWiraniaga.length} Sales`;
+
+      const kpiOnlineEl = document.getElementById('kpiOnlineCount');
+      if (kpiOnlineEl) kpiOnlineEl.textContent = `${totalOnline} Online`;
+
+      const kpiOfflineEl = document.getElementById('kpiOfflineCount');
+      if (kpiOfflineEl) kpiOfflineEl.innerHTML = `<i class="fa-solid fa-moon" style="color:#94a3b8;"></i> ${totalOffline} Wiraniaga Offline`;
+
+      const kpiHighEl = document.getElementById('kpiHighCount');
+      if (kpiHighEl) kpiHighEl.textContent = `${countHigh} Sales`;
+
+      const kpiCoachingEl = document.getElementById('kpiCoachingCount');
+      if (kpiCoachingEl) kpiCoachingEl.textContent = `${countNeedCoaching} Sales`;
+
       const rows = q
         ? listDataWiraniaga.filter(r =>
             (r.nama_lengkap || '').toLowerCase().includes(q) ||
             (r.username || '').toLowerCase().includes(q) ||
+            (r.nama_spv || '').toLowerCase().includes(q) ||
             (q === 'online' && r.is_online) ||
             (q === 'offline' && !r.is_online))
         : listDataWiraniaga;
@@ -181,75 +225,97 @@ let listDataWiraniaga = [];
 
         const conversionRate = `${rateVal}%`;
 
-        let badgeHtml = '<span style="font-size:11px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px;">🚀 Konsisten</span>';
+        let rateClass = 'rate-normal';
+        if (rateVal >= 75) rateClass = 'rate-high';
+        else if (rateVal >= 50) rateClass = 'rate-medium';
+        else if (rateVal < 40) rateClass = 'rate-low';
+
+        let badgeClass = 'consistent';
+        let badgeIcon = 'fa-rocket';
+        let badgeText = 'Konsisten';
         if (rateVal >= 75) {
-          badgeHtml = '<span style="font-size:11px; font-weight:800; background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px;">🎯 High Conversion</span>';
+          badgeClass = 'high'; badgeIcon = 'fa-bullseye'; badgeText = 'High Conversion';
         } else if (rateVal >= 50) {
-          badgeHtml = '<span style="font-size:11px; font-weight:800; background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px;">⚡ Fast Closer</span>';
+          badgeClass = 'fast'; badgeIcon = 'fa-bolt'; badgeText = 'Fast Closer';
         } else if (rateVal < 40) {
-          badgeHtml = '<span style="font-size:11px; font-weight:800; background:#ffe4e6; color:#be123c; padding:3px 8px; border-radius:6px;">💡 Need Coaching</span>';
+          badgeClass = 'need'; badgeIcon = 'fa-lightbulb'; badgeText = 'Need Coaching';
         }
 
-        let statusHtml = '';
-        if (isOn) {
-          statusHtml = `
-            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
-              <span class="status-pill on" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">
-                <i class="fa-solid fa-circle" style="font-size:7px;"></i> Online
-              </span>
-              <span style="font-size:10px; color:#15803d; font-weight:600;">Aktif di Web</span>
-            </div>
-          `;
-        } else {
-          statusHtml = `
-            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
-              <span class="status-pill off" style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;">
-                <i class="fa-solid fa-circle" style="font-size:7px; opacity:0.6;"></i> Offline
-              </span>
-              <span style="font-size:10px; color:#94a3b8;">${row.last_active_formatted || 'Belum aktif'}</span>
-            </div>
-          `;
-        }
+        const spvName = row.nama_spv || 'Tim SPV';
+        let spvClass = 'tag-spv-default';
+        if (spvName.includes('Ryan')) spvClass = 'tag-spv-ryan';
+        else if (spvName.includes('Alvin')) spvClass = 'tag-spv-alvin';
+        else if (spvName.includes('Riva')) spvClass = 'tag-spv-riva';
 
-        const dotStyle = isOn
-          ? 'background:#10b981; box-shadow:0 0 0 2px white, 0 0 6px #10b981;'
-          : (isOff ? 'background:#ef4444;' : 'background:#94a3b8;');
+        const tingkatan = row.tingkatan || 'Junior';
+        let gradeClass = 'grade-junior';
+        if (tingkatan === 'Executive') gradeClass = 'grade-executive';
+        else if (tingkatan === 'Senior') gradeClass = 'grade-senior';
+        else if (tingkatan === 'Magang') gradeClass = 'grade-magang';
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="num" style="color:var(--muted);">${globalIndex + 1}</td>
+          <td class="num" style="font-weight:800; color:#94a3b8; font-size:12px;">${globalIndex + 1}</td>
           <td>
             <div class="wira-name">
-              <div class="wira-avatar" style="position:relative;">
-                <img src="${avatar}" alt="Foto ${row.nama_lengkap}">
-                <span class="dot" style="${dotStyle} position:absolute; bottom:0; right:0; width:10px; height:10px; border-radius:50%; border:2px solid white;" title="${isOn ? 'Online Sekarang' : 'Offline'}"></span>
+              <div class="wira-avatar">
+                <img src="${avatar}" alt="Foto ${escapeHtml(row.nama_lengkap)}">
+                <span class="dot ${isOn ? '' : 'off'}" title="${isOn ? 'Online Sekarang' : 'Offline'}"></span>
               </div>
-              <div style="display:flex; flex-direction:column;">
-                <span class="n" style="font-weight:800; color:#0f172a;">${row.nama_lengkap}</span>
-                <span style="font-size:11px; color:#64748b;">${row.nama_spv || 'Tim SPV'}</span>
+              <div>
+                <div class="wira-meta-name">${escapeHtml(row.nama_lengkap)}</div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span class="wira-spv-tag ${spvClass}">
+                    <i class="fa-solid fa-user-tie" style="font-size:10px;"></i> ${escapeHtml(spvName)}
+                  </span>
+                </div>
               </div>
             </div>
           </td>
-          <td class="wira-username">${row.username}</td>
           <td>
-            <div style="font-weight:800; color:#0f172a;">${conversionRate}</div>
-            <div style="height:4px; background:#e2e8f0; border-radius:4px; margin-top:3px; overflow:hidden;">
-              <div style="height:100%; width:${conversionRate}; background:#2563eb;"></div>
+            <span class="wira-username-pill">@${escapeHtml(row.username)}</span>
+          </td>
+          <td>
+            <div class="wira-rate-box">
+              <div class="wira-rate-num">${conversionRate}</div>
+              <div class="wira-rate-track">
+                <div class="wira-rate-fill ${rateClass}" style="width:${conversionRate};"></div>
+              </div>
             </div>
           </td>
-          <td class="num">${statusHtml}</td>
-          <td class="num"><span class="badge-tingkatan">${row.tingkatan || 'Junior'}</span></td>
-          <td>${badgeHtml}</td>
           <td class="num">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
+              ${isOn ? `
+                <span class="wira-status-pill online">
+                  <i class="fa-solid fa-circle" style="font-size:7px;"></i> Online
+                </span>
+                <span style="font-size:10.5px; color:#15803d; font-weight:700;">Aktif di Web</span>
+              ` : `
+                <span class="wira-status-pill offline">
+                  <i class="fa-solid fa-circle" style="font-size:7px; opacity:0.6;"></i> Offline
+                </span>
+                <span style="font-size:10.5px; color:#94a3b8; font-weight:600;">${escapeHtml(row.last_active_formatted || 'Belum aktif')}</span>
+              `}
+            </div>
+          </td>
+          <td class="num">
+            <span class="badge-tingkatan ${gradeClass}">${escapeHtml(tingkatan)}</span>
+          </td>
+          <td>
+            <span class="badge-coaching ${badgeClass}">
+              <i class="fa-solid ${badgeIcon}"></i> ${badgeText}
+            </span>
+          </td>
+          <td style="text-align:right;">
             <div class="row-actions">
-              <button class="btn btn-sm" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; font-weight:700;" onclick="openCoachingAdvice('${safeName}', '${conversionRate}')">
+              <button class="btn-wira-action btn-wira-coaching" onclick="openCoachingAdvice('${safeName}', '${conversionRate}')" title="AI Coaching Advice">
                 <i class="fa-solid fa-lightbulb"></i> Coaching
               </button>
-              <button class="btn btn-sm btn-primary" onclick="openModalEdit(${row.id})">
+              <button class="btn-wira-action btn-wira-edit" onclick="openModalEdit(${row.id})" title="Edit Akun">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
-              <button class="btn btn-sm btn-danger" onclick="deleteWiraniaga(${row.id}, '${safeName}')">
-                <i class="fa-solid fa-trash"></i>
+              <button class="btn-wira-action btn-wira-delete" onclick="deleteWiraniaga(${row.id}, '${safeName}')" title="Hapus Akun">
+                <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
           </td>
@@ -283,7 +349,11 @@ let listDataWiraniaga = [];
         selectSpv.value = currentSpv;
       }
 
-      document.getElementById('modalWiraniaga').classList.add('show');
+      const el = document.getElementById('modalWiraniaga');
+      if (el) {
+        el.classList.add('show', 'active');
+        el.style.display = 'flex';
+      }
     }
 
     function openModalEdit(id) {
@@ -306,11 +376,19 @@ let listDataWiraniaga = [];
         selectSpv.value = row.nama_spv;
       }
 
-      document.getElementById('modalWiraniaga').classList.add('show');
+      const el = document.getElementById('modalWiraniaga');
+      if (el) {
+        el.classList.add('show', 'active');
+        el.style.display = 'flex';
+      }
     }
 
     function closeModal() {
-      document.getElementById('modalWiraniaga').classList.remove('show');
+      const el = document.getElementById('modalWiraniaga');
+      if (el) {
+        el.classList.remove('show', 'active');
+        el.style.display = 'none';
+      }
     }
 
     async function saveWiraniaga(event) {

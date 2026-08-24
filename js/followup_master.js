@@ -14,6 +14,10 @@ let masterState = {
     sales_id: 'all',
     status: 'all',
     category: 'all'
+  },
+  pagination: {
+    currentPage: 1,
+    perPage: 50
   }
 };
 
@@ -231,7 +235,11 @@ function populateCategoryDropdown() {
   });
 }
 
-async function loadMasterCustomers() {
+async function loadMasterCustomers(resetPage = true) {
+  if (resetPage) {
+    masterState.pagination.currentPage = 1;
+  }
+
   const tbody = document.getElementById('masterCustomerTbody');
   if (tbody) {
     tbody.innerHTML = `
@@ -272,10 +280,31 @@ function renderCustomerTable() {
   const tbody = document.getElementById('masterCustomerTbody');
   if (!tbody) return;
 
-  const list = masterState.customers;
-  document.getElementById('tableCountText').textContent = `Total: ${list.length} Customer`;
+  const allList = masterState.customers || [];
+  const totalCount = allList.length;
+  const perPage = masterState.pagination.perPage || 50;
+  const totalPages = Math.max(1, Math.ceil(totalCount / perPage));
 
-  if (list.length === 0) {
+  if (masterState.pagination.currentPage > totalPages) {
+    masterState.pagination.currentPage = totalPages;
+  }
+  if (masterState.pagination.currentPage < 1) {
+    masterState.pagination.currentPage = 1;
+  }
+
+  const currentPage = masterState.pagination.currentPage;
+  const startIndex = (currentPage - 1) * perPage;
+  const endIndex = Math.min(startIndex + perPage, totalCount);
+  const pageItems = allList.slice(startIndex, endIndex);
+
+  const countTextEl = document.getElementById('tableCountText');
+  if (countTextEl) {
+    countTextEl.innerHTML = totalCount > 0
+      ? `Menampilkan <strong>${startIndex + 1} - ${endIndex}</strong> dari <strong>${totalCount}</strong> Customer &middot; <span style="color:#d7123a; font-weight:800;">Halaman ${currentPage}/${totalPages}</span>`
+      : 'Total: 0 Customer';
+  }
+
+  if (totalCount === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="8" style="text-align:center; padding:60px 20px; color:#94a3b8;">
@@ -285,11 +314,12 @@ function renderCustomerTable() {
         </td>
       </tr>
     `;
+    renderPagination(0, 0, 0, 1, 1, perPage);
     return;
   }
 
   let html = '';
-  list.forEach(c => {
+  pageItems.forEach(c => {
     const isSelected = masterState.selectedIds.includes(c.id);
 
     // Generate Initials
@@ -314,15 +344,15 @@ function renderCustomerTable() {
           <div style="display:flex; align-items:center; gap:12px;">
             <div class="cust-avatar-circle">${initials}</div>
             <div>
-              <div style="font-weight:800; color:#0f172a; font-size:13.5px; line-height:1.25;">${c.name}</div>
+              <div style="font-weight:800; color:#0f172a; font-size:13.5px; line-height:1.25;">${escapeHtml(c.name || '')}</div>
               <div style="font-family:monospace; font-size:11.5px; color:#059669; font-weight:700; margin-top:3px;">
                 <a href="https://wa.me/${c.phone}" target="_blank" style="color:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
                   <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> +${c.phone}
                 </a>
               </div>
               <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
-                ${c.district ? `<span style="font-size:10.5px; color:#64748b;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; font-size:9.5px;"></i> Kec. ${c.district}</span>` : ''}
-                ${c.customer_type ? `<span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:#f1f5f9; color:#475569;">${c.customer_type}</span>` : ''}
+                ${c.district ? `<span style="font-size:10.5px; color:#64748b;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; font-size:9.5px;"></i> Kec. ${escapeHtml(c.district)}</span>` : ''}
+                ${c.customer_type ? `<span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:#f1f5f9; color:#475569;">${escapeHtml(c.customer_type)}</span>` : ''}
               </div>
             </div>
           </div>
@@ -331,31 +361,31 @@ function renderCustomerTable() {
         <!-- 3. Unit Mobil & Usia -->
         <td style="min-width:230px;">
           <div style="font-weight:900; color:#d7123a; font-size:13.5px; letter-spacing:-0.2px; display:flex; align-items:center; gap:5px;">
-            <i class="fa-solid fa-car-side" style="color:#d7123a;"></i> ${c.recommended_model || c.car_model}
+            <i class="fa-solid fa-car-side" style="color:#d7123a;"></i> ${escapeHtml(c.recommended_model || c.car_model || '')}
           </div>
           <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
-            ${c.last_car_model ? `<span class="badge-last-car">Saat ini: <strong>${c.last_car_model}</strong></span>` : ''}
-            ${c.car_age ? `<span class="badge-car-age"><i class="fa-solid fa-clock"></i> ${c.car_age}</span>` : ''}
+            ${c.last_car_model ? `<span class="badge-last-car">Saat ini: <strong>${escapeHtml(c.last_car_model)}</strong></span>` : ''}
+            ${c.car_age ? `<span class="badge-car-age"><i class="fa-solid fa-clock"></i> ${escapeHtml(c.car_age)}</span>` : ''}
           </div>
           ${(c.alt_model_2 || c.alt_model_3) ? `
             <div style="font-size:10.5px; color:#64748b; margin-top:3px;">
-              🔄 Alt: <strong style="color:#334155;">${[c.alt_model_2, c.alt_model_3].filter(Boolean).join(', ')}</strong>
+              🔄 Alt: <strong style="color:#334155;">${[c.alt_model_2, c.alt_model_3].filter(Boolean).map(escapeHtml).join(', ')}</strong>
             </div>
           ` : ''}
-          ${c.vin ? `<div style="font-size:9.5px; font-family:monospace; color:#94a3b8; margin-top:2px;">VIN: ${c.vin}</div>` : ''}
+          ${c.vin ? `<div style="font-size:9.5px; font-family:monospace; color:#94a3b8; margin-top:2px;">VIN: ${escapeHtml(c.vin)}</div>` : ''}
         </td>
 
         <!-- 4. Kategori & Klaster -->
         <td style="min-width:190px;">
-          ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="background:#f8fafc; color:#334155; border-color:#e2e8f0; font-size:10.5px; margin-bottom:3px;">🏷️ ${c.cluster_name}</span></div>` : ''}
-          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:10px; margin-bottom:3px;">⚡ ${c.priority}</span></div>` : ''}
+          ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="background:#f8fafc; color:#334155; border-color:#e2e8f0; font-size:10.5px; margin-bottom:3px;">🏷️ ${escapeHtml(c.cluster_name)}</span></div>` : ''}
+          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:10px; margin-bottom:3px;">⚡ ${escapeHtml(c.priority)}</span></div>` : ''}
           <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
-            ${c.outlet_do ? `<span style="font-size:9.5px; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-building" style="font-size:9px;"></i> DO: ${c.outlet_do}</span>` : ''}
-            ${c.service_compliance ? `<span style="font-size:9.5px; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-wrench" style="font-size:9px;"></i> Servis: ${c.service_compliance}</span>` : ''}
+            ${c.outlet_do ? `<span style="font-size:9.5px; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-building" style="font-size:9px;"></i> DO: ${escapeHtml(c.outlet_do)}</span>` : ''}
+            ${c.service_compliance ? `<span style="font-size:9.5px; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-wrench" style="font-size:9px;"></i> Servis: ${escapeHtml(c.service_compliance)}</span>` : ''}
           </div>
         </td>
 
-        <!-- 5. Status Terkini (No Clipping) -->
+        <!-- 5. Status Terkini -->
         <td style="min-width:185px;">
           <select class="fu-table-select" onchange="inlineUpdateStatus(${c.id}, this.value)">
             <option value="Belum Dihubungi" ${c.followup_status === 'Belum Dihubungi' ? 'selected' : ''}>⚪ Belum Dihubungi</option>
@@ -366,12 +396,12 @@ function renderCustomerTable() {
           </select>
         </td>
 
-        <!-- 6. Sales PIC (No Clipping) -->
+        <!-- 6. Sales PIC -->
         <td style="min-width:190px;">
           <select class="fu-table-select" onchange="inlineUpdateSales(${c.id}, this.value)">
             <option value="">-- Belum Ditugaskan --</option>
             ${masterState.salesList.map(s => `
-              <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${s.name}</option>
+              <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>
             `).join('')}
           </select>
         </td>
@@ -381,10 +411,10 @@ function renderCustomerTable() {
           ${c.remarks ? `
             <div style="margin-bottom:3px; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
               <span class="badge-cluster-pill" style="font-size:10.5px; font-weight:800; background:#f0fdf4; color:#15803d; border-color:#bbf7d0;">
-                ${c.remarks}
+                ${escapeHtml(c.remarks)}
               </span>
               <span style="font-size:9.5px; font-weight:800; padding:1px 5px; border-radius:4px; background:${c.sales_fu_status === 'Closed' ? '#fee2e2; color:#991b1b;' : '#e0f2fe; color:#0369a1;'}">
-                ${c.sales_fu_status || 'Open'}
+                ${escapeHtml(c.sales_fu_status || 'Open')}
               </span>
             </div>
             <div style="font-size:10px; color:#475569; display:flex; gap:4px; flex-wrap:wrap; margin-bottom:2px;">
@@ -393,11 +423,11 @@ function renderCustomerTable() {
               <span style="color:${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Prosp: ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '✅' : '❌'}</span>
               <span style="color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">SPK: ${(c.spk === 'TRUE' || c.spk === 'IYA') ? '✅' : '❌'}</span>
             </div>
-            ${c.reason_followup ? `<div style="font-size:10.5px; color:#334155; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${c.reason_followup}">"${c.reason_followup}"</div>` : ''}
-            ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace;">📅 ${c.followup_date.substring(0, 16)}</div>` : ''}
+            ${c.reason_followup ? `<div style="font-size:10.5px; color:#334155; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.reason_followup)}">"${escapeHtml(c.reason_followup)}"</div>` : ''}
+            ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace;">📅 ${escapeHtml(c.followup_date.substring(0, 16))}</div>` : ''}
           ` : `
-            <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${c.notes || '-'}">
-              ${c.notes || '-'}
+            <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.notes || '-')}">
+              ${escapeHtml(c.notes || '-')}
             </div>
           `}
         </td>
@@ -422,11 +452,123 @@ function renderCustomerTable() {
 
   tbody.innerHTML = html;
 
-  // Sync Thead Checkbox State
+  // Sync Thead Checkbox State for current page items
   const theadCheckboxes = document.querySelectorAll('.followup-table thead input[type="checkbox"]');
   theadCheckboxes.forEach(cb => {
-    cb.checked = list.length > 0 && list.every(c => masterState.selectedIds.includes(c.id));
+    cb.checked = pageItems.length > 0 && pageItems.every(c => masterState.selectedIds.includes(c.id));
   });
+
+  // Render pagination bar
+  renderPagination(startIndex, endIndex, totalCount, totalPages, currentPage, perPage);
+}
+
+function renderPagination(startIndex, endIndex, totalCount, totalPages, currentPage, perPage) {
+  const container = document.getElementById('paginationContainer');
+  if (!container) return;
+
+  if (totalCount === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  let buttonsHtml = '';
+
+  // First & Prev buttons
+  buttonsHtml += `
+    <button class="fu-page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="goToPage(1)" title="Halaman Pertama">
+      <i class="fa-solid fa-angles-left"></i>
+    </button>
+    <button class="fu-page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})" title="Halaman Sebelumnya">
+      <i class="fa-solid fa-angle-left"></i>
+    </button>
+  `;
+
+  // Page Numbers Sliding Window
+  const maxVisiblePages = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  if (startPage > 1) {
+    buttonsHtml += `<button class="fu-page-btn ${currentPage === 1 ? 'active' : ''}" onclick="goToPage(1)">1</button>`;
+    if (startPage > 2) {
+      buttonsHtml += `<span class="fu-page-ellipsis">&hellip;</span>`;
+    }
+  }
+
+  for (let p = startPage; p <= endPage; p++) {
+    buttonsHtml += `<button class="fu-page-btn ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>`;
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      buttonsHtml += `<span class="fu-page-ellipsis">&hellip;</span>`;
+    }
+    buttonsHtml += `<button class="fu-page-btn ${currentPage === totalPages ? 'active' : ''}" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+  }
+
+  // Next & Last buttons
+  buttonsHtml += `
+    <button class="fu-page-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})" title="Halaman Berikutnya">
+      <i class="fa-solid fa-angle-right"></i>
+    </button>
+    <button class="fu-page-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="goToPage(${totalPages})" title="Halaman Terakhir">
+      <i class="fa-solid fa-angles-right"></i>
+    </button>
+  `;
+
+  container.innerHTML = `
+    <div class="fu-pagination-info">
+      <span>
+        Menampilkan <b>${startIndex + 1} - ${endIndex}</b> dari <b>${totalCount}</b> data
+      </span>
+      <div class="fu-per-page-wrap">
+        <label style="font-size:11px; color:#64748b; font-weight:700;">Baris per halaman:</label>
+        <select class="fu-per-page-select" onchange="changePerPage(this.value)">
+          <option value="25" ${perPage === 25 ? 'selected' : ''}>25</option>
+          <option value="50" ${perPage === 50 ? 'selected' : ''}>50 (Default)</option>
+          <option value="100" ${perPage === 100 ? 'selected' : ''}>100</option>
+          <option value="200" ${perPage === 200 ? 'selected' : ''}>200</option>
+        </select>
+      </div>
+    </div>
+    <div class="fu-pagination-controls">
+      ${buttonsHtml}
+    </div>
+  `;
+}
+
+function goToPage(page) {
+  masterState.pagination.currentPage = page;
+  renderCustomerTable();
+  const tableWrap = document.querySelector('.followup-table-wrap');
+  if (tableWrap) {
+    tableWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function changePerPage(perPage) {
+  masterState.pagination.perPage = parseInt(perPage, 10) || 50;
+  masterState.pagination.currentPage = 1;
+  renderCustomerTable();
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  })[m]);
+}
+
+function escapeJs(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
 // -------------------------------------------------------------
@@ -635,10 +777,22 @@ function toggleSelectCustomer(id) {
 }
 
 function toggleSelectAll(checked) {
+  const allList = masterState.customers || [];
+  const perPage = masterState.pagination.perPage || 50;
+  const currentPage = masterState.pagination.currentPage || 1;
+  const startIndex = (currentPage - 1) * perPage;
+  const endIndex = Math.min(startIndex + perPage, allList.length);
+  const pageItems = allList.slice(startIndex, endIndex);
+
   if (checked) {
-    masterState.selectedIds = masterState.customers.map(c => c.id);
+    pageItems.forEach(c => {
+      if (!masterState.selectedIds.includes(c.id)) {
+        masterState.selectedIds.push(c.id);
+      }
+    });
   } else {
-    masterState.selectedIds = [];
+    const pageItemIds = pageItems.map(c => c.id);
+    masterState.selectedIds = masterState.selectedIds.filter(id => !pageItemIds.includes(id));
   }
   renderCustomerTable();
   updateBulkActionBar();
@@ -1077,7 +1231,12 @@ async function openWhatsAppDirect(customerId) {
 }
 
 function closeMasterWAModal() {
-  document.getElementById('masterWhatsAppModal')?.classList.remove('active');
+  const modal = document.getElementById('masterWhatsAppModal');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
+  }
 }
 
 function updateMasterLiveBubble(text) {
@@ -1205,7 +1364,12 @@ function openAddCustomerModal() {
 }
 
 function closeAddCustModal() {
-  document.getElementById('modalAddCust')?.classList.remove('active');
+  const modal = document.getElementById('modalAddCust');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
+  }
 }
 
 async function handleSaveNewCust(e) {
@@ -1246,36 +1410,36 @@ async function handleSaveNewCust(e) {
 // TEMPLATE MANAGER MODAL
 // -------------------------------------------------------------
 function openTemplateManagerModal() {
-  if (!document.getElementById('modalTemplateManager')) {
-    const html = `
-      <div class="modal-overlay" id="modalTemplateManager" onclick="closeTemplateModal()">
-        <div class="modal-content" style="max-width:700px; border-radius:var(--fu-radius-lg); padding:24px;" onclick="event.stopPropagation()">
-          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px;">
-            <div>
-              <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px;">
-                <i class="fa-solid fa-comment-dots"></i> Message Library
-              </div>
-              <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">Template Pesan WhatsApp</h3>
+  document.getElementById('modalTemplateManager')?.remove();
+
+  const html = `
+    <div class="modal-overlay" id="modalTemplateManager" onclick="closeTemplateModal()">
+      <div class="modal-content" style="max-width:700px; border-radius:var(--fu-radius-lg); padding:24px;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px;">
+              <i class="fa-solid fa-comment-dots"></i> Message Library
             </div>
-            <button class="btn-close-modal" onclick="closeTemplateModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">Template Pesan WhatsApp</h3>
           </div>
+          <button class="btn-close-modal" onclick="closeTemplateModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
 
-          <p style="font-size:12px; color:#64748b; margin:0 0 14px 0;">
-            Daftar template pesan WhatsApp standar Toyota yang otomatis disesuaikan dengan nama pelanggan, unit mobil, dan sales PIC saat wiraniaga menekan tombol WhatsApp.
-          </p>
+        <p style="font-size:12px; color:#64748b; margin:0 0 14px 0;">
+          Daftar template pesan WhatsApp standar Toyota yang otomatis disesuaikan dengan nama pelanggan, unit mobil, dan sales PIC saat wiraniaga menekan tombol WhatsApp.
+        </p>
 
-          <div style="display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding-right:4px;" id="templateListContainer">
-          </div>
+        <div style="display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding-right:4px;" id="templateListContainer">
         </div>
       </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', html);
-  }
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
 
   const container = document.getElementById('templateListContainer');
-  let html = '';
+  let htmlContent = '';
   masterState.templates.forEach(t => {
-    html += `
+    htmlContent += `
       <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <strong style="font-size:13.5px; color:#0f172a; font-weight:800;">${t.title}</strong>
@@ -1287,29 +1451,41 @@ function openTemplateManagerModal() {
       </div>
     `;
   });
-  container.innerHTML = html;
+  container.innerHTML = htmlContent;
 
   document.getElementById('modalTemplateManager').classList.add('active');
 }
 
 function closeTemplateModal() {
-  document.getElementById('modalTemplateManager')?.classList.remove('active');
+  const modal = document.getElementById('modalTemplateManager');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
+  }
 }
 
+// -------------------------------------------------------------
 // -------------------------------------------------------------
 // -------------------------------------------------------------
 // GOOGLE SHEET SYNC MODAL (2-WAY SYNC)
 // -------------------------------------------------------------
 async function openSyncSettingsModal() {
-  let defaultSheetUrl = 'https://docs.google.com/spreadsheets/d/1P7_QcL88DFg7v3arU8m_keOtUNLoiE_4i74t65f6HFQ/edit?gid=1800685961#gid=1800685961';
-  let defaultScriptUrl = '';
+  let defaultSheetUrl = localStorage.getItem('sft_google_sheet_url') || 'https://docs.google.com/spreadsheets/d/1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs/edit?usp=sharing';
+  let defaultScriptUrl = localStorage.getItem('sft_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec';
 
   try {
     const res = await fetch('../api/api_followup_sync.php?action=get_settings');
     const data = await res.json();
     if (data.success && data.settings) {
-      if (data.settings.google_sheet_url) defaultSheetUrl = data.settings.google_sheet_url;
-      if (data.settings.google_apps_script_url) defaultScriptUrl = data.settings.google_apps_script_url;
+      if (data.settings.google_sheet_url) {
+        defaultSheetUrl = data.settings.google_sheet_url;
+        localStorage.setItem('sft_google_sheet_url', defaultSheetUrl);
+      }
+      if (data.settings.google_apps_script_url) {
+        defaultScriptUrl = data.settings.google_apps_script_url;
+        localStorage.setItem('sft_apps_script_url', defaultScriptUrl);
+      }
     }
   } catch (e) {
     console.error('Error fetching sync settings', e);
@@ -1381,7 +1557,85 @@ async function openSyncSettingsModal() {
 }
 
 function closeSyncModal() {
-  document.getElementById('modalSyncSettings')?.classList.remove('active');
+  const modal = document.getElementById('modalSyncSettings');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
+  }
+}
+
+// =============================================================
+// ULTRA-PREMIUM MODERN LOADER ENGINE
+// =============================================================
+function showModernOperationLoader({
+  tag = 'SMART ENGINE',
+  tagColor = 'red',
+  icon = 'fa-solid fa-bolt-lightning',
+  theme = 'red-theme',
+  title = 'Memproses Data...',
+  subtitle = 'Mohon tunggu beberapa saat...',
+  statusText = 'Sedang memproses...',
+  percent = 65,
+  barColor = 'red'
+}) {
+  closeModernOperationLoader();
+
+  const html = `
+    <div class="fu-loader-overlay" id="modernOperationLoader" onclick="event.stopPropagation()">
+      <div class="fu-loader-card">
+        
+        <!-- Center Animated Pulse Icon -->
+        <div class="fu-loader-icon-wrap">
+          <div class="fu-loader-ring-outer"></div>
+          <div class="fu-loader-ring-pulse"></div>
+          <div class="fu-loader-icon-center ${theme}">
+            <i class="${icon}"></i>
+          </div>
+        </div>
+
+        <div class="fu-loader-tag ${tagColor}">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> ${tag}
+        </div>
+
+        <h3 class="fu-loader-title">${title}</h3>
+        <p class="fu-loader-subtitle">${subtitle}</p>
+
+        <!-- Progress Track & Shimmer -->
+        <div class="fu-loader-track">
+          <div class="fu-loader-bar ${barColor}" id="modernLoaderBar" style="width:${percent}%;"></div>
+        </div>
+
+        <div class="fu-loader-status-row">
+          <span style="display:inline-flex; align-items:center; gap:5px; color:#0f172a;" id="modernLoaderStatus">
+            ${statusText} <span class="fu-loader-dots"></span>
+          </span>
+          <span style="color:#d7123a; font-weight:800; font-family:monospace;" id="modernLoaderPercent">${percent}%</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function updateModernOperationLoader(percent, statusText) {
+  const bar = document.getElementById('modernLoaderBar');
+  const txt = document.getElementById('modernLoaderStatus');
+  const pct = document.getElementById('modernLoaderPercent');
+  if (bar) bar.style.width = `${percent}%`;
+  if (txt) txt.innerHTML = `${statusText} <span class="fu-loader-dots"></span>`;
+  if (pct) pct.textContent = `${percent}%`;
+}
+
+function closeModernOperationLoader() {
+  const el = document.getElementById('modernOperationLoader');
+  if (el) {
+    el.style.opacity = '0';
+    el.style.transform = 'scale(0.95)';
+    el.style.transition = 'all 0.2s ease';
+    setTimeout(() => el.remove(), 200);
+  }
 }
 
 async function executePullGoogleSheet() {
@@ -1397,7 +1651,27 @@ async function executePullGoogleSheet() {
     return;
   }
 
-  // Save settings first
+  // 1. Save to client cache so it always remembers
+  localStorage.setItem('sft_google_sheet_url', sheetUrl);
+  localStorage.setItem('sft_apps_script_url', scriptUrl);
+
+  // 2. Immediately close and destroy the settings modal
+  closeSyncModal();
+
+  // 3. Show Ultra-Modern Cloud Sync Loader
+  showModernOperationLoader({
+    tag: '2-Way Cloud Sync Engine',
+    tagColor: 'emerald',
+    icon: 'fa-solid fa-arrows-rotate fa-spin',
+    theme: 'emerald-theme',
+    title: 'Menghubungkan Google Sheet...',
+    subtitle: 'Sedang mengunduh dan menyelaraskan database prospek customer ke CRM SFT.',
+    statusText: 'Menghubungkan ke Google Sheets API',
+    percent: 45,
+    barColor: 'emerald'
+  });
+
+  // 4. Save settings first to database
   try {
     await fetch('../api/api_followup_sync.php?action=save_settings', {
       method: 'POST',
@@ -1411,33 +1685,43 @@ async function executePullGoogleSheet() {
     console.error('Save sync settings error', e);
   }
 
-  // Show loading indicator
-  showImportProgressModal('Google Spreadsheet Cloud Sync', 0);
-  updateImportProgress(40, 'Menghubungkan ke Google Spreadsheet...', 1);
-
   try {
+    updateModernOperationLoader(75, 'Mengekstrak data prospek & memperbarui database');
+
     const res = await fetch('../api/api_followup_sync.php?action=pull_sheet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ google_sheet_url: sheetUrl })
     });
     const data = await res.json();
-    closeSyncModal();
+    
+    updateModernOperationLoader(100, 'Sinkronisasi Selesai');
+    setTimeout(() => {
+      closeModernOperationLoader();
+    }, 400);
 
-    if (data.success) {
-      updateImportProgress(100, 'Sinkronisasi Selesai!', 4, {
-        message: data.message,
-        sheet_used: 'Google Sheet Cloud Sync',
-        inserted: data.inserted,
-        updated: data.updated || 0,
-        total: data.inserted
-      });
+    if (data && data.success) {
       await initMasterDashboard();
+      if (typeof showCustomAlert === 'function') {
+        const insertMsg = data.inserted ? `\n\n+${data.inserted} Data Customer Baru Ditambahkan & Disimpan ke Database.` : '';
+        showCustomAlert('Sinkronisasi Berhasil!', `${data.message || 'Sinkronisasi Google Spreadsheet berhasil diproses.'}${insertMsg}`, 'success');
+      } else {
+        alert(data.message || 'Sinkronisasi Google Spreadsheet berhasil!');
+      }
     } else {
-      showImportError(data.message || 'Gagal sinkronisasi data Google Sheet.');
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal Sinkronisasi', data?.message || 'Gagal mengambil data dari Google Spreadsheet.', 'danger');
+      } else {
+        alert(data?.message || 'Gagal mengambil data dari Google Spreadsheet.');
+      }
     }
   } catch (e) {
-    showImportError('Terjadi kesalahan koneksi saat sinkronisasi Google Sheet.');
+    closeModernOperationLoader();
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Koneksi Terputus', 'Terjadi kesalahan koneksi saat menghubungi server.', 'danger');
+    } else {
+      alert('Terjadi kesalahan koneksi saat menghubungi server.');
+    }
   }
 }
 
@@ -1586,7 +1870,9 @@ function openSmartDistributionModal() {
   smartDistState.selectedSales = masterState.salesList.map(s => s.id); // Default select all
   smartDistState.quota = 50;
 
-  if (!document.getElementById('modalSmartDist')) {
+  // Always recreate with fresh salesList data
+  document.getElementById('modalSmartDist')?.remove();
+  if (true) {
     const html = `
       <div class="modal-overlay" id="modalSmartDist" onclick="closeSmartDistModal()">
         <div class="modal-content" style="max-width:820px; border-radius:var(--fu-radius-lg); padding:24px; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
@@ -1711,7 +1997,12 @@ function openSmartDistributionModal() {
 }
 
 function closeSmartDistModal() {
-  document.getElementById('modalSmartDist')?.classList.remove('active');
+  const modal = document.getElementById('modalSmartDist');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
+  }
 }
 
 function setQuotaPill(val, btn) {
@@ -1816,10 +2107,28 @@ async function executeSmartDistribution() {
     return;
   }
 
-  showImportProgressModal('Smart Leads Distribution Matrix', 0);
-  updateImportProgress(50, 'Mendistribusikan kuota leads ke wiraniaga terpilih...', 2);
+  const quotaVal = smartDistState.quota;
+  const salesCount = smartDistState.selectedSales.length;
+
+  // 1. Immediately close and remove the distribution selection modal
+  closeSmartDistModal();
+
+  // 2. Show Ultra-Modern Smart Distribution Loader
+  showModernOperationLoader({
+    tag: 'Smart Distribution Matrix',
+    tagColor: 'red',
+    icon: 'fa-solid fa-bolt-lightning',
+    theme: 'red-theme',
+    title: 'Mendistribusikan Leads...',
+    subtitle: `Sistem sedang membagi kuota <strong>${quotaVal === 0 ? 'Semua' : quotaVal} leads</strong> ke <strong>${salesCount} wiraniaga</strong> terpilih secara merata.`,
+    statusText: 'Menganalisis kuota & mendistribusikan data',
+    percent: 60,
+    barColor: 'red'
+  });
 
   try {
+    updateModernOperationLoader(85, 'Menyimpan alokasi PIC ke database CRM');
+
     const res = await fetch('../api/api_followup.php?action=distribute_quota', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1831,26 +2140,43 @@ async function executeSmartDistribution() {
       })
     });
     const data = await res.json();
-    closeSmartDistModal();
-    closeImportModal();
+    
+    updateModernOperationLoader(100, 'Distribusi Selesai');
+    setTimeout(() => {
+      closeModernOperationLoader();
+    }, 400);
 
-    if (data.success) {
+    if (data && data.success) {
       await initMasterDashboard();
       showDistSuccessModal(data);
     } else {
       if (typeof showCustomAlert === 'function') {
-        showCustomAlert('Gagal', data.message || 'Gagal membagikan kuota leads.', 'danger');
+        showCustomAlert('Gagal', data?.message || 'Gagal membagikan kuota leads.', 'danger');
       } else {
-        alert(data.message);
+        alert(data?.message || 'Gagal membagikan kuota leads.');
       }
     }
   } catch (e) {
-    closeImportModal();
+    closeModernOperationLoader();
     console.error('Smart dist error', e);
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Koneksi Terputus', 'Gagal menghubungi server saat membagikan leads.', 'danger');
+    }
+  }
+}
+
+function closeDistSuccessModal() {
+  const modal = document.getElementById('modalDistSuccess');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
   }
 }
 
 function showDistSuccessModal(result) {
+  closeDistSuccessModal();
+
   const breakdown = result.breakdown || [];
   
   let listHtml = '';
@@ -1869,8 +2195,11 @@ function showDistSuccessModal(result) {
   });
 
   const modalHtml = `
-    <div class="modal-overlay active" id="modalDistSuccess" onclick="document.getElementById('modalDistSuccess').remove()">
-      <div class="modal-content" style="max-width:650px; border-radius:var(--fu-radius-lg); padding:24px;" onclick="event.stopPropagation()">
+    <div class="modal-overlay active" id="modalDistSuccess" style="display:flex; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); align-items:center; justify-content:center;" onclick="closeDistSuccessModal()">
+      <div class="modal-content" style="max-width:650px; border-radius:var(--fu-radius-lg); padding:24px; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:-10px;">
+          <button class="btn-close-modal" onclick="closeDistSuccessModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
         <div style="text-align:center; margin-bottom:16px;">
           <div style="width:56px; height:56px; border-radius:50%; background:#dcfce7; color:#16a34a; display:flex; align-items:center; justify-content:center; font-size:26px; margin:0 auto 10px;">
             <i class="fa-solid fa-circle-check"></i>
@@ -1887,8 +2216,8 @@ function showDistSuccessModal(result) {
           ${listHtml}
         </div>
 
-        <button class="btn-fu btn-fu-navy" style="width:100%; justify-content:center; padding:12px;" onclick="document.getElementById('modalDistSuccess').remove()">
-          Selesai &amp; Lihat Tabel
+        <button class="btn-fu btn-fu-navy" style="width:100%; justify-content:center; padding:12px;" onclick="closeDistSuccessModal()">
+          <i class="fa-solid fa-check"></i> Selesai &amp; Lihat Tabel
         </button>
       </div>
     </div>

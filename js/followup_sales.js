@@ -1,7 +1,7 @@
 let followupState = {
-  activeTab: 'kanban', // 'kanban' or 'followup'
-  subTab: 'my_tasks',  // 'my_tasks' or 'orphan_pool'
-  viewMode: 'cards',   // 'cards' or 'table'
+  activeTab: 'followup', // 'followup' or 'kanban'
+  subTab: 'my_tasks',    // 'my_tasks' or 'orphan_pool'
+  viewMode: 'cards',     // 'cards' or 'table'
   customers: [],
   orphanLeads: [],
   templates: [],
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFollowupTabs();
   loadSalesProfile();
   loadTemplates();
+  loadFollowupCustomers();
 });
 
 function escapeHtml(str) {
@@ -68,17 +69,17 @@ function initFollowupTabs() {
   if (!document.getElementById('followupNavTabs')) {
     const tabsHtml = `
       <div class="followup-nav-tabs" id="followupNavTabs">
-        <button class="followup-tab-btn active" id="tabBtnKanban" onclick="switchCustomerTab('kanban')">
-          <i class="fa-solid fa-table-columns"></i> Pipeline Prospek
-        </button>
-        <button class="followup-tab-btn" id="tabBtnFollowup" onclick="switchCustomerTab('followup')">
+        <button class="followup-tab-btn active" id="tabBtnFollowup" onclick="switchCustomerTab('followup')">
           <i class="fa-solid fa-bullhorn"></i> Database Follow-Up (Attack List)
           <span id="followupBadgeCount" style="display:none; font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; background:#d7123a; color:#fff; box-shadow:0 2px 6px rgba(215,18,58,0.4);">0</span>
+        </button>
+        <button class="followup-tab-btn" id="tabBtnKanban" onclick="switchCustomerTab('kanban')">
+          <i class="fa-solid fa-table-columns"></i> Pipeline Prospek
         </button>
       </div>
 
       <!-- CONTAINER UNTUK TAB DATABASE FOLLOW-UP -->
-      <div id="followupSectionView" style="display:none;">
+      <div id="followupSectionView" style="display:block;">
         
         <!-- 1. HERO SUMMARY BANNER -->
         <div class="followup-hero-banner">
@@ -205,6 +206,12 @@ function initFollowupTabs() {
     `;
 
     container.insertAdjacentHTML('afterbegin', tabsHtml);
+
+    // Hide kanban elements initially since default active tab is followup database
+    const kanbanElements = Array.from(document.querySelectorAll('.mobile-app .container > .card, #kanbanBoard'));
+    kanbanElements.forEach(el => {
+      if (el.id !== 'followupSectionView') el.style.display = 'none';
+    });
   }
 }
 
@@ -967,7 +974,7 @@ function renderSingleCustomerCardHtml(c) {
         <!-- Controls: Remarks & Status Follow-Up -->
         <div class="fu-controls-row">
           <div>
-            <select id="remarks_${c.id}" class="fu-select-remarks" onchange="debouncedSaveSalesFu(${c.id}, 0, false)">
+            <select id="remarks_${c.id}" class="fu-select-remarks" onchange="handleRemarksChange(${c.id}, this.value)">
               <option value="">-- Pilih Remarks Respon Customer --</option>
               <optgroup label="🟢 RESPON POSITIF & PROSPEK">
                 <option value="Customer tertarik" ${c.remarks === 'Customer tertarik' ? 'selected' : ''}>🔵 Customer tertarik (Beri Info Unit)</option>
@@ -991,7 +998,7 @@ function renderSingleCustomerCardHtml(c) {
           </div>
 
           <div>
-            <select id="salesFuStatus_${c.id}" class="fu-select-status" onchange="debouncedSaveSalesFu(${c.id}, 0, false)" title="Status Tahapan Follow-Up">
+            <select id="salesFuStatus_${c.id}" class="fu-select-status" onchange="handleStatusChange(${c.id}, this.value)" title="Status Tahapan Follow-Up">
               <option value="Open" ${(c.sales_fu_status === 'Open' || !c.sales_fu_status) ? 'selected' : ''}>🔓 Open (Proses)</option>
               <option value="Closed" ${c.sales_fu_status === 'Closed' ? 'selected' : ''}>🔒 Closed (Selesai)</option>
             </select>
@@ -1004,6 +1011,7 @@ function renderSingleCustomerCardHtml(c) {
             <i class="fa-solid fa-bolt" style="color:#d7123a;"></i> Catatan Cepat (1-Klik):
           </div>
           <div class="fu-quick-chips-scroll">
+            <button type="button" class="fu-chip-btn fu-chip-clear" onclick="clearQuickNote(${c.id})" title="Hapus / Kosongkan seluruh catatan"><i class="fa-solid fa-trash-can"></i> Hapus Catatan</button>
             <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Minta simulasi TDP & Angsuran')">💬 Minta Simulasi DP</button>
             <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Janjian ketemu weekend ini')">📅 Janjian Weekend</button>
             <button type="button" class="fu-chip-btn" onclick="applyQuickNote(${c.id}, 'Mau coba test drive unit')">🚗 Mau Test Drive</button>
@@ -1016,8 +1024,13 @@ function renderSingleCustomerCardHtml(c) {
 
         <!-- Note Input & Save Button Row -->
         <div class="fu-note-row">
-          <input type="text" id="reasonFu_${c.id}" class="fu-note-input" placeholder="Tulis alasan follow up / catatan respon spesifik..." value="${escapeHtml(c.reason_followup || c.notes || '')}" oninput="handleReasonInput(${c.id}, this.value)" onblur="debouncedSaveSalesFu(${c.id}, 0, false)" onkeydown="if(event.key==='Enter') debouncedSaveSalesFu(${c.id}, 0, true)">
-          <button type="button" class="fu-btn-save" onclick="debouncedSaveSalesFu(${c.id}, 0, true)" title="Simpan Respon Follow-Up">
+          <div style="position:relative; flex:1; display:flex; align-items:center;">
+            <input type="text" id="reasonFu_${c.id}" class="fu-note-input" style="width:100%; padding-right:32px;" placeholder="Tulis alasan follow up / catatan respon spesifik..." value="${escapeHtml(c.reason_followup || c.notes || '')}" oninput="handleReasonInput(${c.id}, this.value)" onkeydown="if(event.key==='Enter') saveSalesFuManual(${c.id})">
+            <button type="button" id="btnClearNote_${c.id}" class="fu-btn-clear-inline" style="display:${(c.reason_followup || c.notes || '').trim() ? 'flex' : 'none'};" onclick="clearQuickNote(${c.id})" title="Hapus / Kosongkan Catatan">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <button type="button" id="btnSaveFu_${c.id}" class="fu-btn-save" onclick="saveSalesFuManual(${c.id})" title="Simpan Data Follow-Up">
             <i class="fa-solid fa-floppy-disk"></i> Simpan
           </button>
         </div>
@@ -1156,7 +1169,28 @@ function applyQuickNote(customerId, text) {
     c.reason_followup = input.value;
   }
 
-  debouncedSaveSalesFu(customerId, 100, false);
+  const btnClear = document.getElementById(`btnClearNote_${customerId}`);
+  if (btnClear) {
+    btnClear.style.display = input.value.trim() ? 'flex' : 'none';
+  }
+}
+
+function clearQuickNote(customerId) {
+  const input = document.getElementById(`reasonFu_${customerId}`);
+  if (input) {
+    input.value = '';
+  }
+
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (c) {
+    c.reason_followup = '';
+    c.notes = '';
+  }
+
+  const btnClear = document.getElementById(`btnClearNote_${customerId}`);
+  if (btnClear) {
+    btnClear.style.display = 'none';
+  }
 }
 
 function renderCustomerTableView(list) {
@@ -1294,6 +1328,9 @@ function renderCustomerTableView(list) {
         <!-- 6. Aksi -->
         <td style="text-align:right;">
           <div style="display:flex; justify-content:flex-end; gap:4px;">
+            <button id="btnSaveFu_${c.id}" class="btn-fu btn-fu-emerald" style="padding:6px 9px; font-size:11px; border-radius:8px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border:none;" onclick="saveSalesFuManual(${c.id})" title="Simpan Data Follow-Up">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan
+            </button>
             <button class="btn-fu btn-fu-emerald" style="padding:6px 10px; font-size:11px; border-radius:8px;" onclick="openWhatsAppModal(${c.id})" title="Chat WA">
               <i class="fa-brands fa-whatsapp"></i> WA
             </button>
@@ -1313,7 +1350,6 @@ function setTableRemarks(customerId, remarks) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
   if (!c) return;
   c.remarks = remarks;
-  autoSaveSalesFu(customerId, true);
 }
 
 // -------------------------------------------------------------
@@ -1362,8 +1398,24 @@ function handleReasonInput(customerId, value) {
   if (c) {
     c.reason_followup = value;
   }
-  // Debounce background save while typing to ensure zero input lag
-  debouncedSaveSalesFu(customerId, 600, false);
+  const btnClear = document.getElementById(`btnClearNote_${customerId}`);
+  if (btnClear) {
+    btnClear.style.display = value.trim() ? 'flex' : 'none';
+  }
+}
+
+function handleRemarksChange(customerId, value) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (c) {
+    c.remarks = value;
+  }
+}
+
+function handleStatusChange(customerId, value) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (c) {
+    c.sales_fu_status = value;
+  }
 }
 
 function setFuToggle(customerId, field, value) {
@@ -1404,50 +1456,43 @@ function setFuToggle(customerId, field, value) {
     }
   }
 
-  // 1. INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms
+  // INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms (Only saves when user clicks Simpan)
   ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
     updateToggleButtonsUI(customerId, f, c[f]);
   });
-
-  // 2. INSTANT OPTIMISTIC DATE BADGE
-  const badge = document.getElementById(`fuDateBadge_${customerId}`);
-  if (badge) {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    badge.textContent = `📅 Hari ini, ${h}:${m} WIB`;
-    badge.className = 'fu-date-badge recorded';
-  }
-
-  // 3. INSTANT HERO STATS UPDATE
-  updateHeroStats();
-
-  // 4. DEBOUNCED BACKGROUND SAVE (Non-blocking)
-  debouncedSaveSalesFu(customerId, 200, false);
 }
 
-function debouncedSaveSalesFu(customerId, delay = 250, showAlert = false) {
-  if (followupState.saveTimeouts[customerId]) {
-    clearTimeout(followupState.saveTimeouts[customerId]);
+async function saveSalesFuManual(customerId) {
+  const saveBtn = document.getElementById(`btnSaveFu_${customerId}`);
+  const origHtml = saveBtn ? saveBtn.innerHTML : '<i class="fa-solid fa-floppy-disk"></i> Simpan';
+
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan...';
   }
 
-  if (delay === 0) {
-    delete followupState.saveTimeouts[customerId];
-    sendSaveSalesFu(customerId, showAlert);
-    return;
+  try {
+    await sendSaveSalesFu(customerId, true);
+    if (saveBtn) {
+      saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Tersimpan!';
+      saveBtn.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+      setTimeout(() => {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = origHtml;
+          saveBtn.style.background = '';
+        }
+      }, 1500);
+    }
+  } catch (e) {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = origHtml;
+    }
   }
-
-  followupState.saveTimeouts[customerId] = setTimeout(() => {
-    delete followupState.saveTimeouts[customerId];
-    sendSaveSalesFu(customerId, showAlert);
-  }, delay);
 }
 
-async function autoSaveSalesFu(customerId, showAlert = true) {
-  debouncedSaveSalesFu(customerId, 0, showAlert);
-}
-
-async function sendSaveSalesFu(customerId, showAlert = false) {
+async function sendSaveSalesFu(customerId, showAlert = true) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
   if (!c) return;
 
@@ -1494,13 +1539,16 @@ async function sendSaveSalesFu(customerId, showAlert = false) {
       // Update hero KPI stats
       updateHeroStats();
 
-      // Quick toast notification if user clicked explicit save
+      // Quick toast notification on manual save
       if (showAlert && typeof showCustomAlert === 'function') {
-        showCustomAlert('Respon Tersimpan!', `Data follow-up untuk ${c.name} berhasil disimpan. Waktu tercatat: ${formatWibDate(data.followup_date).formatted}`, 'success');
+        showCustomAlert('Data Berhasil Disimpan!', `Hasil follow-up untuk ${c.name} telah disimpan ke database. Waktu: ${formatWibDate(data.followup_date).formatted}`, 'success');
       }
     }
   } catch (e) {
     console.error('Error saving sales FU:', e);
+    if (showAlert && typeof showCustomAlert === 'function') {
+      showCustomAlert('Gagal Menyimpan', 'Terjadi kesalahan koneksi saat menyimpan follow up.', 'error');
+    }
   }
 }
 
@@ -1514,25 +1562,25 @@ function openSalesCustomerDetailModal(customerId) {
     return;
   }
 
-  if (!document.getElementById('modalSalesCustDetail')) {
-    const html = `
-      <div class="modal-overlay" id="modalSalesCustDetail" onclick="closeSalesCustDetailModal()">
-        <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
-          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
-            <div>
-              <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:3px;">
-                <i class="fa-solid fa-id-badge"></i> Data Lengkap Pelanggan
-              </div>
-              <h3 style="font-size:17px; font-weight:900; color:#0d1b3e; margin:0;" id="scdName">-</h3>
+  document.getElementById('modalSalesCustDetail')?.remove();
+
+  const html = `
+    <div class="modal-overlay" id="modalSalesCustDetail" onclick="closeSalesCustDetailModal()">
+      <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:3px;">
+              <i class="fa-solid fa-id-badge"></i> Data Lengkap Pelanggan
             </div>
-            <button class="btn-close-modal" onclick="closeSalesCustDetailModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="font-size:17px; font-weight:900; color:#0d1b3e; margin:0;" id="scdName">-</h3>
           </div>
-          <div id="scdModalBody"></div>
+          <button class="btn-close-modal" onclick="closeSalesCustDetailModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
+        <div id="scdModalBody"></div>
       </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', html);
-  }
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
 
   document.getElementById('scdName').textContent = c.name;
   const body = document.getElementById('scdModalBody');
@@ -1589,8 +1637,7 @@ function openSalesCustomerDetailModal(customerId) {
 
   const modal = document.getElementById('modalSalesCustDetail');
   if (modal) {
-    modal.classList.add('active');
-    modal.classList.add('show');
+    modal.classList.add('active', 'show');
     modal.style.display = 'flex';
   }
 }
@@ -1598,9 +1645,18 @@ function openSalesCustomerDetailModal(customerId) {
 function closeSalesCustDetailModal() {
   const modal = document.getElementById('modalSalesCustDetail');
   if (modal) {
-    modal.classList.remove('active');
-    modal.classList.remove('show');
+    modal.classList.remove('active', 'show');
     modal.style.display = 'none';
+    modal.remove();
+  }
+}
+
+function closeWhatsAppModal() {
+  const modal = document.getElementById('modalWhatsAppFollowup');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
   }
 }
 
@@ -1614,7 +1670,9 @@ async function openWhatsAppModal(customerId) {
   if (!cust) return;
   activeCustomerForWA = cust;
 
-  if (!document.getElementById('modalWhatsAppFollowup')) {
+  // Always recreate with fresh template chips & sales identity
+  document.getElementById('modalWhatsAppFollowup')?.remove();
+  if (true) {
     const modalHtml = `
       <div class="modal-overlay" id="modalWhatsAppFollowup" onclick="closeWhatsAppModal()">
         <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
@@ -1643,14 +1701,16 @@ async function openWhatsAppModal(customerId) {
 
           <!-- Variable Chips Quick Insert Bar -->
           <div style="margin-bottom:10px;">
-            <div style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:4px;">Klik tag untuk menyisipkan variabel:</div>
+            <div style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:4px;">Klik tag untuk menyisipkan variabel otomatis:</div>
             <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertVariableToWA('{nama_sales}')">👤 {nama_sales}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{nama_customer}')">{nama_customer}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kendaraan_terakhir}')">{kendaraan_terakhir}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{usia_kendaraan}')">{usia_kendaraan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{model_rekomendasi}')">{model_rekomendasi}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{cluster}')">{cluster}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kecamatan}')">{kecamatan}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{dealer}')">{dealer}</button>
             </div>
           </div>
 
@@ -1728,11 +1788,28 @@ function updateLiveBubble(text) {
 function insertVariableToWA(tag) {
   const textarea = document.getElementById('waMessageText');
   if (!textarea) return;
+
+  loadSalesProfile();
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name) 
+    ? followupState.salesInfo.name 
+    : (localStorage.getItem('namaSales') || 'Sales Tunas Toyota');
+
+  let insertVal = tag;
+  if (tag === '{nama_sales}') insertVal = `*${salesName}*`;
+  else if (tag === '{nama_customer}' && activeCustomerForWA) insertVal = `*${activeCustomerForWA.name}*`;
+  else if (tag === '{kendaraan_terakhir}' && activeCustomerForWA) insertVal = `*${activeCustomerForWA.last_car_model || activeCustomerForWA.car_model}*`;
+  else if (tag === '{usia_kendaraan}' && activeCustomerForWA) insertVal = activeCustomerForWA.car_age || '3 Tahun';
+  else if (tag === '{model_rekomendasi}' && activeCustomerForWA) insertVal = `*${activeCustomerForWA.recommended_model || activeCustomerForWA.car_model}*`;
+  else if (tag === '{cluster}' && activeCustomerForWA) insertVal = activeCustomerForWA.cluster_name || '';
+  else if (tag === '{kecamatan}' && activeCustomerForWA) insertVal = activeCustomerForWA.district || '';
+  else if (tag === '{dealer}') insertVal = '*Tunas Toyota Kiara Condong*';
+
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const text = textarea.value;
-  textarea.value = text.substring(0, start) + tag + text.substring(end);
+  textarea.value = text.substring(0, start) + insertVal + text.substring(end);
   textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = start + insertVal.length;
   updateLiveBubble(textarea.value);
 }
 
@@ -1741,6 +1818,14 @@ async function applyWhatsAppTemplate(templateId) {
   const tmpl = followupState.templates.find(t => String(t.id) === String(templateId));
   if (!tmpl) return;
 
+  loadSalesProfile();
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name) 
+    ? followupState.salesInfo.name 
+    : (localStorage.getItem('namaSales') || 'Sales Tunas Toyota');
+  const salesId = (followupState.salesInfo && followupState.salesInfo.id) 
+    ? followupState.salesInfo.id 
+    : (parseInt(localStorage.getItem('idSales') || localStorage.getItem('salesId') || 1, 10));
+
   try {
     const res = await fetch('../api/api_followup.php?action=format_template', {
       method: 'POST',
@@ -1748,7 +1833,8 @@ async function applyWhatsAppTemplate(templateId) {
       body: JSON.stringify({
         customer_id: activeCustomerForWA.id,
         template_id: tmpl.id,
-        sales_id: followupState.salesInfo ? followupState.salesInfo.id : null
+        sales_id: salesId,
+        sales_name: salesName
       })
     });
     const data = await res.json();
@@ -1757,8 +1843,18 @@ async function applyWhatsAppTemplate(templateId) {
       updateLiveBubble(data.formatted_text);
     }
   } catch (e) {
-    document.getElementById('waMessageText').value = tmpl.content;
-    updateLiveBubble(tmpl.content);
+    let formatted = tmpl.content
+      .replace(/{nama_customer}/gi, activeCustomerForWA.name || '')
+      .replace(/{tipe_mobil}/gi, activeCustomerForWA.car_model || '')
+      .replace(/{kendaraan_terakhir}/gi, activeCustomerForWA.last_car_model || activeCustomerForWA.car_model || '')
+      .replace(/{usia_kendaraan}/gi, activeCustomerForWA.car_age || '')
+      .replace(/{model_rekomendasi}/gi, activeCustomerForWA.recommended_model || activeCustomerForWA.car_model || '')
+      .replace(/{cluster}/gi, activeCustomerForWA.cluster_name || '')
+      .replace(/{kecamatan}/gi, activeCustomerForWA.district || '')
+      .replace(/{nama_sales}/gi, salesName)
+      .replace(/{dealer}/gi, 'Tunas Toyota Kiara Condong');
+    document.getElementById('waMessageText').value = formatted;
+    updateLiveBubble(formatted);
   }
 }
 

@@ -168,7 +168,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     ];
     $periode_str = $current_day . " " . $nama_bulan_list[$current_month] . " " . $current_year;
 
-    $q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts WHERE status != 'Inaktif' OR status IS NULL ORDER BY nama_spv ASC, nama_lengkap ASC");
+    $q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts ORDER BY nama_spv ASC, nama_lengkap ASC");
 
     $underperforming = [];
     $on_track = [];
