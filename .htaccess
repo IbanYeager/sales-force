@@ -1,6 +1,6 @@
-# .htaccess for Hostinger & Laragon SFT Web Application
+DirectoryIndex index.html index.php
 
-# 1. Clean URL Routing (Removes .html from address bar & serves .html internally)
+# 1. Clean URL Routing (Serves .html internally without rewrite loops)
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
@@ -13,17 +13,9 @@
     RewriteCond %{REQUEST_URI} ^/(api|assets|css|js|uploads|image|styles|scratch)/ [NC]
     RewriteRule ^ - [L]
 
-    # 1. Redirect requests with .html to clean URL without .html
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.html [NC]
-    RewriteRule ^ %1 [R=301,L]
-
-    # 2. Transparently serve .html internally for clean URLs
+    # Transparently serve .html internally when user accesses clean URL without .html
     RewriteCond %{REQUEST_FILENAME}.html -f
-    RewriteRule ^(.*)$ $1.html [L,QSA]
-
-    # 3. Handle subfolder setups (e.g. /sft/)
-    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
-    RewriteRule ^(.*)$ %{REQUEST_URI}.html [L,QSA]
+    RewriteRule ^([^.]+)$ $1.html [L,QSA]
 </IfModule>
 
 # 2. Add Proper MIME Types for PWA
