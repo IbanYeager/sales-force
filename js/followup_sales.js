@@ -1727,7 +1727,7 @@ function openSalesCustomerDetailModal(customerId) {
 
   const html = `
     <div class="modal-overlay" id="modalSalesCustDetail" onclick="closeSalesCustDetailModal()">
-      <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
+      <div class="modal-content" style="max-width:540px; border-radius:var(--fu-radius-lg, 16px); padding:16px 18px;" onclick="event.stopPropagation()">
         <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
           <div>
             <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:3px;">
@@ -1836,34 +1836,34 @@ async function openWhatsAppModal(customerId) {
   if (true) {
     const modalHtml = `
       <div class="modal-overlay" id="modalWhatsAppFollowup" onclick="closeWhatsAppModal()">
-        <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
-          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
-            <h3 style="display:flex; align-items:center; gap:8px; color:#059669; font-size:16px; font-weight:800;">
-              <i class="fa-brands fa-whatsapp" style="font-size:22px;"></i> Follow Up WhatsApp Customer
+        <div class="modal-content" style="max-width:540px; border-radius:var(--fu-radius-lg, 16px); padding:16px 18px;" onclick="event.stopPropagation()">
+          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:10px; margin-bottom:10px;">
+            <h3 style="display:flex; align-items:center; gap:8px; color:#059669; font-size:15px; font-weight:800; margin:0;">
+              <i class="fa-brands fa-whatsapp" style="font-size:20px;"></i> Follow Up WhatsApp Customer
             </h3>
             <button class="btn-close-modal" onclick="closeWhatsAppModal()"><i class="fa-solid fa-xmark"></i></button>
           </div>
 
           <!-- Customer Banner Header -->
-          <div style="background:linear-gradient(135deg, #0d1b3e 0%, #16305f 100%); color:#fff; border-radius:14px; padding:14px 16px; margin-bottom:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:15px;" id="waCustName">-</strong>
-              <span style="font-family:monospace; color:#6ee7b7; font-weight:800; font-size:13px;" id="waCustPhone">-</span>
+          <div style="background:linear-gradient(135deg, #0d1b3e 0%, #16305f 100%); color:#fff; border-radius:12px; padding:10px 14px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+              <strong style="font-size:14px;" id="waCustName">-</strong>
+              <span style="font-family:monospace; color:#6ee7b7; font-weight:800; font-size:12.5px;" id="waCustPhone">-</span>
             </div>
-            <div style="font-size:12px; color:rgba(255,255,255,0.85); margin-top:4px;" id="waCustCar">-</div>
+            <div style="font-size:11.5px; color:rgba(255,255,255,0.85); margin-top:2px;" id="waCustCar">-</div>
           </div>
 
           <!-- Template Selector -->
-          <div class="form-group" style="margin-bottom:12px;">
-            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Pilih Template WhatsApp:</label>
-            <select class="form-control" id="waTemplateSelect" style="font-size:12.5px; font-weight:600; border-radius:10px;" onchange="applyWhatsAppTemplate(this.value)">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:3px; display:block;">Pilih Template WhatsApp:</label>
+            <select class="form-control" id="waTemplateSelect" style="font-size:12px; font-weight:600; border-radius:8px; padding:6px 10px;" onchange="applyWhatsAppTemplate(this.value)">
             </select>
           </div>
 
           <!-- Variable Chips Quick Insert Bar -->
-          <div style="margin-bottom:10px;">
-            <div style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:4px;">Klik tag untuk menyisipkan variabel otomatis:</div>
-            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+          <div style="margin-bottom:8px;">
+            <div style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px;">Klik tag untuk menyisipkan variabel otomatis:</div>
+            <div style="display:flex; flex-wrap:wrap; gap:3px;">
               <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertVariableToWA('{nama_sales}')">👤 {nama_sales}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{nama_customer}')">{nama_customer}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kendaraan_terakhir}')">{kendaraan_terakhir}</button>
@@ -1876,28 +1876,28 @@ async function openWhatsAppModal(customerId) {
           </div>
 
           <!-- Live WhatsApp Bubble Preview -->
-          <div class="wa-chat-preview">
-            <div class="wa-bubble-sent" id="waLiveBubble">-</div>
+          <div class="wa-chat-preview" style="max-height:110px; overflow-y:auto; padding:8px 12px; margin:6px 0;">
+            <div class="wa-bubble-sent" id="waLiveBubble" style="font-size:11.5px; line-height:1.45; padding:6px 10px;">-</div>
           </div>
 
           <!-- Message Textarea -->
-          <div class="form-group" style="margin-bottom:12px;">
-            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Edit Isi Pesan WhatsApp:</label>
-            <textarea class="form-control" id="waMessageText" rows="5" style="font-size:12.5px; line-height:1.5; font-family:inherit; border-radius:10px;" oninput="updateLiveBubble(this.value)"></textarea>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:3px; display:block;">Edit Isi Pesan WhatsApp:</label>
+            <textarea class="form-control" id="waMessageText" rows="3" style="font-size:12px; line-height:1.4; font-family:inherit; border-radius:8px; min-height:60px; max-height:130px; padding:6px 10px;" oninput="updateLiveBubble(this.value)"></textarea>
           </div>
 
           <!-- Next Follow-up Status -->
-          <div class="form-group" style="margin-bottom:16px;">
-            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Perbarui Status Setelah Kirim:</label>
-            <select class="form-control" id="waNextStatus" style="font-size:12.5px; font-weight:700; border-radius:10px;">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:3px; display:block;">Perbarui Status Setelah Kirim:</label>
+            <select class="form-control" id="waNextStatus" style="font-size:12px; font-weight:700; border-radius:8px; padding:6px 10px;">
               <option value="Menunggu Respon" selected>🟡 Menunggu Respon</option>
               <option value="Tertarik / Jadwal Servis">🔵 Tertarik / Jadwal Servis</option>
               <option value="Deal / Selesai">🟢 Deal / Selesai</option>
             </select>
           </div>
 
-          <button class="btn-wa-action" style="padding:14px;" onclick="executeSendWhatsApp()">
-            <i class="fa-brands fa-whatsapp" style="font-size:20px;"></i> Buka WhatsApp &amp; Kirim Sekarang
+          <button class="btn-wa-action" style="padding:11px 16px; font-size:13px; border-radius:10px;" onclick="executeSendWhatsApp()">
+            <i class="fa-brands fa-whatsapp" style="font-size:18px;"></i> Buka WhatsApp &amp; Kirim Sekarang
           </button>
         </div>
       </div>

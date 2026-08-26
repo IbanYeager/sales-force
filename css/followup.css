@@ -769,20 +769,32 @@ tr.card-just-followed-up td {
   background: #e5ddd5;
   background-image: radial-gradient(#d1c7bc 1px, transparent 1px);
   background-size: 16px 16px;
-  border-radius: 14px;
-  padding: 16px;
-  margin: 12px 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
   position: relative;
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.wa-chat-preview::-webkit-scrollbar {
+  width: 5px;
+}
+
+.wa-chat-preview::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
 .wa-bubble-sent {
   background: #dcf8c6;
   border-radius: 10px 10px 0 10px;
-  padding: 10px 12px;
-  font-size: 12.5px;
-  line-height: 1.5;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
   color: #111b21;
-  max-width: 95%;
+  max-width: 96%;
   margin-left: auto;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   white-space: pre-wrap;
@@ -794,9 +806,9 @@ tr.card-just-followed-up td {
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
-  font-size: 10px;
+  font-size: 9.5px;
   color: #667781;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .wa-bubble-footer i {
@@ -1219,18 +1231,22 @@ tr.card-just-followed-up td {
   bottom: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  background: rgba(7, 13, 34, 0.65) !important;
+  height: 100dvh !important;
+  background: rgba(7, 13, 34, 0.72) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
   display: none;
-  align-items: center !important;
+  align-items: flex-start !important;
   justify-content: center !important;
-  padding: 20px !important;
+  padding: 16px 12px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   z-index: 999999 !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.22s ease, visibility 0.22s ease;
+  box-sizing: border-box !important;
 }
 
 .modal-overlay.active,
@@ -1243,17 +1259,20 @@ tr.card-just-followed-up td {
 
 .modal-content {
   background: #ffffff !important;
-  border-radius: var(--fu-radius-lg) !important;
+  border-radius: var(--fu-radius-lg, 16px) !important;
   box-shadow: 0 24px 60px -8px rgba(7, 13, 34, 0.4) !important;
   border: 1.5px solid #e2e8f0 !important;
   width: 100% !important;
-  max-width: 600px;
-  max-height: 90vh !important;
+  max-width: 550px !important;
+  max-height: calc(100dvh - 32px) !important;
   overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   position: relative !important;
   margin: auto !important;
+  padding: 18px 20px !important;
   transform: translateY(0) scale(1) !important;
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  box-sizing: border-box !important;
 }
 
 .modal-overlay.active .modal-content,
@@ -2343,6 +2362,60 @@ tr.card-just-followed-up td {
   0%, 20% { content: '.'; }
   40% { content: '..'; }
   60%, 100% { content: '...'; }
+}
+
+/* =============================================================
+   RESPONSIVE MODAL & LAYOUT RULES (MOBILE, TABLET, DESKTOP)
+   ============================================================= */
+@media (max-width: 991px), (max-height: 760px) {
+  .modal-overlay {
+    padding: 10px 8px !important;
+  }
+
+  .modal-content {
+    max-width: 96% !important;
+    max-height: calc(100dvh - 20px) !important;
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .modal-header h3 {
+    font-size: 14.5px !important;
+  }
+
+  .wa-chat-preview {
+    max-height: 95px !important;
+    padding: 8px 10px !important;
+    margin: 6px 0 !important;
+  }
+
+  .wa-bubble-sent {
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+  }
+
+  .variable-chip-btn {
+    font-size: 9.5px !important;
+    padding: 2px 5px !important;
+  }
+
+  .btn-wa-action {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 6px !important;
+  }
+
+  .modal-content {
+    max-width: 100% !important;
+    max-height: calc(100dvh - 12px) !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+  }
 }
 
 
