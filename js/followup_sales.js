@@ -1511,8 +1511,6 @@ function updateToggleButtonsUI(customerId, field, value) {
   }
 }
 
-let fuAutoSaveTimers = {};
-
 function handleReasonInput(customerId, value) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
   if (c) {
@@ -1522,12 +1520,6 @@ function handleReasonInput(customerId, value) {
   if (btnClear) {
     btnClear.style.display = value.trim() ? 'flex' : 'none';
   }
-  if (fuAutoSaveTimers[customerId]) {
-    clearTimeout(fuAutoSaveTimers[customerId]);
-  }
-  fuAutoSaveTimers[customerId] = setTimeout(() => {
-    sendSaveSalesFu(customerId, false);
-  }, 600);
 }
 
 function handleRemarksChange(customerId, value) {
@@ -1535,12 +1527,6 @@ function handleRemarksChange(customerId, value) {
   if (c) {
     c.remarks = value;
   }
-  if (fuAutoSaveTimers[customerId]) {
-    clearTimeout(fuAutoSaveTimers[customerId]);
-  }
-  fuAutoSaveTimers[customerId] = setTimeout(() => {
-    sendSaveSalesFu(customerId, false);
-  }, 300);
 }
 
 function handleStatusChange(customerId, value) {
@@ -1548,12 +1534,6 @@ function handleStatusChange(customerId, value) {
   if (c) {
     c.sales_fu_status = value;
   }
-  if (fuAutoSaveTimers[customerId]) {
-    clearTimeout(fuAutoSaveTimers[customerId]);
-  }
-  fuAutoSaveTimers[customerId] = setTimeout(() => {
-    sendSaveSalesFu(customerId, false);
-  }, 300);
 }
 
 function setFuToggle(customerId, field, value) {
@@ -1594,18 +1574,10 @@ function setFuToggle(customerId, field, value) {
     }
   }
 
-  // INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms
+  // INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms (Only saved when user clicks Simpan)
   ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
     updateToggleButtonsUI(customerId, f, c[f]);
   });
-
-  // REAL-TIME AUTO-SAVE (Ensures changes on Laptop/HP save immediately so both devices stay 100% in sync):
-  if (fuAutoSaveTimers[customerId]) {
-    clearTimeout(fuAutoSaveTimers[customerId]);
-  }
-  fuAutoSaveTimers[customerId] = setTimeout(() => {
-    sendSaveSalesFu(customerId, false);
-  }, 250);
 }
 
 async function saveSalesFuManual(customerId) {
