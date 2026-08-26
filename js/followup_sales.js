@@ -215,6 +215,7 @@ function initFollowupTabs() {
             <table class="sales-fu-table">
               <thead>
                 <tr>
+                  <th style="width:48px; text-align:center;">No.</th>
                   <th style="min-width:200px;">Customer &amp; Kontak</th>
                   <th style="min-width:190px;">Unit Mobil &amp; Usia</th>
                   <th style="min-width:170px;">Klaster &amp; Dealer</th>
@@ -225,7 +226,7 @@ function initFollowupTabs() {
               </thead>
               <tbody id="followupTableTbody">
                 <tr>
-                  <td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Memuat data...</td>
+                  <td colspan="7" style="text-align:center; padding:30px; color:#64748b;">Memuat data...</td>
                 </tr>
               </tbody>
             </table>
@@ -479,7 +480,7 @@ function renderOrphanPoolCards() {
     </div>
   `;
 
-  list.forEach(c => {
+  list.forEach((c, idx) => {
     const rawName = (c.name || 'Customer').trim();
     const parts = rawName.split(/\s+/);
     let initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : rawName.substring(0, 2).toUpperCase();
@@ -509,7 +510,10 @@ function renderOrphanPoolCards() {
                 ${initials}
               </div>
               <div>
-                <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2;">${escapeHtml(c.name || 'Customer')}</div>
+                <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <span class="fu-card-num-badge orphan-badge">#${idx + 1}</span>
+                  <span>${escapeHtml(c.name || 'Customer')}</span>
+                </div>
                 <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
                   <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link">
                     <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${escapeHtml(c.phone || '-')}
@@ -904,7 +908,7 @@ function formatWibDate(dateStr) {
 // -------------------------------------------------------------
 // MODULAR SINGLE CUSTOMER CARD HTML GENERATOR
 // -------------------------------------------------------------
-function renderSingleCustomerCardHtml(c) {
+function renderSingleCustomerCardHtml(c, num) {
   const isPending = c.followup_status === 'Belum Dihubungi';
   const isDeal = c.followup_status === 'Deal / Selesai';
   const isInterested = c.followup_status === 'Tertarik / Jadwal Servis';
@@ -949,7 +953,10 @@ function renderSingleCustomerCardHtml(c) {
           <div style="display:flex; align-items:center; gap:12px;">
             <div class="cust-avatar-circle" style="width:44px; height:44px; font-size:15px; flex-shrink:0;">${initials}</div>
             <div>
-              <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2;">${c.name}</div>
+              <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                ${num ? `<span class="fu-card-num-badge">#${num}</span>` : ''}
+                <span>${c.name}</span>
+              </div>
               <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
                 <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link" onclick="sessionStorage.setItem('last_active_fu_customer_id', ${c.id})">
                   <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${c.phone}
@@ -1208,7 +1215,7 @@ function renderCustomerCardsView(list, append = false) {
   const startIdx = append ? Math.max(0, followupState.renderLimit - 24) : 0;
   const currentSlice = list.slice(startIdx, followupState.renderLimit);
 
-  let htmlChunk = currentSlice.map(c => renderSingleCustomerCardHtml(c)).join('');
+  let htmlChunk = currentSlice.map((c, i) => renderSingleCustomerCardHtml(c, startIdx + i + 1)).join('');
 
   if (append) {
     grid.insertAdjacentHTML('beforeend', htmlChunk);
@@ -1311,7 +1318,7 @@ function renderCustomerTableView(list) {
     if (followupState.customers.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:center; padding:60px 20px; color:#64748b;">
+          <td colspan="7" style="text-align:center; padding:60px 20px; color:#64748b;">
             <i class="fa-solid fa-user-clock" style="font-size:36px; margin-bottom:12px; color:#93c5fd;"></i><br>
             <strong style="color:#0f172a; font-size:15px;">Belum Ada Database Prospek yang Ditugaskan</strong>
             <p style="font-size:12px; color:#64748b; margin-top:4px;">Supervisor (SPV) belum membagikan tugas follow-up database ke akun Anda.</p>
@@ -1321,7 +1328,7 @@ function renderCustomerTableView(list) {
     } else {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:center; padding:50px 20px; color:#94a3b8;">
+          <td colspan="7" style="text-align:center; padding:50px 20px; color:#94a3b8;">
             <i class="fa-solid fa-folder-open" style="font-size:32px; margin-bottom:8px; color:#cbd5e1;"></i><br>
             <strong style="color:#0f172a;">Tidak ada data customer yang sesuai filter</strong>
           </td>
@@ -1332,7 +1339,7 @@ function renderCustomerTableView(list) {
   }
 
   let html = '';
-  list.forEach(c => {
+  list.forEach((c, idx) => {
     const rawName = (c.name || 'Customer').trim();
     const parts = rawName.split(/\s+/);
     let initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : rawName.substring(0, 2).toUpperCase();
@@ -1354,6 +1361,11 @@ function renderCustomerTableView(list) {
 
     html += `
       <tr id="customerRow_${c.id}">
+        <!-- 0. No. Urut -->
+        <td style="text-align:center; vertical-align:middle; width:48px; background:#f8fafc;">
+          <span class="fu-row-num-badge">${idx + 1}</span>
+        </td>
+
         <!-- 1. Customer & Kontak -->
         <td>
           <div style="display:flex; align-items:center; gap:10px;">

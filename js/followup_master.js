@@ -244,7 +244,7 @@ async function loadMasterCustomers(resetPage = true) {
   if (tbody) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align:center; padding:30px; color:#64748b;">
+        <td colspan="9" style="text-align:center; padding:30px; color:#64748b;">
           <i class="fa-solid fa-spinner fa-spin" style="font-size:20px; color:#d7123a; margin-bottom:8px;"></i><br>
           Memuat database customer...
         </td>
@@ -267,7 +267,7 @@ async function loadMasterCustomers(resetPage = true) {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" style="text-align:center; padding:30px; color:red;">
+          <td colspan="9" style="text-align:center; padding:30px; color:red;">
             Gagal memuat data customer dari server.
           </td>
         </tr>
@@ -307,7 +307,7 @@ function renderCustomerTable() {
   if (totalCount === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align:center; padding:60px 20px; color:#94a3b8;">
+        <td colspan="9" style="text-align:center; padding:60px 20px; color:#94a3b8;">
           <i class="fa-solid fa-folder-open" style="font-size:32px; margin-bottom:12px; color:#cbd5e1;"></i><br>
           <strong style="font-size:14px; color:#0f172a;">Tidak ada data customer yang sesuai</strong><br>
           <span style="font-size:12px;">Coba ubah kata kunci pencarian atau filter kategori di atas.</span>
@@ -319,8 +319,9 @@ function renderCustomerTable() {
   }
 
   let html = '';
-  pageItems.forEach(c => {
+  pageItems.forEach((c, idx) => {
     const isSelected = masterState.selectedIds.includes(c.id);
+    const rowNumber = startIndex + idx + 1;
 
     // Generate Initials
     const rawName = (c.name || 'Customer').trim();
@@ -339,7 +340,12 @@ function renderCustomerTable() {
           <input type="checkbox" style="width:17px; height:17px; accent-color:#d7123a; cursor:pointer;" ${isSelected ? 'checked' : ''} onchange="toggleSelectCustomer(${c.id})">
         </td>
 
-        <!-- 2. Customer & Kontak -->
+        <!-- 2. No. Urut -->
+        <td style="text-align:center; width:52px; vertical-align:middle; background:rgba(248,250,252,0.6);">
+          <span class="fu-row-num-badge">${rowNumber}</span>
+        </td>
+
+        <!-- 3. Customer & Kontak -->
         <td style="min-width:240px;">
           <div style="display:flex; align-items:center; gap:12px;">
             <div class="cust-avatar-circle">${initials}</div>
