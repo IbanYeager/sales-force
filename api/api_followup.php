@@ -710,7 +710,11 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     }
 
     // Smart Cascading logic
-    if ($spk === 'TRUE') {
+    if ($connected === 'FALSE') {
+        $contacted = 'FALSE';
+        $prospect = 'FALSE';
+        $spk = 'FALSE';
+    } elseif ($spk === 'TRUE') {
         $prospect = 'TRUE';
         $contacted = 'TRUE';
         $connected = 'TRUE';
@@ -728,26 +732,36 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
 
     $template_used = trim($input['template_used'] ?? '');
 
-    // Remarks
-    $remarks = trim($input['remarks'] ?? '');
-    if ($remarks === '') {
-        if ($spk === 'TRUE') $remarks = 'SPK berhasil';
-        elseif ($prospect === 'TRUE') $remarks = 'Customer tertarik';
-        elseif ($contacted === 'TRUE' || $connected === 'TRUE') $remarks = 'Customer pending';
-        elseif ($connected === 'FALSE' && $contacted === 'FALSE' && (isset($input['connected']) || isset($input['contacted']))) $remarks = 'Customer tidak diangkat';
-        else $remarks = $curr['remarks'] ?? '';
-    }
-
     // Status Determination:
     $status = trim($input['status'] ?? '');
+
+    // Automatic Remarks Determination:
+    $remarks = trim($input['remarks'] ?? '');
+    if ($remarks === '') {
+        if ($connected === 'FALSE') {
+            $remarks = 'Customer tidak aktif';
+        } elseif ($contacted === 'FALSE') {
+            $remarks = 'Customer tidak diangkat';
+        } elseif ($spk === 'TRUE' || $status === 'Deal / Selesai') {
+            $remarks = 'SPK berhasil';
+        } elseif ($prospect === 'TRUE' || $status === 'Tertarik / Jadwal Servis') {
+            $remarks = 'Customer tertarik';
+        } elseif ($status === 'Menunggu Respon' || $contacted === 'TRUE' || $connected === 'TRUE') {
+            $remarks = 'Customer pending';
+        } else {
+            $remarks = $curr['remarks'] ?? '';
+        }
+    }
+
+    // Status fallback if not explicitly provided
     if (!$status || $status === 'Belum Dihubungi') {
         if ($spk === 'TRUE' || $remarks === 'SPK berhasil') {
             $status = 'Deal / Selesai';
-        } elseif ($prospect === 'TRUE' || $remarks === 'Customer tertarik') {
+        } elseif ($prospect === 'TRUE' || $remarks === 'Customer tertarik' || $remarks === 'Customer janjian' || $remarks === 'Minta simulasi kredit' || $remarks === 'Janjian test drive') {
             $status = 'Tertarik / Jadwal Servis';
-        } elseif ($remarks === 'Customer menolak' || $remarks === 'Customer tidak aktif' || ($connected === 'FALSE' && $contacted === 'FALSE' && (isset($input['connected']) || isset($input['contacted'])))) {
+        } elseif ($remarks === 'Customer menolak' || $remarks === 'Beli di dealer/merk lain' || $remarks === 'Customer tidak aktif' || $connected === 'FALSE') {
             $status = 'Tidak Tertarik';
-        } elseif ($connected === 'TRUE' || $contacted === 'TRUE' || $remarks === 'Customer janjian' || $remarks === 'Customer pending' || !empty($reason_followup)) {
+        } elseif ($connected === 'TRUE' || $contacted === 'TRUE' || $remarks === 'Customer pending' || $remarks === 'Tunggu gajian/dana' || $remarks === 'Cek harga mobil lama' || !empty($reason_followup)) {
             $status = 'Menunggu Respon';
         } else {
             if ($action === 'save_sales_followup') {

@@ -168,7 +168,8 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     ];
     $periode_str = $current_day . " " . $nama_bulan_list[$current_month] . " " . $current_year;
 
-    $q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts ORDER BY nama_spv ASC, nama_lengkap ASC");
+    // Ambil HANYA wiraniaga yang aktif di Google Spreadsheet saat ini
+    $q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts WHERE is_active = 1 ORDER BY nama_spv ASC, nama_lengkap ASC");
 
     $underperforming = [];
     $on_track = [];
@@ -176,28 +177,25 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     if ($q_sales && $q_sales->num_rows > 0) {
         while ($row = $q_sales->fetch_assoc()) {
             $sales_id = intval($row['id']);
-            $username_clean = strtolower(trim($row['username']));
             $sales_name = $row['nama_lengkap'];
             $spv_name = $row['nama_spv'] ?: 'Supervisor';
             $tingkatan = $row['tingkatan'] ?: 'Executive';
 
-            $tgt_spk = 7; $tgt_do = 5;
-            if (isset($whiteboard_targets[$username_clean])) {
-                $tgt_spk = $whiteboard_targets[$username_clean]['target_spk'];
-                $tgt_do = $whiteboard_targets[$username_clean]['target_do'];
-            }
+            $tgt_spk = 3; 
+            $tgt_do = 3;
+            $real_spk = 0; 
+            $real_do = 0;
 
-            $q_target = $conn->query("SELECT target_spk, target_do, realisasi_spk, realisasi_do FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan = $current_month");
-
-            $real_spk = 0; $real_do = 0;
+            // Target & Realisasi langsung dari Google Spreadsheet yang tersimpan di target_do_bulanan
+            $q_target = $conn->query("SELECT target_spk, target_do, realisasi_spk, realisasi_do FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan = $current_month LIMIT 1");
             if ($q_target && $t_row = $q_target->fetch_assoc()) {
-                if (intval($t_row['target_spk']) > 0) $tgt_spk = intval($t_row['target_spk']);
-                if (intval($t_row['target_do']) > 0) $tgt_do = intval($t_row['target_do']);
+                $tgt_spk = intval($t_row['target_spk']) > 0 ? intval($t_row['target_spk']) : 3;
+                $tgt_do = intval($t_row['target_do']) > 0 ? intval($t_row['target_do']) : 3;
                 $real_spk = intval($t_row['realisasi_spk']);
                 $real_do = intval($t_row['realisasi_do']);
             }
 
-            if ($real_spk === 0) {
+            if ($real_spk === 0 && $real_do === 0) {
                 $q_dyn = $conn->query("SELECT 
                     SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as dyn_spk,
                     SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as dyn_do

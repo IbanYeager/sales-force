@@ -23,7 +23,7 @@ $SPREADSHEET_ID = "1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs";
 $CSV_EXPORT_URL = "https://docs.google.com/spreadsheets/d/{$SPREADSHEET_ID}/export?format=csv";
 $APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec";
 
-// Pastikan tabel sync log & config ada
+// Pastikan tabel sync log & config ada serta kolom is_active di sales_accounts
 if ($conn && !$conn->connect_error) {
     $conn->query("CREATE TABLE IF NOT EXISTS tabel_sheets_sync_config (
         id INT PRIMARY KEY DEFAULT 1,
@@ -39,6 +39,10 @@ if ($conn && !$conn->connect_error) {
     $conn->query("INSERT INTO tabel_sheets_sync_config (id, spreadsheet_id, apps_script_webhook_url, auto_sync_enabled) 
                   VALUES (1, '$SPREADSHEET_ID', '$APPS_SCRIPT_URL', 1)
                   ON DUPLICATE KEY UPDATE apps_script_webhook_url = '$APPS_SCRIPT_URL'");
+
+    try {
+        $conn->query("ALTER TABLE sales_accounts ADD COLUMN is_active INT DEFAULT 1");
+    } catch(Exception $e) {}
 }
 
 // Helper: Normalisasi Nama untuk Matching
@@ -48,7 +52,7 @@ function normalizeName($str) {
     return $str;
 }
 
-// Function 1: TARIK DATA DARI GOOGLE SPREADSHEET KE DATABASE SFT (PULL)
+// Function 1: TARIK DATA DARI GOOGLE SPREADSHEET KE DATABASE SFT (PULL DENGAN DYNAMIC MEMBER MANAGEMENT)
 function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     global $CSV_EXPORT_URL;
     if (!$month) $month = intval(date('n'));
@@ -84,24 +88,29 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         ];
     }
 
-    // Ambil seluruh akun sales di database untuk pencocokan
+    // Ambil seluruh akun sales di database untuk pencocokan awal
     $sales_map = [];
-    $res_sales = $conn->query("SELECT id, username, nama_lengkap, nama_spv, tingkatan FROM sales_accounts");
+    $res_sales = $conn->query("SELECT id, username, nama_lengkap, nama_spv, tingkatan, is_active FROM sales_accounts");
     if ($res_sales) {
         while ($row = $res_sales->fetch_assoc()) {
             $spv_key = normalizeName($row['nama_spv']);
             $norm = normalizeName($row['nama_lengkap']);
             $user_norm = normalizeName($row['username']);
+            $clean_name = normalizeName(preg_replace('/\s*\(.*?\)\s*/', '', $row['nama_lengkap']));
 
             $sales_map[$spv_key . '_' . $norm] = $row;
+            $sales_map[$spv_key . '_' . $clean_name] = $row;
             $sales_map[$spv_key . '_' . $user_norm] = $row;
             if (!isset($sales_map[$norm])) $sales_map[$norm] = $row;
+            if (!isset($sales_map[$clean_name])) $sales_map[$clean_name] = $row;
             if (!isset($sales_map[$user_norm])) $sales_map[$user_norm] = $row;
         }
     }
 
     $current_spv = "Pak Ryan";
     $synced_rows = [];
+    $active_sheet_ids = [];
+    $teams_breakdown = [];
     $total_spk = 0;
     $total_do = 0;
     $total_target_spk = 0;
@@ -145,61 +154,107 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         $total_target_spk += $target_spk;
         $total_target_do += $target_do;
 
-        // Cari sales di database (prioritas kecocokan dengan SPV saat ini)
+        if (!isset($teams_breakdown[$current_spv])) {
+            $teams_breakdown[$current_spv] = [
+                'spv' => $current_spv,
+                'total_sales' => 0,
+                'target_spk' => 0,
+                'target_do' => 0,
+                'actual_spk' => 0,
+                'actual_do' => 0
+            ];
+        }
+        $teams_breakdown[$current_spv]['total_sales']++;
+        $teams_breakdown[$current_spv]['target_spk'] += $target_spk;
+        $teams_breakdown[$current_spv]['target_do'] += $target_do;
+        $teams_breakdown[$current_spv]['actual_spk'] += $actual_spk;
+        $teams_breakdown[$current_spv]['actual_do'] += $actual_do;
+
+        // Cari sales di database
         $norm_name = normalizeName($nama_sales);
         $cur_spv_key = normalizeName($current_spv);
-        $sales_id = null;
+        $matched = null;
 
         if (isset($sales_map[$cur_spv_key . '_' . $norm_name])) {
             $matched = $sales_map[$cur_spv_key . '_' . $norm_name];
-            $sales_id = intval($matched['id']);
+        } elseif ($norm_name === 'yeni' && isset($sales_map[$cur_spv_key . '_yenni'])) {
+            $matched = $sales_map[$cur_spv_key . '_yenni'];
         } elseif (isset($sales_map[$norm_name])) {
             $matched = $sales_map[$norm_name];
-            $sales_id = intval($matched['id']);
-        } else {
-            // Coba pencarian LIKE
-            $q_find = $conn->query("SELECT id FROM sales_accounts WHERE (nama_lengkap LIKE '%$nama_sales%' OR username LIKE '%$nama_sales%') AND (nama_spv = '$current_spv' OR nama_spv LIKE '%" . str_replace('Pak ', '', $current_spv) . "%') LIMIT 1");
-            if ($q_find && $f = $q_find->fetch_assoc()) {
-                $sales_id = intval($f['id']);
-            }
         }
 
-        if ($sales_id) {
-            // Update atau Insert ke tabel target_do_bulanan
-            $cek = $conn->query("SELECT id_target_bulanan FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan = $month");
-            if ($cek && $cek->num_rows > 0) {
-                $id_target = intval($cek->fetch_assoc()['id_target_bulanan']);
-                $conn->query("UPDATE target_do_bulanan SET 
-                    target_spk = $target_spk,
-                    target_do = $target_do,
-                    realisasi_spk = $actual_spk,
-                    realisasi_do = $actual_do,
-                    is_manual_spk = 1,
-                    is_manual_do = 1,
-                    is_manual_target_spk = 1,
-                    is_manual_target_do = 1,
-                    periode_tahun = $year
-                    WHERE id_target_bulanan = $id_target");
-            } else {
-                $conn->query("INSERT INTO target_do_bulanan 
-                    (sales_account_id, periode_bulan, periode_tahun, target_spk, target_do, realisasi_spk, realisasi_do, is_manual_spk, is_manual_do, is_manual_target_spk, is_manual_target_do) 
-                    VALUES ($sales_id, $month, $year, $target_spk, $target_do, $actual_spk, $actual_do, 1, 1, 1, 1)");
+        $sales_id = null;
+        if ($matched) {
+            $sales_id = intval($matched['id']);
+            // Pastikan nama_spv dan is_active terupdate
+            $conn->query("UPDATE sales_accounts SET nama_spv = '$current_spv', is_active = 1 WHERE id = $sales_id");
+        } else {
+            // AUTO-CREATE JIKA ADA ANGGOTA BARU DI SPREADSHEET
+            $safe_spv_code = strtolower(str_replace('Pak ', '', $current_spv));
+            $base_user = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $nama_sales));
+            $username = $base_user . ($safe_spv_code ? '_' . $safe_spv_code : '');
+            
+            $c_usr = $conn->query("SELECT id FROM sales_accounts WHERE username = '$username'");
+            if ($c_usr && $c_usr->num_rows > 0) {
+                $username .= '_' . rand(10, 99);
             }
 
-            $synced_rows[] = [
-                'sales_id' => $sales_id,
-                'nama' => $nama_sales,
-                'spv' => $current_spv,
-                'target_spk' => $target_spk,
-                'target_do' => $target_do,
-                'actual_spk' => $actual_spk,
-                'actual_do' => $actual_do
+            $pass_hash = md5('123456');
+            $conn->query("INSERT INTO sales_accounts (username, password, nama_lengkap, tingkatan, nama_spv, is_active) 
+                          VALUES ('$username', '$pass_hash', '$nama_sales', 'Executive', '$current_spv', 1)");
+            $sales_id = $conn->insert_id;
+
+            // Tambahkan ke map
+            $sales_map[$cur_spv_key . '_' . $norm_name] = [
+                'id' => $sales_id,
+                'username' => $username,
+                'nama_lengkap' => $nama_sales,
+                'nama_spv' => $current_spv
             ];
         }
+
+        $active_sheet_ids[] = $sales_id;
+
+        // Update atau Insert ke tabel target_do_bulanan
+        $cek = $conn->query("SELECT id_target_bulanan FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan = $month");
+        if ($cek && $cek->num_rows > 0) {
+            $id_target = intval($cek->fetch_assoc()['id_target_bulanan']);
+            $conn->query("UPDATE target_do_bulanan SET 
+                target_spk = $target_spk,
+                target_do = $target_do,
+                realisasi_spk = $actual_spk,
+                realisasi_do = $actual_do,
+                is_manual_spk = 1,
+                is_manual_do = 1,
+                is_manual_target_spk = 1,
+                is_manual_target_do = 1,
+                periode_tahun = $year
+                WHERE id_target_bulanan = $id_target");
+        } else {
+            $conn->query("INSERT INTO target_do_bulanan 
+                (sales_account_id, periode_bulan, periode_tahun, target_spk, target_do, realisasi_spk, realisasi_do, is_manual_spk, is_manual_do, is_manual_target_spk, is_manual_target_do) 
+                VALUES ($sales_id, $month, $year, $target_spk, $target_do, $actual_spk, $actual_do, 1, 1, 1, 1)");
+        }
+
+        $synced_rows[] = [
+            'sales_id' => $sales_id,
+            'nama' => $nama_sales,
+            'spv' => $current_spv,
+            'target_spk' => $target_spk,
+            'target_do' => $target_do,
+            'actual_spk' => $actual_spk,
+            'actual_do' => $actual_do
+        ];
+    }
+
+    // Nonaktifkan sales di DB yang sudah tidak terdaftar di spreadsheet saat ini
+    if (!empty($active_sheet_ids)) {
+        $id_list_str = implode(',', $active_sheet_ids);
+        $conn->query("UPDATE sales_accounts SET is_active = 0 WHERE id NOT IN ($id_list_str)");
     }
 
     $now_str = date('Y-m-d H:i:s');
-    $summary = "Berhasil sinkronisasi " . count($synced_rows) . " sales dari Google Sheets (Total SPK: $total_spk, Total DO: $total_do)";
+    $summary = "Berhasil sinkronisasi " . count($synced_rows) . " wiraniaga dari Google Sheets (Total: $total_spk SPK | $total_do DO)";
     
     $conn->query("UPDATE tabel_sheets_sync_config SET 
         last_sync_at = '$now_str',
@@ -218,6 +273,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
             'total_actual_spk' => $total_spk,
             'total_actual_do' => $total_do
         ],
+        'teams' => $teams_breakdown,
         'data' => $synced_rows
     ];
 }

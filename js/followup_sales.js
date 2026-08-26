@@ -1445,7 +1445,7 @@ function renderCustomerTableView(list) {
 
         <!-- 5. Remarks & Status FU -->
         <td>
-          <select class="form-control" style="font-size:11px; font-weight:700; padding:4px 6px; border-radius:6px; margin-bottom:4px;" onchange="setTableRemarks(${c.id}, this.value)">
+          <select id="tbl_remarks_${c.id}" class="form-control" style="font-size:11px; font-weight:700; padding:4px 6px; border-radius:6px; margin-bottom:4px;" onchange="handleRemarksChange(${c.id}, this.value)">
             <option value="">-- Remarks --</option>
             <option value="Customer janjian" ${c.remarks === 'Customer janjian' ? 'selected' : ''}>🟡 Customer janjian</option>
             <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>🔴 Customer menolak</option>
@@ -1456,7 +1456,7 @@ function renderCustomerTableView(list) {
             <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>🏆 SPK berhasil</option>
           </select>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#64748b;">
-            <span>FU: <strong style="color:${c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb'};">${c.sales_fu_status || 'Open'}</strong></span>
+            <span>FU: <strong id="tbl_status_txt_${c.id}" style="color:${c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb'};">${c.sales_fu_status || 'Open'}</strong></span>
             <span>${dateInfo.isRecorded ? dateInfo.formatted : '-'}</span>
           </div>
         </td>
@@ -1483,9 +1483,7 @@ function renderCustomerTableView(list) {
 }
 
 function setTableRemarks(customerId, remarks) {
-  const c = followupState.customers.find(x => String(x.id) === String(customerId));
-  if (!c) return;
-  c.remarks = remarks;
+  handleRemarksChange(customerId, remarks);
 }
 
 // -------------------------------------------------------------
@@ -1534,59 +1532,158 @@ function handleReasonInput(customerId, value) {
   }
 }
 
+// -------------------------------------------------------------
+// OTOMATISASI REMARKS & STATUS CASCADING
+// -------------------------------------------------------------
 function handleRemarksChange(customerId, value) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
-  if (c) {
-    c.remarks = value;
+  if (!c) return;
+  c.remarks = value;
+
+  // Sync DOM Selects (Card View & Table View)
+  const selCard = document.getElementById(`remarks_${customerId}`);
+  if (selCard && selCard.value !== value) selCard.value = value;
+  const selTbl = document.getElementById(`tbl_remarks_${customerId}`);
+  if (selTbl && selTbl.value !== value) selTbl.value = value;
+
+  // OTOMATISASI LOGIKA PILIHAN REMARKS KE STATUS & TAM 4-PILAR:
+  if (value === 'Customer tidak aktif') {
+    c.connected = 'FALSE';
+    c.contacted = 'FALSE';
+    c.prospect = 'FALSE';
+    c.spk = 'FALSE';
+  } else if (value === 'Customer tidak diangkat') {
+    c.connected = 'TRUE';
+    c.contacted = 'FALSE';
+    c.prospect = 'FALSE';
+    c.spk = 'FALSE';
+  } else if (value === 'Customer pending' || value === 'Tunggu gajian/dana' || value === 'Cek harga mobil lama') {
+    c.connected = 'TRUE';
+    c.contacted = 'TRUE';
+    c.prospect = 'FALSE';
+    c.spk = 'FALSE';
+    c.sales_fu_status = 'Open';
+  } else if (value === 'Customer tertarik' || value === 'Customer janjian' || value === 'Minta simulasi kredit' || value === 'Janjian test drive') {
+    c.connected = 'TRUE';
+    c.contacted = 'TRUE';
+    c.prospect = 'TRUE';
+    c.spk = 'FALSE';
+    c.sales_fu_status = 'Open';
+  } else if (value === 'SPK berhasil') {
+    c.connected = 'TRUE';
+    c.contacted = 'TRUE';
+    c.prospect = 'TRUE';
+    c.spk = 'TRUE';
+    c.sales_fu_status = 'Closed';
+  } else if (value === 'Customer menolak' || value === 'Beli di dealer/merk lain') {
+    c.connected = 'TRUE';
+    c.contacted = 'TRUE';
+    c.prospect = 'FALSE';
+    c.spk = 'FALSE';
+    c.sales_fu_status = 'Closed';
   }
+
+  // Update Status Select & Text UI
+  const selStatus = document.getElementById(`salesFuStatus_${customerId}`);
+  if (selStatus && c.sales_fu_status) selStatus.value = c.sales_fu_status;
+  const tblStatusTxt = document.getElementById(`tbl_status_txt_${customerId}`);
+  if (tblStatusTxt && c.sales_fu_status) {
+    tblStatusTxt.textContent = c.sales_fu_status;
+    tblStatusTxt.style.color = c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb';
+  }
+
+  // Update semua 4 tombol TAM (Iya / Tidak) di Card & Table
+  ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
+    updateToggleButtonsUI(customerId, f, c[f]);
+  });
 }
 
 function handleStatusChange(customerId, value) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
   if (c) {
     c.sales_fu_status = value;
+    const tblStatusTxt = document.getElementById(`tbl_status_txt_${customerId}`);
+    if (tblStatusTxt) {
+      tblStatusTxt.textContent = value;
+      tblStatusTxt.style.color = value === 'Closed' ? '#ef4444' : '#2563eb';
+    }
   }
 }
 
+// -------------------------------------------------------------
+// OTOMATISASI REMARKS SAAT TOMBOL TAM 4-PILAR DIKLIK
+// -------------------------------------------------------------
 function setFuToggle(customerId, field, value) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
   if (!c) return;
 
   c[field] = value;
 
-  // SMART CASCADING LOGIC:
-  if (field === 'spk' && value === 'TRUE') {
-    c.prospect = 'TRUE';
-    c.contacted = 'TRUE';
-    c.connected = 'TRUE';
-    c.remarks = 'SPK berhasil';
-    c.sales_fu_status = 'Closed';
-    const selRemarks = document.getElementById(`remarks_${customerId}`);
-    if (selRemarks) selRemarks.value = 'SPK berhasil';
-    const selStatus = document.getElementById(`salesFuStatus_${customerId}`);
-    if (selStatus) selStatus.value = 'Closed';
-  } else if (field === 'prospect' && value === 'TRUE') {
-    c.contacted = 'TRUE';
-    c.connected = 'TRUE';
-    if (!c.remarks || c.remarks === 'Customer tidak aktif' || c.remarks === 'Customer tidak diangkat') {
-      c.remarks = 'Customer tertarik';
-      const selRemarks = document.getElementById(`remarks_${customerId}`);
-      if (selRemarks) selRemarks.value = 'Customer tertarik';
-    }
-  } else if (field === 'contacted' && value === 'TRUE') {
-    c.connected = 'TRUE';
-  } else if (field === 'connected' && value === 'FALSE') {
+  // SMART AUTOMATIC CASCADING LOGIC:
+  if (field === 'connected' && value === 'FALSE') {
+    // 1. Kalo connected TIDAK -> otomatis remarks 'Customer tidak aktif'
     c.contacted = 'FALSE';
     c.prospect = 'FALSE';
     c.spk = 'FALSE';
-    if (!c.remarks || c.remarks === 'SPK berhasil' || c.remarks === 'Customer tertarik') {
-      c.remarks = 'Customer tidak diangkat';
-      const selRemarks = document.getElementById(`remarks_${customerId}`);
-      if (selRemarks) selRemarks.value = 'Customer tidak diangkat';
+    c.remarks = 'Customer tidak aktif';
+  } else if (field === 'connected' && value === 'TRUE') {
+    // Kalo connected IYA -> jika sebelumnya tidak aktif, ubah ke pending
+    if (!c.remarks || c.remarks === 'Customer tidak aktif') {
+      c.remarks = 'Customer pending';
+    }
+  } else if (field === 'contacted' && value === 'FALSE') {
+    // 2. Kalo contacted TIDAK -> otomatis remarks 'Customer tidak diangkat'
+    c.prospect = 'FALSE';
+    c.spk = 'FALSE';
+    c.remarks = 'Customer tidak diangkat';
+  } else if (field === 'contacted' && value === 'TRUE') {
+    // Kalo contacted IYA -> otomatis connected IYA & remarks 'Customer pending'
+    c.connected = 'TRUE';
+    if (!c.remarks || c.remarks === 'Customer tidak aktif' || c.remarks === 'Customer tidak diangkat') {
+      c.remarks = 'Customer pending';
+    }
+  } else if (field === 'prospect' && value === 'TRUE') {
+    // 3. Kalo prospect IYA -> otomatis connected, contacted & remarks 'Customer tertarik'
+    c.connected = 'TRUE';
+    c.contacted = 'TRUE';
+    c.remarks = 'Customer tertarik';
+    c.sales_fu_status = 'Open';
+  } else if (field === 'prospect' && value === 'FALSE') {
+    // Kalo prospect TIDAK -> spk FALSE & jika sebelumnya tertarik, ubah ke menolak
+    c.spk = 'FALSE';
+    if (c.remarks === 'Customer tertarik' || c.remarks === 'SPK berhasil') {
+      c.remarks = 'Customer menolak';
+    }
+  } else if (field === 'spk' && value === 'TRUE') {
+    // 4. Kalo SPK IYA -> otomatis closing deal, remarks 'SPK berhasil', status Closed
+    c.connected = 'TRUE';
+    c.contacted = 'TRUE';
+    c.prospect = 'TRUE';
+    c.remarks = 'SPK berhasil';
+    c.sales_fu_status = 'Closed';
+  } else if (field === 'spk' && value === 'FALSE') {
+    // Kalo SPK TIDAK -> jika sebelumnya SPK berhasil, kembalikan ke tertarik / pending & status Open
+    if (c.remarks === 'SPK berhasil') {
+      c.remarks = (c.prospect === 'TRUE') ? 'Customer tertarik' : 'Customer pending';
+      c.sales_fu_status = 'Open';
     }
   }
 
-  // INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms (Only saved when user clicks Simpan)
+  // Update DOM Selects (Card View & Table View)
+  const selRemarks = document.getElementById(`remarks_${customerId}`);
+  if (selRemarks && c.remarks) selRemarks.value = c.remarks;
+  const selTblRemarks = document.getElementById(`tbl_remarks_${customerId}`);
+  if (selTblRemarks && c.remarks) selTblRemarks.value = c.remarks;
+
+  const selStatus = document.getElementById(`salesFuStatus_${customerId}`);
+  if (selStatus && c.sales_fu_status) selStatus.value = c.sales_fu_status;
+  const tblStatusTxt = document.getElementById(`tbl_status_txt_${customerId}`);
+  if (tblStatusTxt && c.sales_fu_status) {
+    tblStatusTxt.textContent = c.sales_fu_status;
+    tblStatusTxt.style.color = c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb';
+  }
+
+  // Update seluruh 4 segmented button UI secara realtime
   ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
     updateToggleButtonsUI(customerId, f, c[f]);
   });
@@ -2563,6 +2660,13 @@ function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
   // 2. Update Table View (if active)
   const row = document.getElementById(`customerRow_${customerId}`);
   if (row) {
+    const selTblRemarks = document.getElementById(`tbl_remarks_${customerId}`);
+    if (selTblRemarks && c.remarks) selTblRemarks.value = c.remarks;
+    const tblStatusTxt = document.getElementById(`tbl_status_txt_${customerId}`);
+    if (tblStatusTxt && c.sales_fu_status) {
+      tblStatusTxt.textContent = c.sales_fu_status;
+      tblStatusTxt.style.color = c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb';
+    }
     ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
       updateToggleButtonsUI(customerId, f, c[f]);
     });
@@ -2608,16 +2712,17 @@ async function executeSendWhatsApp() {
   // Close modal immediately
   closeWhatsAppModal();
 
-  // Determine TAM 4-Pilar values based on WhatsApp follow up action
+  // Determine TAM 4-Pilar & Remarks values automatically based on WhatsApp status
   const isDeal = (nextStatus === 'Deal / Selesai');
   const isInterested = (nextStatus === 'Tertarik / Jadwal Servis');
+  const isRejected = (nextStatus === 'Tidak Tertarik');
 
   const connectedVal = 'TRUE';
   const contactedVal = 'TRUE';
-  const prospectVal = (isDeal || isInterested || activeCustomerForWA.prospect === 'TRUE') ? 'TRUE' : 'FALSE';
-  const spkVal = (isDeal || activeCustomerForWA.spk === 'TRUE') ? 'TRUE' : 'FALSE';
-  const remarksVal = isDeal ? 'SPK berhasil' : (isInterested ? 'Customer tertarik' : (activeCustomerForWA.remarks || 'Customer pending'));
-  const salesFuStatusVal = isDeal ? 'Closed' : 'Open';
+  const prospectVal = (isDeal || isInterested) ? 'TRUE' : 'FALSE';
+  const spkVal = isDeal ? 'TRUE' : 'FALSE';
+  const remarksVal = isDeal ? 'SPK berhasil' : (isInterested ? 'Customer tertarik' : (isRejected ? 'Customer menolak' : 'Customer pending'));
+  const salesFuStatusVal = (isDeal || isRejected) ? 'Closed' : 'Open';
 
   // Optimistic UI updates in-place without page reset / DOM rebuild
   updateSingleCardAfterWhatsApp(customerId, nextStatus, {

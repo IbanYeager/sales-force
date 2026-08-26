@@ -62,9 +62,19 @@ if ($method === 'GET') {
         return date('d M Y H:i', $time);
     }
 
+    $show_all = isset($_GET['all']) && $_GET['all'] === '1';
+    $where_parts = [];
+    if (!$show_all) {
+        $where_parts[] = "is_active = 1";
+    }
+
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_clean = str_replace('Pak ', '', $spv);
-        $query .= " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+        $where_parts[] = "(nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+    }
+
+    if (!empty($where_parts)) {
+        $query .= " WHERE " . implode(" AND ", $where_parts);
     }
     $query .= " ORDER BY id ASC";
 

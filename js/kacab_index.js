@@ -453,10 +453,19 @@ async function syncGoogleSheetNow() {
       if (statusEl) {
         statusEl.innerHTML = `Tersinkron (${data.totals.total_actual_spk} SPK | ${data.totals.total_actual_do} DO) &middot; ${data.synced_count} Wiraniaga`;
       }
-      alert(`✅ ${data.message}\nTotal SPK: ${data.totals.total_actual_spk} | Total DO: ${data.totals.total_actual_do}`);
-      // Refresh Dashboard & Sentinel UI
-      loadDashboard();
-      loadAiSentinelKacab();
+      
+      // Invalidate all session caches
+      sessionStorage.removeItem('kacab_hierarchy_cache');
+      sessionStorage.removeItem('kacab_hierarchy_cache_time');
+      for (let i = 1; i <= 31; i++) {
+        sessionStorage.removeItem(`kacab_sentinel_cache_${i}_${new Date().getMonth() + 1}`);
+      }
+
+      alert(`✅ ${data.message}\nTotal SPK: ${data.totals.total_actual_spk} | Total DO: ${data.totals.total_actual_do}\nJumlah Wiraniaga Aktif: ${data.synced_count} Orang`);
+      
+      // Force refresh Dashboard & Sentinel UI
+      await loadDashboard();
+      await loadAiSentinelKacab(null, true);
     } else {
       alert('Gagal sinkron: ' + (data.message || 'Error'));
     }

@@ -118,8 +118,8 @@ $nama_bulan_list = [
 ];
 $periode_str = $current_day . " " . $nama_bulan_list[$current_month] . " " . $current_year;
 
-// 2. Ambil Semua Data Sales dari database
-$q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts ORDER BY nama_spv ASC, nama_lengkap ASC");
+// 2. Ambil Data Sales yang AKTIF dari Google Spreadsheet
+$q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts WHERE is_active = 1 ORDER BY nama_spv ASC, nama_lengkap ASC");
 
 // BATCH PRE-FETCH TARGET & DYNAMIC DATA (Eliminates 92 loop queries)
 $target_map = [];
@@ -147,33 +147,26 @@ $on_track = [];
 if ($q_sales && $q_sales->num_rows > 0) {
     while ($row = $q_sales->fetch_assoc()) {
         $sales_id = intval($row['id']);
-        $username_clean = strtolower(trim($row['username']));
         $sales_name = $row['nama_lengkap'];
         $spv_name = $row['nama_spv'] ?: 'Supervisor';
         $tingkatan = $row['tingkatan'] ?: 'Executive';
 
-        // Tentukan target baseline
-        $tgt_spk = 7;
-        $tgt_do = 5;
-        if (isset($whiteboard_targets[$username_clean])) {
-            $tgt_spk = $whiteboard_targets[$username_clean]['target_spk'];
-            $tgt_do = $whiteboard_targets[$username_clean]['target_do'];
-        }
-
-        // Baca target & realisasi di in-memory batch map
+        // Tentukan target baseline langsung dari Google Spreadsheet
+        $tgt_spk = 3;
+        $tgt_do = 3;
         $real_spk = 0;
         $real_do = 0;
         $t_row = $target_map[$sales_id] ?? null;
 
         if ($t_row) {
-            if (intval($t_row['target_spk']) > 0) $tgt_spk = intval($t_row['target_spk']);
-            if (intval($t_row['target_do']) > 0) $tgt_do = intval($t_row['target_do']);
+            $tgt_spk = intval($t_row['target_spk']) > 0 ? intval($t_row['target_spk']) : 3;
+            $tgt_do = intval($t_row['target_do']) > 0 ? intval($t_row['target_do']) : 3;
             $real_spk = intval($t_row['realisasi_spk']);
             $real_do = intval($t_row['realisasi_do']);
         }
 
         // Jika dynamic SPK belum terisi manual dan nilai masih 0, ambil dari dyn_map
-        if ($real_spk === 0) {
+        if ($real_spk === 0 && $real_do === 0) {
             $d = $dyn_map[$sales_id] ?? null;
             if ($d) {
                 $real_spk = max($real_spk, intval($d['dyn_spk'] ?? 0));

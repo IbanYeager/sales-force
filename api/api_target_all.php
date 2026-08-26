@@ -57,11 +57,11 @@ if ($method === 'GET') {
         }
     }
 
-    // Sales Consultants Query
-    $where_clause = "";
+    // Sales Consultants Query - Strictly select Active Sales from Google Spreadsheet
+    $where_clause = "WHERE is_active = 1";
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_clean = str_replace('Pak ', '', $spv);
-        $where_clause = "WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+        $where_clause .= " AND (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
     }
 
     $whiteboard_targets = [
