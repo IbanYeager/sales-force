@@ -927,6 +927,20 @@ function renderSingleCustomerCardHtml(c) {
     statusBadgeHtml = `<span class="badge-status-pill waiting" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-clock"></i> Respon</span>`;
   }
 
+  const isFollowedUp = (c.followup_status && c.followup_status !== 'Belum Dihubungi') || Boolean(c.followup_date);
+
+  const isConnYes = isFollowedUp && (c.connected === 'TRUE' || c.connected === 'IYA');
+  const isConnNo = isFollowedUp && (c.connected === 'FALSE' || c.connected === 'TIDAK');
+
+  const isContYes = isFollowedUp && (c.contacted === 'TRUE' || c.contacted === 'IYA');
+  const isContNo = isFollowedUp && (c.contacted === 'FALSE' || c.contacted === 'TIDAK');
+
+  const isProspYes = isFollowedUp && (c.prospect === 'TRUE' || c.prospect === 'IYA');
+  const isProspNo = isFollowedUp && (c.prospect === 'FALSE' || c.prospect === 'TIDAK');
+
+  const isSpkYes = isFollowedUp && (c.spk === 'TRUE' || c.spk === 'IYA');
+  const isSpkNo = isFollowedUp && (c.spk === 'FALSE' || c.spk === 'TIDAK');
+
   return `
     <div class="followup-card ${statusClass}" id="customerCard_${c.id}">
       <div>
@@ -1016,8 +1030,8 @@ function renderSingleCustomerCardHtml(c) {
               </div>
             </div>
             <div class="fu-segmented-btn-group" id="group_connected_${c.id}">
-              <button type="button" class="fu-tog-btn ${(c.connected === 'TRUE' || c.connected === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'connected', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
-              <button type="button" class="fu-tog-btn ${(c.connected === 'FALSE' || (!c.connected && c.connected !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'connected', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+              <button type="button" class="fu-tog-btn ${isConnYes ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'connected', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${isConnNo ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'connected', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
             </div>
           </div>
 
@@ -1031,8 +1045,8 @@ function renderSingleCustomerCardHtml(c) {
               </div>
             </div>
             <div class="fu-segmented-btn-group" id="group_contacted_${c.id}">
-              <button type="button" class="fu-tog-btn ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'contacted', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
-              <button type="button" class="fu-tog-btn ${(c.contacted === 'FALSE' || (!c.contacted && c.contacted !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'contacted', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+              <button type="button" class="fu-tog-btn ${isContYes ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'contacted', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${isContNo ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'contacted', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
             </div>
           </div>
 
@@ -1046,8 +1060,8 @@ function renderSingleCustomerCardHtml(c) {
               </div>
             </div>
             <div class="fu-segmented-btn-group" id="group_prospect_${c.id}">
-              <button type="button" class="fu-tog-btn ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'prospect', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
-              <button type="button" class="fu-tog-btn ${(c.prospect === 'FALSE' || (!c.prospect && c.prospect !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'prospect', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+              <button type="button" class="fu-tog-btn ${isProspYes ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'prospect', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${isProspNo ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'prospect', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
             </div>
           </div>
 
@@ -1061,8 +1075,8 @@ function renderSingleCustomerCardHtml(c) {
               </div>
             </div>
             <div class="fu-segmented-btn-group" id="group_spk_${c.id}">
-              <button type="button" class="fu-tog-btn ${(c.spk === 'TRUE' || c.spk === 'IYA') ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'spk', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
-              <button type="button" class="fu-tog-btn ${(c.spk === 'FALSE' || (!c.spk && c.spk !== '')) ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'spk', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
+              <button type="button" class="fu-tog-btn ${isSpkYes ? 'active-yes' : ''}" onclick="setFuToggle(${c.id}, 'spk', 'TRUE')"><i class="fa-solid fa-check"></i> Iya</button>
+              <button type="button" class="fu-tog-btn ${isSpkNo ? 'active-no' : ''}" onclick="setFuToggle(${c.id}, 'spk', 'FALSE')"><i class="fa-solid fa-xmark"></i> Tidak</button>
             </div>
           </div>
         </div>
@@ -1324,6 +1338,20 @@ function renderCustomerTableView(list) {
     let initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : rawName.substring(0, 2).toUpperCase();
     const dateInfo = formatWibDate(c.followup_date);
 
+    const isFollowedUp = (c.followup_status && c.followup_status !== 'Belum Dihubungi') || Boolean(c.followup_date);
+
+    const isConnYes = isFollowedUp && (c.connected === 'TRUE' || c.connected === 'IYA');
+    const isConnNo = isFollowedUp && (c.connected === 'FALSE' || c.connected === 'TIDAK');
+
+    const isContYes = isFollowedUp && (c.contacted === 'TRUE' || c.contacted === 'IYA');
+    const isContNo = isFollowedUp && (c.contacted === 'FALSE' || c.contacted === 'TIDAK');
+
+    const isProspYes = isFollowedUp && (c.prospect === 'TRUE' || c.prospect === 'IYA');
+    const isProspNo = isFollowedUp && (c.prospect === 'FALSE' || c.prospect === 'TIDAK');
+
+    const isSpkYes = isFollowedUp && (c.spk === 'TRUE' || c.spk === 'IYA');
+    const isSpkNo = isFollowedUp && (c.spk === 'FALSE' || c.spk === 'TIDAK');
+
     html += `
       <tr id="customerRow_${c.id}">
         <!-- 1. Customer & Kontak -->
@@ -1372,32 +1400,32 @@ function renderCustomerTableView(list) {
             <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
               <span style="font-size:10px; font-weight:700;">1.Conn:</span>
               <div class="fu-segmented-btn-group" id="tbl_group_connected_${c.id}" style="padding:1.5px;">
-                <button type="button" class="fu-tog-btn ${(c.connected === 'TRUE' || c.connected === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'connected', 'TRUE')">Ya</button>
-                <button type="button" class="fu-tog-btn ${(c.connected === 'FALSE' || (!c.connected && c.connected !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'connected', 'FALSE')">Tidak</button>
+                <button type="button" class="fu-tog-btn ${isConnYes ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'connected', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${isConnNo ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'connected', 'FALSE')">Tidak</button>
               </div>
             </div>
             <!-- Cont -->
             <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
               <span style="font-size:10px; font-weight:700;">2.Cont:</span>
               <div class="fu-segmented-btn-group" id="tbl_group_contacted_${c.id}" style="padding:1.5px;">
-                <button type="button" class="fu-tog-btn ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'contacted', 'TRUE')">Ya</button>
-                <button type="button" class="fu-tog-btn ${(c.contacted === 'FALSE' || (!c.contacted && c.contacted !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'contacted', 'FALSE')">Tidak</button>
+                <button type="button" class="fu-tog-btn ${isContYes ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'contacted', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${isContNo ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'contacted', 'FALSE')">Tidak</button>
               </div>
             </div>
             <!-- Prosp -->
             <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
               <span style="font-size:10px; font-weight:700;">3.Prosp:</span>
               <div class="fu-segmented-btn-group" id="tbl_group_prospect_${c.id}" style="padding:1.5px;">
-                <button type="button" class="fu-tog-btn ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'prospect', 'TRUE')">Ya</button>
-                <button type="button" class="fu-tog-btn ${(c.prospect === 'FALSE' || (!c.prospect && c.prospect !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'prospect', 'FALSE')">Tidak</button>
+                <button type="button" class="fu-tog-btn ${isProspYes ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'prospect', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${isProspNo ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'prospect', 'FALSE')">Tidak</button>
               </div>
             </div>
             <!-- SPK -->
             <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px;">
               <span style="font-size:10px; font-weight:800; color:#d7123a;">4.SPK:</span>
               <div class="fu-segmented-btn-group" id="tbl_group_spk_${c.id}" style="padding:1.5px;">
-                <button type="button" class="fu-tog-btn ${(c.spk === 'TRUE' || c.spk === 'IYA') ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'spk', 'TRUE')">Ya</button>
-                <button type="button" class="fu-tog-btn ${(c.spk === 'FALSE' || (!c.spk && c.spk !== '')) ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'spk', 'FALSE')">Tidak</button>
+                <button type="button" class="fu-tog-btn ${isSpkYes ? 'active-yes' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'spk', 'TRUE')">Ya</button>
+                <button type="button" class="fu-tog-btn ${isSpkNo ? 'active-no' : ''}" style="padding:2px 6px; font-size:9px;" onclick="setFuToggle(${c.id}, 'spk', 'FALSE')">Tidak</button>
               </div>
             </div>
           </div>
@@ -1457,15 +1485,12 @@ function updateToggleButtonsUI(customerId, field, value) {
   if (group) {
     const btns = group.querySelectorAll('.fu-tog-btn');
     if (btns.length >= 2) {
-      if (value === 'TRUE') {
-        btns[0].className = 'fu-tog-btn active-yes';
-        btns[1].className = 'fu-tog-btn';
-      } else if (value === 'FALSE') {
-        btns[0].className = 'fu-tog-btn';
-        btns[1].className = 'fu-tog-btn active-no';
-      } else {
-        btns[0].className = 'fu-tog-btn';
-        btns[1].className = 'fu-tog-btn';
+      btns[0].classList.remove('active-yes');
+      btns[1].classList.remove('active-no');
+      if (value === 'TRUE' || value === 'IYA') {
+        btns[0].classList.add('active-yes');
+      } else if (value === 'FALSE' || value === 'TIDAK') {
+        btns[1].classList.add('active-no');
       }
     }
   }
@@ -1475,19 +1500,18 @@ function updateToggleButtonsUI(customerId, field, value) {
   if (tblGroup) {
     const btns = tblGroup.querySelectorAll('.fu-tog-btn');
     if (btns.length >= 2) {
-      if (value === 'TRUE') {
-        btns[0].className = 'fu-tog-btn active-yes';
-        btns[1].className = 'fu-tog-btn';
-      } else if (value === 'FALSE') {
-        btns[0].className = 'fu-tog-btn';
-        btns[1].className = 'fu-tog-btn active-no';
-      } else {
-        btns[0].className = 'fu-tog-btn';
-        btns[1].className = 'fu-tog-btn';
+      btns[0].classList.remove('active-yes');
+      btns[1].classList.remove('active-no');
+      if (value === 'TRUE' || value === 'IYA') {
+        btns[0].classList.add('active-yes');
+      } else if (value === 'FALSE' || value === 'TIDAK') {
+        btns[1].classList.add('active-no');
       }
     }
   }
 }
+
+let fuAutoSaveTimers = {};
 
 function handleReasonInput(customerId, value) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
@@ -1498,6 +1522,12 @@ function handleReasonInput(customerId, value) {
   if (btnClear) {
     btnClear.style.display = value.trim() ? 'flex' : 'none';
   }
+  if (fuAutoSaveTimers[customerId]) {
+    clearTimeout(fuAutoSaveTimers[customerId]);
+  }
+  fuAutoSaveTimers[customerId] = setTimeout(() => {
+    sendSaveSalesFu(customerId, false);
+  }, 600);
 }
 
 function handleRemarksChange(customerId, value) {
@@ -1505,6 +1535,12 @@ function handleRemarksChange(customerId, value) {
   if (c) {
     c.remarks = value;
   }
+  if (fuAutoSaveTimers[customerId]) {
+    clearTimeout(fuAutoSaveTimers[customerId]);
+  }
+  fuAutoSaveTimers[customerId] = setTimeout(() => {
+    sendSaveSalesFu(customerId, false);
+  }, 300);
 }
 
 function handleStatusChange(customerId, value) {
@@ -1512,6 +1548,12 @@ function handleStatusChange(customerId, value) {
   if (c) {
     c.sales_fu_status = value;
   }
+  if (fuAutoSaveTimers[customerId]) {
+    clearTimeout(fuAutoSaveTimers[customerId]);
+  }
+  fuAutoSaveTimers[customerId] = setTimeout(() => {
+    sendSaveSalesFu(customerId, false);
+  }, 300);
 }
 
 function setFuToggle(customerId, field, value) {
@@ -1552,10 +1594,18 @@ function setFuToggle(customerId, field, value) {
     }
   }
 
-  // INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms (Only saves when user clicks Simpan)
+  // INSTANT OPTIMISTIC UI: Update all 4 toggle buttons in 0ms
   ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
     updateToggleButtonsUI(customerId, f, c[f]);
   });
+
+  // REAL-TIME AUTO-SAVE (Ensures changes on Laptop/HP save immediately so both devices stay 100% in sync):
+  if (fuAutoSaveTimers[customerId]) {
+    clearTimeout(fuAutoSaveTimers[customerId]);
+  }
+  fuAutoSaveTimers[customerId] = setTimeout(() => {
+    sendSaveSalesFu(customerId, false);
+  }, 250);
 }
 
 async function saveSalesFuManual(customerId) {
@@ -1603,10 +1653,10 @@ async function sendSaveSalesFu(customerId, showAlert = true) {
   const payload = {
     id: customerId,
     sales_id: followupState.salesInfo ? followupState.salesInfo.id : null,
-    connected: c.connected || 'FALSE',
-    contacted: c.contacted || 'FALSE',
-    prospect: c.prospect || 'FALSE',
-    spk: c.spk || 'FALSE',
+    connected: c.connected || '',
+    contacted: c.contacted || '',
+    prospect: c.prospect || '',
+    spk: c.spk || '',
     remarks: remarks,
     sales_fu_status: salesFuStatus,
     reason_followup: reasonFu
@@ -1622,7 +1672,8 @@ async function sendSaveSalesFu(customerId, showAlert = true) {
 
     if (data && data.success) {
       c.followup_date = data.followup_date;
-      c.followup_status = data.status;
+      c.followup_status = data.status || c.followup_status;
+      c.sales_fu_status = data.sales_fu_status || c.sales_fu_status;
 
       // Update date badge with Indonesian WIB format
       const badge = document.getElementById(`fuDateBadge_${customerId}`);
@@ -1631,6 +1682,25 @@ async function sendSaveSalesFu(customerId, showAlert = true) {
         badge.textContent = dateInfo.text;
         badge.className = 'fu-date-badge recorded';
       }
+
+      // Update card status pill
+      const statusPill = document.getElementById(`custCardStatusPill_${customerId}`);
+      if (statusPill) {
+        let badgeHtml = '';
+        if (c.followup_status === 'Deal / Selesai') {
+          badgeHtml = `<span class="badge-status-pill deal" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-trophy"></i> Deal</span>`;
+        } else if (c.followup_status === 'Tertarik / Jadwal Servis') {
+          badgeHtml = `<span class="badge-status-pill interested" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-thumbs-up"></i> Tertarik</span>`;
+        } else if (c.followup_status === 'Menunggu Respon') {
+          badgeHtml = `<span class="badge-status-pill waiting" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-clock"></i> Respon</span>`;
+        } else if (c.followup_status === 'Tidak Tertarik') {
+          badgeHtml = `<span class="badge-status-pill" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-ban"></i> Menolak</span>`;
+        }
+        statusPill.innerHTML = badgeHtml;
+      }
+
+      // Update Hero KPI stats and live filter badges
+      updateHeroStats();
 
       // Save active customer ID into sessionStorage
       sessionStorage.setItem('last_active_fu_customer_id', customerId);
@@ -1644,9 +1714,23 @@ async function sendSaveSalesFu(customerId, showAlert = true) {
         setTimeout(() => card.classList.remove('card-just-followed-up'), 5000);
       }
 
+      // If user is currently filtering by "Belum Di-Follow Up", smooth fade out card so it moves over to "Sudah Di-Follow Up"
+      if (followupState.activeStatus === 'belum_fu' || followupState.activeStatus === 'Belum Dihubungi') {
+        if (card) {
+          card.style.transition = 'all 0.35s ease';
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            renderCustomerCards(true);
+          }, 380);
+        } else {
+          renderCustomerCards(true);
+        }
+      }
+
       // Quick toast notification on manual save
       if (showAlert && typeof showCustomAlert === 'function') {
-        showCustomAlert('Data Berhasil Disimpan!', `Hasil follow-up untuk ${c.name} telah disimpan ke database. Waktu: ${formatWibDate(data.followup_date).formatted}`, 'success');
+        showCustomAlert('Data Berhasil Disimpan!', `Hasil follow-up untuk ${c.name} telah disimpan ke database (Status: ${c.followup_status}). Waktu: ${formatWibDate(data.followup_date).formatted}`, 'success');
       }
     }
   } catch (e) {
@@ -2201,5 +2285,124 @@ function switchCustomerTab(tab) {
 
   if (viewFu) viewFu.style.display = tab === 'followup' ? 'block' : 'none';
   if (kanban) kanban.style.display = tab === 'kanban' ? 'flex' : 'none';
+}
+
+// -------------------------------------------------------------
+// REAL-TIME MULTI-DEVICE 2-WAY SYNC (LAPTOP <-> HP <-> SERVER)
+// -------------------------------------------------------------
+let isSyncingBackground = false;
+
+async function syncFollowupCustomersBackground() {
+  if (isSyncingBackground || document.hidden) return;
+  isSyncingBackground = true;
+
+  try {
+    loadSalesProfile();
+    const salesId = (followupState.salesInfo && followupState.salesInfo.id) ? followupState.salesInfo.id : 1;
+    const res = await fetch(`../api/api_followup.php?action=customers&sales_id=${salesId}`);
+    const data = await res.json();
+
+    if (data && data.success && Array.isArray(data.data)) {
+      const serverList = data.data;
+      let hasChanges = false;
+
+      serverList.forEach(serverCust => {
+        const localCust = followupState.customers.find(x => String(x.id) === String(serverCust.id));
+        if (localCust) {
+          // Check if server has updated information from other device (e.g. laptop or HP)
+          const isDateDiff = serverCust.followup_date !== localCust.followup_date;
+          const isStatusDiff = serverCust.followup_status !== localCust.followup_status;
+          const isConnDiff = serverCust.connected !== localCust.connected;
+          const isContDiff = serverCust.contacted !== localCust.contacted;
+          const isProspDiff = serverCust.prospect !== localCust.prospect;
+          const isSpkDiff = serverCust.spk !== localCust.spk;
+          const isRemarksDiff = serverCust.remarks !== localCust.remarks;
+          const isSalesFuStatusDiff = serverCust.sales_fu_status !== localCust.sales_fu_status;
+          const isReasonDiff = (serverCust.reason_followup !== localCust.reason_followup) && (document.activeElement !== document.getElementById(`reasonFu_${localCust.id}`));
+
+          if (isDateDiff || isStatusDiff || isConnDiff || isContDiff || isProspDiff || isSpkDiff || isRemarksDiff || isSalesFuStatusDiff || isReasonDiff) {
+            hasChanges = true;
+            Object.assign(localCust, serverCust);
+
+            const cid = localCust.id;
+            // Update Card & Table TAM toggles in 0ms
+            ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
+              updateToggleButtonsUI(cid, f, localCust[f]);
+            });
+
+            // Update remarks dropdown if not focused
+            const selRemarks = document.getElementById(`remarks_${cid}`);
+            if (selRemarks && document.activeElement !== selRemarks) {
+              selRemarks.value = localCust.remarks || '';
+            }
+
+            // Update reason note input if not actively focused
+            const inputReason = document.getElementById(`reasonFu_${cid}`);
+            if (inputReason && document.activeElement !== inputReason) {
+              inputReason.value = localCust.reason_followup || '';
+            }
+
+            // Update sales FU status dropdown if not focused
+            const selStatus = document.getElementById(`salesFuStatus_${cid}`);
+            if (selStatus && document.activeElement !== selStatus) {
+              selStatus.value = localCust.sales_fu_status || 'Open';
+            }
+
+            // Update date badge
+            const dateBadge = document.getElementById(`fuDateBadge_${cid}`);
+            if (dateBadge) {
+              const dateInfo = formatWibDate(localCust.followup_date);
+              dateBadge.textContent = dateInfo.text;
+              dateBadge.className = `fu-date-badge ${dateInfo.isRecorded ? 'recorded' : 'empty'}`;
+            }
+
+            // Update status badge pill
+            const statusPill = document.getElementById(`custCardStatusPill_${cid}`);
+            if (statusPill) {
+              let badgeHtml = '';
+              if (localCust.followup_status === 'Deal / Selesai') {
+                badgeHtml = `<span class="badge-status-pill deal" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-trophy"></i> Deal</span>`;
+              } else if (localCust.followup_status === 'Tertarik / Jadwal Servis') {
+                badgeHtml = `<span class="badge-status-pill interested" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-thumbs-up"></i> Tertarik</span>`;
+              } else if (localCust.followup_status === 'Menunggu Respon') {
+                badgeHtml = `<span class="badge-status-pill waiting" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-clock"></i> Respon</span>`;
+              } else if (localCust.followup_status === 'Tidak Tertarik') {
+                badgeHtml = `<span class="badge-status-pill" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-ban"></i> Menolak</span>`;
+              }
+              statusPill.innerHTML = badgeHtml;
+            }
+          }
+        }
+      });
+
+      if (hasChanges) {
+        updateHeroStats();
+      }
+    }
+  } catch (e) {
+    // Non-blocking background sync
+  } finally {
+    isSyncingBackground = false;
+  }
+}
+
+// Attach Real-Time Multi-Device sync listeners
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    syncFollowupCustomersBackground();
+  }
+});
+
+window.addEventListener('focus', () => {
+  syncFollowupCustomersBackground();
+});
+
+// Periodic background auto-sync every 6 seconds
+if (!window.fuBackgroundSyncInterval) {
+  window.fuBackgroundSyncInterval = setInterval(() => {
+    if (!document.hidden) {
+      syncFollowupCustomersBackground();
+    }
+  }, 6000);
 }
 
