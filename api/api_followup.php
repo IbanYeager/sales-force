@@ -119,8 +119,14 @@ if ($action === 'customers') {
     }
 
     if ($status !== '' && $status !== 'all') {
-        $where[] = "followup_status = ?";
-        $params[] = $status;
+        if ($status === 'belum_fu' || $status === 'Belum Dihubungi') {
+            $where[] = "(followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')";
+        } elseif ($status === 'sudah_fu') {
+            $where[] = "(followup_status != 'Belum Dihubungi' AND followup_status IS NOT NULL AND followup_status != '')";
+        } else {
+            $where[] = "followup_status = ?";
+            $params[] = $status;
+        }
     }
 
     if ($category !== '' && $category !== 'all') {

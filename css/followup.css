@@ -402,6 +402,96 @@
   border-color: #cbd5e1;
 }
 
+/* --- STATUS FILTER PILLS & BUTTONS --- */
+.status-fu-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: var(--fu-radius-md);
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: var(--fu-text-main);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.status-fu-tab-btn:hover:not(.active) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.status-fu-tab-btn.active {
+  background: linear-gradient(135deg, var(--fu-navy) 0%, var(--fu-navy-light) 100%);
+  color: #ffffff !important;
+  border-color: var(--fu-navy);
+  box-shadow: 0 4px 14px rgba(13, 27, 62, 0.25);
+  transform: translateY(-1px);
+}
+
+.status-fu-tab-btn.tab-belum.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-color: #d97706;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  color: #ffffff !important;
+}
+
+.status-fu-tab-btn.tab-sudah.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #059669;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  color: #ffffff !important;
+}
+
+.fu-filter-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  background: #f1f5f9;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.status-fu-tab-btn.active .fu-filter-count-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff !important;
+}
+
+.fu-filter-count-badge.badge-amber {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.fu-filter-count-badge.badge-green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.fu-filter-count-badge.badge-yellow {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.fu-filter-count-badge.badge-blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.fu-filter-count-badge.badge-emerald {
+  background: #d1fae5;
+  color: #047857;
+}
+
 /* --- CUSTOMER CARDS (SALES POV - ULTRA POLISHED) --- */
 .followup-cards-grid {
   display: grid;

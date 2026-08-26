@@ -96,23 +96,23 @@ function initFollowupTabs() {
             </button>
           </div>
 
-          <!-- Hero KPI Mini Chips -->
+          <!-- Hero KPI Mini Chips (Interactive Click to Filter) -->
           <div class="hero-kpi-grid">
-            <div class="hero-kpi-chip">
+            <div class="hero-kpi-chip" style="cursor:pointer;" onclick="handleStatusFilter('all')" title="Klik untuk menampilkan semua database">
               <div class="num" id="heroTotalCount">0</div>
-              <div class="lbl">Tugas Saya</div>
+              <div class="lbl">📋 Semua Database</div>
             </div>
-            <div class="hero-kpi-chip" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3);">
+            <div class="hero-kpi-chip" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); cursor:pointer;" onclick="handleStatusFilter('belum_fu')" title="Klik untuk melihat database yang belum di-follow up">
               <div class="num" style="color:#fbbf24;" id="heroPendingCount">0</div>
-              <div class="lbl">Belum Dihubungi</div>
+              <div class="lbl">⚪ Belum Di-Follow Up</div>
             </div>
-            <div class="hero-kpi-chip" style="background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3);">
-              <div class="num" style="color:#93c5fd;" id="heroWaitingCount">0</div>
-              <div class="lbl">Respon / Servis</div>
+            <div class="hero-kpi-chip" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3); cursor:pointer;" onclick="handleStatusFilter('sudah_fu')" title="Klik untuk melihat database yang sudah di-follow up">
+              <div class="num" style="color:#6ee7b7;" id="heroFollowedCount">0</div>
+              <div class="lbl">✅ Sudah Di-Follow Up</div>
             </div>
-            <div class="hero-kpi-chip" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3);">
-              <div class="num" style="color:#6ee7b7;" id="heroDealCount">0</div>
-              <div class="lbl">Deal / Selesai</div>
+            <div class="hero-kpi-chip" style="background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3); cursor:pointer;" onclick="handleStatusFilter('Tertarik / Jadwal Servis')" title="Klik untuk melihat prospek tertarik">
+              <div class="num" style="color:#93c5fd;" id="heroInterestedCount">0</div>
+              <div class="lbl">🔵 Tertarik / Servis</div>
             </div>
           </div>
         </div>
@@ -155,7 +155,7 @@ function initFollowupTabs() {
           </div>
 
           <!-- Category Chips Horizontal Scroll -->
-          <div style="margin-bottom:10px;">
+          <div style="margin-bottom:12px;">
             <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; margin-bottom:6px; letter-spacing:0.5px;">
               <i class="fa-solid fa-filter" style="color:#d7123a;"></i> Kategori Repurchase &amp; Layanan:
             </div>
@@ -166,13 +166,37 @@ function initFollowupTabs() {
             </div>
           </div>
 
-          <!-- Status Filter Tabs -->
-          <div style="display:flex; gap:6px; overflow-x:auto; padding-top:4px;" id="followupStatusTabs">
-            <button class="btn-fu btn-fu-secondary active" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('all', this)">Semua Status</button>
-            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Belum Dihubungi', this)">⚪ Belum Dihubungi</button>
-            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Menunggu Respon', this)">🟡 Menunggu Respon</button>
-            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Tertarik / Jadwal Servis', this)">🔵 Tertarik / Servis</button>
-            <button class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11px; border-radius:8px;" onclick="handleStatusFilter('Deal / Selesai', this)">🟢 Deal / Selesai</button>
+          <!-- Status Filter Tabs: Dedicated Sudah FU vs Belum FU with live count badges -->
+          <div>
+            <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; margin-bottom:6px; letter-spacing:0.5px;">
+              <i class="fa-solid fa-list-check" style="color:#d7123a;"></i> Filter Progres Follow-Up:
+            </div>
+            <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;" id="followupStatusTabs">
+              <button type="button" class="status-fu-tab-btn active" id="btnStatusAll" onclick="handleStatusFilter('all', this)">
+                <i class="fa-solid fa-layer-group"></i> Semua Database
+                <span class="fu-filter-count-badge" id="countBadgeAll">0</span>
+              </button>
+              <button type="button" class="status-fu-tab-btn tab-belum" id="btnStatusBelum" onclick="handleStatusFilter('belum_fu', this)">
+                <i class="fa-solid fa-hourglass-half"></i> ⚪ Belum Di-Follow Up
+                <span class="fu-filter-count-badge badge-amber" id="countBadgeBelum">0</span>
+              </button>
+              <button type="button" class="status-fu-tab-btn tab-sudah" id="btnStatusSudah" onclick="handleStatusFilter('sudah_fu', this)">
+                <i class="fa-solid fa-circle-check"></i> ✅ Sudah Di-Follow Up
+                <span class="fu-filter-count-badge badge-green" id="countBadgeSudah">0</span>
+              </button>
+              <button type="button" class="status-fu-tab-btn" id="btnStatusWaiting" onclick="handleStatusFilter('Menunggu Respon', this)">
+                🟡 Menunggu Respon
+                <span class="fu-filter-count-badge badge-yellow" id="countBadgeWaiting">0</span>
+              </button>
+              <button type="button" class="status-fu-tab-btn" id="btnStatusInterested" onclick="handleStatusFilter('Tertarik / Jadwal Servis', this)">
+                🔵 Tertarik / Servis
+                <span class="fu-filter-count-badge badge-blue" id="countBadgeInterested">0</span>
+              </button>
+              <button type="button" class="status-fu-tab-btn" id="btnStatusDeal" onclick="handleStatusFilter('Deal / Selesai', this)">
+                🟢 Deal / Selesai
+                <span class="fu-filter-count-badge badge-emerald" id="countBadgeDeal">0</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -663,21 +687,38 @@ async function claimOrphanLead(customerId, customerName) {
 function updateHeroStats() {
   const list = followupState.customers;
   const total = list.length;
-  const pending = list.filter(c => c.followup_status === 'Belum Dihubungi').length;
-  const waiting = list.filter(c => c.followup_status === 'Menunggu Respon' || c.followup_status === 'Tertarik / Jadwal Servis').length;
+  const pending = list.filter(c => !c.followup_status || c.followup_status === 'Belum Dihubungi').length;
+  const followedUp = total - pending;
+  const waiting = list.filter(c => c.followup_status === 'Menunggu Respon').length;
+  const interested = list.filter(c => c.followup_status === 'Tertarik / Jadwal Servis').length;
   const deal = list.filter(c => c.followup_status === 'Deal / Selesai').length;
 
   const elTotal = document.getElementById('heroTotalCount');
   const elPending = document.getElementById('heroPendingCount');
-  const elWaiting = document.getElementById('heroWaitingCount');
-  const elDeal = document.getElementById('heroDealCount');
+  const elFollowed = document.getElementById('heroFollowedCount');
+  const elInterested = document.getElementById('heroInterestedCount');
   const badgeMyTasks = document.getElementById('badgeMyTasksCount');
 
   if (elTotal) elTotal.textContent = total;
   if (elPending) elPending.textContent = pending;
-  if (elWaiting) elWaiting.textContent = waiting;
-  if (elDeal) elDeal.textContent = deal;
+  if (elFollowed) elFollowed.textContent = followedUp;
+  if (elInterested) elInterested.textContent = interested;
   if (badgeMyTasks) badgeMyTasks.textContent = total;
+
+  // Filter Tab Badges
+  const bAll = document.getElementById('countBadgeAll');
+  const bBelum = document.getElementById('countBadgeBelum');
+  const bSudah = document.getElementById('countBadgeSudah');
+  const bWaiting = document.getElementById('countBadgeWaiting');
+  const bInterested = document.getElementById('countBadgeInterested');
+  const bDeal = document.getElementById('countBadgeDeal');
+
+  if (bAll) bAll.textContent = total;
+  if (bBelum) bBelum.textContent = pending;
+  if (bSudah) bSudah.textContent = followedUp;
+  if (bWaiting) bWaiting.textContent = waiting;
+  if (bInterested) bInterested.textContent = interested;
+  if (bDeal) bDeal.textContent = deal;
 }
 
 function renderCategoryPills() {
@@ -727,9 +768,20 @@ function handleCategoryFilter(cat, btn) {
 
 function handleStatusFilter(status, btn) {
   followupState.activeStatus = status;
-  document.querySelectorAll('#followupStatusTabs button').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderCustomerCards();
+  document.querySelectorAll('#followupStatusTabs .status-fu-tab-btn, #followupStatusTabs button').forEach(b => b.classList.remove('active'));
+  
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    if (status === 'all') document.getElementById('btnStatusAll')?.classList.add('active');
+    else if (status === 'belum_fu' || status === 'Belum Dihubungi') document.getElementById('btnStatusBelum')?.classList.add('active');
+    else if (status === 'sudah_fu') document.getElementById('btnStatusSudah')?.classList.add('active');
+    else if (status === 'Menunggu Respon') document.getElementById('btnStatusWaiting')?.classList.add('active');
+    else if (status === 'Tertarik / Jadwal Servis') document.getElementById('btnStatusInterested')?.classList.add('active');
+    else if (status === 'Deal / Selesai') document.getElementById('btnStatusDeal')?.classList.add('active');
+  }
+
+  renderCustomerCards(false);
 }
 
 function renderCustomerCards(preserveRenderLimit = false) {
@@ -754,9 +806,15 @@ function renderCustomerCards(preserveRenderLimit = false) {
     list = list.filter(c => c.followup_category === followupState.activeCategory);
   }
 
-  // Filter Status
+  // Filter Status (All, Belum FU, Sudah FU, or specific status)
   if (followupState.activeStatus !== 'all') {
-    list = list.filter(c => c.followup_status === followupState.activeStatus);
+    if (followupState.activeStatus === 'belum_fu' || followupState.activeStatus === 'Belum Dihubungi') {
+      list = list.filter(c => !c.followup_status || c.followup_status === 'Belum Dihubungi');
+    } else if (followupState.activeStatus === 'sudah_fu') {
+      list = list.filter(c => c.followup_status && c.followup_status !== 'Belum Dihubungi');
+    } else {
+      list = list.filter(c => c.followup_status === followupState.activeStatus);
+    }
   }
 
   followupState.filteredList = list;
