@@ -323,6 +323,23 @@ function init_followup_tables() {
         }
     }
 
+    // Ensure followup_templates has created_by and sales_id columns
+    try {
+        if ($is_mysql) {
+            followup_execute("ALTER TABLE followup_templates ADD COLUMN sales_id INT DEFAULT NULL");
+        } else {
+            followup_execute("ALTER TABLE followup_templates ADD COLUMN sales_id INTEGER DEFAULT NULL");
+        }
+    } catch (Exception $e) {}
+
+    try {
+        if ($is_mysql) {
+            followup_execute("ALTER TABLE followup_templates ADD COLUMN created_by VARCHAR(150) DEFAULT ''");
+        } else {
+            followup_execute("ALTER TABLE followup_templates ADD COLUMN created_by TEXT DEFAULT ''");
+        }
+    } catch (Exception $e) {}
+
     // Seed or update default templates
     $templates = [
         [

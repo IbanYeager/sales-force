@@ -1180,7 +1180,7 @@ async function openWhatsAppDirect(customerId) {
       <div class="modal-overlay" id="masterWhatsAppModal" onclick="closeMasterWAModal()">
         <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg); padding:22px;" onclick="event.stopPropagation()">
           <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
-            <h3 style="display:flex; align-items:center; gap:8px; color:#059669; font-size:16px; font-weight:800;">
+            <h3 style="display:flex; align-items:center; gap:8px; color:#059669; font-size:16px; font-weight:800; margin:0;">
               <i class="fa-brands fa-whatsapp" style="font-size:22px;"></i> Direct WhatsApp Follow-Up
             </h3>
             <button class="btn-close-modal" onclick="closeMasterWAModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -1191,12 +1191,17 @@ async function openWhatsAppDirect(customerId) {
               <strong style="font-size:15px;" id="mWaCustName">-</strong>
               <span style="font-family:monospace; color:#6ee7b7; font-weight:800; font-size:13px;" id="mWaCustPhone">-</span>
             </div>
-            <div style="font-size:12px; color:rgba(255,255,255,0.85); margin-top:4px;" id="mWaCustCar">-</div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.9); margin-top:4px;" id="mWaCustCar">-</div>
           </div>
 
           <div class="form-group" style="margin-bottom:12px;">
-            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Pilih Template WhatsApp:</label>
-            <select class="form-control" id="mWaTemplateSelect" style="font-size:12.5px; font-weight:600; border-radius:10px;" onchange="applyMasterWATemplate(this.value)">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="font-size:12px; font-weight:800; color:#0f172a; margin:0;">Pilih Template WhatsApp:</label>
+              <button type="button" class="btn-fu btn-fu-secondary" style="padding:2px 8px; font-size:11px; border-radius:6px;" onclick="openTemplateManagerModal()">
+                <i class="fa-solid fa-sliders"></i> Kelola Template
+              </button>
+            </div>
+            <select class="form-control" id="mWaTemplateSelect" style="font-size:12.5px; font-weight:600; border-radius:10px;" onchange="handleMasterTemplateSelectChange(this.value)">
             </select>
           </div>
 
@@ -1237,18 +1242,61 @@ async function openWhatsAppDirect(customerId) {
     </div>
   `;
 
-  const tmplSelect = document.getElementById('mWaTemplateSelect');
-  tmplSelect.innerHTML = '';
-  masterState.templates.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.id;
-    opt.textContent = t.title;
-    if (t.is_default) opt.selected = true;
-    tmplSelect.appendChild(opt);
-  });
+  const lastUsedTmplId = localStorage.getItem('sft_last_template_id');
+  const activeTmplId = renderMasterTemplateDropdownOptions(lastUsedTmplId);
 
-  applyMasterWATemplate(tmplSelect.value);
+  applyMasterWATemplate(activeTmplId);
   document.getElementById('masterWhatsAppModal').classList.add('active');
+}
+
+function renderMasterTemplateDropdownOptions(preferredId = null) {
+  const tmplSelect = document.getElementById('mWaTemplateSelect');
+  if (!tmplSelect) return null;
+
+  tmplSelect.innerHTML = '';
+  const allTemplates = masterState.templates || [];
+  const defaultTemplates = allTemplates.filter(t => (t.is_default == 1 || !t.sales_id));
+  const customTemplates = allTemplates.filter(t => (t.is_default != 1 && (t.sales_id || t.created_by || t.category === 'kustom')));
+
+  let selectedId = preferredId;
+  const exists = allTemplates.some(t => String(t.id) === String(selectedId));
+  if (!exists) {
+    const def = allTemplates.find(t => t.is_default == 1) || allTemplates[0];
+    selectedId = def ? def.id : null;
+  }
+
+  if (defaultTemplates.length > 0) {
+    const groupStd = document.createElement('optgroup');
+    groupStd.label = '📋 Template Standar Toyota';
+    defaultTemplates.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.title;
+      if (String(t.id) === String(selectedId)) opt.selected = true;
+      groupStd.appendChild(opt);
+    });
+    tmplSelect.appendChild(groupStd);
+  }
+
+  if (customTemplates.length > 0) {
+    const groupCust = document.createElement('optgroup');
+    groupCust.label = '⭐ Template Kustom';
+    customTemplates.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = `⭐ ${t.title} ${t.created_by ? `(${t.created_by})` : ''}`;
+      if (String(t.id) === String(selectedId)) opt.selected = true;
+      groupCust.appendChild(opt);
+    });
+    tmplSelect.appendChild(groupCust);
+  }
+
+  return selectedId;
+}
+
+function handleMasterTemplateSelectChange(val) {
+  localStorage.setItem('sft_last_template_id', val);
+  applyMasterWATemplate(val);
 }
 
 function closeMasterWAModal() {
@@ -1271,6 +1319,8 @@ async function applyMasterWATemplate(templateId) {
   if (!masterActiveCustWA) return;
   const tmpl = masterState.templates.find(t => String(t.id) === String(templateId));
   if (!tmpl) return;
+
+  localStorage.setItem('sft_last_template_id', templateId);
 
   try {
     const res = await fetch('../api/api_followup.php?action=format_template', {
@@ -1480,7 +1530,7 @@ function openTemplateManagerModal() {
 
   const html = `
     <div class="modal-overlay" id="modalTemplateManager" onclick="closeTemplateModal()">
-      <div class="modal-content" style="max-width:700px; border-radius:var(--fu-radius-lg); padding:24px;" onclick="event.stopPropagation()">
+      <div class="modal-content" style="max-width:700px; border-radius:var(--fu-radius-lg); padding:24px; max-height:88vh; overflow-y:auto;" onclick="event.stopPropagation()">
         <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px;">
           <div>
             <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px;">
@@ -1491,9 +1541,14 @@ function openTemplateManagerModal() {
           <button class="btn-close-modal" onclick="closeTemplateModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <p style="font-size:12px; color:#64748b; margin:0 0 14px 0;">
-          Daftar template pesan WhatsApp standar Toyota yang otomatis disesuaikan dengan nama pelanggan, unit mobil, dan sales PIC saat wiraniaga menekan tombol WhatsApp.
-        </p>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+          <p style="font-size:12px; color:#64748b; margin:0;">
+            Daftar template pesan WhatsApp standar Toyota &amp; template kustom yang otomatis disesuaikan variabelnya.
+          </p>
+          <button class="btn-fu btn-fu-emerald" style="padding:6px 14px; font-size:12px; border-radius:8px;" onclick="closeTemplateModal(); openCustomTemplateModalMaster();">
+            <i class="fa-solid fa-plus"></i> + Tambah Template Baru
+          </button>
+        </div>
 
         <div style="display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding-right:4px;" id="templateListContainer">
         </div>
@@ -1505,21 +1560,224 @@ function openTemplateManagerModal() {
   const container = document.getElementById('templateListContainer');
   let htmlContent = '';
   masterState.templates.forEach(t => {
+    const isCustom = (t.is_default != 1 && (t.sales_id || t.created_by || t.category === 'kustom'));
     htmlContent += `
-      <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <strong style="font-size:13.5px; color:#0f172a; font-weight:800;">${t.title}</strong>
-          <span style="font-size:10px; font-weight:800; padding:3px 9px; border-radius:9999px; background:${t.is_default ? '#dcfce7; color:#15803d;' : '#f1f5f9; color:#475569;'}">
-            ${t.is_default ? '🟢 Template Default' : t.category}
-          </span>
+      <div style="background:#f8fafc; border:1.5px solid ${isCustom ? '#86efac' : '#e2e8f0'}; border-radius:14px; padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="font-size:13.5px; color:#0f172a; font-weight:800;">${escapeHtml(t.title)}</strong>
+            <span style="font-size:10px; font-weight:800; padding:3px 9px; border-radius:9999px; ${isCustom ? 'background:#dcfce7; color:#15803d;' : 'background:#eff6ff; color:#1d4ed8;'}">
+              ${isCustom ? `⭐ Kustom (${t.created_by || 'Sales'})` : '🔒 Template Default'}
+            </span>
+          </div>
+          ${isCustom ? `
+            <div style="display:flex; gap:6px;">
+              <button class="btn-fu btn-fu-secondary" style="padding:3px 8px; font-size:11px; border-radius:6px;" onclick="closeTemplateModal(); openCustomTemplateModalMaster(\`${escapeJs(t.content)}\`, ${t.id}, \`${escapeJs(t.title)}\`, \`${escapeJs(t.category)}\`)">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+              <button class="btn-fu btn-fu-secondary" style="padding:3px 8px; font-size:11px; border-radius:6px; color:#ef4444 !important; border-color:#fecaca;" onclick="handleMasterDeleteCustomTemplate(${t.id}, \`${escapeJs(t.title)}\`)">
+                <i class="fa-solid fa-trash-can"></i> Hapus
+              </button>
+            </div>
+          ` : `
+            <span style="font-size:11px; color:#64748b;"><i class="fa-solid fa-lock"></i> Standar Sistem</span>
+          `}
         </div>
-        <div style="font-size:12px; color:#334155; white-space:pre-wrap; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; line-height:1.6; font-family:inherit;">${t.content}</div>
+        <div style="font-size:12px; color:#334155; white-space:pre-wrap; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; line-height:1.6; font-family:inherit;">${escapeHtml(t.content)}</div>
       </div>
     `;
   });
   container.innerHTML = htmlContent;
 
   document.getElementById('modalTemplateManager').classList.add('active');
+}
+
+function openCustomTemplateModalMaster(initialContent = '', editId = 0, editTitle = '', editCategory = 'promo') {
+  document.getElementById('modalMasterCustomTmpl')?.remove();
+
+  const defaultContent = initialContent || `Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hormat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\n[Tuliskan penawaran promo / follow up spesial Bpk/Ibu di sini]\n\nBoleh saya kirimkan detail lengkapnya Bpk/Ibu? Terima kasih! 🙏`;
+
+  const html = `
+    <div class="modal-overlay active" id="modalMasterCustomTmpl" style="display:flex; z-index:99999;" onclick="closeCustomTemplateModalMaster()">
+      <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg, 16px); padding:20px 22px;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px; border:1px solid #bfdbfe;">
+              <i class="fa-solid fa-star"></i> Template Kustom
+            </div>
+            <h3 style="font-size:17px; font-weight:900; color:#0d1b3e; margin:0;">
+              ${editId ? '✏️ Edit Template WhatsApp' : '➕ Buat Template WhatsApp Kustom'}
+            </h3>
+          </div>
+          <button class="btn-close-modal" onclick="closeCustomTemplateModalMaster()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form onsubmit="handleMasterSaveCustomTemplate(event, ${editId})">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Judul Template *</label>
+              <input type="text" id="mCustTmplTitle" required class="fu-input" style="font-size:12px; padding:7px 10px;" placeholder="Cth: Promo Flash Sale" value="${escapeHtml(editTitle)}">
+            </div>
+            <div>
+              <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Kategori</label>
+              <select id="mCustTmplCategory" class="fu-select" style="font-size:12px; padding:7px 10px;">
+                <option value="promo" ${editCategory === 'promo' ? 'selected' : ''}>🔥 Promo &amp; Diskon</option>
+                <option value="tradein" ${editCategory === 'tradein' ? 'selected' : ''}>🔄 Trade-In / Upgrade</option>
+                <option value="csat" ${editCategory === 'csat' ? 'selected' : ''}>🥰 CSAT &amp; Tanya Kabar</option>
+                <option value="servis" ${editCategory === 'servis' ? 'selected' : ''}>🔧 Servis &amp; Bengkel</option>
+                <option value="stnk" ${editCategory === 'stnk' ? 'selected' : ''}>📄 STNK &amp; Pajak</option>
+                <option value="kustom" ${editCategory === 'kustom' ? 'selected' : ''}>✨ Follow Up Kustom</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Variable Chips Quick Insert Bar -->
+          <div style="margin-bottom:8px;">
+            <div style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px;">Klik tag untuk menyisipkan variabel otomatis:</div>
+            <div style="display:flex; flex-wrap:wrap; gap:3px;">
+              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{nama_sales}')">👤 {nama_sales}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{nama_customer}')">{nama_customer}</button>
+              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{mobil_saat_ini}')">🚗 {mobil_saat_ini}</button>
+              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{model_rekomendasi}')">🎯 {model_rekomendasi}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{usia_kendaraan}')">{usia_kendaraan}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{kecamatan}')">{kecamatan}</button>
+              <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{dealer}')">{dealer}</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px;">
+            <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Isi Pesan Template *</label>
+            <textarea id="mCustTmplContent" required class="form-control" rows="6" style="font-size:12px; line-height:1.5; font-family:inherit; border-radius:10px;" placeholder="Ketik format pesan WhatsApp...">${escapeHtml(defaultContent)}</textarea>
+          </div>
+
+          <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn-fu btn-fu-emerald" style="flex:1; justify-content:center; padding:11px 18px; font-size:13px;">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Template
+            </button>
+            <button type="button" class="btn-fu btn-fu-secondary" style="padding:11px 18px; font-size:13px;" onclick="closeCustomTemplateModalMaster()">
+              Batal
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function closeCustomTemplateModalMaster() {
+  const modal = document.getElementById('modalMasterCustomTmpl');
+  if (modal) {
+    modal.classList.remove('active', 'show');
+    modal.style.display = 'none';
+    modal.remove();
+  }
+}
+
+function insertTagToMasterCustomTmpl(tag) {
+  const textarea = document.getElementById('mCustTmplContent');
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+  textarea.value = text.substring(0, start) + tag + text.substring(end);
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+}
+
+async function handleMasterSaveCustomTemplate(e, editId = 0) {
+  e.preventDefault();
+  const title = (document.getElementById('mCustTmplTitle')?.value || '').trim();
+  const category = document.getElementById('mCustTmplCategory')?.value || 'promo';
+  const content = (document.getElementById('mCustTmplContent')?.value || '').trim();
+
+  if (!title || !content) {
+    alert('Judul dan isi template wajib diisi');
+    return;
+  }
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=save_template', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: editId,
+        title: title,
+        category: category,
+        content: content,
+        created_by: 'SPV/Master'
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      masterState.templates = data.data || [];
+      const savedId = data.saved_id;
+
+      closeCustomTemplateModalMaster();
+
+      if (document.getElementById('mWaTemplateSelect')) {
+        renderMasterTemplateDropdownOptions(savedId);
+        localStorage.setItem('sft_last_template_id', savedId);
+        if (masterActiveCustWA) {
+          applyMasterWATemplate(savedId);
+        }
+      }
+
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Template Disimpan!', data.message, 'success');
+      } else {
+        alert(data.message);
+      }
+    } else {
+      alert(data.message || 'Gagal menyimpan template.');
+    }
+  } catch (err) {
+    console.error('Save template error', err);
+    alert('Terjadi kesalahan saat menyimpan template.');
+  }
+}
+
+async function handleMasterDeleteCustomTemplate(id, title) {
+  let isConfirmed = false;
+  if (typeof customConfirm === 'function') {
+    isConfirmed = await customConfirm(`Apakah Anda yakin ingin menghapus template "${title}"?`);
+  } else {
+    isConfirmed = confirm(`Hapus template "${title}"?`);
+  }
+  if (!isConfirmed) return;
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=delete_template', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      masterState.templates = data.data || [];
+      
+      if (localStorage.getItem('sft_last_template_id') == id) {
+        localStorage.removeItem('sft_last_template_id');
+      }
+
+      if (document.getElementById('mWaTemplateSelect')) {
+        renderMasterTemplateDropdownOptions();
+      }
+
+      openTemplateManagerModal();
+
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Template Dihapus', data.message, 'success');
+      } else {
+        alert(data.message);
+      }
+    } else {
+      alert(data.message || 'Gagal menghapus template.');
+    }
+  } catch (err) {
+    console.error('Delete template error', err);
+    alert('Terjadi kesalahan saat menghapus template.');
+  }
 }
 
 function closeTemplateModal() {

@@ -296,6 +296,104 @@ if ($action === 'templates') {
 }
 
 // -------------------------------------------------------------
+// ROUTE: POST /api_followup.php?action=save_template
+// -------------------------------------------------------------
+if ($action === 'save_template') {
+    $input = get_json_input();
+    $id = (int)($input['id'] ?? 0);
+    $title = trim($input['title'] ?? '');
+    $category = trim($input['category'] ?? 'kustom');
+    $content = trim($input['content'] ?? '');
+    $sales_id = !empty($input['sales_id']) ? (int)$input['sales_id'] : null;
+    $created_by = trim($input['created_by'] ?? '');
+
+    if (!$title || !$content) {
+        echo json_encode(['success' => false, 'message' => 'Judul template dan isi pesan tidak boleh kosong']);
+        exit;
+    }
+
+    if ($id > 0) {
+        // Update existing template
+        $existing = followup_query("SELECT * FROM followup_templates WHERE id = ? LIMIT 1", [$id]);
+        if (empty($existing)) {
+            echo json_encode(['success' => false, 'message' => 'Template tidak ditemukan']);
+            exit;
+        }
+
+        followup_execute("
+            UPDATE followup_templates 
+            SET title = ?, category = ?, content = ?, sales_id = ?, created_by = ?
+            WHERE id = ?
+        ", [$title, $category, $content, $sales_id, $created_by, $id]);
+
+        $savedId = $id;
+        $msg = 'Template berhasil diperbarui!';
+    } else {
+        // Insert new custom template
+        followup_execute("
+            INSERT INTO followup_templates (title, category, content, is_default, sales_id, created_by)
+            VALUES (?, ?, ?, 0, ?, ?)
+        ", [$title, $category, $content, $sales_id, $created_by]);
+
+        $newRow = followup_query("SELECT id FROM followup_templates ORDER BY id DESC LIMIT 1");
+        $savedId = !empty($newRow) ? (int)$newRow[0]['id'] : 0;
+        $msg = 'Template kustom berhasil disimpan!';
+    }
+
+    $allTemplates = followup_query("SELECT * FROM followup_templates ORDER BY is_default DESC, id ASC");
+    $savedTemplate = null;
+    foreach ($allTemplates as $t) {
+        if ((int)$t['id'] === $savedId) {
+            $savedTemplate = $t;
+            break;
+        }
+    }
+
+    echo json_encode([
+        'success' => true,
+        'message' => $msg,
+        'saved_id' => $savedId,
+        'template' => $savedTemplate,
+        'data' => $allTemplates
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup.php?action=delete_template
+// -------------------------------------------------------------
+if ($action === 'delete_template') {
+    $input = get_json_input();
+    $id = (int)($input['id'] ?? 0);
+
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'ID template tidak valid']);
+        exit;
+    }
+
+    $existing = followup_query("SELECT * FROM followup_templates WHERE id = ? LIMIT 1", [$id]);
+    if (empty($existing)) {
+        echo json_encode(['success' => false, 'message' => 'Template tidak ditemukan']);
+        exit;
+    }
+
+    if ((int)$existing[0]['is_default'] === 1) {
+        echo json_encode(['success' => false, 'message' => 'Template standar sistem tidak dapat dihapus']);
+        exit;
+    }
+
+    followup_execute("DELETE FROM followup_templates WHERE id = ?", [$id]);
+    $allTemplates = followup_query("SELECT * FROM followup_templates ORDER BY is_default DESC, id ASC");
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Template kustom berhasil dihapus!',
+        'data' => $allTemplates
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
 // ROUTE: POST /api_followup.php?action=create_customer
 // -------------------------------------------------------------
 if ($action === 'create_customer') {
