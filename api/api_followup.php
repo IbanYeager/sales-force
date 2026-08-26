@@ -814,39 +814,7 @@ if ($action === 'format_template') {
         $salesName = trim($input['sales_name']);
     }
 
-    $dealerName = 'Tunas Toyota Kiara Condong';
-
-    // Format all variables
-    $formatted = str_ireplace(
-        [
-            '{nama_customer}', '{tipe_mobil}', '{kendaraan_terakhir}', '{usia_kendaraan}',
-            '{model_rekomendasi}', '{model_alternatif}', '{cluster}', '{prioritas}',
-            '{kecamatan}', '{kepatuhan_servis}', '{nopol}', '{vin}',
-            '{tgl_beli}', '{jatuh_tempo_servis}', '{jatuh_tempo_stnk}',
-            '{nama_sales}', '{no_wa_sales}', '{dealer}'
-        ],
-        [
-            $c['name'] ?? '',
-            $c['car_model'] ?? '',
-            $c['last_car_model'] ?: ($c['car_model'] ?? ''),
-            $c['car_age'] ?? '',
-            $c['recommended_model'] ?: ($c['car_model'] ?? ''),
-            $c['alt_model_2'] ?? '',
-            $c['cluster_name'] ?? '',
-            $c['priority'] ?? '',
-            $c['district'] ?? '',
-            $c['service_compliance'] ?? '',
-            $c['plate_number'] ?: '-',
-            $c['vin'] ?: '-',
-            $c['purchase_date'] ?: '-',
-            $c['service_due_date'] ?: '-',
-            $c['stnk_due_date'] ?: '-',
-            $salesName,
-            $salesPhone,
-            $dealerName
-        ],
-        $content
-    );
+    $formatted = format_whatsapp_followup_text($content, $c, $salesName, $salesPhone);
 
     $cleanPhone = clean_phone_number($c['phone']);
     $waUrl = "https://wa.me/{$cleanPhone}?text=" . rawurlencode($formatted);
@@ -859,6 +827,112 @@ if ($action === 'format_template') {
         'customer_name' => $c['name']
     ]);
     exit;
+}
+
+/**
+ * Universal Intelligent WhatsApp Follow-Up Text Formatter
+ * Distinguishes between Mobil Saat Ini (Current Car) and Target Upgrade (Recommended Model)
+ */
+function format_whatsapp_followup_text($content, $c, $salesName = '', $salesPhone = '') {
+    $custName = trim($c['name'] ?? '');
+
+    // 1. Current Vehicle Owned by Customer (Mobil Saat Ini)
+    $lastCarRaw = trim($c['last_car_model'] ?? '');
+    if ($lastCarRaw === '-' || $lastCarRaw === 'NO DATA' || strtolower($lastCarRaw) === 'null') {
+        $lastCarRaw = '';
+    }
+
+    // 2. Target Upgrade Model from TAM
+    $recModelRaw = trim($c['recommended_model'] ?? '');
+    if (!$recModelRaw || $recModelRaw === '-' || $recModelRaw === 'NO DATA' || strtolower($recModelRaw) === 'null') {
+        $recModelRaw = trim($c['car_model'] ?? '');
+    }
+    if (!$recModelRaw || $recModelRaw === '-' || $recModelRaw === 'NO DATA' || strtolower($recModelRaw) === 'null') {
+        $recModelRaw = 'Toyota Terbaru';
+    }
+
+    $carAgeRaw = trim($c['car_age'] ?? '');
+    if ($carAgeRaw === '-' || $carAgeRaw === 'NO DATA' || strtolower($carAgeRaw) === 'null') {
+        $carAgeRaw = '';
+    }
+
+    $districtRaw = trim($c['district'] ?? '');
+    if ($districtRaw === '-' || $districtRaw === 'NO DATA' || strtolower($districtRaw) === 'null') {
+        $districtRaw = '';
+    }
+
+    $plateRaw = trim($c['plate_number'] ?? '');
+    if ($plateRaw === '-' || $plateRaw === 'NO DATA' || strtolower($plateRaw) === 'null') {
+        $plateRaw = '';
+    }
+
+    $stnkDueRaw = trim($c['stnk_due_date'] ?? '');
+    if (!$stnkDueRaw || $stnkDueRaw === '-' || $stnkDueRaw === 'NO DATA') {
+        $stnkDueRaw = 'bulan ini';
+    }
+
+    // 3. Smart Phrasing construction based on whether last_car_model exists
+    if ($lastCarRaw !== '') {
+        $mobilSaatIniTeks = "*{$lastCarRaw}*";
+        $teksKendaraanLama = " *{$lastCarRaw}*" . ($carAgeRaw ? " ({$carAgeRaw})" : "");
+        $tanyaPengalaman = "Bagaimana pengalaman berkendara dengan mobil *{$lastCarRaw}* Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?";
+        $teksStnkUnit = " *{$lastCarRaw}*" . ($plateRaw ? " (*{$plateRaw}*)" : "");
+    } else {
+        $mobilSaatIniTeks = "mobil Toyota Bpk/Ibu";
+        $teksKendaraanLama = "";
+        $tanyaPengalaman = "Bagaimana pengalaman berkendara dengan mobil Toyota Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?";
+        $teksStnkUnit = $plateRaw ? " (*{$plateRaw}*)" : "";
+    }
+
+    $teksKecamatan = $districtRaw ? " di Kec. {$districtRaw}" : "";
+
+    $salesNameDisplay = $salesName ?: 'Sales Tunas Toyota';
+    $dealerName = 'Tunas Toyota Kiara Condong';
+
+    // Handle asterisk-wrapped tags first to prevent double asterisks
+    $replacementsWrapped = [
+        '*{mobil_saat_ini}*'     => $mobilSaatIniTeks,
+        '*{kendaraan_terakhir}*' => $mobilSaatIniTeks,
+        '*{tipe_mobil}*'         => $mobilSaatIniTeks,
+        '*{model_rekomendasi}*'  => "*{$recModelRaw}*",
+        '*{target_upgrade}*'     => "*{$recModelRaw}*",
+    ];
+    $content = str_ireplace(array_keys($replacementsWrapped), array_values($replacementsWrapped), $content);
+
+    // 4. Replacement Map
+    $replacements = [
+        '{tanya_pengalaman_berkendara}' => $tanyaPengalaman,
+        '{teks_kendaraan_lama}'         => $teksKendaraanLama,
+        '{teks_mobil_saat_ini}'         => ($lastCarRaw !== '' ? " *{$lastCarRaw}*" : ""),
+        '{teks_stnk_unit}'              => $teksStnkUnit,
+        '{teks_kecamatan}'              => $teksKecamatan,
+        
+        '{nama_customer}'               => $custName,
+        '{mobil_saat_ini}'              => $mobilSaatIniTeks,
+        '{kendaraan_terakhir}'          => $mobilSaatIniTeks,
+        '{tipe_mobil}'                  => $mobilSaatIniTeks, // Guarantees current car, never upgrade target
+        '{model_rekomendasi}'           => "*{$recModelRaw}*",
+        '{target_upgrade}'              => "*{$recModelRaw}*",
+        '{model_alternatif}'            => trim($c['alt_model_2'] ?? ''),
+        '{usia_kendaraan}'              => ($carAgeRaw ?: '3 Tahun'),
+        '{cluster}'                     => trim($c['cluster_name'] ?? ''),
+        '{prioritas}'                   => trim($c['priority'] ?? ''),
+        '{kecamatan}'                   => $districtRaw,
+        '{kepatuhan_servis}'            => trim($c['service_compliance'] ?? ''),
+        '{nopol}'                       => ($plateRaw ?: '-'),
+        '{vin}'                         => trim($c['vin'] ?? '-'),
+        '{tgl_beli}'                    => trim($c['purchase_date'] ?? '-'),
+        '{jatuh_tempo_servis}'          => trim($c['service_due_date'] ?? '-'),
+        '{jatuh_tempo_stnk}'            => $stnkDueRaw,
+        '{nama_sales}'                  => $salesNameDisplay,
+        '{no_wa_sales}'                 => $salesPhone,
+        '{dealer}'                      => $dealerName
+    ];
+
+    $formatted = str_ireplace(array_keys($replacements), array_values($replacements), $content);
+    $formatted = preg_replace('/\\*{2,}/', '*', $formatted);
+
+    return $formatted;
 }
 
 // -------------------------------------------------------------

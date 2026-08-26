@@ -323,36 +323,36 @@ function init_followup_tables() {
         }
     }
 
-    // Seed default templates if empty
+    // Seed or update default templates
+    $templates = [
+        [
+            'Follow Up Repurchase & Upgrade Unit (Attack List)',
+            'tradein',
+            "Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hormat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\nSemoga mobil kesayangan Bpk/Ibu{teks_kendaraan_lama} selalu memberikan kenyamanan bagi keluarga.\n\nBulan ini dealer kami memiliki *Special Loyalty Upgrade Program* khusus pelanggan setia Toyota. Kami menyiapkan penawaran trade-in spesial dengan taksiran harga tertinggi untuk upgrade ke unit *{model_rekomendasi}*.\n\nKeuntungan Spesial:\n✅ Subsidi Trade-in & Ekstra Cashback\n✅ Bunga Spesial 0% / DP & Angsuran Ringan\n✅ Layanan appraisal gratis ke rumah Bpk/Ibu{teks_kecamatan}\n\nBoleh saya kirimkan detail promo & simulasi perhitungannya Bpk/Ibu? Terima kasih! 🙏",
+            1
+        ],
+        [
+            'Customer Satisfaction (CSAT) & Tanya Kabar',
+            'csat',
+            "Selamat pagi/siang Bpk/Ibu *{nama_customer}*,\n\nSaya *{nama_sales}*, konsultan sales Bpk/Ibu di *{dealer}*.\n\n{tanya_pengalaman_berkendara} 🥰\n\nJika ada pertanyaan mengenai fitur kendaraan, jadwal servis berkala, ataupun rencana penambahan/upgrade unit baru, jangan ragu untuk kontak saya ya Bpk/Ibu.\n\nSalam hormat untuk Bpk/Ibu dan keluarga tercinta! 🙏",
+            0
+        ],
+        [
+            'Servis Berkala & Booking Bengkel',
+            'servis',
+            "Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hangat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\nSemoga mobil kesayangan Bpk/Ibu{teks_kendaraan_lama} selalu dalam kondisi prima dan nyaman digunakan.\n\nKami menginfokan bahwa kendaraan Bpk/Ibu sudah waktunya untuk mendapatkan *Servis Berkala* di bengkel resmi Tunas Toyota Kiara Condong untuk menjaga performa mesin tetap optimal dan garansi tetap aktif.\n\nApakah kami bantu jadwalkan Booking Servis di bengkel resmi agar tidak perlu antre?\n\nMohon kabari kami jika ingin dijadwalkan ya Bpk/Ibu. Terima kasih! 🙏😊",
+            0
+        ],
+        [
+            'Pengingat Perpanjangan STNK & Pajak Tahunan',
+            'stnk',
+            "Halo Bpk/Ibu *{nama_customer}*,\n\nSaya *{nama_sales}* dari *{dealer}*.\n\nSekadar info pengingat ramah, STNK kendaraan Bpk/Ibu{teks_stnk_unit} diperkirakan akan jatuh tempo pada *{jatuh_tempo_stnk}*.\n\nJika Bpk/Ibu membutuhkan bantuan perpanjangan STNK / Pajak tanpa antre di Samsat, kami dari Tunas Toyota Kiara Condong siap membantu prosesnya.\n\nSilakan hubungi saya untuk info berkas yang diperlukan ya Bpk/Ibu. Terima kasih! 🚘",
+            0
+        ]
+    ];
+
     $chkTmpl = followup_query("SELECT id FROM followup_templates LIMIT 1");
     if (empty($chkTmpl)) {
-        $templates = [
-            [
-                'Servis Berkala 1.000 KM (Gratis Cek Awal)',
-                'servis',
-                "Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hangat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\nSemoga mobil kesayangan *{tipe_mobil}* selalu memberikan kenyamanan bagi Bpk/Ibu dan keluarga.\n\nKami menginfokan bahwa kendaraan Bpk/Ibu sudah memasuki masa *Servis Berkala 1.000 KM* (Free Biaya Jasa & Pengecekan 100% Gratis).\n\nApakah kami bantu jadwalkan Booking Servis di bengkel resmi Tunas Toyota Kiaracondong agar tidak perlu antre?\n\nMohon kabari kami jika ingin dijadwalkan ya Bpk/Ibu. Terima kasih! 🙏😊",
-                0
-            ],
-            [
-                'Follow Up Repurchase & Upgrade Unit (Attack List)',
-                'tradein',
-                "Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hormat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\nSemoga mobil kesayangan Bpk/Ibu *{kendaraan_terakhir}* ({usia_kendaraan}) selalu nyaman digunakan bersama keluarga.\n\nBulan ini dealer kami memiliki *Special Loyalty Upgrade Program* khusus pelanggan setia Toyota. Kami menyiapkan penawaran trade-in spesial dengan taksiran harga tertinggi untuk upgrade ke unit *{model_rekomendasi}*.\n\nKeuntungan Spesial:\n✅ Subsidi Trade-in & Ekstra Cashback\n✅ Bunga Spesial 0% / DP Ringan\n✅ Layanan appraisal gratis ke rumah Bpk/Ibu di {kecamatan}\n\nBoleh saya kirimkan detail promo & simulasi perhitungannya Bpk/Ibu? Terima kasih! 🙏",
-                1
-            ],
-            [
-                'Pengingat Perpanjangan STNK & Pajak Tahunan',
-                'stnk',
-                "Halo Bpk/Ibu *{nama_customer}*,\n\nSaya *{nama_sales}* dari *{dealer}*.\n\nSekadar info pengingat ramah, STNK kendaraan *{tipe_mobil}* (*{nopol}*) diperkirakan akan jatuh tempo pada *{jatuh_tempo_stnk}*.\n\nJika Bpk/Ibu membutuhkan bantuan perpanjangan STNK / Pajak tanpa antre di Samsat, kami dari Tunas Toyota Kiaracondong siap membantu prosesnya.\n\nSilakan hubungi saya untuk info berkas yang diperlukan ya Bpk/Ibu. Terima kasih! 🚘",
-                0
-            ],
-            [
-                'Customer Satisfaction (CSAT) & Tanya Kabar',
-                'csat',
-                "Selamat pagi/siang Bpk/Ibu *{nama_customer}*,\n\nSaya *{nama_sales}*, konsultan sales Bpk/Ibu di *{dealer}*.\n\nBagaimana pengalaman berkendara dengan *{tipe_mobil}* selama ini? Apakah semuanya berjalan nyaman dan memuaskan? 🥰\n\nJika ada pertanyaan mengenai fitur kendaraan atau layanan aftersales lainnya, jangan ragu untuk kontak saya ya Bpk/Ibu.\n\nSalam hormat untuk keluarga tercinta!",
-                0
-            ]
-        ];
-
         foreach ($templates as $t) {
             followup_execute("INSERT INTO followup_templates (title, category, content, is_default) VALUES (?, ?, ?, ?)", [$t[0], $t[1], $t[2], $t[3]]);
         }

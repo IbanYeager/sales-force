@@ -1862,7 +1862,7 @@ async function openWhatsAppModal(customerId) {
               <strong style="font-size:14px;" id="waCustName">-</strong>
               <span style="font-family:monospace; color:#6ee7b7; font-weight:800; font-size:12.5px;" id="waCustPhone">-</span>
             </div>
-            <div style="font-size:11.5px; color:rgba(255,255,255,0.85); margin-top:2px;" id="waCustCar">-</div>
+            <div style="font-size:11.5px; color:rgba(255,255,255,0.9); margin-top:4px;" id="waCustCar">-</div>
           </div>
 
           <!-- Template Selector -->
@@ -1878,10 +1878,9 @@ async function openWhatsAppModal(customerId) {
             <div style="display:flex; flex-wrap:wrap; gap:3px;">
               <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertVariableToWA('{nama_sales}')">👤 {nama_sales}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{nama_customer}')">{nama_customer}</button>
-              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kendaraan_terakhir}')">{kendaraan_terakhir}</button>
+              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertVariableToWA('{mobil_saat_ini}')" title="Mobil yang dimiliki customer saat ini (cth: Avanza)">🚗 {mobil_saat_ini}</button>
+              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertVariableToWA('{model_rekomendasi}')" title="Target upgrade TAM (cth: Hilux / Rush)">🎯 {model_rekomendasi}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{usia_kendaraan}')">{usia_kendaraan}</button>
-              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{model_rekomendasi}')">{model_rekomendasi}</button>
-              <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{cluster}')">{cluster}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kecamatan}')">{kecamatan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{dealer}')">{dealer}</button>
             </div>
@@ -1917,10 +1916,25 @@ async function openWhatsAppModal(customerId) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
 
-  // Populate Customer Data into Modal
+  // Populate Customer Data into Modal with clear Distinction between Mobil Saat Ini & Target Upgrade
   document.getElementById('waCustName').textContent = cust.name;
   document.getElementById('waCustPhone').textContent = `+${cust.phone}`;
-  document.getElementById('waCustCar').innerHTML = `🚗 Unit: <strong>${cust.car_model}</strong> ${cust.last_car_model ? `(Saat ini: ${cust.last_car_model})` : ''} ${cust.district ? `• Kec. ${cust.district}` : ''}`;
+  
+  const lastCarClean = (cust.last_car_model && cust.last_car_model !== '-' && cust.last_car_model !== 'NO DATA') ? cust.last_car_model : '';
+  const targetCarClean = cust.recommended_model || cust.car_model || '-';
+
+  document.getElementById('waCustCar').innerHTML = `
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+      <span style="background:rgba(255,255,255,0.15); padding:2px 7px; border-radius:6px;">
+        <i class="fa-solid fa-car"></i> Mobil Saat Ini: <strong>${lastCarClean || 'Tidak Ada Data'}</strong> ${cust.car_age ? `(${cust.car_age})` : ''}
+      </span>
+      <i class="fa-solid fa-arrow-right" style="font-size:10px; opacity:0.8;"></i>
+      <span style="background:rgba(215,18,58,0.3); border:1px solid rgba(215,18,58,0.5); padding:2px 7px; border-radius:6px; font-weight:800;">
+        <i class="fa-solid fa-bullseye"></i> Target Upgrade: <strong>${targetCarClean}</strong>
+      </span>
+      ${cust.district ? `<span style="opacity:0.85;">• Kec. ${cust.district}</span>` : ''}
+    </div>
+  `;
 
   // Populate Templates Dropdown
   const tmplSelect = document.getElementById('waTemplateSelect');
@@ -1967,12 +1981,20 @@ function insertVariableToWA(tag) {
     ? followupState.salesInfo.name 
     : (localStorage.getItem('namaSales') || 'Sales Tunas Toyota');
 
+  const lastCarClean = (activeCustomerForWA && activeCustomerForWA.last_car_model && activeCustomerForWA.last_car_model !== '-' && activeCustomerForWA.last_car_model !== 'NO DATA') 
+    ? activeCustomerForWA.last_car_model 
+    : '';
+
   let insertVal = tag;
   if (tag === '{nama_sales}') insertVal = `*${salesName}*`;
   else if (tag === '{nama_customer}' && activeCustomerForWA) insertVal = `*${activeCustomerForWA.name}*`;
-  else if (tag === '{kendaraan_terakhir}' && activeCustomerForWA) insertVal = `*${activeCustomerForWA.last_car_model || activeCustomerForWA.car_model}*`;
+  else if ((tag === '{kendaraan_terakhir}' || tag === '{mobil_saat_ini}' || tag === '{tipe_mobil}') && activeCustomerForWA) {
+    insertVal = lastCarClean ? `*${lastCarClean}*` : 'mobil Toyota Bpk/Ibu';
+  }
   else if (tag === '{usia_kendaraan}' && activeCustomerForWA) insertVal = activeCustomerForWA.car_age || '3 Tahun';
-  else if (tag === '{model_rekomendasi}' && activeCustomerForWA) insertVal = `*${activeCustomerForWA.recommended_model || activeCustomerForWA.car_model}*`;
+  else if ((tag === '{model_rekomendasi}' || tag === '{target_upgrade}') && activeCustomerForWA) {
+    insertVal = `*${activeCustomerForWA.recommended_model || activeCustomerForWA.car_model || 'Toyota Terbaru'}*`;
+  }
   else if (tag === '{cluster}' && activeCustomerForWA) insertVal = activeCustomerForWA.cluster_name || '';
   else if (tag === '{kecamatan}' && activeCustomerForWA) insertVal = activeCustomerForWA.district || '';
   else if (tag === '{dealer}') insertVal = '*Tunas Toyota Kiara Condong*';
@@ -2016,16 +2038,42 @@ async function applyWhatsAppTemplate(templateId) {
       updateLiveBubble(data.formatted_text);
     }
   } catch (e) {
+    // Intelligent client-side fallback formatting
+    const c = activeCustomerForWA;
+    const lastCar = (c.last_car_model && c.last_car_model !== '-' && c.last_car_model !== 'NO DATA') ? c.last_car_model : '';
+    const recModel = c.recommended_model || c.car_model || 'Toyota Terbaru';
+    const carAge = (c.car_age && c.car_age !== '-' && c.car_age !== 'NO DATA') ? c.car_age : '';
+    const district = (c.district && c.district !== '-' && c.district !== 'NO DATA') ? c.district : '';
+    const plate = (c.plate_number && c.plate_number !== '-' && c.plate_number !== 'NO DATA') ? c.plate_number : '';
+
+    let mobilSaatIniTeks = lastCar ? `*${lastCar}*` : 'mobil Toyota Bpk/Ibu';
+    let teksKendaraanLama = lastCar ? ` *${lastCar}*${carAge ? ` (${carAge})` : ''}` : '';
+    let tanyaPengalaman = lastCar 
+      ? `Bagaimana pengalaman berkendara dengan mobil *${lastCar}* Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`
+      : `Bagaimana pengalaman berkendara dengan mobil Toyota Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`;
+    let teksStnkUnit = lastCar ? ` *${lastCar}*${plate ? ` (*${plate}*)` : ''}` : (plate ? ` (*${plate}*)` : '');
+    let teksKecamatan = district ? ` di Kec. ${district}` : '';
+
     let formatted = tmpl.content
-      .replace(/{nama_customer}/gi, activeCustomerForWA.name || '')
-      .replace(/{tipe_mobil}/gi, activeCustomerForWA.car_model || '')
-      .replace(/{kendaraan_terakhir}/gi, activeCustomerForWA.last_car_model || activeCustomerForWA.car_model || '')
-      .replace(/{usia_kendaraan}/gi, activeCustomerForWA.car_age || '')
-      .replace(/{model_rekomendasi}/gi, activeCustomerForWA.recommended_model || activeCustomerForWA.car_model || '')
-      .replace(/{cluster}/gi, activeCustomerForWA.cluster_name || '')
-      .replace(/{kecamatan}/gi, activeCustomerForWA.district || '')
+      .replace(/\*?{mobil_saat_ini}\*?/gi, mobilSaatIniTeks)
+      .replace(/\*?{kendaraan_terakhir}\*?/gi, mobilSaatIniTeks)
+      .replace(/\*?{tipe_mobil}\*?/gi, mobilSaatIniTeks)
+      .replace(/\*?{model_rekomendasi}\*?/gi, `*${recModel}*`)
+      .replace(/\*?{target_upgrade}\*?/gi, `*${recModel}*`)
+      .replace(/{tanya_pengalaman_berkendara}/gi, tanyaPengalaman)
+      .replace(/{teks_kendaraan_lama}/gi, teksKendaraanLama)
+      .replace(/{teks_mobil_saat_ini}/gi, lastCar ? ` *${lastCar}*` : '')
+      .replace(/{teks_stnk_unit}/gi, teksStnkUnit)
+      .replace(/{teks_kecamatan}/gi, teksKecamatan)
+      .replace(/{nama_customer}/gi, c.name || '')
+      .replace(/{usia_kendaraan}/gi, carAge || '3 Tahun')
+      .replace(/{cluster}/gi, c.cluster_name || '')
+      .replace(/{kecamatan}/gi, district)
+      .replace(/{nopol}/gi, plate || '-')
       .replace(/{nama_sales}/gi, salesName)
-      .replace(/{dealer}/gi, 'Tunas Toyota Kiara Condong');
+      .replace(/{dealer}/gi, 'Tunas Toyota Kiara Condong')
+      .replace(/\*{2,}/g, '*');
+
     document.getElementById('waMessageText').value = formatted;
     updateLiveBubble(formatted);
   }

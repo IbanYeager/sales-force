@@ -1220,7 +1220,22 @@ async function openWhatsAppDirect(customerId) {
 
   document.getElementById('mWaCustName').textContent = cust.name;
   document.getElementById('mWaCustPhone').textContent = `+${cust.phone}`;
-  document.getElementById('mWaCustCar').innerHTML = `🚗 Unit: <strong>${cust.car_model}</strong> ${cust.last_car_model ? `(Saat ini: ${cust.last_car_model})` : ''} ${cust.district ? `• Kec. ${cust.district}` : ''}`;
+
+  const lastCarClean = (cust.last_car_model && cust.last_car_model !== '-' && cust.last_car_model !== 'NO DATA') ? cust.last_car_model : '';
+  const targetCarClean = cust.recommended_model || cust.car_model || '-';
+
+  document.getElementById('mWaCustCar').innerHTML = `
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+      <span style="background:rgba(255,255,255,0.15); padding:2px 7px; border-radius:6px;">
+        <i class="fa-solid fa-car"></i> Mobil Saat Ini: <strong>${lastCarClean || 'Tidak Ada Data'}</strong> ${cust.car_age ? `(${cust.car_age})` : ''}
+      </span>
+      <i class="fa-solid fa-arrow-right" style="font-size:10px; opacity:0.8;"></i>
+      <span style="background:rgba(215,18,58,0.3); border:1px solid rgba(215,18,58,0.5); padding:2px 7px; border-radius:6px; font-weight:800;">
+        <i class="fa-solid fa-bullseye"></i> Target Upgrade: <strong>${targetCarClean}</strong>
+      </span>
+      ${cust.district ? `<span style="opacity:0.85;">• Kec. ${cust.district}</span>` : ''}
+    </div>
+  `;
 
   const tmplSelect = document.getElementById('mWaTemplateSelect');
   tmplSelect.innerHTML = '';
@@ -1272,8 +1287,43 @@ async function applyMasterWATemplate(templateId) {
       updateMasterLiveBubble(data.formatted_text);
     }
   } catch (e) {
-    document.getElementById('mWaMessageText').value = tmpl.content;
-    updateMasterLiveBubble(tmpl.content);
+    const c = masterActiveCustWA;
+    const lastCar = (c.last_car_model && c.last_car_model !== '-' && c.last_car_model !== 'NO DATA') ? c.last_car_model : '';
+    const recModel = c.recommended_model || c.car_model || 'Toyota Terbaru';
+    const carAge = (c.car_age && c.car_age !== '-' && c.car_age !== 'NO DATA') ? c.car_age : '';
+    const district = (c.district && c.district !== '-' && c.district !== 'NO DATA') ? c.district : '';
+    const plate = (c.plate_number && c.plate_number !== '-' && c.plate_number !== 'NO DATA') ? c.plate_number : '';
+
+    let mobilSaatIniTeks = lastCar ? `*${lastCar}*` : 'mobil Toyota Bpk/Ibu';
+    let teksKendaraanLama = lastCar ? ` *${lastCar}*${carAge ? ` (${carAge})` : ''}` : '';
+    let tanyaPengalaman = lastCar 
+      ? `Bagaimana pengalaman berkendara dengan mobil *${lastCar}* Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`
+      : `Bagaimana pengalaman berkendara dengan mobil Toyota Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`;
+    let teksStnkUnit = lastCar ? ` *${lastCar}*${plate ? ` (*${plate}*)` : ''}` : (plate ? ` (*${plate}*)` : '');
+    let teksKecamatan = district ? ` di Kec. ${district}` : '';
+
+    let formatted = tmpl.content
+      .replace(/\*?{mobil_saat_ini}\*?/gi, mobilSaatIniTeks)
+      .replace(/\*?{kendaraan_terakhir}\*?/gi, mobilSaatIniTeks)
+      .replace(/\*?{tipe_mobil}\*?/gi, mobilSaatIniTeks)
+      .replace(/\*?{model_rekomendasi}\*?/gi, `*${recModel}*`)
+      .replace(/\*?{target_upgrade}\*?/gi, `*${recModel}*`)
+      .replace(/{tanya_pengalaman_berkendara}/gi, tanyaPengalaman)
+      .replace(/{teks_kendaraan_lama}/gi, teksKendaraanLama)
+      .replace(/{teks_mobil_saat_ini}/gi, lastCar ? ` *${lastCar}*` : '')
+      .replace(/{teks_stnk_unit}/gi, teksStnkUnit)
+      .replace(/{teks_kecamatan}/gi, teksKecamatan)
+      .replace(/{nama_customer}/gi, c.name || '')
+      .replace(/{usia_kendaraan}/gi, carAge || '3 Tahun')
+      .replace(/{cluster}/gi, c.cluster_name || '')
+      .replace(/{kecamatan}/gi, district)
+      .replace(/{nopol}/gi, plate || '-')
+      .replace(/{nama_sales}/gi, 'Sales Tunas Toyota')
+      .replace(/{dealer}/gi, 'Tunas Toyota Kiara Condong')
+      .replace(/\*{2,}/g, '*');
+
+    document.getElementById('mWaMessageText').value = formatted;
+    updateMasterLiveBubble(formatted);
   }
 }
 
