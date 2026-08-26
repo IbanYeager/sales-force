@@ -16,6 +16,12 @@ const SalesSuperpowers = {
   isRecording: false,
   salesCoords: null,
 
+  getApiPrefix() {
+    const path = window.location.pathname;
+    const isRoot = !path.includes('/pages/') && !path.includes('/pages_spv/') && !path.includes('/pages_kacab/');
+    return isRoot ? 'api/' : '../api/';
+  },
+
   // =========================================================================
   // 1. RADAR PROSPEK TERDEKAT (EXECUTIVE RADAR COCKPIT)
   // =========================================================================
@@ -105,7 +111,7 @@ const SalesSuperpowers = {
 
     try {
       const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
-      const res = await fetch(`../api/api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&sales_id=${salesId}`);
+      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&sales_id=${salesId}`);
       const result = await res.json();
 
       if (result.status !== 'success' || !result.data || result.data.length === 0) {
@@ -289,7 +295,7 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
   async checkDailyFollowupReminders() {
     try {
       const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
-      const res = await fetch(`../api/api_followup.php?action=customers&sales_id=${salesId}`);
+      const res = await fetch(`${this.getApiPrefix()}api_followup.php?action=customers&sales_id=${salesId}`);
       const json = await res.json();
       
       if (json.status !== 'success' || !json.data) return;

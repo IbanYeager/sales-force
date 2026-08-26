@@ -333,7 +333,7 @@ function renderCustomerTable() {
     }
 
     html += `
-      <tr style="${isSelected ? 'background:#fff1f2;' : ''}">
+      <tr id="masterRow_${c.id}" style="${isSelected ? 'background:#fff1f2;' : ''}">
         <!-- 1. Checkbox -->
         <td style="text-align:center; width:44px;">
           <input type="checkbox" style="width:17px; height:17px; accent-color:#d7123a; cursor:pointer;" ${isSelected ? 'checked' : ''} onchange="toggleSelectCustomer(${c.id})">
@@ -1273,11 +1273,21 @@ async function applyMasterWATemplate(templateId) {
 
 function executeMasterSendWA() {
   if (!masterActiveCustWA) return;
+  const customerId = masterActiveCustWA.id;
   const msg = document.getElementById('mWaMessageText').value;
   const cleanPhone = masterActiveCustWA.phone.replace(/[^0-9]/g, '');
   const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
   closeMasterWAModal();
+
+  const row = document.getElementById(`masterRow_${customerId}`);
+  if (row) {
+    row.classList.remove('card-just-followed-up');
+    void row.offsetWidth;
+    row.classList.add('card-just-followed-up');
+    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => row.classList.remove('card-just-followed-up'), 5000);
+  }
 }
 
 // -------------------------------------------------------------

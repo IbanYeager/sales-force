@@ -732,7 +732,7 @@ function handleStatusFilter(status, btn) {
   renderCustomerCards();
 }
 
-function renderCustomerCards() {
+function renderCustomerCards(preserveRenderLimit = false) {
   let list = followupState.customers;
 
   // Filter Search
@@ -760,12 +760,35 @@ function renderCustomerCards() {
   }
 
   followupState.filteredList = list;
-  followupState.renderLimit = 24;
+
+  const lastActiveId = sessionStorage.getItem('last_active_fu_customer_id');
+  if (lastActiveId) {
+    const targetIdx = list.findIndex(x => String(x.id) === String(lastActiveId));
+    if (targetIdx !== -1 && targetIdx >= 24) {
+      followupState.renderLimit = Math.min(list.length, Math.ceil((targetIdx + 1) / 24) * 24);
+    } else if (!preserveRenderLimit) {
+      followupState.renderLimit = 24;
+    }
+  } else if (!preserveRenderLimit) {
+    followupState.renderLimit = 24;
+  }
 
   if (followupState.viewMode === 'table') {
     renderCustomerTableView(list);
   } else {
     renderCustomerCardsView(list, false);
+  }
+
+  // Scroll to last active customer if available
+  if (lastActiveId) {
+    setTimeout(() => {
+      const targetEl = document.getElementById(`customerCard_${lastActiveId}`) || document.getElementById(`customerRow_${lastActiveId}`);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetEl.classList.add('card-just-followed-up');
+        setTimeout(() => targetEl.classList.remove('card-just-followed-up'), 5000);
+      }
+    }, 200);
   }
 }
 
@@ -837,6 +860,15 @@ function renderSingleCustomerCardHtml(c) {
 
   const dateInfo = formatWibDate(c.followup_date);
 
+  let statusBadgeHtml = '';
+  if (c.followup_status === 'Deal / Selesai') {
+    statusBadgeHtml = `<span class="badge-status-pill deal" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-trophy"></i> Deal</span>`;
+  } else if (c.followup_status === 'Tertarik / Jadwal Servis') {
+    statusBadgeHtml = `<span class="badge-status-pill interested" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-thumbs-up"></i> Tertarik</span>`;
+  } else if (c.followup_status === 'Menunggu Respon') {
+    statusBadgeHtml = `<span class="badge-status-pill waiting" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-clock"></i> Respon</span>`;
+  }
+
   return `
     <div class="followup-card ${statusClass}" id="customerCard_${c.id}">
       <div>
@@ -847,7 +879,7 @@ function renderSingleCustomerCardHtml(c) {
             <div>
               <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2;">${c.name}</div>
               <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
-                <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link">
+                <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link" onclick="sessionStorage.setItem('last_active_fu_customer_id', ${c.id})">
                   <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${c.phone}
                 </a>
                 <button type="button" onclick="navigator.clipboard.writeText('${c.phone}'); showToastCopy('${c.phone}');" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; padding:2px 4px; font-size:11px;" title="Salin No. WA">
@@ -861,6 +893,7 @@ function renderSingleCustomerCardHtml(c) {
             <span class="badge-cluster-pill" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-size:10px; font-weight:800;">
               ${c.followup_category || 'Trade-in / Repurchase'}
             </span>
+            <div id="custCardStatusPill_${c.id}">${statusBadgeHtml}</div>
             <span style="font-size:9.5px; font-family:monospace; color:#94a3b8; font-weight:700;">
               ${c.customer_code || `CUST-${c.id}`}
             </span>
@@ -1234,7 +1267,7 @@ function renderCustomerTableView(list) {
     const dateInfo = formatWibDate(c.followup_date);
 
     html += `
-      <tr>
+      <tr id="customerRow_${c.id}">
         <!-- 1. Customer & Kontak -->
         <td>
           <div style="display:flex; align-items:center; gap:10px;">
@@ -1242,7 +1275,7 @@ function renderCustomerTableView(list) {
             <div>
               <div style="font-weight:800; color:#0f172a; font-size:13.5px; line-height:1.2;">${c.name}</div>
               <div style="font-family:monospace; font-size:11.5px; color:#059669; font-weight:700; margin-top:2px;">
-                <a href="https://wa.me/${c.phone}" target="_blank" style="color:inherit; text-decoration:none;">
+                <a href="https://wa.me/${c.phone}" target="_blank" onclick="sessionStorage.setItem('last_active_fu_customer_id', ${c.id})" style="color:inherit; text-decoration:none;">
                   <i class="fa-brands fa-whatsapp"></i> +${c.phone}
                 </a>
               </div>
@@ -1541,8 +1574,17 @@ async function sendSaveSalesFu(customerId, showAlert = true) {
         badge.className = 'fu-date-badge recorded';
       }
 
-      // Update hero KPI stats
-      updateHeroStats();
+      // Save active customer ID into sessionStorage
+      sessionStorage.setItem('last_active_fu_customer_id', customerId);
+
+      // Pulse card highlight
+      const card = document.getElementById(`customerCard_${customerId}`);
+      if (card) {
+        card.classList.remove('card-just-followed-up');
+        void card.offsetWidth;
+        card.classList.add('card-just-followed-up');
+        setTimeout(() => card.classList.remove('card-just-followed-up'), 5000);
+      }
 
       // Quick toast notification on manual save
       if (showAlert && typeof showCustomAlert === 'function') {
@@ -1863,42 +1905,190 @@ async function applyWhatsAppTemplate(templateId) {
   }
 }
 
+function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  if (!c) return;
+
+  const nowIso = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  c.followup_date = nowIso;
+  c.followup_status = nextStatus;
+  
+  // Set TAM 4-Pilar logically: Connected & Contacted are always TRUE when WA is sent
+  c.connected = tamData.connected || 'TRUE';
+  c.contacted = tamData.contacted || 'TRUE';
+  c.prospect = tamData.prospect || ((nextStatus === 'Deal / Selesai' || nextStatus === 'Tertarik / Jadwal Servis') ? 'TRUE' : (c.prospect || 'FALSE'));
+  c.spk = tamData.spk || (nextStatus === 'Deal / Selesai' ? 'TRUE' : (c.spk || 'FALSE'));
+  if (tamData.remarks) c.remarks = tamData.remarks;
+  if (tamData.sales_fu_status) c.sales_fu_status = tamData.sales_fu_status;
+
+  // 1. Update Card View in DOM
+  const card = document.getElementById(`customerCard_${customerId}`);
+  if (card) {
+    // Update border color status class
+    card.classList.remove('pending', 'deal', 'interested');
+    if (nextStatus === 'Deal / Selesai') card.classList.add('deal');
+    else if (nextStatus === 'Tertarik / Jadwal Servis') card.classList.add('interested');
+    else if (nextStatus === 'Belum Dihubungi') card.classList.add('pending');
+
+    // Update WIB date badge
+    const dateBadge = document.getElementById(`fuDateBadge_${customerId}`);
+    if (dateBadge) {
+      const dateInfo = formatWibDate(nowIso);
+      dateBadge.textContent = dateInfo.text;
+      dateBadge.className = 'fu-date-badge recorded';
+    }
+
+    // Update status badge pill
+    const statusPill = document.getElementById(`custCardStatusPill_${customerId}`);
+    if (statusPill) {
+      let badgeHtml = '';
+      if (nextStatus === 'Deal / Selesai') {
+        badgeHtml = `<span class="badge-status-pill deal" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-trophy"></i> Deal</span>`;
+      } else if (nextStatus === 'Tertarik / Jadwal Servis') {
+        badgeHtml = `<span class="badge-status-pill interested" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-thumbs-up"></i> Tertarik</span>`;
+      } else if (nextStatus === 'Menunggu Respon') {
+        badgeHtml = `<span class="badge-status-pill waiting" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-clock"></i> Respon</span>`;
+      }
+      statusPill.innerHTML = badgeHtml;
+    }
+
+    // Update remarks and status dropdown in card
+    const selRemarks = document.getElementById(`remarks_${customerId}`);
+    if (selRemarks && c.remarks) selRemarks.value = c.remarks;
+    const selStatus = document.getElementById(`salesFuStatus_${customerId}`);
+    if (selStatus && c.sales_fu_status) selStatus.value = c.sales_fu_status;
+
+    // Update TAM 4-pilar toggle buttons in card
+    ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
+      updateToggleButtonsUI(customerId, f, c[f]);
+    });
+
+    // Add Highlight Pulse & smooth scroll
+    card.classList.remove('card-just-followed-up');
+    void card.offsetWidth; // trigger reflow
+    card.classList.add('card-just-followed-up');
+
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    setTimeout(() => {
+      card.classList.remove('card-just-followed-up');
+    }, 6000);
+  }
+
+  // 2. Update Table View (if active)
+  const row = document.getElementById(`customerRow_${customerId}`);
+  if (row) {
+    ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
+      updateToggleButtonsUI(customerId, f, c[f]);
+    });
+    row.classList.remove('card-just-followed-up');
+    void row.offsetWidth;
+    row.classList.add('card-just-followed-up');
+    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => {
+      row.classList.remove('card-just-followed-up');
+    }, 6000);
+  }
+
+  // Update Hero KPI stats & top tab pending badges
+  updateHeroStats();
+  const pendingCount = followupState.customers.filter(x => x.followup_status === 'Belum Dihubungi').length;
+  const badge = document.getElementById('followupBadgeCount');
+  if (badge) {
+    if (pendingCount > 0) {
+      badge.style.display = 'inline-block';
+      badge.textContent = pendingCount;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+}
+
 async function executeSendWhatsApp() {
   if (!activeCustomerForWA) return;
   const message = document.getElementById('waMessageText').value;
   const nextStatus = document.getElementById('waNextStatus').value;
+  const customerId = activeCustomerForWA.id;
+  const customerName = activeCustomerForWA.name;
 
   const cleanPhone = activeCustomerForWA.phone.replace(/[^0-9]/g, '');
   const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 
-  // Open WhatsApp in new tab
+  // Save active customer ID into sessionStorage so position is always remembered
+  sessionStorage.setItem('last_active_fu_customer_id', customerId);
+
+  // Open WhatsApp in new tab / app
   window.open(waUrl, '_blank');
 
-  // Update Status in backend
+  // Close modal immediately
+  closeWhatsAppModal();
+
+  // Determine TAM 4-Pilar values based on WhatsApp follow up action
+  const isDeal = (nextStatus === 'Deal / Selesai');
+  const isInterested = (nextStatus === 'Tertarik / Jadwal Servis');
+
+  const connectedVal = 'TRUE';
+  const contactedVal = 'TRUE';
+  const prospectVal = (isDeal || isInterested || activeCustomerForWA.prospect === 'TRUE') ? 'TRUE' : 'FALSE';
+  const spkVal = (isDeal || activeCustomerForWA.spk === 'TRUE') ? 'TRUE' : 'FALSE';
+  const remarksVal = isDeal ? 'SPK berhasil' : (isInterested ? 'Customer tertarik' : (activeCustomerForWA.remarks || 'Customer pending'));
+  const salesFuStatusVal = isDeal ? 'Closed' : 'Open';
+
+  // Optimistic UI updates in-place without page reset / DOM rebuild
+  updateSingleCardAfterWhatsApp(customerId, nextStatus, {
+    connected: connectedVal,
+    contacted: contactedVal,
+    prospect: prospectVal,
+    spk: spkVal,
+    remarks: remarksVal,
+    sales_fu_status: salesFuStatusVal
+  });
+
+  // Update Status in backend asynchronously
   try {
-    await fetch('../api/api_followup.php?action=update_status', {
+    const res = await fetch('../api/api_followup.php?action=update_status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        id: activeCustomerForWA.id,
+        id: customerId,
         status: nextStatus,
-        notes: `Follow up via WhatsApp`,
+        connected: connectedVal,
+        contacted: contactedVal,
+        prospect: prospectVal,
+        spk: spkVal,
+        remarks: remarksVal,
+        sales_fu_status: salesFuStatusVal,
+        notes: `Follow up via WhatsApp (${nextStatus})`,
+        reason_followup: activeCustomerForWA.reason_followup || `Follow up via WhatsApp (${nextStatus})`,
         sales_id: followupState.salesInfo ? followupState.salesInfo.id : activeCustomerForWA.assigned_sales_id
       })
     });
-
-    closeWhatsAppModal();
-    loadFollowupCustomers();
+    const data = await res.json();
+    if (data && data.success && data.followup_date) {
+      const c = followupState.customers.find(x => String(x.id) === String(customerId));
+      if (c) {
+        c.followup_date = data.followup_date;
+        const dateBadge = document.getElementById(`fuDateBadge_${customerId}`);
+        if (dateBadge) {
+          const dateInfo = formatWibDate(data.followup_date);
+          dateBadge.textContent = dateInfo.text;
+          dateBadge.className = 'fu-date-badge recorded';
+        }
+      }
+    }
 
     if (typeof showCustomAlert === 'function') {
-      showCustomAlert('WhatsApp Terbuka!', `Status ${activeCustomerForWA.name} berhasil diperbarui menjadi "${nextStatus}".`, 'success');
+      showCustomAlert('WhatsApp Terkirim!', `Pesan untuk ${customerName} telah dibuka di WA. Respon TAM otomatis tercatat (Connected & Contacted = Iya).`, 'success');
     }
   } catch (e) {
-    closeWhatsAppModal();
+    console.error('Error updating status after WhatsApp send:', e);
   }
 }
 
 async function quickUpdateCustomerStatus(customerId, newStatus) {
+  sessionStorage.setItem('last_active_fu_customer_id', customerId);
+  updateSingleCardAfterWhatsApp(customerId, newStatus);
+
   try {
     await fetch('../api/api_followup.php?action=update_status', {
       method: 'POST',
@@ -1909,8 +2099,6 @@ async function quickUpdateCustomerStatus(customerId, newStatus) {
         sales_id: followupState.salesInfo ? followupState.salesInfo.id : null
       })
     });
-
-    loadFollowupCustomers();
   } catch (e) {
     console.error('Error updating status', e);
   }

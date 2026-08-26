@@ -433,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Foto thumbnail
                         let thumbHtml = imgSrc ? `
                                     <div style="position:relative;width:70px;height:70px;flex-shrink:0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.14);">
-                                        <img src="${imgSrc}" alt="${item.tipe_aktivitas}" style="width:100%;height:100%;object-fit:cover;">
+                                        <img src="${imgSrc}" alt="${item.tipe_aktivitas}" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.parentElement.style.background='${ts.bg}'; this.parentElement.innerHTML='<div style=\\'width:70px;height:70px;display:flex;align-items:center;justify-content:center;\\'><i class=\\'fa-solid ${ts.icon}\\' style=\\'font-size:22px;color:${ts.color};\\'></i></div>';">
                                         ${fotoList.length > 1 ? `<span style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;backdrop-filter:blur(4px);">+${fotoList.length - 1}</span>` : ''}
                                     </div>
                                 ` : `

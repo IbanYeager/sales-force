@@ -138,13 +138,15 @@ if (typeof window.OBJECTIONS_DATA === 'undefined') {
 var AI_KNOWLEDGE = window.AI_KNOWLEDGE;
 var OBJECTIONS_DATA = window.OBJECTIONS_DATA;
 
+window.aiCopilotLoaded = true;
 window.currentSelectedObjectionId = window.currentSelectedObjectionId || 'diskon';
 window.currentResponseStyle = window.currentResponseStyle || 'soft';
 var currentSelectedObjectionId = window.currentSelectedObjectionId;
 var currentResponseStyle = window.currentResponseStyle;
 
 // Chat history in session memory
-let chatConversationHistory = [];
+window.chatConversationHistory = window.chatConversationHistory || [];
+var chatConversationHistory = window.chatConversationHistory;
 
 // ==========================================
 // 2. PAGE LEVEL LOGIC (AI COPILOT FULL PAGE)
@@ -430,8 +432,8 @@ function injectFloatingAiWidget() {
 
         @media (max-width: 768px) {
             #btnToggleAiCopilot {
-                bottom: 85px !important;
-                right: 14px !important;
+                bottom: 110px !important;
+                right: 16px !important;
                 padding: 0 !important;
                 width: 50px !important;
                 height: 50px !important;
@@ -450,10 +452,10 @@ function injectFloatingAiWidget() {
                 height: auto !important;
             }
             #aiCopilotWindow {
-                bottom: 145px !important;
+                bottom: 170px !important;
                 right: 4vw !important;
                 width: 92vw !important;
-                height: 72vh !important;
+                height: 70vh !important;
             }
         }
     </style>

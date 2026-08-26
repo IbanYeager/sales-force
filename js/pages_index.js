@@ -245,11 +245,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             const latestFotoList = latest.foto ? latest.foto.split(',') : [];
                             const latestFirstFoto = latestFotoList.length > 0 ? `../uploads/lokasi/${latestFotoList[0]}` : 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80';
 
-                            let latestImageHtml = `<img src="${latestFirstFoto}" alt="${latest.tipe_aktivitas}" class="activity-img" onclick="openPhotoViewer('${latestFirstFoto}')" style="cursor: pointer;">`;
+                            const defaultPlaceholder = 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80';
+                            let latestImageHtml = `<img src="${latestFirstFoto}" alt="${latest.tipe_aktivitas}" class="activity-img" onerror="this.onerror=null; this.src='${defaultPlaceholder}';" onclick="openPhotoViewer('${latestFirstFoto}')" style="cursor: pointer;">`;
                             if (latestFotoList.length > 1) {
                                 latestImageHtml = `
                                 <div style="position: relative; width: 60px; height: 60px; flex-shrink: 0; cursor: pointer;" onclick="openPhotoViewer('${latestFirstFoto}')">
-                                    <img src="${latestFirstFoto}" alt="${latest.tipe_aktivitas}" class="activity-img" style="width: 100%; height: 100%;">
+                                    <img src="${latestFirstFoto}" alt="${latest.tipe_aktivitas}" class="activity-img" onerror="this.onerror=null; this.src='${defaultPlaceholder}';" style="width: 100%; height: 100%;">
                                     <span style="position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.65); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px;">+${latestFotoList.length - 1}</span>
                                 </div>
                             `;
@@ -278,13 +279,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Render semua (maks 10) di modal list
                             modalList.innerHTML = items.map(item => {
                                 const fotoList = item.foto ? item.foto.split(',') : [];
-                                const firstFoto = fotoList.length > 0 ? `../uploads/lokasi/${fotoList[0]}` : 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80';
+                                const firstFoto = fotoList.length > 0 ? `../uploads/lokasi/${fotoList[0]}` : defaultPlaceholder;
 
-                                let imageHtml = `<img src="${firstFoto}" alt="${item.tipe_aktivitas}" class="activity-img" onclick="openPhotoViewer('${firstFoto}')" style="cursor: pointer;">`;
+                                let imageHtml = `<img src="${firstFoto}" alt="${item.tipe_aktivitas}" class="activity-img" onerror="this.onerror=null; this.src='${defaultPlaceholder}';" onclick="openPhotoViewer('${firstFoto}')" style="cursor: pointer;">`;
                                 if (fotoList.length > 1) {
                                     imageHtml = `
                                     <div style="position: relative; width: 60px; height: 60px; flex-shrink: 0; cursor: pointer;" onclick="openPhotoViewer('${firstFoto}')">
-                                        <img src="${firstFoto}" alt="${item.tipe_aktivitas}" class="activity-img" style="width: 100%; height: 100%;">
+                                        <img src="${firstFoto}" alt="${item.tipe_aktivitas}" class="activity-img" onerror="this.onerror=null; this.src='${defaultPlaceholder}';" style="width: 100%; height: 100%;">
                                         <span style="position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.65); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px;">+${fotoList.length - 1}</span>
                                     </div>
                                 `;

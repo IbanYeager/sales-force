@@ -459,6 +459,46 @@
   border-color: #cbd5e1;
 }
 
+/* Card & Row Just Followed-Up Highlight Pulse */
+@keyframes fu-just-sent-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6), 0 4px 16px rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0), 0 8px 24px rgba(16, 185, 129, 0.25);
+    border-color: #059669;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 4px 16px rgba(15, 23, 42, 0.05);
+    border-color: #10b981;
+  }
+}
+
+.followup-card.card-just-followed-up {
+  border-color: #10b981 !important;
+  animation: fu-just-sent-pulse 1.8s ease-in-out 3;
+}
+
+tr.card-just-followed-up td {
+  background: #f0fdf4 !important;
+  transition: background 0.5s ease;
+}
+
+.just-followed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #15803d;
+  border: 1px solid #86efac;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 800;
+  animation: fuPopIn 0.3s ease;
+}
+
 /* Header Inside Card */
 .card-header-row {
   display: flex;
