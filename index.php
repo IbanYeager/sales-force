@@ -8,3 +8,4 @@ define('LARAVEL_START', microtime(true));
 
 // Forward to public index.php
 require __DIR__ . '/public/index.php';
+
