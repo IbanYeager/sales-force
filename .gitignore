@@ -30,3 +30,7 @@ yarn-error.log
 uploads/import_*.xlsx
 public/uploads/import_*.xlsx
 scratch/
+
+# Keep composer.json local only to prevent Hostinger auto composer trigger
+composer.json
+composer.lock
