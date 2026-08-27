@@ -1,62 +1,15 @@
-# .htaccess for Hostinger & Laragon SFT Web Application
-
-# 1. Clean URL Routing (Removes .html from address bar & serves .html internally)
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Prevent rewriting existing physical files or directories
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
-
-    # Don't touch API or Static Asset Folders
-    RewriteCond %{REQUEST_URI} ^/(api|assets|css|js|uploads|image|styles|scratch)/ [NC]
-    RewriteRule ^ - [L]
-
-    # 1. Redirect requests with .html to clean URL without .html
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.html [NC]
-    RewriteRule ^ %1 [R=301,L]
-
-    # 2. Transparently serve .html internally for clean URLs
-    RewriteCond %{REQUEST_FILENAME}.html -f
-    RewriteRule ^(.*)$ $1.html [L,QSA]
-
-    # 3. Handle subfolder setups (e.g. /sft/)
-    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
-    RewriteRule ^(.*)$ %{REQUEST_URI}.html [L,QSA]
+    # Redirect all traffic to Laravel's public directory
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
 
-# 2. Add Proper MIME Types for PWA
-<IfModule mod_mime.c>
-    AddType application/manifest+json .webmanifest .json
-    AddType application/x-web-app-manifest+json .webapp
-    AddType text/cache-manifest .appcache
-</IfModule>
-
-# 3. Enable Gzip / Deflate Compression for Speed
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/manifest+json
-</IfModule>
-
-# 4. Enterprise Security Headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-    Header set Permissions-Policy "geolocation=(self), microphone=(), camera=()"
-</IfModule>
-
-# 5. Prevent Direct Listing of Directories
+# Prevent direct listing of directories
 Options -Indexes
 
-# 6. Block Direct Access to Sensitive System Files (.sql, .log, .env, .git, koneksi.php)
+# Block direct access to sensitive files
 <FilesMatch "\.(sql|log|env|git|htaccess|ini|sh|bak)$">
     Require all denied
 </FilesMatch>
-
-<Files "koneksi.php">
-    # Prevent direct browser access to DB credentials file while allowing PHP include
-    Order Deny,Allow
-    Deny from all
-</Files>
