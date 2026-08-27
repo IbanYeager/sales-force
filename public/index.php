@@ -16,6 +16,20 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
+// Ensure storage directories exist with proper write access
+$requiredDirs = [
+    __DIR__ . '/../storage/framework/views',
+    __DIR__ . '/../storage/framework/sessions',
+    __DIR__ . '/../storage/framework/cache/data',
+    __DIR__ . '/../storage/logs',
+    __DIR__ . '/../bootstrap/cache',
+];
+foreach ($requiredDirs as $rDir) {
+    if (!is_dir($rDir)) {
+        @mkdir($rDir, 0775, true);
+    }
+}
+
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
