@@ -1,0 +1,549 @@
+/* ================================================================
+   WIRANIAGA — EXECUTIVE LUXURY DESIGN SYSTEM
+   Tunas Toyota Kiara Condong
+   ================================================================ */
+
+/* --- KPI GRID 4 MINI STATS --- */
+.wira-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.wira-kpi-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1.5px solid #e2e8f0;
+  padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(13, 27, 62, 0.04);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+}
+
+.wira-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+}
+
+.wira-kpi-card.card-blue::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.wira-kpi-card.card-emerald::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.wira-kpi-card.card-amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.wira-kpi-card.card-rose::before { background: linear-gradient(90deg, #e11d48, #fb7185); }
+
+.wira-kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(13, 27, 62, 0.08);
+  border-color: #cbd5e1;
+}
+
+.wira-kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.wira-kpi-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wira-kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.icon-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); box-shadow: 0 3px 10px rgba(37,99,235,0.3); }
+.icon-emerald { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 3px 10px rgba(16,185,129,0.3); }
+.icon-amber { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 3px 10px rgba(245,158,11,0.3); }
+.icon-rose { background: linear-gradient(135deg, #e11d48, #be123c); box-shadow: 0 3px 10px rgba(225,29,72,0.3); }
+
+.wira-kpi-val {
+  font-size: 24px;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+
+.wira-kpi-sub {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* --- MAIN SECTION CARD --- */
+.spv-card,
+.wira-section-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1.5px solid #e2e8f0;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(13, 27, 62, 0.04);
+  margin-bottom: 24px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* --- TABLE CONTAINER & STYLING (SPACIOUS & LUXURIOUS) --- */
+.table-responsive {
+  border-radius: 14px;
+  border: 1.5px solid #e2e8f0;
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.table.table-board {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  text-align: left;
+}
+
+.table.table-board thead th {
+  background: #f8fafc;
+  padding: 16px 20px !important;
+  color: #475569;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  border-bottom: 1.5px solid #e2e8f0;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.table.table-board thead th.num {
+  text-align: center;
+}
+
+.table.table-board tbody td {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+  transition: background 0.15s ease;
+}
+
+.table.table-board tbody td.num {
+  text-align: center;
+}
+
+.table.table-board tbody tr:hover td {
+  background: #f8fafc;
+}
+
+.table.table-board tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* --- WIRANIAGA IDENTITY COLUMN --- */
+.wira-name {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wira-avatar {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.wira-avatar img {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1.5px solid #e2e8f0;
+  display: block;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.wira-avatar .dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.wira-avatar .dot.off {
+  background: #94a3b8;
+}
+
+.wira-meta-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+
+.wira-spv-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.tag-spv-ryan { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.tag-spv-alvin { background: #fdf4ff; color: #a21caf; border: 1px solid #f0abfc; }
+.tag-spv-riva { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.tag-spv-default { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+
+/* --- USERNAME PILL --- */
+.wira-username-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  display: inline-block;
+}
+
+/* --- CONVERSION RATE BAR --- */
+.wira-rate-box {
+  min-width: 140px;
+}
+
+.wira-rate-num {
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.wira-rate-track {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.wira-rate-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.rate-high { background: linear-gradient(90deg, #10b981, #059669); }
+.rate-medium { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.rate-normal { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+.rate-low { background: linear-gradient(90deg, #f43f5e, #e11d48); }
+
+/* --- STATUS PRESENSI --- */
+.wira-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  line-height: 1.2;
+}
+
+.wira-status-pill.online {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.15);
+}
+
+.wira-status-pill.offline {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+/* --- TINGKATAN (GRADE) BADGE --- */
+.badge-tingkatan {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  display: inline-block;
+  letter-spacing: 0.2px;
+}
+
+.grade-executive { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.grade-senior { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.grade-junior { background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; }
+.grade-magang { background: #f8fafc; color: #64748b; border: 1px solid #cbd5e1; }
+
+/* --- AI COACHING BADGE --- */
+.badge-coaching {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.badge-coaching.high { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.badge-coaching.fast { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.badge-coaching.consistent { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.badge-coaching.need { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+
+/* --- ACTION BUTTONS (GENEROUS SPACING) --- */
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn-wira-action {
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.btn-wira-action:hover {
+  transform: translateY(-1px);
+}
+
+.btn-wira-coaching {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+.btn-wira-coaching:hover {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.btn-wira-edit {
+  background: #f8fafc;
+  color: #334155;
+  border-color: #cbd5e1;
+  padding: 7px 10px;
+}
+.btn-wira-edit:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-wira-delete {
+  background: #fff1f2;
+  color: #ef4444;
+  border-color: #fecaca;
+  padding: 7px 10px;
+}
+.btn-wira-delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ================================================================
+   MODALS
+   ================================================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+
+.modal-overlay.show,
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+  transform: scale(0.96);
+  transition: all 0.25s ease;
+  overflow: hidden;
+  border: 1.5px solid #e2e8f0;
+}
+
+.modal-overlay.show .modal-content,
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 100%);
+  color: #fff;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 24px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.form-group label i {
+  color: #d7123a;
+  margin-right: 5px;
+}
+
+.label-hint {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #0f172a;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+select.form-control {
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+@media (max-width: 1024px) {
+  .wira-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .wira-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

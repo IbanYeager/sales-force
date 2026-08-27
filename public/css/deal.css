@@ -1,0 +1,168 @@
+﻿/* Modern upload box styling */
+        .upload-card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .upload-box-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .upload-box-wrapper label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .deal-upload-box {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .deal-upload-box:hover {
+            border-color: #10b981;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .deal-upload-box i {
+            font-size: 28px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            transition: color 0.2s;
+        }
+
+        .deal-upload-box:hover i {
+            color: #10b981;
+        }
+
+        .deal-upload-box span {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .deal-upload-box span.sub-text {
+            font-size: 10px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            opacity: 0;
+            z-index: 2;
+            transition: opacity 0.2s;
+        }
+
+        .deal-upload-box:hover .preview-overlay {
+            opacity: 1;
+        }
+
+        /* Success screen overlays */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s ease;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .success-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 360px;
+            margin: auto;
+            border-radius: 28px;
+            padding: 36px 28px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            transform: scale(0.9);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-sizing: border-box;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .success-overlay.show .success-card {
+            transform: scale(1);
+        }
+
+        .success-icon-circle {
+            width: 72px;
+            height: 72px;
+            background: #d1fae5;
+            color: #10b981;
+            font-size: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .success-card h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .success-card p {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }

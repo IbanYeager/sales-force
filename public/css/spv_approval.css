@@ -1,0 +1,311 @@
+/* ================================================================
+   APPROVAL — kartu pengajuan SPK / OLX / Test Drive
+   (Tab & badge-count sudah ada di style_spv.css)
+   ================================================================ */
+
+/* Grid kartu approval */
+.approval-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 992px) {
+  .approval-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1500px) {
+  .approval-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.approval-card {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+}
+
+.approval-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.card-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.card-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-meta i {
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* Status badge */
+.badge-status,
+.status-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+
+.status-pending {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border-color: var(--amber-border);
+}
+
+.status-approved {
+  background: var(--green-soft);
+  color: var(--green);
+  border-color: var(--green-border);
+}
+
+.status-rejected {
+  background: var(--red-soft);
+  color: var(--red);
+  border-color: var(--red-border);
+}
+
+.card-body {
+  padding: 14px 16px;
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* Baris data label→nilai (dipakai kartu Test Drive) */
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.data-row:last-child {
+  border-bottom: none;
+}
+
+.data-row span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.data-row strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+}
+
+.card-footer {
+  padding: 13px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Input harga OLX */
+.price-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  transition: var(--transition);
+}
+
+.price-input-group:focus-within {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(36, 88, 197, 0.12);
+}
+
+.price-input-group span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.price-input-group input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text);
+  padding: 6px 0;
+  background: transparent;
+  min-width: 0;
+}
+
+/* Tombol aksi setuju / tolak */
+.btn-action {
+  padding: 0 15px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  transition: var(--transition);
+}
+
+.btn-approve {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.btn-approve:hover {
+  background: #0b6e4c;
+}
+
+.btn-reject {
+  background: var(--surface);
+  border-color: var(--red-border);
+  color: var(--red);
+}
+
+.btn-reject:hover {
+  background: var(--red-soft);
+}
+
+/* Thumbnail foto */
+.photo-thumb-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.photo-thumb {
+  aspect-ratio: 1.33;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.photo-thumb:hover {
+  opacity: 0.85;
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Zoom overlay (dipakai bersama zoomImage()) */
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 11000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.zoom-overlay img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.zoom-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+}
+
+/* Grid info dalam kartu SPK */
+.kv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.kv-item .kv-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.kv-item .kv-value {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text);
+  margin-top: 2px;
+}

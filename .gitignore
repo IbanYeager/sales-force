@@ -1,30 +1,33 @@
-# Temporary and Scratch Files
-scratch/
-*.tmp
-*.log
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/logs/*.log
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/views/.gitignore
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
 
-# Large / Installer / Archive Files
+# Big upload imports / archives
 *.zip
-*.rar
-*.7z
 *.msi
-*.exe
-*.bat
-*.sql
-Chat WhatsApp*
-update ai.xlsx
-"TD Test Drive (1).pdf"
-
-# User Uploads (Upload manual 1x ke Hostinger agar Git super cepat & tidak bentrok)
-uploads/*
-!uploads/.gitkeep
-!uploads/*/.gitkeep
-
-# IDE & Configs
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-api/config_db.php
-config_db.php
+uploads/import_*.xlsx
+public/uploads/import_*.xlsx
 scratch/

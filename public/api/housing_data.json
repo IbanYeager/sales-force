@@ -1,0 +1,2770 @@
+{
+  "ANDIR": {
+    "total_komplek": 17,
+    "total_unit": 1853,
+    "komplek_list": [
+      {
+        "nama": "KOMPLEK DADALI",
+        "unit": 476
+      },
+      {
+        "nama": "KOMPLEK PJKA",
+        "unit": 402
+      },
+      {
+        "nama": "KOMPLEK SAPTAMARGA",
+        "unit": 172
+      },
+      {
+        "nama": "RAJAWALI SAKTI I",
+        "unit": 142
+      },
+      {
+        "nama": "MALTRA RESIDEN",
+        "unit": 79
+      },
+      {
+        "nama": "SUDIRMAN TOWN HOUSE",
+        "unit": 78
+      },
+      {
+        "nama": "CEMPAKA HIJAU",
+        "unit": 77
+      },
+      {
+        "nama": "KOMPLEK GARUDA",
+        "unit": 76
+      },
+      {
+        "nama": "TAMAN PESONA MEDITERAN",
+        "unit": 66
+      },
+      {
+        "nama": "KERTA LAKSANA",
+        "unit": 63
+      },
+      {
+        "nama": "KOMPLEK CENDRAWASIH",
+        "unit": 63
+      },
+      {
+        "nama": "KOMPLEK ELANG",
+        "unit": 44
+      },
+      {
+        "nama": "ANDIR SWADAYA",
+        "unit": 38
+      },
+      {
+        "nama": "RAJAWALI SAKTI PERMAI",
+        "unit": 36
+      },
+      {
+        "nama": "MY HOME GUNUNG BATU",
+        "unit": 33
+      },
+      {
+        "nama": "BURUNG TUNGKU",
+        "unit": 8
+      },
+      {
+        "nama": "SUDIRMAN SUITES APARTMENT (APARTEMEN)",
+        "unit": 0
+      }
+    ]
+  },
+  "ANTAPANI": {
+    "total_komplek": 37,
+    "total_unit": 11621,
+    "komplek_list": [
+      {
+        "nama": "GRIYA BUMI ANTAPANI",
+        "unit": 5952
+      },
+      {
+        "nama": "PURI DAGO MAS",
+        "unit": 729
+      },
+      {
+        "nama": "SETRA DAGO",
+        "unit": 549
+      },
+      {
+        "nama": "PELANGI ANTAPANI",
+        "unit": 500
+      },
+      {
+        "nama": "PURI DAGO ASRI",
+        "unit": 429
+      },
+      {
+        "nama": "PRATISTA II",
+        "unit": 408
+      },
+      {
+        "nama": "PARAKAN MAS",
+        "unit": 342
+      },
+      {
+        "nama": "TANJUNG SARI ASRI RESIDENCE",
+        "unit": 250
+      },
+      {
+        "nama": "MITRA DAGO PARAHYANGAN",
+        "unit": 230
+      },
+      {
+        "nama": "KOMPLEK TANJUNGSARI",
+        "unit": 228
+      },
+      {
+        "nama": "GRAND ANTAPANI TOWN HOUSE",
+        "unit": 204
+      },
+      {
+        "nama": "KOMPLEK BOUGENVILLE",
+        "unit": 158
+      },
+      {
+        "nama": "PRATISTA ANTAPANI",
+        "unit": 150
+      },
+      {
+        "nama": "ANTAPANI CITY",
+        "unit": 130
+      },
+      {
+        "nama": "ANTAPANI CITY RESIDENCE",
+        "unit": 130
+      },
+      {
+        "nama": "SWEET ANTAPANI RESIDENCE",
+        "unit": 117
+      },
+      {
+        "nama": "BUMI MAS KENCANA",
+        "unit": 105
+      },
+      {
+        "nama": "ANTAPANI REGENCY",
+        "unit": 103
+      },
+      {
+        "nama": "DE LAVENDER",
+        "unit": 102
+      },
+      {
+        "nama": "PARADISE REGENCY",
+        "unit": 100
+      },
+      {
+        "nama": "KOMPLEK BELLEZA",
+        "unit": 90
+      },
+      {
+        "nama": "PURI PERMATA",
+        "unit": 85
+      },
+      {
+        "nama": "ANTAPANI TOWNHOUSE",
+        "unit": 80
+      },
+      {
+        "nama": "THE MANSION",
+        "unit": 66
+      },
+      {
+        "nama": "SINDANG SARI ASRI",
+        "unit": 64
+      },
+      {
+        "nama": "MITRA RESIDENCE ANTAPANI",
+        "unit": 54
+      },
+      {
+        "nama": "MUTIARA ANTAPANI",
+        "unit": 48
+      },
+      {
+        "nama": "SINDANG SARI ASRI II",
+        "unit": 48
+      },
+      {
+        "nama": "CASA DE ESTA",
+        "unit": 34
+      },
+      {
+        "nama": "ANTAPANI RESIDENCE",
+        "unit": 30
+      },
+      {
+        "nama": "BUNI SARI ASRI",
+        "unit": 27
+      },
+      {
+        "nama": "FLORENCE RESIDENCE",
+        "unit": 26
+      },
+      {
+        "nama": "CLUSTER ANTAPANI MAKMUR",
+        "unit": 21
+      },
+      {
+        "nama": "SETRA MAKMUR",
+        "unit": 17
+      },
+      {
+        "nama": "KOMPLEK HARMONI",
+        "unit": 15
+      },
+      {
+        "nama": "APARTEMEN MENARA ANTAPANI (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "KOMPLEK KALIJATI",
+        "unit": 0
+      }
+    ]
+  },
+  "ARCAMANIK": {
+    "total_komplek": 42,
+    "total_unit": 8152,
+    "komplek_list": [
+      {
+        "nama": "TAMAN GOLF ARCAMANIK ENDAH",
+        "unit": 2381
+      },
+      {
+        "nama": "GRAND PINUS REGENCY",
+        "unit": 1749
+      },
+      {
+        "nama": "GRIYA CARAKA",
+        "unit": 500
+      },
+      {
+        "nama": "PURI DAGO",
+        "unit": 390
+      },
+      {
+        "nama": "PUTERACO GADING REGENCY",
+        "unit": 320
+      },
+      {
+        "nama": "PARAKAN AYU",
+        "unit": 315
+      },
+      {
+        "nama": "KOMPLEK GURUMINDA",
+        "unit": 250
+      },
+      {
+        "nama": "SARIMAS REGENCY",
+        "unit": 250
+      },
+      {
+        "nama": "KAMAYANGAN RESIDENCE",
+        "unit": 215
+      },
+      {
+        "nama": "GREEN CARAKA",
+        "unit": 167
+      },
+      {
+        "nama": "ANTA BARU II",
+        "unit": 155
+      },
+      {
+        "nama": "PURI AYU PRATAMA",
+        "unit": 140
+      },
+      {
+        "nama": "PESONA CISARANTEN INDAH",
+        "unit": 134
+      },
+      {
+        "nama": "CLUSTER PAWENANG",
+        "unit": 125
+      },
+      {
+        "nama": "PESONA ARCAMANIK PERMAI",
+        "unit": 125
+      },
+      {
+        "nama": "MY HOME ARCAMANIK",
+        "unit": 95
+      },
+      {
+        "nama": "PANORAMA ALAM PARAHYANGAN",
+        "unit": 90
+      },
+      {
+        "nama": "PARAKAN ASRI",
+        "unit": 85
+      },
+      {
+        "nama": "CISARANTEN LNDAH",
+        "unit": 82
+      },
+      {
+        "nama": "PERMATA ARCAMANIK",
+        "unit": 80
+      },
+      {
+        "nama": "GRIYA ASRI",
+        "unit": 70
+      },
+      {
+        "nama": "D' CASA GRANDE",
+        "unit": 60
+      },
+      {
+        "nama": "KOMPLEK NIRWANA",
+        "unit": 60
+      },
+      {
+        "nama": "EVERGREEN TOWNHOUSE",
+        "unit": 50
+      },
+      {
+        "nama": "KOMPLEK PRANAYA",
+        "unit": 50
+      },
+      {
+        "nama": "PERMATA LNDAH ARCAMANIK",
+        "unit": 49
+      },
+      {
+        "nama": "DE LA ROSE",
+        "unit": 40
+      },
+      {
+        "nama": "MEDINA ANTAPANI MAKMUR",
+        "unit": 38
+      },
+      {
+        "nama": "PERMATA MULYA RESIDENCE",
+        "unit": 25
+      },
+      {
+        "nama": "MITRA MANUNGGAL",
+        "unit": 16
+      },
+      {
+        "nama": "ALFA GARDEN",
+        "unit": 12
+      },
+      {
+        "nama": "INDAH MULIA",
+        "unit": 11
+      },
+      {
+        "nama": "KOMPLEK AMARILIS",
+        "unit": 11
+      },
+      {
+        "nama": "GANDASARI RESIDENCE",
+        "unit": 6
+      },
+      {
+        "nama": "KAWALI ESTATE",
+        "unit": 6
+      },
+      {
+        "nama": "APARTEMEN PANORAMIC (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "CLUSTER CISARANTEN",
+        "unit": 0
+      },
+      {
+        "nama": "CLUSTER KINARASTI",
+        "unit": 0
+      },
+      {
+        "nama": "EDELWEISS TOWNHOUSE",
+        "unit": 0
+      },
+      {
+        "nama": "GREEN CISARANTEN",
+        "unit": 0
+      },
+      {
+        "nama": "KOMPLEK CISARANTEN",
+        "unit": 0
+      },
+      {
+        "nama": "PURI CISARANTEN",
+        "unit": 0
+      }
+    ]
+  },
+  "ASTANA ANYAR": {
+    "total_komplek": 4,
+    "total_unit": 818,
+    "komplek_list": [
+      {
+        "nama": "KOMPLEK MUARA",
+        "unit": 465
+      },
+      {
+        "nama": "KURDI TIMUR, BARAT & SELATAN",
+        "unit": 178
+      },
+      {
+        "nama": "JATI PERMAI",
+        "unit": 95
+      },
+      {
+        "nama": "KARASAK BARU",
+        "unit": 80
+      }
+    ]
+  },
+  "BABAKAN CIPARAY": {
+    "total_komplek": 15,
+    "total_unit": 3528,
+    "komplek_list": [
+      {
+        "nama": "SUMBER SARI INDAH",
+        "unit": 795
+      },
+      {
+        "nama": "CIBOLERANG INDAH",
+        "unit": 692
+      },
+      {
+        "nama": "KOMPLEK PASADENA",
+        "unit": 432
+      },
+      {
+        "nama": "PRATISTA TAMAN SAKURA",
+        "unit": 300
+      },
+      {
+        "nama": "TAMAN SAKURA LNDAH",
+        "unit": 300
+      },
+      {
+        "nama": "DIAN PERMAI",
+        "unit": 285
+      },
+      {
+        "nama": "HOLIS REGENCY",
+        "unit": 250
+      },
+      {
+        "nama": "KOPO ELOK",
+        "unit": 223
+      },
+      {
+        "nama": "KOPO MAS",
+        "unit": 70
+      },
+      {
+        "nama": "TAMAN KOPO MELATI",
+        "unit": 55
+      },
+      {
+        "nama": "TAMAN HIJAU",
+        "unit": 42
+      },
+      {
+        "nama": "KOPO SARI",
+        "unit": 32
+      },
+      {
+        "nama": "TERRACE GARDEN",
+        "unit": 20
+      },
+      {
+        "nama": "PASADENA TOWNHOUSE",
+        "unit": 16
+      },
+      {
+        "nama": "SITU INDAH",
+        "unit": 16
+      }
+    ]
+  },
+  "BANDUNG KIDUL": {
+    "total_komplek": 13,
+    "total_unit": 2903,
+    "komplek_list": [
+      {
+        "nama": "BATUNUNGGAL LNDAH",
+        "unit": 1630
+      },
+      {
+        "nama": "JAKA PURWA",
+        "unit": 400
+      },
+      {
+        "nama": "BUANA SARI",
+        "unit": 215
+      },
+      {
+        "nama": "BUAH BATU REGENCY",
+        "unit": 145
+      },
+      {
+        "nama": "AMAYA RESIDENCE",
+        "unit": 135
+      },
+      {
+        "nama": "TOPINDO BUAH BATU RESIDENCE",
+        "unit": 104
+      },
+      {
+        "nama": "SUTERA GRAHA",
+        "unit": 86
+      },
+      {
+        "nama": "SAPTA TARUNA PU",
+        "unit": 76
+      },
+      {
+        "nama": "KOMPLEK BARDAN",
+        "unit": 65
+      },
+      {
+        "nama": "NUANSA LNDAH",
+        "unit": 27
+      },
+      {
+        "nama": "BUNGA RESIDENCE",
+        "unit": 20
+      },
+      {
+        "nama": "BUAH BATU PRECIOUS (APARTMENT)",
+        "unit": 0
+      },
+      {
+        "nama": "NEWTON APARTEMENT RESIDENCE (APARTEMEN)",
+        "unit": 0
+      }
+    ]
+  },
+  "BANDUNG KULON": {
+    "total_komplek": 29,
+    "total_unit": 5900,
+    "komplek_list": [
+      {
+        "nama": "TAMAN HOLIS LNDAH I",
+        "unit": 1002
+      },
+      {
+        "nama": "GEMPOL ASRI",
+        "unit": 600
+      },
+      {
+        "nama": "GEMPOL SARI LNDAH",
+        "unit": 585
+      },
+      {
+        "nama": "PERUMNAS CIJERAH I",
+        "unit": 400
+      },
+      {
+        "nama": "MEKAR INDAH",
+        "unit": 383
+      },
+      {
+        "nama": "ISTANA REGENCY SUDIRMAN",
+        "unit": 365
+      },
+      {
+        "nama": "BUMI ASRI GEMPOL SARI",
+        "unit": 299
+      },
+      {
+        "nama": "PERUMNAS CIBUNTU",
+        "unit": 280
+      },
+      {
+        "nama": "PERUMNAS CIJERAH II",
+        "unit": 250
+      },
+      {
+        "nama": "KOMPLEK DIRGANTARA",
+        "unit": 207
+      },
+      {
+        "nama": "TAMAN HOLIS LNDAH II",
+        "unit": 151
+      },
+      {
+        "nama": "HOLIS PESONA TAMAN BURUNG",
+        "unit": 150
+      },
+      {
+        "nama": "HOLIS PERMAI",
+        "unit": 141
+      },
+      {
+        "nama": "GEMPOL ELOK",
+        "unit": 135
+      },
+      {
+        "nama": "PERMATA LNDAH",
+        "unit": 127
+      },
+      {
+        "nama": "MELONG CIJERAH",
+        "unit": 120
+      },
+      {
+        "nama": "KOMPLEK PERDATAM",
+        "unit": 100
+      },
+      {
+        "nama": "PURI AYANA I",
+        "unit": 92
+      },
+      {
+        "nama": "TAMAN SURYA LNDAH",
+        "unit": 90
+      },
+      {
+        "nama": "CIJERAH LNDAH II",
+        "unit": 80
+      },
+      {
+        "nama": "MELONG ASIH REGENCY",
+        "unit": 73
+      },
+      {
+        "nama": "BUMI ASRI REGENCY",
+        "unit": 70
+      },
+      {
+        "nama": "KOMPLEK BPKP",
+        "unit": 63
+      },
+      {
+        "nama": "KOMPLEK KPAD",
+        "unit": 57
+      },
+      {
+        "nama": "SURYANI LNDAH",
+        "unit": 28
+      },
+      {
+        "nama": "KETAPANG KENCANA",
+        "unit": 27
+      },
+      {
+        "nama": "MELONG NIRWANA RESIDENCE",
+        "unit": 25
+      },
+      {
+        "nama": "KOMPLEK MARGAASIH",
+        "unit": 0
+      },
+      {
+        "nama": "PURI AYANA II",
+        "unit": 0
+      }
+    ]
+  },
+  "BATUNUNGGAL": {
+    "total_komplek": 10,
+    "total_unit": 1166,
+    "komplek_list": [
+      {
+        "nama": "BENTANG ASRI",
+        "unit": 368
+      },
+      {
+        "nama": "SALENDRO TIMUR",
+        "unit": 212
+      },
+      {
+        "nama": "JATI LNDAH",
+        "unit": 143
+      },
+      {
+        "nama": "RANCA MANYAR / BUMI DUTA MARTANEGARA",
+        "unit": 117
+      },
+      {
+        "nama": "MEKAR INDAH",
+        "unit": 106
+      },
+      {
+        "nama": "TULIP PERMAI RESIDENCE",
+        "unit": 90
+      },
+      {
+        "nama": "KOTA KEMBANG PERMAI",
+        "unit": 65
+      },
+      {
+        "nama": "JATI MULYA",
+        "unit": 38
+      },
+      {
+        "nama": "KOMPLEK PAJAK SEKELIMUS",
+        "unit": 14
+      },
+      {
+        "nama": "MALEER INDAH LESTARI",
+        "unit": 13
+      }
+    ]
+  },
+  "BOJONGLOA KALER": {
+    "total_komplek": 6,
+    "total_unit": 1044,
+    "komplek_list": [
+      {
+        "nama": "CITARIP BARAT",
+        "unit": 400
+      },
+      {
+        "nama": "KOPO KENCANA",
+        "unit": 330
+      },
+      {
+        "nama": "BUANA INDAH",
+        "unit": 100
+      },
+      {
+        "nama": "TAMAN LINGKAR",
+        "unit": 100
+      },
+      {
+        "nama": "TAMAN ANGGREK",
+        "unit": 84
+      },
+      {
+        "nama": "PAGAR KENCANA",
+        "unit": 30
+      }
+    ]
+  },
+  "BOJONGLOA KIDUL": {
+    "total_komplek": 8,
+    "total_unit": 5411,
+    "komplek_list": [
+      {
+        "nama": "ISTANA MEKAR WANGI",
+        "unit": 2870
+      },
+      {
+        "nama": "SINGGASANA PRADANA",
+        "unit": 1400
+      },
+      {
+        "nama": "SAUYUNAN MAS",
+        "unit": 352
+      },
+      {
+        "nama": "KOMPLEK SAUYUNAN",
+        "unit": 343
+      },
+      {
+        "nama": "LEUWI ANYAR",
+        "unit": 240
+      },
+      {
+        "nama": "LEUWI SARI",
+        "unit": 150
+      },
+      {
+        "nama": "CIBADUYUT PERMAI",
+        "unit": 56
+      },
+      {
+        "nama": "MEKARWANGI SQUARE (APARTMENT)",
+        "unit": 0
+      }
+    ]
+  },
+  "BUAHBATU": {
+    "total_komplek": 74,
+    "total_unit": 11980,
+    "komplek_list": [
+      {
+        "nama": "MARGAHAYU RAYA",
+        "unit": 5279
+      },
+      {
+        "nama": "PANDAN WANGI",
+        "unit": 690
+      },
+      {
+        "nama": "BUANA CIWASTRA RESIDENCE",
+        "unit": 560
+      },
+      {
+        "nama": "TIRTASARI RESIDENCE",
+        "unit": 450
+      },
+      {
+        "nama": "MARGAWANGI ESTATE",
+        "unit": 419
+      },
+      {
+        "nama": "CIJAWURA GIRANG",
+        "unit": 298
+      },
+      {
+        "nama": "BAHAGIA PERMAI",
+        "unit": 260
+      },
+      {
+        "nama": "ANTABARU ENDAH",
+        "unit": 221
+      },
+      {
+        "nama": "CIWASTRA INDAH",
+        "unit": 195
+      },
+      {
+        "nama": "KOMPLEK LOGAM",
+        "unit": 185
+      },
+      {
+        "nama": "MEGA BRATA",
+        "unit": 183
+      },
+      {
+        "nama": "MUSTIKA HEGAR REGENCY",
+        "unit": 173
+      },
+      {
+        "nama": "KEMBANG PARE RESIDENCE",
+        "unit": 143
+      },
+      {
+        "nama": "PALEM PERMAI",
+        "unit": 137
+      },
+      {
+        "nama": "DE GREEN GRANDE",
+        "unit": 128
+      },
+      {
+        "nama": "SARIE BUNGA BAKUNG",
+        "unit": 116
+      },
+      {
+        "nama": "MARGA BARU",
+        "unit": 96
+      },
+      {
+        "nama": "KOMPLEK PERKEBUNAN",
+        "unit": 90
+      },
+      {
+        "nama": "VILLA ILHAMI PERMATA",
+        "unit": 86
+      },
+      {
+        "nama": "ISTANA KAWALUYAAN",
+        "unit": 84
+      },
+      {
+        "nama": "BAITUSSALAM",
+        "unit": 77
+      },
+      {
+        "nama": "BATU PERMATA",
+        "unit": 77
+      },
+      {
+        "nama": "KOMPLEK PEMDA",
+        "unit": 77
+      },
+      {
+        "nama": "MARGA MAKMUR",
+        "unit": 75
+      },
+      {
+        "nama": "PERSADA ASRI II",
+        "unit": 73
+      },
+      {
+        "nama": "GRIYA PERSADA",
+        "unit": 72
+      },
+      {
+        "nama": "KIARA SARI",
+        "unit": 71
+      },
+      {
+        "nama": "GRIYA KUNING ASRI",
+        "unit": 68
+      },
+      {
+        "nama": "KOMPLEK BRIMOB",
+        "unit": 67
+      },
+      {
+        "nama": "TAMAN PUSPA INDAH",
+        "unit": 64
+      },
+      {
+        "nama": "HARMONY PARK",
+        "unit": 63
+      },
+      {
+        "nama": "CIJAWURA LNDAH",
+        "unit": 62
+      },
+      {
+        "nama": "KOMPLEK BULOG",
+        "unit": 59
+      },
+      {
+        "nama": "KIARA MAS LNDAH REGENCY",
+        "unit": 58
+      },
+      {
+        "nama": "SANGGAR HURIP ESTATE",
+        "unit": 56
+      },
+      {
+        "nama": "TAMAN PERSADA ASRI RESIDENCE",
+        "unit": 56
+      },
+      {
+        "nama": "SINGGASANA RESIDENCE CIJAWURA POINT",
+        "unit": 55
+      },
+      {
+        "nama": "GRAHA ALAM RAYA",
+        "unit": 54
+      },
+      {
+        "nama": "BUANA CIGI REGENCY",
+        "unit": 52
+      },
+      {
+        "nama": "CIJAWURA REGENCY",
+        "unit": 52
+      },
+      {
+        "nama": "KOMPLEK AL-ISLAM",
+        "unit": 51
+      },
+      {
+        "nama": "GRAHA PELANGI ELOK",
+        "unit": 49
+      },
+      {
+        "nama": "PERMATA KAWALUYAAN",
+        "unit": 49
+      },
+      {
+        "nama": "CIPAGANTI GRAHA",
+        "unit": 48
+      },
+      {
+        "nama": "PESONA CIWASTRA PERMAI",
+        "unit": 48
+      },
+      {
+        "nama": "KOMPLEK PURAGABAYA",
+        "unit": 47
+      },
+      {
+        "nama": "SAWO INDAH",
+        "unit": 44
+      },
+      {
+        "nama": "BAKUNG ENDAH",
+        "unit": 43
+      },
+      {
+        "nama": "CLUSTER VILLA MARGALUYU",
+        "unit": 42
+      },
+      {
+        "nama": "BUMI KIRANA",
+        "unit": 38
+      },
+      {
+        "nama": "PERMATA RANCASAWO",
+        "unit": 37
+      },
+      {
+        "nama": "KAWALUYAAN REGENCY",
+        "unit": 35
+      },
+      {
+        "nama": "ANDROMEDA ASRI",
+        "unit": 34
+      },
+      {
+        "nama": "PARIS VAN JAVA RESIDENCE",
+        "unit": 34
+      },
+      {
+        "nama": "GALLERY KAWALUYAAN",
+        "unit": 28
+      },
+      {
+        "nama": "MATAHARI MARGAWANGI",
+        "unit": 27
+      },
+      {
+        "nama": "MARGALUYU LNDAH RESIDENCE",
+        "unit": 26
+      },
+      {
+        "nama": "SSP RANCASAWO / MARGAHAYU",
+        "unit": 26
+      },
+      {
+        "nama": "SAPHIRE TOWN HOUSE",
+        "unit": 23
+      },
+      {
+        "nama": "KIWARI RESIDENCE",
+        "unit": 22
+      },
+      {
+        "nama": "PATRAMAYA RESIDENCE",
+        "unit": 22
+      },
+      {
+        "nama": "CASA DE LA TOPA",
+        "unit": 20
+      },
+      {
+        "nama": "MARGA ASRI PERSADA",
+        "unit": 17
+      },
+      {
+        "nama": "BUAHBATU KENCANA TOWN HOUSE",
+        "unit": 16
+      },
+      {
+        "nama": "BANDUNG LNDAH RAYA",
+        "unit": 14
+      },
+      {
+        "nama": "CLUSTER MARGA PURI",
+        "unit": 14
+      },
+      {
+        "nama": "D ELGRAN",
+        "unit": 12
+      },
+      {
+        "nama": "GRAND NABILA RESIDENCE",
+        "unit": 12
+      },
+      {
+        "nama": "IMPERIAL SOHO",
+        "unit": 12
+      },
+      {
+        "nama": "CASA MUKTI RESIDENCE",
+        "unit": 9
+      },
+      {
+        "nama": "KENCANA WANGI",
+        "unit": 0
+      },
+      {
+        "nama": "KOMPLEK TURANGGA",
+        "unit": 0
+      },
+      {
+        "nama": "SANGGAR HURIP APARTEMEN (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "THE SUITES @ METRO APARTEMENT (APARTEMEN)",
+        "unit": 0
+      }
+    ]
+  },
+  "CIBEUNYING KALER": {
+    "total_komplek": 39,
+    "total_unit": 1248,
+    "komplek_list": [
+      {
+        "nama": "CIKUTRA BARU",
+        "unit": 190
+      },
+      {
+        "nama": "PERUMNAS SUKALUYU",
+        "unit": 175
+      },
+      {
+        "nama": "KOMPLEK RANCAKENDAL",
+        "unit": 150
+      },
+      {
+        "nama": "CIGADUNG GREEN LAND",
+        "unit": 116
+      },
+      {
+        "nama": "CIGADUNG INDAH",
+        "unit": 53
+      },
+      {
+        "nama": "CIBEUNYING PERMAI",
+        "unit": 49
+      },
+      {
+        "nama": "CIGADUNG VALLEY RESIDENCE",
+        "unit": 36
+      },
+      {
+        "nama": "GRIYA CIGADUNG BARU",
+        "unit": 33
+      },
+      {
+        "nama": "CIGADUNG ASRI",
+        "unit": 30
+      },
+      {
+        "nama": "PONDOK CIGADUNG LESTARI",
+        "unit": 29
+      },
+      {
+        "nama": "KOMPLEK BTN",
+        "unit": 25
+      },
+      {
+        "nama": "KOMPLEK CIGADUNG 10E",
+        "unit": 23
+      },
+      {
+        "nama": "KOMPLEK LA CASTURI",
+        "unit": 23
+      },
+      {
+        "nama": "CIGADUNG HILLS",
+        "unit": 22
+      },
+      {
+        "nama": "CITRA GREEN GARDEN",
+        "unit": 22
+      },
+      {
+        "nama": "CALISTHA DAGO",
+        "unit": 21
+      },
+      {
+        "nama": "KOMPLEK PERMADANI",
+        "unit": 21
+      },
+      {
+        "nama": "PATIO PERDE 2",
+        "unit": 20
+      },
+      {
+        "nama": "CIKUTRA INDAH RESIDENCE",
+        "unit": 18
+      },
+      {
+        "nama": "RERENG WULUNG INDAH",
+        "unit": 18
+      },
+      {
+        "nama": "QUARTA RESIDENCE",
+        "unit": 14
+      },
+      {
+        "nama": "CIGADUNG MAKMUR",
+        "unit": 13
+      },
+      {
+        "nama": "CUKANG KAWUNG ASRI",
+        "unit": 13
+      },
+      {
+        "nama": "CIGADUNG PERMAI",
+        "unit": 12
+      },
+      {
+        "nama": "KOMPLEK ARDINI",
+        "unit": 12
+      },
+      {
+        "nama": "PARAS CIGADUNG",
+        "unit": 12
+      },
+      {
+        "nama": "DE DANGAU CLUSTER",
+        "unit": 11
+      },
+      {
+        "nama": "D'PLATINUM",
+        "unit": 11
+      },
+      {
+        "nama": "PATIO PERDE 1",
+        "unit": 11
+      },
+      {
+        "nama": "GRAND PERMATA",
+        "unit": 10
+      },
+      {
+        "nama": "BUKIT PINUS DAGO",
+        "unit": 9
+      },
+      {
+        "nama": "MAHKOTA DEWA",
+        "unit": 9
+      },
+      {
+        "nama": "CIGADUNG TEPIS WIRING",
+        "unit": 8
+      },
+      {
+        "nama": "CIGADUNG RAYA TIMUR",
+        "unit": 7
+      },
+      {
+        "nama": "RANTING BAMBU 2",
+        "unit": 7
+      },
+      {
+        "nama": "RANTING BAMBU 1",
+        "unit": 6
+      },
+      {
+        "nama": "PROSPERA RESIDENCE",
+        "unit": 5
+      },
+      {
+        "nama": "CUKANG KAWUNG",
+        "unit": 4
+      },
+      {
+        "nama": "CIGADUNG VILLAGE",
+        "unit": 0
+      }
+    ]
+  },
+  "CIBEUNYING KIDUL": {
+    "total_komplek": 21,
+    "total_unit": 1062,
+    "komplek_list": [
+      {
+        "nama": "BUMI ASRI PADASUKA",
+        "unit": 281
+      },
+      {
+        "nama": "GREEN VALLEY RESIDENCE",
+        "unit": 132
+      },
+      {
+        "nama": "BUMI ASRI PASIRLEUTIK (TUGU ASRI)",
+        "unit": 128
+      },
+      {
+        "nama": "BOJONG KONENG MAKMUR",
+        "unit": 100
+      },
+      {
+        "nama": "SUCI RESIDENCE",
+        "unit": 77
+      },
+      {
+        "nama": "SURAPATI CORE",
+        "unit": 77
+      },
+      {
+        "nama": "GRAHA PADASUKA",
+        "unit": 44
+      },
+      {
+        "nama": "KOMPLEK PASIR LAYUNG ASRI",
+        "unit": 38
+      },
+      {
+        "nama": "PADASUKA ESTATE",
+        "unit": 36
+      },
+      {
+        "nama": "TERRACE HOUSE",
+        "unit": 33
+      },
+      {
+        "nama": "D'BAMBOO REGENCY",
+        "unit": 25
+      },
+      {
+        "nama": "DELIMA CIKUTRA",
+        "unit": 25
+      },
+      {
+        "nama": "KAWASAKI",
+        "unit": 22
+      },
+      {
+        "nama": "VILLA SUKA LNDAH",
+        "unit": 19
+      },
+      {
+        "nama": "SAUNG BOJONG",
+        "unit": 15
+      },
+      {
+        "nama": "PADASUKA ROYAL VIEW",
+        "unit": 10
+      },
+      {
+        "nama": "APARTEMEN ALLEGRIA (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "GATEWAY PADASUKA (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "PADASUKA PARK",
+        "unit": 0
+      },
+      {
+        "nama": "PERUM BUMI ASRI",
+        "unit": 0
+      },
+      {
+        "nama": "THE GREEN PADASUKA",
+        "unit": 0
+      }
+    ]
+  },
+  "CIBIRU": {
+    "total_komplek": 29,
+    "total_unit": 3030,
+    "komplek_list": [
+      {
+        "nama": "VIJAYA KUSUMA - NUANSA PERMAI",
+        "unit": 422
+      },
+      {
+        "nama": "EASTERN HILLS",
+        "unit": 392
+      },
+      {
+        "nama": "ASTOM RESIDENCE",
+        "unit": 265
+      },
+      {
+        "nama": "KOMPLEK TIRTA WENING",
+        "unit": 159
+      },
+      {
+        "nama": "CIPADUNG PERMAI",
+        "unit": 154
+      },
+      {
+        "nama": "DWIPAPURI RESIDENCE",
+        "unit": 154
+      },
+      {
+        "nama": "KOMPLEK PALASARI",
+        "unit": 150
+      },
+      {
+        "nama": "CILENGKRANG CITY VIEW",
+        "unit": 132
+      },
+      {
+        "nama": "KOMPLEK KOPEDI",
+        "unit": 120
+      },
+      {
+        "nama": "KOMPLEK PUSKOPAD",
+        "unit": 120
+      },
+      {
+        "nama": "KOMPLEK KSB",
+        "unit": 110
+      },
+      {
+        "nama": "CITRA BIRU",
+        "unit": 101
+      },
+      {
+        "nama": "KOMPLEK YAYASAN MARGASATWA (YKB)",
+        "unit": 93
+      },
+      {
+        "nama": "KHARISMA LAND",
+        "unit": 89
+      },
+      {
+        "nama": "MENTARI REGENCY",
+        "unit": 86
+      },
+      {
+        "nama": "DE GREEN MANSION",
+        "unit": 75
+      },
+      {
+        "nama": "GRIYA CIPADUNG ASRI (CIGAGAK ASRI)",
+        "unit": 64
+      },
+      {
+        "nama": "BUKIT CITRA BIRU",
+        "unit": 60
+      },
+      {
+        "nama": "GRAHA MUTIARA",
+        "unit": 60
+      },
+      {
+        "nama": "BARA MANGLAYANGÂ  / MANGLAYANG SARI",
+        "unit": 48
+      },
+      {
+        "nama": "KOMPLEK SAFIRA",
+        "unit": 46
+      },
+      {
+        "nama": "GRAHA CIPADUNG",
+        "unit": 35
+      },
+      {
+        "nama": "BUKIT CITRA ASRI",
+        "unit": 26
+      },
+      {
+        "nama": "BUMI CILENGKRANG LNDAH",
+        "unit": 19
+      },
+      {
+        "nama": "GRIYA SAKINAH",
+        "unit": 16
+      },
+      {
+        "nama": "PURI DENKA",
+        "unit": 12
+      },
+      {
+        "nama": "RUMAH CEMARA",
+        "unit": 12
+      },
+      {
+        "nama": "MUTIARA RESIDENCE (CIPADUNG RESIDENCE)",
+        "unit": 10
+      },
+      {
+        "nama": "PALASARI HILLS",
+        "unit": 0
+      }
+    ]
+  },
+  "CICENDO": {
+    "total_komplek": 30,
+    "total_unit": 1194,
+    "komplek_list": [
+      {
+        "nama": "KOMPLEK AURI",
+        "unit": 139
+      },
+      {
+        "nama": "PESONA PASTEUR RESIDENCE",
+        "unit": 138
+      },
+      {
+        "nama": "CIPTA GRAHA",
+        "unit": 123
+      },
+      {
+        "nama": "ISTANA REGENCY 1",
+        "unit": 93
+      },
+      {
+        "nama": "ISTANA PASTEUR",
+        "unit": 92
+      },
+      {
+        "nama": "GATEWAY PASTEUR RESIDENCE",
+        "unit": 76
+      },
+      {
+        "nama": "ISTANA REGENCY 2",
+        "unit": 67
+      },
+      {
+        "nama": "BALADEWA ASRI",
+        "unit": 56
+      },
+      {
+        "nama": "DAKOTA RAYA",
+        "unit": 50
+      },
+      {
+        "nama": "GRAHA INDAH",
+        "unit": 41
+      },
+      {
+        "nama": "MILLENIUM REGENCY",
+        "unit": 41
+      },
+      {
+        "nama": "TAMAN MILLENIUM",
+        "unit": 38
+      },
+      {
+        "nama": "MEGA ASRI 2",
+        "unit": 35
+      },
+      {
+        "nama": "MEGA RAYA",
+        "unit": 30
+      },
+      {
+        "nama": "BUMI SUKARAJA",
+        "unit": 25
+      },
+      {
+        "nama": "MEGA RAYA RESIDENCE",
+        "unit": 21
+      },
+      {
+        "nama": "THE RESIDENCE MEGA ASRI",
+        "unit": 21
+      },
+      {
+        "nama": "KOMPLEK PJKA",
+        "unit": 20
+      },
+      {
+        "nama": "GARDENIA REGENCY",
+        "unit": 16
+      },
+      {
+        "nama": "GREEN PASTEUR CULDESAK",
+        "unit": 15
+      },
+      {
+        "nama": "MEGA MEKAR",
+        "unit": 15
+      },
+      {
+        "nama": "KOMPLEK UNPAR",
+        "unit": 12
+      },
+      {
+        "nama": "KOMPLEK LAPAN",
+        "unit": 10
+      },
+      {
+        "nama": "D'LAPAN RESIDENCE",
+        "unit": 8
+      },
+      {
+        "nama": "KOMPLEK UNPAR",
+        "unit": 8
+      },
+      {
+        "nama": "VILLA KENDARSI",
+        "unit": 4
+      },
+      {
+        "nama": "APARTEMEN LANDMARK (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "BABAKAN RADIO",
+        "unit": 0
+      },
+      {
+        "nama": "GATEWAY PASTEUR APARTMENT (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "RUSUN LNDUSTRI",
+        "unit": 0
+      }
+    ]
+  },
+  "CIDADAP": {
+    "total_komplek": 27,
+    "total_unit": 802,
+    "komplek_list": [
+      {
+        "nama": "BUDI SARI",
+        "unit": 200
+      },
+      {
+        "nama": "CIPAKU INDAH",
+        "unit": 126
+      },
+      {
+        "nama": "THE SETIABUDHI TERRACE",
+        "unit": 80
+      },
+      {
+        "nama": "CITRA GREEN",
+        "unit": 71
+      },
+      {
+        "nama": "GREEN HILL",
+        "unit": 70
+      },
+      {
+        "nama": "KOMPLEK LIPI",
+        "unit": 62
+      },
+      {
+        "nama": "DE BALE PAKUAN",
+        "unit": 42
+      },
+      {
+        "nama": "CIUMBULEUIT REGENCY",
+        "unit": 28
+      },
+      {
+        "nama": "CIDADAP GIRANG BARU",
+        "unit": 26
+      },
+      {
+        "nama": "KOMPLEK CIDADAP",
+        "unit": 22
+      },
+      {
+        "nama": "CIPAKU PERMAI",
+        "unit": 15
+      },
+      {
+        "nama": "THE GREEN CIUMBULEUIT",
+        "unit": 14
+      },
+      {
+        "nama": "KOMPLEK PALECIO",
+        "unit": 12
+      },
+      {
+        "nama": "TAMAN CIKENDI",
+        "unit": 12
+      },
+      {
+        "nama": "RANCABENTANG TOWNHOUSE",
+        "unit": 8
+      },
+      {
+        "nama": "DAGO PANDAWA",
+        "unit": 5
+      },
+      {
+        "nama": "SURYA CIUMBULEUIT RESIDENCE",
+        "unit": 5
+      },
+      {
+        "nama": "AVIANTO RESIDENCE",
+        "unit": 4
+      },
+      {
+        "nama": "ALLEGRO ALTURA",
+        "unit": 0
+      },
+      {
+        "nama": "APARTEMEN PARAHYANGAN RESIDENCE (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "CENDANA RESIDENCE / TJENDANA TOWNHOUSE",
+        "unit": 0
+      },
+      {
+        "nama": "CIDADAP GIRANG",
+        "unit": 0
+      },
+      {
+        "nama": "CIPAKU LNDAH BLOK KADU",
+        "unit": 0
+      },
+      {
+        "nama": "DAGO SMART VALLEY",
+        "unit": 0
+      },
+      {
+        "nama": "GALLERY CIUMBULEUIT APARTMENT (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "GALLERY CIUMBULEUIT APARTMENT 2 (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "GRAND SETIABUDI APARTMENT (APARTEMEN)",
+        "unit": 0
+      }
+    ]
+  },
+  "CINAMBO": {
+    "total_komplek": 11,
+    "total_unit": 2932,
+    "komplek_list": [
+      {
+        "nama": "KOMPLEK CIPADUNG",
+        "unit": 1876
+      },
+      {
+        "nama": "CINAMBO LNDAH",
+        "unit": 297
+      },
+      {
+        "nama": "BANDUNG TIMUR REGENCY",
+        "unit": 152
+      },
+      {
+        "nama": "GRAHA PESONA",
+        "unit": 136
+      },
+      {
+        "nama": "ANDARU RESIDENCE",
+        "unit": 120
+      },
+      {
+        "nama": "ANGGREK RESIDENCE",
+        "unit": 106
+      },
+      {
+        "nama": "BUMI GOLF LESTARI",
+        "unit": 95
+      },
+      {
+        "nama": "KOMPLEK LARISA",
+        "unit": 70
+      },
+      {
+        "nama": "KOMPLEK ASIFA/PADMA",
+        "unit": 46
+      },
+      {
+        "nama": "KOMPLEK SANDANG",
+        "unit": 34
+      },
+      {
+        "nama": "MY HOME CINAMBO",
+        "unit": 0
+      }
+    ]
+  },
+  "COBLONG": {
+    "total_komplek": 23,
+    "total_unit": 630,
+    "komplek_list": [
+      {
+        "nama": "ALAMANDA DAGO PERMAI",
+        "unit": 135
+      },
+      {
+        "nama": "KAMPUNG PADI",
+        "unit": 100
+      },
+      {
+        "nama": "KOMPLEK DOSEN LTB KANAYAKAN",
+        "unit": 63
+      },
+      {
+        "nama": "KOMPLEK BATAN",
+        "unit": 50
+      },
+      {
+        "nama": "DAGO ASRI",
+        "unit": 49
+      },
+      {
+        "nama": "LEMBAH TUBAGUS ISMAIL",
+        "unit": 47
+      },
+      {
+        "nama": "BUKIT DAGO SELATAN TOWN HOUSE",
+        "unit": 38
+      },
+      {
+        "nama": "CIPAGANTI PERMAI",
+        "unit": 29
+      },
+      {
+        "nama": "KAMPOENG DAGO 2",
+        "unit": 22
+      },
+      {
+        "nama": "KOMPLEK DDK",
+        "unit": 19
+      },
+      {
+        "nama": "KOMPLEK DOSEN UNPAD",
+        "unit": 18
+      },
+      {
+        "nama": "KAMPOENG DAGO 1",
+        "unit": 17
+      },
+      {
+        "nama": "GRIYA TUBAGUS ISMAIL",
+        "unit": 15
+      },
+      {
+        "nama": "CISITU TOWNHOUSE",
+        "unit": 11
+      },
+      {
+        "nama": "KOMPLEK PUSLITBANG PENGAIRAN",
+        "unit": 7
+      },
+      {
+        "nama": "KOMPLEK PPTM",
+        "unit": 5
+      },
+      {
+        "nama": "LEMBAH CISITU",
+        "unit": 5
+      },
+      {
+        "nama": "APARTEMEN LIVERA (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "CAPITOL DAGO VALLEY",
+        "unit": 0
+      },
+      {
+        "nama": "DAGO SUITES APARTMENT (APARTEMEN)",
+        "unit": 0
+      },
+      {
+        "nama": "GRAND ROYAL PANGHEGAR (KONDOTEL)",
+        "unit": 0
+      },
+      {
+        "nama": "HQUARTERS BUSSINESS RESIDENCE (KANTOR SEWA)",
+        "unit": 0
+      },
+      {
+        "nama": "PERUMNAS SADANG SERANG",
+        "unit": 0
+      }
+    ]
+  },
+  "GEDEBAGE": {
+    "total_komplek": 6,
+    "total_unit": 1581,
+    "komplek_list": [
+      {
+        "nama": "GRIYA CEMPAKA ARUM",
+        "unit": 539
+      },
+      {
+        "nama": "BUANA SOETTA",
+        "unit": 419
+      },
+      {
+        "nama": "BUMI ADIPURA",
+        "unit": 259
+      },
+      {
+        "nama": "RIUNG GEDE",
+        "unit": 244
+      },
+      {
+        "nama": "BUMI PITALOKA",
+        "unit": 120
+      },
+      {
+        "nama": "SUMMARECON",
+        "unit": 0
+      }
+    ]
+  },
+  "KIARACONDONG": {
+    "total_komplek": 10,
+    "total_unit": 1104,
+    "komplek_list": [
+      {
+        "nama": "BUMI ASRI SUKAPURA",
+        "unit": 336
+      },
+      {
+        "nama": "KPAD PINDAD UTARA",
+        "unit": 250
+      },
+      {
+        "nama": "TAMAN RAFFLESIA",
+        "unit": 163
+      },
+      {
+        "nama": "CLUSTER BALI 2",
+        "unit": 130
+      },
+      {
+        "nama": "DAI-LCHI ANTAPANI",
+        "unit": 69
+      },
+      {
+        "nama": "SULAKSANA MAKMUR",
+        "unit": 56
+      },
+      {
+        "nama": "CLUSTER BALI 1",
+        "unit": 43
+      },
+      {
+        "nama": "VILLA ANTAPANI INDAH",
+        "unit": 35
+      },
+      {
+        "nama": "KOMPLEK WISMA TELADAN",
+        "unit": 11
+      },
+      {
+        "nama": "SARI LNDAH RESIDENCE",
+        "unit": 11
+      }
+    ]
+  },
+  "LENGKONG": {
+    "total_komplek": 9,
+    "total_unit": 953,
+    "komplek_list": [
+      {
+        "nama": "PUTERAKO INDAH",
+        "unit": 453
+      },
+      {
+        "nama": "KOMPLEK P & K",
+        "unit": 155
+      },
+      {
+        "nama": "KOMPLEK WARTAWAN",
+        "unit": 97
+      },
+      {
+        "nama": "KOMPLEK POSTEL",
+        "unit": 64
+      },
+      {
+        "nama": "KOMPLEK B.I",
+        "unit": 62
+      },
+      {
+        "nama": "KOMPLEK PENGAIRAN & METROLOGI",
+        "unit": 55
+      },
+      {
+        "nama": "KOMPLEK BINAMARGA",
+        "unit": 49
+      },
+      {
+        "nama": "KOMPLEK PIN",
+        "unit": 18
+      },
+      {
+        "nama": "THE GREEN KOSAMBI (APARTEMENT)",
+        "unit": 0
+      }
+    ]
+  },
+  "MANDALAJATI": {
+    "total_komplek": 35,
+    "total_unit": 4345,
+    "komplek_list": [
+      {
+        "nama": "TAMAN SARI BUKIT BANDUNG",
+        "unit": 600
+      },
+      {
+        "nama": "BUKIT PAJAJARAN",
+        "unit": 541
+      },
+      {
+        "nama": "KOMPLEK SUKAASIH",
+        "unit": 398
+      },
+      {
+        "nama": "GREEN CITYÂ  VIEW",
+        "unit": 308
+      },
+      {
+        "nama": "GIRI MANDE",
+        "unit": 306
+      },
+      {
+        "nama": "BANDUNG CITY VIEW 1",
+        "unit": 274
+      },
+      {
+        "nama": "MEGA REGENCY",
+        "unit": 173
+      },
+      {
+        "nama": "BUMI PASUNDAN",
+        "unit": 143
+      },
+      {
+        "nama": "CITY GARDEN RESIDENCE",
+        "unit": 142
+      },
+      {
+        "nama": "GRAND PANORAMIC RESIDENCE",
+        "unit": 126
+      },
+      {
+        "nama": "GREEN GARDEN VIEW",
+        "unit": 126
+      },
+      {
+        "nama": "KOMPLEK MANDALA",
+        "unit": 118
+      },
+      {
+        "nama": "KOMPLEK HARMONI",
+        "unit": 95
+      },
+      {
+        "nama": "LEMAH ENDAH",
+        "unit": 91
+      },
+      {
+        "nama": "GREEN HILLS",
+        "unit": 77
+      },
+      {
+        "nama": "BANDUNG CITY VIEW 2",
+        "unit": 74
+      },
+      {
+        "nama": "KOMPLEK VALLEY",
+        "unit": 70
+      },
+      {
+        "nama": "SUNRISE HILL RESIDENCE",
+        "unit": 69
+      },
+      {
+        "nama": "SAYANA D'VILLAGE",
+        "unit": 66
+      },
+      {
+        "nama": "HARMONI SINDANGLAYA",
+        "unit": 60
+      },
+      {
+        "nama": "PONDOK ALAM RESIK",
+        "unit": 60
+      },
+      {
+        "nama": "PURI JATIHANDAP RESIDENCE",
+        "unit": 58
+      },
+      {
+        "nama": "BUMI SINDANG JAYA",
+        "unit": 55
+      },
+      {
+        "nama": "GREEN VALLEY RESIDENCE",
+        "unit": 55
+      },
+      {
+        "nama": "PONDOK GIRI MANDE",
+        "unit": 51
+      },
+      {
+        "nama": "KOMPLEK KEJAKSAAN TINGGI NEGERI",
+        "unit": 45
+      },
+      {
+        "nama": "PASIR LMPUN VALLEY",
+        "unit": 44
+      },
+      {
+        "nama": "CITRA WANAGARI RESIDENCE",
+        "unit": 35
+      },
+      {
+        "nama": "SAKURA ESTATE",
+        "unit": 27
+      },
+      {
+        "nama": "PONDOK ALAM HARMONI",
+        "unit": 25
+      },
+      {
+        "nama": "KOMPLEK ATPUT",
+        "unit": 16
+      },
+      {
+        "nama": "MANDE ASRI",
+        "unit": 10
+      },
+      {
+        "nama": "PARK HILLS",
+        "unit": 7
+      },
+      {
+        "nama": "GRAND PARAHYANGAN",
+        "unit": 0
+      },
+      {
+        "nama": "SEKEBIRU TOWNHOUSE",
+        "unit": 0
+      }
+    ]
+  },
+  "PANYILEUKAN": {
+    "total_komplek": 15,
+    "total_unit": 2798,
+    "komplek_list": [
+      {
+        "nama": "BUMI PANYILEUKAN",
+        "unit": 1150
+      },
+      {
+        "nama": "PANGHEGAR PERMAI",
+        "unit": 738
+      },
+      {
+        "nama": "TAMAN CIPADUNG LNDAH",
+        "unit": 250
+      },
+      {
+        "nama": "MY HOME UJUNG BERUNG",
+        "unit": 141
+      },
+      {
+        "nama": "BUMI ASRI UJUNG BERUNG",
+        "unit": 84
+      },
+      {
+        "nama": "PATRA ASIH (PERTAMINA)",
+        "unit": 81
+      },
+      {
+        "nama": "GRAHA PANYILEUKAN ASRI",
+        "unit": 76
+      },
+      {
+        "nama": "PANYILEUKAN REGENCY",
+        "unit": 50
+      },
+      {
+        "nama": "GONDANGDIA RESIDENCE 1&2",
+        "unit": 47
+      },
+      {
+        "nama": "PERMATA MEKAR MULYA",
+        "unit": 46
+      },
+      {
+        "nama": "CLUSTER MUTIARA",
+        "unit": 39
+      },
+      {
+        "nama": "SUKAMAJU RESIDENCE",
+        "unit": 36
+      },
+      {
+        "nama": "CLUSTER PANGHEGAR",
+        "unit": 31
+      },
+      {
+        "nama": "PANYILEUKAN ASRI RESIDENCE",
+        "unit": 29
+      },
+      {
+        "nama": "GRAND UJUNG BERUNG",
+        "unit": 0
+      }
+    ]
+  },
+  "RANCASARI": {
+    "total_komplek": 41,
+    "total_unit": 5931,
+    "komplek_list": [
+      {
+        "nama": "RIUNG BANDUNG",
+        "unit": 1643
+      },
+      {
+        "nama": "PASIR POGOR",
+        "unit": 579
+      },
+      {
+        "nama": "PESONA CIWASTRA VILLAGE",
+        "unit": 487
+      },
+      {
+        "nama": "ARYA GRAHA",
+        "unit": 350
+      },
+      {
+        "nama": "BANDUNG INTEN LNDAH",
+        "unit": 350
+      },
+      {
+        "nama": "DERWATI MAS",
+        "unit": 319
+      },
+      {
+        "nama": "GRAHA BATU KARANG",
+        "unit": 250
+      },
+      {
+        "nama": "BANYU BIRU",
+        "unit": 212
+      },
+      {
+        "nama": "PESONA CLUSTER GRAHA BATU KARANG",
+        "unit": 185
+      },
+      {
+        "nama": "NUANSA MAS",
+        "unit": 162
+      },
+      {
+        "nama": "CIPAGANTI RAHAYU",
+        "unit": 150
+      },
+      {
+        "nama": "GRIYA SALUYU",
+        "unit": 146
+      },
+      {
+        "nama": "RIUNG DUTA PERMAI",
+        "unit": 135
+      },
+      {
+        "nama": "JINGGA RESIDENCE",
+        "unit": 108
+      },
+      {
+        "nama": "PRATAMA ASRI",
+        "unit": 90
+      },
+      {
+        "nama": "SATURNUS REGENCY",
+        "unit": 75
+      },
+      {
+        "nama": "MUSTIKA TOWNHOUSE",
+        "unit": 58
+      },
+      {
+        "nama": "BATU KARANG RESIDENCE",
+        "unit": 48
+      },
+      {
+        "nama": "CLUSTER BATU KARANG",
+        "unit": 47
+      },
+      {
+        "nama": "GRAHA ASIH",
+        "unit": 47
+      },
+      {
+        "nama": "CLUSTER GRAHA MARS",
+        "unit": 40
+      },
+      {
+        "nama": "TATAR BIDAKARA",
+        "unit": 40
+      },
+      {
+        "nama": "GRAND SHARON RESIDENCE",
+        "unit": 39
+      },
+      {
+        "nama": "DE MARAKESH",
+        "unit": 37
+      },
+      {
+        "nama": "KAWISTARA RESIDENCE",
+        "unit": 33
+      },
+      {
+        "nama": "PANGHEGAR TOWN HOUSE",
+        "unit": 32
+      },
+      {
+        "nama": "SATURNUS TENGAH IV",
+        "unit": 26
+      },
+      {
+        "nama": "BANYU BIRU REGENCY",
+        "unit": 25
+      },
+      {
+        "nama": "CIPTA KARYA",
+        "unit": 22
+      },
+      {
+        "nama": "BANYU BIRU INDAH",
+        "unit": 21
+      },
+      {
+        "nama": "BATU RADEN INDAH RESIDENCE",
+        "unit": 21
+      },
+      {
+        "nama": "D'JARDENA TOWNHOUSE",
+        "unit": 21
+      },
+      {
+        "nama": "MARGA CIPTA 2",
+        "unit": 20
+      },
+      {
+        "nama": "OASIS DE WASTERA",
+        "unit": 19
+      },
+      {
+        "nama": "MERKURI RESIDENCE",
+        "unit": 18
+      },
+      {
+        "nama": "ROYAL CASABLANCA",
+        "unit": 16
+      },
+      {
+        "nama": "GRAHA MARS RAYA",
+        "unit": 13
+      },
+      {
+        "nama": "RANCALOA REGENCY",
+        "unit": 13
+      },
+      {
+        "nama": "SATURNUS UTARA 15",
+        "unit": 13
+      },
+      {
+        "nama": "BATU RADEN ASRI",
+        "unit": 11
+      },
+      {
+        "nama": "CIPTA PESONA",
+        "unit": 10
+      }
+    ]
+  },
+  "REGOL": {
+    "total_komplek": 14,
+    "total_unit": 1791,
+    "komplek_list": [
+      {
+        "nama": "SRIMAHI BARU",
+        "unit": 300
+      },
+      {
+        "nama": "KOMPLEK PASIR JAYA",
+        "unit": 238
+      },
+      {
+        "nama": "KEMBAR TENGAH",
+        "unit": 186
+      },
+      {
+        "nama": "KOMPLEK PASIRWANGI",
+        "unit": 160
+      },
+      {
+        "nama": "KEMBAR EMAS",
+        "unit": 150
+      },
+      {
+        "nama": "KEMBAR INDAH",
+        "unit": 145
+      },
+      {
+        "nama": "PURI BKR",
+        "unit": 130
+      },
+      {
+        "nama": "KOMPLEK PIN CIATEUL",
+        "unit": 120
+      },
+      {
+        "nama": "BATU MAS NUSA LNDAH",
+        "unit": 110
+      },
+      {
+        "nama": "GRIYA SUKAATI PERMAI",
+        "unit": 106
+      },
+      {
+        "nama": "PASIR SALAM ASRI",
+        "unit": 62
+      },
+      {
+        "nama": "KOMPLEK PADMAE",
+        "unit": 50
+      },
+      {
+        "nama": "KEMBAR TIMUR RAYA",
+        "unit": 23
+      },
+      {
+        "nama": "KOMPLEK PIN KARAWITAN",
+        "unit": 11
+      }
+    ]
+  },
+  "SUKAJADI": {
+    "total_komplek": 16,
+    "total_unit": 818,
+    "komplek_list": [
+      {
+        "nama": "SETRA INDAH / SUKAGALIH",
+        "unit": 184
+      },
+      {
+        "nama": "KOMPLEK SUTAMI",
+        "unit": 151
+      },
+      {
+        "nama": "GRIYA MAS",
+        "unit": 98
+      },
+      {
+        "nama": "KUMALA GARDEN",
+        "unit": 92
+      },
+      {
+        "nama": "KOMPLEK SUKADAMAI",
+        "unit": 45
+      },
+      {
+        "nama": "PURI SYAILENDRA",
+        "unit": 38
+      },
+      {
+        "nama": "ISTANA SUKAJADI",
+        "unit": 37
+      },
+      {
+        "nama": "CIPEDES RESIDENCE I DAN II",
+        "unit": 32
+      },
+      {
+        "nama": "KOMPLEK UNPAR",
+        "unit": 32
+      },
+      {
+        "nama": "SETRA RIA",
+        "unit": 30
+      },
+      {
+        "nama": "SUKAMULYA REGENCY",
+        "unit": 25
+      },
+      {
+        "nama": "SETRA WANGI",
+        "unit": 23
+      },
+      {
+        "nama": "SUKAMULYA INDAH",
+        "unit": 11
+      },
+      {
+        "nama": "CIPEDES TENGAH",
+        "unit": 10
+      },
+      {
+        "nama": "MULYA SARI LNDAH CULDESAC",
+        "unit": 10
+      },
+      {
+        "nama": "THE MAJESTY APARTEMEN (APARTEMEN/HOTEL)",
+        "unit": 0
+      }
+    ]
+  },
+  "SUKASARI": {
+    "total_komplek": 34,
+    "total_unit": 4904,
+    "komplek_list": [
+      {
+        "nama": "PERUMNAS SARIJADI I DAN II",
+        "unit": 3293
+      },
+      {
+        "nama": "KOMPLEK ANGKATAN DARAT KPAD",
+        "unit": 560
+      },
+      {
+        "nama": "SETRA SARI",
+        "unit": 151
+      },
+      {
+        "nama": "PARAHYANGAN RUMAH VILLA",
+        "unit": 111
+      },
+      {
+        "nama": "SUKAHAJI PERMAI",
+        "unit": 105
+      },
+      {
+        "nama": "BUDI ASIH RESIDENCE",
+        "unit": 98
+      },
+      {
+        "nama": "ABADI REGENCY",
+        "unit": 65
+      },
+      {
+        "nama": "TIRTA SARI",
+        "unit": 61
+      },
+      {
+        "nama": "KOMPLEK SARIJADI",
+        "unit": 37
+      },
+      {
+        "nama": "GERLONG RESIDENCE",
+        "unit": 36
+      },
+      {
+        "nama": "SURYA SETRA",
+        "unit": 36
+      },
+      {
+        "nama": "PONDOK HIJAU",
+        "unit": 35
+      },
+      {
+        "nama": "SETRA GLORY RESIDENCE",
+        "unit": 32
+      },
+      {
+        "nama": "LEMBAH BAJURI",
+        "unit": 28
+      },
+      {
+        "nama": "GERLONG GIRANG BARU",
+        "unit": 26
+      },
+      {
+        "nama": "REVIERA RESORT RESIDENCE",
+        "unit": 26
+      },
+      {
+        "nama": "PAPYRUS GARDEN",
+        "unit": 25
+      },
+      {
+        "nama": "SUKAHAJI BARU",
+        "unit": 25
+      },
+      {
+        "nama": "KOMPLEK SARIKASO",
+        "unit": 14
+      },
+      {
+        "nama": "PINEWOOD TERRECA",
+        "unit": 14
+      },
+      {
+        "nama": "SETRA DUTA PERMAI",
+        "unit": 14
+      },
+      {
+        "nama": "BABAKAN SUKAJADI RESIDENCE",
+        "unit": 13
+      },
+      {
+        "nama": "PADA SALUYU ISOLA",
+        "unit": 13
+      },
+      {
+        "nama": "BUMI RANCAHERANG INDAH",
+        "unit": 12
+      },
+      {
+        "nama": "SETRA MURNI",
+        "unit": 12
+      },
+      {
+        "nama": "TOWN HOUSE SETRA MURNI ASRI",
+        "unit": 11
+      },
+      {
+        "nama": "SUKAHAJI REGENCY",
+        "unit": 10
+      },
+      {
+        "nama": "ROYAL PALM",
+        "unit": 9
+      },
+      {
+        "nama": "SETRAMURNI PLATINUM",
+        "unit": 9
+      },
+      {
+        "nama": "GREEN RESIDENCE",
+        "unit": 8
+      },
+      {
+        "nama": "GERLONG LEBAK HOME",
+        "unit": 6
+      },
+      {
+        "nama": "SENTRA RESIDENCE",
+        "unit": 5
+      },
+      {
+        "nama": "VILLA KULDESAK",
+        "unit": 4
+      },
+      {
+        "nama": "RUSUN SARIJADI",
+        "unit": 0
+      }
+    ]
+  },
+  "UJUNGBERUNG": {
+    "total_komplek": 35,
+    "total_unit": 6561,
+    "komplek_list": [
+      {
+        "nama": "GRIYA WINAYA",
+        "unit": 873
+      },
+      {
+        "nama": "UJUNG BERUNG INDAH",
+        "unit": 638
+      },
+      {
+        "nama": "GREEN VALLEY RESIDENCE",
+        "unit": 487
+      },
+      {
+        "nama": "VILLA PASIRWANGI",
+        "unit": 403
+      },
+      {
+        "nama": "SIMPAY ASIH",
+        "unit": 379
+      },
+      {
+        "nama": "PASANGGRAHAN LNDAH",
+        "unit": 358
+      },
+      {
+        "nama": "GENDING MAS",
+        "unit": 333
+      },
+      {
+        "nama": "TARUNA PARAHYANGAN",
+        "unit": 325
+      },
+      {
+        "nama": "CLUSTER PESONA REGENCY",
+        "unit": 323
+      },
+      {
+        "nama": "CIJAMBE LNDAH",
+        "unit": 313
+      },
+      {
+        "nama": "KOMPLEK NEGLASARI II",
+        "unit": 238
+      },
+      {
+        "nama": "SUKUP BARU",
+        "unit": 190
+      },
+      {
+        "nama": "BUKIT INDAH PASANGRAHAN",
+        "unit": 186
+      },
+      {
+        "nama": "PESONA HIJAU RESIDENCE",
+        "unit": 154
+      },
+      {
+        "nama": "GRIYA JATI PUTRA",
+        "unit": 143
+      },
+      {
+        "nama": "PESONA PASIR ENDAH",
+        "unit": 143
+      },
+      {
+        "nama": "CINANGKA HARJA",
+        "unit": 140
+      },
+      {
+        "nama": "UJUNG BERUNG REGENCY",
+        "unit": 120
+      },
+      {
+        "nama": "PURI AGRA",
+        "unit": 99
+      },
+      {
+        "nama": "PASANGGRAHAN HILLS",
+        "unit": 88
+      },
+      {
+        "nama": "CLUSTER SAUNG WISATA",
+        "unit": 75
+      },
+      {
+        "nama": "CIPAGANTI DREAM LAND",
+        "unit": 71
+      },
+      {
+        "nama": "GRIYA ASRI",
+        "unit": 61
+      },
+      {
+        "nama": "MADANI REGENCY",
+        "unit": 56
+      },
+      {
+        "nama": "DE VIEW PASIRWANGI",
+        "unit": 54
+      },
+      {
+        "nama": "PANORAMA CILENGKRANG ESTATE",
+        "unit": 54
+      },
+      {
+        "nama": "PURI KUMALA",
+        "unit": 50
+      },
+      {
+        "nama": "NEGLA KENCANA TOWNHOUSE",
+        "unit": 45
+      },
+      {
+        "nama": "KOMPLEK NEGLASARI I",
+        "unit": 44
+      },
+      {
+        "nama": "PREANGER REGENCY",
+        "unit": 39
+      },
+      {
+        "nama": "LEMBAH CITRA",
+        "unit": 30
+      },
+      {
+        "nama": "TAMAN UBER ESTATE",
+        "unit": 26
+      },
+      {
+        "nama": "CLUSTER BILLABONG",
+        "unit": 23
+      },
+      {
+        "nama": "GRIYA PASANGGARAHAN",
+        "unit": 0
+      },
+      {
+        "nama": "MUTIARA MAS",
+        "unit": 0
+      }
+    ]
+  }
+}
