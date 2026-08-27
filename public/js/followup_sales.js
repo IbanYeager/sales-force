@@ -1546,56 +1546,8 @@ function handleRemarksChange(customerId, value) {
   const selTbl = document.getElementById(`tbl_remarks_${customerId}`);
   if (selTbl && selTbl.value !== value) selTbl.value = value;
 
-  // OTOMATISASI LOGIKA PILIHAN REMARKS KE STATUS & TAM 4-PILAR:
-  if (value === 'Customer tidak aktif') {
-    c.connected = 'FALSE';
-    c.contacted = 'FALSE';
-    c.prospect = 'FALSE';
-    c.spk = 'FALSE';
-  } else if (value === 'Customer tidak diangkat') {
-    c.connected = 'TRUE';
-    c.contacted = 'FALSE';
-    c.prospect = 'FALSE';
-    c.spk = 'FALSE';
-  } else if (value === 'Customer pending' || value === 'Tunggu gajian/dana' || value === 'Cek harga mobil lama') {
-    c.connected = 'TRUE';
-    c.contacted = 'TRUE';
-    c.prospect = 'FALSE';
-    c.spk = 'FALSE';
-    c.sales_fu_status = 'Open';
-  } else if (value === 'Customer tertarik' || value === 'Customer janjian' || value === 'Minta simulasi kredit' || value === 'Janjian test drive') {
-    c.connected = 'TRUE';
-    c.contacted = 'TRUE';
-    c.prospect = 'TRUE';
-    c.spk = 'FALSE';
-    c.sales_fu_status = 'Open';
-  } else if (value === 'SPK berhasil') {
-    c.connected = 'TRUE';
-    c.contacted = 'TRUE';
-    c.prospect = 'TRUE';
-    c.spk = 'TRUE';
-    c.sales_fu_status = 'Closed';
-  } else if (value === 'Customer menolak' || value === 'Beli di dealer/merk lain') {
-    c.connected = 'TRUE';
-    c.contacted = 'TRUE';
-    c.prospect = 'FALSE';
-    c.spk = 'FALSE';
-    c.sales_fu_status = 'Closed';
-  }
-
-  // Update Status Select & Text UI
-  const selStatus = document.getElementById(`salesFuStatus_${customerId}`);
-  if (selStatus && c.sales_fu_status) selStatus.value = c.sales_fu_status;
-  const tblStatusTxt = document.getElementById(`tbl_status_txt_${customerId}`);
-  if (tblStatusTxt && c.sales_fu_status) {
-    tblStatusTxt.textContent = c.sales_fu_status;
-    tblStatusTxt.style.color = c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb';
-  }
-
-  // Update semua 4 tombol TAM (Iya / Tidak) di Card & Table
-  ['connected', 'contacted', 'prospect', 'spk'].forEach(f => {
-    updateToggleButtonsUI(customerId, f, c[f]);
-  });
+  // Pilihan tombol Iya / Tidak (connected, contacted, prospect, spk)
+  // TIDAK DIUBAH saat user memilih remarks, tetap sesuai pilihan manual user.
 }
 
 function handleStatusChange(customerId, value) {
