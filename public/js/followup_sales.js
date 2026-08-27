@@ -144,7 +144,10 @@ function initFollowupTabs() {
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="text" class="fu-input" id="followupSearchInput" placeholder="Cari nama pelanggan, nomor WA, plat nomor, atau model mobil..." oninput="handleFollowupSearch(this.value)">
             </div>
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn-fu" id="btnOpenAutoBlast" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%) !important; color:#ffffff !important; border:none !important; padding:8px 16px !important; font-size:12px !important; font-weight:800 !important; border-radius:10px !important; box-shadow:0 4px 14px rgba(16,185,129,0.35) !important; display:inline-flex !important; align-items:center !important; gap:6px !important; cursor:pointer !important;" onclick="openAutoBlastModal()">
+                <i class="fa-solid fa-bolt-lightning" style="color:#fef08a;"></i> ⚡ Auto-Blast Cepat
+              </button>
               <button class="view-toggle-btn active" id="btnViewCards" onclick="switchViewMode('cards')">
                 <i class="fa-solid fa-grip"></i> Kartu Prospek
               </button>
@@ -3337,4 +3340,5 @@ function copyAllBlastLinks() {
     alert('Gagal menyalin ke clipboard.');
   });
 }
+
 
