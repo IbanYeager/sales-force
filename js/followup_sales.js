@@ -80,7 +80,7 @@ function initFollowupTabs() {
 
       <!-- CONTAINER UNTUK TAB DATABASE FOLLOW-UP -->
       <div id="followupSectionView" style="display:block;">
-        
+
         <!-- 1. HERO SUMMARY BANNER -->
         <div class="followup-hero-banner">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -144,10 +144,7 @@ function initFollowupTabs() {
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="text" class="fu-input" id="followupSearchInput" placeholder="Cari nama pelanggan, nomor WA, plat nomor, atau model mobil..." oninput="handleFollowupSearch(this.value)">
             </div>
-            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-              <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; border:none; padding:7px 14px; font-size:11.5px; font-weight:800; border-radius:10px; box-shadow:0 4px 14px rgba(16,185,129,0.3); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="openAutoBlastModal()">
-                <i class="fa-solid fa-bolt-lightning" style="color:#fef08a;"></i> Auto-Blast Cepat
-              </button>
+            <div style="display:flex; gap:6px;">
               <button class="view-toggle-btn active" id="btnViewCards" onclick="switchViewMode('cards')">
                 <i class="fa-solid fa-grip"></i> Kartu Prospek
               </button>
@@ -275,7 +272,7 @@ function switchCustomerTab(tab) {
   const tabKanban = document.getElementById('tabBtnKanban');
   const tabFollowup = document.getElementById('tabBtnFollowup');
   const followupView = document.getElementById('followupSectionView');
-  
+
   const kanbanElements = Array.from(document.querySelectorAll('.mobile-app .container > .card, #kanbanBoard'));
 
   if (tab === 'followup') {
@@ -363,7 +360,7 @@ async function loadFollowupCustomers() {
       followupState.customers = data.data || [];
       updateHeroStats();
       renderCategoryPills();
-      
+
       if (followupState.subTab === 'orphan_pool') {
         loadOrphanLeads();
       } else {
@@ -733,7 +730,7 @@ function renderCategoryPills() {
   if (!container) return;
 
   const categories = Array.from(new Set(followupState.customers.map(c => c.followup_category).filter(Boolean)));
-  
+
   let html = `
     <button class="category-pill-btn ${followupState.activeCategory === 'all' ? 'active' : ''}" onclick="handleCategoryFilter('all', this)">
       <i class="fa-solid fa-grid-2"></i> Semua Kategori (${followupState.customers.length})
@@ -776,7 +773,7 @@ function handleCategoryFilter(cat, btn) {
 function handleStatusFilter(status, btn) {
   followupState.activeStatus = status;
   document.querySelectorAll('#followupStatusTabs .status-fu-tab-btn, #followupStatusTabs button').forEach(b => b.classList.remove('active'));
-  
+
   if (btn) {
     btn.classList.add('active');
   } else {
@@ -797,7 +794,7 @@ function renderCustomerCards(preserveRenderLimit = false) {
   // Filter Search
   if (followupState.searchQuery) {
     const q = followupState.searchQuery;
-    list = list.filter(c => 
+    list = list.filter(c =>
       (c.name && c.name.toLowerCase().includes(q)) ||
       (c.phone && c.phone.includes(q)) ||
       (c.car_model && c.car_model.toLowerCase().includes(q)) ||
@@ -878,14 +875,14 @@ function formatWibDate(dateStr) {
       const day = parseInt(dArr[2], 10);
 
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-      
+
       const now = new Date();
       const todayYear = now.getFullYear();
       const todayMonth = now.getMonth();
       const todayDay = now.getDate();
 
       const isToday = (year === todayYear && month === todayMonth && day === todayDay);
-      
+
       const yesterday = new Date();
       yesterday.setDate(todayDay - 1);
       const isYesterday = (year === yesterday.getFullYear() && month === yesterday.getMonth() && day === yesterday.getDate());
@@ -1986,7 +1983,7 @@ async function openWhatsAppModal(customerId) {
   // Populate Customer Data into Modal with clear Distinction between Mobil Saat Ini & Target Upgrade
   document.getElementById('waCustName').textContent = cust.name;
   document.getElementById('waCustPhone').textContent = `+${cust.phone}`;
-  
+
   const lastCarClean = (cust.last_car_model && cust.last_car_model !== '-' && cust.last_car_model !== 'NO DATA') ? cust.last_car_model : '';
   const targetCarClean = cust.recommended_model || cust.car_model || '-';
 
@@ -2113,12 +2110,12 @@ function insertVariableToWA(tag) {
   if (!textarea) return;
 
   loadSalesProfile();
-  const salesName = (followupState.salesInfo && followupState.salesInfo.name) 
-    ? followupState.salesInfo.name 
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name)
+    ? followupState.salesInfo.name
     : (localStorage.getItem('namaSales') || 'Sales Tunas Toyota');
 
-  const lastCarClean = (activeCustomerForWA && activeCustomerForWA.last_car_model && activeCustomerForWA.last_car_model !== '-' && activeCustomerForWA.last_car_model !== 'NO DATA') 
-    ? activeCustomerForWA.last_car_model 
+  const lastCarClean = (activeCustomerForWA && activeCustomerForWA.last_car_model && activeCustomerForWA.last_car_model !== '-' && activeCustomerForWA.last_car_model !== 'NO DATA')
+    ? activeCustomerForWA.last_car_model
     : '';
 
   let insertVal = tag;
@@ -2153,11 +2150,11 @@ async function applyWhatsAppTemplate(templateId) {
   localStorage.setItem('sft_last_template_id', templateId);
 
   loadSalesProfile();
-  const salesName = (followupState.salesInfo && followupState.salesInfo.name) 
-    ? followupState.salesInfo.name 
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name)
+    ? followupState.salesInfo.name
     : (localStorage.getItem('namaSales') || 'Sales Tunas Toyota');
-  const salesId = (followupState.salesInfo && followupState.salesInfo.id) 
-    ? followupState.salesInfo.id 
+  const salesId = (followupState.salesInfo && followupState.salesInfo.id)
+    ? followupState.salesInfo.id
     : (parseInt(localStorage.getItem('idSales') || localStorage.getItem('salesId') || 1, 10));
 
   try {
@@ -2187,7 +2184,7 @@ async function applyWhatsAppTemplate(templateId) {
 
     let mobilSaatIniTeks = lastCar ? `*${lastCar}*` : 'mobil Toyota Bpk/Ibu';
     let teksKendaraanLama = lastCar ? ` *${lastCar}*${carAge ? ` (${carAge})` : ''}` : '';
-    let tanyaPengalaman = lastCar 
+    let tanyaPengalaman = lastCar
       ? `Bagaimana pengalaman berkendara dengan mobil *${lastCar}* Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`
       : `Bagaimana pengalaman berkendara dengan mobil Toyota Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`;
     let teksStnkUnit = lastCar ? ` *${lastCar}*${plate ? ` (*${plate}*)` : ''}` : (plate ? ` (*${plate}*)` : '');
@@ -2254,8 +2251,8 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
   document.getElementById('modalCreateCustomTemplate')?.remove();
 
   loadSalesProfile();
-  const salesName = (followupState.salesInfo && followupState.salesInfo.name) 
-    ? followupState.salesInfo.name 
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name)
+    ? followupState.salesInfo.name
     : (localStorage.getItem('namaSales') || 'Sales');
 
   const defaultContent = initialContent || `Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hormat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\n[Tuliskan penawaran promo / follow up spesial Bpk/Ibu di sini]\n\nBoleh saya kirimkan detail lengkapnya Bpk/Ibu? Terima kasih! 🙏`;
@@ -2514,7 +2511,7 @@ async function handleDeleteCustomTemplate(id, title) {
     const data = await res.json();
     if (data.success) {
       followupState.templates = data.data || [];
-      
+
       // If deleted template was stored as last used, clear it
       if (localStorage.getItem('sft_last_template_id') == id) {
         localStorage.removeItem('sft_last_template_id');
@@ -2549,7 +2546,7 @@ function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
   const nowIso = new Date().toISOString().slice(0, 19).replace('T', ' ');
   c.followup_date = nowIso;
   c.followup_status = nextStatus;
-  
+
   // Set TAM 4-Pilar logically: Connected & Contacted are always TRUE when WA is sent
   c.connected = tamData.connected || 'TRUE';
   c.contacted = tamData.contacted || 'TRUE';
@@ -2751,7 +2748,7 @@ async function quickUpdateCustomerStatus(customerId, newStatus) {
 
 function switchFollowupSubTab(tab) {
   followupState.subTab = tab;
-  
+
   const btnMyTasks = document.getElementById('subBtnMyTasks');
   const btnOrphan = document.getElementById('subBtnOrphanPool');
   const btnRadar = document.getElementById('subBtnRadar');
@@ -2794,17 +2791,57 @@ function switchCustomerTab(tab) {
 // SMART AUTO-BLAST & FAST QUEUE RUNNER ENGINE
 // =========================================================================
 
+const DEFAULT_BLAST_TEMPLATES = [
+  {
+    id: 101,
+    title: 'Program Trade-In & Upgrade Spektakuler',
+    category: 'tradein',
+    content: `Halo Bpk/Ibu *{nama_customer}* 👋\n\nSalam hangat dari saya, *{nama_sales}* - *{dealer}*.\n\nBagaimana kabar mobil *{mobil_saat_ini}* kesayangan Bpk/Ibu yang sudah menemani selama *{usia_kendaraan}*? Semoga senantiasa nyaman dan prima! 🚗\n\nBulan ini kami sedang mengadakan *Program Spesial Tukar Tambah (Trade-In)* khusus pemilik *{mobil_saat_ini}* ke unit *{model_rekomendasi}*:\n✨ *Ekstra Subsidi Trade-In s.d Rp 15 Juta*\n✨ *Bunga Spesial 0% Tenor 1 Tahun*\n✨ *Free Servis & Sparepart 4 Tahun / 50.000 KM*\n\nApakah boleh saya buatkan simulasi hitungan cicilan ringannya hari ini Bpk/Ibu? Terima kasih! 🙏`
+  },
+  {
+    id: 102,
+    title: 'Flash Promo DP Ringan & Cicilan Hemat',
+    category: 'promo',
+    content: `Halo Bpk/Ibu *{nama_customer}*,\n\nAda kabar gembira dari *{dealer}*! Khusus minggu ini kami merilis *Promo Flash Sale DP Ringan* untuk varian unit favorit *{model_rekomendasi}*:\n\n🔥 *DP Ringan mulai 15%*\n🔥 *Free Kaca Film V-Kool / 3M Original*\n🔥 *Bonus Voucher Bensin & Paint Protection*\n\nKuota unit promo ready stock gudang sangat terbatas. Apakah saya bisa bantu kirimkan rincian paketnya untuk Bpk/Ibu hari ini?\n\nSalam hangat,\n*{nama_sales}*`
+  },
+  {
+    id: 103,
+    title: 'Undangan Spesial Weekend Sales & Test Drive',
+    category: 'promo',
+    content: `Undangan Spesial Weekend Sales Tunas Toyota 🎈✨\n\nYth. Bpk/Ibu *{nama_customer}*,\n\nKami mengundang Bpk/Ibu dan keluarga untuk hadir dalam acara *Weekend Sales Showroom {dealer}* pada:\n\n📅 *Waktu*: Sabtu & Minggu Pekan Ini (09.00 - 16.00 WIB)\n📍 *Lokasi*: Showroom Tunas Toyota Kiara Condong\n\nNikmati sajian hidangan gratis, *Test Drive Unit {model_rekomendasi}*, serta *Extra Cashback SPK di Tempat*!\n\nKonfirmasi kehadiran Bpk/Ibu ke WhatsApp saya ya. Terima kasih!\n\nBest regards,\n*{nama_sales}*`
+  },
+  {
+    id: 104,
+    title: 'CSAT & Evaluasi Kepuasan Berkendara',
+    category: 'csat',
+    content: `Halo Bpk/Ibu *{nama_customer}*,\n\nSalam dari *{nama_sales}* di *{dealer}* 😊\n\n{tanya_pengalaman_berkendara}\n\nJika ada kebutuhan terkait perawatan berkala, perpanjangan asuransi/STNK, atau ingin info unit *{model_rekomendasi}*, jangan ragu kabari saya ya Bpk/Ibu. Semoga hari Bpk/Ibu menyenangkan! 🙏🚗`
+  },
+  {
+    id: 105,
+    title: 'Pengingat Servis Berkala & Gratis Check',
+    category: 'servis',
+    content: `Halo Bpk/Ibu *{nama_customer}*,\n\nKami dari *{dealer}* ingin mengingatkan untuk melakukan *Servis Berkala* unit *{mobil_saat_ini}* Bpk/Ibu agar performa mesin dan garansi resmi Toyota tetap terjamin prima.\n\nNikmati fasilitas *Free Check 23 Titik Komponen* di bengkel resmi kami. Apakah ingin saya bantu *Booking Service* tanpa antre untuk hari apa?\n\nTerima kasih,\n*{nama_sales}*`
+  }
+];
+
 const autoBlastState = {
   targetFilter: 'belum_fu', // 'belum_fu', 'stagnant', 'current_filter', 'respon', 'all'
   targetCustomers: [],
   currentIndex: 0,
-  templateId: null,
+  templateId: 101,
   autoNextCountdown: 0,
   autoNextTimer: null,
   autoNextEnabled: true,
   isPaused: false,
   totalSent: 0
 };
+
+function getActiveBlastTemplates() {
+  if (followupState.templates && followupState.templates.length > 0) {
+    return followupState.templates;
+  }
+  return DEFAULT_BLAST_TEMPLATES;
+}
 
 function formatTextForCustomer(templateContent, c) {
   loadSalesProfile();
@@ -2866,9 +2903,12 @@ function getBlastFilteredCustomers(filterType) {
 function openAutoBlastModal() {
   document.getElementById('modalAutoBlastRunner')?.remove();
 
-  if (!autoBlastState.templateId && followupState.templates && followupState.templates.length > 0) {
-    const savedTmpl = localStorage.getItem('sft_last_template_id');
-    autoBlastState.templateId = savedTmpl ? parseInt(savedTmpl, 10) : followupState.templates[0].id;
+  const allTemplates = getActiveBlastTemplates();
+  const savedTmpl = localStorage.getItem('sft_last_template_id');
+  if (savedTmpl) {
+    autoBlastState.templateId = parseInt(savedTmpl, 10);
+  } else if (allTemplates.length > 0) {
+    autoBlastState.templateId = allTemplates[0].id;
   }
 
   autoBlastState.targetCustomers = getBlastFilteredCustomers(autoBlastState.targetFilter);
@@ -2877,8 +2917,8 @@ function openAutoBlastModal() {
   if (autoBlastState.autoNextTimer) clearInterval(autoBlastState.autoNextTimer);
 
   const modalHtml = `
-    <div class="modal-overlay active" id="modalAutoBlastRunner" style="display:flex; z-index:99999;" onclick="closeAutoBlastModal()">
-      <div class="modal-content" style="max-width:720px; border-radius:var(--fu-radius-lg, 20px); padding:22px 24px; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
+    <div class="modal-overlay active show" id="modalAutoBlastRunner" style="display:flex !important; opacity:1 !important; visibility:visible !important; z-index:999999 !important; position:fixed !important; top:0 !important; left:0 !important; right:0 !important; bottom:0 !important; width:100vw !important; height:100vh !important; background:rgba(7,13,34,0.75) !important; backdrop-filter:blur(8px) !important; align-items:center !important; justify-content:center !important; padding:16px !important; box-sizing:border-box !important;" onclick="closeAutoBlastModal()">
+      <div class="modal-content" style="transform:none !important; display:block !important; opacity:1 !important; visibility:visible !important; background:#ffffff !important; border-radius:20px !important; box-shadow:0 24px 60px rgba(0,0,0,0.35) !important; border:1.5px solid #e2e8f0 !important; width:100% !important; max-width:700px !important; max-height:90vh !important; overflow-y:auto !important; position:relative !important; margin:auto !important; padding:22px 24px !important; box-sizing:border-box !important;" onclick="event.stopPropagation()">
         <!-- Header -->
         <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
           <div>
@@ -2888,7 +2928,7 @@ function openAutoBlastModal() {
             <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">Auto-Blast Follow-Up Database</h3>
             <p style="font-size:12px; color:#64748b; margin:2px 0 0;">Kirim pesan personal otomatis ke prospek secara cepat, terstruktur, &amp; aman dari blokir.</p>
           </div>
-          <button class="btn-close-modal" onclick="closeAutoBlastModal()"><i class="fa-solid fa-xmark"></i></button>
+          <button type="button" class="btn-close-modal" style="background:#f1f5f9; border:none; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; color:#475569; transition:all 0.2s;" onclick="closeAutoBlastModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div id="autoBlastBody"></div>
@@ -2931,11 +2971,12 @@ function renderAutoBlastSetupView() {
     plate_number: 'D 1234 ABC'
   };
 
-  const currentTmpl = followupState.templates.find(t => String(t.id) === String(autoBlastState.templateId)) || followupState.templates[0] || { id: 1, title: 'Template Standar', content: 'Halo Bpk/Ibu *{nama_customer}*...' };
+  const allTemplates = getActiveBlastTemplates();
+  let currentTmpl = allTemplates.find(t => String(t.id) === String(autoBlastState.templateId)) || allTemplates[0];
   const previewText = formatTextForCustomer(currentTmpl.content, sampleCust);
 
   let templateOptionsHtml = '';
-  followupState.templates.forEach(t => {
+  allTemplates.forEach(t => {
     const isSel = (String(t.id) === String(autoBlastState.templateId)) ? 'selected' : '';
     templateOptionsHtml += `<option value="${t.id}" ${isSel}>${escapeHtml(t.title)} (${t.category || 'umum'})</option>`;
   });
@@ -2976,7 +3017,7 @@ function renderAutoBlastSetupView() {
           <i class="fa-solid fa-book-bookmark"></i> Kelola Template
         </button>
       </div>
-      <select id="blastTemplateSelect" class="fu-select" style="width:100%; font-size:12.5px; padding:10px 14px; border-radius:12px;" onchange="handleBlastTemplateChange(this.value)">
+      <select id="blastTemplateSelect" class="fu-select" style="width:100%; font-size:12.5px; padding:10px 14px; border-radius:12px; background:#f8fafc; border:1.5px solid #cbd5e1;" onchange="handleBlastTemplateChange(this.value)">
         ${templateOptionsHtml}
       </select>
     </div>
@@ -2987,7 +3028,7 @@ function renderAutoBlastSetupView() {
         <span style="font-size:11.5px; font-weight:800; color:#475569;">
           <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Contoh Pesan (Data: <strong>${escapeHtml(sampleCust.name)}</strong>):
         </span>
-        <span style="font-size:11px; color:#059669; font-weight:700; background:#ecfdf5; padding:2px 8px; border-radius:6px;">
+        <span style="font-size:11px; color:#059669; font-weight:700; background:#ecfdf5; padding:2px 8px; border-radius:6px; border:1px solid #a7f3d0;">
           ✓ Variabel Terisi Otomatis
         </span>
       </div>
@@ -3007,7 +3048,7 @@ function renderAutoBlastSetupView() {
         </button>
       </div>
 
-      <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:800; border-radius:12px; box-shadow:0 6px 18px rgba(16,185,129,0.35); border:none;" onclick="startAutoBlastQueue()">
+      <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:800; border-radius:12px; box-shadow:0 6px 18px rgba(16,185,129,0.35); border:none; cursor:pointer;" onclick="startAutoBlastQueue()">
         <i class="fa-solid fa-play" style="font-size:14px;"></i> Mulai Antrean Blast (${currentCount} Customer) 🚀
       </button>
     </div>
@@ -3067,7 +3108,8 @@ function renderAutoBlastRunnerView() {
     return;
   }
 
-  const currentTmpl = followupState.templates.find(t => String(t.id) === String(autoBlastState.templateId)) || followupState.templates[0];
+  const allTemplates = getActiveBlastTemplates();
+  const currentTmpl = allTemplates.find(t => String(t.id) === String(autoBlastState.templateId)) || allTemplates[0];
   const formattedMsg = formatTextForCustomer(currentTmpl.content, c);
   const cleanPhone = (c.phone || '').replace(/[^0-9]/g, '');
   const percent = Math.round(((currIdx + 1) / total) * 100);
@@ -3151,7 +3193,8 @@ async function executeSendCurrentBlastCustomer() {
   const c = autoBlastState.targetCustomers[currIdx];
   if (!c) return;
 
-  const currentTmpl = followupState.templates.find(t => String(t.id) === String(autoBlastState.templateId)) || followupState.templates[0];
+  const allTemplates = getActiveBlastTemplates();
+  const currentTmpl = allTemplates.find(t => String(t.id) === String(autoBlastState.templateId)) || allTemplates[0];
   const formattedMsg = formatTextForCustomer(currentTmpl.content, c);
   const cleanPhone = (c.phone || '').replace(/[^0-9]/g, '');
 
@@ -3244,7 +3287,8 @@ function prevBlastCustomer() {
 
 function exportBlastCsv() {
   const customers = autoBlastState.targetCustomers.length > 0 ? autoBlastState.targetCustomers : followupState.customers;
-  const currentTmpl = followupState.templates.find(t => String(t.id) === String(autoBlastState.templateId)) || followupState.templates[0];
+  const allTemplates = getActiveBlastTemplates();
+  const currentTmpl = allTemplates.find(t => String(t.id) === String(autoBlastState.templateId)) || allTemplates[0];
 
   let csv = "No,Nama Customer,Nomor HP,Mobil Saat Ini,Usia Kendaraan,Target Upgrade TAM,Kecamatan,Link WhatsApp,Pesan Terformat\n";
   customers.forEach((c, idx) => {
@@ -3272,7 +3316,8 @@ function exportBlastCsv() {
 
 function copyAllBlastLinks() {
   const customers = autoBlastState.targetCustomers.length > 0 ? autoBlastState.targetCustomers : followupState.customers;
-  const currentTmpl = followupState.templates.find(t => String(t.id) === String(autoBlastState.templateId)) || followupState.templates[0];
+  const allTemplates = getActiveBlastTemplates();
+  const currentTmpl = allTemplates.find(t => String(t.id) === String(autoBlastState.templateId)) || allTemplates[0];
 
   let text = '';
   customers.forEach((c, idx) => {
@@ -3292,5 +3337,4 @@ function copyAllBlastLinks() {
     alert('Gagal menyalin ke clipboard.');
   });
 }
-
 
