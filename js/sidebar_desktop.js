@@ -798,64 +798,70 @@
         }
     }, 300);
 
-    // ==========================================
-    // GLOBAL FLOATING SCROLL-TO-TOP BUTTON
-    // ==========================================
-    (function initScrollToTop() {
+})(); // End of initDesktopSidebar
+
+// =========================================================================
+// UNIVERSAL FLOATING SCROLL-TO-TOP BUTTON (ROBUST STANDALONE ENGINE)
+// =========================================================================
+(function initGlobalScrollToTop() {
+    function setupScrollToTop() {
         if (document.getElementById('sftScrollToTopBtn')) return;
 
-        // Inject Styles
+        // 1. Inject Styles
         if (!document.getElementById('sftScrollTopStyle')) {
             const style = document.createElement('style');
             style.id = 'sftScrollTopStyle';
             style.innerHTML = `
                 .sft-scroll-top-btn {
                     position: fixed;
-                    bottom: 30px;
-                    right: 26px;
-                    width: 46px;
-                    height: 46px;
+                    bottom: 85px;
+                    right: 24px;
+                    width: 45px;
+                    height: 45px;
                     border-radius: 14px;
                     background: linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 60%, #c8102e 100%);
-                    color: #ffffff;
-                    border: 1.5px solid rgba(255, 255, 255, 0.25);
+                    color: #ffffff !important;
+                    border: 1.5px solid rgba(255, 255, 255, 0.3);
                     box-shadow: 0 10px 25px -4px rgba(13, 27, 62, 0.45), 0 0 0 1px rgba(200, 16, 46, 0.2);
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 18px;
-                    z-index: 99998;
+                    font-size: 17px;
+                    z-index: 99999;
                     opacity: 0;
                     visibility: hidden;
-                    transform: translateY(20px) scale(0.85);
-                    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+                    transform: translateY(16px) scale(0.85);
+                    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
                     outline: none;
                     user-select: none;
+                    text-decoration: none;
                 }
                 .sft-scroll-top-btn.show {
-                    opacity: 1;
-                    visibility: visible;
-                    transform: translateY(0) scale(1);
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    transform: translateY(0) scale(1) !important;
+                    pointer-events: auto !important;
                 }
                 .sft-scroll-top-btn:hover {
-                    transform: translateY(-4px) scale(1.06);
+                    transform: translateY(-3px) scale(1.06) !important;
                     box-shadow: 0 14px 30px -4px rgba(200, 16, 46, 0.5), 0 0 15px rgba(200, 16, 46, 0.4);
                     background: linear-gradient(135deg, #1e3a8a 0%, #c8102e 100%);
-                    color: #ffffff;
+                    color: #ffffff !important;
                 }
                 .sft-scroll-top-btn:active {
-                    transform: translateY(0) scale(0.95);
+                    transform: translateY(0) scale(0.95) !important;
                 }
                 .sft-scroll-top-btn i {
-                    transition: transform 0.25s ease;
+                    transition: transform 0.2s ease;
+                    color: #ffffff;
                 }
                 .sft-scroll-top-btn:hover i {
                     transform: translateY(-2px);
                 }
                 .sft-scroll-top-tooltip {
                     position: absolute;
-                    right: 56px;
+                    right: 54px;
                     background: #0f172a;
                     color: #ffffff;
                     font-size: 11px;
@@ -865,7 +871,7 @@
                     white-space: nowrap;
                     opacity: 0;
                     pointer-events: none;
-                    transform: translateX(10px);
+                    transform: translateX(8px);
                     transition: all 0.2s ease;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
                     border: 1px solid rgba(255,255,255,0.1);
@@ -876,11 +882,11 @@
                 }
                 @media (max-width: 768px) {
                     .sft-scroll-top-btn {
-                        bottom: 85px;
+                        bottom: 145px;
                         right: 18px;
                         width: 42px;
                         height: 42px;
-                        font-size: 16px;
+                        font-size: 15px;
                         border-radius: 12px;
                     }
                     .sft-scroll-top-tooltip {
@@ -891,59 +897,70 @@
             (document.head || document.documentElement).appendChild(style);
         }
 
-        // Create Button Element
-        function createButton() {
-            if (document.getElementById('sftScrollToTopBtn')) return;
-            const btn = document.createElement('button');
-            btn.id = 'sftScrollToTopBtn';
-            btn.className = 'sft-scroll-top-btn';
-            btn.setAttribute('type', 'button');
-            btn.setAttribute('title', 'Scroll ke Atas');
-            btn.setAttribute('aria-label', 'Scroll ke Atas');
-            btn.innerHTML = `
-                <i class="fa-solid fa-chevron-up"></i>
-                <span class="sft-scroll-top-tooltip">Ke Atas</span>
-            `;
+        // 2. Create Button Element
+        const btn = document.createElement('button');
+        btn.id = 'sftScrollToTopBtn';
+        btn.className = 'sft-scroll-top-btn';
+        btn.setAttribute('type', 'button');
+        btn.setAttribute('title', 'Scroll ke Atas');
+        btn.setAttribute('aria-label', 'Scroll ke Atas');
+        btn.innerHTML = `
+            <i class="fa-solid fa-chevron-up"></i>
+            <span class="sft-scroll-top-tooltip">Ke Atas</span>
+        `;
 
-            btn.addEventListener('click', function(e) {
+        // 3. Scroll to Top Handler
+        function doScrollToTop(e) {
+            if (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
-                document.body.scrollTo({ top: 0, behavior: 'smooth' });
-                const mainContent = document.querySelector('.desktop-content') || document.querySelector('.container') || document.querySelector('.mobile-app');
-                if (mainContent) {
-                    mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+            document.body.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Scroll all possible overflowing containers
+            const scrollables = document.querySelectorAll('.desktop-content, .table-responsive, .mobile-app, .container, main, [style*="overflow"]');
+            scrollables.forEach(el => {
+                if (el && el.scrollTop > 0) {
+                    el.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        }
+
+        btn.addEventListener('click', doScrollToTop);
+        document.body.appendChild(btn);
+
+        // 4. Robust Visibility Checker (captures any container scrolling)
+        function checkScrollPosition() {
+            const winScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            let maxScroll = winScroll;
+
+            const scrollables = document.querySelectorAll('.desktop-content, .table-responsive, .mobile-app, .container, main, [style*="overflow"]');
+            scrollables.forEach(el => {
+                if (el && el.scrollTop > maxScroll) {
+                    maxScroll = el.scrollTop;
                 }
             });
 
-            document.body.appendChild(btn);
-
-            // Scroll Listener
-            function toggleBtnVisibility() {
-                const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-                const contentScroll = (document.querySelector('.desktop-content')?.scrollTop) || 0;
-                const maxScroll = Math.max(scrollY, contentScroll);
-
-                if (maxScroll > 220) {
-                    btn.classList.add('show');
-                } else {
-                    btn.classList.remove('show');
-                }
-            }
-
-            window.addEventListener('scroll', toggleBtnVisibility, { passive: true });
-            document.addEventListener('scroll', toggleBtnVisibility, { passive: true });
-            const desktopContent = document.querySelector('.desktop-content');
-            if (desktopContent) {
-                desktopContent.addEventListener('scroll', toggleBtnVisibility, { passive: true });
+            if (maxScroll > 100) {
+                btn.classList.add('show');
+            } else {
+                btn.classList.remove('show');
             }
         }
 
-        if (document.body) {
-            createButton();
-        } else {
-            document.addEventListener('DOMContentLoaded', createButton);
-        }
-    })();
+        // Listen on all capture scroll events
+        window.addEventListener('scroll', checkScrollPosition, { passive: true, capture: true });
+        document.addEventListener('scroll', checkScrollPosition, { passive: true, capture: true });
+        
+        // Also check periodically in case of lazy content load
+        setInterval(checkScrollPosition, 400);
+    }
+
+    if (document.body) {
+        setupScrollToTop();
+    } else {
+        document.addEventListener('DOMContentLoaded', setupScrollToTop);
+    }
 })();
