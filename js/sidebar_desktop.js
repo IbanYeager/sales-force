@@ -797,4 +797,153 @@
             document.body.classList.add('sidebar-loaded');
         }
     }, 300);
+
+    // ==========================================
+    // GLOBAL FLOATING SCROLL-TO-TOP BUTTON
+    // ==========================================
+    (function initScrollToTop() {
+        if (document.getElementById('sftScrollToTopBtn')) return;
+
+        // Inject Styles
+        if (!document.getElementById('sftScrollTopStyle')) {
+            const style = document.createElement('style');
+            style.id = 'sftScrollTopStyle';
+            style.innerHTML = `
+                .sft-scroll-top-btn {
+                    position: fixed;
+                    bottom: 30px;
+                    right: 26px;
+                    width: 46px;
+                    height: 46px;
+                    border-radius: 14px;
+                    background: linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 60%, #c8102e 100%);
+                    color: #ffffff;
+                    border: 1.5px solid rgba(255, 255, 255, 0.25);
+                    box-shadow: 0 10px 25px -4px rgba(13, 27, 62, 0.45), 0 0 0 1px rgba(200, 16, 46, 0.2);
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 18px;
+                    z-index: 99998;
+                    opacity: 0;
+                    visibility: hidden;
+                    transform: translateY(20px) scale(0.85);
+                    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+                    outline: none;
+                    user-select: none;
+                }
+                .sft-scroll-top-btn.show {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateY(0) scale(1);
+                }
+                .sft-scroll-top-btn:hover {
+                    transform: translateY(-4px) scale(1.06);
+                    box-shadow: 0 14px 30px -4px rgba(200, 16, 46, 0.5), 0 0 15px rgba(200, 16, 46, 0.4);
+                    background: linear-gradient(135deg, #1e3a8a 0%, #c8102e 100%);
+                    color: #ffffff;
+                }
+                .sft-scroll-top-btn:active {
+                    transform: translateY(0) scale(0.95);
+                }
+                .sft-scroll-top-btn i {
+                    transition: transform 0.25s ease;
+                }
+                .sft-scroll-top-btn:hover i {
+                    transform: translateY(-2px);
+                }
+                .sft-scroll-top-tooltip {
+                    position: absolute;
+                    right: 56px;
+                    background: #0f172a;
+                    color: #ffffff;
+                    font-size: 11px;
+                    font-weight: 700;
+                    padding: 4px 10px;
+                    border-radius: 8px;
+                    white-space: nowrap;
+                    opacity: 0;
+                    pointer-events: none;
+                    transform: translateX(10px);
+                    transition: all 0.2s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+                    border: 1px solid rgba(255,255,255,0.1);
+                }
+                .sft-scroll-top-btn:hover .sft-scroll-top-tooltip {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                @media (max-width: 768px) {
+                    .sft-scroll-top-btn {
+                        bottom: 85px;
+                        right: 18px;
+                        width: 42px;
+                        height: 42px;
+                        font-size: 16px;
+                        border-radius: 12px;
+                    }
+                    .sft-scroll-top-tooltip {
+                        display: none;
+                    }
+                }
+            `;
+            (document.head || document.documentElement).appendChild(style);
+        }
+
+        // Create Button Element
+        function createButton() {
+            if (document.getElementById('sftScrollToTopBtn')) return;
+            const btn = document.createElement('button');
+            btn.id = 'sftScrollToTopBtn';
+            btn.className = 'sft-scroll-top-btn';
+            btn.setAttribute('type', 'button');
+            btn.setAttribute('title', 'Scroll ke Atas');
+            btn.setAttribute('aria-label', 'Scroll ke Atas');
+            btn.innerHTML = `
+                <i class="fa-solid fa-chevron-up"></i>
+                <span class="sft-scroll-top-tooltip">Ke Atas</span>
+            `;
+
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+                document.body.scrollTo({ top: 0, behavior: 'smooth' });
+                const mainContent = document.querySelector('.desktop-content') || document.querySelector('.container') || document.querySelector('.mobile-app');
+                if (mainContent) {
+                    mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
+            document.body.appendChild(btn);
+
+            // Scroll Listener
+            function toggleBtnVisibility() {
+                const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                const contentScroll = (document.querySelector('.desktop-content')?.scrollTop) || 0;
+                const maxScroll = Math.max(scrollY, contentScroll);
+
+                if (maxScroll > 220) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
+            }
+
+            window.addEventListener('scroll', toggleBtnVisibility, { passive: true });
+            document.addEventListener('scroll', toggleBtnVisibility, { passive: true });
+            const desktopContent = document.querySelector('.desktop-content');
+            if (desktopContent) {
+                desktopContent.addEventListener('scroll', toggleBtnVisibility, { passive: true });
+            }
+        }
+
+        if (document.body) {
+            createButton();
+        } else {
+            document.addEventListener('DOMContentLoaded', createButton);
+        }
+    })();
 })();
