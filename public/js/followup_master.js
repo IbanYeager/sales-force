@@ -1196,7 +1196,7 @@ function updateRecallSalesInfo() {
   const infoBox = document.getElementById('recallSalesInfoBox');
   const countText = document.getElementById('recallSalesCountText');
   const pendingText = document.getElementById('recallSalesPendingText');
-  
+
   if (!select || !infoBox) return;
   const salesId = select.value;
   if (!salesId) {

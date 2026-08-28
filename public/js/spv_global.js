@@ -1,22 +1,73 @@
 // spv_global.js - Global background polling, notification sound, and mobile drawer for all SPV pages
 
+// ── Global SPV Logout Function ──────────────────────────
+function logoutUser() {
+    try {
+        localStorage.clear();
+        sessionStorage.clear();
+    } catch (e) {
+        console.error('Logout error', e);
+    }
+    window.location.replace('/pages/login_spv');
+}
+window.logoutUser = logoutUser;
+
 // ── Global SPV Access Guard ─────────────────────────────
 (function enforceSpvGuard() {
     const loggedIn = localStorage.getItem('loggedIn') === 'true';
     const peran = localStorage.getItem('peranSales');
     if (!loggedIn) {
-        window.location.href = '../pages/login_spv.html';
+        window.location.replace('/pages/login_spv');
         return;
     }
-    if (peran === 'Kepala Cabang') {
-        window.location.href = '../pages_kacab/index_kacab.html';
+    if (peran === 'Kepala Cabang' || peran === 'Kacab') {
+        window.location.replace('/pages_kacab/index_kacab');
         return;
     }
-    if (peran !== 'Supervisor') {
-        window.location.href = '../index.html';
+    if (peran !== 'Supervisor' && peran !== 'SPV') {
+        window.location.replace('/index');
         return;
     }
 })();
+
+// ── Global SPV User Renderer (Consistent Topbar Profile) ──
+function renderSpvUser() {
+    let nama = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
+    const peran = localStorage.getItem('peranSales') || 'Supervisor';
+    const foto = localStorage.getItem('fotoSales');
+
+    if (!nama || nama === 'Supervisor' || nama === 'Supervisor Tunas') {
+        nama = 'Pak Ryan';
+        localStorage.setItem('namaSales', 'Pak Ryan');
+    }
+
+    const namaEls = document.querySelectorAll('#spvNama, #kcbNama, .spv-user .name, .spv-topbar .name, .meta .name');
+    namaEls.forEach(el => {
+        if (el) el.textContent = nama;
+    });
+
+    const roleEls = document.querySelectorAll('#spvRole, #kcbRole, .spv-user .role, .spv-topbar .role, .meta .role');
+    roleEls.forEach(el => {
+        if (el) el.textContent = peran;
+    });
+
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0D1B3E&color=ffffff&bold=true`;
+
+    const avatarEls = document.querySelectorAll('#spvAvatar, #kcbAvatar, #mhAvatar, .spv-user img, .spv-topbar img, .avatar-status img');
+    avatarEls.forEach(img => {
+        if (img) {
+            img.src = (foto && foto.trim() !== '') ? foto : defaultAvatar;
+            img.onerror = function() { this.src = defaultAvatar; };
+        }
+    });
+
+    const sidebarBrandRole = document.querySelector('.spv-brand .role, .sidebar-brand .role');
+    if (sidebarBrandRole) sidebarBrandRole.textContent = `Supervisor - ${nama}`;
+}
+
+renderSpvUser();
+document.addEventListener('DOMContentLoaded', renderSpvUser);
+window.addEventListener('pageshow', renderSpvUser);
 
 // ── Mobile Header + Drawer Navigation ──────────────────
 // Diinjeksi lewat JS supaya semua halaman SPV langsung kebagian

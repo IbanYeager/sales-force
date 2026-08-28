@@ -393,13 +393,17 @@
                 }
             }
 
-            localStorage.clear();
-            if (role === 'Kepala Cabang') {
-                window.location.href = prefix + 'pages/login_kacab.html';
-            } else if (role === 'Supervisor') {
-                window.location.href = prefix + 'pages/login_spv.html';
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+            } catch(e) {}
+
+            if (role === 'Kepala Cabang' || role === 'Kacab') {
+                window.location.replace('/pages/login_kacab');
+            } else if (role === 'Supervisor' || role === 'SPV') {
+                window.location.replace('/pages/login_spv');
             } else {
-                window.location.href = prefix + 'pages/login.html';
+                window.location.replace('/pages/login');
             }
         };
 

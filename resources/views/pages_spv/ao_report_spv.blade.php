@@ -62,12 +62,12 @@
         </div>
         <div class="spv-user">
           <div class="avatar-status">
-            <img id="spvAvatar" src="https://ui-avatars.com/api/?name=SPV&background=1c2740&color=ffffff&bold=true" alt="Avatar">
+            <img id="spvAvatar" src="https://ui-avatars.com/api/?name=Pak+Ryan&background=0D1B3E&color=ffffff&bold=true" alt="Avatar">
             <span class="dot"></span>
           </div>
           <div class="meta">
-            <span class="name" id="spvNama">Supervisor</span>
-            <span class="role" id="spvRole">Supervisor Toyota</span>
+            <span class="name" id="spvNama">Pak Ryan</span>
+            <span class="role" id="spvRole">Supervisor</span>
           </div>
         </div>
       </div>
@@ -376,6 +376,7 @@
 
   <script src="../js/ao_report_data.js"></script>
   <script src="../js/ao_report.js"></script>
+  <script src="../js/spv_global.js?v=20260828"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         initAOReport('spv');
@@ -387,11 +388,6 @@
         if (dateEl) {
             dateEl.textContent = val === 'Semua' ? '10 Agustus 2026' : `10 Agu 2026 (Tim ${val})`;
         }
-    }
-
-    function logoutUser() {
-        localStorage.clear();
-        window.location.href = '../pages/login_spv.html';
     }
   </script>
 </body>
