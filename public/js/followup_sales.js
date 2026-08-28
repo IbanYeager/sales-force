@@ -2828,15 +2828,31 @@ const DEFAULT_BLAST_TEMPLATES = [
 ];
 
 const autoBlastState = {
-  targetFilter: 'belum_fu', // 'belum_fu', 'stagnant', 'current_filter', 'respon', 'all'
+  mode: 'background', // 'background' (100% Otomatis Gateway) or 'queue' (Manual wa.me)
+  targetFilter: 'belum_fu',
   targetCustomers: [],
   currentIndex: 0,
   templateId: 101,
-  autoNextCountdown: 0,
-  autoNextTimer: null,
-  autoNextEnabled: true,
+  
+  // Gateway per sales
+  gatewayToken: '',
+  gatewayProvider: 'fonnte', // 'fonnte' or 'wablas'
+  gatewaySenderPhone: '',
+  gatewayDeviceName: '',
+  isCheckingDevice: false,
+  isConfigOpen: false,
+
+  // Background Runner execution state
+  isSendingBackground: false,
   isPaused: false,
-  totalSent: 0
+  isStopped: false,
+  totalSent: 0,
+  totalFailed: 0,
+  logs: [], // [{time, name, phone, status: 'success'|'failed', msg: ''}]
+  
+  // Direct queue runner state
+  autoNextCountdown: 0,
+  autoNextTimer: null
 };
 
 function getActiveBlastTemplates() {
@@ -2844,49 +2860,6 @@ function getActiveBlastTemplates() {
     return followupState.templates;
   }
   return DEFAULT_BLAST_TEMPLATES;
-}
-
-function formatTextForCustomer(templateContent, c) {
-  loadSalesProfile();
-  const salesName = (followupState.salesInfo && followupState.salesInfo.name) 
-    ? followupState.salesInfo.name 
-    : (localStorage.getItem('namaSales') || 'Sales Tunas Toyota');
-  
-  const lastCar = (c.last_car_model && c.last_car_model !== '-' && c.last_car_model !== 'NO DATA') ? c.last_car_model : '';
-  const recModel = c.recommended_model || c.car_model || 'Toyota Terbaru';
-  const carAge = (c.car_age && c.car_age !== '-' && c.car_age !== 'NO DATA') ? c.car_age : '';
-  const district = (c.district && c.district !== '-' && c.district !== 'NO DATA') ? c.district : '';
-  const plate = (c.plate_number && c.plate_number !== '-' && c.plate_number !== 'NO DATA') ? c.plate_number : '';
-
-  let mobilSaatIniTeks = lastCar ? `*${lastCar}*` : 'mobil Toyota Bpk/Ibu';
-  let teksKendaraanLama = lastCar ? ` *${lastCar}*${carAge ? ` (${carAge})` : ''}` : '';
-  let tanyaPengalaman = lastCar 
-    ? `Bagaimana pengalaman berkendara dengan mobil *${lastCar}* Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`
-    : `Bagaimana pengalaman berkendara dengan mobil Toyota Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`;
-  let teksStnkUnit = lastCar ? ` *${lastCar}*${plate ? ` (*${plate}*)` : ''}` : (plate ? ` (*${plate}*)` : '');
-  let teksKecamatan = district ? ` di Kec. ${district}` : '';
-
-  let formatted = (templateContent || '')
-    .replace(/\*?{mobil_saat_ini}\*?/gi, mobilSaatIniTeks)
-    .replace(/\*?{kendaraan_terakhir}\*?/gi, mobilSaatIniTeks)
-    .replace(/\*?{tipe_mobil}\*?/gi, mobilSaatIniTeks)
-    .replace(/\*?{model_rekomendasi}\*?/gi, `*${recModel}*`)
-    .replace(/\*?{target_upgrade}\*?/gi, `*${recModel}*`)
-    .replace(/{tanya_pengalaman_berkendara}/gi, tanyaPengalaman)
-    .replace(/{teks_kendaraan_lama}/gi, teksKendaraanLama)
-    .replace(/{teks_mobil_saat_ini}/gi, lastCar ? ` *${lastCar}*` : '')
-    .replace(/{teks_stnk_unit}/gi, teksStnkUnit)
-    .replace(/{teks_kecamatan}/gi, teksKecamatan)
-    .replace(/{nama_customer}/gi, c.name || '')
-    .replace(/{usia_kendaraan}/gi, carAge || '3 Tahun')
-    .replace(/{cluster}/gi, c.cluster_name || '')
-    .replace(/{kecamatan}/gi, district)
-    .replace(/{nopol}/gi, plate || '-')
-    .replace(/{nama_sales}/gi, salesName)
-    .replace(/{dealer}/gi, 'Tunas Toyota Kiara Condong')
-    .replace(/\*{2,}/g, '*');
-
-  return formatted;
 }
 
 function getBlastFilteredCustomers(filterType) {
@@ -2903,8 +2876,60 @@ function getBlastFilteredCustomers(filterType) {
   return all;
 }
 
-function openAutoBlastModal() {
+async function loadSalesGatewaySettings() {
+  loadSalesProfile();
+  const salesId = (followupState.salesInfo && followupState.salesInfo.id) ? followupState.salesInfo.id : 1;
+  const localKey = 'sft_wa_token_' + salesId;
+  const localProviderKey = 'sft_wa_provider_' + salesId;
+
+  autoBlastState.gatewayToken = localStorage.getItem(localKey) || '';
+  autoBlastState.gatewayProvider = localStorage.getItem(localProviderKey) || 'fonnte';
+
+  try {
+    const res = await fetch(`../api/api_wa_gateway.php?action=get_token&sales_id=${salesId}`);
+    const json = await res.json();
+    if (json.success) {
+      if (json.token) {
+        autoBlastState.gatewayToken = json.token;
+        localStorage.setItem(localKey, json.token);
+      }
+      if (json.provider) {
+        autoBlastState.gatewayProvider = json.provider;
+        localStorage.setItem(localProviderKey, json.provider);
+      }
+      autoBlastState.gatewaySenderPhone = json.sales_phone || '';
+    }
+  } catch (e) {
+    console.log('Gateway fetch fallback to local storage');
+  }
+}
+
+async function saveSalesGatewaySettings(token, provider) {
+  loadSalesProfile();
+  const salesId = (followupState.salesInfo && followupState.salesInfo.id) ? followupState.salesInfo.id : 1;
+  autoBlastState.gatewayToken = token.trim();
+  autoBlastState.gatewayProvider = provider.trim();
+
+  localStorage.setItem('sft_wa_token_' + salesId, autoBlastState.gatewayToken);
+  localStorage.setItem('sft_wa_provider_' + salesId, autoBlastState.gatewayProvider);
+
+  try {
+    await fetch('../api/api_wa_gateway.php?action=save_token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sales_id: salesId,
+        token: autoBlastState.gatewayToken,
+        provider: autoBlastState.gatewayProvider
+      })
+    });
+  } catch (e) {}
+}
+
+async function openAutoBlastModal() {
   document.getElementById('modalAutoBlastRunner')?.remove();
+
+  await loadSalesGatewaySettings();
 
   const allTemplates = getActiveBlastTemplates();
   const savedTmpl = localStorage.getItem('sft_last_template_id');
@@ -2917,19 +2942,23 @@ function openAutoBlastModal() {
   autoBlastState.targetCustomers = getBlastFilteredCustomers(autoBlastState.targetFilter);
   autoBlastState.currentIndex = 0;
   autoBlastState.totalSent = 0;
+  autoBlastState.totalFailed = 0;
+  autoBlastState.logs = [];
+  autoBlastState.isSendingBackground = false;
+  autoBlastState.isPaused = false;
+  autoBlastState.isStopped = false;
   if (autoBlastState.autoNextTimer) clearInterval(autoBlastState.autoNextTimer);
 
   const modalHtml = `
     <div class="modal-overlay active show" id="modalAutoBlastRunner" style="display:flex !important; opacity:1 !important; visibility:visible !important; z-index:999999 !important; position:fixed !important; top:0 !important; left:0 !important; right:0 !important; bottom:0 !important; width:100vw !important; height:100vh !important; background:rgba(7,13,34,0.75) !important; backdrop-filter:blur(8px) !important; align-items:center !important; justify-content:center !important; padding:16px !important; box-sizing:border-box !important;" onclick="closeAutoBlastModal()">
-      <div class="modal-content" style="transform:none !important; display:block !important; opacity:1 !important; visibility:visible !important; background:#ffffff !important; border-radius:20px !important; box-shadow:0 24px 60px rgba(0,0,0,0.35) !important; border:1.5px solid #e2e8f0 !important; width:100% !important; max-width:700px !important; max-height:90vh !important; overflow-y:auto !important; position:relative !important; margin:auto !important; padding:22px 24px !important; box-sizing:border-box !important;" onclick="event.stopPropagation()">
+      <div class="modal-content" style="transform:none !important; display:block !important; opacity:1 !important; visibility:visible !important; background:#ffffff !important; border-radius:20px !important; box-shadow:0 24px 60px rgba(0,0,0,0.35) !important; border:1.5px solid #e2e8f0 !important; width:100% !important; max-width:720px !important; max-height:90vh !important; overflow-y:auto !important; position:relative !important; margin:auto !important; padding:22px 24px !important; box-sizing:border-box !important;" onclick="event.stopPropagation()">
         <!-- Header -->
-        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <div style="display:inline-flex; align-items:center; gap:6px; background:#ecfdf5; color:#059669; font-size:11px; font-weight:800; padding:3px 10px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px; border:1px solid #a7f3d0;">
-              <i class="fa-solid fa-bolt-lightning" style="color:#10b981;"></i> Smart WhatsApp Blast Engine
+              <i class="fa-solid fa-bolt-lightning" style="color:#10b981;"></i> WhatsApp Auto-Blast Engine
             </div>
             <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">Auto-Blast Follow-Up Database</h3>
-            <p style="font-size:12px; color:#64748b; margin:2px 0 0;">Kirim pesan personal otomatis ke prospek secara cepat, terstruktur, &amp; aman dari blokir.</p>
           </div>
           <button type="button" class="btn-close-modal" style="background:#f1f5f9; border:none; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; color:#475569; transition:all 0.2s;" onclick="closeAutoBlastModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
@@ -2944,6 +2973,12 @@ function openAutoBlastModal() {
 }
 
 function closeAutoBlastModal() {
+  if (autoBlastState.isSendingBackground) {
+    if (!confirm('Pengiriman otomatis di latar belakang sedang berjalan. Apakah Anda yakin ingin membatalkan?')) {
+      return;
+    }
+    autoBlastState.isStopped = true;
+  }
   if (autoBlastState.autoNextTimer) clearInterval(autoBlastState.autoNextTimer);
   const modal = document.getElementById('modalAutoBlastRunner');
   if (modal) {
@@ -2952,9 +2987,74 @@ function closeAutoBlastModal() {
   }
 }
 
+function switchBlastMode(mode) {
+  autoBlastState.mode = mode;
+  renderAutoBlastSetupView();
+}
+
+function toggleGatewayConfigBox() {
+  autoBlastState.isConfigOpen = !autoBlastState.isConfigOpen;
+  const box = document.getElementById('gatewayConfigDrawer');
+  if (box) {
+    box.style.display = autoBlastState.isConfigOpen ? 'block' : 'none';
+  }
+}
+
+async function handleTestGatewayConnection() {
+  const tokenInput = document.getElementById('inputBlastGatewayToken');
+  const providerInput = document.getElementById('selectBlastGatewayProvider');
+  const statusEl = document.getElementById('gatewayTestStatus');
+
+  const token = tokenInput ? tokenInput.value.trim() : autoBlastState.gatewayToken;
+  const provider = providerInput ? providerInput.value : autoBlastState.gatewayProvider;
+
+  if (!token) {
+    if (statusEl) {
+      statusEl.innerHTML = `<span style="color:#dc2626; font-size:11.5px; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Masukkan Token Gateway Anda terlebih dahulu.</span>`;
+    }
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.innerHTML = `<span style="color:#2563eb; font-size:11.5px; font-weight:700;"><i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke ${provider}...</span>`;
+  }
+
+  await saveSalesGatewaySettings(token, provider);
+
+  try {
+    const res = await fetch('../api/api_wa_gateway.php?action=test_token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, provider })
+    });
+    const json = await res.json();
+    if (json.success) {
+      if (statusEl) {
+        statusEl.innerHTML = `<span style="color:#059669; font-size:11.5px; font-weight:800;"><i class="fa-solid fa-circle-check"></i> ${escapeHtml(json.message)}</span>`;
+      }
+      autoBlastState.gatewayDeviceName = json.message;
+      setTimeout(() => {
+        renderAutoBlastSetupView();
+      }, 1200);
+    } else {
+      if (statusEl) {
+        statusEl.innerHTML = `<span style="color:#dc2626; font-size:11.5px; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> ${escapeHtml(json.message)}</span>`;
+      }
+    }
+  } catch (e) {
+    if (statusEl) {
+      statusEl.innerHTML = `<span style="color:#dc2626; font-size:11.5px; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> Gagal terhubung ke API Gateway.</span>`;
+    }
+  }
+}
+
 function renderAutoBlastSetupView() {
   const container = document.getElementById('autoBlastBody');
   if (!container) return;
+
+  loadSalesProfile();
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name) ? followupState.salesInfo.name : 'Sales Consultant';
+  const hasToken = !!autoBlastState.gatewayToken;
 
   const countBelum = followupState.customers.filter(c => c.followup_status === 'Belum Dihubungi' || !c.followup_date).length;
   const countRespon = followupState.customers.filter(c => c.followup_status === 'Menunggu Respon').length;
@@ -2985,25 +3085,83 @@ function renderAutoBlastSetupView() {
   });
 
   container.innerHTML = `
+    <!-- Mode Switcher Tabs -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; background:#f1f5f9; padding:4px; border-radius:14px;">
+      <button type="button" class="btn-fu" style="padding:9px 12px; font-size:12px; font-weight:800; border-radius:10px; justify-content:center; border:none; cursor:pointer; ${autoBlastState.mode === 'background' ? 'background:#059669; color:#ffffff; box-shadow:0 2px 8px rgba(5,150,105,0.3);' : 'background:transparent; color:#475569;'}" onclick="switchBlastMode('background')">
+        <i class="fa-solid fa-paper-plane"></i> 🚀 100% Background Otomatis (Gateway)
+      </button>
+      <button type="button" class="btn-fu" style="padding:9px 12px; font-size:12px; font-weight:800; border-radius:10px; justify-content:center; border:none; cursor:pointer; ${autoBlastState.mode === 'queue' ? 'background:#2563eb; color:#ffffff; box-shadow:0 2px 8px rgba(37,99,235,0.3);' : 'background:transparent; color:#475569;'}" onclick="switchBlastMode('queue')">
+        <i class="fa-brands fa-whatsapp"></i> 📲 Antrean WhatsApp Web (Manual)
+      </button>
+    </div>
+
+    <!-- Active Sender Sales Bar (Nomor Pengirim Akun Sales) -->
+    <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:12px 16px; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:16px;">
+            <i class="fa-solid fa-user-tie"></i>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.3px;">Nomor Pengirim (Akun Sales):</div>
+            <div style="font-size:13.5px; font-weight:900; color:#0f172a;">
+              ${escapeHtml(salesName)} 
+              ${autoBlastState.gatewaySenderPhone ? `<span style="color:#059669; font-weight:800; font-size:12px;">(${escapeHtml(autoBlastState.gatewaySenderPhone)})</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          ${hasToken 
+            ? `<span style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-check"></i> Gateway Aktif (${escapeHtml(autoBlastState.gatewayProvider.toUpperCase())})</span>` 
+            : `<span style="font-size:11px; font-weight:800; background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-exclamation"></i> Token Belum Diset</span>`
+          }
+          <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px; border-radius:8px;" onclick="toggleGatewayConfigBox()">
+            <i class="fa-solid fa-gear"></i> ${autoBlastState.isConfigOpen ? 'Tutup Pengaturan' : 'Atur Token WA'}
+          </button>
+        </div>
+      </div>
+
+      <!-- Config Drawer (Token & Provider Input per Sales) -->
+      <div id="gatewayConfigDrawer" style="display:${autoBlastState.isConfigOpen ? 'block' : 'none'}; margin-top:12px; padding-top:12px; border-top:1px dashed #cbd5e1;">
+        <div style="font-size:12px; font-weight:800; color:#1e293b; margin-bottom:6px;">
+          🔑 Pengaturan Token WA Gateway Anda (${escapeHtml(salesName)}):
+        </div>
+        <p style="font-size:11px; color:#64748b; margin:0 0 8px;">
+          Pesan blast akan dikirim dari nomor WA sales yang terhubung dengan token ini (Daftar &amp; scan QR di <strong>fonnte.com</strong> atau <strong>wablas.com</strong>).
+        </p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+          <select id="selectBlastGatewayProvider" class="fu-select" style="width:120px; font-size:11.5px; padding:7px 10px; border-radius:8px;">
+            <option value="fonnte" ${autoBlastState.gatewayProvider === 'fonnte' ? 'selected' : ''}>Fonnte</option>
+            <option value="wablas" ${autoBlastState.gatewayProvider === 'wablas' ? 'selected' : ''}>Wablas</option>
+          </select>
+          <input type="text" id="inputBlastGatewayToken" class="fu-input" style="flex:1; min-width:200px; font-size:12px; padding:7px 12px; border-radius:8px; margin-bottom:0;" placeholder="Tempelkan API Token WA Anda di sini..." value="${escapeHtml(autoBlastState.gatewayToken)}">
+          <button type="button" class="btn-fu btn-fu-emerald" style="padding:7px 14px; font-size:11.5px; border-radius:8px;" onclick="handleTestGatewayConnection()">
+            <i class="fa-solid fa-plug"></i> Simpan &amp; Tes Koneksi
+          </button>
+        </div>
+        <div id="gatewayTestStatus"></div>
+      </div>
+    </div>
+
     <!-- Step 1: Pilih Target Filter -->
-    <div style="margin-bottom:18px;">
+    <div style="margin-bottom:16px;">
       <label style="font-size:12px; font-weight:800; color:#0f172a; display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.3px;">
         1. Pilih Target Database Customer:
       </label>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px;">
-        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'belum_fu' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:10px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('belum_fu')">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:8px;">
+        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'belum_fu' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('belum_fu')">
           <div style="font-weight:800; font-size:12px;">⚪ Belum Di-Follow Up</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countBelum} Data Target</div>
         </button>
-        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'respon' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:10px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('respon')">
+        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'respon' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('respon')">
           <div style="font-weight:800; font-size:12px;">🟡 Menunggu Respon</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countRespon} Data Target</div>
         </button>
-        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'current_filter' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:10px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('current_filter')">
+        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'current_filter' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('current_filter')">
           <div style="font-weight:800; font-size:12px;">🎯 Filter Saat Ini</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countFiltered} Data Target</div>
         </button>
-        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'all' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:10px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('all')">
+        <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'all' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('all')">
           <div style="font-weight:800; font-size:12px;">📋 Semua Database</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countAll} Data Total</div>
         </button>
@@ -3011,7 +3169,7 @@ function renderAutoBlastSetupView() {
     </div>
 
     <!-- Step 2: Pilih Template Pesan -->
-    <div style="margin-bottom:18px;">
+    <div style="margin-bottom:16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <label style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; letter-spacing:0.3px; margin:0;">
           2. Pilih Skrip Template WhatsApp:
@@ -3026,7 +3184,7 @@ function renderAutoBlastSetupView() {
     </div>
 
     <!-- Live Preview Sample -->
-    <div style="margin-bottom:20px;">
+    <div style="margin-bottom:18px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <span style="font-size:11.5px; font-weight:800; color:#475569;">
           <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Contoh Pesan (Data: <strong>${escapeHtml(sampleCust.name)}</strong>):
@@ -3035,25 +3193,34 @@ function renderAutoBlastSetupView() {
           ✓ Variabel Terisi Otomatis
         </span>
       </div>
-      <div style="background:#efeae2; border-radius:14px; padding:14px 16px; border:1px solid #cbd5e1; max-height:160px; overflow-y:auto;">
-        <div style="background:#d9fdd3; border-radius:12px 12px 0 12px; padding:12px 14px; font-size:12px; color:#111b21; line-height:1.55; white-space:pre-wrap; font-family:inherit; box-shadow:0 2px 6px rgba(0,0,0,0.06);" id="blastPreviewBox">${escapeHtml(previewText)}</div>
+      <div style="background:#efeae2; border-radius:14px; padding:12px 14px; border:1px solid #cbd5e1; max-height:140px; overflow-y:auto;">
+        <div style="background:#d9fdd3; border-radius:12px 12px 0 12px; padding:10px 12px; font-size:12px; color:#111b21; line-height:1.5; white-space:pre-wrap; font-family:inherit; box-shadow:0 2px 6px rgba(0,0,0,0.06);" id="blastPreviewBox">${escapeHtml(previewText)}</div>
       </div>
     </div>
 
     <!-- Action Buttons -->
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1.5px solid #f1f5f9; padding-top:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1.5px solid #f1f5f9; padding-top:14px;">
       <div style="display:flex; gap:8px;">
-        <button type="button" class="btn-fu btn-fu-secondary" style="padding:9px 14px; font-size:11.5px;" onclick="exportBlastCsv()" title="Unduh CSV untuk broadcast batch">
-          <i class="fa-solid fa-file-excel" style="color:#059669;"></i> Export CSV
+        <button type="button" class="btn-fu btn-fu-secondary" style="padding:9px 12px; font-size:11.5px;" onclick="exportBlastCsv()" title="Unduh CSV untuk broadcast batch">
+          <i class="fa-solid fa-file-excel" style="color:#059669;"></i> CSV
         </button>
-        <button type="button" class="btn-fu btn-fu-secondary" style="padding:9px 14px; font-size:11.5px;" onclick="copyAllBlastLinks()" title="Salin semua URL WA ke clipboard">
-          <i class="fa-solid fa-copy"></i> Salin Semua Link
+        <button type="button" class="btn-fu btn-fu-secondary" style="padding:9px 12px; font-size:11.5px;" onclick="copyAllBlastLinks()" title="Salin semua URL WA ke clipboard">
+          <i class="fa-solid fa-copy"></i> Salin Link
         </button>
       </div>
 
-      <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:800; border-radius:12px; box-shadow:0 6px 18px rgba(16,185,129,0.35); border:none; cursor:pointer;" onclick="startAutoBlastQueue()">
-        <i class="fa-solid fa-play" style="font-size:14px;"></i> Mulai Antrean Blast (${currentCount} Customer) 🚀
-      </button>
+      ${autoBlastState.mode === 'background'
+        ? `
+          <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:900; border-radius:12px; box-shadow:0 6px 18px rgba(16,185,129,0.35); border:none; cursor:pointer;" onclick="startBackgroundAutoBlast()">
+            <i class="fa-solid fa-paper-plane"></i> Kirim Otomatis Background (${currentCount} Customer) 🚀
+          </button>
+        `
+        : `
+          <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:900; border-radius:12px; box-shadow:0 6px 18px rgba(37,99,235,0.35); border:none; cursor:pointer;" onclick="startAutoBlastQueue()">
+            <i class="fa-solid fa-play"></i> Mulai Antrean WA Web (${currentCount} Customer) 📲
+          </button>
+        `
+      }
     </div>
   `;
 }
@@ -3069,6 +3236,323 @@ function handleBlastTemplateChange(tmplId) {
   localStorage.setItem('sft_last_template_id', autoBlastState.templateId);
   renderAutoBlastSetupView();
 }
+
+// =========================================================================
+// 🚀 BACKGROUND AUTO-BLAST ENGINE (100% OTOMATIS VIA GATEWAY)
+// =========================================================================
+
+async function startBackgroundAutoBlast() {
+  autoBlastState.targetCustomers = getBlastFilteredCustomers(autoBlastState.targetFilter);
+  if (autoBlastState.targetCustomers.length === 0) {
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Database Kosong', 'Tidak ada data customer pada filter yang dipilih.', 'warning');
+    } else {
+      alert('Tidak ada customer pada filter ini.');
+    }
+    return;
+  }
+
+  // Cek token gateway
+  if (!autoBlastState.gatewayToken) {
+    toggleGatewayConfigBox();
+    const tokenInput = document.getElementById('inputBlastGatewayToken');
+    if (tokenInput) tokenInput.focus();
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Token WA Belum Diset', 'Silakan masukkan Token WhatsApp Gateway (Fonnte/Wablas) Anda terlebih dahulu untuk mengirim otomatis di latar belakang.', 'warning');
+    } else {
+      alert('Silakan masukkan Token WhatsApp Gateway Anda terlebih dahulu.');
+    }
+    return;
+  }
+
+  autoBlastState.isSendingBackground = true;
+  autoBlastState.isPaused = false;
+  autoBlastState.isStopped = false;
+  autoBlastState.currentIndex = 0;
+  autoBlastState.totalSent = 0;
+  autoBlastState.totalFailed = 0;
+  autoBlastState.logs = [];
+
+  renderBackgroundBlastRunningView();
+  runBackgroundBlastLoop();
+}
+
+function renderBackgroundBlastRunningView() {
+  const container = document.getElementById('autoBlastBody');
+  if (!container) return;
+
+  const total = autoBlastState.targetCustomers.length;
+  const currIdx = autoBlastState.currentIndex;
+  const c = autoBlastState.targetCustomers[currIdx];
+  const percent = total > 0 ? Math.round((currIdx / total) * 100) : 0;
+
+  loadSalesProfile();
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name) ? followupState.salesInfo.name : 'Sales';
+
+  container.innerHTML = `
+    <!-- Top Progress Card -->
+    <div style="background:#f8fafc; border:1.5px solid #10b981; border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 6px 20px rgba(16,185,129,0.12);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#10b981; animation:pulse 1.5s infinite;"></span>
+          <span style="font-size:13px; font-weight:900; color:#0f172a;" id="blastLiveStatusTitle">
+            ${autoBlastState.isPaused ? '⏸️ Pengiriman Dijeda' : '🚀 Mengirim Otomatis di Latar Belakang...'}
+          </span>
+        </div>
+        <div style="font-size:13px; font-weight:900; color:#059669;" id="blastLivePercent">${percent}%</div>
+      </div>
+
+      <div style="width:100%; height:10px; background:#e2e8f0; border-radius:9999px; overflow:hidden; margin-bottom:10px;">
+        <div id="blastLiveProgressBar" style="width:${percent}%; height:100%; background:linear-gradient(90deg, #10b981, #059669); transition:width 0.3s ease;"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#64748b; font-weight:700;">
+        <span>Progress: <strong id="blastLiveCount" style="color:#0f172a;">${currIdx}</strong> / <strong>${total}</strong> Customer</span>
+        <span>✓ Sukses: <strong id="blastLiveSent" style="color:#059669;">${autoBlastState.totalSent}</strong> | ✗ Gagal: <strong id="blastLiveFailed" style="color:#dc2626;">${autoBlastState.totalFailed}</strong></span>
+      </div>
+    </div>
+
+    <!-- Active Target Information -->
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+      <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase;">Sedang Memproses:</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+        <div style="font-size:15px; font-weight:900; color:#0d1b3e;" id="blastActiveCustName">
+          ${c ? escapeHtml(c.name) : 'Menyiapkan...'}
+        </div>
+        <div style="font-size:12px; font-weight:800; color:#2563eb;" id="blastActiveCustPhone">
+          ${c ? escapeHtml(c.phone) : ''}
+        </div>
+      </div>
+      <div style="font-size:11px; color:#059669; font-weight:700; margin-top:4px;" id="blastJedaNotice">
+        ⏳ Jeda aman anti-spam: <span id="blastJedaTimer">3</span> detik antar pesan...
+      </div>
+    </div>
+
+    <!-- Live Execution Logs Terminal -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11.5px; font-weight:800; color:#334155; margin-bottom:6px; display:flex; justify-content:space-between;">
+        <span><i class="fa-solid fa-list-check"></i> Riwayat Pengiriman Langsung:</span>
+        <span style="font-size:10.5px; color:#64748b;">Pengirim: ${escapeHtml(salesName)}</span>
+      </div>
+      <div id="blastTerminalLogBox" style="background:#0f172a; color:#f8fafc; border-radius:12px; padding:12px; font-family:monospace; font-size:11px; max-height:160px; overflow-y:auto; line-height:1.6; border:1px solid #1e293b;">
+        <div style="color:#94a3b8;">[${new Date().toLocaleTimeString()}] 🚀 Mesin Blast dimulai via WhatsApp Gateway...</div>
+      </div>
+    </div>
+
+    <!-- Control Actions -->
+    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #f1f5f9; padding-top:14px;">
+      <button type="button" class="btn-fu btn-fu-secondary" style="padding:9px 18px; font-size:12px;" onclick="stopBackgroundBlast()">
+        <i class="fa-solid fa-stop"></i> Hentikan Blast
+      </button>
+
+      <div style="display:flex; gap:8px;">
+        <button type="button" id="btnPauseResumeBlast" class="btn-fu" style="background:#f59e0b; color:#ffffff; padding:9px 18px; font-size:12px; font-weight:800; border-radius:10px; border:none; cursor:pointer;" onclick="togglePauseBackgroundBlast()">
+          <i class="fa-solid fa-pause"></i> Jeda Sementara
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function appendBlastTerminalLog(msg, type = 'info') {
+  const box = document.getElementById('blastTerminalLogBox');
+  if (!box) return;
+  const time = new Date().toLocaleTimeString();
+  const color = type === 'success' ? '#4ade80' : (type === 'error' ? '#f87171' : '#94a3b8');
+  const logEntry = document.createElement('div');
+  logEntry.style.color = color;
+  logEntry.innerHTML = `[${time}] ${msg}`;
+  box.appendChild(logEntry);
+  box.scrollTop = box.scrollHeight;
+}
+
+function togglePauseBackgroundBlast() {
+  autoBlastState.isPaused = !autoBlastState.isPaused;
+  const btn = document.getElementById('btnPauseResumeBlast');
+  const title = document.getElementById('blastLiveStatusTitle');
+  if (btn) {
+    btn.innerHTML = autoBlastState.isPaused 
+      ? `<i class="fa-solid fa-play"></i> Lanjutkan Pengiriman` 
+      : `<i class="fa-solid fa-pause"></i> Jeda Sementara`;
+    btn.style.background = autoBlastState.isPaused ? '#059669' : '#f59e0b';
+  }
+  if (title) {
+    title.textContent = autoBlastState.isPaused 
+      ? '⏸️ Pengiriman Dijeda' 
+      : '🚀 Mengirim Otomatis di Latar Belakang...';
+  }
+  appendBlastTerminalLog(autoBlastState.isPaused ? '⏸️ Pengiriman dijeda oleh user.' : '▶️ Melanjutkan pengiriman...', 'info');
+}
+
+function stopBackgroundBlast() {
+  if (confirm('Apakah Anda yakin ingin menghentikan pengiriman blast?')) {
+    autoBlastState.isStopped = true;
+    autoBlastState.isSendingBackground = false;
+    appendBlastTerminalLog('⏹️ Pengiriman dihentikan oleh user.', 'error');
+    renderBackgroundBlastCompletedView();
+  }
+}
+
+async function runBackgroundBlastLoop() {
+  loadSalesProfile();
+  const salesId = (followupState.salesInfo && followupState.salesInfo.id) ? followupState.salesInfo.id : 1;
+  const allTemplates = getActiveBlastTemplates();
+  const currentTmpl = allTemplates.find(t => String(t.id) === String(autoBlastState.templateId)) || allTemplates[0];
+
+  const total = autoBlastState.targetCustomers.length;
+
+  while (autoBlastState.currentIndex < total && !autoBlastState.isStopped) {
+    // Handle pause state
+    while (autoBlastState.isPaused && !autoBlastState.isStopped) {
+      await new Promise(r => setTimeout(r, 500));
+    }
+    if (autoBlastState.isStopped) break;
+
+    const currIdx = autoBlastState.currentIndex;
+    const c = autoBlastState.targetCustomers[currIdx];
+
+    // Update UI elements
+    const nameEl = document.getElementById('blastActiveCustName');
+    const phoneEl = document.getElementById('blastActiveCustPhone');
+    const percentEl = document.getElementById('blastLivePercent');
+    const barEl = document.getElementById('blastLiveProgressBar');
+    const countEl = document.getElementById('blastLiveCount');
+    const sentEl = document.getElementById('blastLiveSent');
+    const failedEl = document.getElementById('blastLiveFailed');
+
+    if (nameEl) nameEl.textContent = c.name;
+    if (phoneEl) phoneEl.textContent = c.phone;
+    if (countEl) countEl.textContent = currIdx + 1;
+
+    const percent = Math.round(((currIdx + 1) / total) * 100);
+    if (percentEl) percentEl.textContent = `${percent}%`;
+    if (barEl) barEl.style.width = `${percent}%`;
+
+    const formattedMsg = formatTextForCustomer(currentTmpl.content, c);
+
+    appendBlastTerminalLog(`Mengirim pesan ke <strong>${escapeHtml(c.name)}</strong> (${escapeHtml(c.phone)})...`, 'info');
+
+    try {
+      const res = await fetch('../api/api_wa_gateway.php?action=send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: c.phone,
+          message: formattedMsg,
+          sales_id: salesId,
+          token: autoBlastState.gatewayToken,
+          provider: autoBlastState.gatewayProvider
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        autoBlastState.totalSent++;
+        if (sentEl) sentEl.textContent = autoBlastState.totalSent;
+        appendBlastTerminalLog(`✓ Berhasil terkirim ke <strong>${escapeHtml(c.name)}</strong>`, 'success');
+
+        // Update card CRM
+        updateSingleCardAfterWhatsApp(c.id, 'Menunggu Respon', {
+          connected: 'TRUE',
+          contacted: 'TRUE',
+          prospect: c.prospect || 'FALSE',
+          spk: 'FALSE',
+          remarks: 'Customer pending',
+          sales_fu_status: 'Open'
+        });
+
+        // Update backend status
+        fetch('../api/api_followup.php?action=update_status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: c.id,
+            status: 'Menunggu Respon',
+            connected: 'TRUE',
+            contacted: 'TRUE',
+            prospect: c.prospect || 'FALSE',
+            spk: 'FALSE',
+            remarks: 'Customer pending',
+            sales_fu_status: 'Open',
+            notes: `Follow up otomatis via Auto-Blast WA (${currentTmpl.title || 'Template'})`,
+            reason_followup: `Auto-Blast WA Gateway (${currentTmpl.title || 'Template'})`,
+            sales_id: salesId
+          })
+        }).catch(() => {});
+      } else {
+        autoBlastState.totalFailed++;
+        if (failedEl) failedEl.textContent = autoBlastState.totalFailed;
+        appendBlastTerminalLog(`✗ Gagal (${escapeHtml(c.name)}): ${escapeHtml(data.message || 'Error Gateway')}`, 'error');
+      }
+    } catch (err) {
+      autoBlastState.totalFailed++;
+      if (failedEl) failedEl.textContent = autoBlastState.totalFailed;
+      appendBlastTerminalLog(`✗ Gagal koneksi: ${err.message}`, 'error');
+    }
+
+    autoBlastState.currentIndex++;
+
+    // Jeda aman anti-spam 3-4 detik jika bukan yang terakhir
+    if (autoBlastState.currentIndex < total && !autoBlastState.isStopped) {
+      const jedaNotice = document.getElementById('blastJedaNotice');
+      for (let sec = 3; sec > 0; sec--) {
+        const timerEl = document.getElementById('blastJedaTimer');
+        if (timerEl) timerEl.textContent = sec;
+        await new Promise(r => setTimeout(r, 1000));
+        while (autoBlastState.isPaused && !autoBlastState.isStopped) {
+          await new Promise(r => setTimeout(r, 500));
+        }
+        if (autoBlastState.isStopped) break;
+      }
+    }
+  }
+
+  autoBlastState.isSendingBackground = false;
+  renderBackgroundBlastCompletedView();
+}
+
+function renderBackgroundBlastCompletedView() {
+  const container = document.getElementById('autoBlastBody');
+  if (!container) return;
+
+  const total = autoBlastState.targetCustomers.length;
+
+  container.innerHTML = `
+    <div style="text-align:center; padding:26px 16px;">
+      <div style="width:72px; height:72px; border-radius:50%; background:#dcfce7; color:#15803d; font-size:34px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:14px; animation:alertModalSpring 0.5s ease;">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h3 style="font-size:21px; font-weight:900; color:#0f172a; margin:0 0 6px;">Auto-Blast Selesai!</h3>
+      <p style="font-size:13px; color:#64748b; margin:0 0 20px;">
+        Pesan berhasil dikirim langsung dari nomor WhatsApp Anda ke database prospek.
+      </p>
+
+      <!-- Stats Summary Box -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; max-width:440px; margin:0 auto 24px; background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:14px;">
+        <div>
+          <div style="font-size:11px; color:#64748b; font-weight:800; text-transform:uppercase;">Total Target</div>
+          <div style="font-size:18px; font-weight:900; color:#0f172a; margin-top:2px;">${total}</div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#059669; font-weight:800; text-transform:uppercase;">✓ Berhasil</div>
+          <div style="font-size:18px; font-weight:900; color:#059669; margin-top:2px;">${autoBlastState.totalSent}</div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:#dc2626; font-weight:800; text-transform:uppercase;">✗ Gagal</div>
+          <div style="font-size:18px; font-weight:900; color:#dc2626; margin-top:2px;">${autoBlastState.totalFailed}</div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-fu btn-fu-emerald" style="padding:11px 28px; font-size:13px; font-weight:800; border-radius:12px; margin:0 auto;" onclick="closeAutoBlastModal()">
+        <i class="fa-solid fa-check"></i> Selesai &amp; Lihat Database
+      </button>
+    </div>
+  `;
+}
+
+// =========================================================================
+// 📲 DIRECT WA WEB QUEUE RUNNER (SEMI-MANUAL VIA WA.ME)
+// =========================================================================
 
 function startAutoBlastQueue() {
   autoBlastState.targetCustomers = getBlastFilteredCustomers(autoBlastState.targetFilter);
@@ -3340,5 +3824,3 @@ function copyAllBlastLinks() {
     alert('Gagal menyalin ke clipboard.');
   });
 }
-
-

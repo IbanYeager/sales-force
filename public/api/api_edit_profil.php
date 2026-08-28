@@ -14,7 +14,7 @@ if ($method === 'GET') {
         exit;
     }
 
-    $query = "SELECT id, username, nama_lengkap, foto, nama_spv, tingkatan, no_hp, email FROM sales_accounts WHERE id = ?";
+    $query = "SELECT id, username, nama_lengkap, foto, nama_spv, tingkatan, no_hp, email, wa_gateway_token, wa_gateway_provider FROM sales_accounts WHERE id = ?";
     $stmt = $conn->prepare($query);
     if ($stmt) {
         $stmt->bind_param("i", $sales_id);
@@ -40,6 +40,8 @@ if ($method === 'GET') {
     $password = $_POST['password'] ?? '';
     $no_hp = $_POST['no_hp'] ?? '';
     $email = $_POST['email'] ?? '';
+    $wa_token = $_POST['wa_gateway_token'] ?? null;
+    $wa_provider = $_POST['wa_gateway_provider'] ?? null;
 
     // Handle File Upload
     $fotoPath = '';
@@ -61,6 +63,17 @@ if ($method === 'GET') {
     $query = "UPDATE sales_accounts SET nama_lengkap = ?, username = ?, no_hp = ?, email = ?";
     $types = "ssss";
     $params = [&$nama, &$username, &$no_hp, &$email];
+
+    if ($wa_token !== null) {
+        $query .= ", wa_gateway_token = ?";
+        $types .= "s";
+        $params[] = &$wa_token;
+    }
+    if ($wa_provider !== null) {
+        $query .= ", wa_gateway_provider = ?";
+        $types .= "s";
+        $params[] = &$wa_provider;
+    }
 
     if (!empty($password)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -90,7 +103,7 @@ if ($method === 'GET') {
 
         if ($stmt->execute()) {
             // Fetch updated data to send back
-            $q2 = "SELECT id, username, nama_lengkap, foto, no_hp, email FROM sales_accounts WHERE id = $sales_id";
+            $q2 = "SELECT id, username, nama_lengkap, foto, no_hp, email, wa_gateway_token, wa_gateway_provider FROM sales_accounts WHERE id = $sales_id";
             $r2 = $conn->query($q2);
             $updated = $r2->fetch_assoc();
             echo json_encode(["status" => "success", "message" => "Profil berhasil diperbarui", "data" => $updated]);
