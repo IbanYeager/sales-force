@@ -33,6 +33,10 @@ class PageController extends Controller
     {
         $cleanPage = str_replace('.html', '', $page);
 
+        if ($cleanPage === 'index' || $cleanPage === '' || $cleanPage === 'dashboard' || $cleanPage === 'home') {
+            return $this->index();
+        }
+
         if (View::exists("pages.{$cleanPage}")) {
             return view("pages.{$cleanPage}");
         }
