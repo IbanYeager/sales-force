@@ -134,10 +134,10 @@
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn" style="background:#25D366; color:white; font-weight:700; border:none; padding:10px 18px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="location.href='briefing_generator.html'">
-              <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> 📢 Briefing Auto-Gen
+              <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Briefing Auto-Gen
             </button>
             <button class="btn" style="background:rgba(255,255,255,0.12); color:white; font-weight:700; border:1px solid rgba(255,255,255,0.2); padding:10px 18px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="openDiscountCalcModal()">
-              <i class="fa-solid fa-calculator"></i> 🏷️ Approval Diskon Desk
+              <i class="fa-solid fa-calculator"></i> Approval Diskon Desk
             </button>
           </div>
         </div>
@@ -435,10 +435,10 @@
         <div>
           <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Pilih Template Instruksi SPV</label>
           <select id="nudgeTemplateSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1; font-weight:600;" onchange="applyNudgeTemplate()">
-            <option value="activity_warning">🔴 Teguran Input Aktivitas Harian</option>
-            <option value="followup_prospect">📌 Instruksi Follow-Up Prospek Tertunda</option>
-            <option value="spk_target">🔥 Pendorong Target SPK Pekan Ini</option>
-            <option value="custom">✏️ Tulis Pesan Instruksi Kustom</option>
+            <option value="activity_warning">Teguran Input Aktivitas Harian</option>
+            <option value="followup_prospect">Instruksi Follow-Up Prospek Tertunda</option>
+            <option value="spk_target">Pendorong Target SPK Pekan Ini</option>
+            <option value="custom">Tulis Pesan Instruksi Kustom</option>
           </select>
         </div>
 

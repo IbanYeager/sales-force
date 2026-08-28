@@ -229,12 +229,12 @@
         <div>
           <select id="filterStatusSelect" class="fu-select" onchange="masterState.filters.status = this.value; loadMasterCustomers();">
             <option value="all">Semua Status Follow Up</option>
-            <option value="belum_fu">⚪ Belum Di-Follow Up</option>
-            <option value="sudah_fu">✅ Sudah Di-Follow Up (Semua)</option>
-            <option value="Menunggu Respon">🟡 Menunggu Respon</option>
-            <option value="Tertarik / Jadwal Servis">🔵 Tertarik / Servis</option>
-            <option value="Deal / Selesai">🟢 Deal / Selesai</option>
-            <option value="Tidak Tertarik">🔴 Tidak Tertarik</option>
+            <option value="belum_fu">Belum Di-Follow Up</option>
+            <option value="sudah_fu">Sudah Di-Follow Up (Semua)</option>
+            <option value="Menunggu Respon">Menunggu Respon</option>
+            <option value="Tertarik / Jadwal Servis">Tertarik / Servis</option>
+            <option value="Deal / Selesai">Deal / Selesai</option>
+            <option value="Tidak Tertarik">Tidak Tertarik</option>
           </select>
         </div>
 

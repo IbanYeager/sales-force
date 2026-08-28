@@ -39,11 +39,12 @@ if ('serviceWorker' in navigator) {
             console.warn('[PWA] ServiceWorker registration warning:', err);
         });
 
-    // Ketika controller berganti (Service Worker baru aktif), auto-refresh halaman agar APK langsung memuat update web terbaru secara silent
+    // Ketika controller berganti (Service Worker baru aktif), auto-refresh halaman agar APK langsung memuat update web terbaru
     navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!pwaRefreshing) {
             pwaRefreshing = true;
             console.log('[PWA] Controller changed -> Memuat ulang aplikasi dengan kode terbaru...');
+            sessionStorage.setItem('sft_pwa_updated_toast', 'true');
             window.location.reload();
         }
     });
@@ -54,6 +55,7 @@ if ('serviceWorker' in navigator) {
             console.log('[PWA] New version activated:', event.data.version);
             if (!pwaRefreshing) {
                 pwaRefreshing = true;
+                sessionStorage.setItem('sft_pwa_updated_toast', 'true');
                 window.location.reload();
             }
         }

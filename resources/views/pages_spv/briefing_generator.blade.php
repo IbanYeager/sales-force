@@ -167,10 +167,10 @@
       <!-- MODE SELECTION -->
       <div class="mode-tab-bar">
         <button class="mode-tab-btn active" id="btnModeMorning" onclick="switchBriefingMode('morning')">
-          <i class="fa-solid fa-sun"></i> 🌅 Morning Huddle &amp; Target Kickoff (Pagi)
+          <i class="fa-solid fa-sun"></i> Morning Huddle &amp; Target Kickoff (Pagi)
         </button>
         <button class="mode-tab-btn" id="btnModeEvening" onclick="switchBriefingMode('evening')">
-          <i class="fa-solid fa-moon"></i> 🌆 Evening Closing &amp; Wrap-Up (Sore)
+          <i class="fa-solid fa-moon"></i> Evening Closing &amp; Wrap-Up (Sore)
         </button>
       </div>
 

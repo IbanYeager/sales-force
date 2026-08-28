@@ -146,7 +146,7 @@ function initFollowupTabs() {
             </div>
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
               <button type="button" class="btn-fu" id="btnOpenAutoBlast" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%) !important; color:#ffffff !important; border:none !important; padding:8px 16px !important; font-size:12px !important; font-weight:800 !important; border-radius:10px !important; box-shadow:0 4px 14px rgba(16,185,129,0.35) !important; display:inline-flex !important; align-items:center !important; gap:6px !important; cursor:pointer !important;" onclick="openAutoBlastModal()">
-                <i class="fa-solid fa-bolt-lightning" style="color:#fef08a;"></i> ⚡ Auto-Blast Cepat
+                <i class="fa-solid fa-bolt-lightning" style="color:#fef08a;"></i> Auto-Blast Cepat
               </button>
               <button class="view-toggle-btn active" id="btnViewCards" onclick="switchViewMode('cards')">
                 <i class="fa-solid fa-grip"></i> Kartu Prospek
@@ -180,24 +180,28 @@ function initFollowupTabs() {
                 <span class="fu-filter-count-badge" id="countBadgeAll">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn tab-belum" id="btnStatusBelum" onclick="handleStatusFilter('belum_fu', this)">
-                <i class="fa-solid fa-hourglass-half"></i> ⚪ Belum Di-Follow Up
+                <i class="fa-solid fa-hourglass-half"></i> Belum Di-Follow Up
                 <span class="fu-filter-count-badge badge-amber" id="countBadgeBelum">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn tab-sudah" id="btnStatusSudah" onclick="handleStatusFilter('sudah_fu', this)">
-                <i class="fa-solid fa-circle-check"></i> ✅ Sudah Di-Follow Up
+                <i class="fa-solid fa-circle-check"></i> Sudah Di-Follow Up
                 <span class="fu-filter-count-badge badge-green" id="countBadgeSudah">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn" id="btnStatusWaiting" onclick="handleStatusFilter('Menunggu Respon', this)">
-                🟡 Menunggu Respon
+                Menunggu Respon
                 <span class="fu-filter-count-badge badge-yellow" id="countBadgeWaiting">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn" id="btnStatusInterested" onclick="handleStatusFilter('Tertarik / Jadwal Servis', this)">
-                🔵 Tertarik / Servis
+                Tertarik / Servis
                 <span class="fu-filter-count-badge badge-blue" id="countBadgeInterested">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn" id="btnStatusDeal" onclick="handleStatusFilter('Deal / Selesai', this)">
-                🟢 Deal / Selesai
+                Deal / Selesai
                 <span class="fu-filter-count-badge badge-emerald" id="countBadgeDeal">0</span>
+              </button>
+              <button type="button" class="status-fu-tab-btn" id="btnStatusNotInterested" onclick="handleStatusFilter('Tidak Tertarik', this)">
+                Tidak Tertarik
+                <span class="fu-filter-count-badge badge-red" id="countBadgeNotInterested">0</span>
               </button>
             </div>
           </div>
@@ -2833,7 +2837,7 @@ const autoBlastState = {
   targetCustomers: [],
   currentIndex: 0,
   templateId: 101,
-  
+
   // Gateway per sales
   gatewayToken: '',
   gatewayProvider: 'fonnte', // 'fonnte' or 'wablas'
@@ -2849,7 +2853,7 @@ const autoBlastState = {
   totalSent: 0,
   totalFailed: 0,
   logs: [], // [{time, name, phone, status: 'success'|'failed', msg: ''}]
-  
+
   // Direct queue runner state
   autoNextCountdown: 0,
   autoNextTimer: null
@@ -2869,8 +2873,8 @@ function getBlastFilteredCustomers(filterType) {
   } else if (filterType === 'respon') {
     return all.filter(c => c.followup_status === 'Menunggu Respon');
   } else if (filterType === 'current_filter') {
-    return (followupState.filteredCustomers && followupState.filteredCustomers.length > 0) 
-      ? followupState.filteredCustomers 
+    return (followupState.filteredCustomers && followupState.filteredCustomers.length > 0)
+      ? followupState.filteredCustomers
       : all;
   }
   return all;
@@ -3088,10 +3092,10 @@ function renderAutoBlastSetupView() {
     <!-- Mode Switcher Tabs -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; background:#f1f5f9; padding:4px; border-radius:14px;">
       <button type="button" class="btn-fu" style="padding:9px 12px; font-size:12px; font-weight:800; border-radius:10px; justify-content:center; border:none; cursor:pointer; ${autoBlastState.mode === 'background' ? 'background:#059669; color:#ffffff; box-shadow:0 2px 8px rgba(5,150,105,0.3);' : 'background:transparent; color:#475569;'}" onclick="switchBlastMode('background')">
-        <i class="fa-solid fa-paper-plane"></i> 🚀 100% Background Otomatis (Gateway)
+        <i class="fa-solid fa-paper-plane"></i> 100% Background Otomatis (Gateway)
       </button>
       <button type="button" class="btn-fu" style="padding:9px 12px; font-size:12px; font-weight:800; border-radius:10px; justify-content:center; border:none; cursor:pointer; ${autoBlastState.mode === 'queue' ? 'background:#2563eb; color:#ffffff; box-shadow:0 2px 8px rgba(37,99,235,0.3);' : 'background:transparent; color:#475569;'}" onclick="switchBlastMode('queue')">
-        <i class="fa-brands fa-whatsapp"></i> 📲 Antrean WhatsApp Web (Manual)
+        <i class="fa-brands fa-whatsapp"></i> Antrean WhatsApp Web (Manual)
       </button>
     </div>
 
@@ -3124,7 +3128,7 @@ function renderAutoBlastSetupView() {
       <!-- Config Drawer (Token & Provider Input per Sales) -->
       <div id="gatewayConfigDrawer" style="display:${autoBlastState.isConfigOpen ? 'block' : 'none'}; margin-top:12px; padding-top:12px; border-top:1px dashed #cbd5e1;">
         <div style="font-size:12px; font-weight:800; color:#1e293b; margin-bottom:6px;">
-          🔑 Pengaturan Token WA Gateway Anda (${escapeHtml(salesName)}):
+          <i class="fa-solid fa-key"></i> Pengaturan Token WA Gateway Anda (${escapeHtml(salesName)}):
         </div>
         <p style="font-size:11px; color:#64748b; margin:0 0 8px;">
           Pesan blast akan dikirim dari nomor WA sales yang terhubung dengan token ini (Daftar &amp; scan QR di <strong>fonnte.com</strong> atau <strong>wablas.com</strong>).
@@ -3150,19 +3154,19 @@ function renderAutoBlastSetupView() {
       </label>
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:8px;">
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'belum_fu' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('belum_fu')">
-          <div style="font-weight:800; font-size:12px;">⚪ Belum Di-Follow Up</div>
+          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-hourglass-half"></i> Belum Di-Follow Up</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countBelum} Data Target</div>
         </button>
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'respon' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('respon')">
-          <div style="font-weight:800; font-size:12px;">🟡 Menunggu Respon</div>
+          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-clock"></i> Menunggu Respon</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countRespon} Data Target</div>
         </button>
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'current_filter' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('current_filter')">
-          <div style="font-weight:800; font-size:12px;">🎯 Filter Saat Ini</div>
+          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-filter"></i> Filter Saat Ini</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countFiltered} Data Target</div>
         </button>
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'all' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('all')">
-          <div style="font-weight:800; font-size:12px;">📋 Semua Database</div>
+          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-database"></i> Semua Database</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countAll} Data Total</div>
         </button>
       </div>
@@ -3190,7 +3194,7 @@ function renderAutoBlastSetupView() {
           <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Contoh Pesan (Data: <strong>${escapeHtml(sampleCust.name)}</strong>):
         </span>
         <span style="font-size:11px; color:#059669; font-weight:700; background:#ecfdf5; padding:2px 8px; border-radius:6px; border:1px solid #a7f3d0;">
-          ✓ Variabel Terisi Otomatis
+          <i class="fa-solid fa-check"></i> Variabel Terisi Otomatis
         </span>
       </div>
       <div style="background:#efeae2; border-radius:14px; padding:12px 14px; border:1px solid #cbd5e1; max-height:140px; overflow-y:auto;">
@@ -3212,12 +3216,12 @@ function renderAutoBlastSetupView() {
       ${autoBlastState.mode === 'background'
         ? `
           <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:900; border-radius:12px; box-shadow:0 6px 18px rgba(16,185,129,0.35); border:none; cursor:pointer;" onclick="startBackgroundAutoBlast()">
-            <i class="fa-solid fa-paper-plane"></i> Kirim Otomatis Background (${currentCount} Customer) 🚀
+            <i class="fa-solid fa-paper-plane"></i> Kirim Otomatis Background (${currentCount} Customer)
           </button>
         `
         : `
           <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:900; border-radius:12px; box-shadow:0 6px 18px rgba(37,99,235,0.35); border:none; cursor:pointer;" onclick="startAutoBlastQueue()">
-            <i class="fa-solid fa-play"></i> Mulai Antrean WA Web (${currentCount} Customer) 📲
+            <i class="fa-solid fa-play"></i> Mulai Antrean WA Web (${currentCount} Customer)
           </button>
         `
       }
@@ -3371,14 +3375,14 @@ function togglePauseBackgroundBlast() {
   const btn = document.getElementById('btnPauseResumeBlast');
   const title = document.getElementById('blastLiveStatusTitle');
   if (btn) {
-    btn.innerHTML = autoBlastState.isPaused 
-      ? `<i class="fa-solid fa-play"></i> Lanjutkan Pengiriman` 
+    btn.innerHTML = autoBlastState.isPaused
+      ? `<i class="fa-solid fa-play"></i> Lanjutkan Pengiriman`
       : `<i class="fa-solid fa-pause"></i> Jeda Sementara`;
     btn.style.background = autoBlastState.isPaused ? '#059669' : '#f59e0b';
   }
   if (title) {
-    title.textContent = autoBlastState.isPaused 
-      ? '⏸️ Pengiriman Dijeda' 
+    title.textContent = autoBlastState.isPaused
+      ? '⏸️ Pengiriman Dijeda'
       : '🚀 Mengirim Otomatis di Latar Belakang...';
   }
   appendBlastTerminalLog(autoBlastState.isPaused ? '⏸️ Pengiriman dijeda oleh user.' : '▶️ Melanjutkan pengiriman...', 'info');
@@ -3662,7 +3666,7 @@ function renderAutoBlastRunnerView() {
       <button type="button" class="btn-fu btn-fu-secondary" style="padding:8px 14px; font-size:11.5px;" onclick="prevBlastCustomer()" ${currIdx === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
         <i class="fa-solid fa-backward-step"></i> Sebelumnya
       </button>
-      
+
       <button type="button" class="btn-fu btn-fu-secondary" style="padding:8px 14px; font-size:11.5px;" onclick="renderAutoBlastSetupView()">
         <i class="fa-solid fa-gear"></i> Ganti Filter/Template
       </button>
