@@ -1287,6 +1287,8 @@ async function executeRecallBySales() {
   } catch (e) {
     console.error('Execute recall error', e);
   }
+}
+
 // =============================================================
 // EDIT SINGLE CUSTOMER / PERUSAHAAN (DENGAN PILIHAN LINGKUP)
 // =============================================================
@@ -2941,10 +2943,6 @@ async function executePullGoogleSheet() {
       alert('Terjadi kesalahan koneksi saat menghubungi server.');
     }
   }
-}
-
-function escapeJs(str) {
-  return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
 // -------------------------------------------------------------
