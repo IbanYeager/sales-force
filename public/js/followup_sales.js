@@ -1566,7 +1566,7 @@ function handleStatusChange(customerId, value) {
 }
 
 // -------------------------------------------------------------
-// OTOMATISASI REMARKS SAAT TOMBOL TAM 4-PILAR DIKLIK
+// OTOMATISASI PINTAR STATUS & REMARKS SAAT TOMBOL TAM DIKLIK
 // -------------------------------------------------------------
 function setFuToggle(customerId, field, value) {
   const c = followupState.customers.find(x => String(x.id) === String(customerId));
@@ -1574,53 +1574,79 @@ function setFuToggle(customerId, field, value) {
 
   c[field] = value;
 
-  // SMART AUTOMATIC CASCADING LOGIC:
-  if (field === 'connected' && value === 'FALSE') {
-    // 1. Kalo connected TIDAK -> otomatis remarks 'Customer tidak aktif'
-    c.contacted = 'FALSE';
-    c.prospect = 'FALSE';
-    c.spk = 'FALSE';
-    c.remarks = 'Customer tidak aktif';
-  } else if (field === 'connected' && value === 'TRUE') {
-    // Kalo connected IYA -> jika sebelumnya tidak aktif, ubah ke pending
-    if (!c.remarks || c.remarks === 'Customer tidak aktif') {
-      c.remarks = 'Customer pending';
+  // SMART DECISION LOGIC (Sistem Pintar SFT CRM):
+  if (field === 'connected') {
+    if (value === 'FALSE') {
+      // 1. Kalo connected TIDAK -> langsung otomatis TIDAK semua & remarks 'Customer tidak aktif'
+      c.connected = 'FALSE';
+      c.contacted = 'FALSE';
+      c.prospect = 'FALSE';
+      c.spk = 'FALSE';
+      c.remarks = 'Customer tidak aktif';
+      c.sales_fu_status = 'Closed';
+      c.followup_status = 'Tidak Tertarik';
+    } else if (value === 'TRUE') {
+      c.connected = 'TRUE';
+      if (c.remarks === 'Customer tidak aktif') {
+        c.remarks = 'Customer pending';
+      }
     }
-  } else if (field === 'contacted' && value === 'FALSE') {
-    // 2. Kalo contacted TIDAK -> otomatis remarks 'Customer tidak diangkat'
-    c.prospect = 'FALSE';
-    c.spk = 'FALSE';
-    c.remarks = 'Customer tidak diangkat';
-  } else if (field === 'contacted' && value === 'TRUE') {
-    // Kalo contacted IYA -> otomatis connected IYA & remarks 'Customer pending'
-    c.connected = 'TRUE';
-    if (!c.remarks || c.remarks === 'Customer tidak aktif' || c.remarks === 'Customer tidak diangkat') {
-      c.remarks = 'Customer pending';
+  } else if (field === 'contacted') {
+    if (value === 'FALSE') {
+      // 2. Kalo connected IYA tapi contacted TIDAK -> customer tidak angkat & prospect/spk TIDAK
+      c.connected = 'TRUE';
+      c.contacted = 'FALSE';
+      c.prospect = 'FALSE';
+      c.spk = 'FALSE';
+      c.remarks = 'Customer tidak diangkat';
+      c.followup_status = 'Menunggu Respon';
+    } else if (value === 'TRUE') {
+      c.connected = 'TRUE';
+      c.contacted = 'TRUE';
+      if (c.remarks === 'Customer tidak aktif' || c.remarks === 'Customer tidak diangkat') {
+        c.remarks = 'Customer pending';
+      }
     }
-  } else if (field === 'prospect' && value === 'TRUE') {
-    // 3. Kalo prospect IYA -> otomatis connected, contacted & remarks 'Customer tertarik'
-    c.connected = 'TRUE';
-    c.contacted = 'TRUE';
-    c.remarks = 'Customer tertarik';
-    c.sales_fu_status = 'Open';
-  } else if (field === 'prospect' && value === 'FALSE') {
-    // Kalo prospect TIDAK -> spk FALSE & jika sebelumnya tertarik, ubah ke menolak
-    c.spk = 'FALSE';
-    if (c.remarks === 'Customer tertarik' || c.remarks === 'SPK berhasil') {
+  } else if (field === 'prospect') {
+    if (value === 'FALSE') {
+      // 3. Kalo prospek TIDAK -> customer menolak & spk TIDAK
+      c.connected = 'TRUE';
+      c.contacted = 'TRUE';
+      c.prospect = 'FALSE';
+      c.spk = 'FALSE';
       c.remarks = 'Customer menolak';
+      c.sales_fu_status = 'Closed';
+      c.followup_status = 'Tidak Tertarik';
+    } else if (value === 'TRUE') {
+      // 4. Kalo prospek IYA -> customer tertarik & connected/contacted IYA
+      c.connected = 'TRUE';
+      c.contacted = 'TRUE';
+      c.prospect = 'TRUE';
+      if (c.spk !== 'TRUE') {
+        c.remarks = 'Customer tertarik';
+        c.sales_fu_status = 'Open';
+        c.followup_status = 'Tertarik / Jadwal Servis';
+      }
     }
-  } else if (field === 'spk' && value === 'TRUE') {
-    // 4. Kalo SPK IYA -> otomatis closing deal, remarks 'SPK berhasil', status Closed
-    c.connected = 'TRUE';
-    c.contacted = 'TRUE';
-    c.prospect = 'TRUE';
-    c.remarks = 'SPK berhasil';
-    c.sales_fu_status = 'Closed';
-  } else if (field === 'spk' && value === 'FALSE') {
-    // Kalo SPK TIDAK -> jika sebelumnya SPK berhasil, kembalikan ke tertarik / pending & status Open
-    if (c.remarks === 'SPK berhasil') {
-      c.remarks = (c.prospect === 'TRUE') ? 'Customer tertarik' : 'Customer pending';
-      c.sales_fu_status = 'Open';
+  } else if (field === 'spk') {
+    if (value === 'TRUE') {
+      // 5. Kalo SPK IYA (Semuanya IYA) -> SPK berhasil, closing selesai
+      c.connected = 'TRUE';
+      c.contacted = 'TRUE';
+      c.prospect = 'TRUE';
+      c.spk = 'TRUE';
+      c.remarks = 'SPK berhasil';
+      c.sales_fu_status = 'Closed';
+      c.followup_status = 'Deal / Selesai';
+    } else if (value === 'FALSE') {
+      c.spk = 'FALSE';
+      if (c.prospect === 'TRUE') {
+        c.remarks = 'Customer tertarik';
+        c.sales_fu_status = 'Open';
+        c.followup_status = 'Tertarik / Jadwal Servis';
+      } else {
+        c.remarks = 'Customer pending';
+      }
     }
   }
 
@@ -2092,15 +2118,6 @@ function handleTemplateSelectChange(val) {
   }
 }
 
-function closeWhatsAppModal() {
-  const modalWA = document.getElementById('modalWhatsAppFollowup');
-  if (modalWA) {
-    modalWA.classList.remove('active');
-    modalWA.classList.remove('show');
-    modalWA.style.display = 'none';
-  }
-}
-
 function updateLiveBubble(text) {
   const bubble = document.getElementById('waLiveBubble');
   if (!bubble) return;
@@ -2548,24 +2565,24 @@ function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
 
   const nowIso = new Date().toISOString().slice(0, 19).replace('T', ' ');
   c.followup_date = nowIso;
-  c.followup_status = nextStatus;
+  c.followup_status = nextStatus || c.followup_status || 'Menunggu Respon';
 
-  // Set TAM 4-Pilar logically: Connected & Contacted are always TRUE when WA is sent
-  c.connected = tamData.connected || 'TRUE';
-  c.contacted = tamData.contacted || 'TRUE';
-  c.prospect = tamData.prospect || ((nextStatus === 'Deal / Selesai' || nextStatus === 'Tertarik / Jadwal Servis') ? 'TRUE' : (c.prospect || 'FALSE'));
-  c.spk = tamData.spk || (nextStatus === 'Deal / Selesai' ? 'TRUE' : (c.spk || 'FALSE'));
-  if (tamData.remarks) c.remarks = tamData.remarks;
-  if (tamData.sales_fu_status) c.sales_fu_status = tamData.sales_fu_status;
+  // Only apply TAM data if explicitly passed, otherwise keep existing manual choices
+  if (tamData.connected !== undefined) c.connected = tamData.connected;
+  if (tamData.contacted !== undefined) c.contacted = tamData.contacted;
+  if (tamData.prospect !== undefined) c.prospect = tamData.prospect;
+  if (tamData.spk !== undefined) c.spk = tamData.spk;
+  if (tamData.remarks !== undefined) c.remarks = tamData.remarks;
+  if (tamData.sales_fu_status !== undefined) c.sales_fu_status = tamData.sales_fu_status;
 
   // 1. Update Card View in DOM
   const card = document.getElementById(`customerCard_${customerId}`);
   if (card) {
     // Update border color status class
     card.classList.remove('pending', 'deal', 'interested');
-    if (nextStatus === 'Deal / Selesai') card.classList.add('deal');
-    else if (nextStatus === 'Tertarik / Jadwal Servis') card.classList.add('interested');
-    else if (nextStatus === 'Belum Dihubungi') card.classList.add('pending');
+    if (c.followup_status === 'Deal / Selesai') card.classList.add('deal');
+    else if (c.followup_status === 'Tertarik / Jadwal Servis') card.classList.add('interested');
+    else if (c.followup_status === 'Belum Dihubungi') card.classList.add('pending');
 
     // Update WIB date badge
     const dateBadge = document.getElementById(`fuDateBadge_${customerId}`);
@@ -2579,11 +2596,11 @@ function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
     const statusPill = document.getElementById(`custCardStatusPill_${customerId}`);
     if (statusPill) {
       let badgeHtml = '';
-      if (nextStatus === 'Deal / Selesai') {
+      if (c.followup_status === 'Deal / Selesai') {
         badgeHtml = `<span class="badge-status-pill deal" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-trophy"></i> Deal</span>`;
-      } else if (nextStatus === 'Tertarik / Jadwal Servis') {
+      } else if (c.followup_status === 'Tertarik / Jadwal Servis') {
         badgeHtml = `<span class="badge-status-pill interested" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-thumbs-up"></i> Tertarik</span>`;
-      } else if (nextStatus === 'Menunggu Respon') {
+      } else if (c.followup_status === 'Menunggu Respon') {
         badgeHtml = `<span class="badge-status-pill waiting" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:9999px;"><i class="fa-solid fa-clock"></i> Respon</span>`;
       }
       statusPill.innerHTML = badgeHtml;
@@ -2651,7 +2668,7 @@ function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
 async function executeSendWhatsApp() {
   if (!activeCustomerForWA) return;
   const message = document.getElementById('waMessageText').value;
-  const nextStatus = document.getElementById('waNextStatus').value;
+  const nextStatus = document.getElementById('waNextStatus').value || 'Menunggu Respon';
   const customerId = activeCustomerForWA.id;
   const customerName = activeCustomerForWA.name;
 
@@ -2667,27 +2684,17 @@ async function executeSendWhatsApp() {
   // Close modal immediately
   closeWhatsAppModal();
 
-  // Determine TAM 4-Pilar & Remarks values automatically based on WhatsApp status
-  const isDeal = (nextStatus === 'Deal / Selesai');
-  const isInterested = (nextStatus === 'Tertarik / Jadwal Servis');
-  const isRejected = (nextStatus === 'Tidak Tertarik');
-
-  const connectedVal = 'TRUE';
-  const contactedVal = 'TRUE';
-  const prospectVal = (isDeal || isInterested) ? 'TRUE' : 'FALSE';
-  const spkVal = isDeal ? 'TRUE' : 'FALSE';
-  const remarksVal = isDeal ? 'SPK berhasil' : (isInterested ? 'Customer tertarik' : (isRejected ? 'Customer menolak' : 'Customer pending'));
-  const salesFuStatusVal = (isDeal || isRejected) ? 'Closed' : 'Open';
+  // Biarkan pilihan tombol TAM tetap manual sesuai pilihan sales (tidak di-force otomatis)
+  const c = followupState.customers.find(x => String(x.id) === String(customerId));
+  const currentConnected = c ? (c.connected || '') : '';
+  const currentContacted = c ? (c.contacted || '') : '';
+  const currentProspect = c ? (c.prospect || '') : '';
+  const currentSpk = c ? (c.spk || '') : '';
+  const currentRemarks = c ? (c.remarks || 'Customer pending') : 'Customer pending';
+  const currentSalesFuStatus = c ? (c.sales_fu_status || 'Open') : 'Open';
 
   // Optimistic UI updates in-place without page reset / DOM rebuild
-  updateSingleCardAfterWhatsApp(customerId, nextStatus, {
-    connected: connectedVal,
-    contacted: contactedVal,
-    prospect: prospectVal,
-    spk: spkVal,
-    remarks: remarksVal,
-    sales_fu_status: salesFuStatusVal
-  });
+  updateSingleCardAfterWhatsApp(customerId, nextStatus, {});
 
   // Update Status in backend asynchronously
   try {
@@ -2697,12 +2704,12 @@ async function executeSendWhatsApp() {
       body: JSON.stringify({
         id: customerId,
         status: nextStatus,
-        connected: connectedVal,
-        contacted: contactedVal,
-        prospect: prospectVal,
-        spk: spkVal,
-        remarks: remarksVal,
-        sales_fu_status: salesFuStatusVal,
+        connected: currentConnected,
+        contacted: currentContacted,
+        prospect: currentProspect,
+        spk: currentSpk,
+        remarks: currentRemarks,
+        sales_fu_status: currentSalesFuStatus,
         notes: `Follow up via WhatsApp (${nextStatus})`,
         reason_followup: activeCustomerForWA.reason_followup || `Follow up via WhatsApp (${nextStatus})`,
         sales_id: followupState.salesInfo ? followupState.salesInfo.id : activeCustomerForWA.assigned_sales_id
@@ -2710,7 +2717,6 @@ async function executeSendWhatsApp() {
     });
     const data = await res.json();
     if (data && data.success && data.followup_date) {
-      const c = followupState.customers.find(x => String(x.id) === String(customerId));
       if (c) {
         c.followup_date = data.followup_date;
         const dateBadge = document.getElementById(`fuDateBadge_${customerId}`);
@@ -2723,7 +2729,7 @@ async function executeSendWhatsApp() {
     }
 
     if (typeof showCustomAlert === 'function') {
-      showCustomAlert('WhatsApp Terkirim!', `Pesan untuk ${customerName} telah dibuka di WA. Respon TAM otomatis tercatat (Connected & Contacted = Iya).`, 'success');
+      showCustomAlert('WhatsApp Terbuka', `Pesan untuk ${customerName} telah dibuka. Silakan pilih hasil respon TAM (Iya / Tidak) sesuai respon customer.`, 'success');
     }
   } catch (e) {
     console.error('Error updating status after WhatsApp send:', e);
@@ -2747,47 +2753,6 @@ async function quickUpdateCustomerStatus(customerId, newStatus) {
   } catch (e) {
     console.error('Error updating status', e);
   }
-}
-
-function switchFollowupSubTab(tab) {
-  followupState.subTab = tab;
-
-  const btnMyTasks = document.getElementById('subBtnMyTasks');
-  const btnOrphan = document.getElementById('subBtnOrphanPool');
-  const btnRadar = document.getElementById('subBtnRadar');
-  const filterCard = document.getElementById('fuFilterCard');
-
-  if (btnMyTasks) btnMyTasks.classList.toggle('active', tab === 'my_tasks');
-  if (btnOrphan) btnOrphan.classList.toggle('active', tab === 'orphan_pool');
-  if (btnRadar) btnRadar.classList.toggle('active', tab === 'radar');
-
-  if (tab === 'radar') {
-    if (filterCard) filterCard.style.display = 'none';
-    if (window.SalesSuperpowers) {
-      SalesSuperpowers.renderRadarCockpit('followupDataContainer', 5);
-    }
-  } else {
-    if (filterCard) filterCard.style.display = 'block';
-    if (tab === 'orphan_pool') {
-      loadOrphanLeads();
-    } else {
-      renderCustomerCards();
-    }
-  }
-}
-
-function switchCustomerTab(tab) {
-  followupState.activeTab = tab;
-  const tabFu = document.getElementById('tabBtnFollowup');
-  const tabKb = document.getElementById('tabBtnKanban');
-  const viewFu = document.getElementById('followupSectionView');
-  const kanban = document.getElementById('kanbanBoard');
-
-  if (tabFu) tabFu.classList.toggle('active', tab === 'followup');
-  if (tabKb) tabKb.classList.toggle('active', tab === 'kanban');
-
-  if (viewFu) viewFu.style.display = tab === 'followup' ? 'block' : 'none';
-  if (kanban) kanban.style.display = tab === 'kanban' ? 'flex' : 'none';
 }
 
 // =========================================================================

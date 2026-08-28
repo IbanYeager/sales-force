@@ -860,20 +860,58 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $spk = !empty($curr['spk']) ? $curr['spk'] : 'FALSE';
     }
 
-    // Smart Cascading logic
+    // SMART DECISION TREE (Sistem Pintar SFT CRM)
     if ($connected === 'FALSE') {
+        // 1. Kalo connected TIDAK -> langsung otomatis TIDAK semua & 'Customer tidak aktif'
+        $connected = 'FALSE';
         $contacted = 'FALSE';
         $prospect = 'FALSE';
         $spk = 'FALSE';
+        $remarks = 'Customer tidak aktif';
+        $status = 'Tidak Tertarik';
+        $sales_fu_status = 'Closed';
+    } elseif ($contacted === 'FALSE') {
+        // 2. Kalo connected IYA tapi contacted TIDAK -> 'Customer tidak diangkat'
+        $connected = 'TRUE';
+        $contacted = 'FALSE';
+        $prospect = 'FALSE';
+        $spk = 'FALSE';
+        $remarks = 'Customer tidak diangkat';
+        if (!$status || $status === 'Belum Dihubungi') {
+            $status = 'Menunggu Respon';
+        }
+        if ($sales_fu_status === '') $sales_fu_status = 'Open';
+    } elseif ($prospect === 'FALSE') {
+        // 3. Kalo prospek TIDAK -> 'Customer menolak'
+        $connected = 'TRUE';
+        $contacted = 'TRUE';
+        $prospect = 'FALSE';
+        $spk = 'FALSE';
+        $remarks = 'Customer menolak';
+        $status = 'Tidak Tertarik';
+        $sales_fu_status = 'Closed';
     } elseif ($spk === 'TRUE') {
+        // 5. Kalo SPK IYA (Semuanya IYA) -> 'SPK berhasil'
+        $connected = 'TRUE';
+        $contacted = 'TRUE';
         $prospect = 'TRUE';
+        $spk = 'TRUE';
+        $remarks = 'SPK berhasil';
+        $status = 'Deal / Selesai';
+        $sales_fu_status = 'Closed';
+    } else {
+        // 4. Kalo prospek IYA & SPK TIDAK -> 'Customer tertarik'
+        $connected = 'TRUE';
         $contacted = 'TRUE';
-        $connected = 'TRUE';
-    } elseif ($prospect === 'TRUE') {
-        $contacted = 'TRUE';
-        $connected = 'TRUE';
-    } elseif ($contacted === 'TRUE') {
-        $connected = 'TRUE';
+        $prospect = 'TRUE';
+        $spk = 'FALSE';
+        if ($remarks === '' || $remarks === 'Customer pending' || $remarks === 'Customer menolak' || $remarks === 'Customer tidak diangkat' || $remarks === 'Customer tidak aktif') {
+            $remarks = 'Customer tertarik';
+        }
+        if (!$status || $status === 'Belum Dihubungi' || $status === 'Tidak Tertarik') {
+            $status = 'Tertarik / Jadwal Servis';
+        }
+        if ($sales_fu_status === '') $sales_fu_status = 'Open';
     }
 
     $reason_followup = trim($input['reason_followup'] ?? ($input['reason'] ?? ($input['notes'] ?? '')));
@@ -883,54 +921,15 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
 
     $template_used = trim($input['template_used'] ?? '');
 
-    // Status Determination:
-    $status = trim($input['status'] ?? '');
-
-    // Automatic Remarks Determination:
-    $remarks = trim($input['remarks'] ?? '');
-    if ($remarks === '') {
-        if ($connected === 'FALSE') {
-            $remarks = 'Customer tidak aktif';
-        } elseif ($contacted === 'FALSE') {
-            $remarks = 'Customer tidak diangkat';
-        } elseif ($spk === 'TRUE' || $status === 'Deal / Selesai') {
-            $remarks = 'SPK berhasil';
-        } elseif ($prospect === 'TRUE' || $status === 'Tertarik / Jadwal Servis') {
-            $remarks = 'Customer tertarik';
-        } elseif ($status === 'Menunggu Respon' || $contacted === 'TRUE' || $connected === 'TRUE') {
-            $remarks = 'Customer pending';
-        } else {
-            $remarks = $curr['remarks'] ?? '';
-        }
+    // Allow manual override for remarks and status if explicitly sent
+    if (!empty($input['remarks'])) {
+        $remarks = trim($input['remarks']);
     }
-
-    // Status fallback if not explicitly provided
-    if (!$status || $status === 'Belum Dihubungi') {
-        if ($spk === 'TRUE' || $remarks === 'SPK berhasil') {
-            $status = 'Deal / Selesai';
-        } elseif ($prospect === 'TRUE' || $remarks === 'Customer tertarik' || $remarks === 'Customer janjian' || $remarks === 'Minta simulasi kredit' || $remarks === 'Janjian test drive') {
-            $status = 'Tertarik / Jadwal Servis';
-        } elseif ($remarks === 'Customer menolak' || $remarks === 'Beli di dealer/merk lain' || $remarks === 'Customer tidak aktif' || $connected === 'FALSE') {
-            $status = 'Tidak Tertarik';
-        } elseif ($connected === 'TRUE' || $contacted === 'TRUE' || $remarks === 'Customer pending' || $remarks === 'Tunggu gajian/dana' || $remarks === 'Cek harga mobil lama' || !empty($reason_followup)) {
-            $status = 'Menunggu Respon';
-        } else {
-            if ($action === 'save_sales_followup') {
-                $status = 'Menunggu Respon';
-            } else {
-                $status = !empty($curr['followup_status']) ? $curr['followup_status'] : 'Belum Dihubungi';
-            }
-        }
+    if (!empty($input['status'])) {
+        $status = trim($input['status']);
     }
-
-    // Sales FU Status (Open vs Closed)
-    $sales_fu_status = trim($input['sales_fu_status'] ?? ($input['status_fu'] ?? ''));
-    if ($sales_fu_status === '') {
-        if ($status === 'Deal / Selesai' || $status === 'Tidak Tertarik' || $remarks === 'SPK berhasil' || $remarks === 'Customer menolak' || $remarks === 'Customer tidak aktif') {
-            $sales_fu_status = 'Closed';
-        } else {
-            $sales_fu_status = 'Open';
-        }
+    if (!empty($input['sales_fu_status'])) {
+        $sales_fu_status = trim($input['sales_fu_status']);
     }
 
     $now = date('Y-m-d H:i:s');

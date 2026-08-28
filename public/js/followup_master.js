@@ -1351,28 +1351,28 @@ function openEditSingleCustomerModal(customerId) {
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">1. Connected (No. Tersambung):</label>
-                <select id="editSingleConnected" class="fu-select" style="font-size:12.5px;">
+                <select id="editSingleConnected" class="fu-select" style="font-size:12.5px;" onchange="handleSingleModalTamChange('connected')">
                   <option value="TRUE" ${isConnected ? 'selected' : ''}>✅ YA (Tersambung / Aktif)</option>
                   <option value="FALSE" ${!isConnected ? 'selected' : ''}>❌ TIDAK (Nomor Salah / Tidak Aktif)</option>
                 </select>
               </div>
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">2. Contacted (Komunikasi Terkirim):</label>
-                <select id="editSingleContacted" class="fu-select" style="font-size:12.5px;">
+                <select id="editSingleContacted" class="fu-select" style="font-size:12.5px;" onchange="handleSingleModalTamChange('contacted')">
                   <option value="TRUE" ${isContacted ? 'selected' : ''}>✅ YA (Ada Respon / Terkirim)</option>
                   <option value="FALSE" ${!isContacted ? 'selected' : ''}>❌ TIDAK (Tidak Diangkat / Centang 1)</option>
                 </select>
               </div>
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">3. Prospect (Minat Beli / Upgrade):</label>
-                <select id="editSingleProspect" class="fu-select" style="font-size:12.5px;">
+                <select id="editSingleProspect" class="fu-select" style="font-size:12.5px;" onchange="handleSingleModalTamChange('prospect')">
                   <option value="TRUE" ${isProspect ? 'selected' : ''}>🔥 YA (Tertarik / Janjian / Simulasi)</option>
                   <option value="FALSE" ${!isProspect ? 'selected' : ''}>⚪ TIDAK (Belum Tertarik / Menolak)</option>
                 </select>
               </div>
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">4. SPK (Closing Transaksi):</label>
-                <select id="editSingleSpk" class="fu-select" style="font-size:12.5px;">
+                <select id="editSingleSpk" class="fu-select" style="font-size:12.5px;" onchange="handleSingleModalTamChange('spk')">
                   <option value="TRUE" ${isSpk ? 'selected' : ''}>🏆 YA (Closing / SPK)</option>
                   <option value="FALSE" ${!isSpk ? 'selected' : ''}>⚪ Belum SPK</option>
                 </select>
@@ -1561,6 +1561,150 @@ async function executeSaveEditCustomer(e, customerId) {
   }
 }
 
+// -------------------------------------------------------------
+// SMART DECISION HANDLER FOR SINGLE EDIT MODAL
+// -------------------------------------------------------------
+function handleSingleModalTamChange(field) {
+  const elConnected = document.getElementById('editSingleConnected');
+  const elContacted = document.getElementById('editSingleContacted');
+  const elProspect = document.getElementById('editSingleProspect');
+  const elSpk = document.getElementById('editSingleSpk');
+  const elRemarks = document.getElementById('editSingleRemarks');
+  const elStatus = document.getElementById('editSingleStatus');
+  const elSalesFuStatus = document.getElementById('editSingleSalesFuStatus');
+
+  if (!elConnected || !elContacted || !elProspect || !elSpk) return;
+
+  const connectedVal = elConnected.value;
+  const contactedVal = elContacted.value;
+  const prospectVal = elProspect.value;
+  const spkVal = elSpk.value;
+
+  if (field === 'connected') {
+    if (connectedVal === 'FALSE') {
+      // 1. Connected TIDAK -> TIDAK SEMUA & Customer tidak aktif
+      elContacted.value = 'FALSE';
+      elProspect.value = 'FALSE';
+      elSpk.value = 'FALSE';
+      if (elRemarks) elRemarks.value = 'Customer tidak aktif';
+      if (elStatus) elStatus.value = 'Tidak Tertarik';
+      if (elSalesFuStatus) elSalesFuStatus.value = 'Closed';
+    } else if (connectedVal === 'TRUE') {
+      if (elRemarks && elRemarks.value === 'Customer tidak aktif') {
+        elRemarks.value = 'Customer pending';
+      }
+    }
+  } else if (field === 'contacted') {
+    if (contactedVal === 'FALSE') {
+      // 2. Connected IYA tapi Contacted TIDAK -> Customer tidak diangkat
+      elConnected.value = 'TRUE';
+      elProspect.value = 'FALSE';
+      elSpk.value = 'FALSE';
+      if (elRemarks) elRemarks.value = 'Customer tidak diangkat';
+      if (elStatus) elStatus.value = 'Menunggu Respon';
+    } else if (contactedVal === 'TRUE') {
+      elConnected.value = 'TRUE';
+      if (elRemarks && (elRemarks.value === 'Customer tidak aktif' || elRemarks.value === 'Customer tidak diangkat')) {
+        elRemarks.value = 'Customer pending';
+      }
+    }
+  } else if (field === 'prospect') {
+    if (prospectVal === 'FALSE') {
+      // 3. Prospek TIDAK -> Customer menolak & SPK TIDAK
+      elConnected.value = 'TRUE';
+      elContacted.value = 'TRUE';
+      elSpk.value = 'FALSE';
+      if (elRemarks) elRemarks.value = 'Customer menolak';
+      if (elStatus) elStatus.value = 'Tidak Tertarik';
+      if (elSalesFuStatus) elSalesFuStatus.value = 'Closed';
+    } else if (prospectVal === 'TRUE') {
+      // 4. Prospek IYA -> Customer tertarik & Connected/Contacted IYA
+      elConnected.value = 'TRUE';
+      elContacted.value = 'TRUE';
+      if (elSpk.value !== 'TRUE') {
+        if (elRemarks) elRemarks.value = 'Customer tertarik';
+        if (elStatus) elStatus.value = 'Tertarik / Jadwal Servis';
+        if (elSalesFuStatus) elSalesFuStatus.value = 'Open';
+      }
+    }
+  } else if (field === 'spk') {
+    if (spkVal === 'TRUE') {
+      // 5. SPK IYA (Semuanya IYA) -> SPK berhasil
+      elConnected.value = 'TRUE';
+      elContacted.value = 'TRUE';
+      elProspect.value = 'TRUE';
+      if (elRemarks) elRemarks.value = 'SPK berhasil';
+      if (elStatus) elStatus.value = 'Deal / Selesai';
+      if (elSalesFuStatus) elSalesFuStatus.value = 'Closed';
+    } else if (spkVal === 'FALSE') {
+      if (elProspect.value === 'TRUE') {
+        if (elRemarks) elRemarks.value = 'Customer tertarik';
+        if (elStatus) elStatus.value = 'Tertarik / Jadwal Servis';
+        if (elSalesFuStatus) elSalesFuStatus.value = 'Open';
+      } else {
+        if (elRemarks) elRemarks.value = 'Customer pending';
+      }
+    }
+  }
+}
+
+// -------------------------------------------------------------
+// SMART DECISION HANDLER FOR BATCH EDIT MODAL
+// -------------------------------------------------------------
+function handleBatchModalTamChange(field) {
+  const elConnected = document.getElementById('batchConnected');
+  const elContacted = document.getElementById('batchContacted');
+  const elProspect = document.getElementById('batchProspect');
+  const elSpk = document.getElementById('batchSpk');
+  const elRemarks = document.getElementById('batchRemarks');
+  const elStatus = document.getElementById('batchStatus');
+  const elSalesFuStatus = document.getElementById('batchSalesFuStatus');
+
+  if (!elConnected || !elContacted || !elProspect || !elSpk) return;
+
+  const connectedVal = elConnected.value;
+  const contactedVal = elContacted.value;
+  const prospectVal = elProspect.value;
+  const spkVal = elSpk.value;
+
+  if (field === 'connected' && connectedVal === 'FALSE') {
+    elContacted.value = 'FALSE';
+    elProspect.value = 'FALSE';
+    elSpk.value = 'FALSE';
+    if (elRemarks) elRemarks.value = 'Customer tidak aktif';
+    if (elStatus) elStatus.value = 'Tidak Tertarik';
+    if (elSalesFuStatus) elSalesFuStatus.value = 'Closed';
+  } else if (field === 'contacted' && contactedVal === 'FALSE') {
+    if (elConnected.value !== 'ignore') elConnected.value = 'TRUE';
+    elProspect.value = 'FALSE';
+    elSpk.value = 'FALSE';
+    if (elRemarks) elRemarks.value = 'Customer tidak diangkat';
+    if (elStatus) elStatus.value = 'Menunggu Respon';
+  } else if (field === 'prospect' && prospectVal === 'FALSE') {
+    if (elConnected.value !== 'ignore') elConnected.value = 'TRUE';
+    if (elContacted.value !== 'ignore') elContacted.value = 'TRUE';
+    elSpk.value = 'FALSE';
+    if (elRemarks) elRemarks.value = 'Customer menolak';
+    if (elStatus) elStatus.value = 'Tidak Tertarik';
+    if (elSalesFuStatus) elSalesFuStatus.value = 'Closed';
+  } else if (field === 'prospect' && prospectVal === 'TRUE') {
+    if (elConnected.value !== 'ignore') elConnected.value = 'TRUE';
+    if (elContacted.value !== 'ignore') elContacted.value = 'TRUE';
+    if (elSpk.value !== 'TRUE') {
+      if (elRemarks) elRemarks.value = 'Customer tertarik';
+      if (elStatus) elStatus.value = 'Tertarik / Jadwal Servis';
+      if (elSalesFuStatus) elSalesFuStatus.value = 'Open';
+    }
+  } else if (field === 'spk' && spkVal === 'TRUE') {
+    if (elConnected.value !== 'ignore') elConnected.value = 'TRUE';
+    if (elContacted.value !== 'ignore') elContacted.value = 'TRUE';
+    if (elProspect.value !== 'ignore') elProspect.value = 'TRUE';
+    if (elRemarks) elRemarks.value = 'SPK berhasil';
+    if (elStatus) elStatus.value = 'Deal / Selesai';
+    if (elSalesFuStatus) elSalesFuStatus.value = 'Closed';
+  }
+}
+
 // =============================================================
 // MODAL UBAH STATUS / DATA MASSAL (BATCH UPDATE CRM)
 // =============================================================
@@ -1643,7 +1787,7 @@ function openBatchEditModal(initialScope = null) {
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Connected (No. Tersambung):</label>
-                <select id="batchConnected" class="fu-select" style="font-size:12px;">
+                <select id="batchConnected" class="fu-select" style="font-size:12px;" onchange="handleBatchModalTamChange('connected')">
                   <option value="ignore">-- Jangan Diubah (Tetap) --</option>
                   <option value="TRUE">✅ YA (Tersambung / Aktif)</option>
                   <option value="FALSE">❌ TIDAK (Tidak Aktif / Salah Nomor)</option>
@@ -1651,7 +1795,7 @@ function openBatchEditModal(initialScope = null) {
               </div>
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Contacted (Ada Respon):</label>
-                <select id="batchContacted" class="fu-select" style="font-size:12px;">
+                <select id="batchContacted" class="fu-select" style="font-size:12px;" onchange="handleBatchModalTamChange('contacted')">
                   <option value="ignore">-- Jangan Diubah (Tetap) --</option>
                   <option value="TRUE">✅ YA (Ada Respon / Terkirim)</option>
                   <option value="FALSE">❌ TIDAK (Tidak Diangkat / Centang 1)</option>
@@ -1659,7 +1803,7 @@ function openBatchEditModal(initialScope = null) {
               </div>
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Prospect (Minat Beli / Upgrade):</label>
-                <select id="batchProspect" class="fu-select" style="font-size:12px;">
+                <select id="batchProspect" class="fu-select" style="font-size:12px;" onchange="handleBatchModalTamChange('prospect')">
                   <option value="ignore">-- Jangan Diubah (Tetap) --</option>
                   <option value="TRUE">🔥 YA (Tertarik / Janjian / Simulasi)</option>
                   <option value="FALSE">⚪ TIDAK (Belum Tertarik / Menolak)</option>
@@ -1667,7 +1811,7 @@ function openBatchEditModal(initialScope = null) {
               </div>
               <div>
                 <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">SPK (Closing Transaksi):</label>
-                <select id="batchSpk" class="fu-select" style="font-size:12px;">
+                <select id="batchSpk" class="fu-select" style="font-size:12px;" onchange="handleBatchModalTamChange('spk')">
                   <option value="ignore">-- Jangan Diubah (Tetap) --</option>
                   <option value="TRUE">🏆 YA (Closing / SPK)</option>
                   <option value="FALSE">⚪ Belum SPK</option>
