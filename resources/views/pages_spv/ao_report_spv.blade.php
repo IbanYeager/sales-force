@@ -62,10 +62,13 @@
         </div>
         <div class="spv-user">
           <div class="avatar-status">
+            <img id="spvAvatar" src="https://ui-avatars.com/api/?name=SPV&background=1c2740&color=ffffff&bold=true" alt="Avatar">
             <img id="spvAvatar" src="https://ui-avatars.com/api/?name=Pak+Ryan&background=0D1B3E&color=ffffff&bold=true" alt="Avatar">
             <span class="dot"></span>
           </div>
           <div class="meta">
+            <span class="name" id="spvNama">Supervisor</span>
+            <span class="role" id="spvRole">Supervisor Toyota</span>
             <span class="name" id="spvNama">Pak Ryan</span>
             <span class="role" id="spvRole">Supervisor</span>
           </div>
@@ -93,7 +96,7 @@
 
       <!-- Main Interactive Whiteboard Container -->
       <div class="ao-board-container" id="aoBoardMainContainer">
-        
+
         <!-- Board Top Header -->
         <div class="ao-board-header">
             <div class="ao-brand-badge">
@@ -160,7 +163,7 @@
 
         <!-- 4 Quadrants Grid -->
         <div class="ao-quadrant-grid">
-            
+
             <!-- Quadrant 1: Stock Matching with OS -->
             <div class="ao-quad-card">
                 <div class="ao-quad-header">
@@ -388,6 +391,11 @@
         if (dateEl) {
             dateEl.textContent = val === 'Semua' ? '10 Agustus 2026' : `10 Agu 2026 (Tim ${val})`;
         }
+    }
+
+    function logoutUser() {
+        localStorage.clear();
+        window.location.href = '../pages/login_spv.html';
     }
   </script>
 </body>

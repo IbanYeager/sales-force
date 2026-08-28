@@ -39,7 +39,7 @@ Route::get('/pages/{page}', [PageController::class, 'showSalesPage'])->name('sal
 
 // Fallback direct route for common sales pages (e.g. /login, /input, /profil)
 $salesPages = [
-    'login', 'login_spv', 'login_kacab', 'login_sales', 'input', 'spk', 'profil', 'customer', 'ao_report', 'deal', 'do',
+    'login', 'input', 'spk', 'profil', 'customer', 'ao_report', 'deal', 'do',
     'dokumen', 'ai_copilot', 'approval', 'balap', 'battle_card', 'brosur', 'catalog', 'catur',
     'checkin', 'delivery_ceremony', 'digital_card', 'drag_race', 'eco_calculator',
     'elibrary', 'game', 'hybrid_flow', 'inspeksi', 'inventory', 'jadwal_input',

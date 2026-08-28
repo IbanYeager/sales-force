@@ -61,12 +61,12 @@
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
-            <img id="kcbAvatar" src="../image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Dendi+Holius&background=1E1014&color=d8a437&bold=true'">
+            <img id="kacabAvatar" src="../image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Kepala+Cabang&background=1E1014&color=fff'">
             <span class="dot"></span>
           </div>
           <div class="meta">
-            <span class="name" id="kcbNama">Dendi Holius</span>
-            <span class="role" id="kcbRole">Kepala Cabang</span>
+            <span class="name" id="kacabNama">Kepala Cabang</span>
+            <span class="role" id="kacabRole">Branch Manager Kiara Condong</span>
           </div>
         </div>
       </div>

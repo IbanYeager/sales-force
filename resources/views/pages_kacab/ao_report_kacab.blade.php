@@ -60,19 +60,19 @@
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
-            <img id="kcbAvatar" src="https://ui-avatars.com/api/?name=Dendi+Holius&background=1e1014&color=d8a437&bold=true" alt="Avatar">
+            <img id="kcbAvatar" src="https://ui-avatars.com/api/?name=KC&background=1e1014&color=d8a437&bold=true" alt="Avatar">
             <span class="dot"></span>
           </div>
           <div class="meta">
-            <span class="name" id="kcbNama">Dendi Holius</span>
-            <span class="role" id="kcbRole">Kepala Cabang</span>
+            <span class="name" id="kcbNama">Kepala Cabang</span>
+            <span class="role" id="kcbRole">Tunas Toyota Kiara Condong</span>
           </div>
         </div>
       </div>
 
       <!-- Main Interactive Whiteboard Container -->
       <div class="ao-board-container" id="aoBoardMainContainer">
-        
+
         <!-- Board Top Header -->
         <div class="ao-board-header">
             <div class="ao-brand-badge">
@@ -139,7 +139,7 @@
 
         <!-- 4 Quadrants Grid -->
         <div class="ao-quadrant-grid">
-            
+
             <!-- Quadrant 1: Stock Matching with OS -->
             <div class="ao-quad-card">
                 <div class="ao-quad-header">
@@ -355,11 +355,15 @@
 
   <script src="../js/ao_report_data.js"></script>
   <script src="../js/ao_report.js"></script>
-  <script src="../js/kacab_global.js?v=20260828"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         initAOReport('kacab');
     });
+
+    function logoutUser() {
+        localStorage.clear();
+        window.location.href = '../pages/login_kacab.html';
+    }
   </script>
 </body>
 </html>

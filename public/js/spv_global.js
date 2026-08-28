@@ -1,73 +1,22 @@
 // spv_global.js - Global background polling, notification sound, and mobile drawer for all SPV pages
 
-// ── Global SPV Logout Function ──────────────────────────
-function logoutUser() {
-    try {
-        localStorage.clear();
-        sessionStorage.clear();
-    } catch (e) {
-        console.error('Logout error', e);
-    }
-    window.location.replace('/pages/login_spv');
-}
-window.logoutUser = logoutUser;
-
 // ── Global SPV Access Guard ─────────────────────────────
 (function enforceSpvGuard() {
     const loggedIn = localStorage.getItem('loggedIn') === 'true';
     const peran = localStorage.getItem('peranSales');
     if (!loggedIn) {
-        window.location.replace('/pages/login_spv');
+        window.location.href = '../pages/login_spv.html';
         return;
     }
-    if (peran === 'Kepala Cabang' || peran === 'Kacab') {
-        window.location.replace('/pages_kacab/index_kacab');
+    if (peran === 'Kepala Cabang') {
+        window.location.href = '../pages_kacab/index_kacab.html';
         return;
     }
-    if (peran !== 'Supervisor' && peran !== 'SPV') {
-        window.location.replace('/index');
+    if (peran !== 'Supervisor') {
+        window.location.href = '../index.html';
         return;
     }
 })();
-
-// ── Global SPV User Renderer (Consistent Topbar Profile) ──
-function renderSpvUser() {
-    let nama = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
-    const peran = localStorage.getItem('peranSales') || 'Supervisor';
-    const foto = localStorage.getItem('fotoSales');
-
-    if (!nama || nama === 'Supervisor' || nama === 'Supervisor Tunas') {
-        nama = 'Pak Ryan';
-        localStorage.setItem('namaSales', 'Pak Ryan');
-    }
-
-    const namaEls = document.querySelectorAll('#spvNama, #kcbNama, .spv-user .name, .spv-topbar .name, .meta .name');
-    namaEls.forEach(el => {
-        if (el) el.textContent = nama;
-    });
-
-    const roleEls = document.querySelectorAll('#spvRole, #kcbRole, .spv-user .role, .spv-topbar .role, .meta .role');
-    roleEls.forEach(el => {
-        if (el) el.textContent = peran;
-    });
-
-    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0D1B3E&color=ffffff&bold=true`;
-
-    const avatarEls = document.querySelectorAll('#spvAvatar, #kcbAvatar, #mhAvatar, .spv-user img, .spv-topbar img, .avatar-status img');
-    avatarEls.forEach(img => {
-        if (img) {
-            img.src = (foto && foto.trim() !== '') ? foto : defaultAvatar;
-            img.onerror = function() { this.src = defaultAvatar; };
-        }
-    });
-
-    const sidebarBrandRole = document.querySelector('.spv-brand .role, .sidebar-brand .role');
-    if (sidebarBrandRole) sidebarBrandRole.textContent = `Supervisor - ${nama}`;
-}
-
-renderSpvUser();
-document.addEventListener('DOMContentLoaded', renderSpvUser);
-window.addEventListener('pageshow', renderSpvUser);
 
 // ── Mobile Header + Drawer Navigation ──────────────────
 // Diinjeksi lewat JS supaya semua halaman SPV langsung kebagian
@@ -183,12 +132,12 @@ if (typeof window.showToastNotification === 'undefined') {
         toast.style.cssText = 'background:#1e293b;color:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.3);font-family:Inter,sans-serif;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(-20px);transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:auto;border-left:4px solid #ef4444;';
         toast.innerHTML = `<i class="fa-solid fa-bell" style="color:#ef4444;font-size:18px;"></i> <span>${msg}</span>`;
         toastContainer.appendChild(toast);
-        
+
         requestAnimationFrame(() => {
             toast.style.opacity = '1';
             toast.style.transform = 'translateY(0)';
         });
-        
+
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(-20px)';
@@ -206,7 +155,7 @@ if (typeof window.sharedAudioCtx === 'undefined') {
             if (AudioContext) window.sharedAudioCtx = new AudioContext();
         }
     }
-    
+
     document.addEventListener('click', () => {
         initAudio();
         if (window.sharedAudioCtx && window.sharedAudioCtx.state === 'suspended') {
@@ -222,24 +171,24 @@ if (typeof window.playNotificationSound === 'undefined') {
             const ctx = window.sharedAudioCtx;
             if (!ctx) return;
             if (ctx.state === 'suspended') ctx.resume();
-            
+
             function playTone(freq, type, startTime, duration, vol) {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, startTime);
-                
+
                 gain.gain.setValueAtTime(0, startTime);
                 gain.gain.linearRampToValueAtTime(vol, startTime + 0.05);
                 gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-                
+
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-                
+
                 osc.start(startTime);
                 osc.stop(startTime + duration);
             }
-            
+
             const t = ctx.currentTime;
             playTone(1318.51, 'sine', t, 0.4, 0.8);
             playTone(1318.51, 'triangle', t, 0.4, 0.3);
@@ -295,7 +244,7 @@ if (typeof window.isFirstLoadSpvGlobal === 'undefined') {
         const spv = localStorage.getItem('namaSales') || '';
         let currentPending = 0;
         let fetchSuccess = false;
-        
+
         try {
             const spkRes = await fetch(`../api/api_spk.php?spv=${encodeURIComponent(spv)}`);
             const spkJson = await spkRes.json();
@@ -315,32 +264,32 @@ if (typeof window.isFirstLoadSpvGlobal === 'undefined') {
             if (tdJson.status === 'success' && Array.isArray(tdJson.data)) {
                 currentPending += tdJson.data.filter(t => t.status === 'Menunggu' || t.status === 'Pending').length;
             }
-            
+
             if (fetchSuccess) {
                 localStorage.setItem('spvApprovalBadgeCount', currentPending);
-                
+
                 if (!window.isFirstLoadSpvGlobal) {
                     if (currentPending !== window.lastSpvGlobalPendingCount) {
                         if (currentPending > window.lastSpvGlobalPendingCount) {
                             if (window.playNotificationSound) window.playNotificationSound();
                             if (window.showToastNotification) window.showToastNotification("Terdapat pengajuan persetujuan baru dari tim Anda.");
                         }
-                        
+
                         // Data changed behind the scenes, trigger auto-refresh for any open SPV page!
-                        if (typeof window.fetchData === 'function') window.fetchData(); 
-                        if (typeof window.loadPendingApprovals === 'function') window.loadPendingApprovals(); 
-                        if (typeof window.loadMonitoringBoard === 'function') window.loadMonitoringBoard(); 
-                        if (typeof window.loadWiraniaga === 'function') window.loadWiraniaga(); 
-                        if (typeof window.loadActivities === 'function') window.loadActivities(); 
+                        if (typeof window.fetchData === 'function') window.fetchData();
+                        if (typeof window.loadPendingApprovals === 'function') window.loadPendingApprovals();
+                        if (typeof window.loadMonitoringBoard === 'function') window.loadMonitoringBoard();
+                        if (typeof window.loadWiraniaga === 'function') window.loadWiraniaga();
+                        if (typeof window.loadActivities === 'function') window.loadActivities();
                     }
                 }
-                
+
                 window.lastSpvGlobalPendingCount = currentPending;
                 window.isFirstLoadSpvGlobal = false;
-                
+
                 const dashPendingEl = document.getElementById('dashPending');
                 if (dashPendingEl) dashPendingEl.textContent = currentPending;
-                
+
                 const navBadge = document.getElementById('navApprovalBadge');
                 const quickBadge = document.getElementById('quickApprovalBadge');
                 const mhDot = document.getElementById('mhPendingDot');

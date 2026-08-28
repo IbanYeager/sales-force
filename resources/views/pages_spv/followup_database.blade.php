@@ -62,12 +62,12 @@
         </div>
         <div class="spv-user">
           <div class="avatar-status">
-            <img id="spvAvatar" src="../image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Pak+Ryan&background=0D1B3E&color=ffffff&bold=true'">
+            <img id="spvAvatar" src="../image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=SPV+Toyota&background=0D1B3E&color=fff'">
             <span class="dot"></span>
           </div>
           <div class="meta">
-            <span class="name" id="spvNama">Pak Ryan</span>
-            <span class="role" id="spvRole">Supervisor</span>
+            <span class="name" id="spvNama">Supervisor Tunas</span>
+            <span class="role" id="spvRole">SPV Kiara Condong</span>
           </div>
         </div>
       </div>
