@@ -918,7 +918,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
             document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
             document.body.scrollTo({ top: 0, behavior: 'smooth' });
-            
+
             // Scroll all possible overflowing containers
             const scrollables = document.querySelectorAll('.desktop-content, .table-responsive, .mobile-app, .container, main, [style*="overflow"]');
             scrollables.forEach(el => {
@@ -953,7 +953,7 @@
         // Listen on all capture scroll events
         window.addEventListener('scroll', checkScrollPosition, { passive: true, capture: true });
         document.addEventListener('scroll', checkScrollPosition, { passive: true, capture: true });
-        
+
         // Also check periodically in case of lazy content load
         setInterval(checkScrollPosition, 400);
     }

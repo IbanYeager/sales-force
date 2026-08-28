@@ -100,19 +100,19 @@ function initFollowupTabs() {
           <div class="hero-kpi-grid">
             <div class="hero-kpi-chip" style="cursor:pointer;" onclick="handleStatusFilter('all')" title="Klik untuk menampilkan semua database">
               <div class="num" id="heroTotalCount">0</div>
-              <div class="lbl">📋 Semua Database</div>
+              <div class="lbl">Semua Database</div>
             </div>
             <div class="hero-kpi-chip" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); cursor:pointer;" onclick="handleStatusFilter('belum_fu')" title="Klik untuk melihat database yang belum di-follow up">
               <div class="num" style="color:#fbbf24;" id="heroPendingCount">0</div>
-              <div class="lbl">⚪ Belum Di-Follow Up</div>
+              <div class="lbl">Belum Di-Follow Up</div>
             </div>
             <div class="hero-kpi-chip" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3); cursor:pointer;" onclick="handleStatusFilter('sudah_fu')" title="Klik untuk melihat database yang sudah di-follow up">
               <div class="num" style="color:#6ee7b7;" id="heroFollowedCount">0</div>
-              <div class="lbl">✅ Sudah Di-Follow Up</div>
+              <div class="lbl">Sudah Di-Follow Up</div>
             </div>
             <div class="hero-kpi-chip" style="background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3); cursor:pointer;" onclick="handleStatusFilter('Tertarik / Jadwal Servis')" title="Klik untuk melihat prospek tertarik">
               <div class="num" style="color:#93c5fd;" id="heroInterestedCount">0</div>
-              <div class="lbl">🔵 Tertarik / Servis</div>
+              <div class="lbl">Tertarik / Servis</div>
             </div>
           </div>
         </div>
@@ -121,17 +121,17 @@ function initFollowupTabs() {
         <div class="sub-nav-fu-wrapper" id="fuSubNavWrapper">
           <button type="button" class="sub-nav-fu-btn active" id="subBtnMyTasks" onclick="switchFollowupSubTab('my_tasks')">
             <i class="fa-solid fa-bullseye" style="color:#2563eb;"></i>
-            <span>🎯 Database Tugas Saya</span>
+            <span>Database Tugas Saya</span>
             <span id="badgeMyTasksCount" style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:#eff6ff; color:#1d4ed8;">0</span>
           </button>
           <button type="button" class="sub-nav-fu-btn pool-tab" id="subBtnOrphanPool" onclick="switchFollowupSubTab('orphan_pool')">
             <i class="fa-solid fa-fire" style="color:#ea580c;"></i>
-            <span>🔥 Pool Rebutan Prospek</span>
-            <span id="badgeOrphanPoolCount" class="badge-pulse-fire">⚡ Cek Rebutan</span>
+            <span>Pool Rebutan Prospek</span>
+            <span id="badgeOrphanPoolCount" class="badge-pulse-fire">0 Siap Rebut</span>
           </button>
           <button type="button" class="sub-nav-fu-btn radar-tab" id="subBtnRadar" onclick="switchFollowupSubTab('radar')">
             <i class="fa-solid fa-location-crosshairs" style="color:#3b82f6;"></i>
-            <span>📍 Radar GPS Terdekat</span>
+            <span>Radar GPS Terdekat</span>
             <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:rgba(215,18,58,0.12); color:#dc2626; border:1px solid rgba(215,18,58,0.25);">Live GPS</span>
           </button>
         </div>
@@ -146,7 +146,7 @@ function initFollowupTabs() {
             </div>
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
               <button type="button" class="btn-fu" id="btnOpenAutoBlast" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%) !important; color:#ffffff !important; border:none !important; padding:8px 16px !important; font-size:12px !important; font-weight:800 !important; border-radius:10px !important; box-shadow:0 4px 14px rgba(16,185,129,0.35) !important; display:inline-flex !important; align-items:center !important; gap:6px !important; cursor:pointer !important;" onclick="openAutoBlastModal()">
-                <i class="fa-solid fa-bolt-lightning" style="color:#fef08a;"></i> Auto-Blast Cepat
+                <i class="fa-solid fa-bolt-lightning" style="color:#fef08a;"></i> ⚡ Auto-Blast Cepat
               </button>
               <button class="view-toggle-btn active" id="btnViewCards" onclick="switchViewMode('cards')">
                 <i class="fa-solid fa-grip"></i> Kartu Prospek
@@ -180,28 +180,24 @@ function initFollowupTabs() {
                 <span class="fu-filter-count-badge" id="countBadgeAll">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn tab-belum" id="btnStatusBelum" onclick="handleStatusFilter('belum_fu', this)">
-                <i class="fa-solid fa-hourglass-half"></i> Belum Di-Follow Up
+                <i class="fa-solid fa-hourglass-half"></i> ⚪ Belum Di-Follow Up
                 <span class="fu-filter-count-badge badge-amber" id="countBadgeBelum">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn tab-sudah" id="btnStatusSudah" onclick="handleStatusFilter('sudah_fu', this)">
-                <i class="fa-solid fa-circle-check"></i> Sudah Di-Follow Up
+                <i class="fa-solid fa-circle-check"></i> ✅ Sudah Di-Follow Up
                 <span class="fu-filter-count-badge badge-green" id="countBadgeSudah">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn" id="btnStatusWaiting" onclick="handleStatusFilter('Menunggu Respon', this)">
-                Menunggu Respon
+                🟡 Menunggu Respon
                 <span class="fu-filter-count-badge badge-yellow" id="countBadgeWaiting">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn" id="btnStatusInterested" onclick="handleStatusFilter('Tertarik / Jadwal Servis', this)">
-                Tertarik / Servis
+                🔵 Tertarik / Servis
                 <span class="fu-filter-count-badge badge-blue" id="countBadgeInterested">0</span>
               </button>
               <button type="button" class="status-fu-tab-btn" id="btnStatusDeal" onclick="handleStatusFilter('Deal / Selesai', this)">
-                Deal / Selesai
+                🟢 Deal / Selesai
                 <span class="fu-filter-count-badge badge-emerald" id="countBadgeDeal">0</span>
-              </button>
-              <button type="button" class="status-fu-tab-btn" id="btnStatusNotInterested" onclick="handleStatusFilter('Tidak Tertarik', this)">
-                Tidak Tertarik
-                <span class="fu-filter-count-badge badge-red" id="countBadgeNotInterested">0</span>
               </button>
             </div>
           </div>
@@ -416,7 +412,7 @@ async function fetchOrphanCountBadge() {
 function updateOrphanBadgeCount(count) {
   const badge = document.getElementById('badgeOrphanPoolCount');
   if (badge) {
-    badge.textContent = `⚡ ${count} Siap Rebut`;
+    badge.textContent = `${count} Siap Rebut`;
   }
 }
 
@@ -474,7 +470,7 @@ function renderOrphanPoolCards() {
     <div style="grid-column: 1 / -1;" class="pool-rebutan-hero">
       <div>
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:22px;">🔥</span>
+          <i class="fa-solid fa-fire" style="font-size:20px; color:#fff;"></i>
           <h3 style="font-size:17px; font-weight:900; margin:0; line-height:1.2;">Pool Rebutan Prospek (Ex-Sales &amp; Unassigned Leads)</h3>
         </div>
         <p style="font-size:12px; color:rgba(255,255,255,0.9); margin:4px 0 0 0;">
@@ -482,7 +478,7 @@ function renderOrphanPoolCards() {
         </p>
       </div>
       <div style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); padding:8px 16px; border-radius:12px; font-weight:800; font-size:14px; text-align:center;">
-        ⚡ ${list.length} Prospek Siap Rebut
+        ${list.length} Prospek Siap Rebut
       </div>
     </div>
   `;
@@ -1454,13 +1450,13 @@ function renderCustomerTableView(list) {
         <td>
           <select id="tbl_remarks_${c.id}" class="form-control" style="font-size:11px; font-weight:700; padding:4px 6px; border-radius:6px; margin-bottom:4px;" onchange="handleRemarksChange(${c.id}, this.value)">
             <option value="">-- Remarks --</option>
-            <option value="Customer janjian" ${c.remarks === 'Customer janjian' ? 'selected' : ''}>🟡 Customer janjian</option>
-            <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>🔴 Customer menolak</option>
-            <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>🟢 Customer pending</option>
-            <option value="Customer tertarik" ${c.remarks === 'Customer tertarik' ? 'selected' : ''}>🔵 Customer tertarik</option>
-            <option value="Customer tidak aktif" ${c.remarks === 'Customer tidak aktif' ? 'selected' : ''}>⚪ Customer tidak aktif</option>
-            <option value="Customer tidak diangkat" ${c.remarks === 'Customer tidak diangkat' ? 'selected' : ''}>⚫ Customer tidak diangkat</option>
-            <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>🏆 SPK berhasil</option>
+            <option value="Customer janjian" ${c.remarks === 'Customer janjian' ? 'selected' : ''}>Customer janjian</option>
+            <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>Customer menolak</option>
+            <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending</option>
+            <option value="Customer tertarik" ${c.remarks === 'Customer tertarik' ? 'selected' : ''}>Customer tertarik</option>
+            <option value="Customer tidak aktif" ${c.remarks === 'Customer tidak aktif' ? 'selected' : ''}>Customer tidak aktif</option>
+            <option value="Customer tidak diangkat" ${c.remarks === 'Customer tidak diangkat' ? 'selected' : ''}>Customer tidak diangkat</option>
+            <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>SPK berhasil</option>
           </select>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#64748b;">
             <span>FU: <strong id="tbl_status_txt_${c.id}" style="color:${c.sales_fu_status === 'Closed' ? '#ef4444' : '#2563eb'};">${c.sales_fu_status || 'Open'}</strong></span>
@@ -1942,10 +1938,10 @@ async function openWhatsAppModal(customerId) {
           <div style="margin-bottom:8px;">
             <div style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px;">Klik tag untuk menyisipkan variabel otomatis:</div>
             <div style="display:flex; flex-wrap:wrap; gap:3px;">
-              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertVariableToWA('{nama_sales}')">👤 {nama_sales}</button>
+              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertVariableToWA('{nama_sales}')">{nama_sales}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{nama_customer}')">{nama_customer}</button>
-              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertVariableToWA('{mobil_saat_ini}')" title="Mobil yang dimiliki customer saat ini (cth: Avanza)">🚗 {mobil_saat_ini}</button>
-              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertVariableToWA('{model_rekomendasi}')" title="Target upgrade TAM (cth: Hilux / Rush)">🎯 {model_rekomendasi}</button>
+              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertVariableToWA('{mobil_saat_ini}')" title="Mobil yang dimiliki customer saat ini (cth: Avanza)">{mobil_saat_ini}</button>
+              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertVariableToWA('{model_rekomendasi}')" title="Target upgrade TAM (cth: Hilux / Rush)">{model_rekomendasi}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{usia_kendaraan}')">{usia_kendaraan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{kecamatan}')">{kecamatan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertVariableToWA('{dealer}')">{dealer}</button>
@@ -1972,9 +1968,9 @@ async function openWhatsAppModal(customerId) {
           <div class="form-group" style="margin-bottom:12px;">
             <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:3px; display:block;">Perbarui Status Setelah Kirim:</label>
             <select class="form-control" id="waNextStatus" style="font-size:12px; font-weight:700; border-radius:8px; padding:6px 10px;">
-              <option value="Menunggu Respon" selected>🟡 Menunggu Respon</option>
-              <option value="Tertarik / Jadwal Servis">🔵 Tertarik / Jadwal Servis</option>
-              <option value="Deal / Selesai">🟢 Deal / Selesai</option>
+              <option value="Menunggu Respon" selected>Menunggu Respon</option>
+              <option value="Tertarik / Jadwal Servis">Tertarik / Jadwal Servis</option>
+              <option value="Deal / Selesai">Deal / Selesai</option>
             </select>
           </div>
 
@@ -2045,7 +2041,7 @@ function renderTemplateDropdownOptions(preferredId = null) {
   // 1. Group: Template Standar Toyota
   if (defaultTemplates.length > 0) {
     const groupStd = document.createElement('optgroup');
-    groupStd.label = '📋 Template Standar Toyota';
+    groupStd.label = 'Template Standar Toyota';
     defaultTemplates.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
@@ -2059,11 +2055,11 @@ function renderTemplateDropdownOptions(preferredId = null) {
   // 2. Group: Template Kustom Sales
   if (customTemplates.length > 0) {
     const groupCust = document.createElement('optgroup');
-    groupCust.label = '⭐ Template Kustom Anda';
+    groupCust.label = 'Template Kustom Anda';
     customTemplates.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
-      opt.textContent = `⭐ ${t.title} ${t.created_by ? `(${t.created_by})` : ''}`;
+      opt.textContent = `${t.title} ${t.created_by ? `(${t.created_by})` : ''}`;
       if (String(t.id) === String(selectedId)) opt.selected = true;
       groupCust.appendChild(opt);
     });
@@ -2073,7 +2069,7 @@ function renderTemplateDropdownOptions(preferredId = null) {
   // 3. Option to create new custom template
   const optNew = document.createElement('option');
   optNew.value = 'NEW_CUSTOM';
-  optNew.textContent = '➕ + Buat Template Kustom Baru...';
+  optNew.textContent = '+ Buat Template Kustom Baru...';
   optNew.style.fontWeight = '800';
   optNew.style.color = '#10b981';
   tmplSelect.appendChild(optNew);
@@ -2273,7 +2269,7 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
               <i class="fa-solid fa-star"></i> Template Kustom Pribadi
             </div>
             <h3 style="font-size:17px; font-weight:900; color:#0d1b3e; margin:0;">
-              ${editId ? '✏️ Edit Template WhatsApp' : '➕ Buat Template WhatsApp Kustom'}
+              ${editId ? 'Edit Template WhatsApp' : 'Buat Template WhatsApp Kustom'}
             </h3>
           </div>
           <button class="btn-close-modal" onclick="closeCustomTemplateModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -2289,12 +2285,12 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
             <div>
               <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Kategori Template</label>
               <select id="custTmplCategory" class="fu-select" style="font-size:12px; padding:7px 10px;">
-                <option value="promo" ${editCategory === 'promo' ? 'selected' : ''}>🔥 Promo &amp; Diskon</option>
-                <option value="tradein" ${editCategory === 'tradein' ? 'selected' : ''}>🔄 Trade-In / Upgrade</option>
-                <option value="csat" ${editCategory === 'csat' ? 'selected' : ''}>🥰 CSAT &amp; Tanya Kabar</option>
-                <option value="servis" ${editCategory === 'servis' ? 'selected' : ''}>🔧 Servis &amp; Bengkel</option>
-                <option value="stnk" ${editCategory === 'stnk' ? 'selected' : ''}>📄 STNK &amp; Pajak</option>
-                <option value="kustom" ${editCategory === 'kustom' ? 'selected' : ''}>✨ Follow Up Kustom</option>
+                <option value="promo" ${editCategory === 'promo' ? 'selected' : ''}>Promo &amp; Diskon</option>
+                <option value="tradein" ${editCategory === 'tradein' ? 'selected' : ''}>Trade-In / Upgrade</option>
+                <option value="csat" ${editCategory === 'csat' ? 'selected' : ''}>CSAT &amp; Tanya Kabar</option>
+                <option value="servis" ${editCategory === 'servis' ? 'selected' : ''}>Servis &amp; Bengkel</option>
+                <option value="stnk" ${editCategory === 'stnk' ? 'selected' : ''}>STNK &amp; Pajak</option>
+                <option value="kustom" ${editCategory === 'kustom' ? 'selected' : ''}>Follow Up Kustom</option>
               </select>
             </div>
           </div>
@@ -2303,10 +2299,10 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
           <div style="margin-bottom:8px;">
             <div style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px;">Klik tag untuk menyisipkan variabel otomatis ke template:</div>
             <div style="display:flex; flex-wrap:wrap; gap:3px;">
-              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertTagToCustomTmpl('{nama_sales}')">👤 {nama_sales}</button>
+              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertTagToCustomTmpl('{nama_sales}')">{nama_sales}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToCustomTmpl('{nama_customer}')">{nama_customer}</button>
-              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertTagToCustomTmpl('{mobil_saat_ini}')">🚗 {mobil_saat_ini}</button>
-              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertTagToCustomTmpl('{model_rekomendasi}')">🎯 {model_rekomendasi}</button>
+              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertTagToCustomTmpl('{mobil_saat_ini}')">{mobil_saat_ini}</button>
+              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertTagToCustomTmpl('{model_rekomendasi}')">{model_rekomendasi}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToCustomTmpl('{usia_kendaraan}')">{usia_kendaraan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToCustomTmpl('{kecamatan}')">{kecamatan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToCustomTmpl('{dealer}')">{dealer}</button>
@@ -2318,7 +2314,7 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
             <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Isi Pesan Template *</label>
             <textarea id="custTmplContent" required class="form-control" rows="6" style="font-size:12px; line-height:1.5; font-family:inherit; border-radius:10px;" placeholder="Ketik format pesan WhatsApp...">${escapeHtml(defaultContent)}</textarea>
             <div style="font-size:11px; color:#64748b; margin-top:4px;">
-              💡 <em>Variabel di dalam kurung kurawal seperti {nama_customer} akan otomatis digantikan sesuai data prospek saat dikirim.</em>
+              <i class="fa-solid fa-circle-info"></i> <em>Variabel di dalam kurung kurawal seperti {nama_customer} akan otomatis digantikan sesuai data prospek saat dikirim.</em>
             </div>
           </div>
 
@@ -2434,7 +2430,7 @@ function openTemplateManagerModalSales() {
           <div style="display:flex; align-items:center; gap:6px;">
             <strong style="font-size:13px; color:#0f172a;">${escapeHtml(t.title)}</strong>
             <span style="font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; ${isCustom ? 'background:#dcfce7; color:#15803d;' : 'background:#eff6ff; color:#1d4ed8;'}">
-              ${isCustom ? `⭐ Kustom (${t.created_by || 'Sales'})` : '🔒 Standar Toyota'}
+              ${isCustom ? `Kustom (${t.created_by || 'Sales'})` : 'Standar Toyota'}
             </span>
           </div>
           ${isCustom ? `
@@ -3092,10 +3088,10 @@ function renderAutoBlastSetupView() {
     <!-- Mode Switcher Tabs -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; background:#f1f5f9; padding:4px; border-radius:14px;">
       <button type="button" class="btn-fu" style="padding:9px 12px; font-size:12px; font-weight:800; border-radius:10px; justify-content:center; border:none; cursor:pointer; ${autoBlastState.mode === 'background' ? 'background:#059669; color:#ffffff; box-shadow:0 2px 8px rgba(5,150,105,0.3);' : 'background:transparent; color:#475569;'}" onclick="switchBlastMode('background')">
-        <i class="fa-solid fa-paper-plane"></i> 100% Background Otomatis (Gateway)
+        <i class="fa-solid fa-paper-plane"></i> 🚀 100% Background Otomatis (Gateway)
       </button>
       <button type="button" class="btn-fu" style="padding:9px 12px; font-size:12px; font-weight:800; border-radius:10px; justify-content:center; border:none; cursor:pointer; ${autoBlastState.mode === 'queue' ? 'background:#2563eb; color:#ffffff; box-shadow:0 2px 8px rgba(37,99,235,0.3);' : 'background:transparent; color:#475569;'}" onclick="switchBlastMode('queue')">
-        <i class="fa-brands fa-whatsapp"></i> Antrean WhatsApp Web (Manual)
+        <i class="fa-brands fa-whatsapp"></i> 📲 Antrean WhatsApp Web (Manual)
       </button>
     </div>
 
@@ -3109,14 +3105,14 @@ function renderAutoBlastSetupView() {
           <div>
             <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.3px;">Nomor Pengirim (Akun Sales):</div>
             <div style="font-size:13.5px; font-weight:900; color:#0f172a;">
-              ${escapeHtml(salesName)} 
+              ${escapeHtml(salesName)}
               ${autoBlastState.gatewaySenderPhone ? `<span style="color:#059669; font-weight:800; font-size:12px;">(${escapeHtml(autoBlastState.gatewaySenderPhone)})</span>` : ''}
             </div>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          ${hasToken 
-            ? `<span style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-check"></i> Gateway Aktif (${escapeHtml(autoBlastState.gatewayProvider.toUpperCase())})</span>` 
+          ${hasToken
+            ? `<span style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-check"></i> Gateway Aktif (${escapeHtml(autoBlastState.gatewayProvider.toUpperCase())})</span>`
             : `<span style="font-size:11px; font-weight:800; background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-exclamation"></i> Token Belum Diset</span>`
           }
           <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px; border-radius:8px;" onclick="toggleGatewayConfigBox()">
@@ -3128,7 +3124,7 @@ function renderAutoBlastSetupView() {
       <!-- Config Drawer (Token & Provider Input per Sales) -->
       <div id="gatewayConfigDrawer" style="display:${autoBlastState.isConfigOpen ? 'block' : 'none'}; margin-top:12px; padding-top:12px; border-top:1px dashed #cbd5e1;">
         <div style="font-size:12px; font-weight:800; color:#1e293b; margin-bottom:6px;">
-          <i class="fa-solid fa-key"></i> Pengaturan Token WA Gateway Anda (${escapeHtml(salesName)}):
+          🔑 Pengaturan Token WA Gateway Anda (${escapeHtml(salesName)}):
         </div>
         <p style="font-size:11px; color:#64748b; margin:0 0 8px;">
           Pesan blast akan dikirim dari nomor WA sales yang terhubung dengan token ini (Daftar &amp; scan QR di <strong>fonnte.com</strong> atau <strong>wablas.com</strong>).
@@ -3154,19 +3150,19 @@ function renderAutoBlastSetupView() {
       </label>
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:8px;">
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'belum_fu' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('belum_fu')">
-          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-hourglass-half"></i> Belum Di-Follow Up</div>
+          <div style="font-weight:800; font-size:12px;">⚪ Belum Di-Follow Up</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countBelum} Data Target</div>
         </button>
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'respon' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('respon')">
-          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-clock"></i> Menunggu Respon</div>
+          <div style="font-weight:800; font-size:12px;">🟡 Menunggu Respon</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countRespon} Data Target</div>
         </button>
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'current_filter' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('current_filter')">
-          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-filter"></i> Filter Saat Ini</div>
+          <div style="font-weight:800; font-size:12px;">🎯 Filter Saat Ini</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countFiltered} Data Target</div>
         </button>
         <button type="button" class="btn-fu ${autoBlastState.targetFilter === 'all' ? 'btn-fu-emerald' : 'btn-fu-secondary'}" style="padding:9px 12px; font-size:11.5px; border-radius:12px; text-align:left; flex-direction:column; align-items:flex-start;" onclick="setBlastTargetFilter('all')">
-          <div style="font-weight:800; font-size:12px;"><i class="fa-solid fa-database"></i> Semua Database</div>
+          <div style="font-weight:800; font-size:12px;">📋 Semua Database</div>
           <div style="font-size:11px; opacity:0.85; margin-top:2px;">${countAll} Data Total</div>
         </button>
       </div>
@@ -3194,7 +3190,7 @@ function renderAutoBlastSetupView() {
           <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Contoh Pesan (Data: <strong>${escapeHtml(sampleCust.name)}</strong>):
         </span>
         <span style="font-size:11px; color:#059669; font-weight:700; background:#ecfdf5; padding:2px 8px; border-radius:6px; border:1px solid #a7f3d0;">
-          <i class="fa-solid fa-check"></i> Variabel Terisi Otomatis
+          ✓ Variabel Terisi Otomatis
         </span>
       </div>
       <div style="background:#efeae2; border-radius:14px; padding:12px 14px; border:1px solid #cbd5e1; max-height:140px; overflow-y:auto;">
@@ -3216,12 +3212,12 @@ function renderAutoBlastSetupView() {
       ${autoBlastState.mode === 'background'
         ? `
           <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:900; border-radius:12px; box-shadow:0 6px 18px rgba(16,185,129,0.35); border:none; cursor:pointer;" onclick="startBackgroundAutoBlast()">
-            <i class="fa-solid fa-paper-plane"></i> Kirim Otomatis Background (${currentCount} Customer)
+            <i class="fa-solid fa-paper-plane"></i> Kirim Otomatis Background (${currentCount} Customer) 🚀
           </button>
         `
         : `
           <button type="button" class="btn-fu" style="background:linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color:#ffffff; padding:11px 22px; font-size:13px; font-weight:900; border-radius:12px; box-shadow:0 6px 18px rgba(37,99,235,0.35); border:none; cursor:pointer;" onclick="startAutoBlastQueue()">
-            <i class="fa-solid fa-play"></i> Mulai Antrean WA Web (${currentCount} Customer)
+            <i class="fa-solid fa-play"></i> Mulai Antrean WA Web (${currentCount} Customer) 📲
           </button>
         `
       }
@@ -3300,7 +3296,7 @@ function renderBackgroundBlastRunningView() {
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#10b981; animation:pulse 1.5s infinite;"></span>
           <span style="font-size:13px; font-weight:900; color:#0f172a;" id="blastLiveStatusTitle">
-            ${autoBlastState.isPaused ? '⏸️ Pengiriman Dijeda' : '🚀 Mengirim Otomatis di Latar Belakang...'}
+            ${autoBlastState.isPaused ? 'Pengiriman Dijeda' : 'Mengirim Otomatis di Latar Belakang...'}
           </span>
         </div>
         <div style="font-size:13px; font-weight:900; color:#059669;" id="blastLivePercent">${percent}%</div>
@@ -3312,7 +3308,7 @@ function renderBackgroundBlastRunningView() {
 
       <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#64748b; font-weight:700;">
         <span>Progress: <strong id="blastLiveCount" style="color:#0f172a;">${currIdx}</strong> / <strong>${total}</strong> Customer</span>
-        <span>✓ Sukses: <strong id="blastLiveSent" style="color:#059669;">${autoBlastState.totalSent}</strong> | ✗ Gagal: <strong id="blastLiveFailed" style="color:#dc2626;">${autoBlastState.totalFailed}</strong></span>
+        <span>Sukses: <strong id="blastLiveSent" style="color:#059669;">${autoBlastState.totalSent}</strong> | Gagal: <strong id="blastLiveFailed" style="color:#dc2626;">${autoBlastState.totalFailed}</strong></span>
       </div>
     </div>
 
@@ -3328,7 +3324,7 @@ function renderBackgroundBlastRunningView() {
         </div>
       </div>
       <div style="font-size:11px; color:#059669; font-weight:700; margin-top:4px;" id="blastJedaNotice">
-        ⏳ Jeda aman anti-spam: <span id="blastJedaTimer">3</span> detik antar pesan...
+        <i class="fa-solid fa-shield-halved"></i> Jeda aman anti-spam: <span id="blastJedaTimer">3</span> detik antar pesan...
       </div>
     </div>
 
@@ -3339,7 +3335,7 @@ function renderBackgroundBlastRunningView() {
         <span style="font-size:10.5px; color:#64748b;">Pengirim: ${escapeHtml(salesName)}</span>
       </div>
       <div id="blastTerminalLogBox" style="background:#0f172a; color:#f8fafc; border-radius:12px; padding:12px; font-family:monospace; font-size:11px; max-height:160px; overflow-y:auto; line-height:1.6; border:1px solid #1e293b;">
-        <div style="color:#94a3b8;">[${new Date().toLocaleTimeString()}] 🚀 Mesin Blast dimulai via WhatsApp Gateway...</div>
+        <div style="color:#94a3b8;">[${new Date().toLocaleTimeString()}] Mesin Blast dimulai via WhatsApp Gateway...</div>
       </div>
     </div>
 
@@ -3382,17 +3378,17 @@ function togglePauseBackgroundBlast() {
   }
   if (title) {
     title.textContent = autoBlastState.isPaused
-      ? '⏸️ Pengiriman Dijeda'
-      : '🚀 Mengirim Otomatis di Latar Belakang...';
+      ? 'Pengiriman Dijeda'
+      : 'Mengirim Otomatis di Latar Belakang...';
   }
-  appendBlastTerminalLog(autoBlastState.isPaused ? '⏸️ Pengiriman dijeda oleh user.' : '▶️ Melanjutkan pengiriman...', 'info');
+  appendBlastTerminalLog(autoBlastState.isPaused ? 'Pengiriman dijeda oleh user.' : 'Melanjutkan pengiriman...', 'info');
 }
 
 function stopBackgroundBlast() {
   if (confirm('Apakah Anda yakin ingin menghentikan pengiriman blast?')) {
     autoBlastState.isStopped = true;
     autoBlastState.isSendingBackground = false;
-    appendBlastTerminalLog('⏹️ Pengiriman dihentikan oleh user.', 'error');
+    appendBlastTerminalLog('Pengiriman dihentikan oleh user.', 'error');
     renderBackgroundBlastCompletedView();
   }
 }
@@ -3638,8 +3634,8 @@ function renderAutoBlastRunnerView() {
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #f1f5f9; font-size:11.5px;">
-        <div>🚗 Mobil Saat Ini: <strong>${escapeHtml(lastCar)}</strong> ${c.car_age ? `(${escapeHtml(c.car_age)})` : ''}</div>
-        <div>🎯 Target Upgrade: <strong style="color:#d7123a;">${escapeHtml(recModel)}</strong></div>
+        <div>Mobil Saat Ini: <strong>${escapeHtml(lastCar)}</strong> ${c.car_age ? `(${escapeHtml(c.car_age)})` : ''}</div>
+        <div>Target Upgrade: <strong style="color:#d7123a;">${escapeHtml(recModel)}</strong></div>
       </div>
     </div>
 
@@ -3652,7 +3648,7 @@ function renderAutoBlastRunnerView() {
 
     <!-- Countdown & Big Action -->
     <div id="blastCountdownNotice" style="display:none; text-align:center; font-size:12px; font-weight:800; color:#059669; margin-bottom:10px;">
-      ⏳ Membuka customer berikutnya dalam <span id="blastCountSec" style="font-size:14px; color:#d7123a;">3</span> detik...
+      <i class="fa-solid fa-clock"></i> Membuka customer berikutnya dalam <span id="blastCountSec" style="font-size:14px; color:#d7123a;">3</span> detik...
     </div>
 
     <div style="margin-bottom:14px;">

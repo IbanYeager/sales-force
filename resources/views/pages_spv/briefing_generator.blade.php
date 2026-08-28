@@ -119,7 +119,7 @@
 
 <body>
   <div class="spv-shell">
-    
+
     <!-- SIDEBAR SPV -->
     <aside class="spv-sidebar">
       <div class="spv-brand-container">
@@ -167,15 +167,17 @@
       <!-- MODE SELECTION -->
       <div class="mode-tab-bar">
         <button class="mode-tab-btn active" id="btnModeMorning" onclick="switchBriefingMode('morning')">
+          <i class="fa-solid fa-sun"></i> 🌅 Morning Huddle &amp; Target Kickoff (Pagi)
           <i class="fa-solid fa-sun"></i> Morning Huddle &amp; Target Kickoff (Pagi)
         </button>
         <button class="mode-tab-btn" id="btnModeEvening" onclick="switchBriefingMode('evening')">
+          <i class="fa-solid fa-moon"></i> 🌆 Evening Closing &amp; Wrap-Up (Sore)
           <i class="fa-solid fa-moon"></i> Evening Closing &amp; Wrap-Up (Sore)
         </button>
       </div>
 
       <div class="brief-layout">
-        
+
         <!-- LEFT: INPUT BUILDER -->
         <div class="spv-card-modern">
           <h3 style="font-family:'Outfit',sans-serif; font-size:16px; font-weight:800; color:#0f172a; margin:0 0 14px;" id="panelTitle">
@@ -265,7 +267,7 @@
       currentMode = mode;
       document.getElementById('btnModeMorning').classList.toggle('active', mode === 'morning');
       document.getElementById('btnModeEvening').classList.toggle('active', mode === 'evening');
-      
+
       const extraBox = document.getElementById('eveningExtraBox');
       const panelTitle = document.getElementById('panelTitle');
 

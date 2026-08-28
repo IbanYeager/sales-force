@@ -82,7 +82,7 @@
 
 <body>
   <div class="mobile-app" style="max-width: 1100px;">
-    
+
     <!-- HEADER -->
     <header class="header-page" style="background:#0d1b3e;">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
@@ -90,7 +90,7 @@
     </header>
 
     <div class="container" style="margin-top:18px;">
-      
+
       <!-- HERO BANNER -->
       <div style="background:linear-gradient(135deg, #8b0519 0%, #d7123a 100%); border-radius:18px; padding:22px 24px; color:white; margin-bottom:20px; box-shadow:0 10px 25px rgba(215,18,58,0.25);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
@@ -110,10 +110,10 @@
       <!-- MAIN TABS -->
       <div class="battle-tab-nav">
         <button class="battle-tab-btn active" id="tabBtnObjection" onclick="switchBattleTab('objection')">
-          <i class="fa-solid fa-comments"></i> Menjawab Keberatan Customer (Objections)
+          <i class="fa-solid fa-comments"></i> 🥊 Menjawab Keberatan Customer (Objections)
         </button>
         <button class="battle-tab-btn" id="tabBtnVs" onclick="switchBattleTab('vs')">
-          <i class="fa-solid fa-scale-unbalanced-flip"></i> Battle Card vs Kompetitor
+          <i class="fa-solid fa-scale-unbalanced-flip"></i> 🚗 Battle Card vs Kompetitor
         </button>
       </div>
 
@@ -127,7 +127,7 @@
 
       <!-- SECTION 1: OBJECTION HANDLING ACCORDIONS -->
       <div id="sectionObjection" style="display:block;">
-        
+
         <!-- ITEM 1 -->
         <div class="objection-accordion battle-item">
           <div class="objection-trigger" onclick="toggleAccordion(this)">
@@ -222,7 +222,7 @@
 
       <!-- SECTION 2: BATTLE CARDS VS COMPETITORS -->
       <div id="sectionVs" style="display:none;">
-        
+
         <!-- CARD 1: INNOVA ZENIX vs HONDA CR-V / WULING CORTEZ -->
         <div class="battle-card-box battle-item">
           <div class="battle-header">
@@ -329,7 +329,7 @@
       const parent = el.parentElement;
       const answer = parent.querySelector('.objection-answer');
       const icon = el.querySelector('.fa-chevron-down') || el.querySelector('.fa-chevron-up');
-      
+
       if (answer.style.display === 'none' || !answer.style.display) {
         answer.style.display = 'block';
         if (icon) icon.className = 'fa-solid fa-chevron-up';

@@ -52,8 +52,9 @@
 
       // Sort wiraniaga by actual SPK realisasi DESC
       const sorted = [...data].sort((a, b) => (b.realisasi_spk_bulan - a.realisasi_spk_bulan));
-      const badges = ['🥇 Top Closer of the Month', '🥈 Fast Mover Award', '🥉 Active Sales Award'];
-      const trophyEmojis = ['🏆', '🥈', '🥉'];
+      const badges = ['Top Closer of the Month', 'Fast Mover Award', 'Active Sales Award'];
+      const trophyIcons = ['fa-trophy', 'fa-medal', 'fa-award'];
+      const trophyColors = ['#f59e0b', '#94a3b8', '#d97706'];
       const ranks = ['Rank 1', 'Rank 2', 'Rank 3'];
       const ranksBg = ['#d97706', '#64748b', '#b45309'];
       const borders = ['rgba(251,191,36,0.4)', 'rgba(148,163,184,0.3)', 'rgba(180,83,9,0.3)'];
@@ -67,10 +68,10 @@
         return `
           <div style="background:rgba(255,255,255,0.06); border:1px solid ${borders[i] || borders[1]}; border-radius:14px; padding:14px; text-align:center; position:relative;">
             <span style="position:absolute; top:-10px; right:10px; background:${ranksBg[i] || ranksBg[1]}; color:white; font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;">${ranks[i] || `Rank ${i+1}`}</span>
-            <div style="font-size:32px; margin-bottom:4px;">${trophyEmojis[i] || '⭐'}</div>
+            <div style="font-size:28px; margin-bottom:6px; color:${trophyColors[i] || '#f59e0b'};"><i class="fa-solid ${trophyIcons[i] || 'fa-trophy'}"></i></div>
             <h4 style="font-size:16px; font-weight:800; color:white; margin:0 0 2px;">${l.nama_sales}</h4>
             <p style="font-size:11px; color:${textColors[i] || '#cbd5e1'}; font-weight:700; margin:0 0 8px;">${actualSpk} / ${targetSpk} SPK Deal (${pct}% Target)</p>
-            <span style="background:rgba(255,255,255,0.1); color:${textColors[i] || '#cbd5e1'}; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${badges[i] || '⭐ Wiraniaga Active'}</span>
+            <span style="background:rgba(255,255,255,0.1); color:${textColors[i] || '#cbd5e1'}; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${badges[i] || 'Wiraniaga Active'}</span>
           </div>
         `;
       }).join('');
@@ -83,7 +84,7 @@
       
       if (filterSpvEl) {
         if (peran === 'Supervisor' || peran === 'SPV') {
-          filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>👑 Tim ${namaSpv}</option>`;
+          filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>Tim ${namaSpv}</option>`;
           filterSpvEl.disabled = true;
           filterSpvEl.style.background = '#f8fafc';
           filterSpvEl.style.cursor = 'default';
@@ -92,7 +93,7 @@
         } else {
           // Kepala Cabang / Branch Manager can see all teams
           filterSpvEl.innerHTML = `
-            <option value="Semua">👑 Semua Tim (Master - 46 Sales)</option>
+            <option value="Semua">Semua Tim (Master - 46 Sales)</option>
             <option value="Pak Ryan">Tim Pak Ryan</option>
             <option value="Pak Alvin">Tim Pak Alvin</option>
             <option value="Pak Riva">Tim Pak Riva</option>

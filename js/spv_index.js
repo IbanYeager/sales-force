@@ -255,7 +255,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
         resultCard.style.borderColor = '#bbf7d0';
         badge.style.background = '#dcfce7';
         badge.style.color = '#15803d';
-        badge.textContent = '🟢 Disetujui SPV';
+        badge.textContent = 'Disetujui SPV';
         profitText.style.color = '#15803d';
         profitText.textContent = `Profit Margin: OK (Sisa Plafond Rp ${(maxSpv - discount).toLocaleString('id-ID')})`;
         descText.textContent = `Nominal diskon Rp ${discount.toLocaleString('id-ID')} berada di dalam wewenang SPV (Max: Rp ${maxSpv.toLocaleString('id-ID')}).`;
@@ -264,7 +264,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
         resultCard.style.borderColor = '#fecdd3';
         badge.style.background = '#ffe4e6';
         badge.style.color = '#be123c';
-        badge.textContent = '🟡 Butuh Approval Kacab';
+        badge.textContent = 'Butuh Approval Kacab';
         profitText.style.color = '#be123c';
         profitText.textContent = `Over Plafond: +Rp ${(discount - maxSpv).toLocaleString('id-ID')}`;
         descText.textContent = `Diskon melebihi batas SPV (Max: Rp ${maxSpv.toLocaleString('id-ID')}). Memerlukan persetujuan Kepala Cabang.`;
@@ -323,7 +323,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
           if (leaders.length === 0) {
             lbContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8; font-size:12px;">Belum ada wiraniaga di bawah naungan SPV ini. Tambahkan wiraniaga di menu Wiraniaga.</div>';
           } else {
-            const badges = ['🥇 Top Closer', '🥈 Fast Mover', '🥉 Active Sales', '⭐ Wiraniaga'];
+            const badges = ['Top Closer', 'Fast Mover', 'Active Sales', 'Wiraniaga'];
             const grads = [
               'linear-gradient(135deg, #f59e0b, #d97706)',
               'linear-gradient(135deg, #94a3b8, #64748b)',
@@ -537,7 +537,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
         container.innerHTML = salesList.map(s => {
           const isZeroInput = s.status === 'Tidak Aktif';
           const badgeClass = isZeroInput ? 'background:#ffe4e6; color:#be123c;' : 'background:#dcfce7; color:#15803d;';
-          const badgeLabel = isZeroInput ? '🔴 Belum Ada Input Hari Ini' : '🟢 Aktivitas Ter-Input';
+          const badgeLabel = isZeroInput ? 'Belum Ada Input Hari Ini' : 'Aktivitas Ter-Input';
 
           return `
             <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:8px;">

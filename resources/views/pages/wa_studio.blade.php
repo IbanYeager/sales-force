@@ -109,7 +109,7 @@
           <i class="fa-solid fa-robot" style="color: #c8102e;"></i> T-STOCK AI WhatsApp Bot &amp; Webhook
         </button>
         <button id="tabBtnSentinel" class="wa-tab-btn" onclick="switchWaTab('sentinel')" style="padding: 10px 18px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: #f1f5f9; color: #475569; transition: all 0.2s;">
-          <i class="fa-solid fa-shield-halved" style="color: #4f46e5;"></i> AI Sentinel: Laporan 5-Harian Kacab
+          <i class="fa-solid fa-shield-halved" style="color: #4f46e5;"></i> 🤖 AI Sentinel: Laporan 5-Harian Kacab
         </button>
       </div>
 
@@ -118,7 +118,7 @@
         <!-- Left: Category List -->
         <div>
           <div style="font-size:11.5px; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Pilih Template Skrip Pesan:</div>
-          
+
           <div class="template-card active" onclick="selectWaTemplate('followup_testdrive')">
             <div style="font-weight:800; color:#0f172a; font-size:13px;"><i class="fa-solid fa-car" style="color:#0284c7; margin-right:6px;"></i> Follow-Up Test Drive</div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">Tanyakan impresi konsumen H+1 setelah mencoba unit</div>
@@ -195,7 +195,7 @@
       <!-- TAB 2: T-STOCK AI WHATSAPP BOT & WEBHOOK -->
       <div id="sectionAiBot" style="display: none;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
-          
+
           <!-- Left: Webhook URL & Gateway Setup -->
           <div style="background: white; border-radius: 20px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(15,23,42,0.04);">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">

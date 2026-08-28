@@ -58,7 +58,7 @@ let listDataWiraniaga = [];
       
       if (filterSpvEl) {
         if (peran === 'Supervisor' || peran === 'SPV') {
-          filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>👑 Tim ${namaSpv}</option>`;
+          filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>Tim ${namaSpv}</option>`;
           filterSpvEl.disabled = true;
           filterSpvEl.style.background = '#f8fafc';
           filterSpvEl.style.cursor = 'default';
@@ -68,7 +68,7 @@ let listDataWiraniaga = [];
         } else {
           // Kepala Cabang / Branch Manager can see all teams
           filterSpvEl.innerHTML = `
-            <option value="Semua">👑 Semua Tim (Master - 46 Sales)</option>
+            <option value="Semua">Semua Tim (Master - 46 Sales)</option>
             <option value="Pak Ryan">Tim Pak Ryan</option>
             <option value="Pak Alvin">Tim Pak Alvin</option>
             <option value="Pak Riva">Tim Pak Riva</option>
@@ -484,13 +484,13 @@ let listDataWiraniaga = [];
 
       let advice = `Rekomendasi Coaching SPV untuk <strong>${nama}</strong>:<br><br>`;
       if (rate === '80%') {
-        advice += `🌟 <strong>Top Performer!</strong> Pertahankan performa luar biasa ini. Disarankan libatkan ${nama} sebagai mentor simulasi objection handling bagi wiraniaga junior.`;
+        advice += `<strong>Top Performer!</strong> Pertahankan performa luar biasa ini. Disarankan libatkan ${nama} sebagai mentor simulasi objection handling bagi wiraniaga junior.`;
       } else if (rate === '60%') {
-        advice += `🚀 <strong>Performa Sangat Baik.</strong> Penjualan di segmen MPV & SUV sangat kuat. SPV disarankan memberikan prioritas alokasi leads segmen Innova Zenix / Veloz.`;
+        advice += `<strong>Performa Sangat Baik.</strong> Penjualan di segmen MPV & SUV sangat kuat. SPV disarankan memberikan prioritas alokasi leads segmen Innova Zenix / Veloz.`;
       } else if (rate === '20%') {
-        advice += `⚡ <strong>Perlu Pendampingan Closing (Co-Closing).</strong> Prospeksi & aktivitas harian sudah baik, namun tahap penutupan kesepakatan perlu dibantu. Jadwalkan dampingan kunjungan bersama SPV minggu ini.`;
+        advice += `<strong>Perlu Pendampingan Closing (Co-Closing).</strong> Prospeksi & aktivitas harian sudah baik, namun tahap penutupan kesepakatan perlu dibantu. Jadwalkan dampingan kunjungan bersama SPV minggu ini.`;
       } else {
-        advice += `📈 <strong>Prospek Stabil.</strong> Pertahankan konsistensi follow-up dan ingatkan pencatatan aktivitas secara harian di Sales App.`;
+        advice += `<strong>Prospek Stabil.</strong> Pertahankan konsistensi follow-up dan ingatkan pencatatan aktivitas secara harian di Sales App.`;
       }
 
       document.getElementById('coachingAdviceBody').innerHTML = advice;

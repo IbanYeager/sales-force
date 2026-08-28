@@ -147,7 +147,7 @@
         <div class="fu-toolbar-left">
           <!-- Hidden File Input for Excel Import -->
           <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display:none;" onchange="handleExcelUpload(this)">
-          
+
           <button class="btn-fu btn-fu-emerald" onclick="document.getElementById('excelFileInput').click()">
             <i class="fa-solid fa-file-excel"></i> Impor Excel / CSV
           </button>
@@ -224,12 +224,12 @@
         <div>
           <select id="filterStatusSelect" class="fu-select" onchange="masterState.filters.status = this.value; loadMasterCustomers();">
             <option value="all">Semua Status Follow Up</option>
-            <option value="belum_fu">Belum Di-Follow Up</option>
-            <option value="sudah_fu">Sudah Di-Follow Up (Semua)</option>
-            <option value="Menunggu Respon">Menunggu Respon</option>
-            <option value="Tertarik / Jadwal Servis">Tertarik / Servis</option>
-            <option value="Deal / Selesai">Deal / Selesai</option>
-            <option value="Tidak Tertarik">Tidak Tertarik</option>
+            <option value="belum_fu">⚪ Belum Di-Follow Up</option>
+            <option value="sudah_fu">✅ Sudah Di-Follow Up (Semua)</option>
+            <option value="Menunggu Respon">🟡 Menunggu Respon</option>
+            <option value="Tertarik / Jadwal Servis">🔵 Tertarik / Servis</option>
+            <option value="Deal / Selesai">🟢 Deal / Selesai</option>
+            <option value="Tidak Tertarik">🔴 Tidak Tertarik</option>
           </select>
         </div>
 

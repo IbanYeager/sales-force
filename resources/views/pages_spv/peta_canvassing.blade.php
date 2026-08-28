@@ -91,7 +91,7 @@
 
 <body>
   <div class="spv-shell">
-    
+
     <!-- SIDEBAR SPV -->
     <aside class="spv-sidebar">
       <div class="spv-brand-container">
@@ -137,11 +137,14 @@
       </div>
 
       <div class="heatmap-layout">
-        
+
         <!-- LEFT: LEAFLET MAP -->
         <div class="map-container-box">
           <div class="floating-layer-bar">
             <span style="font-size:11px; font-weight:800; color:#475569; margin-right:4px;">Filter Zona:</span>
+            <button class="layer-badge layer-red" onclick="filterMapZone('red')">🔴 Potensial Tinggi</button>
+            <button class="layer-badge layer-gold" onclick="filterMapZone('gold')">🟡 Basis Kuat</button>
+            <button class="layer-badge layer-blue" onclick="filterMapZone('blue')">🔵 Komersial/Fleet</button>
             <button class="layer-badge layer-red" onclick="filterMapZone('red')"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Potensial Tinggi</button>
             <button class="layer-badge layer-gold" onclick="filterMapZone('gold')"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Basis Kuat</button>
             <button class="layer-badge layer-blue" onclick="filterMapZone('blue')"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Komersial/Fleet</button>
@@ -155,6 +158,7 @@
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
             <div>
               <span id="zoneBadge" style="font-size:10.5px; font-weight:800; background:#fee2e2; color:#b91c1c; padding:3px 10px; border-radius:20px; text-transform:uppercase;">
+                🔴 Zona Prioritas Canvassing
                 Zona Prioritas Canvassing
               </span>
               <h3 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:800; color:#0f172a; margin:8px 0 2px;" id="zoneTitle">
@@ -281,14 +285,17 @@
 
       const badge = document.getElementById('zoneBadge');
       if (z.type === 'red') {
+        badge.innerText = '🔴 Zona Prioritas Canvassing';
         badge.innerText = 'Zona Prioritas Canvassing';
         badge.style.background = '#fee2e2';
         badge.style.color = '#b91c1c';
       } else if (z.type === 'gold') {
+        badge.innerText = '🟡 Zona Basis Kuat Toyota';
         badge.innerText = 'Zona Basis Kuat Toyota';
         badge.style.background = '#fef3c7';
         badge.style.color = '#b45309';
       } else {
+        badge.innerText = '🔵 Zona Komersial & Fleet';
         badge.innerText = 'Zona Komersial & Fleet';
         badge.style.background = '#dbeafe';
         badge.style.color = '#1d4ed8';

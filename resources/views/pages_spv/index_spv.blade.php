@@ -134,9 +134,11 @@
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn" style="background:#25D366; color:white; font-weight:700; border:none; padding:10px 18px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="location.href='briefing_generator.html'">
+              <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> 📢 Briefing Auto-Gen
               <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Briefing Auto-Gen
             </button>
             <button class="btn" style="background:rgba(255,255,255,0.12); color:white; font-weight:700; border:1px solid rgba(255,255,255,0.2); padding:10px 18px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="openDiscountCalcModal()">
+              <i class="fa-solid fa-calculator"></i> 🏷️ Approval Diskon Desk
               <i class="fa-solid fa-calculator"></i> Approval Diskon Desk
             </button>
           </div>
@@ -255,7 +257,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
           <div>
             <h3 style="font-size:16px; font-weight:800; color:#9f1239; margin:0 0 2px; display:flex; align-items:center; gap:8px;">
-              <i class="fa-solid fa-bell" style="color:#e11d48; animation: swing 2s infinite;"></i> 
+              <i class="fa-solid fa-bell" style="color:#e11d48; animation: swing 2s infinite;"></i>
               Early Warning Checklist &amp; Tugas SPV Hari Ini
             </h3>
             <p style="font-size:12px; color:#be123c; margin:0;">Pastikan tidak ada janji temu, penyerahan unit, atau follow-up sales yang terlewat hari ini.</p>
@@ -356,9 +358,9 @@
         <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin:0;"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Auto-Briefing Generator SPV</h3>
         <button onclick="closeBriefingModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#64748b;">&times;</button>
       </div>
-      
+
       <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Pesan briefing otomatis yang sudah dirangkum berdasarkan aktivitas dan pencapaian tim SPV Anda saat ini:</p>
-      
+
       <textarea id="briefingTextarea" rows="12" style="width:100%; border:1.5px solid #cbd5e1; border-radius:12px; padding:14px; font-family:monospace; font-size:12px; color:#334155; line-height:1.5; background:#f8fafc; resize:vertical;"></textarea>
 
       <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end; flex-wrap:wrap;">
@@ -435,6 +437,10 @@
         <div>
           <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Pilih Template Instruksi SPV</label>
           <select id="nudgeTemplateSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1; font-weight:600;" onchange="applyNudgeTemplate()">
+            <option value="activity_warning">🔴 Teguran Input Aktivitas Harian</option>
+            <option value="followup_prospect">📌 Instruksi Follow-Up Prospek Tertunda</option>
+            <option value="spk_target">🔥 Pendorong Target SPK Pekan Ini</option>
+            <option value="custom">✏️ Tulis Pesan Instruksi Kustom</option>
             <option value="activity_warning">Teguran Input Aktivitas Harian</option>
             <option value="followup_prospect">Instruksi Follow-Up Prospek Tertunda</option>
             <option value="spk_target">Pendorong Target SPK Pekan Ini</option>
