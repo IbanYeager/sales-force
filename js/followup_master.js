@@ -1095,6 +1095,195 @@ async function sendTaskNotificationToSales(salesId) {
 }
 
 // -------------------------------------------------------------
+// RECALL ALL DATABASES FROM A SPECIFIC SALES MODAL
+// -------------------------------------------------------------
+function openRecallBySalesModal(preselectedSalesId = null) {
+  let modal = document.getElementById('modalRecallBySales');
+  if (!modal) {
+    const html = `
+      <div class="modal-overlay" id="modalRecallBySales" onclick="closeRecallBySalesModal()">
+        <div class="modal-content" style="max-width:520px; border-radius:18px; padding:24px;" onclick="event.stopPropagation()">
+          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:18px;">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:6px; background:#fff7ed; color:#c2410c; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px; border:1px solid #fed7aa;">
+                <i class="fa-solid fa-user-xmark"></i> Batal Bagi Database per Sales
+              </div>
+              <h3 style="font-size:18px; font-weight:900; color:#0f172a; margin:0;">Tarik Semua Database Sales</h3>
+            </div>
+            <button class="btn-close-modal" onclick="closeRecallBySalesModal()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:12.5px; color:#64748b; line-height:1.5; margin-bottom:16px;">
+              Pilih wiraniaga di bawah ini untuk <strong>menarik &amp; membatalkan seluruh database</strong> yang sedang dibagikan kepadanya. Seluruh database yang ditarik akan dikembalikan ke status <em>"Belum Ditugaskan / Pool Rebutan"</em>.
+            </p>
+
+            <div class="form-group-fu" style="margin-bottom:14px;">
+              <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Pilih Sales Wiraniaga:</label>
+              <select id="recallSalesSelect" class="fu-select" style="width:100%; font-size:13px; font-weight:700; padding:10px 14px;" onchange="updateRecallSalesInfo()">
+                <option value="">-- Pilih Sales Target --</option>
+              </select>
+            </div>
+
+            <!-- Info Preview Box -->
+            <div id="recallSalesInfoBox" style="display:none; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:12px 14px; margin-bottom:14px;">
+              <div style="font-size:11.5px; color:#64748b; margin-bottom:4px;">Total Database yang Sedang Dipegang:</div>
+              <div style="font-size:16px; font-weight:900; color:#0f172a;" id="recallSalesCountText">0 Customer</div>
+              <div style="font-size:11px; color:#b45309; margin-top:3px;" id="recallSalesPendingText">0 Belum di-FU</div>
+            </div>
+
+            <div class="form-group-fu" style="margin-bottom:18px;">
+              <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:8px; display:block;">Cakupan Database yang Ditarik:</label>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; cursor:pointer;">
+                  <input type="radio" name="recallScope" value="all" checked style="accent-color:#d7123a; width:16px; height:16px;">
+                  <div>
+                    <strong style="display:block;">Tarik Seluruh Database (Semua Status)</strong>
+                    <span style="font-size:11px; color:#64748b;">Membatalkan seluruh database customer yang dipegang sales ini.</span>
+                  </div>
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; cursor:pointer;">
+                  <input type="radio" name="recallScope" value="pending" style="accent-color:#d7123a; width:16px; height:16px;">
+                  <div>
+                    <strong style="display:block;">Hanya yang Belum Di-Follow Up</strong>
+                    <span style="font-size:11px; color:#64748b;">Hanya menarik customer yang statusnya masih Belum Dihubungi (tidak mengganggu yang sudah deal/proses).</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn-fu" style="flex:1; justify-content:center; padding:12px; background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color:#fff !important; font-weight:800; font-size:13px; border:none; box-shadow:0 4px 14px rgba(234,88,12,0.35);" onclick="executeRecallBySales()">
+              <i class="fa-solid fa-user-xmark"></i> Tarik &amp; Batalkan Semua
+            </button>
+            <button type="button" class="btn-fu btn-fu-secondary" style="padding:12px 18px;" onclick="closeRecallBySalesModal()">
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+    modal = document.getElementById('modalRecallBySales');
+  }
+
+  // Populate sales dropdown
+  const select = document.getElementById('recallSalesSelect');
+  select.innerHTML = '<option value="">-- Pilih Sales Target --</option>';
+  masterState.salesList.forEach(s => {
+    select.innerHTML += `<option value="${s.id}" ${preselectedSalesId && String(s.id) === String(preselectedSalesId) ? 'selected' : ''}>${s.name} (${s.total_customers || 0} Customer)</option>`;
+  });
+
+  updateRecallSalesInfo();
+
+  modal.classList.add('active');
+  modal.classList.add('show');
+  modal.style.display = 'flex';
+}
+
+function closeRecallBySalesModal() {
+  const modal = document.getElementById('modalRecallBySales');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  }
+}
+
+function updateRecallSalesInfo() {
+  const select = document.getElementById('recallSalesSelect');
+  const infoBox = document.getElementById('recallSalesInfoBox');
+  const countText = document.getElementById('recallSalesCountText');
+  const pendingText = document.getElementById('recallSalesPendingText');
+  
+  if (!select || !infoBox) return;
+  const salesId = select.value;
+  if (!salesId) {
+    infoBox.style.display = 'none';
+    return;
+  }
+
+  const s = masterState.salesList.find(x => String(x.id) === String(salesId));
+  if (s) {
+    infoBox.style.display = 'block';
+    countText.textContent = `${s.total_customers || 0} Data Customer`;
+    pendingText.textContent = `${s.pending_customers || 0} Customer Belum Dihubungi`;
+  }
+}
+
+async function executeRecallBySales() {
+  const select = document.getElementById('recallSalesSelect');
+  const salesId = select.value;
+  if (!salesId) {
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Pilih Sales', 'Silakan pilih wiraniaga target yang ingin ditarik datanya.', 'warning');
+    } else {
+      alert('Pilih wiraniaga target terlebih dahulu.');
+    }
+    return;
+  }
+
+  const s = masterState.salesList.find(x => String(x.id) === String(salesId));
+  const salesName = s ? s.name : 'Sales';
+  const scopeEl = document.querySelector('input[name="recallScope"]:checked');
+  const scope = scopeEl ? scopeEl.value : 'all';
+
+  let isConfirmed = false;
+  const scopeDesc = scope === 'pending' ? 'yang <b>Belum Di-Follow Up</b>' : '<b>SELURUHNYA</b>';
+  const confirmHtml = `Tarik dan batalkan pembagian database ${scopeDesc} dari sales <strong>${escapeHtml(salesName)}</strong>?<br><br><span style="font-size:12px; color:#64748b;">Semua data yang ditarik akan langsung masuk ke Pool Rebutan / Belum Ditugaskan.</span>`;
+
+  if (typeof Swal !== 'undefined') {
+    const res = await Swal.fire({
+      title: 'Konfirmasi Tarik Database?',
+      html: confirmHtml,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '<i class="fa-solid fa-user-xmark"></i> Ya, Tarik Semua',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#ea580c',
+      cancelButtonColor: '#64748b'
+    });
+    isConfirmed = res.isConfirmed;
+  } else if (typeof customConfirm === 'function') {
+    isConfirmed = await customConfirm(`Tarik semua database dari ${salesName}?`);
+  } else {
+    isConfirmed = confirm(`Tarik semua database dari ${salesName}?`);
+  }
+
+  if (!isConfirmed) return;
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=unassign_sales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sales_id: parseInt(salesId, 10),
+        scope: scope
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeRecallBySalesModal();
+      await initMasterDashboard();
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Berhasil Ditarik!', data.message, 'success');
+      } else {
+        alert(data.message);
+      }
+    } else {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal', data.message || 'Gagal menarik data', 'error');
+      } else {
+        alert(data.message || 'Gagal menarik data');
+      }
+    }
+  } catch (e) {
+    console.error('Execute recall error', e);
+  }
+}
+
+// -------------------------------------------------------------
 // ANIMATED IMPORT EXCEL MODAL ENGINE
 // -------------------------------------------------------------
 function handleExcelUpload(input) {
@@ -1153,7 +1342,7 @@ function showImportProgressModal(fileName, fileSize) {
     const html = `
       <div class="modal-overlay active" id="importProgressModal">
         <div class="import-progress-box" onclick="event.stopPropagation()">
-          
+
           <!-- Animated Top Icon -->
           <div style="position:relative; width:64px; height:64px; margin:0 auto 16px;">
             <div style="width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color:#d7123a; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 8px 20px rgba(215,18,58,0.15);">
@@ -1168,7 +1357,7 @@ function showImportProgressModal(fileName, fileSize) {
           <div class="progress-track">
             <div class="progress-bar-fill" id="importProgressBar" style="width:15%;"></div>
           </div>
-          
+
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; margin-bottom:16px;">
             <span style="font-size:11.5px; font-weight:800; color:#d7123a;" id="importPercentText">15% - Mengunggah File</span>
             <span style="font-size:10.5px; color:#94a3b8; font-family:monospace;" id="importTimeStatus">Memproses...</span>
@@ -1470,7 +1659,7 @@ async function applyMasterWATemplate(templateId) {
 
     let mobilSaatIniTeks = lastCar ? `*${lastCar}*` : 'mobil Toyota Bpk/Ibu';
     let teksKendaraanLama = lastCar ? ` *${lastCar}*${carAge ? ` (${carAge})` : ''}` : '';
-    let tanyaPengalaman = lastCar 
+    let tanyaPengalaman = lastCar
       ? `Bagaimana pengalaman berkendara dengan mobil *${lastCar}* Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`
       : `Bagaimana pengalaman berkendara dengan mobil Toyota Bpk/Ibu selama ini? Apakah semuanya berjalan nyaman dan memuaskan?`;
     let teksStnkUnit = lastCar ? ` *${lastCar}*${plate ? ` (*${plate}*)` : ''}` : (plate ? ` (*${plate}*)` : '');
@@ -1879,7 +2068,7 @@ async function handleMasterDeleteCustomTemplate(id, title) {
     const data = await res.json();
     if (data.success) {
       masterState.templates = data.data || [];
-      
+
       if (localStorage.getItem('sft_last_template_id') == id) {
         localStorage.removeItem('sft_last_template_id');
       }
@@ -2032,7 +2221,7 @@ function showModernOperationLoader({
   const html = `
     <div class="fu-loader-overlay" id="modernOperationLoader" onclick="event.stopPropagation()">
       <div class="fu-loader-card">
-        
+
         <!-- Center Animated Pulse Icon -->
         <div class="fu-loader-icon-wrap">
           <div class="fu-loader-ring-outer"></div>
@@ -2142,7 +2331,7 @@ async function executePullGoogleSheet() {
       body: JSON.stringify({ google_sheet_url: sheetUrl })
     });
     const data = await res.json();
-    
+
     updateModernOperationLoader(100, 'Sinkronisasi Selesai');
     setTimeout(() => {
       closeModernOperationLoader();
@@ -2253,7 +2442,7 @@ async function confirmBulkDelete() {
     if (data.success) {
       masterState.selectedIds = [];
       updateBulkActionBar();
-      
+
       const theadCheckboxes = document.querySelectorAll('.followup-table thead input[type="checkbox"]');
       theadCheckboxes.forEach(cb => cb.checked = false);
 
@@ -2288,7 +2477,7 @@ async function confirmResetDatabase() {
     if (data.success) {
       masterState.selectedIds = [];
       updateBulkActionBar();
-      
+
       const theadCheckboxes = document.querySelectorAll('.followup-table thead input[type="checkbox"]');
       theadCheckboxes.forEach(cb => cb.checked = false);
 
@@ -2324,7 +2513,7 @@ function openSmartDistributionModal() {
     const html = `
       <div class="modal-overlay" id="modalSmartDist" onclick="closeSmartDistModal()">
         <div class="modal-content" style="max-width:820px; border-radius:var(--fu-radius-lg); padding:24px; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
-          
+
           <!-- Header -->
           <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px;">
             <div>
@@ -2342,7 +2531,7 @@ function openSmartDistributionModal() {
             <div style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">
               <i class="fa-solid fa-sliders" style="color:#d7123a;"></i> 1. Tentukan Kuota Leads per Wiraniaga:
             </div>
-            
+
             <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px;">
               <button type="button" class="category-pill-btn active" id="pillQuota50" onclick="setQuotaPill(50, this)">
                 ⚡ 50 Data / Sales
@@ -2356,7 +2545,7 @@ function openSmartDistributionModal() {
               <button type="button" class="category-pill-btn" id="pillQuotaAll" onclick="setQuotaPill(0, this)">
                 ⚖️ Bagi Rata Semua Data
               </button>
-              
+
               <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
                 <span style="font-size:12px; font-weight:700; color:#475569;">Kustom:</span>
                 <input type="number" id="inputCustomQuota" value="50" min="1" max="1000" class="fu-input" style="width:90px; padding:6px 10px; font-size:12px; text-align:center;" oninput="handleCustomQuotaInput(this.value)">
@@ -2588,7 +2777,7 @@ async function executeSmartDistribution() {
       })
     });
     const data = await res.json();
-    
+
     updateModernOperationLoader(100, 'Distribusi Selesai');
     setTimeout(() => {
       closeModernOperationLoader();
@@ -2626,7 +2815,7 @@ function showDistSuccessModal(result) {
   closeDistSuccessModal();
 
   const breakdown = result.breakdown || [];
-  
+
   let listHtml = '';
   breakdown.forEach(b => {
     listHtml += `

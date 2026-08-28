@@ -136,7 +136,7 @@ if ($action === 'customers') {
 
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
     $sql = "SELECT * FROM followup_customers $whereSql ORDER BY id DESC LIMIT 5000";
-    
+
     $customers = followup_query($sql, $params);
     $salesList = get_sales_list();
     $salesMap = [];
@@ -321,7 +321,7 @@ if ($action === 'save_template') {
         }
 
         followup_execute("
-            UPDATE followup_templates 
+            UPDATE followup_templates
             SET title = ?, category = ?, content = ?, sales_id = ?, created_by = ?
             WHERE id = ?
         ", [$title, $category, $content, $sales_id, $created_by, $id]);
@@ -547,6 +547,7 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
     $input = get_json_input();
     $customer_ids = $input['customer_ids'] ?? [];
     $target_sales_id = isset($input['sales_id']) ? (int)$input['sales_id'] : 0;
+    $scope = $input['scope'] ?? 'all'; // 'all' or 'pending'
 
     if (!empty($customer_ids) && is_array($customer_ids)) {
         foreach ($customer_ids as $cid) {
@@ -560,14 +561,48 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
         ]);
         exit;
     } elseif ($target_sales_id > 0) {
-        $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL)", [$target_sales_id]);
-        $count = count($leads);
-        followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL)", [$target_sales_id]);
-        echo json_encode([
-            'success' => true,
-            'message' => "$count data customer (Belum FU) dari sales tersebut berhasil ditarik kembali / dibatalkan pembagiannya."
-        ]);
-        exit;
+        // Ambil nama sales target
+        $salesList = get_sales_list();
+        $targetSalesName = "Sales #$target_sales_id";
+        foreach ($salesList as $s) {
+            if ((int)$s['id'] === $target_sales_id) {
+                $targetSalesName = $s['name'];
+                break;
+            }
+        }
+
+        if ($scope === 'pending') {
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Semua tugas Belum FU dari $targetSalesName ditarik kembali"]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "$count data customer (Belum FU) dari $targetSalesName berhasil ditarik kembali dan dibatalkan pembagiannya."
+            ]);
+            exit;
+        } else {
+            // Tarik SEMUA database dari sales tersebut
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ?", [$target_sales_id]);
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ?", [$target_sales_id]);
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Seluruh tugas dari $targetSalesName ditarik kembali"]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Seluruh $count data customer dari $targetSalesName berhasil ditarik kembali dan dibatalkan pembagiannya."
+            ]);
+            exit;
+        }
     } else {
         echo json_encode(['success' => false, 'message' => 'Tidak ada customer atau sales yang dipilih']);
         exit;
@@ -1064,7 +1099,7 @@ function format_whatsapp_followup_text($content, $c, $salesName = '', $salesPhon
         '{teks_mobil_saat_ini}'         => ($lastCarRaw !== '' ? " *{$lastCarRaw}*" : ""),
         '{teks_stnk_unit}'              => $teksStnkUnit,
         '{teks_kecamatan}'              => $teksKecamatan,
-        
+
         '{nama_customer}'               => $custName,
         '{mobil_saat_ini}'              => $mobilSaatIniTeks,
         '{kendaraan_terakhir}'          => $mobilSaatIniTeks,
@@ -1259,7 +1294,7 @@ if ($action === 'distribute_quota') {
     }
 
     $numSales = count($targetSalesList);
-    
+
     // Calculate quota
     if ($quota_per_sales <= 0) {
         // Divide all available evenly

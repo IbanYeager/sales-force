@@ -157,6 +157,10 @@
             <i class="fa-solid fa-bolt-lightning"></i> Bagi Kuota (50 / 100)
           </button>
 
+          <button class="btn-fu btn-fu-secondary" style="background:#fff7ed; color:#c2410c !important; border:1px solid #fed7aa;" onclick="openRecallBySalesModal()" title="Batalkan dan tarik semua database dari 1 sales tertentu">
+            <i class="fa-solid fa-user-xmark" style="color:#ea580c;"></i> Tarik DB per Sales
+          </button>
+
           <button class="btn-fu btn-fu-secondary" onclick="openAddCustomerModal()">
             <i class="fa-solid fa-user-plus"></i> + Customer
           </button>
