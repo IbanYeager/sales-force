@@ -777,12 +777,4 @@ function renderLeaderboard() {
 }
 
 // ==========================================
-// SERVICE WORKER UNREGISTRATION (Menghapus PWA)
-// ==========================================
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    for(let registration of registrations) {
-      registration.unregister();
-    }
-  });
-}
+// Service Worker integration handled cleanly via pwa-app.js

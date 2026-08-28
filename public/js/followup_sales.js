@@ -2833,7 +2833,7 @@ const autoBlastState = {
   targetCustomers: [],
   currentIndex: 0,
   templateId: 101,
-  
+
   // Gateway per sales
   gatewayToken: '',
   gatewayProvider: 'fonnte', // 'fonnte' or 'wablas'
@@ -2849,7 +2849,7 @@ const autoBlastState = {
   totalSent: 0,
   totalFailed: 0,
   logs: [], // [{time, name, phone, status: 'success'|'failed', msg: ''}]
-  
+
   // Direct queue runner state
   autoNextCountdown: 0,
   autoNextTimer: null
@@ -2869,8 +2869,8 @@ function getBlastFilteredCustomers(filterType) {
   } else if (filterType === 'respon') {
     return all.filter(c => c.followup_status === 'Menunggu Respon');
   } else if (filterType === 'current_filter') {
-    return (followupState.filteredCustomers && followupState.filteredCustomers.length > 0) 
-      ? followupState.filteredCustomers 
+    return (followupState.filteredCustomers && followupState.filteredCustomers.length > 0)
+      ? followupState.filteredCustomers
       : all;
   }
   return all;
@@ -3105,14 +3105,14 @@ function renderAutoBlastSetupView() {
           <div>
             <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.3px;">Nomor Pengirim (Akun Sales):</div>
             <div style="font-size:13.5px; font-weight:900; color:#0f172a;">
-              ${escapeHtml(salesName)} 
+              ${escapeHtml(salesName)}
               ${autoBlastState.gatewaySenderPhone ? `<span style="color:#059669; font-weight:800; font-size:12px;">(${escapeHtml(autoBlastState.gatewaySenderPhone)})</span>` : ''}
             </div>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          ${hasToken 
-            ? `<span style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-check"></i> Gateway Aktif (${escapeHtml(autoBlastState.gatewayProvider.toUpperCase())})</span>` 
+          ${hasToken
+            ? `<span style="font-size:11px; font-weight:800; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-check"></i> Gateway Aktif (${escapeHtml(autoBlastState.gatewayProvider.toUpperCase())})</span>`
             : `<span style="font-size:11px; font-weight:800; background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:4px 10px; border-radius:9999px;"><i class="fa-solid fa-circle-exclamation"></i> Token Belum Diset</span>`
           }
           <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px; border-radius:8px;" onclick="toggleGatewayConfigBox()">
@@ -3371,14 +3371,14 @@ function togglePauseBackgroundBlast() {
   const btn = document.getElementById('btnPauseResumeBlast');
   const title = document.getElementById('blastLiveStatusTitle');
   if (btn) {
-    btn.innerHTML = autoBlastState.isPaused 
-      ? `<i class="fa-solid fa-play"></i> Lanjutkan Pengiriman` 
+    btn.innerHTML = autoBlastState.isPaused
+      ? `<i class="fa-solid fa-play"></i> Lanjutkan Pengiriman`
       : `<i class="fa-solid fa-pause"></i> Jeda Sementara`;
     btn.style.background = autoBlastState.isPaused ? '#059669' : '#f59e0b';
   }
   if (title) {
-    title.textContent = autoBlastState.isPaused 
-      ? '⏸️ Pengiriman Dijeda' 
+    title.textContent = autoBlastState.isPaused
+      ? '⏸️ Pengiriman Dijeda'
       : '🚀 Mengirim Otomatis di Latar Belakang...';
   }
   appendBlastTerminalLog(autoBlastState.isPaused ? '⏸️ Pengiriman dijeda oleh user.' : '▶️ Melanjutkan pengiriman...', 'info');
@@ -3662,7 +3662,7 @@ function renderAutoBlastRunnerView() {
       <button type="button" class="btn-fu btn-fu-secondary" style="padding:8px 14px; font-size:11.5px;" onclick="prevBlastCustomer()" ${currIdx === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
         <i class="fa-solid fa-backward-step"></i> Sebelumnya
       </button>
-      
+
       <button type="button" class="btn-fu btn-fu-secondary" style="padding:8px 14px; font-size:11.5px;" onclick="renderAutoBlastSetupView()">
         <i class="fa-solid fa-gear"></i> Ganti Filter/Template
       </button>
