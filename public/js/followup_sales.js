@@ -2856,10 +2856,54 @@ const autoBlastState = {
 };
 
 function getActiveBlastTemplates() {
-  if (followupState.templates && followupState.templates.length > 0) {
+  if (Array.isArray(followupState.templates) && followupState.templates.length > 0) {
     return followupState.templates;
   }
   return DEFAULT_BLAST_TEMPLATES;
+}
+
+function formatTextForCustomer(content, customer) {
+  if (!content) return '';
+  const c = customer || {};
+  loadSalesProfile();
+
+  const salesName = (followupState.salesInfo && followupState.salesInfo.name) 
+    ? followupState.salesInfo.name 
+    : (localStorage.getItem('namaSales') || 'Sales Consultant');
+  const salesPhone = (followupState.salesInfo && (followupState.salesInfo.phone || followupState.salesInfo.no_hp))
+    ? (followupState.salesInfo.phone || followupState.salesInfo.no_hp)
+    : (localStorage.getItem('noHpSales') || localStorage.getItem('no_hp') || autoBlastState.gatewaySenderPhone || '08123456789');
+
+  const hour = new Date().getHours();
+  let waktu = 'Pagi';
+  if (hour >= 11 && hour < 15) waktu = 'Siang';
+  else if (hour >= 15 && hour < 18) waktu = 'Sore';
+  else if (hour >= 18 || hour < 5) waktu = 'Malam';
+
+  const custName = c.name || c.nama || 'Bapak/Ibu';
+  const currentCar = (c.last_car_model && c.last_car_model !== '-' && c.last_car_model !== 'NO DATA') ? c.last_car_model : (c.car_model || 'Toyota');
+  const recCar = c.recommended_model || c.car_model || 'Toyota Terbaru';
+  const carAge = c.car_age || '3 Tahun';
+  const district = c.district ? `Kec. ${c.district}` : 'Bandung';
+  const plate = c.plate_number || '';
+  const dealer = 'Tunas Toyota Kiara Condong';
+
+  let text = String(content);
+
+  // Replace all {placeholders} and [placeholders]
+  text = text.replace(/\{nama_customer\}|\[nama_customer\]|\[nama\]|\{nama\}/gi, custName);
+  text = text.replace(/\{nama_sales\}|\[nama_sales\]|\[sales\]|\{sales\}/gi, salesName);
+  text = text.replace(/\{nomor_sales\}|\[nomor_sales\]|\[no_hp\]|\{no_hp\}|\{phone\}/gi, salesPhone);
+  text = text.replace(/\{waktu\}|\[waktu\]/gi, waktu);
+  text = text.replace(/\{dealer\}|\[dealer\]|\{cabang\}|\[cabang\]/gi, dealer);
+  text = text.replace(/\{mobil_saat_ini\}|\[mobil_saat_ini\]|\{model_mobil\}|\[model_mobil\]|\{mobil\}/gi, currentCar);
+  text = text.replace(/\{model_rekomendasi\}|\[model_rekomendasi\]|\{rekomendasi_model\}|\[rekomendasi_model\]|\{rekomendasi\}/gi, recCar);
+  text = text.replace(/\{usia_kendaraan\}|\[usia_kendaraan\]|\{usia_mobil\}|\[usia_mobil\]|\{usia\}/gi, carAge);
+  text = text.replace(/\{domisili\}|\[domisili\]|\{wilayah\}|\[wilayah\]|\{kecamatan\}|\[kecamatan\]/gi, district);
+  text = text.replace(/\{no_plat\}|\[no_plat\]|\{plat_nomor\}|\[plat_nomor\]|\{plat\}/gi, plate);
+  text = text.replace(/\{tanya_pengalaman_berkendara\}/gi, `Bagaimana performa dan kenyamanan mobil ${currentCar} Bapak/Ibu saat ini? Semoga selalu memuaskan dan menyenangkan berkendara bersama keluarga.`);
+
+  return text;
 }
 
 function getBlastFilteredCustomers(filterType) {
