@@ -306,9 +306,14 @@ function renderLibrary() {
                                 <span style="background:rgba(255,255,255,0.8); padding:4px 10px; border-radius:12px; font-size:10px; font-weight:700; color:var(--text-muted); box-shadow:0 2px 4px rgba(0,0,0,0.02);"><i class="fa-solid fa-users" style="color:var(--primary-blue);"></i> ${specs.seats}</span>
                             </div>
                         </div>
-                        <button class="btn-main" onclick="showSpecs('${model}')" style="width:100%; font-size:12px; padding:10px; justify-content:center; border-radius:12px; background:linear-gradient(135deg, var(--primary-blue), #003d99); box-shadow: 0 4px 12px rgba(0,82,204,0.25);">
-                            <i class="fa-solid fa-list-ul" style="margin-right:6px;"></i> Lihat Detail
-                        </button>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <button class="btn-main" onclick="showSpecs('${model}')" style="flex:1; font-size:11.5px; padding:10px 6px; justify-content:center; border-radius:12px; background:linear-gradient(135deg, var(--primary-blue), #003d99); box-shadow: 0 4px 12px rgba(0,82,204,0.25);">
+                                <i class="fa-solid fa-list-ul" style="margin-right:4px;"></i> Lihat Detail
+                            </button>
+                            <button class="btn-main" onclick="quickShareCar('${model}')" title="Bagikan Info & Spek ke WhatsApp" style="width:38px; height:38px; padding:0; justify-content:center; border-radius:12px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; box-shadow: 0 4px 12px rgba(37,211,102,0.3); border:none; cursor:pointer; flex-shrink:0;">
+                                <i class="fa-brands fa-whatsapp" style="font-size:17px;"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
             });
@@ -419,7 +424,11 @@ async function showSpecs(model) {
     }
 }
 
+let currentSelectedVariantName = '';
+let currentSelectedColorName = '';
+
 function handleVariantChange(variantName) {
+    currentSelectedVariantName = variantName;
     const variantData = currentElibVariants.find(v => v.tipe_paket === variantName);
     const specs = getUnitSpecs(currentElibModel, variantName);
 
@@ -753,6 +762,7 @@ function renderColorSelector(model) {
         }
 
         dot.onclick = () => {
+            currentSelectedColorName = c.name;
             // Update image
             if (c.img) document.getElementById('spekImg').src = c.img;
             // Update name
@@ -777,3 +787,190 @@ function renderColorSelector(model) {
         }
     });
 }
+
+// =========================================================================
+// 📲 WHATSAPP SHARING ENGINE (PRODUCT KNOWLEDGE & E-CATALOG)
+// =========================================================================
+
+function generateCarShareMessage(model, variantName, selectedColor) {
+    const specs = getUnitSpecs(model, variantName);
+    const m = (model || '').trim();
+    const v = (variantName || '').trim();
+
+    // Get Price & Kode Tipe
+    let priceStr = '-';
+    let kodeStr = '-';
+    const variantData = (currentElibVariants || []).find(item => item.tipe_paket === variantName);
+    if (variantData) {
+        if (variantData.harga_mt > 0 && variantData.harga_at > 0) {
+            const hMT = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(variantData.harga_mt).replace('Rp', 'Rp ');
+            const hAT = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(variantData.harga_at).replace('Rp', 'Rp ');
+            priceStr = `${hMT} (M/T) | ${hAT} (A/T)`;
+            kodeStr = `${variantData.kode_tipe_mt || '-'} (M/T) | ${variantData.kode_tipe_at || '-'} (A/T)`;
+        } else if (variantData.harga_mt > 0) {
+            priceStr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(variantData.harga_mt).replace('Rp', 'Rp ');
+            kodeStr = variantData.kode_tipe_mt || '-';
+        } else if (variantData.harga_at > 0) {
+            priceStr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(variantData.harga_at).replace('Rp', 'Rp ');
+            kodeStr = variantData.kode_tipe_at || '-';
+        }
+    }
+
+    // Get list of all available colors for this model
+    let allColorNames = [];
+    if (typeof window.carColorData !== 'undefined') {
+        const modelLower = m.toLowerCase();
+        let bestKey = null;
+        const mapping = {
+            "innova zenix": "Zenix",
+            "corolla altis": "Altis",
+            "hilux double cabin": "Double Cabin",
+            "hilux single cabin": "Single Cabin",
+            "hilux rangga": "Rangga",
+            "hiace premio": "Hi Ace Premio",
+            "hiace commuter": "Hi Ace Commuter",
+            "hi ace comm": "Hi Ace Commuter",
+            "hi ace premio": "Hi Ace Premio"
+        };
+        if (mapping[modelLower]) {
+            bestKey = mapping[modelLower];
+        } else {
+            const keys = Object.keys(window.carColorData).sort((a, b) => b.length - a.length);
+            for (let k of keys) {
+                if (modelLower.includes(k.toLowerCase())) {
+                    bestKey = k;
+                    break;
+                }
+            }
+        }
+        if (bestKey && window.carColorData[bestKey]) {
+            allColorNames = window.carColorData[bestKey].map(c => c.name);
+        }
+    }
+
+    // Sales Identity
+    const salesName = localStorage.getItem('namaSales') || 'Sales Consultant';
+    const salesPhone = localStorage.getItem('noHpSales') || localStorage.getItem('no_hp') || '';
+    const cleanPhone = salesPhone.replace(/[^0-9]/g, '');
+
+    // E-Catalog link
+    const slug = m.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    let catalogUrl = `https://salesforcetunassft.com/pages/catalog?model=${encodeURIComponent(slug)}`;
+    if (salesName) catalogUrl += `&sales=${encodeURIComponent(salesName)}`;
+    if (cleanPhone) catalogUrl += `&phone=${encodeURIComponent(cleanPhone)}`;
+
+    // Build Features text
+    const featuresList = (specs.fitur || '').split(',').map(f => `  ✓ ${f.trim()}`).filter(Boolean).join('\n');
+
+    // Build Color text
+    let colorSection = '';
+    if (selectedColor && selectedColor.trim() !== '') {
+        colorSection += `🎨 *Warna Pilihan*: *${selectedColor.trim()}*\n`;
+    }
+    if (allColorNames.length > 0) {
+        colorSection += `🌈 *Pilihan Warna Resmi*:\n` + allColorNames.map(c => `  • ${c}`).join('\n');
+    }
+
+    let text = `*🚗 INFORMASI & SPESIFIKASI RESMI TOYOTA 🚗*\n`;
+    text += `*TUNAS TOYOTA KIARA CONDONG*\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    text += `🚘 *Model*: *TOYOTA ${m.toUpperCase()}*\n`;
+    if (v) text += `🏷️ *Tipe / Varian*: *${v}*\n`;
+    if (priceStr && priceStr !== '-') text += `💰 *Harga OTR*: *${priceStr}*\n`;
+    if (kodeStr && kodeStr !== '-') text += `🔖 *Kode Tipe*: ${kodeStr}\n`;
+    text += `\n`;
+
+    text += `📋 *KETERANGAN & SPESIFIKASI*:\n`;
+    text += `👥 Kapasitas: *${specs.seats}*\n`;
+    text += `⛽ Bahan Bakar: *${specs.fuel}*\n`;
+    text += `⚙️ Mesin: *${specs.engine}*\n`;
+    text += `🕹️ Transmisi: *${specs.transmisi}*\n`;
+    text += `🔄 Penggerak: *${specs.penggerak}*\n\n`;
+
+    if (featuresList) {
+        text += `✨ *FITUR-FITUR UNGGULAN*:\n${featuresList}\n\n`;
+    }
+
+    if (colorSection) {
+        text += `${colorSection}\n\n`;
+    }
+
+    text += `📖 *Brosur & E-Catalog Digital Lengkap*:\n${catalogUrl}\n\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `📞 *Konsultasi Pembelian, Test Drive & Simulasi Kredit:*\n`;
+    text += `👤 *${salesName}* (Sales Consultant)\n`;
+    if (cleanPhone) {
+        text += `📱 WhatsApp: https://wa.me/${cleanPhone}\n`;
+    }
+    text += `🏢 *Tunas Toyota Kiara Condong*\n`;
+    text += `📍 Jl. Ibrahim Adjie No. 372, Kiara Condong, Bandung\n\n`;
+    text += `_Dapatkan promo DP ringan, bunga spesial 0%, dan bonus aksesoris khusus bulan ini!_ 🔥`;
+
+    return text;
+}
+
+function shareCarToWhatsApp(customModel = null) {
+    const model = customModel || currentElibModel;
+    const variantSelect = document.getElementById('variantSelector');
+    const variantName = (variantSelect && variantSelect.value) ? variantSelect.value : currentSelectedVariantName;
+    const selectedColor = currentSelectedColorName;
+
+    const message = generateCarShareMessage(model, variantName, selectedColor);
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, '_blank');
+}
+
+function copyCarSpecsToClipboard() {
+    const model = currentElibModel;
+    const variantSelect = document.getElementById('variantSelector');
+    const variantName = (variantSelect && variantSelect.value) ? variantSelect.value : currentSelectedVariantName;
+    const selectedColor = currentSelectedColorName;
+
+    const message = generateCarShareMessage(model, variantName, selectedColor);
+    navigator.clipboard.writeText(message).then(() => {
+        alert('Format teks spesifikasi lengkap berhasil disalin ke clipboard!');
+    }).catch(() => {
+        alert('Gagal menyalin ke clipboard.');
+    });
+}
+
+async function quickShareCar(model) {
+    let variantName = '';
+    const pl = await fetchElibraryPricelist();
+    const rawVariants = pl.filter(p => {
+        const kat = (p.kategori_order || '').toLowerCase();
+        const isReguler = kat.includes('reguler') || kat.includes('regular');
+        if (!isReguler) return false;
+
+        let dbModel = p.model.trim().toLowerCase();
+        dbModel = dbModel.replace(/\s+hybrid/gi, '').replace(/\s+hev/gi, '').trim();
+        let eModel = model.trim().toLowerCase();
+
+        if (eModel === 'innova zenix') eModel = 'zenix';
+        if (eModel === 'innova reborn' && (dbModel === 'reborn' || dbModel === 'innova reborn')) return true;
+        if (eModel === 'corolla cross') eModel = 'cross';
+        if (eModel === 'corolla altis') eModel = 'altis';
+        if (eModel === 'hilux single cabin') eModel = 'single cabin';
+        if (eModel === 'hilux double cabin') eModel = 'double cabin';
+        if (eModel === 'hilux rangga') eModel = 'rangga';
+        if (eModel === 'hiace commuter') eModel = 'hi ace comm';
+        if (eModel === 'hiace premio') eModel = 'hi ace premio';
+
+        if (eModel === 'raize' && (dbModel === 'raize' || dbModel === 'raize improvement')) return true;
+        if (eModel === 'veloz' && (dbModel === 'veloz')) return true;
+        if (eModel === 'vios' && (dbModel === 'vios')) return true;
+
+        return dbModel === eModel;
+    });
+
+    if (rawVariants.length > 0) {
+        variantName = rawVariants[0].tipe_paket;
+        currentElibVariants = rawVariants;
+    }
+
+    const message = generateCarShareMessage(model, variantName, '');
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, '_blank');
+}
+

@@ -320,8 +320,23 @@
           <div id="spekFitur" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
         </div>
       </div>
+
+      <!-- Action Buttons: WhatsApp Share & Copy -->
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+        <button type="button" class="btn-main"
+          style="width:100%; justify-content:center; padding:13px 16px; border-radius:14px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; font-weight:800; font-size:13.5px; box-shadow: 0 6px 20px rgba(37,211,102,0.35); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
+          onclick="shareCarToWhatsApp()">
+          <i class="fa-brands fa-whatsapp" style="font-size:19px;"></i> Bagikan Info Lengkap ke WA
+        </button>
+        <button type="button" class="btn-main"
+          style="width:100%; justify-content:center; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,0.9); color:#0f172a; font-weight:700; font-size:12px; border:1.5px solid #cbd5e1; cursor:pointer; display:flex; align-items:center; gap:6px;"
+          onclick="copyCarSpecsToClipboard()">
+          <i class="fa-solid fa-copy" style="color:#2563eb;"></i> Salin Format Teks
+        </button>
+      </div>
+
       <button class="btn-main"
-        style="width:100%; justify-content:center; padding:12px; border-radius:12px; background:var(--primary-blue); box-shadow: 0 8px 16px rgba(0,82,204,0.3);"
+        style="width:100%; justify-content:center; padding:12px; border-radius:12px; background:#64748b; color:#ffffff; font-weight:700; font-size:12px; border:none; cursor:pointer;"
         onclick="document.getElementById('modalSpek').classList.remove('show')">
         Tutup Detail
       </button>
