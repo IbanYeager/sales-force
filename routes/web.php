@@ -37,7 +37,7 @@ Route::get('/pages/{page}', [PageController::class, 'showSalesPage'])->name('sal
 // Fallback direct route for common sales pages (e.g. /login, /input, /profil)
 $salesPages = [
     'login', 'input', 'spk', 'profil', 'customer', 'ao_report', 'deal', 'do',
-    'dokumen', 'ai_copilot', 'approval', 'balap', 'battle_card', 'brosur', 'catalog', 'catur',
+    'dokumen', 'ai_copilot', 'approval', 'balap', 'battle_card', 'brosur', 'catur',
     'checkin', 'delivery_ceremony', 'digital_card', 'drag_race', 'eco_calculator',
     'elibrary', 'game', 'hybrid_flow', 'inspeksi', 'inventory', 'jadwal_input',
     'kalkulator', 'kecamatan', 'komparasi', 'leasing_matrix', 'market_analysis',
@@ -46,13 +46,6 @@ $salesPages = [
     'riwayat_foto_aktivitas', 'snake', 'target', 'tco', 'tebak', 'testdrive',
     'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'wa_studio'
 ];
-
-Route::get('/e-catalog', function () {
-    return app(PageController::class)->showSalesPage('catalog');
-});
-Route::get('/katalog', function () {
-    return app(PageController::class)->showSalesPage('catalog');
-});
 
 foreach ($salesPages as $page) {
     Route::get("/{$page}", function () use ($page) {

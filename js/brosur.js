@@ -331,35 +331,11 @@ window.openImageLightbox = function (src) {
 
 // ─── Share / copy link ───────────────────────────────────
 function shareBrosur(nama, url) {
-  // Ambil info sales aktif dari session / localStorage
-  const salesName = localStorage.getItem('namaSales') || localStorage.getItem('salesName') || '';
-  const salesPhone = localStorage.getItem('noHpSales') || localStorage.getItem('salesPhone') || localStorage.getItem('nomorWaSales') || '';
-
-  // Format model slug (e.g. "Toyota Hiace" -> "hiace")
-  let cleanSlug = (nama || '').toLowerCase().replace(/toyota/gi, '').trim();
-  cleanSlug = cleanSlug.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-  const origin = window.location.origin;
-  let catalogUrl = `${origin}/pages/catalog?model=${encodeURIComponent(cleanSlug)}`;
-  
-  if (salesName) {
-    catalogUrl += `&sales=${encodeURIComponent(salesName)}`;
-  }
-  if (salesPhone) {
-    catalogUrl += `&phone=${encodeURIComponent(salesPhone)}`;
-  }
-
-  const shareTitle = `E-Catalog Resmi Toyota ${nama}`;
-  const shareText = `Berikut E-Catalog Resmi Toyota *${nama}* (Spesifikasi, Fitur & Promo Terbaru):\n${catalogUrl}`;
-
   if (navigator.share) {
-    navigator.share({
-      title: shareTitle,
-      text: shareText,
-      url: catalogUrl
-    }).catch(() => copyToClipboard(catalogUrl));
+    navigator.share({ title: `Brosur Toyota ${nama}`, url: url })
+      .catch(() => copyToClipboard(url));
   } else {
-    copyToClipboard(catalogUrl);
+    copyToClipboard(url);
   }
 }
 
@@ -380,11 +356,8 @@ function copyToClipboard(text) {
 
 function showToast() {
   const toast = document.getElementById('shareToast');
-  if (toast) {
-    toast.innerHTML = '<i class="fa-solid fa-circle-check"></i> Link E-Catalog berhasil disalin!';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
 // ─── Search handlers ─────────────────────────────────────

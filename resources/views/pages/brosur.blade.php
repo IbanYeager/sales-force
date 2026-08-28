@@ -147,11 +147,11 @@
              style="width:36px; height:36px; border-radius:6px; border:none; background:var(--primary-blue); color:#fff; display:flex; align-items:center; justify-content:center; text-decoration:none;">
             <i class="fa-solid fa-download"></i>
           </a>
-          <button id="btnSharePdf" type="button" 
+          <button id="btnSharePdf" type="button"
              style="width:36px; height:36px; border-radius:6px; border:none; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="shareBrosurModal()">
             <i class="fa-solid fa-share-nodes"></i>
           </button>
-          
+
           <div id="pdfControls" style="display:none; align-items:center; gap:8px; margin-left: 10px; padding-left:10px; border-left:1px solid var(--border-color);">
             <button id="btnPrevPdf"
               style="width:30px; height:30px; border-radius:6px; border:1px solid var(--border-color); background:#fff; cursor:pointer;"><i
@@ -191,23 +191,23 @@
   <!-- PDF Focus Lightbox -->
   <div class="modal-overlay" id="pdfLightbox" style="align-items: center; background: rgba(0,0,0,0.85);">
     <div style="position:relative; width:95%; max-width:900px; height:85vh; border-radius:12px; overflow:hidden; display:flex; justify-content:center; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.5); background:#1e1e1e;">
-      
+
       <!-- Blurred background -->
       <div id="pdfLightboxBg" style="position:absolute; top:0; left:0; width:100%; height:100%; background-size:cover; background-position:center; filter:blur(25px); opacity:0.5; z-index:1; transform: scale(1.1);"></div>
-      
+
       <!-- Controls -->
       <button class="btn-close-modal" style="position:absolute; top:15px; right:15px; z-index:10; background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;" onclick="closePdfLightbox()">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      
+
       <button id="btnPrevLightbox" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); z-index:10; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      
+
       <button id="btnNextLightbox" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); z-index:10; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
-      
+
       <div style="position:absolute; bottom:15px; left:50%; transform:translateX(-50%); z-index:10; background:rgba(0,0,0,0.6); color:#fff; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:bold; letter-spacing:0.5px;">
         Hal <span id="pdfLightboxPageNum">1</span>/<span id="pdfLightboxPageCount">-</span>
       </div>
@@ -235,9 +235,9 @@
   <!-- PDF.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="../custom_alert.js"></script>
-  <script src="../js/brosur.js?v=20260828_ecatalog_v1"></script>
+  <script src="../js/brosur.js"></script>
 
-  <script src="../js/pwa-app.js?v=20260828_single_icons"></script>
+  <script src="../js/pwa-app.js?v=3"></script>
 </body>
 
 </html>
