@@ -1287,6 +1287,21 @@ if ($action === 'distribute_quota') {
         exit;
     }
 
+    $exclude_keywords = $input['exclude_keywords'] ?? '';
+    $excludeList = [];
+    if (is_string($exclude_keywords) && trim($exclude_keywords) !== '') {
+        $parts = explode(',', $exclude_keywords);
+        foreach ($parts as $p) {
+            $p = trim($p);
+            if ($p !== '') $excludeList[] = strtolower($p);
+        }
+    } elseif (is_array($exclude_keywords)) {
+        foreach ($exclude_keywords as $p) {
+            $p = trim((string)$p);
+            if ($p !== '') $excludeList[] = strtolower($p);
+        }
+    }
+
     // Build query for available leads (Prioritize Unassigned and Uncontacted Leads)
     $where = [];
     $params = [];
@@ -1303,7 +1318,7 @@ if ($action === 'distribute_quota') {
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
     
     // Order: Unassigned first, Belum Dihubungi first, then newest ID
-    $sql = "SELECT id, name, phone, car_model, followup_category, assigned_sales_id, followup_status 
+    $sql = "SELECT id, name, phone, car_model, followup_category, assigned_sales_id, followup_status, notes 
             FROM followup_customers 
             $whereSql 
             ORDER BY 
@@ -1313,7 +1328,8 @@ if ($action === 'distribute_quota') {
 
     $rawLeads = followup_query($sql, $params);
 
-    // Deduplicate available leads by clean phone / id in this batch to prevent any double assignment
+    // Deduplicate available leads and apply exclusion filters
+    $excludedCount = 0;
     $uniqueLeads = [];
     $seenPhones = [];
     foreach ($rawLeads as $l) {
@@ -1321,6 +1337,27 @@ if ($action === 'distribute_quota') {
         if ($cleanPhone !== '' && isset($seenPhones[$cleanPhone])) {
             continue; // Skip duplicate phone number in the same distribution batch
         }
+
+        // Check if customer name or data matches any excluded keyword
+        $leadName = strtolower($l['name'] ?? '');
+        $leadCar = strtolower($l['car_model'] ?? '');
+        $leadNotes = strtolower($l['notes'] ?? '');
+        $isExcluded = false;
+
+        if (!empty($excludeList)) {
+            foreach ($excludeList as $kw) {
+                if (stripos($leadName, $kw) !== false || stripos($leadNotes, $kw) !== false || stripos($leadCar, $kw) !== false) {
+                    $isExcluded = true;
+                    break;
+                }
+            }
+        }
+
+        if ($isExcluded) {
+            $excludedCount++;
+            continue; // Skip this lead from being distributed!
+        }
+
         if ($cleanPhone !== '') {
             $seenPhones[$cleanPhone] = true;
         }
@@ -1330,7 +1367,10 @@ if ($action === 'distribute_quota') {
 
     $totalAvailable = count($availableLeads);
     if ($totalAvailable === 0) {
-        echo json_encode(['success' => false, 'message' => 'Tidak ada data leads yang tersedia untuk dibagikan. Semua data mungkin sudah memiliki sales PIC.']);
+        $msg = $excludedCount > 0 
+            ? "Tidak ada data leads yang dapat dibagikan karena semua data ($excludedCount data) cocok dengan filter pengecualian."
+            : "Tidak ada data leads yang tersedia untuk dibagikan. Semua data mungkin sudah memiliki sales PIC.";
+        echo json_encode(['success' => false, 'message' => $msg]);
         exit;
     }
 
@@ -1391,10 +1431,13 @@ if ($action === 'distribute_quota') {
         ];
     }
 
+    $excludeMsg = $excludedCount > 0 ? " ($excludedCount data customer berhasil dikecualikan)" : "";
+
     echo json_encode([
         'success' => true,
-        'message' => "Berhasil membagikan total $totalAssigned leads kepada $numSales wiraniaga terpilih (masing-masing hingga $quota_per_sales leads).",
+        'message' => "Berhasil membagikan total $totalAssigned leads kepada $numSales wiraniaga terpilih (masing-masing hingga $quota_per_sales leads)$excludeMsg.",
         'total_assigned' => $totalAssigned,
+        'excluded_count' => $excludedCount,
         'sales_count' => $numSales,
         'quota_per_sales' => $quota_per_sales,
         'breakdown' => $breakdown

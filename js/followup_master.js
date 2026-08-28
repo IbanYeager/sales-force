@@ -2501,7 +2501,8 @@ let smartDistState = {
   category: 'all',
   selectedSales: [],
   searchFilter: '',
-  onlyUnassigned: true
+  onlyUnassigned: true,
+  excludeKeywords: ''
 };
 
 function openSmartDistributionModal() {
@@ -2523,7 +2524,7 @@ function openSmartDistributionModal() {
                 <i class="fa-solid fa-bolt-lightning"></i> Smart Distribution Matrix
               </div>
               <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">Bagi Kuota Leads ke Wiraniaga</h3>
-              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Atur jumlah pembagian data (misal 50 atau 100 leads) dan prioritaskan data yang belum dibagikan.</p>
+              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Atur jumlah pembagian data (misal 50 atau 100 leads), prioritaskan data unassigned, dan kecualikan nama/perusahaan tertentu.</p>
             </div>
             <button class="btn-close-modal" onclick="closeSmartDistModal()"><i class="fa-solid fa-xmark"></i></button>
           </div>
@@ -2592,11 +2593,32 @@ function openSmartDistributionModal() {
             </div>
           </div>
 
-          <!-- 2. PILIH WIRANIAGA PENERIMA -->
+          <!-- 2. PENGECUALIAN DATA / EXCLUDE KEYWORDS -->
+          <div style="background:#fff1f2; border:1.5px solid #fecdd3; border-radius:14px; padding:16px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="font-size:12px; font-weight:800; color:#9f1239; text-transform:uppercase; letter-spacing:0.5px;">
+                <i class="fa-solid fa-ban" style="color:#e11d48;"></i> 2. Pengecualian Data (Tidak Dibagikan ke Sales):
+              </div>
+              <span style="font-size:10.5px; font-weight:800; color:#be123c; background:#ffe4e6; border:1px solid #fecdd3; padding:2px 8px; border-radius:6px;">
+                Fitur Filter Khusus
+              </span>
+            </div>
+            <p style="font-size:11.5px; color:#be123c; margin:0 0 8px 0;">
+              Ketik nama customer, PT/Perusahaan (misal: <strong>PT Sudeco</strong>), atau kata kunci yang <strong>TIDAK BOLEH</strong> dibagikan ke sales (pisahkan dengan koma jika lebih dari 1):
+            </p>
+            <div class="fu-input-with-icon">
+              <i class="fa-solid fa-filter-circle-xmark" style="color:#e11d48;"></i>
+              <input type="text" id="inputDistExcludeKeywords" class="fu-input" placeholder="Contoh: PT Sudeco, PT Rental, Bpk. Hendra..." value="${escapeHtml(smartDistState.excludeKeywords || '')}" style="font-size:12px; border-color:#fda4af; background:#ffffff;" oninput="handleDistExcludeInput(this.value)">
+            </div>
+            <div id="distExcludePreviewBadge" style="font-size:11.5px; color:#9f1239; font-weight:700; margin-top:8px; display:none; background:#ffe4e6; padding:6px 12px; border-radius:8px; border:1px solid #fecdd3;">
+            </div>
+          </div>
+
+          <!-- 3. PILIH WIRANIAGA PENERIMA -->
           <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px; margin-bottom:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
               <div style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; letter-spacing:0.5px;">
-                <i class="fa-solid fa-users-gear" style="color:#10b981;"></i> 2. Pilih Wiraniaga Penerima Leads:
+                <i class="fa-solid fa-users-gear" style="color:#10b981;"></i> 3. Pilih Wiraniaga Penerima Leads:
               </div>
               <div style="font-size:12px; font-weight:800; color:#1e40af;">
                 <span id="distSelectedSalesCount">0</span> dari ${masterState.salesList.length} Wiraniaga Terpilih
@@ -2632,7 +2654,7 @@ function openSmartDistributionModal() {
             </div>
           </div>
 
-          <!-- 3. LIVE CALCULATION PREVIEW BOX -->
+          <!-- 4. LIVE CALCULATION PREVIEW BOX -->
           <div style="background:linear-gradient(135deg, #0d1b3e 0%, #16305f 100%); color:#ffffff; border-radius:14px; padding:16px; margin-bottom:18px; box-shadow:0 6px 20px rgba(13,27,62,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
               <div>
@@ -2732,6 +2754,11 @@ function renderDistSalesGrid() {
   container.innerHTML = html;
 }
 
+function handleDistExcludeInput(val) {
+  smartDistState.excludeKeywords = val;
+  updateSmartDistPreview();
+}
+
 function updateSmartDistPreview() {
   const selectedCount = smartDistState.selectedSales.length;
   document.getElementById('distSelectedSalesCount').textContent = selectedCount;
@@ -2739,6 +2766,24 @@ function updateSmartDistPreview() {
   // Unassigned pool count
   const unassignedTotal = masterState.stats.unassigned !== undefined ? masterState.stats.unassigned : (masterState.stats.total || 0);
   document.getElementById('distPoolCount').textContent = unassignedTotal;
+
+  // Live preview for excluded keywords
+  const exInput = (smartDistState.excludeKeywords || '').trim();
+  const badgeEl = document.getElementById('distExcludePreviewBadge');
+  if (exInput && badgeEl) {
+    const kws = exInput.split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+    const matchedCount = (masterState.customers || []).filter(c => {
+      const name = (c.name || '').toLowerCase();
+      const car = (c.car_model || '').toLowerCase();
+      const notes = (c.notes || '').toLowerCase();
+      return kws.some(kw => name.includes(kw) || car.includes(kw) || notes.includes(kw));
+    }).length;
+
+    badgeEl.style.display = 'block';
+    badgeEl.innerHTML = `<i class="fa-solid fa-ban"></i> <strong>${matchedCount} data</strong> customer (${kws.map(k => `<em>"${escapeHtml(k)}"</em>`).join(', ')}) akan otomatis <strong>DIKECUALIKAN</strong> dan tidak akan dibagikan ke sales.`;
+  } else if (badgeEl) {
+    badgeEl.style.display = 'none';
+  }
 
   const quota = smartDistState.quota;
   let formulaText = '';
@@ -2796,7 +2841,8 @@ async function executeSmartDistribution() {
         sales_ids: smartDistState.selectedSales,
         quota_per_sales: smartDistState.quota,
         category: smartDistState.category,
-        only_unassigned: smartDistState.onlyUnassigned !== false
+        only_unassigned: smartDistState.onlyUnassigned !== false,
+        exclude_keywords: (smartDistState.excludeKeywords || '').trim()
       })
     });
     const data = await res.json();
