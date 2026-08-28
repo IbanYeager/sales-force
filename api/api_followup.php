@@ -79,6 +79,60 @@ function get_sales_list($spv = '') {
     return $salesList;
 }
 
+/**
+ * Auto-Expiry Engine:
+ * If customer remarks is 'Customer pending' (Menunggu Respon) and > 2 days (48 hours) without update,
+ * automatically change remarks to 'Customer tidak diangkat' / 'Customer tidak aktif'.
+ */
+function auto_expire_pending_followups() {
+    global $is_mysql, $conn, $sqlite_pdo;
+    try {
+        $thresholdTime = date('Y-m-d H:i:s', strtotime('-2 days'));
+        
+        // Find customers that have been in 'Customer pending' for more than 2 days
+        $sqlFind = "
+            SELECT id, name, remarks, followup_status, followup_date, last_contacted_at, updated_at
+            FROM followup_customers
+            WHERE (remarks = 'Customer pending' OR remarks LIKE '%pending%')
+              AND followup_status != 'Deal / Selesai'
+              AND (
+                (followup_date IS NOT NULL AND followup_date != '' AND followup_date <= ?)
+                OR (last_contacted_at IS NOT NULL AND last_contacted_at != '' AND last_contacted_at <= ?)
+                OR ((followup_date IS NULL OR followup_date = '') AND (last_contacted_at IS NULL OR last_contacted_at = '') AND updated_at IS NOT NULL AND updated_at <= ?)
+              )
+            LIMIT 500
+        ";
+
+        $expiredCusts = followup_query($sqlFind, [$thresholdTime, $thresholdTime, $thresholdTime]);
+        if (!empty($expiredCusts) && is_array($expiredCusts)) {
+            $now = date('Y-m-d H:i:s');
+            foreach ($expiredCusts as $ec) {
+                $cid = (int)$ec['id'];
+                followup_execute("
+                    UPDATE followup_customers 
+                    SET remarks = 'Customer tidak diangkat',
+                        contacted = 'FALSE',
+                        sales_fu_status = 'Closed',
+                        updated_at = ?
+                    WHERE id = ?
+                ", [$now, $cid]);
+
+                followup_execute("
+                    INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, old_status, new_status, note)
+                    VALUES (?, NULL, 'Sistem Auto-Expiry', 'auto_timeout', ?, ?, 'Otomatis diubah ke \"Customer tidak diangkat\" karena melewati batas waktu 2 hari menunggu respon.')
+                ", [$cid, $ec['remarks'] ?? 'Customer pending', 'Customer tidak diangkat']);
+            }
+        }
+    } catch (Throwable $e) {
+        // Silently fail to never block other CRM API calls
+    }
+}
+
+// Run auto-expiry evaluation automatically on CRM actions
+if (in_array($action, ['customers', 'stats', 'sales', 'sales_dashboard', 'check_expiry'])) {
+    auto_expire_pending_followups();
+}
+
 // -------------------------------------------------------------
 // ROUTE: GET /api_followup.php?action=customers
 // -------------------------------------------------------------
