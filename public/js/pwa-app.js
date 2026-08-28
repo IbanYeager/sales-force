@@ -14,7 +14,7 @@ let pwaRefreshing = false;
 // 1. SMART AUTO-UPDATING SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
     const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20260828_01' : 'sw.js?v=20260828_01';
-    
+
     navigator.serviceWorker.register(swPath)
         .then(registration => {
             console.log('[PWA] ServiceWorker registered with scope:', registration.scope);
@@ -39,12 +39,11 @@ if ('serviceWorker' in navigator) {
             console.warn('[PWA] ServiceWorker registration warning:', err);
         });
 
-    // Ketika controller berganti (Service Worker baru aktif), auto-refresh halaman agar APK langsung memuat update web terbaru
+    // Ketika controller berganti (Service Worker baru aktif), auto-refresh halaman agar APK langsung memuat update web terbaru secara silent
     navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!pwaRefreshing) {
             pwaRefreshing = true;
             console.log('[PWA] Controller changed -> Memuat ulang aplikasi dengan kode terbaru...');
-            sessionStorage.setItem('sft_pwa_updated_toast', 'true');
             window.location.reload();
         }
     });
@@ -55,7 +54,6 @@ if ('serviceWorker' in navigator) {
             console.log('[PWA] New version activated:', event.data.version);
             if (!pwaRefreshing) {
                 pwaRefreshing = true;
-                sessionStorage.setItem('sft_pwa_updated_toast', 'true');
                 window.location.reload();
             }
         }
@@ -81,37 +79,6 @@ if ('serviceWorker' in navigator) {
     }, 5 * 60 * 1000);
 }
 
-// Tampilkan notifikasi toast jika aplikasi baru saja ter-update
-document.addEventListener('DOMContentLoaded', () => {
-    if (sessionStorage.getItem('sft_pwa_updated_toast') === 'true') {
-        sessionStorage.removeItem('sft_pwa_updated_toast');
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #059669;
-            color: #ffffff;
-            padding: 10px 18px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 800;
-            z-index: 999999;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: slideDownToast 0.4s ease;
-        `;
-        toast.innerHTML = `<i class="fa-solid fa-bolt"></i> ⚡ Aplikasi diperbarui ke versi terbaru!`;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.transition = 'opacity 0.4s ease';
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 400);
-        }, 3500);
-    }
-});
 
 // Menangkap event install dari browser
 window.addEventListener('beforeinstallprompt', (e) => {
