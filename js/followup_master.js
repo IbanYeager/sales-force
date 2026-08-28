@@ -405,7 +405,7 @@ function renderCustomerTable() {
         <!-- 6. Sales PIC -->
         <td style="min-width:190px;">
           <select class="fu-table-select" onchange="inlineUpdateSales(${c.id}, this.value)">
-            <option value="">-- Belum Ditugaskan --</option>
+            <option value="">-- Belum Ditugaskan (Batal) --</option>
             ${masterState.salesList.map(s => `
               <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>
             `).join('')}
@@ -424,13 +424,13 @@ function renderCustomerTable() {
               </span>
             </div>
             <div style="font-size:10px; color:#475569; display:flex; gap:4px; flex-wrap:wrap; margin-bottom:2px;">
-              <span style="color:${(c.connected === 'TRUE' || c.connected === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Conn: ${(c.connected === 'TRUE' || c.connected === 'IYA') ? '✅' : '❌'}</span>
-              <span style="color:${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Cont: ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '✅' : '❌'}</span>
-              <span style="color:${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Prosp: ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '✅' : '❌'}</span>
-              <span style="color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">SPK: ${(c.spk === 'TRUE' || c.spk === 'IYA') ? '✅' : '❌'}</span>
+              <span style="color:${(c.connected === 'TRUE' || c.connected === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Conn: ${(c.connected === 'TRUE' || c.connected === 'IYA') ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}</span>
+              <span style="color:${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Cont: ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}</span>
+              <span style="color:${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Prosp: ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '<i class="fa-solid fa-fire"></i>' : 'Belum'}</span>
+              <span style="color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">SPK: ${(c.spk === 'TRUE' || c.spk === 'IYA') ? '<i class="fa-solid fa-award"></i>' : 'Belum'}</span>
             </div>
             ${c.reason_followup ? `<div style="font-size:10.5px; color:#334155; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.reason_followup)}">"${escapeHtml(c.reason_followup)}"</div>` : ''}
-            ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace;">📅 ${escapeHtml(c.followup_date.substring(0, 16))}</div>` : ''}
+            ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace;">${escapeHtml(c.followup_date.substring(0, 16))}</div>` : ''}
           ` : `
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.notes || '-')}">
               ${escapeHtml(c.notes || '-')}
@@ -439,7 +439,7 @@ function renderCustomerTable() {
         </td>
 
         <!-- 8. Aksi -->
-        <td style="text-align:right; min-width:150px;">
+        <td style="text-align:right; min-width:180px;">
           <div style="display:flex; align-items:center; justify-content:flex-end; gap:5px;">
             <button class="btn-fu btn-fu-secondary" style="padding:6px 10px; font-size:11px; border-radius:8px;" onclick="openCustomerDetailModal(${c.id})" title="Lihat Profil Lengkap Customer 360°">
               <i class="fa-solid fa-circle-info"></i> Detail
@@ -447,6 +447,11 @@ function renderCustomerTable() {
             <button class="btn-fu btn-fu-emerald" style="padding:6px 10px; font-size:11px; border-radius:8px;" onclick="openWhatsAppDirect(${c.id})" title="Follow Up WhatsApp">
               <i class="fa-brands fa-whatsapp"></i> WA
             </button>
+            ${(c.assigned_sales_id && parseInt(c.assigned_sales_id) > 0) ? `
+              <button class="btn-fu" style="padding:6px 8px; font-size:11px; background:#fff7ed; color:#c2410c !important; border:1px solid #fed7aa; border-radius:8px;" onclick="unassignCustomerSingle(${c.id}, '${escapeJs(c.name)}', '${escapeJs((masterState.salesList.find(s => s.id == c.assigned_sales_id) || {}).name || 'Sales')}')" title="Batalkan Penugasan Sales">
+                <i class="fa-solid fa-user-xmark"></i> Batal
+              </button>
+            ` : ''}
             <button class="btn-fu" style="padding:6px 8px; font-size:11px; background:#fef2f2; color:#ef4444 !important; border:1px solid #fecaca; border-radius:8px;" onclick="confirmDeleteCustomer(${c.id}, '${escapeJs(c.name)}')" title="Hapus Customer">
               <i class="fa-solid fa-trash-can"></i>
             </button>
@@ -742,10 +747,15 @@ function openCustomerDetailModal(customerId) {
     </div>
 
     <!-- Actions -->
-    <div style="display:flex; gap:10px;">
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn-fu btn-fu-emerald" style="flex:1; justify-content:center; padding:12px;" onclick="closeCustomerDetailModal(); openWhatsAppDirect(${c.id});">
         <i class="fa-brands fa-whatsapp"></i> Follow Up via WhatsApp
       </button>
+      ${(c.assigned_sales_id && parseInt(c.assigned_sales_id) > 0) ? `
+        <button class="btn-fu" style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; padding:12px 14px;" onclick="closeCustomerDetailModal(); unassignCustomerSingle(${c.id}, '${escapeJs(c.name)}', '${escapeJs((masterState.salesList.find(s => s.id == c.assigned_sales_id) || {}).name || 'Sales')}');" title="Batalkan Penugasan Sales">
+          <i class="fa-solid fa-user-xmark"></i> Batal Penugasan
+        </button>
+      ` : ''}
       <a href="tel:${c.phone}" class="btn-fu btn-fu-secondary" style="padding:12px 18px; text-decoration:none;">
         <i class="fa-solid fa-phone"></i> Telepon
       </a>
@@ -924,6 +934,113 @@ async function executeReleaseToPool() {
   }
 }
 
+async function executeBulkUnassign() {
+  if (masterState.selectedIds.length === 0) return;
+
+  const count = masterState.selectedIds.length;
+  let isConfirmed = false;
+
+  if (typeof Swal !== 'undefined') {
+    const res = await Swal.fire({
+      title: 'Batalkan Penugasan Sales?',
+      html: `Batalkan pembagian <strong>${count} customer</strong> dari sales?<br><br><span style="font-size:12px; color:#64748b;">Customer akan dikembalikan ke status "Belum Ditugaskan / Pool Rebutan" sehingga dapat ditugaskan ke sales lain.</span>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '<i class="fa-solid fa-user-xmark"></i> Ya, Batalkan Penugasan',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#d97706',
+      cancelButtonColor: '#64748b'
+    });
+    isConfirmed = res.isConfirmed;
+  } else if (typeof customConfirm === 'function') {
+    isConfirmed = await customConfirm(`Batalkan penugasan ${count} data customer terpilih dari sales?`);
+  } else {
+    isConfirmed = confirm(`Batalkan penugasan ${count} data customer terpilih dari sales?`);
+  }
+
+  if (!isConfirmed) return;
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=unassign_sales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_ids: masterState.selectedIds
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      masterState.selectedIds = [];
+      updateBulkActionBar();
+      await initMasterDashboard();
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Penugasan Dibatalkan!', data.message, 'success');
+      } else {
+        alert(data.message);
+      }
+    } else {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal', data.message || 'Gagal membatalkan penugasan', 'error');
+      } else {
+        alert(data.message || 'Gagal membatalkan penugasan');
+      }
+    }
+  } catch (e) {
+    console.error('Bulk unassign error', e);
+  }
+}
+
+async function unassignCustomerSingle(customerId, custName, salesName) {
+  let isConfirmed = false;
+
+  if (typeof Swal !== 'undefined') {
+    const res = await Swal.fire({
+      title: 'Batalkan Penugasan Sales?',
+      html: `Batalkan pembagian customer <strong>${escapeHtml(custName)}</strong> dari sales <strong>${escapeHtml(salesName)}</strong>?<br><br><span style="font-size:12px; color:#64748b;">Customer ini akan dikembalikan ke status "Belum Ditugaskan / Pool Rebutan".</span>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '<i class="fa-solid fa-user-xmark"></i> Ya, Batalkan',
+      cancelButtonText: 'Kembali',
+      confirmButtonColor: '#d97706',
+      cancelButtonColor: '#64748b'
+    });
+    isConfirmed = res.isConfirmed;
+  } else if (typeof customConfirm === 'function') {
+    isConfirmed = await customConfirm(`Batalkan pembagian customer "${custName}" dari sales "${salesName}"?`);
+  } else {
+    isConfirmed = confirm(`Batalkan pembagian customer "${custName}" dari sales "${salesName}"?`);
+  }
+
+  if (!isConfirmed) return;
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=unassign_sales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_ids: [customerId]
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      await initMasterDashboard();
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Penugasan Dibatalkan!', data.message, 'success');
+      } else {
+        alert(data.message);
+      }
+    } else {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal', data.message || 'Gagal membatalkan penugasan', 'error');
+      } else {
+        alert(data.message || 'Gagal membatalkan penugasan');
+      }
+    }
+  } catch (e) {
+    console.error('Single unassign error', e);
+  }
+}
+
 async function inlineUpdateStatus(customerId, status) {
   try {
     await fetch('../api/api_followup.php?action=update_status', {
@@ -939,7 +1056,7 @@ async function inlineUpdateStatus(customerId, status) {
 
 async function inlineUpdateSales(customerId, salesId) {
   try {
-    await fetch('../api/api_followup.php?action=bulk_assign', {
+    const res = await fetch('../api/api_followup.php?action=bulk_assign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -947,7 +1064,14 @@ async function inlineUpdateSales(customerId, salesId) {
         sales_id: salesId
       })
     });
-    loadMasterStats();
+    const data = await res.json();
+    if (data.success) {
+      await loadMasterStats();
+      await loadMasterCustomers(false);
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Update Sales PIC', data.message, 'success');
+      }
+    }
   } catch (e) {
     console.error('Inline update sales error', e);
   }

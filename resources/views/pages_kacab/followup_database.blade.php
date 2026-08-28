@@ -202,6 +202,14 @@
             <i class="fa-solid fa-scale-balanced" style="color:#ffffff;"></i> Bagi Rata
           </button>
 
+          <button class="btn-fu" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(245,158,11,0.35);" onclick="executeBulkUnassign()" title="Batalkan pembagian customer terpilih dari sales (kembalikan ke pool)">
+            <i class="fa-solid fa-user-xmark"></i> Batalkan Penugasan
+          </button>
+
+          <button class="btn-fu" style="background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(234,88,12,0.35);" onclick="executeReleaseToPool()" title="Lepas data customer ini ke Pool Rebutan Prospek">
+            <i class="fa-solid fa-fire"></i> Lepas ke Pool Rebutan
+          </button>
+
           <button class="btn-fu" style="background:#ef4444; color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(239,68,68,0.3);" onclick="confirmBulkDelete()">
             <i class="fa-solid fa-trash-can"></i> Hapus Terpilih
           </button>
@@ -284,7 +292,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../custom_alert.js?v=25"></script>
   <script src="../js/kacab_global.js?v=20260824_dendi"></script>
-  <script src="../js/followup_master.js?v=20260826_auto_remarks"></script>
+  <script src="../js/followup_master.js?v=20260828_unassign_feature"></script>
   <script src="../js/pwa-app.js?v=3"></script>
 </body>
 </html>

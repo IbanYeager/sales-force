@@ -505,6 +505,17 @@ if ($action === 'bulk_assign') {
         exit;
     }
 
+    // Jika sales_id kosong / 0 / 'unassign', batalkan penugasan ke sales
+    if (empty($sales_id) || $sales_id === '0' || $sales_id === 'unassign') {
+        foreach ($customer_ids as $cid) {
+            $cid = (int)$cid;
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE id = ?", [$cid]);
+            followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Pembagian database ke sales dibatalkan oleh SPV/Kacab')", [$cid]);
+        }
+        echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibatalkan penugasannya dari sales."]);
+        exit;
+    }
+
     $targetSales = null;
     foreach ($salesList as $s) {
         if ((int)$s['id'] === (int)$sales_id) {
@@ -526,6 +537,41 @@ if ($action === 'bulk_assign') {
 
     echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil ditugaskan ke " . $targetSales['name']]);
     exit;
+}
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup.php?action=unassign_sales
+// Membatalkan Pembagian Database dari Sales (Single / Bulk / All from Sales)
+// -------------------------------------------------------------
+if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
+    $input = get_json_input();
+    $customer_ids = $input['customer_ids'] ?? [];
+    $target_sales_id = isset($input['sales_id']) ? (int)$input['sales_id'] : 0;
+
+    if (!empty($customer_ids) && is_array($customer_ids)) {
+        foreach ($customer_ids as $cid) {
+            $cid = (int)$cid;
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE id = ?", [$cid]);
+            followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Pembagian database ke sales dibatalkan oleh SPV/Kacab')", [$cid]);
+        }
+        echo json_encode([
+            'success' => true,
+            'message' => count($customer_ids) . " data customer berhasil dibatalkan penugasannya dari sales dan dikembalikan ke database unassigned/pool."
+        ]);
+        exit;
+    } elseif ($target_sales_id > 0) {
+        $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL)", [$target_sales_id]);
+        $count = count($leads);
+        followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL)", [$target_sales_id]);
+        echo json_encode([
+            'success' => true,
+            'message' => "$count data customer (Belum FU) dari sales tersebut berhasil ditarik kembali / dibatalkan pembagiannya."
+        ]);
+        exit;
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Tidak ada customer atau sales yang dipilih']);
+        exit;
+    }
 }
 
 // -------------------------------------------------------------
