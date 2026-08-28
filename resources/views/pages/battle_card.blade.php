@@ -110,10 +110,10 @@
       <!-- MAIN TABS -->
       <div class="battle-tab-nav">
         <button class="battle-tab-btn active" id="tabBtnObjection" onclick="switchBattleTab('objection')">
-          <i class="fa-solid fa-comments"></i> 🥊 Menjawab Keberatan Customer (Objections)
+          <i class="fa-solid fa-comments"></i> Menjawab Keberatan Customer (Objections)
         </button>
         <button class="battle-tab-btn" id="tabBtnVs" onclick="switchBattleTab('vs')">
-          <i class="fa-solid fa-scale-unbalanced-flip"></i> 🚗 Battle Card vs Kompetitor
+          <i class="fa-solid fa-scale-unbalanced-flip"></i> Battle Card vs Kompetitor
         </button>
       </div>
 

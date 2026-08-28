@@ -273,7 +273,7 @@
         <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin-bottom:14px;">
           <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:6px;">
             <span>XP Saat Ini: <strong style="color:var(--primary-red);">1,450 / 2,000 XP</strong></span>
-            <span style="color:var(--text-muted);">Next: Top Performer Badge 🎖️</span>
+            <span style="color:var(--text-muted);">Next: Top Performer Badge <i class="fa-solid fa-medal"></i></span>
           </div>
           <div style="height:10px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
             <div style="height:100%; width:72.5%; background:linear-gradient(90deg, #d97706, #d7123a); border-radius:10px;"></div>
@@ -323,12 +323,12 @@
         <!-- Badges Collection -->
         <div style="margin-top:14px; border-top:1px dashed #e2e8f0; padding-top:12px;">
           <div style="font-size:12px; font-weight:800; color:var(--text-dark); margin-bottom:8px;">
-            🎖️ Lencana Prestasi (Badges Unlocked):
+            <i class="fa-solid fa-medal" style="color:#f59e0b;"></i> Lencana Prestasi (Badges Unlocked):
           </div>
           <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:4px;">
-            <span style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap;">⚡ Speedy Follow Up</span>
-            <span style="background:#fef3c7; border:1px solid #fde68a; color:#b45309; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap;">🔥 Master Closer</span>
-            <span style="background:#f3effd; border:1px solid #ddd6fe; color:#6d28d9; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap;">🚘 Test Drive Champ</span>
+            <span style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap;"><i class="fa-solid fa-bolt"></i> Speedy Follow Up</span>
+            <span style="background:#fef3c7; border:1px solid #fde68a; color:#b45309; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap;"><i class="fa-solid fa-fire"></i> Master Closer</span>
+            <span style="background:#f3effd; border:1px solid #ddd6fe; color:#6d28d9; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap;"><i class="fa-solid fa-car"></i> Test Drive Champ</span>
           </div>
         </div>
       </div>

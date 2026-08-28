@@ -98,9 +98,9 @@
             <i class="fa-solid fa-clock"></i>
             <select id="filterSesi" onchange="applyActivityFilters()">
               <option value="">Semua Sesi Waktu</option>
-              <option value="Pagi">🌅 Sesi Pagi</option>
-              <option value="Siang">☀️ Sesi Siang</option>
-              <option value="Sore">🌆 Sesi Sore</option>
+              <option value="Pagi">Sesi Pagi</option>
+              <option value="Siang">Sesi Siang</option>
+              <option value="Sore">Sesi Sore</option>
               <option value="Pagi">Sesi Pagi</option>
               <option value="Siang">Sesi Siang</option>
               <option value="Sore">Sesi Sore</option>

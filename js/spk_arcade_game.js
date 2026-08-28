@@ -970,7 +970,7 @@
           if (window.showCustomAlert) {
             window.showCustomAlert('🏁 SPK RACER CLOSING BERHASIL!', `Selamat! High Score ${gameState.score} PTS & SPK tercatat di sistem!`, 'success');
           } else {
-            alert(`🎉 Selamat! SPK berhasil disubmit dengan High Score ${gameState.score} PTS!`);
+            alert(`Selamat! SPK berhasil disubmit dengan High Score ${gameState.score} PTS!`);
           }
 
           if (typeof fetchSpk === 'function') fetchSpk();

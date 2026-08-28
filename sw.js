@@ -1,9 +1,9 @@
 // =========================================================================
 // SFT PWA Service Worker (Auto-Updating & Zero-Stale Cache Engine)
-// Version: 2026.08.28_v1
+// Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20260828-01';
+const CACHE_VERSION = 'sft-pwa-v20260828-single-icons-v2';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',

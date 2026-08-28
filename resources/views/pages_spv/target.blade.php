@@ -110,7 +110,7 @@
             <i class="fa-solid fa-crown" style="color: #f59e0b;"></i>
             <span class="lbl">Tim:</span>
             <select id="selectFilterSpvTarget" onchange="loadMonitoringBoard()" style="font-weight:700;">
-              <option value="Semua">👑 Semua Tim (Master - 46 Sales)</option>
+              <option value="Semua">Semua Tim (Master - 46 Sales)</option>
               <option value="Pak Ryan">Tim Pak Ryan</option>
               <option value="Pak Alvin">Tim Pak Alvin</option>
               <option value="Pak Riva">Tim Pak Riva</option>

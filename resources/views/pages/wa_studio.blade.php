@@ -109,7 +109,7 @@
           <i class="fa-solid fa-robot" style="color: #c8102e;"></i> T-STOCK AI WhatsApp Bot &amp; Webhook
         </button>
         <button id="tabBtnSentinel" class="wa-tab-btn" onclick="switchWaTab('sentinel')" style="padding: 10px 18px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: #f1f5f9; color: #475569; transition: all 0.2s;">
-          <i class="fa-solid fa-shield-halved" style="color: #4f46e5;"></i> 🤖 AI Sentinel: Laporan 5-Harian Kacab
+          <i class="fa-solid fa-shield-halved" style="color: #4f46e5;"></i> AI Sentinel: Laporan 5-Harian Kacab
         </button>
       </div>
 

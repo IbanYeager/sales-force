@@ -203,9 +203,9 @@
 
         <!-- SPK Status Target Badges -->
         <div class="arcade-hud-chips-bar">
-          <div id="hudCustBadge" class="arcade-hud-chip" onclick="triggerPitStopModal()" title="Klik untuk edit data customer">👤 Pitstop Customer</div>
-          <div id="hudCarBadge" class="arcade-hud-chip" onclick="openCarSelectionModal()" title="Klik untuk ganti/pilih ulang unit mobil">🚗 Catch Mobil 🔄</div>
-          <div id="hudPayBadge" class="arcade-hud-chip">💳 Kredit</div>
+          <div id="hudCustBadge" class="arcade-hud-chip" onclick="triggerPitStopModal()" title="Klik untuk edit data customer"><i class="fa-solid fa-user"></i> Pitstop Customer</div>
+          <div id="hudCarBadge" class="arcade-hud-chip" onclick="openCarSelectionModal()" title="Klik untuk ganti/pilih ulang unit mobil"><i class="fa-solid fa-car"></i> Catch Mobil</div>
+          <div id="hudPayBadge" class="arcade-hud-chip"><i class="fa-solid fa-credit-card"></i> Kredit</div>
         </div>
 
         <!-- Nitro Track -->
@@ -221,7 +221,7 @@
         <!-- OVERLAY MODAL 1: PITSTOP CUSTOMER INTAKE -->
         <div id="arcadePitstopModal" class="arcade-modal-overlay">
           <div class="arcade-modal-box">
-            <h4 class="arcade-modal-title">🛑 PITSTOP: VIP Prospect Intake</h4>
+            <h4 class="arcade-modal-title"><i class="fa-solid fa-flag-checkered"></i> PITSTOP: VIP Prospect Intake</h4>
             <p class="arcade-modal-sub">Masukkan identitas pembeli untuk lanjut balapan!</p>
 
             <input type="text" id="arcadeInputNama" class="arcade-input" placeholder="Nama Lengkap Customer..." />
@@ -236,7 +236,7 @@
         <!-- OVERLAY MODAL 2: FINISH LINE BONNET SIGNATURE -->
         <div id="arcadeFinishOverlay" class="arcade-modal-overlay">
           <div class="arcade-modal-box" style="text-align:center;">
-            <h4 class="arcade-modal-title" style="justify-content:center;">🏁 FINISH LINE: Deal Bonnet Sign</h4>
+            <h4 class="arcade-modal-title" style="justify-content:center;"><i class="fa-solid fa-trophy"></i> FINISH LINE: Deal Bonnet Sign</h4>
             <p class="arcade-modal-sub" style="margin-bottom:8px;">Tanda tangan customer di kap mobil juara!</p>
 
             <div style="background:rgba(255,255,255,0.05); padding:10px 12px; border-radius:10px; font-size:11px; color:#cbd5e1; margin-bottom:10px; text-align:left;">

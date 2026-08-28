@@ -465,22 +465,22 @@
                         <i class="fa-solid fa-list-check"></i> Semua Pengingat
                     </button>
                     <button class="filter-tab-btn" onclick="filterRetentionCategory('1000KM', this)">
-                        🛠️ Servis 1.000 KM (Garansi)
+                        <i class="fa-solid fa-wrench"></i> Servis 1.000 KM (Garansi)
                     </button>
                     <button class="filter-tab-btn" onclick="filterRetentionCategory('10000KM', this)">
-                        🧰 Servis 10.000 KM (T-Care)
+                        <i class="fa-solid fa-toolbox"></i> Servis 10.000 KM (T-Care)
                     </button>
                     <button class="filter-tab-btn" onclick="filterRetentionCategory('ASURANSI', this)">
-                        🛡️ Pajak STNK &amp; Asuransi
+                        <i class="fa-solid fa-shield-halved"></i> Pajak STNK &amp; Asuransi
                     </button>
                     <button class="filter-tab-btn" onclick="filterRetentionCategory('BIRTHDAY', this)">
-                        🎂 Ulang Tahun Konsumen
+                        <i class="fa-solid fa-cake-candles"></i> Ulang Tahun Konsumen
                     </button>
                     <button class="filter-tab-btn" onclick="filterRetentionCategory('TRADEIN', this)">
-                        🚗 Trade-In Hybrid (3-5 Thn)
+                        <i class="fa-solid fa-car"></i> Trade-In Hybrid (3-5 Thn)
                     </button>
                     <button class="filter-tab-btn" onclick="filterRetentionCategory('BOOKED', this)">
-                        📅 Terjadwal Servis
+                        <i class="fa-solid fa-calendar-check"></i> Terjadwal Servis
                     </button>
                 </div>
 
@@ -619,13 +619,13 @@
             <div class="form-group-retention">
                 <label>Jenis Layanan Servis:</label>
                 <select id="bookingServiceTypeSelect">
-                    <option value="Servis Berkala 1.000 KM (Aktivasi Garansi)">🛠️ Servis Berkala 1.000 KM (Aktivasi Garansi ATPM)</option>
-                    <option value="Servis Berkala 10.000 KM (T-Care)">🧰 Servis Berkala 10.000 KM / 6 Bulan (T-Care Gratis Oli &amp; Jasa)</option>
-                    <option value="Servis Berkala 20.000 KM / 1 Tahun">🔧 Servis Berkala 20.000 KM / 1 Tahun</option>
-                    <option value="Toyota Mobile Service (TMS Home Service)">🏠 Toyota Mobile Service (TMS / Servis ke Rumah)</option>
-                    <option value="Ganti Oli Cepat (Express Maintenance 60 Menit)">⏱️ Express Maintenance 60 Menit</option>
-                    <option value="Perbaikan Body &amp; Cat (Body &amp; Paint)">🎨 Perbaikan Bodi &amp; Cat (Body &amp; Paint)</option>
-                    <option value="Pemeriksaan Keluhan Khusus / General Repair">🔍 General Repair &amp; Pemeriksaan Keluhan</option>
+                    <option value="Servis Berkala 1.000 KM (Aktivasi Garansi)">Servis Berkala 1.000 KM (Aktivasi Garansi ATPM)</option>
+                    <option value="Servis Berkala 10.000 KM (T-Care)">Servis Berkala 10.000 KM / 6 Bulan (T-Care Gratis Oli &amp; Jasa)</option>
+                    <option value="Servis Berkala 20.000 KM / 1 Tahun">Servis Berkala 20.000 KM / 1 Tahun</option>
+                    <option value="Toyota Mobile Service (TMS Home Service)">Toyota Mobile Service (TMS / Servis ke Rumah)</option>
+                    <option value="Ganti Oli Cepat (Express Maintenance 60 Menit)">Express Maintenance 60 Menit</option>
+                    <option value="Perbaikan Body &amp; Cat (Body &amp; Paint)">Perbaikan Bodi &amp; Cat (Body &amp; Paint)</option>
+                    <option value="Pemeriksaan Keluhan Khusus / General Repair">General Repair &amp; Pemeriksaan Keluhan</option>
                 </select>
             </div>
 

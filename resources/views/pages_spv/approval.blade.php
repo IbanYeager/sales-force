@@ -100,7 +100,7 @@
         </div>
         <div>
           <select id="selectFilterSpvApproval" class="form-control" style="width: auto; padding: 7px 12px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12px; background: #f8fafc;" onchange="changeApprovalSpvFilter(this.value)">
-            <option value="Semua">👑 Semua Tim (Master - 42 Sales)</option>
+            <option value="Semua">Semua Tim (Master - 42 Sales)</option>
             <option value="Ryan">Tim Pak Ryan</option>
             <option value="Riva">Tim Pak Riva</option>
             <option value="Dani">Tim Pak Dani</option>

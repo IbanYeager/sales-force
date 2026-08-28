@@ -213,7 +213,7 @@
       
       <!-- Hero Banner -->
       <div class="tss-hero-section">
-        <h2 style="font-size: 18px; font-weight: 900; margin: 0 0 6px 0;">🛡️ Simulator TSS 3.0</h2>
+        <h2 style="font-size: 18px; font-weight: 900; margin: 0 0 6px 0;"><i class="fa-solid fa-shield-halved" style="color:#ef4444;"></i> Simulator TSS 3.0</h2>
         <p style="font-size: 12px; color: #cbd5e1; margin: 0; line-height: 1.4;">Simulasi interaktif teknologi keselamatan aktif Toyota Safety Sense (TSS) untuk demonstrasi keunggulan fitur kepada konsumen.</p>
       </div>
 

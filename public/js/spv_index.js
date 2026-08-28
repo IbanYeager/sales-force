@@ -122,10 +122,10 @@ function logoutUser() {
         if (wirJson.status === 'success' && Array.isArray(wirJson.data)) {
           const elSalesCount = document.getElementById('dashSalesCount');
           if (elSalesCount) elSalesCount.textContent = wirJson.data.length;
-          
+
           const totalOnline = wirJson.total_online || 0;
           const totalOffline = (wirJson.data.length - totalOnline);
-          
+
           const elActive = document.getElementById('dashSalesActive');
           const elInactive = document.getElementById('dashSalesInactive');
           if (elActive) {
@@ -141,7 +141,7 @@ function logoutUser() {
 
       const dashPendingEl = document.getElementById('dashPending');
       if (dashPendingEl) dashPendingEl.textContent = totalPending;
-      
+
       if (typeof window.checkPendingApprovalsGlobal === 'function') {
         window.checkPendingApprovalsGlobal();
       }
@@ -161,10 +161,10 @@ function logoutUser() {
     window.openBriefingModal = function() {
       const spvNama = localStorage.getItem('spvSales') || localStorage.getItem('namaSales') || 'Supervisor';
       const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-      
+
       const spkStatus = document.getElementById('dashSpkStatus') ? document.getElementById('dashSpkStatus').textContent : '0 / 0 unit';
       const doStatus = document.getElementById('dashDoStatus') ? document.getElementById('dashDoStatus').textContent : '0 / 0 unit';
-      
+
       let topSalesStr = 'Belum ada data wiraniaga.';
       if (window.realLeadersData && window.realLeadersData.length > 0) {
         topSalesStr = window.realLeadersData.slice(0, 3).map((l, i) => {
@@ -235,7 +235,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
     window.updateDiscountSim = function() {
       const model = document.getElementById('calcModelSelect').value;
       const discount = parseInt(document.getElementById('calcDiscountInput').value) || 0;
-      
+
       const limits = {
         avanza: 15000000,
         veloz: 18000000,
@@ -338,7 +338,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
                     ${i + 1}
                   </div>
                   <div>
-                    <div style="font-weight:800; font-size:14px; color:#0f172a;">${l.name} <span style="font-size:10px; font-weight:700; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px;">${badges[i] || '⭐ Active'}</span></div>
+                    <div style="font-weight:800; font-size:14px; color:#0f172a;">${l.name} <span style="font-size:10px; font-weight:700; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px;">${badges[i] || 'Active'}</span></div>
                     <div style="font-size:11px; color:#64748b;">Realisasi: ${l.spk} / ${l.target} SPK (${l.pct}%) &middot; ${l.tingkatan}</div>
                   </div>
                 </div>
@@ -357,7 +357,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
       try {
         const spkRes = await fetch(`../api/api_spk.php?spv=${encodeURIComponent(spv)}`);
         const spkJson = await spkRes.json();
-        
+
         let stagnantLeads = [];
         if (spkJson.status === 'success' && Array.isArray(spkJson.data)) {
           stagnantLeads = spkJson.data.filter(item => item.status === 'Menunggu' || item.status === 'Pending').map(item => ({
@@ -439,7 +439,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
       if (!container) return;
 
       const spv = localStorage.getItem('spvSales') || localStorage.getItem('namaSales') || '';
-      
+
       try {
         const spkRes = await fetch(`../api/api_spk.php?spv=${encodeURIComponent(spv)}`);
         const spkJson = await spkRes.json();
@@ -489,7 +489,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
     // ==========================================
     async function loadPipelineFunnelData() {
       const spv = localStorage.getItem('spvSales') || localStorage.getItem('namaSales') || '';
-      
+
       try {
         const spkRes = await fetch(`../api/api_spk.php?spv=${encodeURIComponent(spv)}`);
         const spkJson = await spkRes.json();
@@ -548,8 +548,8 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
                 <div>
                   <div style="font-weight:800; font-size:13.5px; color:#0f172a;">${s.nama_lengkap} <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:6px; ${badgeClass}">${badgeLabel}</span></div>
                   <div style="font-size:11px; color:#64748b; margin-top:2px;">
-                    <i class="fa-solid fa-phone" style="margin-right:4px;"></i> Call &middot; 
-                    <i class="fa-solid fa-handshake" style="margin-right:4px;"></i> Visit &middot; 
+                    <i class="fa-solid fa-phone" style="margin-right:4px;"></i> Call &middot;
+                    <i class="fa-solid fa-handshake" style="margin-right:4px;"></i> Visit &middot;
                     <i class="fa-solid fa-car" style="margin-right:4px;"></i> Test Drive
                   </div>
                 </div>

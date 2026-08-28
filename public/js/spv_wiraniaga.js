@@ -55,7 +55,7 @@ let listDataWiraniaga = [];
       const peran = localStorage.getItem('peranSales') || 'Supervisor';
       const namaSpv = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
       const filterSpvEl = document.getElementById('selectFilterSpvWiraniaga');
-      
+
       if (filterSpvEl) {
         if (peran === 'Supervisor' || peran === 'SPV') {
           filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>Tim ${namaSpv}</option>`;

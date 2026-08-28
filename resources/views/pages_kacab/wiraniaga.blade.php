@@ -118,7 +118,7 @@
           </div>
           <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 10px 14px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
-              <option value="Semua">👑 Semua Tim (Master - 46 Sales)</option>
+              <option value="Semua">Semua Tim (Master - 46 Sales)</option>
               <option value="Pak Ryan">Tim Pak Ryan</option>
               <option value="Pak Alvin">Tim Pak Alvin</option>
               <option value="Pak Riva">Tim Pak Riva</option>

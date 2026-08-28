@@ -81,7 +81,7 @@
       const peran = localStorage.getItem('peranSales') || 'Supervisor';
       const namaSpv = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Pak Ryan';
       const filterSpvEl = document.getElementById('selectFilterSpvTarget');
-      
+
       if (filterSpvEl) {
         if (peran === 'Supervisor' || peran === 'SPV') {
           filterSpvEl.innerHTML = `<option value="${namaSpv}" selected>Tim ${namaSpv}</option>`;
@@ -219,7 +219,7 @@
     async function savePlanNote(input, idTargetBulanan, salesAccountId) {
       const val = input.value.trim();
       input.style.borderColor = 'var(--blue)';
-      
+
       const selectBulan = document.getElementById('selectBulanMonitoring');
       const bulanParam = selectBulan ? parseInt(selectBulan.value) : (new Date().getMonth() + 1);
 

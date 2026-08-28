@@ -383,8 +383,8 @@ function renderCustomerTable() {
 
         <!-- 4. Kategori & Klaster -->
         <td style="min-width:190px;">
-          ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="background:#f8fafc; color:#334155; border-color:#e2e8f0; font-size:10.5px; margin-bottom:3px;">🏷️ ${escapeHtml(c.cluster_name)}</span></div>` : ''}
-          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:10px; margin-bottom:3px;">⚡ ${escapeHtml(c.priority)}</span></div>` : ''}
+          ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="background:#f8fafc; color:#334155; border-color:#e2e8f0; font-size:10.5px; margin-bottom:3px;"><i class="fa-solid fa-tag"></i> ${escapeHtml(c.cluster_name)}</span></div>` : ''}
+          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:10px; margin-bottom:3px;"><i class="fa-solid fa-bolt"></i> ${escapeHtml(c.priority)}</span></div>` : ''}
           <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
             ${c.outlet_do ? `<span style="font-size:9.5px; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-building" style="font-size:9px;"></i> DO: ${escapeHtml(c.outlet_do)}</span>` : ''}
             ${c.service_compliance ? `<span style="font-size:9.5px; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-wrench" style="font-size:9px;"></i> Servis: ${escapeHtml(c.service_compliance)}</span>` : ''}
@@ -395,10 +395,10 @@ function renderCustomerTable() {
         <td style="min-width:185px;">
           <select class="fu-table-select" onchange="inlineUpdateStatus(${c.id}, this.value)">
             <option value="Belum Dihubungi" ${c.followup_status === 'Belum Dihubungi' ? 'selected' : ''}>⚪ Belum Dihubungi</option>
-            <option value="Menunggu Respon" ${c.followup_status === 'Menunggu Respon' ? 'selected' : ''}>🟡 Menunggu Respon</option>
-            <option value="Tertarik / Jadwal Servis" ${c.followup_status === 'Tertarik / Jadwal Servis' ? 'selected' : ''}>🔵 Tertarik / Servis</option>
-            <option value="Deal / Selesai" ${c.followup_status === 'Deal / Selesai' ? 'selected' : ''}>🟢 Deal / Selesai</option>
-            <option value="Tidak Tertarik" ${c.followup_status === 'Tidak Tertarik' ? 'selected' : ''}>🔴 Tidak Tertarik</option>
+            <option value="Menunggu Respon" ${c.followup_status === 'Menunggu Respon' ? 'selected' : ''}>Menunggu Respon</option>
+            <option value="Tertarik / Jadwal Servis" ${c.followup_status === 'Tertarik / Jadwal Servis' ? 'selected' : ''}>Tertarik / Servis</option>
+            <option value="Deal / Selesai" ${c.followup_status === 'Deal / Selesai' ? 'selected' : ''}>Deal / Selesai</option>
+            <option value="Tidak Tertarik" ${c.followup_status === 'Tidak Tertarik' ? 'selected' : ''}>Tidak Tertarik</option>
           </select>
         </td>
 
@@ -616,7 +616,7 @@ function openCustomerDetailModal(customerId) {
     <div style="background:linear-gradient(135deg, #0d1b3e 0%, #16305f 100%); color:#ffffff; border-radius:14px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
       <div>
         <div style="font-size:11px; color:#93c5fd; text-transform:uppercase; font-weight:800; letter-spacing:0.5px;">Target Rekomendasi TAM</div>
-        <div style="font-size:18px; font-weight:900; color:#ffffff; margin-top:2px;">🚗 ${c.recommended_model || c.car_model}</div>
+        <div style="font-size:18px; font-weight:900; color:#ffffff; margin-top:2px;"><i class="fa-solid fa-car"></i> ${c.recommended_model || c.car_model}</div>
         <div style="font-size:12px; color:#cbd5e1; margin-top:4px;">
           ${(c.alt_model_2 || c.alt_model_3) ? `Alternatif: <strong>${[c.alt_model_2, c.alt_model_3].filter(Boolean).join(' • ')}</strong>` : 'Rekomendasi Utama'}
         </div>
@@ -1567,7 +1567,7 @@ function openTemplateManagerModal() {
           <div style="display:flex; align-items:center; gap:8px;">
             <strong style="font-size:13.5px; color:#0f172a; font-weight:800;">${escapeHtml(t.title)}</strong>
             <span style="font-size:10px; font-weight:800; padding:3px 9px; border-radius:9999px; ${isCustom ? 'background:#dcfce7; color:#15803d;' : 'background:#eff6ff; color:#1d4ed8;'}">
-              ${isCustom ? `⭐ Kustom (${t.created_by || 'Sales'})` : '🔒 Template Default'}
+              ${isCustom ? `Kustom (${t.created_by || 'Sales'})` : '🔒 Template Default'}
             </span>
           </div>
           ${isCustom ? `
@@ -1606,7 +1606,7 @@ function openCustomTemplateModalMaster(initialContent = '', editId = 0, editTitl
               <i class="fa-solid fa-star"></i> Template Kustom
             </div>
             <h3 style="font-size:17px; font-weight:900; color:#0d1b3e; margin:0;">
-              ${editId ? '✏️ Edit Template WhatsApp' : '➕ Buat Template WhatsApp Kustom'}
+              ${editId ? 'Edit Template WhatsApp' : 'Buat Template WhatsApp Kustom'}
             </h3>
           </div>
           <button class="btn-close-modal" onclick="closeCustomTemplateModalMaster()"><i class="fa-solid fa-xmark"></i></button>
@@ -1621,12 +1621,12 @@ function openCustomTemplateModalMaster(initialContent = '', editId = 0, editTitl
             <div>
               <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Kategori</label>
               <select id="mCustTmplCategory" class="fu-select" style="font-size:12px; padding:7px 10px;">
-                <option value="promo" ${editCategory === 'promo' ? 'selected' : ''}>🔥 Promo &amp; Diskon</option>
-                <option value="tradein" ${editCategory === 'tradein' ? 'selected' : ''}>🔄 Trade-In / Upgrade</option>
-                <option value="csat" ${editCategory === 'csat' ? 'selected' : ''}>🥰 CSAT &amp; Tanya Kabar</option>
-                <option value="servis" ${editCategory === 'servis' ? 'selected' : ''}>🔧 Servis &amp; Bengkel</option>
-                <option value="stnk" ${editCategory === 'stnk' ? 'selected' : ''}>📄 STNK &amp; Pajak</option>
-                <option value="kustom" ${editCategory === 'kustom' ? 'selected' : ''}>✨ Follow Up Kustom</option>
+                <option value="promo" ${editCategory === 'promo' ? 'selected' : ''}>Promo &amp; Diskon</option>
+                <option value="tradein" ${editCategory === 'tradein' ? 'selected' : ''}>Trade-In / Upgrade</option>
+                <option value="csat" ${editCategory === 'csat' ? 'selected' : ''}>CSAT &amp; Tanya Kabar</option>
+                <option value="servis" ${editCategory === 'servis' ? 'selected' : ''}>Servis &amp; Bengkel</option>
+                <option value="stnk" ${editCategory === 'stnk' ? 'selected' : ''}>STNK &amp; Pajak</option>
+                <option value="kustom" ${editCategory === 'kustom' ? 'selected' : ''}>Follow Up Kustom</option>
               </select>
             </div>
           </div>
@@ -1635,10 +1635,10 @@ function openCustomTemplateModalMaster(initialContent = '', editId = 0, editTitl
           <div style="margin-bottom:8px;">
             <div style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px;">Klik tag untuk menyisipkan variabel otomatis:</div>
             <div style="display:flex; flex-wrap:wrap; gap:3px;">
-              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{nama_sales}')">👤 {nama_sales}</button>
+              <button type="button" class="variable-chip-btn" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{nama_sales}')">{nama_sales}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{nama_customer}')">{nama_customer}</button>
-              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{mobil_saat_ini}')">🚗 {mobil_saat_ini}</button>
-              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{model_rekomendasi}')">🎯 {model_rekomendasi}</button>
+              <button type="button" class="variable-chip-btn" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{mobil_saat_ini}')">{mobil_saat_ini}</button>
+              <button type="button" class="variable-chip-btn" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:800;" onclick="insertTagToMasterCustomTmpl('{model_rekomendasi}')">{model_rekomendasi}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{usia_kendaraan}')">{usia_kendaraan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{kecamatan}')">{kecamatan}</button>
               <button type="button" class="variable-chip-btn" onclick="insertTagToMasterCustomTmpl('{dealer}')">{dealer}</button>

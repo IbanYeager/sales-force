@@ -62,9 +62,9 @@
                 <div class="form-group">
                     <label>Sesi Waktu Aktivitas <span style="color: var(--primary-red);">*</span></label>
                     <select id="sesiWaktuAktivitas" class="form-control" disabled style="background: #f1f5f9; color: #0f172a; font-weight: 700; cursor: not-allowed; opacity: 0.9;">
-                        <option value="Pagi">🌅 Sesi Pagi (08:00 - 12:00)</option>
-                        <option value="Siang">☀️ Sesi Siang (12:00 - 15:00)</option>
-                        <option value="Sore">🌆 Sesi Sore / Malam (15:00 - 18:00+)</option>
+                        <option value="Pagi">Sesi Pagi (08:00 - 12:00)</option>
+                        <option value="Siang">Sesi Siang (12:00 - 15:00)</option>
+                        <option value="Sore">Sesi Sore / Malam (15:00 - 18:00+)</option>
                     </select>
                     <span style="font-size: 11px; color: #475569; font-weight: 600; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;">
                         <i class="fa-solid fa-lock" style="color: #0284c7;"></i> Dikunci otomatis oleh sistem berdasarkan jam real-time saat ini

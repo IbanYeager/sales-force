@@ -79,8 +79,8 @@
             <i class="fa-solid fa-signal"></i>
             <select id="filterStatusSales" onchange="applyHierFilters()">
               <option value="">Semua Kehadiran</option>
-              <option value="Online">🟢 Online Saja</option>
-              <option value="Offline">⚪ Offline Saja</option>
+              <option value="Online">Online Saja</option>
+              <option value="Offline">Offline Saja</option>
             </select>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="toggleAllGroups()" id="btnToggleAll">

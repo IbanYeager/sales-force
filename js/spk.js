@@ -204,7 +204,7 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
             if (window.showCustomAlert) {
               window.showCustomAlert('🎉 SELAMAT! SPK BERHASIL SUBMIT!', 'Pengajuan SPK baru berhasil dicatat & Lencana Prestasi "Top Closer" aktif!', 'success');
             } else {
-              alert('🎉 Selamat! SPK baru berhasil submit!');
+              alert('Selamat! SPK baru berhasil submit!');
             }
 
             document.getElementById('namaCustomer').value = '';

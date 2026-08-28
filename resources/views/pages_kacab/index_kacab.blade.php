@@ -77,7 +77,7 @@
             <div class="kpi-icon gold"><i class="fa-solid fa-user-tie"></i></div>
           </div>
           <div class="kpi-value" id="kpiSpv">0</div>
-          <div class="kpi-sub" id="kpiSpvSub"><span style="color:#10b981; font-weight:800;">🟢 0 Online</span> &middot; <span style="color:#94a3b8;">0 Offline</span></div>
+          <div class="kpi-sub" id="kpiSpvSub"><span style="color:#10b981; font-weight:800;">0 Online</span> &middot; <span style="color:#94a3b8;">0 Offline</span></div>
           <div class="kpi-sub" id="kpiSpvSub"><span style="color:#10b981; font-weight:800;"><i class="fa-solid fa-circle" style="font-size:8px;"></i> 0 Online</span> &middot; <span style="color:#94a3b8;">0 Offline</span></div>
         </div>
 
@@ -251,7 +251,7 @@
               <input type="text" id="kacabWaNumberInput" placeholder="081234567890" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px; font-weight:700; color:#0f172a; box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">⏰ Jam Pengiriman Otomatis (Bisa Diubah):</label>
+              <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Jam Pengiriman Otomatis (Bisa Diubah):</label>
               <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;"><i class="fa-regular fa-clock"></i> Jam Pengiriman Otomatis (Bisa Diubah):</label>
               <input type="time" id="kacabScheduleTimeInput" value="06:00" style="width:100%; padding:7px 10px; border-radius:8px; border:1.5px solid #6366f1; font-size:13px; font-weight:800; color:#1e1b4b; background:#eef2ff; box-sizing:border-box; cursor:pointer;">
             </div>

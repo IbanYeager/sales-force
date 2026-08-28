@@ -82,7 +82,7 @@
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
           <select id="selectSpvTeamFilter" class="form-control" style="width: auto; padding: 6px 12px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12.5px; background: #f8fafc;" onchange="applyTeamFilter(this.value)">
-            <option value="Semua">👑 Semua Tim (Total Cabang - 42 Sales)</option>
+            <option value="Semua">Semua Tim (Total Cabang - 42 Sales)</option>
             <option value="Ryan">Tim Pak Ryan (11 Sales)</option>
             <option value="Riva">Tim Pak Riva (10 Sales)</option>
             <option value="Dani">Tim Pak Dani (11 Sales)</option>

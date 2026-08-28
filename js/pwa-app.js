@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gap: 8px;
             animation: slideDownToast 0.4s ease;
         `;
-        toast.innerHTML = `<i class="fa-solid fa-bolt"></i> ⚡ Aplikasi diperbarui ke versi terbaru!`;
+        toast.innerHTML = `<i class="fa-solid fa-bolt"></i> Aplikasi diperbarui ke versi terbaru!`;
         document.body.appendChild(toast);
         setTimeout(() => {
             toast.style.transition = 'opacity 0.4s ease';

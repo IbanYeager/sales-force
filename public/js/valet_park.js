@@ -284,7 +284,7 @@ function completeLevel() {
   else if (bumpsCount > 0) stars = '⭐⭐';
 
   modalStars.innerText = stars;
-  modalTitle.innerText = `🎉 LEVEL ${currentLevel} SELESAI!`;
+  modalTitle.innerText = `LEVEL ${currentLevel} SELESAI!`;
   modalDesc.innerText = `Waktu: ${dispTimer.innerText} • Benturan: ${bumpsCount} kali`;
 
   if (currentLevel >= 3) {

@@ -423,7 +423,7 @@ function showSuccessModal() {
       successIcon.style.boxShadow = '0 6px 24px rgba(251,191,36,0.45)';
     }
     
-    if (successTitle) successTitle.innerText = '🎉 Selamat!';
+    if (successTitle) successTitle.innerText = 'Selamat!';
     if (successMessage) successMessage.innerText = 'Luar biasa! Anda telah menyelesaikan seluruh 20 tingkat kesulitan dengan sempurna. Anda adalah pakar otomotif Toyota sejati!';
     if (nextLevelBtn) nextLevelBtn.innerHTML = '<i class="fa-solid fa-flag-checkered" style="margin-right:6px;"></i>Selesai & Keluar';
     
