@@ -28,7 +28,7 @@
       transition: all 0.2s ease;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02) inset;
     }
-    
+
     .select2-container--default .select2-selection--single:focus,
     .select2-container--default.select2-container--open .select2-selection--single {
       border-color: var(--primary-blue, #3b82f6);
@@ -52,7 +52,7 @@
     .select2-container--default .select2-selection--single .select2-selection__placeholder {
       color: var(--text-muted, #94a3b8);
     }
-    
+
     .select2-dropdown {
       border: 1px solid var(--border-color, #e2e8f0);
       border-radius: 12px;
@@ -60,14 +60,14 @@
       overflow: hidden;
       margin-top: 4px;
     }
-    
+
     .select2-search--dropdown .select2-search__field {
       border-radius: 8px;
       border: 1px solid var(--border-color, #e2e8f0);
       padding: 8px 12px;
       background-color: #f8fafc;
     }
-    
+
     .select2-search--dropdown .select2-search__field:focus {
       border-color: var(--primary-blue, #3b82f6);
       outline: none;
@@ -79,7 +79,7 @@
       font-size: 13px;
       border-bottom: 1px solid #f1f5f9;
     }
-    
+
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
       background-color: var(--primary-blue, #3b82f6);
       color: white;
@@ -188,7 +188,7 @@
 
       <!-- ── FORM INPUT LEWAT GAME (SPK RUSH ARCADE) ──────────── -->
       <div id="inputGameContainer" class="spk-arcade-wrapper" style="display:none;">
-        
+
         <!-- Live HUD Bar -->
         <div class="arcade-hud-bar">
           <div class="arcade-speed-gauge">

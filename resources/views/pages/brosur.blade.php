@@ -235,9 +235,9 @@
   <!-- PDF.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="../custom_alert.js"></script>
-  <script src="../js/brosur.js"></script>
+  <script src="../js/brosur.js?v=20260828_ecatalog_v1"></script>
 
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260828_single_icons"></script>
 </body>
 
 </html>

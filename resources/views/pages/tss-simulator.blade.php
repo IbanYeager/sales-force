@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sales App - Toyota Safety Sense (TSS) Simulator</title>
-  
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -202,7 +202,7 @@
 
 <body>
   <div class="mobile-app" style="max-width: 1200px;">
-    
+
     <!-- Header SFT Upgraded by sidebar_desktop.js -->
     <header class="header-page">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
@@ -210,7 +210,7 @@
     </header>
 
     <div class="container" style="margin-top: 18px; max-width: 100%;">
-      
+
       <!-- Hero Banner -->
       <div class="tss-hero-section">
         <h2 style="font-size: 18px; font-weight: 900; margin: 0 0 6px 0;"><i class="fa-solid fa-shield-halved" style="color:#ef4444;"></i> Simulator TSS 3.0</h2>
