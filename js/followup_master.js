@@ -1196,7 +1196,7 @@ function updateRecallSalesInfo() {
   const infoBox = document.getElementById('recallSalesInfoBox');
   const countText = document.getElementById('recallSalesCountText');
   const pendingText = document.getElementById('recallSalesPendingText');
-  
+
   if (!select || !infoBox) return;
   const salesId = select.value;
   if (!salesId) {
@@ -2500,12 +2500,14 @@ let smartDistState = {
   quota: 50,
   category: 'all',
   selectedSales: [],
-  searchFilter: ''
+  searchFilter: '',
+  onlyUnassigned: true
 };
 
 function openSmartDistributionModal() {
   smartDistState.selectedSales = masterState.salesList.map(s => s.id); // Default select all
   smartDistState.quota = 50;
+  smartDistState.onlyUnassigned = true;
 
   // Always recreate with fresh salesList data
   document.getElementById('modalSmartDist')?.remove();
@@ -2521,9 +2523,30 @@ function openSmartDistributionModal() {
                 <i class="fa-solid fa-bolt-lightning"></i> Smart Distribution Matrix
               </div>
               <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">Bagi Kuota Leads ke Wiraniaga</h3>
-              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Atur jumlah pembagian data (misal 50 atau 100 leads) dan pilih sales tertentu yang ditugaskan.</p>
+              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Atur jumlah pembagian data (misal 50 atau 100 leads) dan prioritaskan data yang belum dibagikan.</p>
             </div>
             <button class="btn-close-modal" onclick="closeSmartDistModal()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <!-- Proteksi Anti-Double Banner -->
+          <div style="background:#ecfdf5; border:1.5px solid #a7f3d0; border-radius:14px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:34px; height:34px; border-radius:50%; background:#059669; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div>
+                <div style="font-size:12.5px; font-weight:800; color:#065f46;">
+                  Proteksi Anti-Double: Utamakan Data Belum Ditugaskan
+                </div>
+                <div style="font-size:11px; color:#047857;">
+                  Sistem memprioritaskan database yang belum memiliki sales PIC agar tidak ada customer yang terbagi ganda / double.
+                </div>
+              </div>
+            </div>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px; font-weight:800; color:#065f46; white-space:nowrap; background:#ffffff; border:1px solid #86efac; padding:5px 10px; border-radius:8px;">
+              <input type="checkbox" id="checkOnlyUnassigned" checked style="width:16px; height:16px; accent-color:#059669;" onchange="smartDistState.onlyUnassigned = this.checked; updateSmartDistPreview();">
+              Hanya Data Belum Ditugaskan
+            </label>
           </div>
 
           <!-- 1. PENGATURAN KUOTA -->
@@ -2773,7 +2796,7 @@ async function executeSmartDistribution() {
         sales_ids: smartDistState.selectedSales,
         quota_per_sales: smartDistState.quota,
         category: smartDistState.category,
-        only_unassigned: true
+        only_unassigned: smartDistState.onlyUnassigned !== false
       })
     });
     const data = await res.json();

@@ -495,13 +495,29 @@ if ($action === 'bulk_assign') {
 
     if ($auto_distribute) {
         $numSales = count($salesList);
+
+        // Prioritize unassigned leads and order them
+        if (!empty($customer_ids)) {
+            $idList = implode(',', array_map('intval', $customer_ids));
+            $custRows = followup_query("
+                SELECT id, phone, assigned_sales_id, followup_status 
+                FROM followup_customers 
+                WHERE id IN ($idList)
+                ORDER BY 
+                  (CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) THEN 0 ELSE 1 END) ASC,
+                  (CASE WHEN (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') THEN 0 ELSE 1 END) ASC,
+                  id DESC
+            ");
+            $customer_ids = array_map(fn($r) => (int)$r['id'], $custRows);
+        }
+
         for ($i = 0; $i < count($customer_ids); $i++) {
             $cid = (int)$customer_ids[$i];
             $assignedSales = $salesList[$i % $numSales];
             followup_execute("UPDATE followup_customers SET assigned_sales_id = ? WHERE id = ?", [$assignedSales['id'], $cid]);
-            followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', 'Auto-distribusi ke sales')", [$cid, $assignedSales['id'], $assignedSales['name']]);
+            followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', 'Auto-distribusi ke sales (Prioritas Unassigned)')", [$cid, $assignedSales['id'], $assignedSales['name']]);
         }
-        echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibagi rata ke $numSales wiraniaga."]);
+        echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibagi rata ke $numSales wiraniaga (mengutamakan data belum ditugaskan)."]);
         exit;
     }
 
@@ -1271,7 +1287,7 @@ if ($action === 'distribute_quota') {
         exit;
     }
 
-    // Build query for available leads
+    // Build query for available leads (Prioritize Unassigned and Uncontacted Leads)
     $where = [];
     $params = [];
 
@@ -1285,11 +1301,36 @@ if ($action === 'distribute_quota') {
     }
 
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
-    $availableLeads = followup_query("SELECT id, name, phone, car_model, followup_category FROM followup_customers $whereSql ORDER BY id DESC", $params);
+    
+    // Order: Unassigned first, Belum Dihubungi first, then newest ID
+    $sql = "SELECT id, name, phone, car_model, followup_category, assigned_sales_id, followup_status 
+            FROM followup_customers 
+            $whereSql 
+            ORDER BY 
+              (CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) THEN 0 ELSE 1 END) ASC,
+              (CASE WHEN (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') THEN 0 ELSE 1 END) ASC,
+              id DESC";
+
+    $rawLeads = followup_query($sql, $params);
+
+    // Deduplicate available leads by clean phone / id in this batch to prevent any double assignment
+    $uniqueLeads = [];
+    $seenPhones = [];
+    foreach ($rawLeads as $l) {
+        $cleanPhone = clean_phone_number($l['phone'] ?? '');
+        if ($cleanPhone !== '' && isset($seenPhones[$cleanPhone])) {
+            continue; // Skip duplicate phone number in the same distribution batch
+        }
+        if ($cleanPhone !== '') {
+            $seenPhones[$cleanPhone] = true;
+        }
+        $uniqueLeads[] = $l;
+    }
+    $availableLeads = $uniqueLeads;
 
     $totalAvailable = count($availableLeads);
     if ($totalAvailable === 0) {
-        echo json_encode(['success' => false, 'message' => 'Tidak ada data leads yang tersedia untuk dibagikan']);
+        echo json_encode(['success' => false, 'message' => 'Tidak ada data leads yang tersedia untuk dibagikan. Semua data mungkin sudah memiliki sales PIC.']);
         exit;
     }
 
