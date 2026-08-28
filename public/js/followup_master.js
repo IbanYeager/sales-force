@@ -439,12 +439,15 @@ function renderCustomerTable() {
         </td>
 
         <!-- 8. Aksi -->
-        <td style="text-align:right; min-width:180px;">
+        <td style="text-align:right; min-width:210px;">
           <div style="display:flex; align-items:center; justify-content:flex-end; gap:5px;">
-            <button class="btn-fu btn-fu-secondary" style="padding:6px 10px; font-size:11px; border-radius:8px;" onclick="openCustomerDetailModal(${c.id})" title="Lihat Profil Lengkap Customer 360°">
+            <button class="btn-fu btn-fu-secondary" style="padding:6px 9px; font-size:11px; border-radius:8px; background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;" onclick="openEditSingleCustomerModal(${c.id})" title="Ubah Data / Respon TAM (Bisa untuk 1 customer atau seluruh data perusahaan)">
+              <i class="fa-solid fa-pen-to-square" style="color:#2563eb;"></i> Ubah
+            </button>
+            <button class="btn-fu btn-fu-secondary" style="padding:6px 9px; font-size:11px; border-radius:8px;" onclick="openCustomerDetailModal(${c.id})" title="Lihat Profil Lengkap Customer 360°">
               <i class="fa-solid fa-circle-info"></i> Detail
             </button>
-            <button class="btn-fu btn-fu-emerald" style="padding:6px 10px; font-size:11px; border-radius:8px;" onclick="openWhatsAppDirect(${c.id})" title="Follow Up WhatsApp">
+            <button class="btn-fu btn-fu-emerald" style="padding:6px 9px; font-size:11px; border-radius:8px;" onclick="openWhatsAppDirect(${c.id})" title="Follow Up WhatsApp">
               <i class="fa-brands fa-whatsapp"></i> WA
             </button>
             ${(c.assigned_sales_id && parseInt(c.assigned_sales_id) > 0) ? `
@@ -747,19 +750,22 @@ function openCustomerDetailModal(customerId) {
     </div>
 
     <!-- Actions -->
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
       <button class="btn-fu btn-fu-emerald" style="flex:1; justify-content:center; padding:12px;" onclick="closeCustomerDetailModal(); openWhatsAppDirect(${c.id});">
-        <i class="fa-brands fa-whatsapp"></i> Follow Up via WhatsApp
+        <i class="fa-brands fa-whatsapp"></i> Follow Up WA
+      </button>
+      <button class="btn-fu btn-fu-secondary" style="background:#eff6ff; color:#1d4ed8 !important; border:1px solid #bfdbfe; padding:12px 14px;" onclick="closeCustomerDetailModal(); openEditSingleCustomerModal(${c.id});" title="Ubah data dan respon untuk customer ini atau seluruh data perusahaan">
+        <i class="fa-solid fa-pen-to-square" style="color:#2563eb;"></i> Ubah Data
       </button>
       ${(c.assigned_sales_id && parseInt(c.assigned_sales_id) > 0) ? `
         <button class="btn-fu" style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; padding:12px 14px;" onclick="closeCustomerDetailModal(); unassignCustomerSingle(${c.id}, '${escapeJs(c.name)}', '${escapeJs((masterState.salesList.find(s => s.id == c.assigned_sales_id) || {}).name || 'Sales')}');" title="Batalkan Penugasan Sales">
           <i class="fa-solid fa-user-xmark"></i> Batal Penugasan
         </button>
       ` : ''}
-      <a href="tel:${c.phone}" class="btn-fu btn-fu-secondary" style="padding:12px 18px; text-decoration:none;">
+      <a href="tel:${c.phone}" class="btn-fu btn-fu-secondary" style="padding:12px 16px; text-decoration:none;">
         <i class="fa-solid fa-phone"></i> Telepon
       </a>
-      <button class="btn-fu btn-fu-secondary" style="padding:12px 18px;" onclick="closeCustomerDetailModal()">
+      <button class="btn-fu btn-fu-secondary" style="padding:12px 16px;" onclick="closeCustomerDetailModal()">
         Tutup
       </button>
     </div>
@@ -1280,6 +1286,581 @@ async function executeRecallBySales() {
     }
   } catch (e) {
     console.error('Execute recall error', e);
+  }
+// =============================================================
+// EDIT SINGLE CUSTOMER / PERUSAHAAN (DENGAN PILIHAN LINGKUP)
+// =============================================================
+function openEditSingleCustomerModal(customerId) {
+  const c = masterState.customers.find(x => String(x.id) === String(customerId));
+  if (!c) {
+    console.error('Customer not found for id', customerId);
+    return;
+  }
+
+  // Detect candidate company name (e.g. "PT Sudeco", "CV Makmur", etc.)
+  const rawName = (c.name || '').trim();
+  let companyKeyword = rawName;
+  if (/^(PT|CV|UD|TOKO|YAYASAN|KOPERASI)\.?\s+/i.test(rawName)) {
+    const parts = rawName.split(/\s+/);
+    companyKeyword = parts.slice(0, 2).join(' ');
+  }
+
+  // Count how many matching records exist in current dataset
+  const matchingCompanyCount = masterState.customers.filter(x => {
+    return (x.name || '').toLowerCase().includes(companyKeyword.toLowerCase()) || 
+           (x.notes || '').toLowerCase().includes(companyKeyword.toLowerCase());
+  }).length;
+
+  const currentSearch = (masterState.filters.search || '').trim();
+  const matchingSearchCount = currentSearch ? masterState.customers.length : 0;
+
+  if (document.getElementById('modalEditSingleCustomer')) {
+    document.getElementById('modalEditSingleCustomer').remove();
+  }
+
+  const isConnected = (c.connected === 'TRUE' || c.connected === 'IYA' || c.connected === '1');
+  const isContacted = (c.contacted === 'TRUE' || c.contacted === 'IYA' || c.contacted === '1');
+  const isProspect = (c.prospect === 'TRUE' || c.prospect === 'IYA' || c.prospect === '1');
+  const isSpk = (c.spk === 'TRUE' || c.spk === 'IYA' || c.spk === '1');
+
+  const html = `
+    <div class="modal-overlay active" id="modalEditSingleCustomer" style="display:flex; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); align-items:center; justify-content:center;" onclick="closeEditSingleCustomerModal()">
+      <div class="modal-content" style="max-width:680px; width:95%; border-radius:18px; padding:24px; max-height:92vh; overflow-y:auto;" onclick="event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px;">
+              <i class="fa-solid fa-pen-to-square"></i> Edit Data & Status TAM
+            </div>
+            <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">${escapeHtml(c.name)}</h3>
+            <span style="font-size:11.5px; color:#64748b;">${escapeHtml(c.recommended_model || c.car_model || '-')} &bull; +${c.phone}</span>
+          </div>
+          <button class="btn-close-modal" onclick="closeEditSingleCustomerModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form id="formEditSingleCustomer" onsubmit="executeSaveEditCustomer(event, ${c.id})">
+          
+          <!-- 4 Grid TAM Status Toggle -->
+          <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-sliders" style="color:#d7123a;"></i> Indikator Respon TAM (Standar Toyota)
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">1. Connected (No. Tersambung):</label>
+                <select id="editSingleConnected" class="fu-select" style="font-size:12.5px;">
+                  <option value="TRUE" ${isConnected ? 'selected' : ''}>✅ YA (Tersambung / Aktif)</option>
+                  <option value="FALSE" ${!isConnected ? 'selected' : ''}>❌ TIDAK (Nomor Salah / Tidak Aktif)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">2. Contacted (Komunikasi Terkirim):</label>
+                <select id="editSingleContacted" class="fu-select" style="font-size:12.5px;">
+                  <option value="TRUE" ${isContacted ? 'selected' : ''}>✅ YA (Ada Respon / Terkirim)</option>
+                  <option value="FALSE" ${!isContacted ? 'selected' : ''}>❌ TIDAK (Tidak Diangkat / Centang 1)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">3. Prospect (Minat Beli / Upgrade):</label>
+                <select id="editSingleProspect" class="fu-select" style="font-size:12.5px;">
+                  <option value="TRUE" ${isProspect ? 'selected' : ''}>🔥 YA (Tertarik / Janjian / Simulasi)</option>
+                  <option value="FALSE" ${!isProspect ? 'selected' : ''}>⚪ TIDAK (Belum Tertarik / Menolak)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">4. SPK (Closing Transaksi):</label>
+                <select id="editSingleSpk" class="fu-select" style="font-size:12.5px;">
+                  <option value="TRUE" ${isSpk ? 'selected' : ''}>🏆 YA (Closing / SPK)</option>
+                  <option value="FALSE" ${!isSpk ? 'selected' : ''}>⚪ Belum SPK</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status CRM & Sales PIC -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div>
+              <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Status Follow-Up Utama:</label>
+              <select id="editSingleStatus" class="fu-select" style="font-size:12.5px;">
+                <option value="Belum Dihubungi" ${c.followup_status === 'Belum Dihubungi' ? 'selected' : ''}>⚪ Belum Dihubungi</option>
+                <option value="Menunggu Respon" ${c.followup_status === 'Menunggu Respon' ? 'selected' : ''}>⏳ Menunggu Respon</option>
+                <option value="Tertarik / Jadwal Servis" ${c.followup_status === 'Tertarik / Jadwal Servis' ? 'selected' : ''}>🔥 Tertarik / Jadwal Servis</option>
+                <option value="Deal / Selesai" ${c.followup_status === 'Deal / Selesai' ? 'selected' : ''}>🏆 Deal / Selesai</option>
+                <option value="Tidak Tertarik" ${c.followup_status === 'Tidak Tertarik' ? 'selected' : ''}>❌ Tidak Tertarik</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Status FU (Open/Closed):</label>
+              <select id="editSingleSalesFuStatus" class="fu-select" style="font-size:12.5px;">
+                <option value="Open" ${(c.sales_fu_status || 'Open') === 'Open' ? 'selected' : ''}>🔵 Open (Masih Berjalan)</option>
+                <option value="Closed" ${c.sales_fu_status === 'Closed' ? 'selected' : ''}>🔴 Closed (Selesai)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div>
+              <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Catatan Remarks:</label>
+              <select id="editSingleRemarks" class="fu-select" style="font-size:12.5px;">
+                <option value="">-- Pilih Remarks Standar --</option>
+                <option value="Customer tertarik" ${c.remarks === 'Customer tertarik' ? 'selected' : ''}>Customer tertarik</option>
+                <option value="Customer janjian" ${c.remarks === 'Customer janjian' ? 'selected' : ''}>Customer janjian</option>
+                <option value="Minta simulasi kredit" ${c.remarks === 'Minta simulasi kredit' ? 'selected' : ''}>Minta simulasi kredit</option>
+                <option value="Janjian test drive" ${c.remarks === 'Janjian test drive' ? 'selected' : ''}>Janjian test drive</option>
+                <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>SPK berhasil</option>
+                <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending</option>
+                <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>Customer menolak</option>
+                <option value="Beli di dealer/merk lain" ${c.remarks === 'Beli di dealer/merk lain' ? 'selected' : ''}>Beli di dealer/merk lain</option>
+                <option value="Customer tidak aktif" ${c.remarks === 'Customer tidak aktif' ? 'selected' : ''}>Customer tidak aktif</option>
+                <option value="Customer tidak diangkat" ${c.remarks === 'Customer tidak diangkat' ? 'selected' : ''}>Customer tidak diangkat</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Sales PIC Wiraniaga:</label>
+              <select id="editSingleSalesPic" class="fu-select" style="font-size:12.5px;">
+                <option value="0">-- Belum Ditugaskan / Batal Penugasan --</option>
+                ${masterState.salesList.map(s => `
+                  <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>
+                `).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Alasan / Keterangan Tambahan:</label>
+            <input type="text" id="editSingleNotes" class="fu-input" style="font-size:12.5px;" value="${escapeHtml(c.reason_followup || c.notes || '')}" placeholder="Masukkan catatan respon follow-up...">
+          </div>
+
+          <!-- LINGKUP PENERAPAN PERUBAHAN (Sesuai Permintaan User) -->
+          <div style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border:1.5px solid #93c5fd; border-radius:14px; padding:14px 16px; margin-bottom:18px;">
+            <div style="font-size:12.5px; font-weight:900; color:#1e40af; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i> Pilih Lingkup Penerapan Perubahan:
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#0f172a; cursor:pointer; background:#ffffff; padding:8px 12px; border-radius:10px; border:1px solid #bfdbfe;">
+                <input type="radio" name="editCustomerScope" value="single" checked style="accent-color:#d7123a; width:16px; height:16px;">
+                <div>
+                  <strong>Hanya ubah 1 data customer ini</strong>
+                  <span style="font-size:11px; color:#64748b; display:block;">Perubahan hanya diterapkan pada customer "${escapeHtml(c.name)}".</span>
+                </div>
+              </label>
+
+              ${(companyKeyword && matchingCompanyCount > 1) ? `
+                <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#0f172a; cursor:pointer; background:#ffffff; padding:8px 12px; border-radius:10px; border:1px solid #bfdbfe;">
+                  <input type="radio" name="editCustomerScope" value="company_name" style="accent-color:#d7123a; width:16px; height:16px;">
+                  <div>
+                    <strong>Ubah SEMUA data perusahaan "${escapeHtml(companyKeyword)}" (<span style="color:#d7123a; font-weight:800;">${matchingCompanyCount} customer</span>)</strong>
+                    <span style="font-size:11px; color:#64748b; display:block;">Terapkan status ini sekaligus ke seluruh data yang bernama/mengandung "${escapeHtml(companyKeyword)}".</span>
+                  </div>
+                </label>
+              ` : ''}
+
+              ${(currentSearch && matchingSearchCount > 1) ? `
+                <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#0f172a; cursor:pointer; background:#ffffff; padding:8px 12px; border-radius:10px; border:1px solid #bfdbfe;">
+                  <input type="radio" name="editCustomerScope" value="search" style="accent-color:#d7123a; width:16px; height:16px;">
+                  <div>
+                    <strong>Ubah SEMUA data hasil pencarian "${escapeHtml(currentSearch)}" (<span style="color:#d7123a; font-weight:800;">${matchingSearchCount} customer</span>)</strong>
+                    <span style="font-size:11px; color:#64748b; display:block;">Terapkan ke seluruh baris yang sedang tampil sesuai filter pencarian.</span>
+                  </div>
+                </label>
+              ` : ''}
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn-fu btn-fu-crimson" style="flex:1; justify-content:center; padding:12px; font-size:13.5px;">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan Data
+            </button>
+            <button type="button" class="btn-fu btn-fu-secondary" style="padding:12px 20px;" onclick="closeEditSingleCustomerModal()">
+              Batal
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function closeEditSingleCustomerModal() {
+  const modal = document.getElementById('modalEditSingleCustomer');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+async function executeSaveEditCustomer(e, customerId) {
+  e.preventDefault();
+
+  const connected = document.getElementById('editSingleConnected').value;
+  const contacted = document.getElementById('editSingleContacted').value;
+  const prospect = document.getElementById('editSingleProspect').value;
+  const spk = document.getElementById('editSingleSpk').value;
+  const status = document.getElementById('editSingleStatus').value;
+  const sales_fu_status = document.getElementById('editSingleSalesFuStatus').value;
+  const remarks = document.getElementById('editSingleRemarks').value;
+  const assigned_sales_id = document.getElementById('editSingleSalesPic').value;
+  const notes = document.getElementById('editSingleNotes').value;
+
+  const scopeEl = document.querySelector('input[name="editCustomerScope"]:checked');
+  const scope = scopeEl ? scopeEl.value : 'single';
+
+  const c = masterState.customers.find(x => String(x.id) === String(customerId));
+  const rawName = (c?.name || '').trim();
+  let companyKeyword = rawName;
+  if (/^(PT|CV|UD|TOKO|YAYASAN|KOPERASI)\.?\s+/i.test(rawName)) {
+    const parts = rawName.split(/\s+/);
+    companyKeyword = parts.slice(0, 2).join(' ');
+  }
+
+  const payload = {
+    scope: scope,
+    id: customerId,
+    company_name: companyKeyword,
+    search: (masterState.filters.search || '').trim(),
+    connected: connected,
+    contacted: contacted,
+    prospect: prospect,
+    spk: spk,
+    status: status,
+    sales_fu_status: sales_fu_status,
+    remarks: remarks,
+    assigned_sales_id: assigned_sales_id,
+    notes: notes
+  };
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=batch_update_customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeEditSingleCustomerModal();
+      await initMasterDashboard();
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Perubahan Berhasil Disimpan!', data.message, 'success');
+      } else {
+        alert(data.message);
+      }
+    } else {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal Menyimpan', data.message || 'Gagal memperbarui data', 'error');
+      } else {
+        alert(data.message || 'Gagal memperbarui data');
+      }
+    }
+  } catch (err) {
+    console.error('Error saving customer edits', err);
+  }
+}
+
+// =============================================================
+// MODAL UBAH STATUS / DATA MASSAL (BATCH UPDATE CRM)
+// =============================================================
+function openBatchEditModal(initialScope = null) {
+  const selectedCount = masterState.selectedIds.length;
+  const currentSearch = (masterState.filters.search || '').trim();
+  const searchCount = masterState.customers.length;
+
+  let defaultScope = 'search';
+  if (initialScope === 'selected' || selectedCount > 0) {
+    defaultScope = 'selected';
+  } else if (currentSearch) {
+    defaultScope = 'search';
+  } else {
+    defaultScope = 'company_name';
+  }
+
+  if (document.getElementById('modalBatchEditMaster')) {
+    document.getElementById('modalBatchEditMaster').remove();
+  }
+
+  const html = `
+    <div class="modal-overlay active" id="modalBatchEditMaster" style="display:flex; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); align-items:center; justify-content:center;" onclick="closeBatchEditModal()">
+      <div class="modal-content" style="max-width:720px; width:95%; border-radius:18px; padding:24px; max-height:92vh; overflow-y:auto;" onclick="event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px;">
+              <i class="fa-solid fa-layer-group"></i> Batch Data Update Manager
+            </div>
+            <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">Ubah Data & Respon Massal</h3>
+            <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">Perbarui status Connected, Contacted, Prospect, SPK, atau Sales PIC sekaligus untuk banyak data atau 1 perusahaan.</p>
+          </div>
+          <button class="btn-close-modal" onclick="closeBatchEditModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form id="formBatchEditMaster" onsubmit="executeBatchUpdateMaster(event)">
+          
+          <!-- 1. PILIH CAKUPAN / TARGET DATA -->
+          <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 16px; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">
+              <i class="fa-solid fa-crosshairs" style="color:#d7123a;"></i> 1. Tentukan Data yang Ingin Diubah:
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#0f172a; cursor:pointer; background:#ffffff; padding:10px 12px; border-radius:10px; border:1.5px solid #e2e8f0;">
+                <input type="radio" name="batchScopeChoice" value="selected" ${defaultScope === 'selected' ? 'checked' : ''} style="accent-color:#d7123a; width:16px; height:16px;">
+                <div>
+                  <strong>Data yang Sedang Dicentang (${selectedCount} Customer)</strong>
+                  <span style="font-size:11px; color:#64748b; display:block;">Hanya ubah ${selectedCount} data yang Anda centang pada tabel.</span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#0f172a; cursor:pointer; background:#ffffff; padding:10px 12px; border-radius:10px; border:1.5px solid #e2e8f0;">
+                <input type="radio" name="batchScopeChoice" value="search" ${defaultScope === 'search' ? 'checked' : ''} style="accent-color:#d7123a; width:16px; height:16px;">
+                <div style="flex:1;">
+                  <strong>Semua Data Hasil Pencarian Saat Ini (${searchCount} Customer)</strong>
+                  <span style="font-size:11px; color:#64748b; display:block;">Kata kunci: "${escapeHtml(currentSearch || 'Semua Data')}"</span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#0f172a; cursor:pointer; background:#ffffff; padding:10px 12px; border-radius:10px; border:1.5px solid #e2e8f0;">
+                <input type="radio" name="batchScopeChoice" value="company_name" ${defaultScope === 'company_name' ? 'checked' : ''} style="accent-color:#d7123a; width:16px; height:16px;">
+                <div style="flex:1;">
+                  <strong>Berdasarkan Nama PT / Perusahaan / Kata Kunci Tertentu</strong>
+                  <input type="text" id="batchCustomCompanyName" class="fu-input" placeholder="Ketik nama (contoh: PT Sudeco)..." value="${escapeHtml(currentSearch || '')}" style="font-size:12px; padding:6px 10px; margin-top:6px;" onclick="document.querySelector('input[name=\\'batchScopeChoice\\'][value=\\'company_name\\']').checked = true;">
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 2. PILIH KOLOM YANG INGIN DIUBAH -->
+          <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px; margin-bottom:18px;">
+            <div style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">
+              <i class="fa-solid fa-pen-ruler" style="color:#2563eb;"></i> 2. Atur Nilai Baru yang Ingin Diterapkan:
+            </div>
+
+            <!-- Indikator TAM -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Connected (No. Tersambung):</label>
+                <select id="batchConnected" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="TRUE">✅ YA (Tersambung / Aktif)</option>
+                  <option value="FALSE">❌ TIDAK (Tidak Aktif / Salah Nomor)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Contacted (Ada Respon):</label>
+                <select id="batchContacted" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="TRUE">✅ YA (Ada Respon / Terkirim)</option>
+                  <option value="FALSE">❌ TIDAK (Tidak Diangkat / Centang 1)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Prospect (Minat Beli / Upgrade):</label>
+                <select id="batchProspect" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="TRUE">🔥 YA (Tertarik / Janjian / Simulasi)</option>
+                  <option value="FALSE">⚪ TIDAK (Belum Tertarik / Menolak)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">SPK (Closing Transaksi):</label>
+                <select id="batchSpk" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="TRUE">🏆 YA (Closing / SPK)</option>
+                  <option value="FALSE">⚪ Belum SPK</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Status Follow-Up Utama & FU Open/Closed -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Status Follow-Up Utama:</label>
+                <select id="batchStatus" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="Belum Dihubungi">⚪ Belum Dihubungi</option>
+                  <option value="Menunggu Respon">⏳ Menunggu Respon</option>
+                  <option value="Tertarik / Jadwal Servis">🔥 Tertarik / Jadwal Servis</option>
+                  <option value="Deal / Selesai">🏆 Deal / Selesai</option>
+                  <option value="Tidak Tertarik">❌ Tidak Tertarik</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Status FU (Open/Closed):</label>
+                <select id="batchSalesFuStatus" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="Open">🔵 Open (Masih Berjalan)</option>
+                  <option value="Closed">🔴 Closed (Selesai)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Remarks & Sales PIC -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Remarks Standar:</label>
+                <select id="batchRemarks" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="Customer tertarik">Customer tertarik</option>
+                  <option value="Customer janjian">Customer janjian</option>
+                  <option value="Minta simulasi kredit">Minta simulasi kredit</option>
+                  <option value="Janjian test drive">Janjian test drive</option>
+                  <option value="SPK berhasil">SPK berhasil</option>
+                  <option value="Customer pending">Customer pending</option>
+                  <option value="Customer menolak">Customer menolak</option>
+                  <option value="Beli di dealer/merk lain">Beli di dealer/merk lain</option>
+                  <option value="Customer tidak aktif">Customer tidak aktif</option>
+                  <option value="Customer tidak diangkat">Customer tidak diangkat</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Tugaskan ke Sales PIC:</label>
+                <select id="batchSalesPic" class="fu-select" style="font-size:12px;">
+                  <option value="ignore">-- Jangan Diubah (Tetap) --</option>
+                  <option value="unassign">⚠️ Kosongkan (Batal Penugasan Sales)</option>
+                  ${masterState.salesList.map(s => `
+                    <option value="${s.id}">${escapeHtml(s.name)}</option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Catatan / Keterangan Tambahan (Opsional):</label>
+              <input type="text" id="batchNotes" class="fu-input" style="font-size:12px;" placeholder="Biarkan kosong jika tidak ingin mengubah catatan...">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn-fu btn-fu-crimson" style="flex:1; justify-content:center; padding:12px; font-size:13.5px;">
+              <i class="fa-solid fa-bolt-lightning"></i> Terapkan Perubahan Massal
+            </button>
+            <button type="button" class="btn-fu btn-fu-secondary" style="padding:12px 20px;" onclick="closeBatchEditModal()">
+              Batal
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function closeBatchEditModal() {
+  const modal = document.getElementById('modalBatchEditMaster');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+async function executeBatchUpdateMaster(e) {
+  e.preventDefault();
+
+  const scopeChoice = document.querySelector('input[name="batchScopeChoice"]:checked')?.value || 'selected';
+  const customCompanyName = (document.getElementById('batchCustomCompanyName')?.value || '').trim();
+
+  const connected = document.getElementById('batchConnected').value;
+  const contacted = document.getElementById('batchContacted').value;
+  const prospect = document.getElementById('batchProspect').value;
+  const spk = document.getElementById('batchSpk').value;
+  const status = document.getElementById('batchStatus').value;
+  const sales_fu_status = document.getElementById('batchSalesFuStatus').value;
+  const remarks = document.getElementById('batchRemarks').value;
+  const assigned_sales_id = document.getElementById('batchSalesPic').value;
+  const notes = (document.getElementById('batchNotes').value || '').trim();
+
+  // Validate at least one field is selected for update
+  if (connected === 'ignore' && contacted === 'ignore' && prospect === 'ignore' && spk === 'ignore' && status === 'ignore' && sales_fu_status === 'ignore' && remarks === 'ignore' && assigned_sales_id === 'ignore' && notes === '') {
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Pilih Data', 'Pilih minimal 1 kolom (Connected, Contacted, Status, Sales, dll.) yang ingin Anda ubah.', 'warning');
+    } else {
+      alert('Pilih minimal 1 kolom yang ingin Anda ubah.');
+    }
+    return;
+  }
+
+  if (scopeChoice === 'selected' && masterState.selectedIds.length === 0) {
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Tidak Ada Data Dicentang', 'Silakan centang data customer pada tabel terlebih dahulu, atau pilih opsi "Semua Data Hasil Pencarian / Nama PT".', 'warning');
+    } else {
+      alert('Tidak ada data customer yang dicentang.');
+    }
+    return;
+  }
+
+  if (scopeChoice === 'company_name' && !customCompanyName) {
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Ketik Nama Perusahaan', 'Harap masukkan nama PT/Perusahaan (misal: PT Sudeco) pada kolom yang disediakan.', 'warning');
+    } else {
+      alert('Harap masukkan nama PT/Perusahaan.');
+    }
+    return;
+  }
+
+  let isConfirmed = false;
+  let confirmDesc = '';
+  if (scopeChoice === 'selected') {
+    confirmDesc = `Ubah data ${masterState.selectedIds.length} customer terpilih?`;
+  } else if (scopeChoice === 'company_name') {
+    confirmDesc = `Ubah SEMUA data customer yang bernama/mengandung "${customCompanyName}"?`;
+  } else {
+    confirmDesc = `Ubah SEMUA data hasil pencarian "${masterState.filters.search || 'Semua Data'}"?`;
+  }
+
+  if (typeof customConfirm === 'function') {
+    isConfirmed = await customConfirm(confirmDesc);
+  } else {
+    isConfirmed = confirm(confirmDesc);
+  }
+
+  if (!isConfirmed) return;
+
+  const payload = {
+    scope: scopeChoice,
+    customer_ids: masterState.selectedIds,
+    company_name: customCompanyName,
+    search: (masterState.filters.search || '').trim(),
+    connected: connected,
+    contacted: contacted,
+    prospect: prospect,
+    spk: spk,
+    status: status,
+    sales_fu_status: sales_fu_status,
+    remarks: remarks,
+    assigned_sales_id: assigned_sales_id,
+    notes: notes || 'ignore'
+  };
+
+  try {
+    const res = await fetch('../api/api_followup.php?action=batch_update_customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeBatchEditModal();
+      masterState.selectedIds = [];
+      updateBulkActionBar();
+      await initMasterDashboard();
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Pembaruan Massal Berhasil!', data.message, 'success');
+      } else {
+        alert(data.message);
+      }
+    } else {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal', data.message || 'Gagal memperbarui data', 'error');
+      } else {
+        alert(data.message || 'Gagal memperbarui data');
+      }
+    }
+  } catch (err) {
+    console.error('Batch update error', err);
   }
 }
 

@@ -161,6 +161,10 @@
             <i class="fa-solid fa-user-xmark" style="color:#ea580c;"></i> Tarik DB per Sales
           </button>
 
+          <button class="btn-fu btn-fu-secondary" style="background:#eff6ff; color:#1d4ed8 !important; border:1px solid #bfdbfe;" onclick="openBatchEditModal()" title="Ubah status Connected, Contacted, Prospect, SPK, dan Status Follow-Up sekaligus untuk banyak data atau 1 perusahaan">
+            <i class="fa-solid fa-pen-to-square" style="color:#2563eb;"></i> Ubah Data Massal
+          </button>
+
           <button class="btn-fu btn-fu-secondary" onclick="openAddCustomerModal()">
             <i class="fa-solid fa-user-plus"></i> + Customer
           </button>
@@ -200,6 +204,10 @@
 
           <button class="btn-fu btn-fu-crimson" onclick="executeBulkAssign()">
             <i class="fa-solid fa-user-check"></i> Tugaskan ke Sales
+          </button>
+
+          <button class="btn-fu" style="background:#2563eb; color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(37,99,235,0.35);" onclick="openBatchEditModal('selected')" title="Ubah status respon, connected, prospect, spk untuk customer terpilih">
+            <i class="fa-solid fa-pen-to-square"></i> Ubah Data Terpilih
           </button>
 
           <button class="btn-fu btn-fu-secondary" style="background:rgba(255,255,255,0.15); color:#ffffff !important; border-color:rgba(255,255,255,0.25);" onclick="executeAutoDistribute()">

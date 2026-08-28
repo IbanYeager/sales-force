@@ -983,6 +983,163 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
 }
 
 // -------------------------------------------------------------
+// ROUTE: POST /api_followup.php?action=batch_update_customers
+// Update Status, Connected, Contacted, Prospect, SPK, Remarks secara massal / 1 Nama / Pencarian
+// -------------------------------------------------------------
+if ($action === 'batch_update_customers') {
+    $input = get_json_input();
+    $scope = $input['scope'] ?? 'selected'; // 'single', 'selected', 'search', 'company_name'
+    $single_id = (int)($input['id'] ?? 0);
+    $customer_ids = $input['customer_ids'] ?? [];
+    $search = trim($input['search'] ?? '');
+    $company_name = trim($input['company_name'] ?? '');
+
+    // Fields to update (only update if passed in payload and not empty/ignore)
+    $updates = [];
+    $params = [];
+
+    // 1. Connected
+    if (isset($input['connected']) && $input['connected'] !== '' && $input['connected'] !== 'ignore') {
+        $cRaw = strtoupper(trim($input['connected']));
+        $connected = ($cRaw === 'IYA' || $cRaw === 'YA' || $cRaw === '1' || $cRaw === 'TRUE') ? 'TRUE' : 'FALSE';
+        $updates[] = "connected = ?";
+        $params[] = $connected;
+    }
+
+    // 2. Contacted
+    if (isset($input['contacted']) && $input['contacted'] !== '' && $input['contacted'] !== 'ignore') {
+        $cRaw = strtoupper(trim($input['contacted']));
+        $contacted = ($cRaw === 'IYA' || $cRaw === 'YA' || $cRaw === '1' || $cRaw === 'TRUE') ? 'TRUE' : 'FALSE';
+        $updates[] = "contacted = ?";
+        $params[] = $contacted;
+    }
+
+    // 3. Prospect
+    if (isset($input['prospect']) && $input['prospect'] !== '' && $input['prospect'] !== 'ignore') {
+        $pRaw = strtoupper(trim($input['prospect']));
+        $prospect = ($pRaw === 'IYA' || $pRaw === 'YA' || $pRaw === '1' || $pRaw === 'TRUE') ? 'TRUE' : 'FALSE';
+        $updates[] = "prospect = ?";
+        $params[] = $prospect;
+    }
+
+    // 4. SPK
+    if (isset($input['spk']) && $input['spk'] !== '' && $input['spk'] !== 'ignore') {
+        $sRaw = strtoupper(trim($input['spk']));
+        $spk = ($sRaw === 'IYA' || $sRaw === 'YA' || $sRaw === '1' || $sRaw === 'TRUE') ? 'TRUE' : 'FALSE';
+        $updates[] = "spk = ?";
+        $params[] = $spk;
+    }
+
+    // 5. Follow-Up Status
+    if (isset($input['status']) && $input['status'] !== '' && $input['status'] !== 'ignore') {
+        $updates[] = "followup_status = ?";
+        $params[] = trim($input['status']);
+    } elseif (isset($input['followup_status']) && $input['followup_status'] !== '' && $input['followup_status'] !== 'ignore') {
+        $updates[] = "followup_status = ?";
+        $params[] = trim($input['followup_status']);
+    }
+
+    // 6. Remarks
+    if (isset($input['remarks']) && $input['remarks'] !== '' && $input['remarks'] !== 'ignore') {
+        $updates[] = "remarks = ?";
+        $params[] = trim($input['remarks']);
+    }
+
+    // 7. Sales FU Status (Open / Closed)
+    if (isset($input['sales_fu_status']) && $input['sales_fu_status'] !== '' && $input['sales_fu_status'] !== 'ignore') {
+        $updates[] = "sales_fu_status = ?";
+        $params[] = trim($input['sales_fu_status']);
+    }
+
+    // 8. Reason / Notes
+    if (isset($input['notes']) && $input['notes'] !== '' && $input['notes'] !== 'ignore') {
+        $updates[] = "notes = ?";
+        $params[] = trim($input['notes']);
+        $updates[] = "reason_followup = ?";
+        $params[] = trim($input['notes']);
+    }
+
+    // 9. Assign Sales PIC
+    if (isset($input['assigned_sales_id']) && $input['assigned_sales_id'] !== '' && $input['assigned_sales_id'] !== 'ignore') {
+        if ($input['assigned_sales_id'] === '0' || $input['assigned_sales_id'] === 0 || $input['assigned_sales_id'] === 'unassign') {
+            $updates[] = "assigned_sales_id = 0";
+            $updates[] = "is_orphan = 1";
+        } else {
+            $updates[] = "assigned_sales_id = ?";
+            $params[] = (int)$input['assigned_sales_id'];
+        }
+    }
+
+    if (empty($updates)) {
+        echo json_encode(['success' => false, 'message' => 'Tidak ada kolom data yang dipilih untuk diperbarui.']);
+        exit;
+    }
+
+    $now = date('Y-m-d H:i:s');
+    $updates[] = "last_contacted_at = '$now'";
+    $updates[] = "followup_date = '$now'";
+    $updateSql = implode(", ", $updates);
+
+    // Determine WHERE clause based on scope
+    $where = [];
+    $whereParams = [];
+
+    if ($scope === 'single' && $single_id > 0) {
+        $where[] = "id = ?";
+        $whereParams[] = $single_id;
+    } elseif ($scope === 'selected' && !empty($customer_ids) && is_array($customer_ids)) {
+        $idList = implode(',', array_map('intval', $customer_ids));
+        $where[] = "id IN ($idList)";
+    } elseif (($scope === 'company_name' || $scope === 'matching') && !empty($company_name)) {
+        $where[] = "(name LIKE ? OR notes LIKE ?)";
+        $sTerm = "%$company_name%";
+        $whereParams[] = $sTerm;
+        $whereParams[] = $sTerm;
+    } elseif ($scope === 'search' && !empty($search)) {
+        $where[] = "(name LIKE ? OR phone LIKE ? OR plate_number LIKE ? OR car_model LIKE ? OR vin LIKE ? OR last_car_model LIKE ? OR district LIKE ? OR notes LIKE ?)";
+        $sTerm = "%$search%";
+        $whereParams = array_merge($whereParams, [$sTerm, $sTerm, $sTerm, $sTerm, $sTerm, $sTerm, $sTerm, $sTerm]);
+    } else {
+        if ($single_id > 0) {
+            $where[] = "id = ?";
+            $whereParams[] = $single_id;
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Target data tidak ditentukan']);
+            exit;
+        }
+    }
+
+    $whereSql = "WHERE " . implode(" AND ", $where);
+    $allParams = array_merge($params, $whereParams);
+
+    // Get count of target customers first
+    $targets = followup_query("SELECT id, name FROM followup_customers $whereSql", $whereParams);
+    $count = count($targets);
+
+    if ($count === 0) {
+        echo json_encode(['success' => false, 'message' => 'Tidak ada data customer yang cocok dengan kriteria']);
+        exit;
+    }
+
+    followup_execute("UPDATE followup_customers SET $updateSql $whereSql", $allParams);
+
+    // Log the batch update
+    foreach ($targets as $t) {
+        followup_execute("
+            INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note)
+            VALUES (?, NULL, 'SPV/Kacab', 'batch_update', ?)
+        ", [(int)$t['id'], "Pembaruan data massal via CRM Manager ($count customer diperbarui)"]);
+    }
+
+    echo json_encode([
+        'success' => true,
+        'count' => $count,
+        'message' => "Berhasil memperbarui $count data customer secara serentak."
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
 // ROUTE: POST /api_followup.php?action=format_template
 // -------------------------------------------------------------
 if ($action === 'format_template') {
