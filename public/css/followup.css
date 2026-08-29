@@ -3008,3 +3008,194 @@ tr:hover .fu-row-num-badge {
   transition: width 0.6s ease;
 }
 
+/* ================================================================
+   MOBILE RESPONSIVENESS (KACAB EXECUTIVE FOLLOW-UP CRM)
+   ================================================================ */
+@media (max-width: 992px) {
+  .kcb-main {
+    padding: 16px 12px 32px !important;
+    width: 100% !important;
+  }
+
+  .kcb-topbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding-bottom: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .kcb-topbar h2 {
+    font-size: 18px !important;
+    line-height: 1.3 !important;
+  }
+
+  .kcb-topbar .page-sub {
+    font-size: 12px !important;
+  }
+
+  .fu-view-nav-wrap {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .fu-view-segmented {
+    width: 100% !important;
+    display: flex !important;
+  }
+
+  .fu-view-tab {
+    flex: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 10px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .fu-sync-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+  }
+
+  .fu-sync-banner-left {
+    width: 100% !important;
+  }
+
+  .fu-sync-info h4 {
+    font-size: 13.5px !important;
+  }
+
+  .fu-model-filter-pills {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: stretch !important;
+  }
+
+  .fu-model-btn {
+    flex: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 8px 6px !important;
+    font-size: 11.5px !important;
+  }
+
+  .fu-charts-row-2,
+  .fu-charts-row-3 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .fu-chart-card {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .fu-chart-canvas-wrap {
+    min-height: 220px !important;
+    height: 230px !important;
+  }
+
+  .fu-table-card {
+    border-radius: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .fu-table-head-bar {
+    padding: 14px 16px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+
+  .fu-table-head-bar h3 {
+    font-size: 13.5px !important;
+  }
+
+  .fu-analytics-table {
+    min-width: 680px !important;
+  }
+
+  .fu-analytics-table th,
+  .fu-analytics-table td {
+    padding: 11px 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .fu-funnel-grid-7 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .fu-funnel-card {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .fu-fcard-val {
+    font-size: 20px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .fu-fcard-name {
+    font-size: 11px !important;
+  }
+
+  .fu-fcard-step-tag {
+    font-size: 9.5px !important;
+    padding: 2px 6px !important;
+  }
+
+  .fu-fcard-icon {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 11px !important;
+  }
+
+  .fu-fcard-ratio {
+    font-size: 10px !important;
+    padding: 3px 6px !important;
+  }
+
+  .fu-view-tab {
+    font-size: 11px !important;
+    padding: 8px 4px !important;
+  }
+
+  .fu-view-tab .badge-count {
+    display: none !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .fu-funnel-grid-7 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.fu-table-scroll-hint {
+  display: none;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+  padding: 8px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+@media (max-width: 992px) {
+  .fu-table-scroll-hint {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+  }
+}
+

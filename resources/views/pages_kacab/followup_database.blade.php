@@ -312,7 +312,8 @@
             <h3><i class="fa-solid fa-sitemap" style="color:#d7123a;"></i> Analisis Performa Klaster Pelanggan (Cluster Matrix)</h3>
             <span style="font-size:12px; color:#64748b; font-weight:600;" id="clusterCountText">9 Klaster Segmentasi TAM</span>
           </div>
-          <div style="overflow-x:auto;">
+          <div class="fu-table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Geser tabel ke samping untuk melihat detail lengkap</div>
+          <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
             <table class="fu-analytics-table">
               <thead>
                 <tr>
@@ -343,7 +344,8 @@
             <h3><i class="fa-solid fa-trophy" style="color:#f59e0b;"></i> Leaderboard Performa Follow-Up Wiraniaga (Sales PIC)</h3>
             <span style="font-size:12px; color:#64748b; font-weight:600;" id="salesLeaderboardCount">46 Wiraniaga</span>
           </div>
-          <div style="overflow-x:auto;">
+          <div class="fu-table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Geser tabel ke samping untuk melihat detail lengkap</div>
+          <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
             <table class="fu-analytics-table">
               <thead>
                 <tr>
