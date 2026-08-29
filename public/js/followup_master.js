@@ -472,31 +472,55 @@ function renderClusterBreakdownTable(clusters) {
   if (countBadge) countBadge.textContent = `${clusters.length} Klaster Segmentasi TAM`;
 
   if (clusters.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">Tidak ada data klaster untuk filter ini.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:32px; color:#64748b; font-weight:600;">Tidak ada data klaster untuk filter ini.</td></tr>`;
     return;
   }
 
   let html = '';
   clusters.forEach((c) => {
-    const closingRate = c.potency > 0 ? ((c.spk / c.potency) * 100).toFixed(1) : '0.0';
+    const rateNum = c.potency > 0 ? ((c.spk / c.potency) * 100) : 0;
+    const closingRate = rateNum.toFixed(1);
+    
+    // Extract cluster number for color styling
+    let clClass = 'cl-1';
+    const matchNum = (c.cluster_name || '').match(/(\d+)/);
+    if (matchNum) {
+      clClass = 'cl-' + matchNum[1];
+    }
+
+    const rateColor = rateNum > 5 ? '#15803d' : (rateNum > 0 ? '#2563eb' : '#64748b');
+    const barBg = rateNum > 5 ? '#10b981' : (rateNum > 0 ? '#3b82f6' : '#cbd5e1');
 
     html += `
       <tr>
         <td>
-          <span class="fu-cluster-badge">
-            <i class="fa-solid fa-tag"></i> ${escapeHtml(c.cluster_name)}
+          <span class="fu-cluster-badge ${clClass}">
+            <i class="fa-solid fa-tag" style="font-size:10px;"></i> ${escapeHtml(c.cluster_name)}
           </span>
         </td>
         <td class="num font-bold">${(c.potency || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(c.cust_fu || 0).toLocaleString('id-ID')}</td>
-        <td class="num"><span style="color:#2563eb; font-weight:700;">${c.ratio_fu || 0}%</span></td>
+        <td class="num"><span style="display:inline-block; padding:2px 8px; border-radius:6px; background:#eff6ff; color:#2563eb; font-weight:800; font-size:11.5px;">${c.ratio_fu || 0}%</span></td>
         <td class="num">${(c.connected || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(c.contacted || 0).toLocaleString('id-ID')}</td>
-        <td class="num"><span style="color:#d97706; font-weight:700;">${(c.hot_prospect || 0).toLocaleString('id-ID')}</span></td>
-        <td class="num"><span class="fu-spk-pill">${(c.spk || 0).toLocaleString('id-ID')} SPK</span></td>
-        <td class="num"><span class="fu-do-pill">${(c.do_unit || 0).toLocaleString('id-ID')} DO</span></td>
         <td class="num">
-          <span style="font-weight:800; color:${closingRate > 0 ? '#15803d' : '#64748b'};">${closingRate}%</span>
+          ${c.hot_prospect > 0 
+            ? `<span class="fu-hot-pill"><i class="fa-solid fa-bolt" style="font-size:10px;"></i> ${(c.hot_prospect || 0).toLocaleString('id-ID')}</span>` 
+            : `<span style="color:#94a3b8; font-weight:600;">0</span>`}
+        </td>
+        <td class="num">
+          <span class="fu-spk-pill"><i class="fa-solid fa-fire" style="font-size:10px;"></i> ${(c.spk || 0).toLocaleString('id-ID')} SPK</span>
+        </td>
+        <td class="num">
+          <span class="fu-do-pill"><i class="fa-solid fa-truck-ramp-box" style="font-size:10px;"></i> ${(c.do_unit || 0).toLocaleString('id-ID')} DO</span>
+        </td>
+        <td class="num">
+          <div class="fu-rate-cell">
+            <span style="font-weight:800; font-size:12.5px; color:${rateColor};">${closingRate}%</span>
+            <div class="fu-rate-track">
+              <div class="fu-rate-fill" style="width:${Math.min(100, Math.max(0, rateNum * 5))}%; background:${barBg};"></div>
+            </div>
+          </div>
         </td>
       </tr>
     `;
@@ -519,7 +543,7 @@ function renderSalesLeaderboardTable(salesList) {
   if (countBadge) countBadge.textContent = `${validSales.length} Wiraniaga Aktif`;
 
   if (validSales.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">Tidak ada data performa wiraniaga untuk filter ini.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:32px; color:#64748b; font-weight:600;">Tidak ada data performa wiraniaga untuk filter ini.</td></tr>`;
     return;
   }
 
@@ -527,36 +551,53 @@ function renderSalesLeaderboardTable(salesList) {
   validSales.forEach((s, idx) => {
     const rank = idx + 1;
     let rankBadge = `<span class="fu-row-num-badge">${rank}</span>`;
-    if (rank === 1) rankBadge = `<span class="fu-row-num-badge" style="background:#fef08a; color:#854d0e; border-color:#fde047;"><i class="fa-solid fa-crown"></i> 1</span>`;
-    else if (rank === 2) rankBadge = `<span class="fu-row-num-badge" style="background:#e2e8f0; color:#334155;"><i class="fa-solid fa-medal"></i> 2</span>`;
-    else if (rank === 3) rankBadge = `<span class="fu-row-num-badge" style="background:#ffedd5; color:#9a3412;"><i class="fa-solid fa-medal"></i> 3</span>`;
+    if (rank === 1) rankBadge = `<span class="fu-row-num-badge" style="background:linear-gradient(135deg, #fef08a, #fde047); color:#854d0e; border-color:#eab308; box-shadow:0 2px 6px rgba(234,179,8,0.25);"><i class="fa-solid fa-crown"></i> 1</span>`;
+    else if (rank === 2) rankBadge = `<span class="fu-row-num-badge" style="background:linear-gradient(135deg, #f1f5f9, #e2e8f0); color:#334155; border-color:#cbd5e1;"><i class="fa-solid fa-medal"></i> 2</span>`;
+    else if (rank === 3) rankBadge = `<span class="fu-row-num-badge" style="background:linear-gradient(135deg, #ffedd5, #fed7aa); color:#9a3412; border-color:#fb923c;"><i class="fa-solid fa-medal"></i> 3</span>`;
 
-    const closingRate = s.potency > 0 ? ((s.spk / s.potency) * 100).toFixed(1) : '0.0';
-    const spvTeam = s.spv ? `<div style="font-size:11px; color:#64748b; font-weight:600;"><i class="fa-solid fa-user-tie" style="font-size:10px; margin-right:3px; color:#94a3b8;"></i>${escapeHtml(s.spv)}</div>` : '';
+    const rateNum = s.potency > 0 ? ((s.spk / s.potency) * 100) : 0;
+    const closingRate = rateNum.toFixed(1);
+    const rateColor = rateNum > 5 ? '#15803d' : (rateNum > 0 ? '#2563eb' : '#64748b');
+    const barBg = rateNum > 5 ? '#10b981' : (rateNum > 0 ? '#3b82f6' : '#cbd5e1');
+
+    const spvTeam = s.spv ? `<div style="font-size:11px; color:#64748b; font-weight:600; margin-top:2px;"><i class="fa-solid fa-user-tie" style="font-size:10px; margin-right:3px; color:#94a3b8;"></i>${escapeHtml(s.spv)}</div>` : '';
 
     html += `
       <tr>
         <td style="text-align:center;">${rankBadge}</td>
         <td>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:32px; height:32px; min-width:32px; border-radius:50%; background:linear-gradient(135deg, #0d1b3e, #d7123a); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; box-shadow:0 2px 5px rgba(13,27,62,0.15);">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:36px; height:36px; min-width:36px; border-radius:50%; background:linear-gradient(135deg, #0d1b3e 0%, #d7123a 100%); color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:14px; box-shadow:0 3px 8px rgba(13,27,62,0.2);">
               ${escapeHtml(s.sales_name.charAt(0).toUpperCase())}
             </div>
             <div>
-              <div style="font-weight:700; color:#0f172a; font-size:13.5px;">${escapeHtml(s.sales_name)}</div>
+              <div style="font-weight:800; color:#0f172a; font-size:14px; letter-spacing:-0.2px;">${escapeHtml(s.sales_name)}</div>
               ${spvTeam}
             </div>
           </div>
         </td>
-        <td class="num font-bold">${(s.potency || 0).toLocaleString('id-ID')}</td>
+        <td class="num font-bold" style="font-size:13.5px;">${(s.potency || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(s.cust_fu || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(s.connected || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(s.contacted || 0).toLocaleString('id-ID')}</td>
-        <td class="num"><span style="color:#d97706; font-weight:700;">${(s.hot_prospect || 0).toLocaleString('id-ID')}</span></td>
-        <td class="num"><span class="fu-spk-pill">${(s.spk || 0).toLocaleString('id-ID')} SPK</span></td>
-        <td class="num"><span class="fu-do-pill">${(s.do_unit || 0).toLocaleString('id-ID')} DO</span></td>
         <td class="num">
-          <span style="font-weight:800; color:${closingRate > 0 ? '#15803d' : '#64748b'};">${closingRate}%</span>
+          ${s.hot_prospect > 0 
+            ? `<span class="fu-hot-pill"><i class="fa-solid fa-bolt" style="font-size:10px;"></i> ${(s.hot_prospect || 0).toLocaleString('id-ID')}</span>` 
+            : `<span style="color:#94a3b8; font-weight:600;">0</span>`}
+        </td>
+        <td class="num">
+          <span class="fu-spk-pill"><i class="fa-solid fa-fire" style="font-size:10px;"></i> ${(s.spk || 0).toLocaleString('id-ID')} SPK</span>
+        </td>
+        <td class="num">
+          <span class="fu-do-pill"><i class="fa-solid fa-truck-ramp-box" style="font-size:10px;"></i> ${(s.do_unit || 0).toLocaleString('id-ID')} DO</span>
+        </td>
+        <td class="num">
+          <div class="fu-rate-cell">
+            <span style="font-weight:800; font-size:12.5px; color:${rateColor};">${closingRate}%</span>
+            <div class="fu-rate-track">
+              <div class="fu-rate-fill" style="width:${Math.min(100, Math.max(0, rateNum * 5))}%; background:${barBg};"></div>
+            </div>
+          </div>
         </td>
       </tr>
     `;
