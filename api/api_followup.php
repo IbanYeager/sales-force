@@ -404,11 +404,20 @@ if ($action === 'dashboard_analytics') {
     // Sort clusters alphabetically
     usort($clusterBreakdown, fn($a, $b) => strcmp($a['cluster_name'], $b['cluster_name']));
 
-    // 4. Breakdown by Sales FU / Wiraniaga
+    // 4. Breakdown by Sales FU / Wiraniaga (Real Sales PICs only)
+    $salesListDb = get_sales_list();
+    $salesSpvMap = [];
+    foreach ($salesListDb as $s) {
+        $sNameKey = strtolower(trim($s['name']));
+        $salesSpvMap[$sNameKey] = $s['spv'] ?? 'Umum';
+    }
+
     $salesMap = [];
     foreach ($filtered as $r) {
         $sName = trim($r['sales_fu'] ?? '');
-        if (!$sName) $sName = 'Belum Ditugaskan';
+        if (!$sName || $sName === '-' || strtolower($sName) === 'belum ditugaskan' || strtolower($sName) === 'unassigned') {
+            continue;
+        }
         if (!isset($salesMap[$sName])) $salesMap[$sName] = [];
         $salesMap[$sName][] = $r;
     }
@@ -417,11 +426,25 @@ if ($action === 'dashboard_analytics') {
     foreach ($salesMap as $sName => $sRecords) {
         $sFunnel = $calcFunnel($sRecords);
         $sFunnel['sales_name'] = $sName;
+        
+        // Match SPV team
+        $sLower = strtolower($sName);
+        $spvName = $salesSpvMap[$sLower] ?? '';
+        if (!$spvName) {
+            foreach ($salesSpvMap as $k => $v) {
+                if (strpos($k, $sLower) !== false || strpos($sLower, $k) !== false) {
+                    $spvName = $v;
+                    break;
+                }
+            }
+        }
+        $sFunnel['spv'] = $spvName ?: 'Tunas Toyota Kiara Condong';
         $salesPerformance[] = $sFunnel;
     }
-    // Sort by SPK desc, then Potency desc
+    // Sort by SPK desc, then Hot Prospect desc, then Potency desc
     usort($salesPerformance, function($a, $b) {
         if ($b['spk'] !== $a['spk']) return $b['spk'] - $a['spk'];
+        if ($b['hot_prospect'] !== $a['hot_prospect']) return $b['hot_prospect'] - $a['hot_prospect'];
         if ($b['cust_fu'] !== $a['cust_fu']) return $b['cust_fu'] - $a['cust_fu'];
         return $b['potency'] - $a['potency'];
     });

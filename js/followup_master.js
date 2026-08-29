@@ -512,16 +512,19 @@ function renderSalesLeaderboardTable(salesList) {
   const tbody = document.getElementById('tbodySalesLeaderboard');
   if (!tbody) return;
 
-  const countBadge = document.getElementById('salesLeaderboardCount');
-  if (countBadge) countBadge.textContent = `${salesList.length} Wiraniaga`;
+  // Filter out any invalid / unassigned names
+  const validSales = (salesList || []).filter(s => s && s.sales_name && s.sales_name !== 'Belum Ditugaskan' && s.sales_name !== '-' && s.sales_name !== 'Unassigned');
 
-  if (salesList.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">Tidak ada data performa wiraniaga.</td></tr>`;
+  const countBadge = document.getElementById('salesLeaderboardCount');
+  if (countBadge) countBadge.textContent = `${validSales.length} Wiraniaga Aktif`;
+
+  if (validSales.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">Tidak ada data performa wiraniaga untuk filter ini.</td></tr>`;
     return;
   }
 
   let html = '';
-  salesList.forEach((s, idx) => {
+  validSales.forEach((s, idx) => {
     const rank = idx + 1;
     let rankBadge = `<span class="fu-row-num-badge">${rank}</span>`;
     if (rank === 1) rankBadge = `<span class="fu-row-num-badge" style="background:#fef08a; color:#854d0e; border-color:#fde047;"><i class="fa-solid fa-crown"></i> 1</span>`;
@@ -529,12 +532,21 @@ function renderSalesLeaderboardTable(salesList) {
     else if (rank === 3) rankBadge = `<span class="fu-row-num-badge" style="background:#ffedd5; color:#9a3412;"><i class="fa-solid fa-medal"></i> 3</span>`;
 
     const closingRate = s.potency > 0 ? ((s.spk / s.potency) * 100).toFixed(1) : '0.0';
+    const spvTeam = s.spv ? `<div style="font-size:11px; color:#64748b; font-weight:600;"><i class="fa-solid fa-user-tie" style="font-size:10px; margin-right:3px; color:#94a3b8;"></i>${escapeHtml(s.spv)}</div>` : '';
 
     html += `
       <tr>
         <td style="text-align:center;">${rankBadge}</td>
         <td>
-          <strong style="color:#0f172a;">${escapeHtml(s.sales_name)}</strong>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:32px; height:32px; min-width:32px; border-radius:50%; background:linear-gradient(135deg, #0d1b3e, #d7123a); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; box-shadow:0 2px 5px rgba(13,27,62,0.15);">
+              ${escapeHtml(s.sales_name.charAt(0).toUpperCase())}
+            </div>
+            <div>
+              <div style="font-weight:700; color:#0f172a; font-size:13.5px;">${escapeHtml(s.sales_name)}</div>
+              ${spvTeam}
+            </div>
+          </div>
         </td>
         <td class="num font-bold">${(s.potency || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(s.cust_fu || 0).toLocaleString('id-ID')}</td>
