@@ -419,8 +419,13 @@ function init_followup_tables() {
     }
 }
 
-// Run table initialization once if not yet initialized
-if (!file_exists(__DIR__ . '/.followup_db_migrated')) {
-    init_followup_tables();
-    @touch(__DIR__ . '/.followup_db_migrated');
+// Run table initialization and column migrations if migration version not up-to-date
+$migration_ver_file = __DIR__ . '/.followup_db_migrated_v4';
+if (!file_exists($migration_ver_file)) {
+    try {
+        init_followup_tables();
+        @touch($migration_ver_file);
+    } catch (Exception $e) {
+        error_log("Followup DB Migration Error: " . $e->getMessage());
+    }
 }

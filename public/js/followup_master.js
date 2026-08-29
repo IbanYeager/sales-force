@@ -98,6 +98,12 @@ async function loadExecutiveAnalytics() {
     if (data.success) {
       executiveState.analytics = data;
       renderExecutiveDashboardUI(data);
+
+      // Auto-trigger sync if database is completely empty on initial load
+      if ((data.total_database === 0 || (data.funnel && data.funnel.potency === 0)) && !executiveState._autoSynced) {
+        executiveState._autoSynced = true;
+        triggerGoogleSheetSync(false);
+      }
     }
   } catch (err) {
     console.error('Error loading executive analytics:', err);

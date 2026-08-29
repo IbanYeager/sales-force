@@ -104,13 +104,10 @@ if ($action === 'save_settings') {
     exit;
 }
 
-// -------------------------------------------------------------
-// ROUTE: POST /api_followup_sync.php?action=pull_sheet
-// -------------------------------------------------------------
-if ($action === 'pull_sheet') {
-    $input = get_json_input();
-    $sheetUrl = trim($input['google_sheet_url'] ?? '');
-
+/**
+ * Reusable Google Sheet pull engine for Tunas Toyota Kiara Condong CRM
+ */
+function sync_google_sheet_data($sheetUrl = null) {
     if (!$sheetUrl) {
         $rows = followup_query("SELECT setting_value FROM followup_settings WHERE setting_key = 'google_sheet_url' LIMIT 1");
         $sheetUrl = !empty($rows) ? $rows[0]['setting_value'] : '';
@@ -128,7 +125,6 @@ if ($action === 'pull_sheet') {
         $gid = '1525199412'; // Default data sheet for Tunas Toyota Kiara Condong ('New FU Kiara Condong')
         if (preg_match('/gid=([0-9]+)/', $sheetUrl, $gMatches)) {
             $parsedGid = $gMatches[1];
-            // If user passed the DASHBOARD gid (1618304635) or 0, redirect to data sheet (1525199412)
             if ($parsedGid === '1618304635' || $parsedGid === '607414573' || $parsedGid === '0') {
                 $gid = '1525199412';
             } else {
@@ -154,21 +150,19 @@ if ($action === 'pull_sheet') {
     $csvContent = @file_get_contents($csvUrl, false, $context);
 
     if ($csvContent === false) {
-        echo json_encode([
+        return [
             'success' => false,
-            'message' => 'Gagal mengambil data dari Google Spreadsheet. Pastikan link dapat diakses publik (Anyone with the link can view).'
-        ]);
-        exit;
+            'message' => 'Gagal mengambil data dari Google Spreadsheet. Pastikan link dapat diakses publik.'
+        ];
     }
 
     // Parse CSV rows
     $lines = str_getcsv($csvContent, "\n");
     if (empty($lines)) {
-        echo json_encode(['success' => false, 'message' => 'Google Sheet kosong.']);
-        exit;
+        return ['success' => false, 'message' => 'Google Sheet kosong.'];
     }
 
-    // Find header row (scan first 10 rows for keywords)
+    // Find header row
     $headerRowIdx = 0;
     $keywords = ['nama', 'customer', 'contact', 'telepon', 'phone', 'wa', 'vehicle', 'mobil', 'model', 'vin', 'cluster', 'priority'];
     
@@ -443,13 +437,23 @@ if ($action === 'pull_sheet') {
         followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)", [$sheetUrl]);
     }
 
-    echo json_encode([
+    return [
         'success' => true,
         'message' => "Sinkronisasi Google Spreadsheet berhasil! $inserted data leads customer berhasil disinkronkan ke sistem.",
         'inserted' => $inserted,
         'last_sync' => $now,
         'sheet_url' => $sheetUrl
-    ]);
+    ];
+}
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup_sync.php?action=pull_sheet
+// -------------------------------------------------------------
+if ($action === 'pull_sheet') {
+    $input = get_json_input();
+    $sheetUrl = trim($input['google_sheet_url'] ?? '');
+    $res = sync_google_sheet_data($sheetUrl);
+    echo json_encode($res);
     exit;
 }
 

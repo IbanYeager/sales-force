@@ -233,6 +233,23 @@ if ($action === 'dashboard_analytics') {
         ORDER BY id ASC
     ");
 
+    // Auto-sync from Google Sheets if database is currently empty
+    if (empty($allCust)) {
+        require_once __DIR__ . '/api_followup_sync.php';
+        if (function_exists('sync_google_sheet_data')) {
+            sync_google_sheet_data();
+        }
+        $allCust = followup_query("
+            SELECT id, customer_code, name, phone, car_model, last_car_model, car_age,
+                   recommended_model, cluster_name, priority, priority_class, district,
+                   connected, contacted, prospect, spk, remarks, sales_fu_status,
+                   reason_followup, followup_date, followup_status, sync_source,
+                   vehicle_filter, cust_type, outlet_name, sales_fu, do_unit, all_spk, all_do
+            FROM followup_customers
+            ORDER BY id ASC
+        ");
+    }
+
     // Apply model filter
     $filtered = array_filter($allCust, function($c) use ($filterModel, $filterCluster, $filterClass) {
         $vf = strtoupper(trim($c['vehicle_filter'] ?? 'OTHERS'));
