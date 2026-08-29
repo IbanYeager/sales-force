@@ -21,17 +21,594 @@ let masterState = {
   }
 };
 
+let executiveState = {
+  activeView: 'executive', // 'executive' or 'database'
+  activeModel: 'all',      // 'all', 'veloz_hybrid', 'others'
+  analytics: null,
+  charts: {}
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   initMasterDashboard();
 });
 
 async function initMasterDashboard() {
   await Promise.all([
+    loadExecutiveAnalytics(),
     loadSalesList(),
     loadTemplates(),
     loadMasterStats(),
     loadMasterCustomers()
   ]);
+}
+
+// -------------------------------------------------------------
+// VIEW SWITCHER: EXECUTIVE ANALYTICS vs CUSTOMER DATABASE
+// -------------------------------------------------------------
+function switchFollowupView(view) {
+  executiveState.activeView = view;
+
+  const tabExec = document.getElementById('tabExecutiveView');
+  const tabDb = document.getElementById('tabDatabaseView');
+  const secExec = document.getElementById('sectionExecutiveDashboard');
+  const secDb = document.getElementById('sectionCustomerDatabase');
+
+  if (view === 'executive') {
+    if (tabExec) tabExec.classList.add('active');
+    if (tabDb) tabDb.classList.remove('active');
+    if (secExec) secExec.style.display = 'block';
+    if (secDb) secDb.style.display = 'none';
+    if (!executiveState.analytics) {
+      loadExecutiveAnalytics();
+    }
+  } else {
+    if (tabExec) tabExec.classList.remove('active');
+    if (tabDb) tabDb.classList.add('active');
+    if (secExec) secExec.style.display = 'none';
+    if (secDb) secDb.style.display = 'block';
+  }
+}
+
+// -------------------------------------------------------------
+// MODEL FILTER BUTTONS (Semua Model, Veloz Hybrid, Others)
+// -------------------------------------------------------------
+function setDashboardModelFilter(model) {
+  executiveState.activeModel = model;
+
+  const btnAll = document.getElementById('btnModelAll');
+  const btnVeloz = document.getElementById('btnModelVeloz');
+  const btnOthers = document.getElementById('btnModelOthers');
+
+  if (btnAll) btnAll.classList.toggle('active', model === 'all');
+  if (btnVeloz) btnVeloz.classList.toggle('active', model === 'veloz_hybrid');
+  if (btnOthers) btnOthers.classList.toggle('active', model === 'others');
+
+  loadExecutiveAnalytics();
+}
+
+// -------------------------------------------------------------
+// FETCH & RENDER EXECUTIVE ANALYTICS (GOOGLE SHEET MATCHED)
+// -------------------------------------------------------------
+async function loadExecutiveAnalytics() {
+  try {
+    const model = executiveState.activeModel || 'all';
+    const res = await fetch(`../api/api_followup.php?action=dashboard_analytics&filter_model=${encodeURIComponent(model)}`);
+    const data = await res.json();
+
+    if (data.success) {
+      executiveState.analytics = data;
+      renderExecutiveDashboardUI(data);
+    }
+  } catch (err) {
+    console.error('Error loading executive analytics:', err);
+  }
+}
+
+function renderExecutiveDashboardUI(data) {
+  const f = data.funnel || {};
+
+  // 1. Update 7 Funnel KPI Cards
+  const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setWidth = (id, pct) => { const el = document.getElementById(id); if (el) el.style.width = Math.min(100, Math.max(0, pct)) + '%'; };
+
+  setTxt('fnPotency', (f.potency || 0).toLocaleString('id-ID'));
+  setTxt('fnCustFu', (f.cust_fu || 0).toLocaleString('id-ID'));
+  setTxt('fnRatioCustFu', (f.ratio_fu || 0) + '%');
+  setWidth('fnBarCustFu', f.ratio_fu || 0);
+
+  setTxt('fnConnected', (f.connected || 0).toLocaleString('id-ID'));
+  setTxt('fnRatioConnected', (f.ratio_connected || 0) + '%');
+  setWidth('fnBarConnected', f.ratio_connected || 0);
+
+  setTxt('fnContacted', (f.contacted || 0).toLocaleString('id-ID'));
+  setTxt('fnRatioContacted', (f.ratio_contacted || 0) + '%');
+  setWidth('fnBarContacted', f.ratio_contacted || 0);
+
+  setTxt('fnHotProspect', (f.hot_prospect || 0).toLocaleString('id-ID'));
+  setTxt('fnRatioHotProspect', (f.ratio_hot_prospect || 0) + '%');
+  setWidth('fnBarHotProspect', f.ratio_hot_prospect || 0);
+
+  setTxt('fnSpk', (f.spk || 0).toLocaleString('id-ID'));
+  setTxt('fnRatioSpk', (f.ratio_spk || 0) + '%');
+  setWidth('fnBarSpk', f.ratio_spk || 0);
+
+  setTxt('fnDo', (f.do_unit || 0).toLocaleString('id-ID'));
+  setTxt('fnRatioDo', (f.ratio_do || 0) + '%');
+  setWidth('fnBarDo', f.ratio_do || 0);
+
+  // Update Sync info
+  const totalLeads = data.total_database || 0;
+  const badgeTotal = document.getElementById('badgeTotalCust');
+  if (badgeTotal) badgeTotal.textContent = totalLeads.toLocaleString('id-ID');
+
+  const syncText = document.getElementById('lastSyncIndicatorText');
+  if (syncText) {
+    const rawTime = data.last_sync || '';
+    syncText.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> Terakhir Sinkron: <strong>${rawTime ? formatIndoTime(rawTime) : 'Baru saja'}</strong>`;
+  }
+
+  // 2. Render Charts
+  renderChartFunnelConversion(f);
+  renderChartFleetRetail(data.type_breakdown || {});
+  renderChartTemperatureClass(data.class_breakdown || {});
+  renderChartResponseDistribution(f.responses || {});
+  renderChartTopModels(data.top_models || []);
+
+  // 3. Render Cluster Table
+  renderClusterBreakdownTable(data.cluster_breakdown || []);
+
+  // 4. Render Sales Leaderboard Table
+  renderSalesLeaderboardTable(data.sales_performance || []);
+}
+
+function formatIndoTime(dtStr) {
+  if (!dtStr) return '-';
+  try {
+    const d = new Date(dtStr.replace(' ', 'T'));
+    if (isNaN(d.getTime())) return dtStr;
+    return d.toLocaleString('id-ID', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    }) + ' WIB';
+  } catch (e) {
+    return dtStr;
+  }
+}
+
+// -------------------------------------------------------------
+// CHART 1: FUNNEL CONVERSION (HORIZONTAL BAR WITH RATIOS)
+// -------------------------------------------------------------
+function renderChartFunnelConversion(f) {
+  const canvas = document.getElementById('chartFunnelConversion');
+  if (!canvas) return;
+
+  if (executiveState.charts.funnel) {
+    executiveState.charts.funnel.destroy();
+  }
+
+  const ctx = canvas.getContext('2d');
+  const labels = ['1. Potensi', '2. Cust FU', '3. Connected', '4. Contacted', '5. Hot Prospek', '6. SPK', '7. DO Unit'];
+  const datasetValues = [
+    f.potency || 0,
+    f.cust_fu || 0,
+    f.connected || 0,
+    f.contacted || 0,
+    f.hot_prospect || 0,
+    f.spk || 0,
+    f.do_unit || 0
+  ];
+
+  const backgroundColors = [
+    '#3b82f6', '#0ea5e9', '#06b6d4', '#8b5cf6', '#f59e0b', '#d7123a', '#10b981'
+  ];
+
+  executiveState.charts.funnel = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Jumlah Leads',
+        data: datasetValues,
+        backgroundColor: backgroundColors,
+        borderRadius: 8,
+        barThickness: 20
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const val = ctx.raw || 0;
+              const pot = f.potency || 1;
+              const pctOfPotency = ((val / pot) * 100).toFixed(1);
+              return ` ${val.toLocaleString('id-ID')} Leads (${pctOfPotency}% dari Potensi)`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#f1f5f9' },
+          ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { family: 'Plus Jakarta Sans', weight: '700' } }
+        }
+      }
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// CHART 2: FLEET VS RETAIL (DOUGHNUT)
+// -------------------------------------------------------------
+function renderChartFleetRetail(types) {
+  const canvas = document.getElementById('chartFleetRetail');
+  if (!canvas) return;
+
+  if (executiveState.charts.fleetRetail) {
+    executiveState.charts.fleetRetail.destroy();
+  }
+
+  const retail = types.RETAIL || { potency: 0, spk: 0 };
+  const fleet = types.FLEET || { potency: 0, spk: 0 };
+
+  const ctx = canvas.getContext('2d');
+  executiveState.charts.fleetRetail = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: [
+        `Retail (${retail.potency || 0} Leads - ${retail.spk || 0} SPK)`,
+        `Fleet (${fleet.potency || 0} Leads - ${fleet.spk || 0} SPK)`
+      ],
+      datasets: [{
+        data: [retail.potency || 0, fleet.potency || 0],
+        backgroundColor: ['#d7123a', '#0d1b3e'],
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 11 }, boxWidth: 12, padding: 12 }
+        }
+      },
+      cutout: '68%'
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// CHART 3: TEMPERATURE / CLASS (HIGH, MEDIUM, LOW)
+// -------------------------------------------------------------
+function renderChartTemperatureClass(classes) {
+  const canvas = document.getElementById('chartTemperatureClass');
+  if (!canvas) return;
+
+  if (executiveState.charts.temperature) {
+    executiveState.charts.temperature.destroy();
+  }
+
+  const high = classes.HIGH || { potency: 0, cust_fu: 0, spk: 0 };
+  const med = classes.MEDIUM || { potency: 0, cust_fu: 0, spk: 0 };
+  const low = classes.LOW || { potency: 0, cust_fu: 0, spk: 0 };
+
+  const ctx = canvas.getContext('2d');
+  executiveState.charts.temperature = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['HIGH', 'MEDIUM', 'LOW'],
+      datasets: [
+        {
+          label: 'Potensi Leads',
+          data: [high.potency || 0, med.potency || 0, low.potency || 0],
+          backgroundColor: '#3b82f6',
+          borderRadius: 6
+        },
+        {
+          label: 'Cust. FU',
+          data: [high.cust_fu || 0, med.cust_fu || 0, low.cust_fu || 0],
+          backgroundColor: '#f59e0b',
+          borderRadius: 6
+        },
+        {
+          label: 'SPK Closing',
+          data: [high.spk || 0, med.spk || 0, low.spk || 0],
+          backgroundColor: '#10b981',
+          borderRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 }, boxWidth: 10, padding: 10 }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', weight: '800' } } },
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } } }
+      }
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// CHART 4: RESPONSE DISTRIBUTION (DOUGHNUT)
+// -------------------------------------------------------------
+function renderChartResponseDistribution(responses) {
+  const canvas = document.getElementById('chartResponseDistribution');
+  if (!canvas) return;
+
+  if (executiveState.charts.response) {
+    executiveState.charts.response.destroy();
+  }
+
+  const labels = [
+    'SPK berhasil',
+    'Customer tertarik',
+    'Customer janjian',
+    'Customer pending',
+    'Customer menolak',
+    'Customer tidak aktif'
+  ];
+
+  const dataValues = labels.map(l => responses[l] || 0);
+
+  const ctx = canvas.getContext('2d');
+  executiveState.charts.response = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: dataValues,
+        backgroundColor: [
+          '#10b981', // SPK hijau
+          '#3b82f6', // Tertarik biru
+          '#8b5cf6', // Janjian ungu
+          '#f59e0b', // Pending amber
+          '#ef4444', // Menolak merah
+          '#64748b'  // Tidak aktif abu
+        ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Plus Jakarta Sans', weight: '600', size: 9 }, boxWidth: 10, padding: 6 }
+        }
+      },
+      cutout: '60%'
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// CHART 5: TOP VEHICLE MODELS (BAR)
+// -------------------------------------------------------------
+function renderChartTopModels(models) {
+  const canvas = document.getElementById('chartTopModels');
+  if (!canvas) return;
+
+  if (executiveState.charts.models) {
+    executiveState.charts.models.destroy();
+  }
+
+  const top6 = models.slice(0, 6);
+  const labels = top6.map(m => m.model);
+  const potValues = top6.map(m => m.potency);
+  const spkValues = top6.map(m => m.spk);
+
+  const ctx = canvas.getContext('2d');
+  executiveState.charts.models = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Total Leads',
+          data: potValues,
+          backgroundColor: '#0d1b3e',
+          borderRadius: 6
+        },
+        {
+          label: 'SPK',
+          data: spkValues,
+          backgroundColor: '#d7123a',
+          borderRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 }, boxWidth: 10, padding: 8 }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 } } },
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } } }
+      }
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// TABLE 1: CLUSTER BREAKDOWN TABLE
+// -------------------------------------------------------------
+function renderClusterBreakdownTable(clusters) {
+  const tbody = document.getElementById('tbodyClusterBreakdown');
+  if (!tbody) return;
+
+  const countBadge = document.getElementById('clusterCountText');
+  if (countBadge) countBadge.textContent = `${clusters.length} Klaster Segmentasi TAM`;
+
+  if (clusters.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">Tidak ada data klaster untuk filter ini.</td></tr>`;
+    return;
+  }
+
+  let html = '';
+  clusters.forEach((c) => {
+    const closingRate = c.potency > 0 ? ((c.spk / c.potency) * 100).toFixed(1) : '0.0';
+
+    html += `
+      <tr>
+        <td>
+          <span class="fu-cluster-badge">
+            <i class="fa-solid fa-tag"></i> ${escapeHtml(c.cluster_name)}
+          </span>
+        </td>
+        <td class="num font-bold">${(c.potency || 0).toLocaleString('id-ID')}</td>
+        <td class="num">${(c.cust_fu || 0).toLocaleString('id-ID')}</td>
+        <td class="num"><span style="color:#2563eb; font-weight:700;">${c.ratio_fu || 0}%</span></td>
+        <td class="num">${(c.connected || 0).toLocaleString('id-ID')}</td>
+        <td class="num">${(c.contacted || 0).toLocaleString('id-ID')}</td>
+        <td class="num"><span style="color:#d97706; font-weight:700;">${(c.hot_prospect || 0).toLocaleString('id-ID')}</span></td>
+        <td class="num"><span class="fu-spk-pill">${(c.spk || 0).toLocaleString('id-ID')} SPK</span></td>
+        <td class="num"><span class="fu-do-pill">${(c.do_unit || 0).toLocaleString('id-ID')} DO</span></td>
+        <td class="num">
+          <span style="font-weight:800; color:${closingRate > 0 ? '#15803d' : '#64748b'};">${closingRate}%</span>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+}
+
+// -------------------------------------------------------------
+// TABLE 2: SALES LEADERBOARD TABLE
+// -------------------------------------------------------------
+function renderSalesLeaderboardTable(salesList) {
+  const tbody = document.getElementById('tbodySalesLeaderboard');
+  if (!tbody) return;
+
+  const countBadge = document.getElementById('salesLeaderboardCount');
+  if (countBadge) countBadge.textContent = `${salesList.length} Wiraniaga`;
+
+  if (salesList.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">Tidak ada data performa wiraniaga.</td></tr>`;
+    return;
+  }
+
+  let html = '';
+  salesList.forEach((s, idx) => {
+    const rank = idx + 1;
+    let rankBadge = `<span class="fu-row-num-badge">${rank}</span>`;
+    if (rank === 1) rankBadge = `<span class="fu-row-num-badge" style="background:#fef08a; color:#854d0e; border-color:#fde047;"><i class="fa-solid fa-crown"></i> 1</span>`;
+    else if (rank === 2) rankBadge = `<span class="fu-row-num-badge" style="background:#e2e8f0; color:#334155;"><i class="fa-solid fa-medal"></i> 2</span>`;
+    else if (rank === 3) rankBadge = `<span class="fu-row-num-badge" style="background:#ffedd5; color:#9a3412;"><i class="fa-solid fa-medal"></i> 3</span>`;
+
+    const closingRate = s.potency > 0 ? ((s.spk / s.potency) * 100).toFixed(1) : '0.0';
+
+    html += `
+      <tr>
+        <td style="text-align:center;">${rankBadge}</td>
+        <td>
+          <strong style="color:#0f172a;">${escapeHtml(s.sales_name)}</strong>
+        </td>
+        <td class="num font-bold">${(s.potency || 0).toLocaleString('id-ID')}</td>
+        <td class="num">${(s.cust_fu || 0).toLocaleString('id-ID')}</td>
+        <td class="num">${(s.connected || 0).toLocaleString('id-ID')}</td>
+        <td class="num">${(s.contacted || 0).toLocaleString('id-ID')}</td>
+        <td class="num"><span style="color:#d97706; font-weight:700;">${(s.hot_prospect || 0).toLocaleString('id-ID')}</span></td>
+        <td class="num"><span class="fu-spk-pill">${(s.spk || 0).toLocaleString('id-ID')} SPK</span></td>
+        <td class="num"><span class="fu-do-pill">${(s.do_unit || 0).toLocaleString('id-ID')} DO</span></td>
+        <td class="num">
+          <span style="font-weight:800; color:${closingRate > 0 ? '#15803d' : '#64748b'};">${closingRate}%</span>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+}
+
+// -------------------------------------------------------------
+// SINKRONISASI LIVE GOOGLE SPREADSHEET
+// -------------------------------------------------------------
+async function triggerGoogleSheetSync(showNotification = true) {
+  try {
+    if (showNotification && window.Swal) {
+      Swal.fire({
+        title: 'Menyinkronkan Spreadsheet...',
+        text: 'Mengambil data terbaru dari Google Spreadsheet Tunas Toyota Kiara Condong...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+    }
+
+    const res = await fetch('../api/api_followup_sync.php?action=pull_sheet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Reload both analytics and customer database
+      await Promise.all([
+        loadExecutiveAnalytics(),
+        loadMasterStats(),
+        loadMasterCustomers()
+      ]);
+
+      if (showNotification && window.Swal) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Sinkronisasi Berhasil!',
+          text: data.message || `${data.inserted || 0} data leads customer berhasil disinkronkan.`,
+          confirmButtonColor: '#d7123a',
+          timer: 2500
+        });
+      }
+    } else {
+      if (showNotification && window.Swal) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Sinkronisasi Gagal',
+          text: data.message || 'Terjadi kesalahan saat sinkronisasi Google Sheet.',
+          confirmButtonColor: '#d7123a'
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Error syncing Google Sheet:', err);
+    if (showNotification && window.Swal) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Terhubung',
+        text: 'Tidak dapat menghubungi server sinkronisasi.',
+        confirmButtonColor: '#d7123a'
+      });
+    }
+  }
 }
 
 function getLoggedInSpvName() {
