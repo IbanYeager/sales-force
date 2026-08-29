@@ -343,13 +343,33 @@ function sync_google_sheet_data($sheetUrl = null) {
         // Deterministic customer code to prevent duplicates on repeated syncs
         $code = $vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone), 0, 12));
 
+        // Auto-match sales_fu string from Google Sheet to sales_accounts ID
+        $salesListDb = function_exists('get_sales_list') ? get_sales_list() : [];
+        $assignedSalesId = null;
+        if ($salesFu && $salesFu !== '-' && strtolower($salesFu) !== 'belum ditugaskan' && strtolower($salesFu) !== 'unassigned') {
+            $sLower = strtolower(trim($salesFu));
+            $aliasMap = [
+                'fadhil' => 'fadil',
+                'yeni' => 'yenni',
+                'egi' => 'egy',
+            ];
+            $targetSearch = $aliasMap[$sLower] ?? $sLower;
+            foreach ($salesListDb as $s) {
+                $dbNameClean = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $s['name'])));
+                if ($dbNameClean === $targetSearch || strtolower(trim($s['name'])) === $targetSearch || stripos($s['name'], $targetSearch) !== false) {
+                    $assignedSalesId = (int)$s['id'];
+                    break;
+                }
+            }
+        }
+
         $rowsToInsert[] = [
             $code, $name, $phone, $carModel, $lastCar, $age,
             $targetCar, $rec2, $rec3, $cluster, $priority, $district, $vin,
             $outletDo, $outletSrv, $srvComp,
             $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
             $category, $status,
-            $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo
+            $vFilter, $custType, $temperature, $outletName, $salesFu, $assignedSalesId, $doUnit, $allSpk, $allDo
         ];
     }
 
@@ -366,8 +386,8 @@ function sync_google_sheet_data($sheetUrl = null) {
                 outlet_do, outlet_service, service_compliance,
                 connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                 followup_category, followup_status, sync_source,
-                vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)
+                vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, assigned_sales_id, do_unit, all_spk, all_do
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(customer_code) DO UPDATE SET
                 name = excluded.name, car_model = excluded.car_model, last_car_model = excluded.last_car_model,
                 car_age = excluded.car_age, recommended_model = excluded.recommended_model,
@@ -389,6 +409,8 @@ function sync_google_sheet_data($sheetUrl = null) {
                 priority_class = excluded.priority_class,
                 outlet_name = excluded.outlet_name,
                 sales_fu = CASE WHEN excluded.sales_fu != '' THEN excluded.sales_fu ELSE followup_customers.sales_fu END,
+                assigned_sales_id = CASE WHEN excluded.assigned_sales_id > 0 THEN excluded.assigned_sales_id ELSE followup_customers.assigned_sales_id END,
+                is_orphan = CASE WHEN excluded.assigned_sales_id > 0 THEN 0 ELSE followup_customers.is_orphan END,
                 do_unit = CASE WHEN excluded.do_unit != 'FALSE' THEN excluded.do_unit ELSE followup_customers.do_unit END,
                 all_spk = excluded.all_spk,
                 all_do = excluded.all_do
@@ -403,7 +425,7 @@ function sync_google_sheet_data($sheetUrl = null) {
             $placeholders = [];
             $flatParams = [];
             foreach ($chunk as $rData) {
-                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)";
+                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 foreach ($rData as $val) {
                     $flatParams[] = $val;
                 }
@@ -416,7 +438,7 @@ function sync_google_sheet_data($sheetUrl = null) {
                     outlet_do, outlet_service, service_compliance,
                     connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                     followup_category, followup_status, sync_source,
-                    vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do
+                    vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, assigned_sales_id, do_unit, all_spk, all_do
                 ) VALUES " . implode(', ', $placeholders) . "
                 ON DUPLICATE KEY UPDATE
                     name = VALUES(name), car_model = VALUES(car_model), last_car_model = VALUES(last_car_model),
@@ -439,6 +461,8 @@ function sync_google_sheet_data($sheetUrl = null) {
                     priority_class = VALUES(priority_class),
                     outlet_name = VALUES(outlet_name),
                     sales_fu = CASE WHEN VALUES(sales_fu) != '' THEN VALUES(sales_fu) ELSE sales_fu END,
+                    assigned_sales_id = CASE WHEN VALUES(assigned_sales_id) > 0 THEN VALUES(assigned_sales_id) ELSE assigned_sales_id END,
+                    is_orphan = CASE WHEN VALUES(assigned_sales_id) > 0 THEN 0 ELSE is_orphan END,
                     do_unit = CASE WHEN VALUES(do_unit) != 'FALSE' THEN VALUES(do_unit) ELSE do_unit END,
                     all_spk = VALUES(all_spk),
                     all_do = VALUES(all_do)

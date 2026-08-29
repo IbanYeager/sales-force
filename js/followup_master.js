@@ -1042,9 +1042,10 @@ function renderCustomerTable() {
         <td style="min-width:190px;">
           <select class="fu-table-select" onchange="inlineUpdateSales(${c.id}, this.value)">
             <option value="">-- Belum Ditugaskan (Batal) --</option>
-            ${masterState.salesList.map(s => `
-              <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>
-            `).join('')}
+            ${masterState.salesList.map(s => {
+              const isSelected = (c.assigned_sales_id && String(c.assigned_sales_id) === String(s.id)) || (!c.assigned_sales_id && c.sales_fu && s.name && c.sales_fu.toLowerCase().trim() === s.name.toLowerCase().trim());
+              return `<option value="${s.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(s.name)}</option>`;
+            }).join('')}
           </select>
         </td>
 
@@ -2058,9 +2059,10 @@ function openEditSingleCustomerModal(customerId) {
               <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Sales PIC Wiraniaga:</label>
               <select id="editSingleSalesPic" class="fu-select" style="font-size:12.5px;">
                 <option value="0">-- Belum Ditugaskan / Batal Penugasan --</option>
-                ${masterState.salesList.map(s => `
-                  <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>
-                `).join('')}
+                ${masterState.salesList.map(s => {
+                  const isSelected = (c.assigned_sales_id && String(c.assigned_sales_id) === String(s.id)) || (!c.assigned_sales_id && c.sales_fu && s.name && c.sales_fu.toLowerCase().trim() === s.name.toLowerCase().trim());
+                  return `<option value="${s.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(s.name)}</option>`;
+                }).join('')}
               </select>
             </div>
           </div>

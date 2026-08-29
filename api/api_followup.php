@@ -136,6 +136,73 @@ function auto_expire_pending_followups() {
 // Run auto-expiry evaluation automatically on CRM actions
 if (in_array($action, ['customers', 'stats', 'sales', 'sales_dashboard', 'check_expiry'])) {
     auto_expire_pending_followups();
+    sync_unlinked_sales_fu_assignments();
+}
+
+/**
+ * Auto-Sync Sales FU Assignments:
+ * Automatically matches text in `sales_fu` (e.g. Indah, Rahma, Yani, etc. from Google Sheet/Excel)
+ * to `assigned_sales_id` so that all leads are immediately assigned to the respective sales.
+ */
+function sync_unlinked_sales_fu_assignments() {
+    global $is_mysql, $conn, $sqlite_pdo;
+    try {
+        $salesList = get_sales_list();
+        if (empty($salesList)) return;
+
+        $caseBranches = [];
+        $aliasMap = [
+            'fadhil' => 'fadil',
+            'yeni' => 'yenni',
+            'egi' => 'egy',
+        ];
+
+        foreach ($salesList as $s) {
+            $id = (int)$s['id'];
+            $nameLower = strtolower(trim($s['name']));
+            $cleanName = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $s['name'])));
+            
+            $caseBranches[] = "WHEN LOWER(sales_fu) = '$nameLower' THEN $id";
+            if ($cleanName !== $nameLower) {
+                $caseBranches[] = "WHEN LOWER(sales_fu) = '$cleanName' THEN $id";
+            }
+        }
+
+        foreach ($aliasMap as $alias => $target) {
+            foreach ($salesList as $s) {
+                if (strtolower(trim($s['name'])) === $target) {
+                    $id = (int)$s['id'];
+                    $caseBranches[] = "WHEN LOWER(sales_fu) = '$alias' THEN $id";
+                    break;
+                }
+            }
+        }
+
+        if (empty($caseBranches)) return;
+
+        $caseSql = implode("\n            ", $caseBranches);
+
+        $query = "
+            UPDATE followup_customers
+            SET assigned_sales_id = CASE
+                $caseSql
+                ELSE assigned_sales_id
+            END,
+            is_orphan = CASE
+                WHEN (assigned_sales_id IS NOT NULL AND assigned_sales_id > 0) THEN 0
+                ELSE is_orphan
+            END
+            WHERE sales_fu != '' AND sales_fu IS NOT NULL AND (assigned_sales_id IS NULL OR assigned_sales_id = 0)
+        ";
+
+        if ($is_mysql && $conn) {
+            $conn->query($query);
+        } else {
+            followup_execute($query);
+        }
+    } catch (Throwable $e) {
+        // Silently fail to never block other CRM API calls
+    }
 }
 
 // -------------------------------------------------------------
@@ -206,8 +273,16 @@ if ($action === 'customers') {
     // Attach sales name
     foreach ($customers as &$c) {
         $sid = (int)($c['assigned_sales_id'] ?? 0);
-        $c['sales_name'] = isset($salesMap[$sid]) ? $salesMap[$sid]['name'] : 'Belum Ditugaskan';
-        $c['sales_phone'] = isset($salesMap[$sid]) ? $salesMap[$sid]['phone'] : '';
+        if ($sid > 0 && isset($salesMap[$sid])) {
+            $c['sales_name'] = $salesMap[$sid]['name'];
+            $c['sales_phone'] = $salesMap[$sid]['phone'];
+        } elseif (!empty($c['sales_fu']) && $c['sales_fu'] !== '-' && strtolower($c['sales_fu']) !== 'belum ditugaskan') {
+            $c['sales_name'] = $c['sales_fu'];
+            $c['sales_phone'] = '';
+        } else {
+            $c['sales_name'] = 'Belum Ditugaskan';
+            $c['sales_phone'] = '';
+        }
     }
 
     echo json_encode([
