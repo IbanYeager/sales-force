@@ -92,7 +92,7 @@ function setDashboardModelFilter(model) {
 async function loadExecutiveAnalytics() {
   try {
     const model = executiveState.activeModel || 'all';
-    const res = await fetch(`../api/api_followup.php?action=dashboard_analytics&filter_model=${encodeURIComponent(model)}`);
+    const res = await fetch(`/api/api_followup.php?action=dashboard_analytics&filter_model=${encodeURIComponent(model)}`);
     const data = await res.json();
 
     if (data.success) {
@@ -563,7 +563,7 @@ async function triggerGoogleSheetSync(showNotification = true) {
       });
     }
 
-    const res = await fetch('../api/api_followup_sync.php?action=pull_sheet', {
+    const res = await fetch('/api/api_followup_sync.php?action=pull_sheet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({})
@@ -622,7 +622,7 @@ function getLoggedInSpvName() {
 async function loadSalesList() {
   try {
     const spv = getLoggedInSpvName();
-    const res = await fetch(`../api/api_followup.php?action=sales&spv=${encodeURIComponent(spv)}`);
+    const res = await fetch(`/api/api_followup.php?action=sales&spv=${encodeURIComponent(spv)}`);
     const data = await res.json();
     if (data.success) {
       masterState.salesList = data.data || [];
@@ -635,7 +635,7 @@ async function loadSalesList() {
 
 async function loadTemplates() {
   try {
-    const res = await fetch('../api/api_followup.php?action=templates');
+    const res = await fetch('/api/api_followup.php?action=templates');
     const data = await res.json();
     if (data.success) {
       masterState.templates = data.data || [];
@@ -647,7 +647,7 @@ async function loadTemplates() {
 
 async function loadMasterStats() {
   try {
-    const res = await fetch('../api/api_followup.php?action=stats');
+    const res = await fetch('/api/api_followup.php?action=stats');
     const data = await res.json();
     if (data.success) {
       masterState.stats = data.stats || {};
@@ -748,7 +748,7 @@ async function refillSalesLeads(salesId, salesName, quota = 50) {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=add_more_leads_to_sales', {
+    const res = await fetch('/api/api_followup.php?action=add_more_leads_to_sales', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sales_id: salesId, quota: quota })
@@ -832,7 +832,7 @@ async function loadMasterCustomers(resetPage = true) {
   try {
     const { search, sales_id, status, category } = masterState.filters;
     const spv = getLoggedInSpvName();
-    const url = `../api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&spv=${encodeURIComponent(spv)}`;
+    const url = `/api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&spv=${encodeURIComponent(spv)}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -1422,7 +1422,7 @@ async function executeBulkAssign() {
   }
 
   try {
-    const res = await fetch('../api/api_followup.php?action=bulk_assign', {
+    const res = await fetch('/api/api_followup.php?action=bulk_assign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1457,7 +1457,7 @@ async function executeAutoDistribute() {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=bulk_assign', {
+    const res = await fetch('/api/api_followup.php?action=bulk_assign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1494,7 +1494,7 @@ async function executeReleaseToPool() {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=release_to_pool', {
+    const res = await fetch('/api/api_followup.php?action=release_to_pool', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1544,7 +1544,7 @@ async function executeBulkUnassign() {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=unassign_sales', {
+    const res = await fetch('/api/api_followup.php?action=unassign_sales', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1597,7 +1597,7 @@ async function unassignCustomerSingle(customerId, custName, salesName) {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=unassign_sales', {
+    const res = await fetch('/api/api_followup.php?action=unassign_sales', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1626,7 +1626,7 @@ async function unassignCustomerSingle(customerId, custName, salesName) {
 
 async function inlineUpdateStatus(customerId, status) {
   try {
-    await fetch('../api/api_followup.php?action=update_status', {
+    await fetch('/api/api_followup.php?action=update_status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: customerId, status: status })
@@ -1639,7 +1639,7 @@ async function inlineUpdateStatus(customerId, status) {
 
 async function inlineUpdateSales(customerId, salesId) {
   try {
-    const res = await fetch('../api/api_followup.php?action=bulk_assign', {
+    const res = await fetch('/api/api_followup.php?action=bulk_assign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1663,7 +1663,7 @@ async function inlineUpdateSales(customerId, salesId) {
 async function sendTaskNotificationToSales(salesId) {
   if (!salesId) return;
   try {
-    const res = await fetch('../api/api_followup.php?action=notify_sales_task', {
+    const res = await fetch('/api/api_followup.php?action=notify_sales_task', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sales_id: salesId })
@@ -1837,7 +1837,7 @@ async function executeRecallBySales() {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=unassign_sales', {
+    const res = await fetch('/api/api_followup.php?action=unassign_sales', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2112,7 +2112,7 @@ async function executeSaveEditCustomer(e, customerId) {
   };
 
   try {
-    const res = await fetch('../api/api_followup.php?action=batch_update_customers', {
+    const res = await fetch('/api/api_followup.php?action=batch_update_customers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -2559,7 +2559,7 @@ async function executeBatchUpdateMaster(e) {
   };
 
   try {
-    const res = await fetch('../api/api_followup.php?action=batch_update_customers', {
+    const res = await fetch('/api/api_followup.php?action=batch_update_customers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -2601,7 +2601,7 @@ function handleExcelUpload(input) {
   formData.append('file', file);
 
   const xhr = new XMLHttpRequest();
-  xhr.open('POST', '../api/api_followup_import.php', true);
+  xhr.open('POST', '/api/api_followup_import.php', true);
 
   xhr.upload.onprogress = (e) => {
     if (e.lengthComputable) {
@@ -2940,7 +2940,7 @@ async function applyMasterWATemplate(templateId) {
   localStorage.setItem('sft_last_template_id', templateId);
 
   try {
-    const res = await fetch('../api/api_followup.php?action=format_template', {
+    const res = await fetch('/api/api_followup.php?action=format_template', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -3119,7 +3119,7 @@ async function handleSaveNewCust(e) {
   };
 
   try {
-    const res = await fetch('../api/api_followup.php?action=create_customer', {
+    const res = await fetch('/api/api_followup.php?action=create_customer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -3314,7 +3314,7 @@ async function handleMasterSaveCustomTemplate(e, editId = 0) {
   }
 
   try {
-    const res = await fetch('../api/api_followup.php?action=save_template', {
+    const res = await fetch('/api/api_followup.php?action=save_template', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -3364,7 +3364,7 @@ async function handleMasterDeleteCustomTemplate(id, title) {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=delete_template', {
+    const res = await fetch('/api/api_followup.php?action=delete_template', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: id })
@@ -3416,7 +3416,7 @@ async function openSyncSettingsModal() {
   let defaultScriptUrl = localStorage.getItem('sft_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec';
 
   try {
-    const res = await fetch('../api/api_followup_sync.php?action=get_settings');
+    const res = await fetch('/api/api_followup_sync.php?action=get_settings');
     const data = await res.json();
     if (data.success && data.settings) {
       if (data.settings.google_sheet_url) {
@@ -3614,7 +3614,7 @@ async function executePullGoogleSheet() {
 
   // 4. Save settings first to database
   try {
-    await fetch('../api/api_followup_sync.php?action=save_settings', {
+    await fetch('/api/api_followup_sync.php?action=save_settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -3629,7 +3629,7 @@ async function executePullGoogleSheet() {
   try {
     updateModernOperationLoader(75, 'Mengekstrak data prospek & memperbarui database');
 
-    const res = await fetch('../api/api_followup_sync.php?action=pull_sheet', {
+    const res = await fetch('/api/api_followup_sync.php?action=pull_sheet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ google_sheet_url: sheetUrl })
@@ -3684,7 +3684,7 @@ async function confirmDeleteCustomer(id, name) {
 
 async function executeDeleteCustomer(id) {
   try {
-    const res = await fetch('../api/api_followup.php?action=delete_customer', {
+    const res = await fetch('/api/api_followup.php?action=delete_customer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
@@ -3733,7 +3733,7 @@ async function confirmBulkDelete() {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=bulk_delete', {
+    const res = await fetch('/api/api_followup.php?action=bulk_delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ customer_ids: masterState.selectedIds })
@@ -3769,7 +3769,7 @@ async function confirmResetDatabase() {
   if (!isConfirmed) return;
 
   try {
-    const res = await fetch('../api/api_followup.php?action=reset_database', {
+    const res = await fetch('/api/api_followup.php?action=reset_database', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -4134,7 +4134,7 @@ async function executeSmartDistribution() {
   try {
     updateModernOperationLoader(85, 'Menyimpan alokasi PIC ke database CRM');
 
-    const res = await fetch('../api/api_followup.php?action=distribute_quota', {
+    const res = await fetch('/api/api_followup.php?action=distribute_quota', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

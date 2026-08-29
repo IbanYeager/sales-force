@@ -214,6 +214,239 @@ if ($action === 'customers') {
 }
 
 // -------------------------------------------------------------
+// ROUTE: GET /api_followup.php?action=dashboard_analytics
+// Executive CRM & Follow-Up Analytics matching Google Spreadsheet MASTER & DASHBOARD sheets
+// -------------------------------------------------------------
+if ($action === 'dashboard_analytics') {
+    $filterModel = isset($_GET['filter_model']) ? strtolower(trim($_GET['filter_model'])) : 'all'; // all, veloz_hybrid, others
+    $filterCluster = isset($_GET['cluster']) ? trim($_GET['cluster']) : '';
+    $filterClass = isset($_GET['priority_class']) ? strtoupper(trim($_GET['priority_class'])) : '';
+
+    // Fetch all synchronized customers
+    $allCust = followup_query("
+        SELECT id, customer_code, name, phone, car_model, last_car_model, car_age,
+               recommended_model, cluster_name, priority, priority_class, district,
+               connected, contacted, prospect, spk, remarks, sales_fu_status,
+               reason_followup, followup_date, followup_status, sync_source,
+               vehicle_filter, cust_type, outlet_name, sales_fu, do_unit, all_spk, all_do
+        FROM followup_customers
+        ORDER BY id ASC
+    ");
+
+    // Apply model filter
+    $filtered = array_filter($allCust, function($c) use ($filterModel, $filterCluster, $filterClass) {
+        $vf = strtoupper(trim($c['vehicle_filter'] ?? 'OTHERS'));
+        
+        if ($filterModel === 'veloz_hybrid') {
+            if ($vf !== 'VELOZ HYBRID' && stripos($c['car_model'] ?? '', 'VELOZ') === false) return false;
+        } elseif ($filterModel === 'others') {
+            if ($vf === 'VELOZ HYBRID') return false;
+        }
+
+        if ($filterCluster !== '' && $filterCluster !== 'all') {
+            if (($c['cluster_name'] ?? '') !== $filterCluster) return false;
+        }
+
+        if ($filterClass !== '' && $filterClass !== 'ALL') {
+            $cls = strtoupper(trim($c['priority_class'] ?? 'MEDIUM'));
+            if ($cls !== $filterClass) return false;
+        }
+
+        return true;
+    });
+
+    $calcFunnel = function($records) {
+        $potency = count($records);
+        $cust_fu = 0;
+        $connected = 0;
+        $contacted = 0;
+        $hot_prospect = 0;
+        $spk = 0;
+        $do_unit = 0;
+
+        $responseBreakdown = [
+            'SPK berhasil' => 0,
+            'Customer tertarik' => 0,
+            'Customer janjian' => 0,
+            'Customer pending' => 0,
+            'Customer menolak' => 0,
+            'Customer tidak aktif' => 0,
+            'Customer Tidak Diangkat' => 0,
+            'Belum Dihubungi' => 0
+        ];
+
+        foreach ($records as $r) {
+            $rem = trim($r['remarks'] ?? '');
+            $remLower = strtolower($rem);
+            $conn = strtoupper(trim($r['connected'] ?? 'FALSE')) === 'TRUE';
+            $cont = strtoupper(trim($r['contacted'] ?? 'FALSE')) === 'TRUE';
+            $prosp = strtoupper(trim($r['prospect'] ?? 'FALSE')) === 'TRUE';
+            $isSpk = strtoupper(trim($r['spk'] ?? 'FALSE')) === 'TRUE' || stripos($rem, 'SPK berhasil') !== false || !empty($r['all_spk']);
+            $isDo = strtoupper(trim($r['do_unit'] ?? 'FALSE')) === 'TRUE' || stripos($r['all_do'] ?? '', 'DO') !== false;
+
+            // Remarks response count
+            if (isset($responseBreakdown[$rem])) {
+                $responseBreakdown[$rem]++;
+            } elseif (stripos($rem, 'spk') !== false) {
+                $responseBreakdown['SPK berhasil']++;
+            } elseif (stripos($rem, 'tertarik') !== false) {
+                $responseBreakdown['Customer tertarik']++;
+            } elseif (stripos($rem, 'janjian') !== false) {
+                $responseBreakdown['Customer janjian']++;
+            } elseif (stripos($rem, 'pending') !== false) {
+                $responseBreakdown['Customer pending']++;
+            } elseif (stripos($rem, 'menolak') !== false) {
+                $responseBreakdown['Customer menolak']++;
+            } elseif (stripos($rem, 'tidak aktif') !== false) {
+                $responseBreakdown['Customer tidak aktif']++;
+            } elseif (stripos($rem, 'tidak diangkat') !== false) {
+                $responseBreakdown['Customer Tidak Diangkat']++;
+            } else {
+                $responseBreakdown['Belum Dihubungi']++;
+            }
+
+            // Customer Follow-Up (FU) is true if contacted, connected, remarks filled, or status changed
+            $hasFu = ($rem !== '' || $conn || $cont || $prosp || $isSpk || ($r['sales_fu_status'] ?? '') !== 'Open' || ($r['followup_status'] ?? '') !== 'Belum Dihubungi');
+            if ($hasFu) $cust_fu++;
+
+            // Connected: calls/WA that connected
+            $isConnected = ($conn || $cont || $prosp || $isSpk || in_array($rem, ['SPK berhasil', 'Customer tertarik', 'Customer janjian', 'Customer pending', 'Customer menolak']));
+            if ($isConnected) $connected++;
+
+            // Contacted: 2-way communication established (Connected minus 'Customer Tidak Diangkat' & 'Customer tidak aktif')
+            $isContacted = ($cont || $prosp || $isSpk || in_array($rem, ['SPK berhasil', 'Customer tertarik', 'Customer janjian', 'Customer pending', 'Customer menolak']));
+            if ($isContacted) $contacted++;
+
+            // Hot Prospect: Customer tertarik + Customer janjian + SPK
+            $isHot = ($prosp || $isSpk || in_array($rem, ['SPK berhasil', 'Customer tertarik', 'Customer janjian']));
+            if ($isHot) $hot_prospect++;
+
+            // SPK
+            if ($isSpk) $spk++;
+
+            // DO (Delivery Order)
+            if ($isDo) $do_unit++;
+        }
+
+        return [
+            'potency' => $potency,
+            'cust_fu' => $cust_fu,
+            'connected' => $connected,
+            'contacted' => $contacted,
+            'hot_prospect' => $hot_prospect,
+            'spk' => $spk,
+            'do_unit' => $do_unit,
+            'ratio_fu' => $potency > 0 ? round(($cust_fu / $potency) * 100, 1) : 0,
+            'ratio_connected' => $cust_fu > 0 ? round(($connected / $cust_fu) * 100, 1) : 0,
+            'ratio_contacted' => $connected > 0 ? round(($contacted / $connected) * 100, 1) : 0,
+            'ratio_hot_prospect' => $contacted > 0 ? round(($hot_prospect / $contacted) * 100, 1) : 0,
+            'ratio_spk' => $hot_prospect > 0 ? round(($spk / $hot_prospect) * 100, 1) : 0,
+            'ratio_do' => $spk > 0 ? round(($do_unit / $spk) * 100, 1) : 0,
+            'responses' => $responseBreakdown
+        ];
+    };
+
+    // Overall / Filtered Funnel
+    $overallFunnel = $calcFunnel($filtered);
+
+    // 1. Breakdown by Priority Class / Suhu (HIGH, MEDIUM, LOW)
+    $classBreakdown = [];
+    foreach (['HIGH', 'MEDIUM', 'LOW'] as $cls) {
+        $clsRecords = array_filter($filtered, fn($r) => strtoupper(trim($r['priority_class'] ?? 'MEDIUM')) === $cls);
+        $clsFunnel = $calcFunnel($clsRecords);
+        $classBreakdown[$cls] = $clsFunnel;
+    }
+
+    // 2. Breakdown by Purchase / Cust Type (FLEET vs RETAIL)
+    $typeBreakdown = [];
+    foreach (['FLEET', 'RETAIL'] as $ctype) {
+        $typeRecords = array_filter($filtered, fn($r) => strtoupper(trim($r['cust_type'] ?? 'RETAIL')) === $ctype);
+        $typeBreakdown[$ctype] = $calcFunnel($typeRecords);
+    }
+
+    // 3. Breakdown by Clusters
+    $clustersMap = [];
+    foreach ($filtered as $r) {
+        $cl = trim($r['cluster_name'] ?? '');
+        if (!$cl) $cl = 'Tanpa Klaster';
+        if (!isset($clustersMap[$cl])) $clustersMap[$cl] = [];
+        $clustersMap[$cl][] = $r;
+    }
+
+    $clusterBreakdown = [];
+    foreach ($clustersMap as $clName => $clRecords) {
+        $cFunnel = $calcFunnel($clRecords);
+        $cFunnel['cluster_name'] = $clName;
+        $clusterBreakdown[] = $cFunnel;
+    }
+    // Sort clusters alphabetically
+    usort($clusterBreakdown, fn($a, $b) => strcmp($a['cluster_name'], $b['cluster_name']));
+
+    // 4. Breakdown by Sales FU / Wiraniaga
+    $salesMap = [];
+    foreach ($filtered as $r) {
+        $sName = trim($r['sales_fu'] ?? '');
+        if (!$sName) $sName = 'Belum Ditugaskan';
+        if (!isset($salesMap[$sName])) $salesMap[$sName] = [];
+        $salesMap[$sName][] = $r;
+    }
+
+    $salesPerformance = [];
+    foreach ($salesMap as $sName => $sRecords) {
+        $sFunnel = $calcFunnel($sRecords);
+        $sFunnel['sales_name'] = $sName;
+        $salesPerformance[] = $sFunnel;
+    }
+    // Sort by SPK desc, then Potency desc
+    usort($salesPerformance, function($a, $b) {
+        if ($b['spk'] !== $a['spk']) return $b['spk'] - $a['spk'];
+        if ($b['cust_fu'] !== $a['cust_fu']) return $b['cust_fu'] - $a['cust_fu'];
+        return $b['potency'] - $a['potency'];
+    });
+
+    // 5. Breakdown by Top Car Models
+    $modelCounts = [];
+    foreach ($filtered as $r) {
+        $m = trim($r['last_car_model'] ?? ($r['car_model'] ?? 'Toyota'));
+        if (!$m || $m === '-' || $m === 'NO DATA') $m = 'Lainnya';
+        if (!isset($modelCounts[$m])) $modelCounts[$m] = ['model' => $m, 'potency' => 0, 'spk' => 0, 'fu' => 0];
+        $modelCounts[$m]['potency']++;
+        if (strtoupper(trim($r['spk'] ?? 'FALSE')) === 'TRUE' || stripos($r['remarks'] ?? '', 'SPK') !== false) {
+            $modelCounts[$m]['spk']++;
+        }
+        if (trim($r['remarks'] ?? '') !== '') {
+            $modelCounts[$m]['fu']++;
+        }
+    }
+    usort($modelCounts, fn($a, $b) => $b['potency'] - $a['potency']);
+    $topModels = array_slice($modelCounts, 0, 10);
+
+    // 6. Settings and Sync Info
+    $settingsRows = followup_query("SELECT setting_key, setting_value FROM followup_settings");
+    $settings = [];
+    foreach ($settingsRows as $sr) {
+        $settings[$sr['setting_key']] = $sr['setting_value'];
+    }
+
+    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1618304635#gid=1618304635';
+
+    echo json_encode([
+        'success' => true,
+        'filter_model' => $filterModel,
+        'total_database' => count($allCust),
+        'funnel' => $overallFunnel,
+        'class_breakdown' => $classBreakdown,
+        'type_breakdown' => $typeBreakdown,
+        'cluster_breakdown' => $clusterBreakdown,
+        'sales_performance' => $salesPerformance,
+        'top_models' => $topModels,
+        'last_sync' => $settings['last_sync_time'] ?? date('Y-m-d H:i:s'),
+        'sheet_url' => !empty($settings['google_sheet_url']) ? $settings['google_sheet_url'] : $defaultSheet
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
 // ROUTE: GET /api_followup.php?action=stats
 // -------------------------------------------------------------
 if ($action === 'stats') {

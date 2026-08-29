@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Database Follow-Up (CRM)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_kacab.css">
-  <link rel="stylesheet" href="../css/followup.css?v=20260829_executive">
+  <link rel="stylesheet" href="/css/style_kacab.css">
+  <link rel="stylesheet" href="/css/followup.css?v=20260829_executive">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <link rel="icon" type="image/x-icon" href="../favicon.ico">
-  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1e1014">
 </head>
 
@@ -62,7 +62,7 @@
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
-            <img id="kacabAvatar" src="../image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Kepala+Cabang&background=1E1014&color=fff'">
+            <img id="kacabAvatar" src="/image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Kepala+Cabang&background=1E1014&color=fff'">
             <span class="dot"></span>
           </div>
           <div class="meta">
@@ -481,7 +481,7 @@
               <i class="fa-solid fa-arrows-rotate" style="color:#0f9d58; font-size:13px;"></i> Sync Sheet
             </button>
 
-            <a href="../api/api_followup_sync.php?action=export_csv" class="btn-fu btn-fu-secondary">
+            <a href="/api/api_followup_sync.php?action=export_csv" class="btn-fu btn-fu-secondary">
               <i class="fa-solid fa-file-arrow-down" style="color:#0284c7; font-size:13px;"></i> Ekspor CSV
             </a>
 
@@ -604,9 +604,9 @@
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="../custom_alert.js?v=25"></script>
-  <script src="../js/kacab_global.js?v=20260824_dendi"></script>
-  <script src="../js/followup_master.js?v=20260829_executive_dashboard"></script>
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="/custom_alert.js?v=25"></script>
+  <script src="/js/kacab_global.js?v=20260824_dendi"></script>
+  <script src="/js/followup_master.js?v=20260829_executive_dashboard"></script>
+  <script src="/js/pwa-app.js?v=3"></script>
 </body>
 </html>

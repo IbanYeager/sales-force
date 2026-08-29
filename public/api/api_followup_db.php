@@ -181,7 +181,15 @@ function init_followup_tables() {
             'followup_date' => "DATETIME",
             'is_orphan' => "TINYINT(1) DEFAULT 0",
             'ex_sales_name' => "VARCHAR(150) NULL",
-            'released_at' => "DATETIME NULL"
+            'released_at' => "DATETIME NULL",
+            'vehicle_filter' => "VARCHAR(100) DEFAULT 'OTHERS'",
+            'cust_type' => "VARCHAR(50) DEFAULT 'RETAIL'",
+            'priority_class' => "VARCHAR(50) DEFAULT 'MEDIUM'",
+            'outlet_name' => "VARCHAR(255) DEFAULT 'TUNAS TOYOTA KIARA CONDONG'",
+            'sales_fu' => "VARCHAR(150) NULL",
+            'do_unit' => "VARCHAR(20) DEFAULT 'FALSE'",
+            'all_spk' => "VARCHAR(50) NULL",
+            'all_do' => "VARCHAR(50) NULL"
         ];
         foreach ($cols as $colName => $colDef) {
             $check = followup_query("SHOW COLUMNS FROM followup_customers LIKE '$colName'");
@@ -303,16 +311,46 @@ function init_followup_tables() {
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ");
+
+        // Safe column migration for SQLite
+        $sqlite_cols = [
+            'connected' => "TEXT DEFAULT 'FALSE'",
+            'contacted' => "TEXT DEFAULT 'FALSE'",
+            'prospect' => "TEXT DEFAULT 'FALSE'",
+            'spk' => "TEXT DEFAULT 'FALSE'",
+            'remarks' => "TEXT DEFAULT ''",
+            'sales_fu_status' => "TEXT DEFAULT 'Open'",
+            'reason_followup' => "TEXT",
+            'followup_date' => "DATETIME",
+            'is_orphan' => "INTEGER DEFAULT 0",
+            'ex_sales_name' => "TEXT NULL",
+            'released_at' => "DATETIME NULL",
+            'vehicle_filter' => "TEXT DEFAULT 'OTHERS'",
+            'cust_type' => "TEXT DEFAULT 'RETAIL'",
+            'priority_class' => "TEXT DEFAULT 'MEDIUM'",
+            'outlet_name' => "TEXT DEFAULT 'TUNAS TOYOTA KIARA CONDONG'",
+            'sales_fu' => "TEXT NULL",
+            'do_unit' => "TEXT DEFAULT 'FALSE'",
+            'all_spk' => "TEXT NULL",
+            'all_do' => "TEXT NULL"
+        ];
+        foreach ($sqlite_cols as $colName => $colDef) {
+            try {
+                followup_execute("ALTER TABLE followup_customers ADD COLUMN $colName $colDef");
+            } catch (Exception $e) {}
+        }
     }
 
-    // Seed default settings if empty
+    $defaultSheetUrl = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1618304635#gid=1618304635';
+
+    // Seed default settings if empty or update default sheet url
     $chkSet = followup_query("SELECT setting_key FROM followup_settings LIMIT 1");
     if (empty($chkSet)) {
         $settings = [
             ['dealer_name', 'Tunas Toyota Kiara Condong'],
             ['dealer_address', 'Jl. Kiaracondong No. 440, Bandung, Jawa Barat'],
             ['dealer_phone', '(022) 731-8888'],
-            ['google_sheet_url', ''],
+            ['google_sheet_url', $defaultSheetUrl],
             ['google_apps_script_url', ''],
             ['auto_sync_interval', '15'],
             ['last_sync_time', ''],
@@ -320,6 +358,11 @@ function init_followup_tables() {
         ];
         foreach ($settings as $s) {
             followup_execute("INSERT INTO followup_settings (setting_key, setting_value) VALUES (?, ?)", [$s[0], $s[1]]);
+        }
+    } else {
+        $currUrl = followup_query("SELECT setting_value FROM followup_settings WHERE setting_key = 'google_sheet_url' LIMIT 1");
+        if (empty($currUrl) || empty($currUrl[0]['setting_value'])) {
+            followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)", [$defaultSheetUrl]);
         }
     }
 

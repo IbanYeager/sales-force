@@ -37,30 +37,30 @@ if (file_exists(__DIR__ . '/config_db.php')) {
 }
 
 $conn = null;
-try {
-    $conn = @new mysqli($host, $user, $pass, $db, 3306);
-} catch (Throwable $e) {
-    $conn = null;
+mysqli_report(MYSQLI_REPORT_OFF);
+
+function try_connect_mysqli($h, $u, $p, $d, $port = 3306, $timeout = 2) {
+    try {
+        $c = mysqli_init();
+        if (!$c) return null;
+        $c->options(MYSQLI_OPT_CONNECT_TIMEOUT, $timeout);
+        if (@$c->real_connect($h, $u, $p, $d, $port)) {
+            return $c;
+        }
+    } catch (Throwable $e) {}
+    return null;
 }
+
+$conn = try_connect_mysqli($host, $user, $pass, $db, 3306, 2);
 
 // Fallback otomatis: Jika internet terputus di lokal, fallback ke database lokal Laragon
 if (!$conn || $conn->connect_error) {
     // Coba fallback ke IP langsung Hostinger
-    try {
-        $altConn = @new mysqli("153.92.15.23", "u253557905_kircon", "Kircon154", "u253557905_db_sales", 3306);
-        if ($altConn && !$altConn->connect_error) {
-            $conn = $altConn;
-        }
-    } catch (Throwable $e) {}
+    $conn = try_connect_mysqli("153.92.15.23", "u253557905_kircon", "Kircon154", "u253557905_db_sales", 3306, 2);
 
     // Jika masih gagal (misal sedang offline total), gunakan DB offline lokal
     if (!$conn || $conn->connect_error) {
-        try {
-            $localConn = @new mysqli("localhost", "root", "", "db_sales_app");
-            if ($localConn && !$localConn->connect_error) {
-                $conn = $localConn;
-            }
-        } catch (Throwable $e) {}
+        $conn = try_connect_mysqli("localhost", "root", "", "db_sales_app", 3306, 2);
     }
 }
 
