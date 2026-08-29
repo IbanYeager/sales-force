@@ -222,6 +222,11 @@ if ($action === 'dashboard_analytics') {
     $filterCluster = isset($_GET['cluster']) ? trim($_GET['cluster']) : '';
     $filterClass = isset($_GET['priority_class']) ? strtoupper(trim($_GET['priority_class'])) : '';
 
+    // Clean up phantom/blank records from previous syncs if any
+    try {
+        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR phone = '-' OR phone = '' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
+    } catch (Exception $e) {}
+
     // Fetch all synchronized customers
     $allCust = followup_query("
         SELECT id, customer_code, name, phone, car_model, last_car_model, car_age,
@@ -475,6 +480,11 @@ if ($action === 'stats') {
         $whereSql = "WHERE assigned_sales_id = ?";
         $params[] = (int)$sales_id;
     }
+
+    // Clean up phantom/blank records from previous syncs if any
+    try {
+        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR phone = '-' OR phone = '' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
+    } catch (Exception $e) {}
 
     $allCust = followup_query("SELECT id, followup_status, followup_category, assigned_sales_id FROM followup_customers $whereSql", $params);
 

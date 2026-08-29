@@ -231,14 +231,24 @@ function sync_google_sheet_data($sheetUrl = null) {
         $sqlite_pdo->beginTransaction();
     }
 
+    // Clean up phantom/blank records from previous syncs
+    try {
+        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR phone = '-' OR phone = '' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
+    } catch (Exception $e) {}
+
+    global $is_mysql, $sqlite_pdo, $conn;
+
+    $rowsToInsert = [];
     $inserted = 0;
 
     for ($i = $headerRowIdx + 1; $i < count($lines); $i++) {
         if (!trim($lines[$i])) continue;
         $row = str_getcsv($lines[$i], ",");
-        if (empty($row) || count($row) < 3) continue;
+        if (empty($row) || count($row) < 5) continue;
 
         $name = $nameIdx !== -1 ? trim($row[$nameIdx] ?? '') : '';
+        if (!$name || $name === '-' || $name === 'NO DATA') continue;
+
         $rawPhone1 = $phone1Idx !== -1 ? trim($row[$phone1Idx] ?? '') : '';
         $rawPhone2 = $phone2Idx !== -1 ? trim($row[$phone2Idx] ?? '') : '';
         
@@ -255,7 +265,9 @@ function sync_google_sheet_data($sheetUrl = null) {
 
         $phone1 = $cleanP($rawPhone1);
         $phone2 = $cleanP($rawPhone2);
-        $phone = $phone1 ?: ($phone2 ?: '-');
+        $phone = $phone1 ?: ($phone2 ?: '');
+
+        if (!$phone) continue;
 
         $lastCar = $lastCarIdx !== -1 ? trim($row[$lastCarIdx] ?? '') : '';
         if ($lastCar === 'NO DATA' || $lastCar === '-') $lastCar = '';
@@ -328,13 +340,76 @@ function sync_google_sheet_data($sheetUrl = null) {
         elseif ($remarks === 'Customer menolak' || $remarks === 'Customer tidak aktif') $status = 'Tidak Tertarik';
         elseif ($remarks === 'Customer janjian' || $remarks === 'Customer pending' || $contacted === 'TRUE' || $connected === 'TRUE') $status = 'Menunggu Respon';
 
-        $code = 'CUST-KIRCON-' . str_pad($inserted + 1, 5, '0', STR_PAD_LEFT);
-        if (!$name || $name === '-') {
-            $name = 'Pelanggan Toyota ' . ($vin ? substr($vin, -6) : '#' . ($inserted + 1));
-        }
+        // Deterministic customer code to prevent duplicates on repeated syncs
+        $code = $vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone), 0, 12));
 
-        if ($is_mysql) {
-            followup_execute("
+        $rowsToInsert[] = [
+            $code, $name, $phone, $carModel, $lastCar, $age,
+            $targetCar, $rec2, $rec3, $cluster, $priority, $district, $vin,
+            $outletDo, $outletSrv, $srvComp,
+            $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
+            $category, $status,
+            $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo
+        ];
+    }
+
+    // Execute in fast chunks of 50 rows
+    $chunkSize = 50;
+    $chunks = array_chunk($rowsToInsert, $chunkSize);
+
+    if ($sqlite_pdo && !$is_mysql) {
+        $sqlite_pdo->beginTransaction();
+        $sqlite_stmt = $sqlite_pdo->prepare("
+            INSERT INTO followup_customers (
+                customer_code, name, phone, car_model, last_car_model, car_age,
+                recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin,
+                outlet_do, outlet_service, service_compliance,
+                connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
+                followup_category, followup_status, sync_source,
+                vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(customer_code) DO UPDATE SET
+                name = excluded.name, car_model = excluded.car_model, last_car_model = excluded.last_car_model,
+                car_age = excluded.car_age, recommended_model = excluded.recommended_model,
+                alt_model_2 = excluded.alt_model_2, alt_model_3 = excluded.alt_model_3,
+                cluster_name = excluded.cluster_name, priority = excluded.priority, district = excluded.district,
+                vin = excluded.vin, outlet_do = excluded.outlet_do, outlet_service = excluded.outlet_service,
+                service_compliance = excluded.service_compliance,
+                connected = CASE WHEN excluded.connected != 'FALSE' THEN excluded.connected ELSE followup_customers.connected END,
+                contacted = CASE WHEN excluded.contacted != 'FALSE' THEN excluded.contacted ELSE followup_customers.contacted END,
+                prospect = CASE WHEN excluded.prospect != 'FALSE' THEN excluded.prospect ELSE followup_customers.prospect END,
+                spk = CASE WHEN excluded.spk != 'FALSE' THEN excluded.spk ELSE followup_customers.spk END,
+                remarks = CASE WHEN excluded.remarks != '' THEN excluded.remarks ELSE followup_customers.remarks END,
+                sales_fu_status = CASE WHEN excluded.sales_fu_status != 'Open' THEN excluded.sales_fu_status ELSE followup_customers.sales_fu_status END,
+                reason_followup = CASE WHEN excluded.reason_followup != '' THEN excluded.reason_followup ELSE followup_customers.reason_followup END,
+                followup_date = CASE WHEN excluded.followup_date IS NOT NULL THEN excluded.followup_date ELSE followup_customers.followup_date END,
+                followup_category = excluded.followup_category,
+                vehicle_filter = excluded.vehicle_filter,
+                cust_type = excluded.cust_type,
+                priority_class = excluded.priority_class,
+                outlet_name = excluded.outlet_name,
+                sales_fu = CASE WHEN excluded.sales_fu != '' THEN excluded.sales_fu ELSE followup_customers.sales_fu END,
+                do_unit = CASE WHEN excluded.do_unit != 'FALSE' THEN excluded.do_unit ELSE followup_customers.do_unit END,
+                all_spk = excluded.all_spk,
+                all_do = excluded.all_do
+        ");
+        foreach ($rowsToInsert as $rData) {
+            $sqlite_stmt->execute($rData);
+            $inserted++;
+        }
+        $sqlite_pdo->commit();
+    } elseif ($is_mysql && $conn) {
+        foreach ($chunks as $chunk) {
+            $placeholders = [];
+            $flatParams = [];
+            foreach ($chunk as $rData) {
+                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)";
+                foreach ($rData as $val) {
+                    $flatParams[] = $val;
+                }
+                $inserted++;
+            }
+            $sql = "
                 INSERT INTO followup_customers (
                     customer_code, name, phone, car_model, last_car_model, car_age,
                     recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin,
@@ -342,7 +417,7 @@ function sync_google_sheet_data($sheetUrl = null) {
                     connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                     followup_category, followup_status, sync_source,
                     vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES " . implode(', ', $placeholders) . "
                 ON DUPLICATE KEY UPDATE
                     name = VALUES(name), car_model = VALUES(car_model), last_car_model = VALUES(last_car_model),
                     car_age = VALUES(car_age), recommended_model = VALUES(recommended_model),
@@ -367,72 +442,22 @@ function sync_google_sheet_data($sheetUrl = null) {
                     do_unit = CASE WHEN VALUES(do_unit) != 'FALSE' THEN VALUES(do_unit) ELSE do_unit END,
                     all_spk = VALUES(all_spk),
                     all_do = VALUES(all_do)
-            ", [
-                $code, $name, $phone, $carModel, $lastCar, $age,
-                $targetCar, $rec2, $rec3, $cluster, $priority, $district, $vin,
-                $outletDo, $outletSrv, $srvComp,
-                $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
-                $category, $status,
-                $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo
-            ]);
-        } else {
-            // SQLite upsert
-            followup_execute("
-                INSERT INTO followup_customers (
-                    customer_code, name, phone, car_model, last_car_model, car_age,
-                    recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin,
-                    outlet_do, outlet_service, service_compliance,
-                    connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
-                    followup_category, followup_status, sync_source,
-                    vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(customer_code) DO UPDATE SET
-                    name = excluded.name, car_model = excluded.car_model, last_car_model = excluded.last_car_model,
-                    car_age = excluded.car_age, recommended_model = excluded.recommended_model,
-                    alt_model_2 = excluded.alt_model_2, alt_model_3 = excluded.alt_model_3,
-                    cluster_name = excluded.cluster_name, priority = excluded.priority, district = excluded.district,
-                    vin = excluded.vin, outlet_do = excluded.outlet_do, outlet_service = excluded.outlet_service,
-                    service_compliance = excluded.service_compliance,
-                    connected = CASE WHEN excluded.connected != 'FALSE' THEN excluded.connected ELSE followup_customers.connected END,
-                    contacted = CASE WHEN excluded.contacted != 'FALSE' THEN excluded.contacted ELSE followup_customers.contacted END,
-                    prospect = CASE WHEN excluded.prospect != 'FALSE' THEN excluded.prospect ELSE followup_customers.prospect END,
-                    spk = CASE WHEN excluded.spk != 'FALSE' THEN excluded.spk ELSE followup_customers.spk END,
-                    remarks = CASE WHEN excluded.remarks != '' THEN excluded.remarks ELSE followup_customers.remarks END,
-                    sales_fu_status = CASE WHEN excluded.sales_fu_status != 'Open' THEN excluded.sales_fu_status ELSE followup_customers.sales_fu_status END,
-                    reason_followup = CASE WHEN excluded.reason_followup != '' THEN excluded.reason_followup ELSE followup_customers.reason_followup END,
-                    followup_date = CASE WHEN excluded.followup_date IS NOT NULL THEN excluded.followup_date ELSE followup_customers.followup_date END,
-                    followup_category = excluded.followup_category,
-                    vehicle_filter = excluded.vehicle_filter,
-                    cust_type = excluded.cust_type,
-                    priority_class = excluded.priority_class,
-                    outlet_name = excluded.outlet_name,
-                    sales_fu = CASE WHEN excluded.sales_fu != '' THEN excluded.sales_fu ELSE followup_customers.sales_fu END,
-                    do_unit = CASE WHEN excluded.do_unit != 'FALSE' THEN excluded.do_unit ELSE followup_customers.do_unit END,
-                    all_spk = excluded.all_spk,
-                    all_do = excluded.all_do
-            ", [
-                $code, $name, $phone, $carModel, $lastCar, $age,
-                $targetCar, $rec2, $rec3, $cluster, $priority, $district, $vin,
-                $outletDo, $outletSrv, $srvComp,
-                $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
-                $category, $status,
-                $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo
-            ]);
+            ";
+            followup_execute($sql, $flatParams);
         }
-
-        $inserted++;
-    }
-
-    if ($sqlite_pdo) {
-        $sqlite_pdo->commit();
     }
 
     $now = date('Y-m-d H:i:s');
-    followup_execute("
-        INSERT INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?)
-        ON DUPLICATE KEY UPDATE setting_value = ?
-    ", [$now, $now]);
-    if (!$is_mysql) {
+    if ($is_mysql && $conn) {
+        followup_execute("
+            INSERT INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?)
+            ON DUPLICATE KEY UPDATE setting_value = ?
+        ", [$now, $now]);
+        followup_execute("
+            INSERT INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)
+            ON DUPLICATE KEY UPDATE setting_value = ?
+        ", [$sheetUrl, $sheetUrl]);
+    } else {
         followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?)", [$now]);
         followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)", [$sheetUrl]);
     }
