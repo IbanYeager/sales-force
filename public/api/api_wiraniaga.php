@@ -89,6 +89,17 @@ if ($method === 'GET') {
             if ($is_on) $total_online++;
             else $total_offline++;
 
+            // Normalisasi URL foto agar selalu valid & HTTPS di production
+            $f = trim($row['foto'] ?? '');
+            if ($f !== '') {
+                if (str_starts_with($f, 'http://') && !str_contains($f, 'localhost')) {
+                    $f = 'https://' . substr($f, 7);
+                } elseif (str_starts_with($f, 'uploads/')) {
+                    $f = '/' . $f;
+                }
+            }
+            $row['foto'] = $f;
+
             $row['is_online'] = $is_on;
             $row['status_online'] = $is_on ? "Online" : "Offline";
             $row['last_active_formatted'] = formatRelTime($row['last_active']);
@@ -118,6 +129,7 @@ if ($method === 'POST') {
         $tingkatan = $conn->real_escape_string(trim($data['tingkatan'] ?? 'Magang'));
         $nama_spv = $conn->real_escape_string(trim($data['nama_spv'] ?? 'Pak Riva'));
         $created_at = $conn->real_escape_string(trim($data['created_at'] ?? date('Y-m-d')));
+        $foto = $conn->real_escape_string(trim($data['foto'] ?? ''));
 
         if (empty($nama_lengkap) || empty($username) || empty($raw_password)) {
             echo json_encode(["status" => "error", "message" => "Nama lengkap, username, dan password wajib diisi!"]);
@@ -133,7 +145,7 @@ if ($method === 'POST') {
             exit();
         }
 
-        $sql = "INSERT INTO sales_accounts (nama_lengkap, username, password, tingkatan, nama_spv, foto, created_at) VALUES ('$nama_lengkap', '$username', '$password', '$tingkatan', '$nama_spv', '', '$created_at')";
+        $sql = "INSERT INTO sales_accounts (nama_lengkap, username, password, tingkatan, nama_spv, foto, created_at) VALUES ('$nama_lengkap', '$username', '$password', '$tingkatan', '$nama_spv', '$foto', '$created_at')";
         if ($conn->query($sql)) {
             echo json_encode(["status" => "success", "message" => "Akun wiraniaga berhasil ditambahkan!"]);
         } else {
@@ -151,6 +163,7 @@ if ($method === 'POST') {
         $tingkatan = $conn->real_escape_string(trim($data['tingkatan'] ?? 'Magang'));
         $nama_spv = $conn->real_escape_string(trim($data['nama_spv'] ?? 'Pak Riva'));
         $created_at = $conn->real_escape_string(trim($data['created_at'] ?? date('Y-m-d')));
+        $foto = isset($data['foto']) ? $conn->real_escape_string(trim($data['foto'])) : null;
 
         if ($id === 0 || empty($nama_lengkap) || empty($username)) {
             echo json_encode(["status" => "error", "message" => "Data tidak lengkap untuk melakukan update!"]);
@@ -166,12 +179,24 @@ if ($method === 'POST') {
             exit();
         }
 
+        $set_parts = [
+            "nama_lengkap = '$nama_lengkap'",
+            "username = '$username'",
+            "tingkatan = '$tingkatan'",
+            "nama_spv = '$nama_spv'",
+            "created_at = '$created_at'"
+        ];
+
         if (!empty($raw_password)) {
             $password = $conn->real_escape_string(password_hash($raw_password, PASSWORD_DEFAULT));
-            $sql = "UPDATE sales_accounts SET nama_lengkap = '$nama_lengkap', username = '$username', password = '$password', tingkatan = '$tingkatan', nama_spv = '$nama_spv', created_at = '$created_at' WHERE id = $id";
-        } else {
-            $sql = "UPDATE sales_accounts SET nama_lengkap = '$nama_lengkap', username = '$username', tingkatan = '$tingkatan', nama_spv = '$nama_spv', created_at = '$created_at' WHERE id = $id";
+            $set_parts[] = "password = '$password'";
         }
+
+        if ($foto !== null) {
+            $set_parts[] = "foto = '$foto'";
+        }
+
+        $sql = "UPDATE sales_accounts SET " . implode(", ", $set_parts) . " WHERE id = $id";
 
         if ($conn->query($sql)) {
             echo json_encode(["status" => "success", "message" => "Data wiraniaga berhasil diperbarui!"]);

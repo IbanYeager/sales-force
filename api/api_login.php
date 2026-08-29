@@ -67,6 +67,18 @@ try {
         $password = $data->password;
         $login_type = isset($data->login_type) ? $data->login_type : 'sales'; // 'sales', 'spv', or 'kacab'
 
+function normalizePhotoUrl($foto) {
+    $f = trim($foto ?? '');
+    if (!$f) return '';
+    if (str_starts_with($f, 'http://') && !str_contains($f, 'localhost')) {
+        return 'https://' . substr($f, 7);
+    }
+    if (str_starts_with($f, 'uploads/')) {
+        return '/' . $f;
+    }
+    return $f;
+}
+
         if ($login_type === 'sales') {
             $query = "SELECT id, username, password, nama_lengkap, tingkatan, foto, nama_spv FROM sales_accounts WHERE username = '$username'";
             $result = $conn ? $conn->query($query) : false;
@@ -80,7 +92,7 @@ try {
                         "sales" => [
                             "id" => $user['id'],
                             "name" => $user['nama_lengkap'],
-                            "foto" => $user['foto'],
+                            "foto" => normalizePhotoUrl($user['foto']),
                             "spv" => $user['nama_spv'],
                             "peran" => "Sales Consultant",
                             "tingkatan" => $user['tingkatan'] ?? "Executive"
@@ -190,7 +202,7 @@ try {
                         "sales" => [
                             "id" => $spv['id'],
                             "name" => $spv['nama_lengkap'],
-                            "foto" => $spv['foto'],
+                            "foto" => normalizePhotoUrl($spv['foto']),
                             "spv" => $spv['nama_lengkap'],
                             "peran" => "Supervisor",
                             "tingkatan" => ""
@@ -263,7 +275,7 @@ try {
                         "sales" => [
                             "id" => $kacab['id'],
                             "name" => $kacab['nama_lengkap'],
-                            "foto" => $kacab['foto'] ?? '',
+                            "foto" => normalizePhotoUrl($kacab['foto'] ?? ''),
                             "spv" => "Kepala Cabang",
                             "peran" => "Kepala Cabang",
                             "tingkatan" => "Branch Manager",

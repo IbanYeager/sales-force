@@ -35,12 +35,10 @@ guardKacab();
 function renderKacabUser() {
   let nama = localStorage.getItem('namaSales') || 'Dendi Holius';
   const peran = localStorage.getItem('peranSales') || 'Kepala Cabang';
-  const foto = localStorage.getItem('fotoSales');
-
-  // Transparently migrate / ensure Kacab name is always Dendi Holius
-  if (peran === 'Kepala Cabang' || nama.includes('Anton') || nama === 'Kepala Cabang' || !nama.trim()) {
-    nama = 'Dendi Holius';
-    localStorage.setItem('namaSales', 'Dendi Holius');
+  let foto = localStorage.getItem('fotoSales');
+  if (foto && foto.startsWith('http://') && !foto.includes('localhost')) {
+    foto = 'https://' + foto.substring(7);
+    localStorage.setItem('fotoSales', foto);
   }
 
   // Update all possible header/topbar name elements
@@ -59,8 +57,8 @@ function renderKacabUser() {
   const avatarEls = document.querySelectorAll('#kcbAvatar, #kacabAvatar, #mhAvatar, .kcb-user img, .kcb-topbar img, .avatar-status img');
   avatarEls.forEach(img => {
     if (img) {
+      img.onerror = function() { this.onerror = null; this.src = defaultAvatar; };
       img.src = (foto && foto.trim() !== '') ? foto : defaultAvatar;
-      img.onerror = function() { this.src = defaultAvatar; };
     }
   });
 

@@ -2,23 +2,29 @@
 // guard login, render user, drawer mobile, dan pengambilan data hierarki cabang.
 
 function logoutUser() {
-  localStorage.clear();
-  window.location.href = '../pages/login_kacab.html';
+  try {
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch (e) {
+    console.error('Logout error', e);
+  }
+  window.location.replace('/pages/login_kacab');
 }
+window.logoutUser = logoutUser;
 
 function guardKacab() {
   const loggedIn = localStorage.getItem('loggedIn') === 'true';
   const peran = localStorage.getItem('peranSales');
   if (!loggedIn) {
-    window.location.href = '../pages/login_kacab.html';
+    window.location.replace('/pages/login_kacab');
     return;
   }
-  if (peran === 'Supervisor') {
-    window.location.href = '../pages_spv/index_spv.html';
+  if (peran === 'Supervisor' || peran === 'SPV') {
+    window.location.replace('/pages_spv/index_spv');
     return;
   }
-  if (peran !== 'Kepala Cabang') {
-    window.location.href = '../index.html';
+  if (peran !== 'Kepala Cabang' && peran !== 'Kacab') {
+    window.location.replace('/index');
     return;
   }
 }
@@ -29,28 +35,41 @@ guardKacab();
 function renderKacabUser() {
   let nama = localStorage.getItem('namaSales') || 'Dendi Holius';
   const peran = localStorage.getItem('peranSales') || 'Kepala Cabang';
-
-  // Transparently migrate / ensure Kacab name is always Dendi Holius
-  if (peran === 'Kepala Cabang' || nama.includes('Anton') || nama === 'Kepala Cabang') {
-    nama = 'Dendi Holius';
-    localStorage.setItem('namaSales', 'Dendi Holius');
+  let foto = localStorage.getItem('fotoSales');
+  if (foto && foto.startsWith('http://') && !foto.includes('localhost')) {
+    foto = 'https://' + foto.substring(7);
+    localStorage.setItem('fotoSales', foto);
   }
 
-  const namaEl = document.getElementById('kcbNama');
-  const roleEl = document.getElementById('kcbRole');
-  if (namaEl) namaEl.textContent = nama;
-  if (roleEl) roleEl.textContent = peran;
+  // Update all possible header/topbar name elements
+  const namaEls = document.querySelectorAll('#kcbNama, #kacabNama, .kcb-user .name, .kcb-topbar .name, .meta .name');
+  namaEls.forEach(el => {
+    if (el) el.textContent = nama;
+  });
 
-  const avatar = localStorage.getItem('fotoSales');
-  const avatarEl = document.getElementById('kcbAvatar');
-  if (avatarEl) {
-    avatarEl.src = (avatar && avatar.trim() !== '')
-      ? avatar
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=1e1014&color=d8a437`;
-  }
+  const roleEls = document.querySelectorAll('#kcbRole, #kacabRole, .kcb-user .role, .kcb-topbar .role, .meta .role');
+  roleEls.forEach(el => {
+    if (el) el.textContent = peran;
+  });
+
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=1e1014&color=d8a437&bold=true`;
+
+  const avatarEls = document.querySelectorAll('#kcbAvatar, #kacabAvatar, #mhAvatar, .kcb-user img, .kcb-topbar img, .avatar-status img');
+  avatarEls.forEach(img => {
+    if (img) {
+      img.onerror = function() { this.onerror = null; this.src = defaultAvatar; };
+      img.src = (foto && foto.trim() !== '') ? foto : defaultAvatar;
+    }
+  });
+
+  const sidebarBrandRole = document.querySelector('.kcb-brand .role, .sidebar-brand .role');
+  if (sidebarBrandRole) sidebarBrandRole.textContent = `Kepala Cabang - ${nama}`;
 }
 
+// Jalankan langsung dan saat DOM siap
+renderKacabUser();
 document.addEventListener('DOMContentLoaded', renderKacabUser);
+window.addEventListener('pageshow', renderKacabUser);
 
 // ── Data hierarki cabang: SPV → Sales (dengan target & realisasi) ──
 // Sumber: api_spv_list.php (daftar SPV), api_wiraniaga.php (semua sales),
@@ -164,9 +183,9 @@ async function fetchBranchHierarchy(forceFresh = false) {
   // Urutkan: pencapaian DO tertinggi dulu, lalu jumlah tim
   hierarchy.sort((a, b) => (b.pct_do - a.pct_do) || (b.total_sales - a.total_sales));
 
-  const result = {
-    hierarchy,
-    periode: tgtJson.periode || '',
+  const result = { 
+    hierarchy, 
+    periode: tgtJson.periode || '', 
     evaluasi_do_label: tgtJson.evaluasi_do_label || '',
     spv_total: spvNames.length,
     spv_online: totalSpvOnline,

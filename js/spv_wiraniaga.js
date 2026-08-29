@@ -42,9 +42,17 @@ let listDataWiraniaga = [];
       if (elNama) elNama.textContent = nama;
       if (elRole) elRole.textContent = peran;
 
-      const avatar = localStorage.getItem('fotoSales');
+      let avatar = localStorage.getItem('fotoSales');
+      if (avatar && avatar.startsWith('http://') && !avatar.includes('localhost')) {
+        avatar = 'https://' + avatar.substring(7);
+        localStorage.setItem('fotoSales', avatar);
+      }
       const avatarEl = document.getElementById('spvAvatar') || document.getElementById('kcbAvatar');
       if (avatarEl) {
+        avatarEl.onerror = function() {
+          this.onerror = null;
+          this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${peran === 'Kepala Cabang' ? '1e1014' : 'f4f7f6'}&color=${peran === 'Kepala Cabang' ? 'd8a437' : 'c8102e'}`;
+        };
         avatarEl.src = (avatar && avatar.trim() !== '')
           ? avatar
           : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${peran === 'Kepala Cabang' ? '1e1014' : 'f4f7f6'}&color=${peran === 'Kepala Cabang' ? 'd8a437' : 'c8102e'}`;
@@ -259,7 +267,7 @@ let listDataWiraniaga = [];
           <td>
             <div class="wira-name">
               <div class="wira-avatar">
-                <img src="${avatar}" alt="Foto ${escapeHtml(row.nama_lengkap)}">
+                <img src="${avatar}" alt="Foto ${escapeHtml(row.nama_lengkap)}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(row.nama_lengkap)}&background=eef4fd&color=2458c5';">
                 <span class="dot ${isOn ? '' : 'off'}" title="${isOn ? 'Online Sekarang' : 'Offline'}"></span>
               </div>
               <div>

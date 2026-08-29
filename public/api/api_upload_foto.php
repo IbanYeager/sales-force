@@ -4,74 +4,112 @@ error_reporting(0);
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-require 'koneksi.php';
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $sales_id = $_POST['sales_id'];
+require_once __DIR__ . '/koneksi.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $sales_id = intval($_POST['sales_id'] ?? 0);
+    if ($sales_id <= 0) {
+        echo json_encode(["ok" => false, "message" => "ID Sales tidak valid"]);
+        exit();
+    }
 
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
         $file = $_FILES['foto'];
-        $fileName = time() . '_' . basename($file['name']); 
-        
-        // Target folder mundur 1 direktori
-        $targetDir = "../uploads/"; 
-        
-        // Buat folder uploads otomatis jika belum ada
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (!in_array($ext, $allowTypes)) {
+            echo json_encode(["ok" => false, "message" => "Format file tidak didukung (Gunakan JPG, PNG, WEBP, GIF)"]);
+            exit();
         }
 
-        $targetFilePath = $targetDir . $fileName;
-        
-        $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
-        $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
+        // Sanitasi nama file unik
+        $fileName = time() . '_' . $sales_id . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
 
-        if (in_array($fileType, $allowTypes)) {
-            // Cek foto lama di database sebelum mengunggah yang baru
-            $query_old = $conn->query("SELECT foto FROM sales_accounts WHERE id = '$sales_id'");
-            $old_foto_url = "";
-            if ($query_old && $query_old->num_rows > 0) {
-                $row_old = $query_old->fetch_assoc();
-                $old_foto_url = $row_old['foto'];
+        // Target direktori (simpan ke kedua lokasi: root uploads dan public uploads agar selalu sinkron)
+        $dirs = [
+            __DIR__ . '/../uploads/',
+            __DIR__ . '/../public/uploads/',
+            __DIR__ . '/../../public/uploads/',
+            __DIR__ . '/uploads/'
+        ];
+
+        $uploaded = false;
+        $savedPath = '';
+
+        foreach ($dirs as $dir) {
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0777, true);
+            }
+            if (is_dir($dir)) {
+                $dest = rtrim($dir, '/\\') . '/' . $fileName;
+                if (!$uploaded) {
+                    if (@move_uploaded_file($file['tmp_name'], $dest)) {
+                        $uploaded = true;
+                        $savedPath = $dest;
+                    }
+                } else if ($savedPath && file_exists($savedPath)) {
+                    @copy($savedPath, $dest);
+                }
+            }
+        }
+
+        if ($uploaded) {
+            // Tentukan URL yang aman & selalu HTTPS di production
+            $isHttps = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1')) ||
+                       (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') ||
+                       (isset($_SERVER['HTTP_CF_VISITOR']) && stripos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false) ||
+                       (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+
+            $protocol = $isHttps ? "https" : "http";
+            $domain = $_SERVER['HTTP_HOST'] ?? 'salesforcetunassft.com';
+            if ($domain !== 'localhost' && !str_starts_with($domain, '127.0.0.1')) {
+                $protocol = "https"; // Selalu paksa HTTPS untuk domain publik
             }
 
-            if (move_uploaded_file($file['tmp_name'], $targetFilePath)) {
-                // Hapus foto lama dari folder uploads jika ada
-                if (!empty($old_foto_url)) {
-                    $old_file_name = basename($old_foto_url);
-                    $old_file_path = "../uploads/" . $old_file_name;
-                    if (!empty($old_file_name) && file_exists($old_file_path) && is_file($old_file_path)) {
-                        unlink($old_file_path);
+            // Path lengkap dan path relatif root
+            $fullPath = $protocol . "://" . $domain . "/uploads/" . $fileName;
+
+            // Hapus foto lama jika ada
+            $qOld = $conn->query("SELECT foto FROM sales_accounts WHERE id = $sales_id LIMIT 1");
+            if ($qOld && $rOld = $qOld->fetch_assoc()) {
+                $oldFoto = trim($rOld['foto'] ?? '');
+                if ($oldFoto && !str_starts_with($oldFoto, 'http://ui-avatars') && !str_starts_with($oldFoto, 'https://ui-avatars')) {
+                    $oldName = basename($oldFoto);
+                    foreach ($dirs as $d) {
+                        $oldFile = rtrim($d, '/\\') . '/' . $oldName;
+                        if (file_exists($oldFile) && is_file($oldFile)) {
+                            @unlink($oldFile);
+                        }
                     }
                 }
-                
-                // Dapatkan URL dinamis agar foto bisa diakses dengan benar
-                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-                $domain = $_SERVER['HTTP_HOST'];
-                // $_SERVER['REQUEST_URI'] menunjuk ke /sales_pov/api/api_upload_foto.php
-                // dirname(dirname) mengambil /sales_pov
-                $base_dir = rtrim(dirname(dirname($_SERVER['REQUEST_URI'])), '/\\');
-                
-                // Path lengkap untuk disimpan ke Database
-                $fullPath = $protocol . "://" . $domain . $base_dir . "/uploads/" . $fileName;
-                
-                $sql = "UPDATE sales_accounts SET foto = '$fullPath' WHERE id = '$sales_id'";
-                
-                if ($conn->query($sql) === TRUE) {
-                    echo json_encode(["ok" => true, "message" => "Foto berhasil diunggah", "path" => $fullPath]);
-                } else {
-                    echo json_encode(["ok" => false, "message" => "Gagal update database: " . $conn->error]);
-                }
+            }
+
+            $sql = "UPDATE sales_accounts SET foto = '" . $conn->real_escape_string($fullPath) . "' WHERE id = $sales_id";
+            if ($conn->query($sql)) {
+                echo json_encode([
+                    "ok" => true,
+                    "status" => "success",
+                    "message" => "Foto profil berhasil diperbarui!",
+                    "path" => $fullPath,
+                    "foto" => $fullPath
+                ]);
             } else {
-                echo json_encode(["ok" => false, "message" => "Gagal memindahkan file ke folder uploads"]);
+                echo json_encode(["ok" => false, "message" => "Gagal menyimpan ke database: " . $conn->error]);
             }
         } else {
-            echo json_encode(["ok" => false, "message" => "Format file tidak didukung (Hanya JPG, PNG, GIF)"]);
+            echo json_encode(["ok" => false, "message" => "Gagal memindahkan file ke server"]);
         }
     } else {
-        echo json_encode(["ok" => false, "message" => "Tidak ada file yang diunggah atau file rusak"]);
+        echo json_encode(["ok" => false, "message" => "Tidak ada file yang diunggah atau ukuran file terlalu besar"]);
     }
 } else {
     echo json_encode(["ok" => false, "message" => "Metode request salah"]);

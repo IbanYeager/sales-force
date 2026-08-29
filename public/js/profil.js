@@ -20,8 +20,8 @@ const avatarEl = document.querySelector('.avatar');
                     const avatar = document.querySelector('.avatar');
                     avatar.style.opacity = '0.5';
 
-                    // URL FETCH MENGGUNAKAN RELATIF PATH (Mundur ke folder api)
-                    const res = await fetch('../api/api_upload_foto.php', {
+                    // URL FETCH MENGGUNAKAN ROOT ABSOLUTE PATH
+                    const res = await fetch('/api/api_upload_foto.php', {
                         method: 'POST',
                         body: formData
                     });
@@ -29,10 +29,19 @@ const avatarEl = document.querySelector('.avatar');
                     // Menerima response JSON dari server
                     const data = await res.json();
 
-                    if (data.ok) {
-                        avatar.src = data.path;
-                        localStorage.setItem('fotoSales', data.path);
-                        alert('Foto profil berhasil diperbarui!');
+                    if (data.ok || data.status === 'success') {
+                        const newPath = data.path || data.foto;
+                        avatar.src = newPath;
+                        avatar.onerror = function() {
+                            const n = localStorage.getItem('namaSales') || 'Sales';
+                            this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=f4f7f6&color=c8102e`;
+                        };
+                        localStorage.setItem('fotoSales', newPath);
+                        if (typeof showCustomAlert === 'function') {
+                            showCustomAlert('Foto profil berhasil diperbarui!', 'success');
+                        } else {
+                            alert('Foto profil berhasil diperbarui!');
+                        }
                     } else {
                         alert('Error dari server: ' + data.message);
                         console.error("Server Message:", data.message);
@@ -72,7 +81,11 @@ const avatarEl = document.querySelector('.avatar');
                 const peranFallback = localStorage.getItem('peranSales') || 'Sales Consultant';
                 const tingkatanFallback = localStorage.getItem('tingkatanSales') || 'Magang';
                 const spvFallback = localStorage.getItem('spvSales') || '-';
-                const fotoFallback = localStorage.getItem('fotoSales');
+                let fotoFallback = localStorage.getItem('fotoSales');
+                if (fotoFallback && fotoFallback.startsWith('http://') && !fotoFallback.includes('localhost')) {
+                    fotoFallback = 'https://' + fotoFallback.substring(7);
+                    localStorage.setItem('fotoSales', fotoFallback);
+                }
                 const cabangLocked = 'Tunas Toyota Kiara Condong';
 
                 const peranTingkatan = peranFallback === 'Sales Consultant' && tingkatanFallback ? `${peranFallback} - ${tingkatanFallback}` : peranFallback;
@@ -87,6 +100,10 @@ const avatarEl = document.querySelector('.avatar');
                 if (infoCabang) infoCabang.textContent = cabangLocked;
 
                 if (avatarImg) {
+                    avatarImg.onerror = function() {
+                        this.onerror = null;
+                        this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(namaFallback)}&background=f4f7f6&color=c8102e`;
+                    };
                     if (fotoFallback && fotoFallback.trim() !== '') {
                         avatarImg.src = fotoFallback;
                     } else {

@@ -139,6 +139,16 @@ if ($salesRes && $salesRes->num_rows > 0) {
         if ($isOn) $sales_online_count++;
         else $sales_offline_count++;
 
+        $f = trim($sRow['foto'] ?? '');
+        if ($f !== '') {
+            if (str_starts_with($f, 'http://') && !str_contains($f, 'localhost')) {
+                $f = 'https://' . substr($f, 7);
+            } elseif (str_starts_with($f, 'uploads/')) {
+                $f = '/' . $f;
+            }
+        }
+        $sRow['foto'] = $f;
+
         $sRow['is_online'] = $isOn;
         $sRow['status_online'] = $isOn ? "Online" : "Offline";
         $sRow['last_active_formatted'] = formatRelativeTime($sRow['last_active']);

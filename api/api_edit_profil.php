@@ -1,9 +1,15 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-require 'koneksi.php';
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+require_once __DIR__ . '/koneksi.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -22,6 +28,10 @@ if ($method === 'GET') {
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
+            // Normalisasi HTTPS pada foto jika tersimpan HTTP
+            if (!empty($user['foto']) && str_starts_with($user['foto'], 'http://') && !str_contains($user['foto'], 'localhost')) {
+                $user['foto'] = 'https://' . substr($user['foto'], 7);
+            }
             echo json_encode(["status" => "success", "data" => $user]);
         } else {
             echo json_encode(["status" => "error", "message" => "Sales tidak ditemukan."]);
@@ -35,26 +45,62 @@ if ($method === 'GET') {
         exit;
     }
 
-    $nama = $_POST['nama_lengkap'] ?? '';
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $no_hp = $_POST['no_hp'] ?? '';
-    $email = $_POST['email'] ?? '';
+    $nama = trim($_POST['nama_lengkap'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $no_hp = trim($_POST['no_hp'] ?? '');
+    $email = trim($_POST['email'] ?? '');
 
-    // Handle File Upload
+    // Handle File Upload jika ada
     $fotoPath = '';
-    if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
-        $target_dir = "../uploads/lokasi/";
-        if (!is_dir($target_dir)) {
-            mkdir($target_dir, 0777, true);
-        }
-        $filename = time() . '_' . basename($_FILES["foto"]["name"]);
-        $target_file = $target_dir . $filename;
-        if (move_uploaded_file($_FILES["foto"]["tmp_name"], $target_file)) {
-            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-            $domain = $_SERVER['HTTP_HOST'];
-            $base_dir = rtrim(dirname(dirname($_SERVER['REQUEST_URI'])), '/\\');
-            $fotoPath = $protocol . "://" . $domain . $base_dir . "/uploads/lokasi/" . $filename;
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
+        $file = $_FILES['foto'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (in_array($ext, $allowTypes)) {
+            $fileName = time() . '_' . $sales_id . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+
+            $dirs = [
+                __DIR__ . '/../uploads/',
+                __DIR__ . '/../public/uploads/',
+                __DIR__ . '/../../public/uploads/',
+                __DIR__ . '/uploads/'
+            ];
+
+            $uploaded = false;
+            $savedPath = '';
+
+            foreach ($dirs as $dir) {
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0777, true);
+                }
+                if (is_dir($dir)) {
+                    $dest = rtrim($dir, '/\\') . '/' . $fileName;
+                    if (!$uploaded) {
+                        if (@move_uploaded_file($file['tmp_name'], $dest)) {
+                            $uploaded = true;
+                            $savedPath = $dest;
+                        }
+                    } else if ($savedPath && file_exists($savedPath)) {
+                        @copy($savedPath, $dest);
+                    }
+                }
+            }
+
+            if ($uploaded) {
+                $isHttps = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1')) ||
+                           (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') ||
+                           (isset($_SERVER['HTTP_CF_VISITOR']) && stripos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false);
+
+                $protocol = $isHttps ? "https" : "http";
+                $domain = $_SERVER['HTTP_HOST'] ?? 'salesforcetunassft.com';
+                if ($domain !== 'localhost' && !str_starts_with($domain, '127.0.0.1')) {
+                    $protocol = "https";
+                }
+
+                $fotoPath = $protocol . "://" . $domain . "/uploads/" . $fileName;
+            }
         }
     }
 
@@ -81,25 +127,26 @@ if ($method === 'GET') {
 
     $stmt = $conn->prepare($query);
     if ($stmt) {
-        // dynamic bind
-        $bind_names[] = $types;
-        for ($i=0; $i<count($params);$i++) {
+        $bind_names = [$types];
+        for ($i = 0; $i < count($params); $i++) {
             $bind_names[] = &$params[$i];
         }
         call_user_func_array([$stmt, 'bind_param'], $bind_names);
 
         if ($stmt->execute()) {
-            // Fetch updated data to send back
             $q2 = "SELECT id, username, nama_lengkap, foto, no_hp, email FROM sales_accounts WHERE id = $sales_id";
             $r2 = $conn->query($q2);
             $updated = $r2->fetch_assoc();
+            if (!empty($updated['foto']) && str_starts_with($updated['foto'], 'http://') && !str_contains($updated['foto'], 'localhost')) {
+                $updated['foto'] = 'https://' . substr($updated['foto'], 7);
+            }
             echo json_encode(["status" => "success", "message" => "Profil berhasil diperbarui", "data" => $updated]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal memperbarui: " . $stmt->error]);
         }
         $stmt->close();
     } else {
-        echo json_encode(["status" => "error", "message" => "Query Error"]);
+        echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
     }
 }
 $conn->close();
