@@ -77,7 +77,7 @@ function applyHierFilters() {
           onkeydown="if(event.key==='Enter')openSalesDrill(${s.id})"
           aria-label="Lihat detail ${escapeHtml(s.nama)}">
           <div class="sale-ident">
-            <img class="sale-avatar" src="${salesAvatarUrl(s)}" alt="" loading="lazy">
+            <img class="sale-avatar" src="${salesAvatarUrl(s)}" alt="${escapeHtml(s.nama)}" loading="lazy" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(s.nama)}&background=f2f4f8&color=64748d';">
             <div class="info">
               <div class="nm" style="display:flex; align-items:center; gap:6px;">
                 <span class="status-dot" style="${salesDotStyle} width:8px; height:8px;" title="${isSalesOnline ? 'Sales Online Sekarang' : 'Offline'}"></span>

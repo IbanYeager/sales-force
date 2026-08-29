@@ -210,9 +210,14 @@ function pctClass(pct) {
 }
 
 function salesAvatarUrl(s) {
-  return (s.foto && s.foto.trim() !== '')
-    ? s.foto
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(s.nama)}&background=f2f4f8&color=64748d`;
+  let f = (s && s.foto ? s.foto.trim() : '');
+  if (f && f.startsWith('http://') && !f.includes('localhost')) {
+    f = 'https://' + f.substring(7);
+  }
+  const nameStr = (s && s.nama ? s.nama : 'Sales');
+  return (f !== '')
+    ? f
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(nameStr)}&background=f2f4f8&color=64748d`;
 }
 
 function spvInitials(nm) {
