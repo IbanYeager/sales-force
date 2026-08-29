@@ -47,14 +47,19 @@ function get_sales_list($spv = '') {
                 $spvClean = str_replace('Pak ', '', $conn->real_escape_string($spv));
                 $where .= " AND (nama_spv = '" . $conn->real_escape_string($spv) . "' OR nama_spv LIKE '%$spvClean%')";
             }
-            $res = $conn->query("SELECT id, nama_lengkap as name, no_hp as phone, tingkatan as role, nama_spv FROM sales_accounts WHERE $where ORDER BY nama_spv ASC, nama_lengkap ASC");
+            $res = $conn->query("SELECT id, nama_lengkap as name, no_hp as phone, tingkatan as role, foto, nama_spv FROM sales_accounts WHERE $where ORDER BY nama_spv ASC, nama_lengkap ASC");
             if ($res && $res->num_rows > 0) {
                 while ($r = $res->fetch_assoc()) {
+                    $f = trim($r['foto'] ?? '');
+                    if ($f !== '' && str_starts_with($f, 'http://') && !str_contains($f, 'localhost')) {
+                        $f = 'https://' . substr($f, 7);
+                    }
                     $salesList[] = [
                         'id' => (int)$r['id'],
                         'name' => $r['name'],
                         'phone' => clean_phone_number($r['phone'] ?: '6281223344551'),
                         'role' => $r['role'] ?: 'Sales Consultant',
+                        'foto' => $f,
                         'spv' => $r['nama_spv'] ?: 'Umum',
                         'target_monthly' => 30
                     ];
@@ -407,9 +412,13 @@ if ($action === 'dashboard_analytics') {
     // 4. Breakdown by Sales FU / Wiraniaga (Real Sales PICs only)
     $salesListDb = get_sales_list();
     $salesSpvMap = [];
+    $salesFotoMap = [];
     foreach ($salesListDb as $s) {
         $sNameKey = strtolower(trim($s['name']));
         $salesSpvMap[$sNameKey] = $s['spv'] ?? 'Umum';
+        if (!empty($s['foto'])) {
+            $salesFotoMap[$sNameKey] = $s['foto'];
+        }
     }
 
     $salesMap = [];
@@ -427,18 +436,21 @@ if ($action === 'dashboard_analytics') {
         $sFunnel = $calcFunnel($sRecords);
         $sFunnel['sales_name'] = $sName;
         
-        // Match SPV team
+        // Match SPV team & Foto
         $sLower = strtolower($sName);
         $spvName = $salesSpvMap[$sLower] ?? '';
-        if (!$spvName) {
+        $fotoUrl = $salesFotoMap[$sLower] ?? '';
+        if (!$spvName || !$fotoUrl) {
             foreach ($salesSpvMap as $k => $v) {
                 if (strpos($k, $sLower) !== false || strpos($sLower, $k) !== false) {
-                    $spvName = $v;
+                    if (!$spvName) $spvName = $v;
+                    if (!$fotoUrl && !empty($salesFotoMap[$k])) $fotoUrl = $salesFotoMap[$k];
                     break;
                 }
             }
         }
         $sFunnel['spv'] = $spvName ?: 'Tunas Toyota Kiara Condong';
+        $sFunnel['foto'] = $fotoUrl ?: '';
         $salesPerformance[] = $sFunnel;
     }
     // Sort by SPK desc, then Hot Prospect desc, then Potency desc

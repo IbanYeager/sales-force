@@ -562,14 +562,14 @@ function renderSalesLeaderboardTable(salesList) {
 
     const spvTeam = s.spv ? `<div style="font-size:11px; color:#64748b; font-weight:600; margin-top:2px;"><i class="fa-solid fa-user-tie" style="font-size:10px; margin-right:3px; color:#94a3b8;"></i>${escapeHtml(s.spv)}</div>` : '';
 
+    const avatarUrl = (s.foto && s.foto.trim() !== '') ? s.foto : `https://ui-avatars.com/api/?name=${encodeURIComponent(s.sales_name)}&background=0d1b3e&color=ffffff&bold=true`;
+
     html += `
       <tr>
         <td style="text-align:center;">${rankBadge}</td>
         <td>
           <div style="display:flex; align-items:center; gap:12px;">
-            <div style="width:36px; height:36px; min-width:36px; border-radius:50%; background:linear-gradient(135deg, #0d1b3e 0%, #d7123a 100%); color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:14px; box-shadow:0 3px 8px rgba(13,27,62,0.2);">
-              ${escapeHtml(s.sales_name.charAt(0).toUpperCase())}
-            </div>
+            <img src="${avatarUrl}" alt="${escapeHtml(s.sales_name)}" style="width:36px; height:36px; min-width:36px; border-radius:50%; object-fit:cover; border:2px solid #e2e8f0; box-shadow:0 2px 6px rgba(13,27,62,0.12);" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(s.sales_name)}&background=0d1b3e&color=ffffff&bold=true';">
             <div>
               <div style="font-weight:800; color:#0f172a; font-size:14px; letter-spacing:-0.2px;">${escapeHtml(s.sales_name)}</div>
               ${spvTeam}

@@ -339,6 +339,14 @@ let listDataWiraniaga = [];
       renderWiraniagaRows();
     }
 
+    window.previewWiraniagaModalPhoto = function(event) {
+      const file = event.target.files && event.target.files[0];
+      const preview = document.getElementById('previewModalFoto');
+      if (file && preview) {
+        preview.src = URL.createObjectURL(file);
+      }
+    };
+
     function openModalCreate() {
       document.getElementById('modalTitle').textContent = 'Tambah Akun Wiraniaga';
       document.getElementById('formAction').value = 'create';
@@ -350,6 +358,13 @@ let listDataWiraniaga = [];
       document.getElementById('passwordHelp').textContent = '(Wajib diisi)';
       document.getElementById('selectTingkatan').value = 'Junior';
       document.getElementById('inputTanggalBergabung').value = new Date().toISOString().split('T')[0];
+
+      const inputFoto = document.getElementById('inputFotoWiraniaga');
+      if (inputFoto) inputFoto.value = '';
+      const previewFoto = document.getElementById('previewModalFoto');
+      if (previewFoto) {
+        previewFoto.src = 'https://ui-avatars.com/api/?name=Sales&background=eef4fd&color=2458c5';
+      }
 
       const currentSpv = localStorage.getItem('namaSales') || 'Pak Riva';
       const selectSpv = document.getElementById('selectSpv');
@@ -378,6 +393,14 @@ let listDataWiraniaga = [];
       document.getElementById('passwordHelp').textContent = '(Kosongkan jika tidak ingin mengubah password)';
       document.getElementById('selectTingkatan').value = row.tingkatan || 'Junior';
       document.getElementById('inputTanggalBergabung').value = row.created_at_raw || '';
+
+      const inputFoto = document.getElementById('inputFotoWiraniaga');
+      if (inputFoto) inputFoto.value = '';
+      const previewFoto = document.getElementById('previewModalFoto');
+      if (previewFoto) {
+        const rowFoto = (row.foto && row.foto.trim() !== '') ? row.foto : `https://ui-avatars.com/api/?name=${encodeURIComponent(row.nama_lengkap)}&background=eef4fd&color=2458c5`;
+        previewFoto.src = rowFoto;
+      }
 
       const selectSpv = document.getElementById('selectSpv');
       if (Array.from(selectSpv.options).some(o => o.value === row.nama_spv)) {
@@ -414,21 +437,26 @@ let listDataWiraniaga = [];
       const tingkatan = document.getElementById('selectTingkatan').value;
       const nama_spv = document.getElementById('selectSpv').value;
       const created_at = document.getElementById('inputTanggalBergabung').value;
+      const inputFoto = document.getElementById('inputFotoWiraniaga');
 
       try {
-        const res = await fetch('../api/api_wiraniaga.php', {
+        const formData = new FormData();
+        formData.append('action', action);
+        formData.append('id', String(id));
+        formData.append('nama_lengkap', nama_lengkap);
+        formData.append('username', username);
+        if (password) formData.append('password', password);
+        formData.append('tingkatan', tingkatan);
+        formData.append('nama_spv', nama_spv);
+        formData.append('created_at', created_at);
+
+        if (inputFoto && inputFoto.files && inputFoto.files[0]) {
+          formData.append('foto', inputFoto.files[0]);
+        }
+
+        const res = await fetch('/api/api_wiraniaga.php', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action,
-            id,
-            nama_lengkap,
-            username,
-            password,
-            tingkatan,
-            nama_spv,
-            created_at
-          })
+          body: formData
         });
 
         const result = await res.json();
@@ -439,6 +467,8 @@ let listDataWiraniaga = [];
           } else {
             alert(result.message || 'Data berhasil disimpan!');
           }
+          // Invalidate cache and reload
+          try { sessionStorage.removeItem('kacab_hierarchy_cache'); } catch(e) {}
           loadWiraniaga();
         } else {
           alert('Gagal: ' + result.message);

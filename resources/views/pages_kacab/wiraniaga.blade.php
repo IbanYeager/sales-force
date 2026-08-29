@@ -236,6 +236,14 @@
             <input type="date" id="inputTanggalBergabung" class="form-control" required>
           </div>
 
+          <div class="form-group">
+            <label><i class="fa-solid fa-camera"></i> Foto Profil Wiraniaga</label>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img id="previewModalFoto" src="https://ui-avatars.com/api/?name=Sales&background=eef4fd&color=2458c5" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid #cbd5e1; box-shadow:0 2px 6px rgba(0,0,0,0.08);" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Sales&background=eef4fd&color=2458c5';">
+              <input type="file" id="inputFotoWiraniaga" accept="image/*" class="form-control" style="padding:7px 10px; font-size:12px;" onchange="previewWiraniagaModalPhoto(event)">
+            </div>
+          </div>
+
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
             <button type="submit" class="btn btn-primary" id="saveBtn">

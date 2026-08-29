@@ -118,8 +118,70 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
-    $data = json_decode(file_get_contents("php://input"), true);
+    // Support both JSON input and multipart/form-data
+    $data = [];
+    $rawInput = file_get_contents("php://input");
+    if (!empty($rawInput) && !empty($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+        $data = json_decode($rawInput, true) ?: [];
+    } else {
+        $data = $_POST;
+    }
+
     $action = isset($data['action']) ? $data['action'] : '';
+
+    // Helper to process uploaded photo if any
+    $uploadedFotoUrl = null;
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
+        $file = $_FILES['foto'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (in_array($ext, $allowTypes)) {
+            $salesIdTag = intval($data['id'] ?? 0);
+            $fileName = time() . '_' . $salesIdTag . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+
+            $dirs = [
+                __DIR__ . '/../uploads/',
+                __DIR__ . '/../public/uploads/',
+                __DIR__ . '/../../public/uploads/',
+                __DIR__ . '/uploads/'
+            ];
+
+            $uploaded = false;
+            $savedPath = '';
+
+            foreach ($dirs as $dir) {
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0777, true);
+                }
+                if (is_dir($dir)) {
+                    $dest = rtrim($dir, '/\\') . '/' . $fileName;
+                    if (!$uploaded) {
+                        if (@move_uploaded_file($file['tmp_name'], $dest)) {
+                            $uploaded = true;
+                            $savedPath = $dest;
+                        }
+                    } else if ($savedPath && file_exists($savedPath)) {
+                        @copy($savedPath, $dest);
+                    }
+                }
+            }
+
+            if ($uploaded) {
+                $isHttps = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1')) ||
+                           (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') ||
+                           (isset($_SERVER['HTTP_CF_VISITOR']) && stripos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false);
+
+                $protocol = $isHttps ? "https" : "http";
+                $domain = $_SERVER['HTTP_HOST'] ?? 'salesforcetunassft.com';
+                if ($domain !== 'localhost' && !str_starts_with($domain, '127.0.0.1')) {
+                    $protocol = "https";
+                }
+
+                $uploadedFotoUrl = $protocol . "://" . $domain . "/uploads/" . $fileName;
+            }
+        }
+    }
 
     if ($action === 'create') {
         $nama_lengkap = $conn->real_escape_string(trim($data['nama_lengkap'] ?? ''));
@@ -129,7 +191,7 @@ if ($method === 'POST') {
         $tingkatan = $conn->real_escape_string(trim($data['tingkatan'] ?? 'Magang'));
         $nama_spv = $conn->real_escape_string(trim($data['nama_spv'] ?? 'Pak Riva'));
         $created_at = $conn->real_escape_string(trim($data['created_at'] ?? date('Y-m-d')));
-        $foto = $conn->real_escape_string(trim($data['foto'] ?? ''));
+        $foto = $uploadedFotoUrl !== null ? $conn->real_escape_string($uploadedFotoUrl) : $conn->real_escape_string(trim($data['foto'] ?? ''));
 
         if (empty($nama_lengkap) || empty($username) || empty($raw_password)) {
             echo json_encode(["status" => "error", "message" => "Nama lengkap, username, dan password wajib diisi!"]);
@@ -147,7 +209,7 @@ if ($method === 'POST') {
 
         $sql = "INSERT INTO sales_accounts (nama_lengkap, username, password, tingkatan, nama_spv, foto, created_at) VALUES ('$nama_lengkap', '$username', '$password', '$tingkatan', '$nama_spv', '$foto', '$created_at')";
         if ($conn->query($sql)) {
-            echo json_encode(["status" => "success", "message" => "Akun wiraniaga berhasil ditambahkan!"]);
+            echo json_encode(["status" => "success", "message" => "Akun wiraniaga berhasil ditambahkan!", "foto" => $foto]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal menyimpan ke database: " . $conn->error]);
         }
@@ -163,7 +225,8 @@ if ($method === 'POST') {
         $tingkatan = $conn->real_escape_string(trim($data['tingkatan'] ?? 'Magang'));
         $nama_spv = $conn->real_escape_string(trim($data['nama_spv'] ?? 'Pak Riva'));
         $created_at = $conn->real_escape_string(trim($data['created_at'] ?? date('Y-m-d')));
-        $foto = isset($data['foto']) ? $conn->real_escape_string(trim($data['foto'])) : null;
+        
+        $foto = $uploadedFotoUrl !== null ? $conn->real_escape_string($uploadedFotoUrl) : (isset($data['foto']) ? $conn->real_escape_string(trim($data['foto'])) : null);
 
         if ($id === 0 || empty($nama_lengkap) || empty($username)) {
             echo json_encode(["status" => "error", "message" => "Data tidak lengkap untuk melakukan update!"]);
@@ -199,7 +262,7 @@ if ($method === 'POST') {
         $sql = "UPDATE sales_accounts SET " . implode(", ", $set_parts) . " WHERE id = $id";
 
         if ($conn->query($sql)) {
-            echo json_encode(["status" => "success", "message" => "Data wiraniaga berhasil diperbarui!"]);
+            echo json_encode(["status" => "success", "message" => "Data wiraniaga berhasil diperbarui!", "foto" => $foto]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal mengupdate database: " . $conn->error]);
         }
