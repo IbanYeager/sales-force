@@ -151,9 +151,33 @@
     };
 
     // Store in localStorage if not already saved
-    const STORAGE_KEY = 'ao_report_live_data_v1';
+    const STORAGE_KEY = 'ao_report_live_data_v2';
+    let cachedLiveAOData = null;
+
+    async function fetchAODataLive(forceFresh = false) {
+        if (!forceFresh && cachedLiveAOData) {
+            return cachedLiveAOData;
+        }
+
+        try {
+            const res = await fetch('../api/api_ao_report.php');
+            const json = await res.json();
+            if (json && json.status === 'success') {
+                cachedLiveAOData = json;
+                saveAOData(json);
+                return json;
+            }
+        } catch (err) {
+            console.warn('Gagal memuat live AO API, fallback ke cached/default:', err);
+        }
+
+        const fallback = getAOData();
+        cachedLiveAOData = fallback;
+        return fallback;
+    }
 
     function getAOData() {
+        if (cachedLiveAOData) return cachedLiveAOData;
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
@@ -175,6 +199,7 @@
 
     function resetAOData() {
         const fresh = JSON.parse(JSON.stringify(DEFAULT_AO_DATA));
+        cachedLiveAOData = null;
         saveAOData(fresh);
         return fresh;
     }
@@ -288,6 +313,7 @@
     window.AOReportData = {
         DEFAULT_AO_DATA,
         getAOData,
+        fetchAODataLive,
         saveAOData,
         resetAOData,
         calculateTotals,

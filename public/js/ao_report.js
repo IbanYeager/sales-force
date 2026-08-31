@@ -8,14 +8,29 @@
 
     let currentRole = 'sales'; // 'sales' | 'spv' | 'kacab'
 
-    function initAOReport(role) {
+    async function initAOReport(role) {
         currentRole = role || 'sales';
-        renderAllAOComponents();
+        renderAllAOComponentsSync();
         bindEvents();
+        try {
+            await renderAllAOComponents(true);
+        } catch (e) {
+            console.warn('Live AO load error:', e);
+        }
     }
 
-    function renderAllAOComponents() {
+    function renderAllAOComponentsSync() {
         const data = window.AOReportData.getAOData();
+        renderWithData(data);
+    }
+
+    async function renderAllAOComponents(forceFresh = false) {
+        const data = await window.AOReportData.fetchAODataLive(forceFresh);
+        renderWithData(data);
+    }
+
+    function renderWithData(data) {
+        if (!data) return;
         renderHeader(data);
         renderStockMatching(data);
         renderSPKPlan(data);
