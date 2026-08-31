@@ -359,10 +359,10 @@ function showResults() {
 }
 
 // ══════════════════════════════════════════════════════
-//  PARTICLES & RENDERING (RESPONSIVE UNIFORM ENGINE)
+//  PARTICLES & RENDERING (RESPONSIVE UNIFORM 16:9 ENGINE)
 // ══════════════════════════════════════════════════════
 const VIRTUAL_W = 800;
-const VIRTUAL_H = 280;
+const VIRTUAL_H = 450;
 
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
@@ -382,8 +382,10 @@ function resizeCanvas() {
 function spawnParticles() {
   if (gameState !== 'RACING' && gameState !== 'FINISHED' && gameState !== 'COUNTDOWN') return;
 
-  const carX = 180;
-  const carY = 180;
+  const carX = Math.round(VIRTUAL_W * 0.25);
+  const roadY = Math.round(VIRTUAL_H * 0.35);
+  const roadH = VIRTUAL_H - roadY;
+  const carY = roadY + Math.round(roadH * 0.70);
 
   // Tire smoke on hard launch (thick white volumetric)
   if (speedKmh < 80 && isGasPressed && currentGear <= 2) {
@@ -467,15 +469,21 @@ function renderCanvas() {
   const H = VIRTUAL_H;
   frameCount++;
 
+  const roadY = Math.round(H * 0.35);
+  const roadH = H - roadY;
+  const laneY = roadY + Math.round(roadH * 0.40);
+  const carX = Math.round(W * 0.25);
+  const carY = roadY + Math.round(roadH * 0.70);
+
   ctx.clearRect(0, 0, W, H);
 
   // ── 1. NIGHT SKY ──
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, 115);
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, roadY);
   skyGrad.addColorStop(0, '#020617');
   skyGrad.addColorStop(0.6, '#0c1629');
   skyGrad.addColorStop(1, '#111827');
   ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, W, 115);
+  ctx.fillRect(0, 0, W, roadY);
 
   // Twinkling stars
   stars.forEach(s => {
@@ -483,21 +491,22 @@ function renderCanvas() {
     ctx.globalAlpha = twinkle;
     ctx.fillStyle = '#f8fafc';
     ctx.beginPath();
-    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+    ctx.arc(s.x, (s.y / 100) * (roadY - 15), s.size, 0, Math.PI * 2);
     ctx.fill();
   });
   ctx.globalAlpha = 1;
 
-  // City skyline silhouette (distant buildings)
+  // City skyline silhouette (distant buildings - sits on roadY)
   ctx.fillStyle = '#1e293b';
   const buildings = [
-    [20, 78, 30, 37], [55, 70, 25, 45], [90, 82, 20, 33], [120, 65, 35, 50], [165, 75, 20, 40],
-    [195, 80, 28, 35], [235, 60, 30, 55], [275, 72, 25, 43], [310, 68, 22, 47], [345, 78, 30, 37],
-    [385, 62, 35, 53], [430, 76, 20, 39], [460, 70, 30, 45], [500, 80, 24, 35], [535, 65, 28, 50],
-    [575, 75, 20, 40], [605, 68, 35, 47], [650, 78, 24, 37], [685, 64, 30, 51], [725, 72, 25, 43],
-    [760, 80, 30, 35]
+    [20, 50, 30], [55, 60, 25], [90, 42, 20], [120, 70, 35], [165, 55, 20],
+    [195, 48, 28], [235, 78, 30], [275, 58, 25], [310, 62, 22], [345, 50, 30],
+    [385, 75, 35], [430, 52, 20], [460, 64, 30], [500, 45, 24], [535, 68, 28],
+    [575, 52, 20], [605, 65, 35], [650, 50, 24], [685, 72, 30], [725, 58, 25],
+    [760, 48, 30]
   ];
-  buildings.forEach(([bx, by, bw, bh]) => {
+  buildings.forEach(([bx, bh, bw]) => {
+    const by = roadY - bh;
     ctx.fillRect(bx, by, bw, bh);
     // Random lit windows
     ctx.fillStyle = 'rgba(254, 240, 138, 0.5)';
@@ -512,33 +521,32 @@ function renderCanvas() {
   });
 
   // ── 2. GRANDSTAND & FLOODLIGHTS ──
+  const towerH = Math.min(85, roadY - 15);
+  const lampY = roadY - towerH;
   for (let x = 80; x < W; x += 200) {
     // Steel tower
     ctx.fillStyle = '#334155';
-    ctx.fillRect(x - 2, 35, 4, 80);
-    ctx.fillRect(x - 8, 30, 16, 8);
+    ctx.fillRect(x - 2, lampY + 5, 4, towerH);
+    ctx.fillRect(x - 8, lampY, 16, 8);
     // Light orbs
     ctx.fillStyle = '#f8fafc';
-    ctx.beginPath(); ctx.arc(x - 4, 33, 3, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + 4, 33, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x - 4, lampY + 3, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 4, lampY + 3, 3, 0, Math.PI * 2); ctx.fill();
     // Light beam cone
-    const cone = ctx.createRadialGradient(x, 33, 4, x, 85, 130);
+    const cone = ctx.createRadialGradient(x, lampY + 3, 4, x, roadY * 0.7, roadY * 1.2);
     cone.addColorStop(0, 'rgba(254, 240, 138, 0.22)');
     cone.addColorStop(1, 'rgba(254, 240, 138, 0)');
     ctx.fillStyle = cone;
     ctx.beginPath();
-    ctx.moveTo(x - 6, 33);
-    ctx.lineTo(x - 80, 115);
-    ctx.lineTo(x + 80, 115);
-    ctx.lineTo(x + 6, 33);
+    ctx.moveTo(x - 6, lampY + 3);
+    ctx.lineTo(x - 80, roadY);
+    ctx.lineTo(x + 80, roadY);
+    ctx.lineTo(x + 6, lampY + 3);
     ctx.closePath();
     ctx.fill();
   }
 
   // ── 3. DRAG STRIP TARMAC ──
-  const roadY = 115;
-  const roadH = H - roadY;
-
   // Asphalt gradient
   const asphGrad = ctx.createLinearGradient(0, roadY, 0, H);
   asphGrad.addColorStop(0, '#1a2332');
@@ -557,11 +565,10 @@ function renderCanvas() {
   for (let rx = 0; rx < W + 30; rx += 24) {
     const ox = ((rx - roadOffset * 0.6) % (W + 30) + (W + 30)) % (W + 30);
     ctx.fillStyle = (Math.floor(rx / 24) % 2 === 0) ? '#dc2626' : '#ffffff';
-    ctx.fillRect(ox, roadY, 12, 5);
+    ctx.fillRect(ox, roadY, 12, 6);
   }
 
   // Center lane yellow dashes (parallax)
-  const laneY = roadY + roadH * 0.45;
   ctx.fillStyle = '#fbbf24';
   for (let lx = 0; lx < W + 50; lx += 60) {
     const ox = ((lx - roadOffset) % (W + 60) + (W + 60)) % (W + 60);
@@ -572,26 +579,26 @@ function renderCanvas() {
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
   for (let lx = 0; lx < W + 50; lx += 45) {
     const ox = ((lx - roadOffset * 0.8) % (W + 50) + (W + 50)) % (W + 50);
-    ctx.fillRect(ox, roadY + 18, 20, 2);
-    ctx.fillRect(ox, H - 10, 20, 2);
+    ctx.fillRect(ox, roadY + 22, 20, 2);
+    ctx.fillRect(ox, H - 14, 20, 2);
   }
 
   // Rubber skid marks on track
-  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';
   for (let rx = 0; rx < W; rx += 120) {
     const ox = ((rx - roadOffset * 0.3) % W + W) % W;
-    ctx.fillRect(ox, laneY + 15, 80, 3);
-    ctx.fillRect(ox + 5, laneY + 22, 75, 3);
+    ctx.fillRect(ox, carY + 22, 80, 4);
+    ctx.fillRect(ox + 5, carY + 28, 75, 4);
   }
 
   // Start line (checkerboard)
   if (distanceM < 35) {
-    const startX = 150 - distanceM * 4;
+    const startX = 160 - distanceM * 4;
     if (startX > -20) {
-      for (let cy = roadY + 6; cy < H; cy += 10) {
+      for (let cy = roadY + 6; cy < H; cy += 12) {
         for (let cc = 0; cc < 2; cc++) {
-          ctx.fillStyle = ((cy + cc) % 2 === 0) ? '#ffffff' : '#1e293b';
-          ctx.fillRect(startX + cc * 8, cy, 8, 10);
+          ctx.fillStyle = ((Math.floor(cy / 12) + cc) % 2 === 0) ? '#ffffff' : '#1e293b';
+          ctx.fillRect(startX + cc * 10, cy, 10, 12);
         }
       }
     }
@@ -601,12 +608,12 @@ function renderCanvas() {
   const markerInterval = 100;
   for (let md = markerInterval; md <= 400; md += markerInterval) {
     if (distanceM > md - 50 && distanceM < md + 80) {
-      const mx = 180 + (md - distanceM) * 6;
+      const mx = 200 + (md - distanceM) * 6;
       if (mx > 0 && mx < W) {
-        ctx.fillStyle = 'rgba(255,255,255,0.15)';
-        ctx.font = 'bold 10px Outfit, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.font = 'bold 12px Outfit, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`${md}m`, mx, roadY + 14);
+        ctx.fillText(`${md}m`, mx, roadY + 22);
       }
     }
   }
@@ -669,7 +676,7 @@ function renderCanvas() {
   }
 
   // ── 5. DRAW CAR ──
-  drawSideCar(180, 180);
+  drawSideCar(carX, carY);
 
   // ── 6. SPEED LINES (at high speed) ──
   if (speedKmh > 120) {

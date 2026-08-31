@@ -102,7 +102,8 @@
       box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
       margin-bottom: 16px;
       width: 100%;
-      aspect-ratio: 800 / 280;
+      aspect-ratio: 16 / 9;
+      max-height: 380px;
     }
 
     canvas#dragCanvas {
@@ -426,8 +427,9 @@
 
       .drag-stage-wrap {
         border-radius: 16px;
-        aspect-ratio: 800 / 280;
+        aspect-ratio: 16 / 9.5;
         margin-bottom: 12px;
+        max-height: 240px;
       }
 
       .tree-lights {
