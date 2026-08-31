@@ -792,7 +792,7 @@
                                 <span class="category-text">Customer CRM</span>
                             </a>
                             <a href="pages/battle_card.html" class="category-item">
-                                <div class="category-icon" style="background:linear-gradient(135deg, #d7123a, #8b0519); color:white;"><i class="fa-solid fa-shield-halved"></i></div>
+                                <div class="category-icon"><i class="fa-solid fa-shield-halved"></i></div>
                                 <span class="category-text">Battle Card</span>
                             </a>
                             <a href="pages/spk.html" class="category-item">
