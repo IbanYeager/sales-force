@@ -7,7 +7,7 @@
   <title>SPV Desktop - Area Operation (AO) Report</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_spv.css">
-  <link rel="stylesheet" href="../css/ao_report.css?v=20260820_1">
+  <link rel="stylesheet" href="../css/ao_report.css?v=20260831_center_darklogo">
 
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
@@ -99,12 +99,15 @@
 
         <!-- Board Top Header -->
         <div class="ao-board-header">
-            <div class="ao-brand-badge">
-                <img src="../image/logo_tunas_toyota.png" alt="Tunas Toyota" style="height:32px; object-fit:contain;">
-                <div>
-                    <h1 class="ao-title-main">Area Operation Report</h1>
-                    <span class="ao-branch-tag"><i class="fa-solid fa-location-dot"></i> <span id="aoBranchName">TUNAS TOYOTA KIARACONDONG</span></span>
+            <div class="ao-header-center-wrap">
+                <div class="ao-logo-top-center">
+                    <img src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png" 
+                         alt="Tunas Toyota" 
+                         class="ao-logo-dark"
+                         onerror="this.onerror=null; this.src='../image/logo_tunas_toyota.png'; this.style.filter='brightness(0)';" />
                 </div>
+                <h1 class="ao-title-main">Area Operation Report</h1>
+                <span class="ao-branch-tag"><i class="fa-solid fa-location-dot"></i> <span id="aoBranchName">TUNAS TOYOTA KIARACONDONG</span></span>
             </div>
 
             <div class="ao-actions-toolbar">

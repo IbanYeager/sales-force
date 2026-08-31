@@ -33,23 +33,53 @@
 /* Board Header */
 .ao-board-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: center;
     gap: 16px;
-    padding-bottom: 18px;
+    padding-bottom: 22px;
     border-bottom: 2px dashed #cbd5e1;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.ao-header-center-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.ao-logo-top-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.ao-logo-dark {
+    height: 42px;
+    max-width: 280px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
+    transition: transform 0.2s ease;
+}
+
+.ao-logo-dark:hover {
+    transform: scale(1.02);
 }
 
 .ao-brand-badge {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .ao-title-main {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 900;
     color: #0f172a;
     letter-spacing: 0.5px;
@@ -61,9 +91,22 @@
     font-size: 13px;
     font-weight: 800;
     color: var(--ao-primary-red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #fff1f2;
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid #fecdd3;
+}
+
+.ao-actions-toolbar {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .ao-date-pill {

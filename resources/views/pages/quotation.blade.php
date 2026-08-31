@@ -219,7 +219,7 @@
           <div class="quote-paper" id="quotePreviewArea">
             <div class="quote-paper-header">
               <div>
-                <img src="../image/logo_tunas_toyota.png" alt="Tunas Toyota" style="height:36px;">
+                <img src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png" alt="Tunas Toyota" style="height:36px; object-fit:contain;" onerror="this.onerror=null; this.src='../image/logo_tunas_toyota.png'; this.style.filter='brightness(0)';">
                 <div style="font-size:10px; font-weight:800; color:#c8102e; margin-top:4px; letter-spacing:0.5px;">TUNAS TOYOTA KIARA CONDONG - BANDUNG</div>
               </div>
               <div style="text-align:right;">
