@@ -313,14 +313,9 @@
 
           <!-- Simulation Selector -->
           <div style="margin-bottom: 16px;">
-            <label class="form-group-label">Pilih Hari Simulasi Audit:</label>
+            <label class="form-group-label">Pilih Hari / Ritme Evaluasi:</label>
             <select id="sentinelStudioDaySelect" class="styled-input" onchange="fetchSentinelStudioReport(this.value)">
-              <option value="5">Hari Ke-5 (Min. 1 SPK/DO)</option>
-              <option value="10">Hari Ke-10 (Min. 2 SPK/DO)</option>
-              <option value="15">Hari Ke-15 (Min. 3 SPK/DO)</option>
-              <option value="19" selected>Hari Ke-19 (Min. 4 SPK/DO - Tanggal Hari Ini)</option>
-              <option value="25">Hari Ke-25 (Min. 5 SPK/DO)</option>
-              <option value="30">Hari Ke-30 (Min. 6 SPK/DO)</option>
+              <option value="">Memuat tanggal hari ini...</option>
             </select>
           </div>
 
@@ -377,6 +372,6 @@
     </div>
   </div>
 
-  <script src="../js/wa_studio.js?v=20260819_sentinel"></script>
+  <script src="../js/wa_studio.js?v=20260831_sentinel_realtime"></script>
 </body>
 </html>

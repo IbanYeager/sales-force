@@ -93,7 +93,7 @@ function auto_expire_pending_followups() {
     global $is_mysql, $conn, $sqlite_pdo;
     try {
         $thresholdTime = date('Y-m-d H:i:s', strtotime('-2 days'));
-        
+
         // Find customers that have been in 'Customer pending' for more than 2 days
         $sqlFind = "
             SELECT id, name, remarks, followup_status, followup_date, last_contacted_at, updated_at
@@ -114,7 +114,7 @@ function auto_expire_pending_followups() {
             foreach ($expiredCusts as $ec) {
                 $cid = (int)$ec['id'];
                 followup_execute("
-                    UPDATE followup_customers 
+                    UPDATE followup_customers
                     SET remarks = 'Customer tidak diangkat',
                         contacted = 'FALSE',
                         sales_fu_status = 'Closed',
@@ -136,73 +136,6 @@ function auto_expire_pending_followups() {
 // Run auto-expiry evaluation automatically on CRM actions
 if (in_array($action, ['customers', 'stats', 'sales', 'sales_dashboard', 'check_expiry'])) {
     auto_expire_pending_followups();
-    sync_unlinked_sales_fu_assignments();
-}
-
-/**
- * Auto-Sync Sales FU Assignments:
- * Automatically matches text in `sales_fu` (e.g. Indah, Rahma, Yani, etc. from Google Sheet/Excel)
- * to `assigned_sales_id` so that all leads are immediately assigned to the respective sales.
- */
-function sync_unlinked_sales_fu_assignments() {
-    global $is_mysql, $conn, $sqlite_pdo;
-    try {
-        $salesList = get_sales_list();
-        if (empty($salesList)) return;
-
-        $caseBranches = [];
-        $aliasMap = [
-            'fadhil' => 'fadil',
-            'yeni' => 'yenni',
-            'egi' => 'egy',
-        ];
-
-        foreach ($salesList as $s) {
-            $id = (int)$s['id'];
-            $nameLower = strtolower(trim($s['name']));
-            $cleanName = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $s['name'])));
-            
-            $caseBranches[] = "WHEN LOWER(sales_fu) = '$nameLower' THEN $id";
-            if ($cleanName !== $nameLower) {
-                $caseBranches[] = "WHEN LOWER(sales_fu) = '$cleanName' THEN $id";
-            }
-        }
-
-        foreach ($aliasMap as $alias => $target) {
-            foreach ($salesList as $s) {
-                if (strtolower(trim($s['name'])) === $target) {
-                    $id = (int)$s['id'];
-                    $caseBranches[] = "WHEN LOWER(sales_fu) = '$alias' THEN $id";
-                    break;
-                }
-            }
-        }
-
-        if (empty($caseBranches)) return;
-
-        $caseSql = implode("\n            ", $caseBranches);
-
-        $query = "
-            UPDATE followup_customers
-            SET assigned_sales_id = CASE
-                $caseSql
-                ELSE assigned_sales_id
-            END,
-            is_orphan = CASE
-                WHEN (assigned_sales_id IS NOT NULL AND assigned_sales_id > 0) THEN 0
-                ELSE is_orphan
-            END
-            WHERE sales_fu != '' AND sales_fu IS NOT NULL AND (assigned_sales_id IS NULL OR assigned_sales_id = 0)
-        ";
-
-        if ($is_mysql && $conn) {
-            $conn->query($query);
-        } else {
-            followup_execute($query);
-        }
-    } catch (Throwable $e) {
-        // Silently fail to never block other CRM API calls
-    }
 }
 
 // -------------------------------------------------------------
@@ -273,16 +206,8 @@ if ($action === 'customers') {
     // Attach sales name
     foreach ($customers as &$c) {
         $sid = (int)($c['assigned_sales_id'] ?? 0);
-        if ($sid > 0 && isset($salesMap[$sid])) {
-            $c['sales_name'] = $salesMap[$sid]['name'];
-            $c['sales_phone'] = $salesMap[$sid]['phone'];
-        } elseif (!empty($c['sales_fu']) && $c['sales_fu'] !== '-' && strtolower($c['sales_fu']) !== 'belum ditugaskan') {
-            $c['sales_name'] = $c['sales_fu'];
-            $c['sales_phone'] = '';
-        } else {
-            $c['sales_name'] = 'Belum Ditugaskan';
-            $c['sales_phone'] = '';
-        }
+        $c['sales_name'] = isset($salesMap[$sid]) ? $salesMap[$sid]['name'] : 'Belum Ditugaskan';
+        $c['sales_phone'] = isset($salesMap[$sid]) ? $salesMap[$sid]['phone'] : '';
     }
 
     echo json_encode([
@@ -338,7 +263,7 @@ if ($action === 'dashboard_analytics') {
     // Apply model filter
     $filtered = array_filter($allCust, function($c) use ($filterModel, $filterCluster, $filterClass) {
         $vf = strtoupper(trim($c['vehicle_filter'] ?? 'OTHERS'));
-        
+
         if ($filterModel === 'veloz_hybrid') {
             if ($vf !== 'VELOZ HYBRID' && stripos($c['car_model'] ?? '', 'VELOZ') === false) return false;
         } elseif ($filterModel === 'others') {
@@ -510,7 +435,7 @@ if ($action === 'dashboard_analytics') {
     foreach ($salesMap as $sName => $sRecords) {
         $sFunnel = $calcFunnel($sRecords);
         $sFunnel['sales_name'] = $sName;
-        
+
         // Match SPV team & Foto
         $sLower = strtolower($sName);
         $spvName = $salesSpvMap[$sLower] ?? '';
@@ -924,10 +849,10 @@ if ($action === 'bulk_assign') {
         if (!empty($customer_ids)) {
             $idList = implode(',', array_map('intval', $customer_ids));
             $custRows = followup_query("
-                SELECT id, phone, assigned_sales_id, followup_status 
-                FROM followup_customers 
+                SELECT id, phone, assigned_sales_id, followup_status
+                FROM followup_customers
                 WHERE id IN ($idList)
-                ORDER BY 
+                ORDER BY
                   (CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) THEN 0 ELSE 1 END) ASC,
                   (CASE WHEN (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') THEN 0 ELSE 1 END) ASC,
                   id DESC
@@ -1896,12 +1821,12 @@ if ($action === 'distribute_quota') {
     }
 
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
-    
+
     // Order: Unassigned first, Belum Dihubungi first, then newest ID
-    $sql = "SELECT id, name, phone, car_model, followup_category, assigned_sales_id, followup_status, notes 
-            FROM followup_customers 
-            $whereSql 
-            ORDER BY 
+    $sql = "SELECT id, name, phone, car_model, followup_category, assigned_sales_id, followup_status, notes
+            FROM followup_customers
+            $whereSql
+            ORDER BY
               (CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) THEN 0 ELSE 1 END) ASC,
               (CASE WHEN (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') THEN 0 ELSE 1 END) ASC,
               id DESC";
@@ -1947,7 +1872,7 @@ if ($action === 'distribute_quota') {
 
     $totalAvailable = count($availableLeads);
     if ($totalAvailable === 0) {
-        $msg = $excludedCount > 0 
+        $msg = $excludedCount > 0
             ? "Tidak ada data leads yang dapat dibagikan karena semua data ($excludedCount data) cocok dengan filter pengecualian."
             : "Tidak ada data leads yang tersedia untuk dibagikan. Semua data mungkin sudah memiliki sales PIC.";
         echo json_encode(['success' => false, 'message' => $msg]);

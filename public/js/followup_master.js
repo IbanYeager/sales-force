@@ -480,7 +480,7 @@ function renderClusterBreakdownTable(clusters) {
   clusters.forEach((c) => {
     const rateNum = c.potency > 0 ? ((c.spk / c.potency) * 100) : 0;
     const closingRate = rateNum.toFixed(1);
-    
+
     // Extract cluster number for color styling
     let clClass = 'cl-1';
     const matchNum = (c.cluster_name || '').match(/(\d+)/);
@@ -504,8 +504,8 @@ function renderClusterBreakdownTable(clusters) {
         <td class="num">${(c.connected || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(c.contacted || 0).toLocaleString('id-ID')}</td>
         <td class="num">
-          ${c.hot_prospect > 0 
-            ? `<span class="fu-hot-pill"><i class="fa-solid fa-bolt" style="font-size:10px;"></i> ${(c.hot_prospect || 0).toLocaleString('id-ID')}</span>` 
+          ${c.hot_prospect > 0
+            ? `<span class="fu-hot-pill"><i class="fa-solid fa-bolt" style="font-size:10px;"></i> ${(c.hot_prospect || 0).toLocaleString('id-ID')}</span>`
             : `<span style="color:#94a3b8; font-weight:600;">0</span>`}
         </td>
         <td class="num">
@@ -581,8 +581,8 @@ function renderSalesLeaderboardTable(salesList) {
         <td class="num">${(s.connected || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(s.contacted || 0).toLocaleString('id-ID')}</td>
         <td class="num">
-          ${s.hot_prospect > 0 
-            ? `<span class="fu-hot-pill"><i class="fa-solid fa-bolt" style="font-size:10px;"></i> ${(s.hot_prospect || 0).toLocaleString('id-ID')}</span>` 
+          ${s.hot_prospect > 0
+            ? `<span class="fu-hot-pill"><i class="fa-solid fa-bolt" style="font-size:10px;"></i> ${(s.hot_prospect || 0).toLocaleString('id-ID')}</span>`
             : `<span style="color:#94a3b8; font-weight:600;">0</span>`}
         </td>
         <td class="num">
@@ -1042,10 +1042,9 @@ function renderCustomerTable() {
         <td style="min-width:190px;">
           <select class="fu-table-select" onchange="inlineUpdateSales(${c.id}, this.value)">
             <option value="">-- Belum Ditugaskan (Batal) --</option>
-            ${masterState.salesList.map(s => {
-              const isSelected = (c.assigned_sales_id && String(c.assigned_sales_id) === String(s.id)) || (!c.assigned_sales_id && c.sales_fu && s.name && c.sales_fu.toLowerCase().trim() === s.name.toLowerCase().trim());
-              return `<option value="${s.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(s.name)}</option>`;
-            }).join('')}
+            ${masterState.salesList.map(s => `
+              <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>
+            `).join('')}
           </select>
         </td>
 
@@ -1946,7 +1945,7 @@ function openEditSingleCustomerModal(customerId) {
 
   // Count how many matching records exist in current dataset
   const matchingCompanyCount = masterState.customers.filter(x => {
-    return (x.name || '').toLowerCase().includes(companyKeyword.toLowerCase()) || 
+    return (x.name || '').toLowerCase().includes(companyKeyword.toLowerCase()) ||
            (x.notes || '').toLowerCase().includes(companyKeyword.toLowerCase());
   }).length;
 
@@ -1965,7 +1964,7 @@ function openEditSingleCustomerModal(customerId) {
   const html = `
     <div class="modal-overlay active" id="modalEditSingleCustomer" style="display:flex; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); align-items:center; justify-content:center;" onclick="closeEditSingleCustomerModal()">
       <div class="modal-content" style="max-width:680px; width:95%; border-radius:18px; padding:24px; max-height:92vh; overflow-y:auto;" onclick="event.stopPropagation()">
-        
+
         <!-- Header -->
         <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
           <div>
@@ -1979,7 +1978,7 @@ function openEditSingleCustomerModal(customerId) {
         </div>
 
         <form id="formEditSingleCustomer" onsubmit="executeSaveEditCustomer(event, ${c.id})">
-          
+
           <!-- 4 Grid TAM Status Toggle -->
           <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px; margin-bottom:16px;">
             <div style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
@@ -2059,10 +2058,9 @@ function openEditSingleCustomerModal(customerId) {
               <label style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Sales PIC Wiraniaga:</label>
               <select id="editSingleSalesPic" class="fu-select" style="font-size:12.5px;">
                 <option value="0">-- Belum Ditugaskan / Batal Penugasan --</option>
-                ${masterState.salesList.map(s => {
-                  const isSelected = (c.assigned_sales_id && String(c.assigned_sales_id) === String(s.id)) || (!c.assigned_sales_id && c.sales_fu && s.name && c.sales_fu.toLowerCase().trim() === s.name.toLowerCase().trim());
-                  return `<option value="${s.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(s.name)}</option>`;
-                }).join('')}
+                ${masterState.salesList.map(s => `
+                  <option value="${s.id}" ${c.assigned_sales_id == s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>
+                `).join('')}
               </select>
             </div>
           </div>
@@ -2367,7 +2365,7 @@ function openBatchEditModal(initialScope = null) {
   const html = `
     <div class="modal-overlay active" id="modalBatchEditMaster" style="display:flex; position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); align-items:center; justify-content:center;" onclick="closeBatchEditModal()">
       <div class="modal-content" style="max-width:720px; width:95%; border-radius:18px; padding:24px; max-height:92vh; overflow-y:auto;" onclick="event.stopPropagation()">
-        
+
         <!-- Header -->
         <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
           <div>
@@ -2381,7 +2379,7 @@ function openBatchEditModal(initialScope = null) {
         </div>
 
         <form id="formBatchEditMaster" onsubmit="executeBatchUpdateMaster(event)">
-          
+
           <!-- 1. PILIH CAKUPAN / TARGET DATA -->
           <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 16px; margin-bottom:16px;">
             <div style="font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">

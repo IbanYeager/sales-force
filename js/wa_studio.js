@@ -79,16 +79,57 @@ function switchWaTab(tab) {
       cronEl.textContent = `${currentOrigin}${rootPath}/api/api_ai_kacab_sentinel.php`;
     }
 
-    fetchSentinelStudioReport(19);
+    fetchSentinelStudioReport();
   }
 }
 
-async function fetchSentinelStudioReport(day = 19) {
+function populateSentinelStudioDayOptions(selectedDay) {
+  const selectEl = document.getElementById('sentinelStudioDaySelect');
+  if (!selectEl) return;
+  
+  const today = new Date().getDate();
+  const activeDay = (selectedDay !== null && selectedDay !== undefined && selectedDay !== '') ? parseInt(selectedDay) : today;
+  
+  const milestoneIntervals = [
+    { day: 5, label: 'Ritme Hari 1 - 5 (Min. 1 SPK/DO)' },
+    { day: 10, label: 'Ritme Hari 6 - 10 (Min. 2 SPK/DO)' },
+    { day: 15, label: 'Ritme Hari 11 - 15 (Min. 3 SPK/DO)' },
+    { day: 20, label: 'Ritme Hari 16 - 20 (Min. 4 SPK/DO)' },
+    { day: 25, label: 'Ritme Hari 21 - 25 (Min. 5 SPK/DO)' },
+    { day: 31, label: 'Ritme Hari 26 - Akhir Bulan (Min. 6 SPK/DO)' }
+  ];
+
+  let optionsHtml = '';
+  optionsHtml += `<option value="${today}">📅 Hari Ini (Tgl ${today} - Real-Time)</option>`;
+  
+  milestoneIntervals.forEach(m => {
+    optionsHtml += `<option value="${m.day}">Simulasi ${m.label}</option>`;
+  });
+
+  selectEl.innerHTML = optionsHtml;
+  selectEl.value = String(activeDay);
+}
+
+async function fetchSentinelStudioReport(day = null) {
+  const selectEl = document.getElementById('sentinelStudioDaySelect');
+  const today = new Date().getDate();
+  const currentMonth = new Date().getMonth() + 1;
+  const targetDay = (day !== null && day !== undefined && day !== '') ? parseInt(day) : today;
+
+  if (selectEl) {
+    if (!selectEl.dataset.initialized || selectEl.options.length <= 1) {
+      populateSentinelStudioDayOptions(targetDay);
+      selectEl.dataset.initialized = 'true';
+    } else {
+      selectEl.value = String(targetDay);
+    }
+  }
+
   const bubble = document.getElementById('sentinelWaBubble');
-  if (bubble) bubble.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memuat laporan AI Sentinel hari ke-${day}...`;
+  if (bubble) bubble.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memuat laporan AI Sentinel hari ke-${targetDay}...`;
 
   try {
-    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${day}&bulan=8`);
+    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${targetDay}&bulan=${currentMonth}`);
     const json = await res.json();
     if (json.status === 'success') {
       currentSentinelStudioData = json;

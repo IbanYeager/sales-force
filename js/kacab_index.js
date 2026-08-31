@@ -197,17 +197,53 @@ function activityIcon(tipe) {
 
 let aiSentinelData = null;
 
+function populateSentinelDayOptions(selectedDay) {
+  const selectEl = document.getElementById('selectSimulasiHari');
+  if (!selectEl) return;
+  
+  const today = new Date().getDate();
+  const activeDay = (selectedDay !== null && selectedDay !== undefined && selectedDay !== '') ? parseInt(selectedDay) : today;
+  
+  const milestoneIntervals = [
+    { day: 5, label: 'Ritme Hari 1 - 5 (Min. 1 SPK/DO)' },
+    { day: 10, label: 'Ritme Hari 6 - 10 (Min. 2 SPK/DO)' },
+    { day: 15, label: 'Ritme Hari 11 - 15 (Min. 3 SPK/DO)' },
+    { day: 20, label: 'Ritme Hari 16 - 20 (Min. 4 SPK/DO)' },
+    { day: 25, label: 'Ritme Hari 21 - 25 (Min. 5 SPK/DO)' },
+    { day: 31, label: 'Ritme Hari 26 - Akhir Bulan (Min. 6 SPK/DO)' }
+  ];
+
+  let optionsHtml = '';
+  optionsHtml += `<option value="${today}">📅 Hari Ini (Tgl ${today} - Real-Time)</option>`;
+  
+  milestoneIntervals.forEach(m => {
+    optionsHtml += `<option value="${m.day}">Simulasi ${m.label}</option>`;
+  });
+
+  selectEl.innerHTML = optionsHtml;
+  selectEl.value = String(activeDay);
+}
+
 async function loadAiSentinelKacab(customDay = null, forceFresh = false) {
   const selectEl = document.getElementById('selectSimulasiHari');
+  const today = new Date().getDate();
   let dayParam;
-  if (customDay !== null) {
+
+  if (customDay !== null && customDay !== undefined && customDay !== '') {
     dayParam = parseInt(customDay);
-    if (selectEl) selectEl.value = String(customDay);
-  } else if (selectEl && selectEl.value) {
-    dayParam = parseInt(selectEl.value);
   } else {
-    dayParam = new Date().getDate();
+    dayParam = today;
   }
+
+  if (selectEl) {
+    if (!selectEl.dataset.initialized || selectEl.options.length <= 1) {
+      populateSentinelDayOptions(dayParam);
+      selectEl.dataset.initialized = 'true';
+    } else {
+      selectEl.value = String(dayParam);
+    }
+  }
+
   const monthParam = new Date().getMonth() + 1;
 
   const sentinelCard = document.getElementById('aiSentinelContainer');

@@ -196,14 +196,9 @@
 
           <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #e2e8f0; padding:4px 10px; border-radius:10px; font-size:12px;">
-              <span style="font-weight:700; color:#475569;">Simulasi Hari:</span>
+              <span style="font-weight:700; color:#475569;"><i class="fa-solid fa-calendar-day" style="color:#6366f1;"></i> Ritme / Periode:</span>
               <select id="selectSimulasiHari" onchange="changeSentinelDay(this.value)" style="border:none; background:transparent; font-weight:800; color:#0f172a; outline:none; cursor:pointer;">
-                <option value="5">Hari Ke-5 (Min. 1 SPK/DO)</option>
-                <option value="10">Hari Ke-10 (Min. 2 SPK/DO)</option>
-                <option value="15">Hari Ke-15 (Min. 3 SPK/DO)</option>
-                <option value="19" selected>Hari Ke-19 (Min. 4 SPK/DO - Hari Ini)</option>
-                <option value="25">Hari Ke-25 (Min. 5 SPK/DO)</option>
-                <option value="30">Hari Ke-30 (Min. 6 SPK/DO)</option>
+                <option value="">Memuat tanggal hari ini...</option>
               </select>
             </div>
 
@@ -276,7 +271,7 @@
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <span style="font-size:12px; font-weight:800; color:#334155; text-transform:uppercase; letter-spacing:0.5px;">
-            <i class="fa-solid fa-list-check" style="color:#6366f1; margin-right:4px;"></i> Status Ritme: <span id="sentinelPeriodLabel" style="color:#0f172a;">Hari 16 - 20 (Target Min. 4 SPK/DO)</span>
+            <i class="fa-solid fa-list-check" style="color:#6366f1; margin-right:4px;"></i> Status Ritme: <span id="sentinelPeriodLabel" style="color:#0f172a;"><i class="fa-solid fa-spinner fa-spin"></i> Menyesuaikan tanggal real-time...</span>
           </span>
           <span style="font-size:11px; color:#94a3b8;"><i class="fa-solid fa-bolt"></i> Evaluasi otomatis real-time</span>
         </div>
@@ -363,8 +358,8 @@
   </div>
 
   <script src="../custom_alert.js"></script>
-  <script src="../js/kacab_global.js?v=20260826_sheets_live"></script>
-  <script src="../js/kacab_index.js?v=20260826_sheets_live"></script>
+  <script src="../js/kacab_global.js?v=20260831_realtime_ritme"></script>
+  <script src="../js/kacab_index.js?v=20260831_realtime_ritme"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>
 </body>
