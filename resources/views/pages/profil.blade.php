@@ -11,6 +11,38 @@
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
+  <style>
+      #editProfilModal.modal-overlay {
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 16px !important;
+          display: flex !important;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.25s ease, visibility 0.25s ease;
+      }
+      #editProfilModal.modal-overlay.show {
+          opacity: 1 !important;
+          visibility: visible !important;
+      }
+      #editProfilModal .modal-content.edit-profil-modal-box {
+          transform: scale(0.95) !important;
+          transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+          max-width: 480px !important;
+          width: 100% !important;
+          max-height: 88vh !important;
+          background: #ffffff !important;
+          border-radius: 20px !important;
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4) !important;
+          display: flex !important;
+          flex-direction: column !important;
+          overflow: hidden !important;
+          margin: auto !important;
+      }
+      #editProfilModal.modal-overlay.show .modal-content.edit-profil-modal-box {
+          transform: scale(1) !important;
+      }
+  </style>
 </head>
 
 <body>
@@ -146,107 +178,131 @@
     </div>
 
     <!-- Edit Profil Modal -->
-    <div class="modal-overlay" id="editProfilModal" style="z-index: 10000;">
-        <div class="modal-content" style="padding:0; overflow:hidden; background:var(--primary-red); display:flex; flex-direction:column; max-height:90vh; border-radius:24px 24px 0 0;">
-            <div style="position:relative; padding:20px; text-align:center; color:white;">
-                <button class="btn-close-modal-white" onclick="closeEditProfilModal()" style="position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.25); border-radius:50%; border:none; width:32px; height:32px; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-                <h3 style="margin:0 0 4px; font-size:18px; font-weight:800;">Edit Profil & Sosmed</h3>
-                <p style="margin:0 0 20px; font-size:12px; opacity:0.9;">Perbarui informasi akun & link promosi Anda</p>
-                
-                <div style="position:relative; width:80px; height:80px; margin:0 auto;">
-                    <img id="editProfilPreview" src="" style="width:80px; height:80px; border-radius:50%; border:3px solid white; object-fit:cover; background:white;">
-                    <button onclick="openPhotoChoiceModal()" type="button" style="position:absolute; bottom:0; right:0; width:28px; height:28px; border-radius:50%; background:white; color:var(--primary-red); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="fa-solid fa-camera"></i></button>
+    <div class="modal-overlay" id="editProfilModal" style="z-index: 10000; align-items: center; justify-content: center; padding: 16px;" onclick="if(event.target===this) closeEditProfilModal()">
+        <div class="modal-content edit-profil-modal-box" style="padding: 0; overflow: hidden; background: #ffffff; display: flex; flex-direction: column; max-height: 90vh; max-width: 500px; width: 100%; border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.35); transform: none; position: relative; margin: auto;">
+            
+            <!-- Compact Header Banner -->
+            <div style="position: relative; background: linear-gradient(135deg, #c8102e 0%, #99001c 100%); padding: 18px 20px 14px; text-align: center; color: white; flex-shrink: 0;">
+                <button type="button" onclick="closeEditProfilModal()" style="position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.2); border-radius: 50%; border: none; width: 32px; height: 32px; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" title="Tutup">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px;">
+                    <div style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
+                        <img id="editProfilPreview" src="" alt="Avatar" style="width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid white; object-fit: cover; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.25);">
+                        <button onclick="openPhotoChoiceModal()" type="button" style="position: absolute; bottom: -2px; right: -2px; width: 24px; height: 24px; border-radius: 50%; background: #ffffff; color: var(--primary-red); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 11px;" title="Ganti Foto">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div style="text-align: left;">
+                        <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #ffffff; letter-spacing: -0.2px;">Edit Profil Sales</h3>
+                        <p style="margin: 2px 0 0; font-size: 11.5px; opacity: 0.9; color: #fecdd3;">Perbarui data akun & link media sosial promosi</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs (Pills) -->
+                <div style="display: flex; gap: 6px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; margin-top: 10px;">
+                    <button type="button" id="tabBtnAkun" class="tab-modal-nav active" onclick="switchModalTab('akun')" style="flex: 1; padding: 7px 10px; border: none; border-radius: 9px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; background: #ffffff; color: var(--primary-red); box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                        <i class="fa-solid fa-id-card"></i> Data Pribadi & Akun
+                    </button>
+                    <button type="button" id="tabBtnSosmed" class="tab-modal-nav" onclick="switchModalTab('sosmed')" style="flex: 1; padding: 7px 10px; border: none; border-radius: 9px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; background: transparent; color: #ffffff;">
+                        <i class="fa-solid fa-share-nodes"></i> Media Sosial
+                    </button>
                 </div>
             </div>
             
-            <div style="background:white; padding:24px; border-radius:24px 24px 0 0; flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:16px;">
-                <div class="form-group">
-                    <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Nama (Harus Nama Lengkap)</label>
-                    <div style="position:relative;">
-                        <i class="fa-regular fa-address-card" style="position:absolute; left:14px; top:14px; color:var(--text-muted);"></i>
-                        <input type="text" id="editNama" class="form-control" style="padding-left:40px;" placeholder="Nama Lengkap">
-                    </div>
-                </div>
+            <!-- Scrollable Body with Clean Layout -->
+            <div style="flex: 1; overflow-y: auto; padding: 20px; background: #ffffff; min-height: 0;">
                 
-                <div class="form-group">
-                    <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Username</label>
-                    <div style="position:relative;">
-                        <i class="fa-solid fa-user" style="position:absolute; left:14px; top:14px; color:var(--text-muted);"></i>
-                        <input type="text" id="editUsername" class="form-control" style="padding-left:40px;" placeholder="Username">
+                <!-- TAB 1: DATA AKUN -->
+                <div id="modalPaneAkun" style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="form-group">
+                        <label style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">
+                            <i class="fa-solid fa-user" style="color: var(--primary-red); margin-right: 4px;"></i> Nama Lengkap
+                        </label>
+                        <input type="text" id="editNama" class="form-control" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #0f172a;" placeholder="Nama Lengkap Wiraniaga">
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Password Baru</label>
-                    <div style="position:relative;">
-                        <i class="fa-solid fa-lock" style="position:absolute; left:14px; top:14px; color:var(--text-muted);"></i>
-                        <input type="password" id="editPassword" class="form-control" style="padding-left:40px;" placeholder="Kosongkan jika tidak ingin mengganti">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Nomor Handphone / WhatsApp</label>
-                    <div style="position:relative;">
-                        <i class="fa-brands fa-whatsapp" style="position:absolute; left:14px; top:14px; color:var(--green-success);"></i>
-                        <input type="text" id="editNoHp" class="form-control" style="padding-left:40px;" placeholder="6281234567890">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Email Official</label>
-                    <div style="position:relative;">
-                        <i class="fa-solid fa-envelope" style="position:absolute; left:14px; top:14px; color:var(--primary-blue);"></i>
-                        <input type="email" id="editEmail" class="form-control" style="padding-left:40px;" placeholder="Cth: nama@tunastoyota.co.id">
-                    </div>
-                </div>
-
-                <!-- ═══ SOCIAL MEDIA & LINK PROMOSI ═══ -->
-                <div style="border-top:1px dashed #cbd5e1; padding-top:14px; margin-top:4px;">
-                    <h4 style="font-size:12px; font-weight:800; color:#0f172a; margin:0 0 4px; display:flex; align-items:center; gap:6px;">
-                        <i class="fa-solid fa-share-nodes" style="color:var(--primary-red);"></i> Link Akun Media Sosial
-                    </h4>
-                    <p style="font-size:11px; color:#64748b; margin:0 0 12px;">Link ini otomatis disisipkan saat membagikan brosur, promo, & simulasi kredit.</p>
-
-                    <div class="form-group" style="margin-bottom:12px;">
-                        <label style="font-size:10.5px; font-weight:800; color:#be185d; text-transform:uppercase;">Instagram (Username / Link)</label>
-                        <div style="position:relative;">
-                            <i class="fa-brands fa-instagram" style="position:absolute; left:14px; top:14px; color:#be185d;"></i>
-                            <input type="text" id="editInstagram" class="form-control" style="padding-left:40px;" placeholder="@namasales_toyota atau https://instagram.com/...">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">
+                                <i class="fa-solid fa-at" style="color: var(--primary-blue); margin-right: 4px;"></i> Username
+                            </label>
+                            <input type="text" id="editUsername" class="form-control" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0f172a;" placeholder="Username login">
                         </div>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom:12px;">
-                        <label style="font-size:10.5px; font-weight:800; color:#0f172a; text-transform:uppercase;">TikTok (Username / Link)</label>
-                        <div style="position:relative;">
-                            <i class="fa-brands fa-tiktok" style="position:absolute; left:14px; top:14px; color:#0f172a;"></i>
-                            <input type="text" id="editTiktok" class="form-control" style="padding-left:40px;" placeholder="@namasales_toyota atau https://tiktok.com/@...">
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom:12px;">
-                        <label style="font-size:10.5px; font-weight:800; color:#1d4ed8; text-transform:uppercase;">Facebook (Username / Link)</label>
-                        <div style="position:relative;">
-                            <i class="fa-brands fa-facebook" style="position:absolute; left:14px; top:14px; color:#1d4ed8;"></i>
-                            <input type="text" id="editFacebook" class="form-control" style="padding-left:40px;" placeholder="https://facebook.com/namasales">
+                        <div class="form-group">
+                            <label style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">
+                                <i class="fa-solid fa-lock" style="color: #64748b; margin-right: 4px;"></i> Password Baru
+                            </label>
+                            <input type="password" id="editPassword" class="form-control" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0f172a;" placeholder="Kosongkan jika tdk ubah">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label style="font-size:10.5px; font-weight:800; color:#15803d; text-transform:uppercase;">Website / Linktree / Bio Link</label>
-                        <div style="position:relative;">
-                            <i class="fa-solid fa-globe" style="position:absolute; left:14px; top:14px; color:#15803d;"></i>
-                            <input type="text" id="editWebsite" class="form-control" style="padding-left:40px;" placeholder="https://linktr.ee/namasales">
-                        </div>
+                        <label style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">
+                            <i class="fa-brands fa-whatsapp" style="color: #10b981; margin-right: 4px;"></i> Nomor WhatsApp / HP Konsultasi
+                        </label>
+                        <input type="text" id="editNoHp" class="form-control" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #0f172a;" placeholder="Cth: 08123456789 atau 628123456789">
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">
+                            <i class="fa-solid fa-envelope" style="color: #0284c7; margin-right: 4px;"></i> Email Official
+                        </label>
+                        <input type="email" id="editEmail" class="form-control" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0f172a;" placeholder="Cth: nama@tunastoyota.co.id">
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px; margin-top:8px;">
-                    <button class="btn-outline-blue" style="flex:1; padding:12px; border-radius:12px;" onclick="closeEditProfilModal()">Batal</button>
-                    <button class="btn-main" style="flex:2; padding:12px; border-radius:12px; display:flex; justify-content:center; align-items:center; gap:8px;" onclick="saveProfil()" id="btnSaveProfil">
-                        <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
-                    </button>
+                <!-- TAB 2: DATA SOSMED -->
+                <div id="modalPaneSosmed" style="display: none; flex-direction: column; gap: 14px;">
+                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fa-solid fa-circle-info" style="color: #0284c7; font-size: 15px; margin-top: 2px;"></i>
+                        <p style="margin: 0; font-size: 11.5px; color: #0369a1; line-height: 1.45;">
+                            Tautan sosmed yang Anda isi di bawah akan <strong>otomatis disisipkan</strong> saat Anda share Promo, Brosur PDF, Pricelist OTR, Quotation, Kalkulator Kredit, dan Trade-In!
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 11px; font-weight: 800; color: #be185d; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-brands fa-instagram" style="font-size: 14px;"></i> Instagram (Username / URL)
+                        </label>
+                        <input type="text" id="editInstagram" class="form-control" style="width: 100%; border: 1.5px solid #fbcfe8; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0f172a; background: #fffdfd;" placeholder="Cth: @namasales atau https://instagram.com/namasales">
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 11px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-brands fa-tiktok" style="font-size: 13px;"></i> TikTok (Username / URL)
+                        </label>
+                        <input type="text" id="editTiktok" class="form-control" style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0f172a; background: #fafafa;" placeholder="Cth: @namasales atau https://tiktok.com/@namasales">
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 11px; font-weight: 800; color: #1d4ed8; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-brands fa-facebook" style="font-size: 13px;"></i> Facebook (Username / URL)
+                        </label>
+                        <input type="text" id="editFacebook" class="form-control" style="width: 100%; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0f172a; background: #fcfdfe;" placeholder="Cth: https://facebook.com/namasales">
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 11px; font-weight: 800; color: #15803d; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-globe" style="font-size: 13px;"></i> Website / Linktree / Bio Link
+                        </label>
+                        <input type="text" id="editWebsite" class="form-control" style="width: 100%; border: 1.5px solid #bbf7d0; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0f172a; background: #fdfefe;" placeholder="Cth: https://linktr.ee/namasales">
+                    </div>
                 </div>
+
             </div>
+
+            <!-- Sticky Fixed Footer -->
+            <div style="padding: 14px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; flex-shrink: 0; border-radius: 0 0 20px 20px;">
+                <button type="button" class="btn-outline-blue" style="flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; border: 1.5px solid #cbd5e1; background: white; color: #475569; cursor: pointer;" onclick="closeEditProfilModal()">
+                    Batal
+                </button>
+                <button type="button" class="btn-main" style="flex: 2; padding: 12px; border-radius: 12px; display: flex; justify-content: center; align-items: center; gap: 8px; font-weight: 800; font-size: 13px; background: linear-gradient(135deg, #c8102e 0%, #99001c 100%); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(200,16,46,0.3);" onclick="saveProfil()" id="btnSaveProfil">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+                </button>
+            </div>
+
         </div>
     </div>
     
@@ -269,10 +325,39 @@
     </div>
 
     <input type="file" id="fileInputGallery" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
-    <input type="file" id="fileInputCamera" accept="image/*" capture="user" style="display: none;" onchange="previewPhoto(    <script src="../js/script.js"></script>
+    <input type="file" id="fileInputCamera" accept="image/*" capture="user" style="display: none;" onchange="previewPhoto(event)">
+
+    <script src="../js/script.js"></script>
     <script src="../js/sales_signature.js"></script>
     <script>
         let selectedFile = null;
+
+        function switchModalTab(tab) {
+            const paneAkun = document.getElementById('modalPaneAkun');
+            const paneSosmed = document.getElementById('modalPaneSosmed');
+            const btnAkun = document.getElementById('tabBtnAkun');
+            const btnSosmed = document.getElementById('tabBtnSosmed');
+
+            if (tab === 'akun') {
+                paneAkun.style.display = 'flex';
+                paneSosmed.style.display = 'none';
+                btnAkun.style.background = '#ffffff';
+                btnAkun.style.color = 'var(--primary-red)';
+                btnAkun.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
+                btnSosmed.style.background = 'transparent';
+                btnSosmed.style.color = '#ffffff';
+                btnSosmed.style.boxShadow = 'none';
+            } else {
+                paneAkun.style.display = 'none';
+                paneSosmed.style.display = 'flex';
+                btnSosmed.style.background = '#ffffff';
+                btnSosmed.style.color = 'var(--primary-red)';
+                btnSosmed.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
+                btnAkun.style.background = 'transparent';
+                btnAkun.style.color = '#ffffff';
+                btnAkun.style.boxShadow = 'none';
+            }
+        }
 
         function updateSocialBadges(data) {
             const ig = data.instagram_url || localStorage.getItem('salesInstagram') || '';
@@ -330,6 +415,7 @@
             if(!salesId) return;
 
             document.getElementById('editProfilModal').classList.add('show'); 
+            switchModalTab('akun');
             
             // Fetch data
             fetch(`../api/api_edit_profil.php?sales_id=${salesId}`)
