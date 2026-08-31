@@ -101,12 +101,14 @@
       border: 2px solid #334155;
       box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
       margin-bottom: 16px;
+      width: 100%;
+      aspect-ratio: 800 / 280;
     }
 
     canvas#dragCanvas {
       display: block;
       width: 100%;
-      height: 240px;
+      height: 100%;
       background: #090d16;
     }
 
@@ -153,7 +155,7 @@
     /* Feedback message banner */
     .shift-feedback {
       position: absolute;
-      top: 60px;
+      top: 55px;
       left: 50%;
       transform: translateX(-50%);
       font-family: 'Orbitron', monospace;
@@ -304,6 +306,8 @@
       transition: all 0.15s ease;
       user-select: none;
       -webkit-user-select: none;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
     }
 
     .ctrl-btn:active {
@@ -383,6 +387,121 @@
       color: #0f172a;
       margin-top: 4px;
     }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 768px) {
+      .drag-hero {
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 14px;
+      }
+
+      .drag-hero h2 {
+        font-size: 17px;
+      }
+
+      .drag-hero p {
+        font-size: 11.5px;
+        line-height: 1.4;
+      }
+
+      .car-select-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .car-btn {
+        padding: 8px 6px;
+        border-radius: 12px;
+      }
+
+      .car-btn .name {
+        font-size: 11.5px;
+      }
+
+      .car-btn .hp {
+        font-size: 10px;
+      }
+
+      .drag-stage-wrap {
+        border-radius: 16px;
+        aspect-ratio: 800 / 280;
+        margin-bottom: 12px;
+      }
+
+      .tree-lights {
+        top: 8px;
+        gap: 5px;
+        padding: 4px 10px;
+      }
+
+      .light-bulb {
+        width: 10px;
+        height: 10px;
+      }
+
+      .shift-feedback {
+        top: 36px;
+        font-size: 13px;
+      }
+
+      .cluster-box {
+        padding: 12px 10px;
+        border-radius: 16px;
+        margin-bottom: 14px;
+      }
+
+      .cluster-top {
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      .metric-card {
+        padding: 6px 4px;
+        border-radius: 10px;
+      }
+
+      .metric-label {
+        font-size: 9.5px;
+      }
+
+      .metric-value {
+        font-size: 16px;
+      }
+
+      .rpm-container {
+        margin-bottom: 12px;
+      }
+
+      .rpm-bar-wrap {
+        height: 16px;
+        border-radius: 8px;
+      }
+
+      .rpm-labels {
+        font-size: 9px;
+        margin-top: 3px;
+      }
+
+      .drag-controls-grid {
+        gap: 8px;
+      }
+
+      .ctrl-btn {
+        padding: 12px 6px;
+        font-size: 12px;
+        border-radius: 12px;
+      }
+
+      .result-title {
+        font-size: 17px;
+      }
+
+      .result-stat-item .val {
+        font-size: 15px;
+      }
+    }
   </style>
 </head>
 
@@ -439,7 +558,7 @@
         <div class="shift-feedback" id="shiftFeedback">PERFECT SHIFT!</div>
 
         <!-- Canvas -->
-        <canvas id="dragCanvas" width="800" height="240"></canvas>
+        <canvas id="dragCanvas"></canvas>
       </div>
 
       <!-- Dashboard Cluster & Telemetry -->

@@ -359,13 +359,31 @@ function showResults() {
 }
 
 // ══════════════════════════════════════════════════════
-//  PARTICLES & RENDERING
+//  PARTICLES & RENDERING (RESPONSIVE UNIFORM ENGINE)
 // ══════════════════════════════════════════════════════
+const VIRTUAL_W = 800;
+const VIRTUAL_H = 280;
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const displayW = rect.width || 800;
+  const displayH = rect.height || (displayW * (VIRTUAL_H / VIRTUAL_W));
+
+  const targetW = Math.round(displayW * dpr);
+  const targetH = Math.round(displayH * dpr);
+
+  if (canvas.width !== targetW || canvas.height !== targetH) {
+    canvas.width = targetW;
+    canvas.height = targetH;
+  }
+}
+
 function spawnParticles() {
   if (gameState !== 'RACING' && gameState !== 'FINISHED' && gameState !== 'COUNTDOWN') return;
 
   const carX = 180;
-  const carY = 155;
+  const carY = 180;
 
   // Tire smoke on hard launch (thick white volumetric)
   if (speedKmh < 80 && isGasPressed && currentGear <= 2) {
@@ -429,7 +447,7 @@ const stars = [];
 for (let i = 0; i < 60; i++) {
   stars.push({
     x: Math.random() * 800,
-    y: Math.random() * 80,
+    y: Math.random() * 100,
     size: Math.random() * 1.5 + 0.3,
     twinkle: Math.random() * Math.PI * 2
   });
@@ -438,19 +456,26 @@ for (let i = 0; i < 60; i++) {
 let frameCount = 0;
 
 function renderCanvas() {
-  const W = canvas.width;
-  const H = canvas.height;
+  resizeCanvas();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const scale = canvas.width / (VIRTUAL_W * dpr);
+
+  ctx.save();
+  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+
+  const W = VIRTUAL_W;
+  const H = VIRTUAL_H;
   frameCount++;
 
   ctx.clearRect(0, 0, W, H);
 
   // ── 1. NIGHT SKY ──
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, 100);
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, 115);
   skyGrad.addColorStop(0, '#020617');
   skyGrad.addColorStop(0.6, '#0c1629');
   skyGrad.addColorStop(1, '#111827');
   ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, W, 100);
+  ctx.fillRect(0, 0, W, 115);
 
   // Twinkling stars
   stars.forEach(s => {
@@ -466,11 +491,11 @@ function renderCanvas() {
   // City skyline silhouette (distant buildings)
   ctx.fillStyle = '#1e293b';
   const buildings = [
-    [20, 68, 30, 32], [55, 60, 25, 40], [90, 72, 20, 28], [120, 55, 35, 45], [165, 65, 20, 35],
-    [195, 70, 28, 30], [235, 50, 30, 50], [275, 62, 25, 38], [310, 58, 22, 42], [345, 68, 30, 32],
-    [385, 52, 35, 48], [430, 66, 20, 34], [460, 60, 30, 40], [500, 70, 24, 30], [535, 55, 28, 45],
-    [575, 65, 20, 35], [605, 58, 35, 42], [650, 68, 24, 32], [685, 54, 30, 46], [725, 62, 25, 38],
-    [760, 70, 30, 30]
+    [20, 78, 30, 37], [55, 70, 25, 45], [90, 82, 20, 33], [120, 65, 35, 50], [165, 75, 20, 40],
+    [195, 80, 28, 35], [235, 60, 30, 55], [275, 72, 25, 43], [310, 68, 22, 47], [345, 78, 30, 37],
+    [385, 62, 35, 53], [430, 76, 20, 39], [460, 70, 30, 45], [500, 80, 24, 35], [535, 65, 28, 50],
+    [575, 75, 20, 40], [605, 68, 35, 47], [650, 78, 24, 37], [685, 64, 30, 51], [725, 72, 25, 43],
+    [760, 80, 30, 35]
   ];
   buildings.forEach(([bx, by, bw, bh]) => {
     ctx.fillRect(bx, by, bw, bh);
@@ -490,28 +515,28 @@ function renderCanvas() {
   for (let x = 80; x < W; x += 200) {
     // Steel tower
     ctx.fillStyle = '#334155';
-    ctx.fillRect(x - 2, 30, 4, 70);
-    ctx.fillRect(x - 8, 25, 16, 8);
+    ctx.fillRect(x - 2, 35, 4, 80);
+    ctx.fillRect(x - 8, 30, 16, 8);
     // Light orbs
     ctx.fillStyle = '#f8fafc';
-    ctx.beginPath(); ctx.arc(x - 4, 28, 3, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + 4, 28, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x - 4, 33, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 4, 33, 3, 0, Math.PI * 2); ctx.fill();
     // Light beam cone
-    const cone = ctx.createRadialGradient(x, 28, 4, x, 75, 120);
+    const cone = ctx.createRadialGradient(x, 33, 4, x, 85, 130);
     cone.addColorStop(0, 'rgba(254, 240, 138, 0.22)');
     cone.addColorStop(1, 'rgba(254, 240, 138, 0)');
     ctx.fillStyle = cone;
     ctx.beginPath();
-    ctx.moveTo(x - 6, 28);
-    ctx.lineTo(x - 80, 100);
-    ctx.lineTo(x + 80, 100);
-    ctx.lineTo(x + 6, 28);
+    ctx.moveTo(x - 6, 33);
+    ctx.lineTo(x - 80, 115);
+    ctx.lineTo(x + 80, 115);
+    ctx.lineTo(x + 6, 33);
     ctx.closePath();
     ctx.fill();
   }
 
   // ── 3. DRAG STRIP TARMAC ──
-  const roadY = 100;
+  const roadY = 115;
   const roadH = H - roadY;
 
   // Asphalt gradient
@@ -644,7 +669,7 @@ function renderCanvas() {
   }
 
   // ── 5. DRAW CAR ──
-  drawSideCar(180, 155);
+  drawSideCar(180, 180);
 
   // ── 6. SPEED LINES (at high speed) ──
   if (speedKmh > 120) {
@@ -661,6 +686,8 @@ function renderCanvas() {
       ctx.stroke();
     }
   }
+
+  ctx.restore();
 }
 
 function drawSideCar(cx, cy) {
