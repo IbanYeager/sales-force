@@ -629,6 +629,14 @@
                 </div>
             </div>
 
+            <!-- SOCIAL MEDIA CHANNELS -->
+            <div id="pubSocialRow" style="display: none; justify-content: center; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+                <a id="pubSocialIg" href="#" target="_blank" style="display:none; width:38px; height:38px; border-radius:50%; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color:#fff; align-items:center; justify-content:center; text-decoration:none; font-size:16px; box-shadow:0 3px 8px rgba(0,0,0,0.12);" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a id="pubSocialTt" href="#" target="_blank" style="display:none; width:38px; height:38px; border-radius:50%; background:#000000; color:#fff; align-items:center; justify-content:center; text-decoration:none; font-size:15px; box-shadow:0 3px 8px rgba(0,0,0,0.12);" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                <a id="pubSocialFb" href="#" target="_blank" style="display:none; width:38px; height:38px; border-radius:50%; background:#1877f2; color:#fff; align-items:center; justify-content:center; text-decoration:none; font-size:16px; box-shadow:0 3px 8px rgba(0,0,0,0.12);" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a id="pubSocialWeb" href="#" target="_blank" style="display:none; width:38px; height:38px; border-radius:50%; background:#0284c7; color:#fff; align-items:center; justify-content:center; text-decoration:none; font-size:15px; box-shadow:0 3px 8px rgba(0,0,0,0.12);" title="Website / Linktree"><i class="fa-solid fa-globe"></i></a>
+            </div>
+
             <!-- SHOWROOM GOOGLE MAPS LINK -->
             <a href="https://maps.google.com/?q=Tunas+Toyota+Kiara+Condong+Bandung" target="_blank" class="map-banner">
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -851,7 +859,11 @@
             telp: params.get('telp') || '08122334455',
             dealer: 'TUNAS TOYOTA',
             branch: 'Cabang Kiara Condong • Bandung',
-            motto: 'Melayani pemesanan Toyota All New & Hybrid dengan proses cepat, data dibantu hingga approval, diskon terbaik, dan free test drive ke rumah Anda.'
+            motto: 'Melayani pemesanan Toyota All New & Hybrid dengan proses cepat, data dibantu hingga approval, diskon terbaik, dan free test drive ke rumah Anda.',
+            ig: params.get('ig') || '',
+            tt: params.get('tt') || '',
+            fb: params.get('fb') || '',
+            web: params.get('web') || ''
         };
 
         // Format WA Number cleanly
@@ -867,6 +879,48 @@
         const defaultWaLink = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Halo ' + salesConfig.name + ', saya melihat kartu nama digital Anda dan tertarik info mobil Toyota.')}`;
         document.getElementById('btnActionWa').href = defaultWaLink;
         document.getElementById('floatWaBtn').href = defaultWaLink;
+
+        // Render Social Media Icons
+        function formatSocial(url, type) {
+            if (!url) return '';
+            url = url.trim();
+            if (url.startsWith('http://') || url.startsWith('https://')) return url;
+            if (type === 'ig') return `https://instagram.com/${url.replace(/^@/, '')}`;
+            if (type === 'tt') return `https://tiktok.com/@${url.replace(/^@/, '')}`;
+            if (type === 'fb') return `https://facebook.com/${url}`;
+            if (type === 'web') return `https://${url}`;
+            return `https://${url}`;
+        }
+
+        let hasSocial = false;
+        if (salesConfig.ig) {
+            const igEl = document.getElementById('pubSocialIg');
+            igEl.href = formatSocial(salesConfig.ig, 'ig');
+            igEl.style.display = 'flex';
+            hasSocial = true;
+        }
+        if (salesConfig.tt) {
+            const ttEl = document.getElementById('pubSocialTt');
+            ttEl.href = formatSocial(salesConfig.tt, 'tt');
+            ttEl.style.display = 'flex';
+            hasSocial = true;
+        }
+        if (salesConfig.fb) {
+            const fbEl = document.getElementById('pubSocialFb');
+            fbEl.href = formatSocial(salesConfig.fb, 'fb');
+            fbEl.style.display = 'flex';
+            hasSocial = true;
+        }
+        if (salesConfig.web) {
+            const webEl = document.getElementById('pubSocialWeb');
+            webEl.href = formatSocial(salesConfig.web, 'web');
+            webEl.style.display = 'flex';
+            hasSocial = true;
+        }
+
+        if (hasSocial) {
+            document.getElementById('pubSocialRow').style.display = 'flex';
+        }
 
         // Tabs switcher
         function switchPublicTab(tabId, btnElem) {

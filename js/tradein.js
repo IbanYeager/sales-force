@@ -143,25 +143,24 @@ function shareTradeInWA() {
     extraNote = `\n🔄 *Status Over-Kredit & Pelunasan:* Sisa ${sisaBulan} bln @ ${angsuran}\n📉 *Estimasi Pelunasan Pokok Hutang:* ${hutang}`;
   }
 
-  const text = `🚗 *SIMULASI TUKAR TAMBAH (TRADE-IN) TUNAS TOYOTA* 🚗
-Dealer: Tunas Toyota Kiara Condong Bandung
+  let text = `🚗 *SIMULASI TUKAR TAMBAH (TRADE-IN) TUNAS TOYOTA* 🚗\n\n` +
+             `📌 *Data Mobil Lama Konsumen:*\n` +
+             `• Unit: ${mobilLamaDesc}\n` +
+             `• Estimasi Nilai Taksiran Pasar: *${hargaMobilLama}*${extraNote}\n` +
+             `• Subsidi Program Trade-In Tunas: +Rp 3.000.000\n\n` +
+             `✨ *Target Pembelian Mobil Baru:*\n` +
+             `• Model: *${targetModelName}*\n` +
+             `• Kebutuhan DP: *${dpRequired}*\n\n` +
+             `📊 *Hasil Simulasi Tukar Tambah:*\n` +
+             `• Nilai Bersih Mobil Lama: *${totalValuation}*\n` +
+             `• ${summaryTitle} *${summaryVal}*\n\n` +
+             `_Unit lama kami jemput langsung ke rumah dan berkas dibantu sampai serah terima unit baru! Hubungi kami untuk jadwal appraisal fisik gratis._\n`;
 
-📌 *Data Mobil Lama Konsumen:*
-• Unit: ${mobilLamaDesc}
-• Estimasi Nilai Taksiran Pasar: *${hargaMobilLama}*${extraNote}
-• Subsidi Program Trade-In Tunas: +Rp 3.000.000
+  if (typeof window.injectSocialSignature === 'function') {
+    text = window.injectSocialSignature(text);
+  }
 
-✨ *Target Pembelian Mobil Baru:*
-• Model: *${targetModelName}*
-• Kebutuhan DP: *${dpRequired}*
-
-📊 *Hasil Simulasi Tukar Tambah:*
-• Nilai Bersih Mobil Lama: *${totalValuation}*
-• ${summaryTitle} *${summaryVal}*
-
-Unit lama kami jemput langsung ke rumah dan berkas dibantu sampai selesai! Hubungi kami untuk jadwal appraisal fisik gratis.`;
-
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 // Initial calculation

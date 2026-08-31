@@ -569,8 +569,16 @@
       };
 
       const fullUnitName = `${selection.model} ${selection.varian} (${selection.transmisi})`;
-      let text = `Halo, berikut adalah informasi harga OTR untuk mobil yang Anda minati:\n\n*Mobil:* ${fullUnitName}\n*Kategori:* ${selection.kategori}\n*Harga OTR:* ${formatRp(selection.harga)}\n\nSilakan hubungi saya untuk informasi lebih lanjut mengenai ketersediaan dan promo menarik.`;
+      let text = `📄 *INFORMASI HARGA OTR TOYOTA RESMI* 📄\n\n` +
+                 `🚗 *Unit*: *${fullUnitName}*\n` +
+                 `🔖 *Kategori*: ${selection.kategori}\n` +
+                 `💰 *Harga OTR Bandung*: *${formatRp(selection.harga)}*\n\n` +
+                 `_Dapatkan diskon promo spesial, paket kredit bunga ringan, dan bonus aksesoris khusus pemesanan minggu ini!_\n`;
       
+      if (typeof window.injectSocialSignature === 'function') {
+        text = window.injectSocialSignature(text);
+      }
+
       const card = document.getElementById(cardId);
       const imgSrc = card ? card.querySelector('.model-thumb').src : '';
 

@@ -157,10 +157,42 @@ let allPromoData = [];
       }
     };
 
+    window.activePromoModalData = null;
+
+    window.sharePromoWA = function(e) {
+      if (e) e.stopPropagation();
+      if (!window.activePromoModalData) return;
+      const pData = window.activePromoModalData;
+      const tipeMobil = pData.mobil;
+      const carData = pData.detail;
+
+      let msg = `🔥 *PROMO SPESIAL TOYOTA RESMI* 🔥\n`;
+      msg += `🚗 *Unit*: *${tipeMobil}*\n`;
+      msg += `🎁 *Paket Program*: ${carData.paket}\n`;
+      msg += `📋 *Skema Bayar*: ${carData.skema}\n\n`;
+      msg += `💰 *DAFTAR SIMULASI DP & CICILAN*:\n`;
+
+      carData.cicilan_list.forEach(item => {
+        const angsuran = item.angsuran || item.angsuran_per_bulan || 0;
+        const tdp = item.tdp || item.tbp || item.otf || 0;
+        msg += `• *Tenor ${item.tenor} Bln*: TDP *${formatRupiah(tdp)}* | Cicilan *${formatRupiah(angsuran)}/bln*\n`;
+      });
+
+      msg += `\n_Dapatkan benefit cashback spesial, bonus aksesoris original, dan gratis service 4 tahun khusus pemesanan minggu ini!_\n`;
+
+      if (typeof window.injectSocialSignature === 'function') {
+        msg = window.injectSocialSignature(msg);
+      }
+
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+    };
+
     function bukaModal(dataKey) {
       try {
         const pData = window.promoStoreData[dataKey];
         if (!pData) return;
+        window.activePromoModalData = pData;
 
         const tipeMobil = pData.mobil;
         const carData = pData.detail;

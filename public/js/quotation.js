@@ -70,31 +70,28 @@ function shareQuotationWA() {
   const angsuran = document.getElementById('previewAngsuran').textContent;
   const salesNama = document.getElementById('previewSalesName').textContent;
 
-  const text = `📄 *SURAT PENAWARAN HARGA RESMI TUNAS TOYOTA* 📄
-Yth. *${namaKonsumen}*,
+  let text = `📄 *SURAT PENAWARAN HARGA RESMI TUNAS TOYOTA* 📄\n` +
+             `Yth. *${namaKonsumen}*,\n\n` +
+             `Berikut kami sampaikan rincian penawaran harga spesial unit impian Anda:\n\n` +
+             `🚘 *Model*: ${modelName}\n` +
+             `🏷️ *Harga OTR Bandung*: ${otr}\n` +
+             `🎁 *Potongan Cashback/Diskon*: ${diskon}\n` +
+             `✨ *Harga Netto*: ${hargaNett}\n\n` +
+             `💳 *SKEMA KREDIT ESTIMASI*:\n` +
+             `• *Uang Muka (Total DP Nett)*: *${dpNett}*\n` +
+             `• *Angsuran*: *${angsuran}* (${tenor} Bulan via ${leasing})\n\n` +
+             `🎁 *BONUS INCLUDED*:\n` +
+             `• Free Kaca Film V-Kool / 3M Original\n` +
+             `• Free Service & Sparepart 4 Thn / 50.000 KM\n` +
+             `• Karpet Dasar Original Toyota\n` +
+             `• Priority Unit Ready Stock\n\n` +
+             `Untuk pemesanan / kunci unit warna impian hari ini, silakan balas pesan ini. Terima kasih!\n`;
 
-Berikut kami sampaikan rincian penawaran harga spesial unit impian Anda:
-
-🚘 *Model*: ${modelName}
-🏷️ *Harga OTR Bandung*: ${otr}
-🎁 *Potongan Cashback/Diskon*: ${diskon}
-✨ *Harga Netto*: ${hargaNett}
-
-💳 *SKEMA KREDIT ESTIMASI*:
-• *Uang Muka (Total DP Nett)*: *${dpNett}*
-• *Angsuran*: *${angsuran}* (${tenor} Bulan via ${leasing})
-
-🎁 *BONUS INCLUDED*:
-• Free Kaca Film V-Kool / 3M Original
-• Free Service & Sparepart 4 Thn / 50.000 KM
-• Karpet Dasar Original Toyota
-• Priority Unit Ready Stock
-
-Untuk pemesanan / kunci unit warna impian hari ini, silakan balas pesan ini. Terima kasih!
-
-Salam hangat,
-*${salesNama}*
-Tunas Toyota Kiara Condong`;
+  if (typeof window.injectSocialSignature === 'function') {
+    text = window.injectSocialSignature(text, { nama: salesNama });
+  } else {
+    text += `\nSalam hangat,\n*${salesNama}*\nTunas Toyota Kiara Condong`;
+  }
 
   let waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
   if (noWa && noWa.length > 5) {

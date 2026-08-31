@@ -897,14 +897,20 @@ function generateCarShareMessage(model, variantName, selectedColor) {
     }
 
     text += `📖 *Brosur & E-Catalog Digital Lengkap*:\n${catalogUrl}\n\n`;
-    text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `📞 *Konsultasi Pembelian, Test Drive & Simulasi Kredit:*\n`;
-    text += `👤 *${salesName}* (Sales Consultant)\n`;
-    if (cleanPhone) {
-        text += `📱 WhatsApp: https://wa.me/${cleanPhone}\n`;
+
+    if (typeof window.getSalesSignature === 'function') {
+        text += window.getSalesSignature({ nama: salesName, no_hp: cleanPhone }) + '\n\n';
+    } else {
+        text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+        text += `📲 *Konsultasi Pembelian, Test Drive & Simulasi Kredit:*\n`;
+        text += `👤 *${salesName}* (Sales Consultant)\n`;
+        if (cleanPhone) {
+            text += `📞 *WhatsApp*: https://wa.me/${cleanPhone}\n`;
+        }
+        text += `🏢 *TUNAS TOYOTA KIARACONDONG BANDUNG*\n`;
+        text += `📍 Jl. Ibrahim Adjie No. 372, Kiara Condong, Bandung\n\n`;
     }
-    text += `🏢 *Tunas Toyota Kiara Condong*\n`;
-    text += `📍 Jl. Ibrahim Adjie No. 372, Kiara Condong, Bandung\n\n`;
+
     text += `_Dapatkan promo DP ringan, bunga spesial 0%, dan bonus aksesoris khusus bulan ini!_ 🔥`;
 
     return text;

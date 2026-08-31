@@ -122,6 +122,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="../js/sales_signature.js"></script>
   <script src="../js/pricelist.js"></script>
 
   <!-- Image Lightbox Modal -->

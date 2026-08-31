@@ -45,7 +45,7 @@ if ($method === 'GET') {
     $conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
     $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
 
-    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, last_active,
+    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, last_active, no_hp, email, instagram_url, tiktok_url, facebook_url, website_url,
                      CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE) THEN 1 ELSE 0 END as is_online,
                      DATE_FORMAT(created_at, '%d %b %Y') as created_at, 
                      DATE_FORMAT(created_at, '%Y-%m-%d') as created_at_raw 

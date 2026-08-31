@@ -11,6 +11,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/koneksi.php';
 
+// Auto-ensure columns for social media and contact
+$cols = ['no_hp', 'email', 'instagram_url', 'tiktok_url', 'facebook_url', 'website_url'];
+foreach ($cols as $col) {
+    $chk = $conn->query("SHOW COLUMNS FROM sales_accounts LIKE '$col'");
+    if ($chk && $chk->num_rows === 0) {
+        @$conn->query("ALTER TABLE sales_accounts ADD COLUMN $col VARCHAR(255) DEFAULT ''");
+    }
+    if ($chk) $chk->free();
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
@@ -20,7 +30,7 @@ if ($method === 'GET') {
         exit;
     }
 
-    $query = "SELECT id, username, nama_lengkap, foto, nama_spv, tingkatan, no_hp, email FROM sales_accounts WHERE id = ?";
+    $query = "SELECT id, username, nama_lengkap, foto, nama_spv, tingkatan, no_hp, email, instagram_url, tiktok_url, facebook_url, website_url FROM sales_accounts WHERE id = ?";
     $stmt = $conn->prepare($query);
     if ($stmt) {
         $stmt->bind_param("i", $sales_id);
@@ -50,6 +60,10 @@ if ($method === 'GET') {
     $password = trim($_POST['password'] ?? '');
     $no_hp = trim($_POST['no_hp'] ?? '');
     $email = trim($_POST['email'] ?? '');
+    $instagram_url = trim($_POST['instagram_url'] ?? '');
+    $tiktok_url = trim($_POST['tiktok_url'] ?? '');
+    $facebook_url = trim($_POST['facebook_url'] ?? '');
+    $website_url = trim($_POST['website_url'] ?? '');
 
     // Handle File Upload jika ada
     $fotoPath = '';
@@ -104,9 +118,9 @@ if ($method === 'GET') {
         }
     }
 
-    $query = "UPDATE sales_accounts SET nama_lengkap = ?, username = ?, no_hp = ?, email = ?";
-    $types = "ssss";
-    $params = [&$nama, &$username, &$no_hp, &$email];
+    $query = "UPDATE sales_accounts SET nama_lengkap = ?, username = ?, no_hp = ?, email = ?, instagram_url = ?, tiktok_url = ?, facebook_url = ?, website_url = ?";
+    $types = "ssssssss";
+    $params = [&$nama, &$username, &$no_hp, &$email, &$instagram_url, &$tiktok_url, &$facebook_url, &$website_url];
 
     if (!empty($password)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -134,13 +148,13 @@ if ($method === 'GET') {
         call_user_func_array([$stmt, 'bind_param'], $bind_names);
 
         if ($stmt->execute()) {
-            $q2 = "SELECT id, username, nama_lengkap, foto, no_hp, email FROM sales_accounts WHERE id = $sales_id";
+            $q2 = "SELECT id, username, nama_lengkap, foto, no_hp, email, instagram_url, tiktok_url, facebook_url, website_url FROM sales_accounts WHERE id = $sales_id";
             $r2 = $conn->query($q2);
             $updated = $r2->fetch_assoc();
             if (!empty($updated['foto']) && str_starts_with($updated['foto'], 'http://') && !str_contains($updated['foto'], 'localhost')) {
                 $updated['foto'] = 'https://' . substr($updated['foto'], 7);
             }
-            echo json_encode(["status" => "success", "message" => "Profil berhasil diperbarui", "data" => $updated]);
+            echo json_encode(["status" => "success", "message" => "Profil dan link media sosial berhasil diperbarui!", "data" => $updated]);
         } else {
             echo json_encode(["status" => "error", "message" => "Gagal memperbarui: " . $stmt->error]);
         }

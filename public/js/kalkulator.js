@@ -340,8 +340,21 @@ let currentTenor = 3;
             const leasingName = leasingSelect.options[leasingSelect.selectedIndex]?.text || '-';
             const metode = state.metode;
 
-            const text = `*Penawaran Spesial Toyota* 🚗💨\n\nModel: ${mobilName || 'Tipe Mobil'}\nHarga OTR: ${hargaOTR}\n\n*Skema Kredit*\nTenor: ${tenor} Bulan\nDP / Bayar Awal: ${tdp}\nCicilan per Bulan: ${cicilan}\nLeasing: ${leasingName}\nMetode: ${metode}\n\n_Estimasi ini dapat berubah sesuai kebijakan leasing yang berlaku._\n\nTerima kasih.`;
+            let text = `🚗 *SIMULASI KREDIT RESMI TUNAS TOYOTA* 🚗\n\n` +
+                       `🚘 *Model*: *${mobilName || 'Tipe Mobil'}*\n` +
+                       `🏷️ *Harga OTR*: ${hargaOTR}\n\n` +
+                       `💳 *SKEMA KREDIT ESTIMASI*:\n` +
+                       `• *Tenor*: ${tenor} Bulan (${Math.round(tenor/12)} Tahun)\n` +
+                       `• *DP / Total Bayar Awal*: *${tdp}*\n` +
+                       `• *Cicilan per Bulan*: *${cicilan}*\n` +
+                       `• *Leasing Rekanan*: ${leasingName}\n` +
+                       `• *Metode*: ${metode}\n\n` +
+                       `_Estimasi dapat disesuaikan dengan budget DP dan kebutuhan tenor Anda._\n`;
             
-            const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            if (typeof window.injectSocialSignature === 'function') {
+                text = window.injectSocialSignature(text);
+            }
+
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
             window.open(waUrl, '_blank');
         };

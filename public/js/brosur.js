@@ -331,12 +331,22 @@ window.openImageLightbox = function (src) {
 
 // ─── Share / copy link ───────────────────────────────────
 function shareBrosur(nama, url) {
-  if (navigator.share) {
-    navigator.share({ title: `Brosur Toyota ${nama}`, url: url })
-      .catch(() => copyToClipboard(url));
-  } else {
-    copyToClipboard(url);
+  let fullUrl = url;
+  if (fullUrl && !fullUrl.startsWith('http')) {
+    fullUrl = window.location.origin + (fullUrl.startsWith('/') ? '' : '/') + fullUrl;
   }
+
+  let text = `📄 *BROSUR & E-KATALOG RESMI TOYOTA* 📄\n\n` +
+             `Berikut link unduh brosur digital resmi untuk unit *Toyota ${nama}*:\n` +
+             `🔗 *Link Brosur (PDF)*: ${fullUrl}\n\n` +
+             `_Silakan unduh untuk melihat detail spesifikasi, pilihan varian, dan fitur unggulan lengkap._\n`;
+
+  if (typeof window.injectSocialSignature === 'function') {
+    text = window.injectSocialSignature(text);
+  }
+
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  window.open(waUrl, '_blank');
 }
 
 function copyToClipboard(text) {

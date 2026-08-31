@@ -744,6 +744,10 @@
                             const waInput = document.getElementById('inputCustomWa');
                             if (waInput) waInput.value = res.data.no_hp;
                         }
+                        if (res.data.instagram_url) salesState.instagram = res.data.instagram_url;
+                        if (res.data.tiktok_url) salesState.tiktok = res.data.tiktok_url;
+                        if (res.data.facebook_url) salesState.facebook = res.data.facebook_url;
+                        if (res.data.website_url) salesState.website = res.data.website_url;
                         refreshProfileDisplay();
                     }
                 })
@@ -765,13 +769,24 @@
         function getPublicLink() {
             let base = window.location.href.split('pages/')[0] + 'pages/public_card.html';
             const cleanWa = formatCleanWa(salesState.noWa);
-            const q = new URLSearchParams({
+            const params = {
                 sales: salesState.nama,
                 role: salesState.role,
                 npk: salesState.npk,
                 wa: cleanWa,
                 telp: salesState.noTelp || salesState.noWa
-            });
+            };
+            const ig = salesState.instagram || localStorage.getItem('salesInstagram');
+            const tt = salesState.tiktok || localStorage.getItem('salesTiktok');
+            const fb = salesState.facebook || localStorage.getItem('salesFacebook');
+            const web = salesState.website || localStorage.getItem('salesWebsite');
+
+            if (ig) params.ig = ig;
+            if (tt) params.tt = tt;
+            if (fb) params.fb = fb;
+            if (web) params.web = web;
+
+            const q = new URLSearchParams(params);
             return `${base}?${q.toString()}`;
         }
 

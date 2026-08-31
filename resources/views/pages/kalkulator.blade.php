@@ -262,6 +262,7 @@
 
 
     <script src="../custom_alert.js"></script>
+    <script src="../js/sales_signature.js"></script>
     <script src="../js/kalkulator.js"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>

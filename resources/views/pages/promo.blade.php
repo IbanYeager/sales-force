@@ -82,16 +82,21 @@
         <div id="modalTenorContainer"></div>
       </div>
 
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; gap: 8px;">
+        <button type="button" class="btn-modal-wa" onclick="sharePromoWA(event)"
+          style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); flex: 1;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 17px;"></i> Bagi ke WA
+        </button>
         <button type="button" id="modalDealBtn" class="btn-modal-wa"
-          style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-          <i class="fa-solid fa-handshake" style="font-size: 18px;"></i> Deal Konsumen
+          style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); flex: 1.5;">
+          <i class="fa-solid fa-handshake" style="font-size: 17px;"></i> Deal Konsumen
         </button>
       </div>
     </div>
   </div>
 
   <script src="../custom_alert.js"></script>
+  <script src="../js/sales_signature.js"></script>
   <script src="../js/promo.js"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>

@@ -273,6 +273,7 @@
     </div>
   </div>
 
+  <script src="../js/sales_signature.js"></script>
   <script src="../js/tradein.js"></script>
 </body>
 </html>

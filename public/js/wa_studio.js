@@ -172,7 +172,11 @@ function renderWaPreview() {
   const sales = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Egy (Sales Consultant)';
 
   const rawTpl = WA_TEMPLATES[currentTemplateId] || WA_TEMPLATES['followup_testdrive'];
-  const formatted = rawTpl.replace(/\{nama\}/g, nama).replace(/\{model\}/g, model).replace(/\{sales\}/g, sales);
+  let formatted = rawTpl.replace(/\{nama\}/g, nama).replace(/\{model\}/g, model).replace(/\{sales\}/g, sales);
+
+  if (typeof window.injectSocialSignature === 'function') {
+    formatted = window.injectSocialSignature(formatted, { nama: sales });
+  }
 
   document.getElementById('waBodyTextarea').value = formatted;
   const bubble = document.getElementById('waBubblePreview');

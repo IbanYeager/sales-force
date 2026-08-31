@@ -654,6 +654,7 @@
     <i class="fa-solid fa-circle-check"></i> Link E-Catalog berhasil disalin!
   </div>
 
+  <script src="../js/sales_signature.js"></script>
   <script>
     // ─── PDF.js Config ───
     if (window.pdfjsLib) {
@@ -897,16 +898,27 @@
       const currentUrl = window.location.href;
       const modelTitle = activeBrochure ? activeBrochure.nama : 'Toyota';
       const shareTitle = `E-Catalog Resmi Toyota ${modelTitle}`;
-      const shareText = `Lihat spesifikasi & fitur lengkap E-Catalog Resmi Toyota ${modelTitle}:\n${currentUrl}`;
+      let shareText = `📖 *E-CATALOG RESMI TOYOTA ${modelTitle.toUpperCase()}* 📖\n\n` +
+                      `Spesifikasi lengkap, pilihan varian warna, dan fitur unggulan:\n` +
+                      `🔗 ${currentUrl}\n\n` +
+                      `_Dapatkan penawaran harga terbaik dan promo spesial unit ini!_\n`;
+
+      if (typeof window.injectSocialSignature === 'function') {
+        shareText = window.injectSocialSignature(shareText);
+      }
 
       if (navigator.share) {
         navigator.share({
           title: shareTitle,
           text: shareText,
           url: currentUrl
-        }).catch(() => copyToClipboard(currentUrl));
+        }).catch(() => {
+          const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+          window.open(waUrl, '_blank');
+        });
       } else {
-        copyToClipboard(currentUrl);
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+        window.open(waUrl, '_blank');
       }
     }
 

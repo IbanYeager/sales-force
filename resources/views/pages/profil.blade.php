@@ -79,17 +79,49 @@
                         <span id="infoSpv"
                             style="font-size:12px;color:var(--text-dark);font-weight:700;">Memuat...</span>
                     </div>
+                    <div style="padding:14px 18px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:12px;color:var(--text-muted);font-weight:700;">WhatsApp / No HP</span>
+                        <span id="infoNoHp" style="font-size:12px;color:var(--text-dark);font-weight:700;">-</span>
+                    </div>
                     <div style="padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
                         <span style="font-size:12px;color:var(--text-muted);font-weight:700;">Cabang</span>
-                        <span id="infoCabang" style="font-size:12px;color:var(--text-dark);font-weight:700;">Kiara
-                            Condong</span>
+                        <span id="infoCabang" style="font-size:12px;color:var(--text-dark);font-weight:700;">Kiara Condong</span>
+                    </div>
+                </div>
+
+                <h3 class="section-title" style="margin-top:18px; display:flex; align-items:center; justify-content:space-between;">
+                    <span>Media Sosial & Link Promosi</span>
+                    <span style="font-size:10px; font-weight:600; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:6px;">Auto-Share WA</span>
+                </h3>
+                <div class="card" style="padding:14px 18px;">
+                    <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">Link akun sosmed di bawah ini akan otomatis disisipkan saat Anda membagikan promo, brosur, pricelist, dan simulasi kredit ke calon konsumen.</p>
+                    <div id="socialLinksContainer" style="display:flex; flex-direction:column; gap:8px;">
+                        <div id="badgeIg" style="display:none; align-items:center; gap:8px; padding:8px 12px; background:#fdf2f8; border:1px solid #fbcfe8; border-radius:10px; font-size:12px; color:#be185d;">
+                            <i class="fa-brands fa-instagram" style="font-size:15px;"></i>
+                            <span id="txtIg" style="font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">-</span>
+                        </div>
+                        <div id="badgeTt" style="display:none; align-items:center; gap:8px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; font-size:12px; color:#0f172a;">
+                            <i class="fa-brands fa-tiktok" style="font-size:14px;"></i>
+                            <span id="txtTt" style="font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">-</span>
+                        </div>
+                        <div id="badgeFb" style="display:none; align-items:center; gap:8px; padding:8px 12px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; font-size:12px; color:#1d4ed8;">
+                            <i class="fa-brands fa-facebook" style="font-size:14px;"></i>
+                            <span id="txtFb" style="font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">-</span>
+                        </div>
+                        <div id="badgeWeb" style="display:none; align-items:center; gap:8px; padding:8px 12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:12px; color:#15803d;">
+                            <i class="fa-solid fa-globe" style="font-size:14px;"></i>
+                            <span id="txtWeb" style="font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">-</span>
+                        </div>
+                        <div id="badgeEmptySosmed" style="text-align:center; padding:12px; font-size:11.5px; color:#94a3b8; border:1px dashed #cbd5e1; border-radius:10px;">
+                            <i class="fa-solid fa-link" style="margin-right:4px;"></i> Belum ada link sosmed. Klik <strong>Edit Profil</strong> untuk menambahkan.
+                        </div>
                     </div>
                 </div>
 
                 <h3 class="section-title" style="margin-top:18px;">Pengaturan</h3>
                 <div class="card" style="padding:14px 18px;">
                     <button class="btn-main" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px; background: var(--primary-blue);" onclick="openEditProfilModal()">
-                        <i class="fa-solid fa-user-pen"></i> Edit Profil
+                        <i class="fa-solid fa-user-pen"></i> Edit Profil & Link Sosmed
                     </button>
                     <button class="btn-outline-blue"
                         style="border-color:var(--primary-red);color:var(--primary-red); width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;"
@@ -118,8 +150,8 @@
         <div class="modal-content" style="padding:0; overflow:hidden; background:var(--primary-red); display:flex; flex-direction:column; max-height:90vh; border-radius:24px 24px 0 0;">
             <div style="position:relative; padding:20px; text-align:center; color:white;">
                 <button class="btn-close-modal-white" onclick="closeEditProfilModal()" style="position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.25); border-radius:50%; border:none; width:32px; height:32px; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-                <h3 style="margin:0 0 4px; font-size:18px; font-weight:800;">Edit Profil</h3>
-                <p style="margin:0 0 20px; font-size:12px; opacity:0.9;">Perbarui informasi akun Anda</p>
+                <h3 style="margin:0 0 4px; font-size:18px; font-weight:800;">Edit Profil & Sosmed</h3>
+                <p style="margin:0 0 20px; font-size:12px; opacity:0.9;">Perbarui informasi akun & link promosi Anda</p>
                 
                 <div style="position:relative; width:80px; height:80px; margin:0 auto;">
                     <img id="editProfilPreview" src="" style="width:80px; height:80px; border-radius:50%; border:3px solid white; object-fit:cover; background:white;">
@@ -153,7 +185,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Nomor Handphone (Aktif)</label>
+                    <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Nomor Handphone / WhatsApp</label>
                     <div style="position:relative;">
                         <i class="fa-brands fa-whatsapp" style="position:absolute; left:14px; top:14px; color:var(--green-success);"></i>
                         <input type="text" id="editNoHp" class="form-control" style="padding-left:40px;" placeholder="6281234567890">
@@ -165,6 +197,46 @@
                     <div style="position:relative;">
                         <i class="fa-solid fa-envelope" style="position:absolute; left:14px; top:14px; color:var(--primary-blue);"></i>
                         <input type="email" id="editEmail" class="form-control" style="padding-left:40px;" placeholder="Cth: nama@tunastoyota.co.id">
+                    </div>
+                </div>
+
+                <!-- ═══ SOCIAL MEDIA & LINK PROMOSI ═══ -->
+                <div style="border-top:1px dashed #cbd5e1; padding-top:14px; margin-top:4px;">
+                    <h4 style="font-size:12px; font-weight:800; color:#0f172a; margin:0 0 4px; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-share-nodes" style="color:var(--primary-red);"></i> Link Akun Media Sosial
+                    </h4>
+                    <p style="font-size:11px; color:#64748b; margin:0 0 12px;">Link ini otomatis disisipkan saat membagikan brosur, promo, & simulasi kredit.</p>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="font-size:10.5px; font-weight:800; color:#be185d; text-transform:uppercase;">Instagram (Username / Link)</label>
+                        <div style="position:relative;">
+                            <i class="fa-brands fa-instagram" style="position:absolute; left:14px; top:14px; color:#be185d;"></i>
+                            <input type="text" id="editInstagram" class="form-control" style="padding-left:40px;" placeholder="@namasales_toyota atau https://instagram.com/...">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="font-size:10.5px; font-weight:800; color:#0f172a; text-transform:uppercase;">TikTok (Username / Link)</label>
+                        <div style="position:relative;">
+                            <i class="fa-brands fa-tiktok" style="position:absolute; left:14px; top:14px; color:#0f172a;"></i>
+                            <input type="text" id="editTiktok" class="form-control" style="padding-left:40px;" placeholder="@namasales_toyota atau https://tiktok.com/@...">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="font-size:10.5px; font-weight:800; color:#1d4ed8; text-transform:uppercase;">Facebook (Username / Link)</label>
+                        <div style="position:relative;">
+                            <i class="fa-brands fa-facebook" style="position:absolute; left:14px; top:14px; color:#1d4ed8;"></i>
+                            <input type="text" id="editFacebook" class="form-control" style="padding-left:40px;" placeholder="https://facebook.com/namasales">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size:10.5px; font-weight:800; color:#15803d; text-transform:uppercase;">Website / Linktree / Bio Link</label>
+                        <div style="position:relative;">
+                            <i class="fa-solid fa-globe" style="position:absolute; left:14px; top:14px; color:#15803d;"></i>
+                            <input type="text" id="editWebsite" class="form-control" style="padding-left:40px;" placeholder="https://linktr.ee/namasales">
+                        </div>
                     </div>
                 </div>
 
@@ -197,11 +269,61 @@
     </div>
 
     <input type="file" id="fileInputGallery" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
-    <input type="file" id="fileInputCamera" accept="image/*" capture="user" style="display: none;" onchange="previewPhoto(event)">
-
-    <script src="../js/script.js"></script>
+    <input type="file" id="fileInputCamera" accept="image/*" capture="user" style="display: none;" onchange="previewPhoto(    <script src="../js/script.js"></script>
+    <script src="../js/sales_signature.js"></script>
     <script>
         let selectedFile = null;
+
+        function updateSocialBadges(data) {
+            const ig = data.instagram_url || localStorage.getItem('salesInstagram') || '';
+            const tt = data.tiktok_url || localStorage.getItem('salesTiktok') || '';
+            const fb = data.facebook_url || localStorage.getItem('salesFacebook') || '';
+            const web = data.website_url || localStorage.getItem('salesWebsite') || '';
+
+            const badgeIg = document.getElementById('badgeIg');
+            const badgeTt = document.getElementById('badgeTt');
+            const badgeFb = document.getElementById('badgeFb');
+            const badgeWeb = document.getElementById('badgeWeb');
+            const emptyEl = document.getElementById('badgeEmptySosmed');
+
+            let hasAny = false;
+
+            if (ig) {
+                badgeIg.style.display = 'flex';
+                document.getElementById('txtIg').textContent = ig;
+                hasAny = true;
+            } else {
+                badgeIg.style.display = 'none';
+            }
+
+            if (tt) {
+                badgeTt.style.display = 'flex';
+                document.getElementById('txtTt').textContent = tt;
+                hasAny = true;
+            } else {
+                badgeTt.style.display = 'none';
+            }
+
+            if (fb) {
+                badgeFb.style.display = 'flex';
+                document.getElementById('txtFb').textContent = fb;
+                hasAny = true;
+            } else {
+                badgeFb.style.display = 'none';
+            }
+
+            if (web) {
+                badgeWeb.style.display = 'flex';
+                document.getElementById('txtWeb').textContent = web;
+                hasAny = true;
+            } else {
+                badgeWeb.style.display = 'none';
+            }
+
+            if (emptyEl) {
+                emptyEl.style.display = hasAny ? 'none' : 'block';
+            }
+        }
 
         function openEditProfilModal() { 
             const salesId = localStorage.getItem('salesId');
@@ -214,22 +336,29 @@
                 .then(r => r.json())
                 .then(res => {
                     if(res.status === 'success') {
-                        document.getElementById('editNama').value = res.data.nama_lengkap || '';
-                        document.getElementById('editUsername').value = res.data.username || '';
-                        document.getElementById('editNoHp').value = res.data.no_hp || '';
-                        document.getElementById('editEmail').value = res.data.email || '';
+                        const d = res.data;
+                        document.getElementById('editNama').value = d.nama_lengkap || '';
+                        document.getElementById('editUsername').value = d.username || '';
+                        document.getElementById('editNoHp').value = d.no_hp || '';
+                        document.getElementById('editEmail').value = d.email || '';
+                        document.getElementById('editInstagram').value = d.instagram_url || '';
+                        document.getElementById('editTiktok').value = d.tiktok_url || '';
+                        document.getElementById('editFacebook').value = d.facebook_url || '';
+                        document.getElementById('editWebsite').value = d.website_url || '';
                         document.getElementById('editPassword').value = '';
                         
-                        let fotoPath = res.data.foto ? `../${res.data.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(res.data.nama_lengkap || 'User')}&background=f4f7f6&color=c8102e`;
+                        let fotoPath = d.foto ? `../${d.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(d.nama_lengkap || 'User')}&background=f4f7f6&color=c8102e`;
                         
-                        if (res.data.foto && res.data.foto.startsWith('http')) {
-                             fotoPath = res.data.foto;
-                        } else if (res.data.foto && res.data.foto.startsWith('../')) {
-                             fotoPath = res.data.foto;
+                        if (d.foto && d.foto.startsWith('http')) {
+                             fotoPath = d.foto;
+                        } else if (d.foto && d.foto.startsWith('../')) {
+                             fotoPath = d.foto;
                         }
 
                         document.getElementById('editProfilPreview').src = fotoPath;
                         selectedFile = null;
+
+                        updateSocialBadges(d);
                     }
                 })
                 .catch(err => console.error(err));
@@ -272,6 +401,10 @@
             const username = document.getElementById('editUsername').value.trim();
             const nohp = document.getElementById('editNoHp').value.trim();
             const email = document.getElementById('editEmail').value.trim();
+            const instagram = document.getElementById('editInstagram').value.trim();
+            const tiktok = document.getElementById('editTiktok').value.trim();
+            const facebook = document.getElementById('editFacebook').value.trim();
+            const website = document.getElementById('editWebsite').value.trim();
             const password = document.getElementById('editPassword').value;
 
             if(!nama || !username) {
@@ -289,6 +422,10 @@
             formData.append('username', username);
             formData.append('no_hp', nohp);
             formData.append('email', email);
+            formData.append('instagram_url', instagram);
+            formData.append('tiktok_url', tiktok);
+            formData.append('facebook_url', facebook);
+            formData.append('website_url', website);
             if(password) formData.append('password', password);
             if(selectedFile) formData.append('foto', selectedFile);
 
@@ -299,15 +436,17 @@
                 });
                 const data = await res.json();
                 if(data.status === 'success') {
-                    alert('Profil berhasil diperbarui!');
+                    alert('Profil dan link media sosial berhasil diperbarui!');
                     // Update LocalStorage
                     localStorage.setItem('namaSales', data.data.nama_lengkap);
-                    if (data.data.email !== undefined) {
-                        localStorage.setItem('emailSales', data.data.email);
-                    }
-                    if(data.data.foto) {
-                        localStorage.setItem('fotoSales', data.data.foto);
-                    }
+                    if (data.data.no_hp !== undefined) localStorage.setItem('salesNoHp', data.data.no_hp);
+                    if (data.data.email !== undefined) localStorage.setItem('salesEmail', data.data.email);
+                    if (data.data.instagram_url !== undefined) localStorage.setItem('salesInstagram', data.data.instagram_url);
+                    if (data.data.tiktok_url !== undefined) localStorage.setItem('salesTiktok', data.data.tiktok_url);
+                    if (data.data.facebook_url !== undefined) localStorage.setItem('salesFacebook', data.data.facebook_url);
+                    if (data.data.website_url !== undefined) localStorage.setItem('salesWebsite', data.data.website_url);
+                    if (data.data.foto) localStorage.setItem('fotoSales', data.data.foto);
+
                     closeEditProfilModal();
                     window.location.reload();
                 } else {
@@ -341,11 +480,13 @@
                 const infoNama = document.getElementById('infoNama');
                 const infoJabatan = document.getElementById('infoJabatan');
                 const infoSpv = document.getElementById('infoSpv');
+                const infoNoHp = document.getElementById('infoNoHp');
                 const infoCabang = document.getElementById('infoCabang');
 
                 const namaFallback = localStorage.getItem('namaSales') || 'Nama Sales';
                 const peranFallback = localStorage.getItem('peranSales') || 'Sales Consultant';
                 const spvFallback = localStorage.getItem('spvSales') || '-';
+                const noHpFallback = localStorage.getItem('salesNoHp') || '-';
                 let fotoFallback = localStorage.getItem('fotoSales');
                 
                 // Fix broken relative paths stuck in local storage
@@ -363,6 +504,7 @@
                 if (infoNama) infoNama.textContent = namaFallback;
                 if (infoJabatan) infoJabatan.textContent = peranFallback;
                 if (infoSpv) infoSpv.textContent = spvFallback;
+                if (infoNoHp) infoNoHp.textContent = noHpFallback !== '-' ? noHpFallback : 'Belum diisi';
                 if (infoCabang) infoCabang.textContent = cabangLocked;
 
                 if (avatarImg) {
@@ -371,6 +513,28 @@
                     } else {
                         avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(namaFallback)}&background=f4f7f6&color=c8102e`;
                     }
+                }
+
+                // Initial render of social badges from localStorage
+                updateSocialBadges({});
+
+                // Auto-fetch profile from database to get fresh social media data
+                const salesId = localStorage.getItem('salesId');
+                if (salesId) {
+                    fetch(`../api/api_edit_profil.php?sales_id=${salesId}`)
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res.status === 'success' && res.data) {
+                                const d = res.data;
+                                if (d.no_hp && infoNoHp) infoNoHp.textContent = d.no_hp;
+                                if (d.instagram_url !== undefined) localStorage.setItem('salesInstagram', d.instagram_url || '');
+                                if (d.tiktok_url !== undefined) localStorage.setItem('salesTiktok', d.tiktok_url || '');
+                                if (d.facebook_url !== undefined) localStorage.setItem('salesFacebook', d.facebook_url || '');
+                                if (d.website_url !== undefined) localStorage.setItem('salesWebsite', d.website_url || '');
+                                updateSocialBadges(d);
+                            }
+                        })
+                        .catch(err => console.warn('Could not auto-fetch profil:', err));
                 }
             } else {
                 inEl.style.display = 'none';

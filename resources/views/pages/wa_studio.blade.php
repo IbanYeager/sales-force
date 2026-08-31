@@ -372,6 +372,7 @@
     </div>
   </div>
 
+  <script src="../js/sales_signature.js"></script>
   <script src="../js/wa_studio.js?v=20260831_sentinel_realtime"></script>
 </body>
 </html>
