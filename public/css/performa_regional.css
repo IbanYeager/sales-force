@@ -1,0 +1,503 @@
+/* performa_regional.css — Styling Khusus Laporan Performa Regional West Java */
+
+:root {
+  --reg-navy: #0d2b63;
+  --reg-navy-dark: #081d45;
+  --reg-blue-header: #14448c;
+  --reg-cyan-header: #0284c7;
+  --reg-cyan-sub: #38bdf8;
+  --reg-gold: #d8a437;
+  --reg-gold-bg: #fffbeb;
+  --reg-gold-border: #f59e0b;
+  --reg-green-bg: #c6efce;
+  --reg-green-text: #006100;
+  --reg-red-bg: #ffc7ce;
+  --reg-red-text: #9c0006;
+  --reg-border: #cbd5e1;
+}
+
+/* ════ Yellow Header Banner (Persis Dokumen Resmi) ════ */
+.reg-yellow-banner {
+  background: #ffff00;
+  color: #000000;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border: 1px solid #e6e600;
+}
+
+.reg-yellow-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reg-yellow-dates {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.reg-date-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reg-date-badge {
+  background: #000000;
+  color: #ffff00;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+/* ════ Executive Summary KPI Grid ════ */
+.reg-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.reg-kpi-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reg-kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+}
+
+.reg-kpi-card.highlight-kircon {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.15);
+}
+
+.reg-kpi-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reg-kpi-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reg-kpi-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.reg-kpi-icon.blue { background: #eff6ff; color: #2563eb; }
+.reg-kpi-icon.green { background: #f0fdf4; color: #16a34a; }
+.reg-kpi-icon.purple { background: #faf5ff; color: #9333ea; }
+.reg-kpi-icon.gold { background: #fef3c7; color: #d97706; }
+
+.reg-kpi-val {
+  font-size: 24px;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.reg-kpi-sub {
+  font-size: 11.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+}
+
+.reg-kpi-badge-ach {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.reg-kpi-badge-ach.pos { background: #dcfce7; color: #15803d; }
+.reg-kpi-badge-ach.neg { background: #fee2e2; color: #b91c1c; }
+
+/* ════ Filter & Control Toolbar ════ */
+.reg-toolbar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.reg-tabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  gap: 4px;
+}
+
+.reg-tab-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reg-tab-btn.active {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+.reg-tab-btn:hover:not(.active) {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.reg-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reg-search-box {
+  position: relative;
+  min-width: 220px;
+}
+
+.reg-search-box i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.reg-search-input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.reg-search-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.reg-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
+
+.reg-btn-action {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s;
+}
+
+.reg-btn-action:hover { opacity: 0.9; }
+.reg-btn-excel { background: #107c41; color: white; }
+.reg-btn-print { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
+
+/* ════ Section Card & Table ════ */
+.reg-section-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.reg-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.reg-section-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reg-table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1.5px solid #0d2b63;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ════ Tabel Utama West Java ════ */
+.reg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  min-width: 960px;
+}
+
+/* Header Cells */
+.reg-table th {
+  padding: 8px 10px;
+  text-align: center;
+  font-weight: 800;
+  border: 1px solid #ffffff;
+}
+
+.reg-th-navy {
+  background: #0d2b63;
+  color: #ffffff;
+  font-size: 13.5px;
+  vertical-align: middle;
+}
+
+.reg-th-navy-group {
+  background: #0f3478;
+  color: #ffffff;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+.reg-th-sub-navy {
+  background: #1e4b8f;
+  color: #ffffff;
+  font-size: 11.5px;
+}
+
+.reg-th-cyan {
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 11.5px;
+}
+
+.reg-th-cyan-sub {
+  background: #0369a1;
+  color: #ffffff;
+  font-size: 11.5px;
+}
+
+/* Divider tebal antara grup SPK dan Retail Sales */
+.reg-col-divider {
+  border-right: 2.5px solid #0d2b63 !important;
+}
+
+/* Body Cells */
+.reg-table td {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-size: 12px;
+}
+
+.reg-td-name {
+  font-weight: 700;
+  text-align: left;
+  background: #ffffff;
+}
+
+.reg-td-num {
+  text-align: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pencapaian Highlight Persis Dokumen */
+.reg-td-ach {
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+}
+
+.reg-ach-green {
+  background: #c6efce !important;
+  color: #006100 !important;
+}
+
+.reg-ach-red {
+  background: #ffc7ce !important;
+  color: #9c0006 !important;
+}
+
+/* Highlight Khusus Cabang Kiara Condong */
+.reg-row-kircon {
+  background: #fffbeb !important;
+  box-shadow: inset 3px 0 0 #d97706;
+}
+
+.reg-row-kircon td {
+  background: #fef3c7 !important;
+  font-weight: 800;
+}
+
+.reg-row-kircon .reg-td-name {
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reg-badge-kircon {
+  background: #d97706;
+  color: white;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
+/* Grand Total Row */
+.reg-row-total {
+  background: #f1f5f9;
+  border-top: 2.5px solid #0d2b63;
+  border-bottom: 2.5px solid #0d2b63;
+}
+
+.reg-row-total td {
+  font-weight: 900 !important;
+  font-size: 13px;
+  background: #f1f5f9 !important;
+  color: #0f172a;
+}
+
+.reg-row-total .reg-ach-green {
+  background: #a3e635 !important;
+  color: #14532d !important;
+}
+
+.reg-row-total .reg-ach-red {
+  background: #fca5a5 !important;
+  color: #7f1d1d !important;
+}
+
+/* Striped rows for readability */
+.reg-table tbody tr:nth-child(even):not(.reg-row-kircon):not(.reg-row-total) td:not(.reg-ach-green):not(.reg-ach-red) {
+  background: #f8fafc;
+}
+
+.reg-table tbody tr:hover:not(.reg-row-total) td:not(.reg-ach-green):not(.reg-ach-red) {
+  background: #f1f5f9;
+}
+
+/* Empty search state */
+.reg-empty-state {
+  text-align: center;
+  padding: 36px 20px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ════ Print Styles ════ */
+@media print {
+  body {
+    background: white !important;
+  }
+  .kcb-sidebar, .reg-toolbar, .kcb-topbar, .sidebar-footer {
+    display: none !important;
+  }
+  .kcb-main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .reg-section-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+  .reg-yellow-banner {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .reg-ach-green, .reg-ach-red, .reg-th-navy, .reg-th-cyan {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
