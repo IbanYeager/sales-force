@@ -42,6 +42,9 @@
           <i class="fa-solid fa-magnifying-glass search-icon" style="top:50%; transform:translateY(-50%);"></i>
           <input type="text" id="searchInput" class="search-input" placeholder="Cari mobil..." style="width:100%; border-radius:12px; height: 42px;">
         </div>
+        <button class="btn-filter" id="btnToggleMultiSelect" onclick="toggleMultiSelectMode()" style="border:1px solid rgba(0,0,0,0.1); background:#fff; color:var(--text-dark); border-radius:12px; padding:0 14px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.02); font-size:13px; transition:all 0.2s ease; height: 42px;" title="Pilih Banyak Tipe / Model">
+          <i class="fa-solid fa-list-check" id="iconMultiSelect"></i> <span id="lblMultiSelect">Pilih Banyak</span>
+        </button>
         <button class="btn-filter" onclick="openFilterModal()" style="border:1px solid rgba(0,0,0,0.1); background:#fff; color:var(--text-dark); border-radius:12px; padding:0 16px; font-weight:700; display:flex; align-items:center; gap:8px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.02); font-size:13px; transition:all 0.2s ease; height: 42px;">
           <i class="fa-solid fa-sliders"></i> Filter
         </button>
@@ -64,6 +67,24 @@
       <!-- List container -->
       <div id="pricelistContainer"></div>
 
+    </div>
+
+    <!-- Floating Multi-Share Bar (Aktif saat memilih lebih dari 1 tipe) -->
+    <div id="multiShareBar" class="multi-share-bar" style="display:none;">
+      <div class="msb-content">
+        <div class="msb-info">
+          <div class="msb-badge"><i class="fa-solid fa-square-check"></i> <span id="msbCount">0</span> Tipe Dipilih</div>
+          <span class="msb-sub">Harga Manual & Auto siap di-share</span>
+        </div>
+        <div class="msb-actions">
+          <button class="btn-msb-clear" onclick="clearMultiSelection()" title="Batal memilih">
+            <i class="fa-solid fa-xmark"></i> Batal
+          </button>
+          <button class="btn-msb-share" onclick="executeMultiShare()" title="Bagikan tipe yang dipilih ke WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i> Bagikan WA (<span id="msbBtnCount">0</span>)
+          </button>
+        </div>
+      </div>
     </div>
 
     <nav class="bottom-nav">

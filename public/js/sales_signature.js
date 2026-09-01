@@ -29,8 +29,20 @@
     val = val.trim();
     if (!val) return '';
 
+    // Bersihkan parameter pelacak query string yang membuat link berantakan
     if (val.startsWith('http://') || val.startsWith('https://')) {
-      return val;
+      try {
+        const u = new URL(val);
+        const trackingKeys = ['igsi', 'igshid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', '_r', '_t', 'mibextid', 'fbclid', 'ref'];
+        trackingKeys.forEach(k => u.searchParams.delete(k));
+        let clean = u.toString().replace(/\?$/, '');
+        clean = clean.replace('www.instagram.com', 'instagram.com')
+                     .replace('www.tiktok.com', 'tiktok.com')
+                     .replace('www.facebook.com', 'facebook.com');
+        return clean;
+      } catch (e) {
+        return val.replace(/(\?|&)(igsi|igshid|utm_[^&=]+|_r|_t|mibextid|fbclid)=[^&]+/gi, '').replace(/\?$/, '');
+      }
     }
 
     // Bersihkan karakter @ di awal username
@@ -131,34 +143,39 @@
     lines.push(`━━━━━━━━━━━━━━━━━━━━━━`);
     lines.push(`📲 *Info Pemesanan, Test Drive & Konsultasi:*`);
     lines.push(`👤 *${nama}* (Sales Consultant)`);
+    lines.push(`🏢 *TUNAS TOYOTA KIARACONDONG BANDUNG*`);
+    lines.push(`📍 Jl. Ibrahim Adjie No. 372, Kiara Condong, Bandung`);
 
+    let socialLinks = [];
     const cleanWa = window.cleanPhoneForWA(noHp);
     if (cleanWa) {
-      lines.push(`📞 *WhatsApp*: https://wa.me/${cleanWa}`);
+      socialLinks.push(`📞 WhatsApp: https://wa.me/${cleanWa}`);
     }
 
     if (ig) {
       const igUrl = window.formatSocialUrl('instagram', ig);
-      lines.push(`📸 *Instagram*: ${igUrl}`);
+      socialLinks.push(`📸 Instagram: ${igUrl}`);
     }
 
     if (tt) {
       const ttUrl = window.formatSocialUrl('tiktok', tt);
-      lines.push(`🎵 *TikTok*: ${ttUrl}`);
+      socialLinks.push(`🎵 TikTok: ${ttUrl}`);
     }
 
     if (fb) {
       const fbUrl = window.formatSocialUrl('facebook', fb);
-      lines.push(`📘 *Facebook*: ${fbUrl}`);
+      socialLinks.push(`📘 Facebook: ${fbUrl}`);
     }
 
     if (web) {
       const webUrl = window.formatSocialUrl('website', web);
-      lines.push(`🌐 *Website / Katalog*: ${webUrl}`);
+      socialLinks.push(`🌐 Website: ${webUrl}`);
     }
 
-    lines.push(`🏢 *TUNAS TOYOTA KIARACONDONG BANDUNG*`);
-    lines.push(`📍 Jl. Ibrahim Adjie No. 372, Kiara Condong, Bandung`);
+    if (socialLinks.length > 0) {
+      lines.push(``);
+      lines.push(...socialLinks);
+    }
 
     return lines.join('\n');
   };

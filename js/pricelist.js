@@ -37,6 +37,63 @@
       return 'Rp ' + juta.toFixed(1).replace('.0', '') + ' Jt';
     };
 
+    // State untuk Multi-Select & Master Varian
+    let isMultiSelectMode = false;
+    let selectedMultiVariants = new Map(); // vKey -> variant object
+    let masterVariantsMap = {};            // vKey -> variant object
+
+    function getVariantKey(v) {
+      const m = (v.model || '').trim();
+      const p = (v.tipe_paket || v.nama || '').trim();
+      const k = (v.kategori_order || 'Reguler').trim();
+      return `${m}__${p}__${k}`.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+    }
+
+    function formatTransmisiLabel(trans) {
+      if (!trans) return '';
+      const t = String(trans).toUpperCase().trim();
+      if (t === 'MT' || t === 'M/T') return 'Manual';
+      if (t === 'AT' || t === 'A/T' || t === 'CVT') return 'Auto';
+      return trans;
+    }
+
+    // Helper format blok harga per tipe mobil (menampilkan Manual & Auto sekaligus jika tersedia)
+    function formatSingleVariantPriceBlock(v) {
+      const modelName = (v.model || '').trim();
+      const tipeName = (v.tipe_paket || v.nama || '').trim();
+      const fullName = tipeName.toLowerCase().includes(modelName.toLowerCase()) ? tipeName : `${modelName} ${tipeName}`;
+      const kat = (v.kategori_order || 'Reguler').toUpperCase();
+
+      const hasMT = v.harga_mt && Number(v.harga_mt) > 0;
+      const hasAT = v.harga_at && Number(v.harga_at) > 0;
+
+      let lines = [];
+      lines.push(`🚗 *${fullName}*`);
+      lines.push(`🔖 *Kategori*: ${kat}`);
+
+      if (hasMT && hasAT) {
+        lines.push(`💰 *Harga OTR*:`);
+        lines.push(`   • Manual : *${formatRp(v.harga_mt)}*`);
+        lines.push(`   • Auto   : *${formatRp(v.harga_at)}*`);
+      } else if (hasMT) {
+        lines.push(`💰 *Harga OTR*: *${formatRp(v.harga_mt)}* (Manual)`);
+      } else if (hasAT) {
+        lines.push(`💰 *Harga OTR*: *${formatRp(v.harga_at)}* (Auto)`);
+      } else if (v.harga && Number(v.harga) > 0) {
+        lines.push(`💰 *Harga OTR*: *${formatRp(v.harga)}*`);
+      } else {
+        lines.push(`💰 *Harga OTR*: Hubungi Sales Consultant`);
+      }
+
+      return lines.join('\n');
+    }
+
+    function isModelAllSelected(modelName) {
+      const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === (modelName || '').toLowerCase());
+      if (modelVariants.length === 0) return false;
+      return modelVariants.every(i => selectedMultiVariants.has(getVariantKey(i)));
+    }
+
     // ======================================================
     // RENDER ENGINE
     // ======================================================
@@ -128,6 +185,7 @@
           const minHarga = varians.find(v => v.harga > 0)?.harga || 0;
           const imgSrc = varians[0]?.img || '';
           const cardId = `card-${kat}-${modelName}`.replace(/\s+/g, '-');
+          const cleanModelName = modelName.replace(/'/g, "\\'");
 
           html += `
             <div class="model-card" id="${cardId}" style="animation-delay:${modelDelay * 0.05}s;" onclick="toggleCard('${cardId}')">
@@ -144,7 +202,16 @@
                     <span class="model-varian-count">${varians.length} Paket</span>
                   </div>
                 </div>
-                <i class="fa-solid fa-chevron-down model-chevron"></i>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" class="btn-card-select-all ${isModelAllSelected(modelName) ? 'active' : ''}" 
+                          id="btn-select-all-${cardId}" data-model="${modelName}"
+                          onclick="event.stopPropagation(); toggleSelectAllModel('${cardId}', '${cleanModelName}')" 
+                          title="Pilih seluruh tipe ${modelName}">
+                    <i class="${isModelAllSelected(modelName) ? 'fa-solid fa-circle-check' : 'fa-regular fa-square-check'}"></i> 
+                    <span class="hide-mobile-sm">${isModelAllSelected(modelName) ? 'Terpilih' : 'Pilih Semua'}</span>
+                  </button>
+                  <i class="fa-solid fa-chevron-down model-chevron"></i>
+                </div>
               </div>
 
               <div class="varian-list" onclick="event.stopPropagation()">`;
@@ -154,6 +221,10 @@
             const hasMT = v.harga_mt && v.harga_mt > 0;
             const hasAT = v.harga_at && v.harga_at > 0;
             const kat = v.kategori_order || 'Reguler';
+
+            const vKey = getVariantKey(v);
+            masterVariantsMap[vKey] = v;
+            const isChecked = selectedMultiVariants.has(vKey);
 
             // Determine default transmisi
             let defaultTrans = '';
@@ -168,21 +239,20 @@
             
             const hasPrice = defaultHarga > 0;
             const cleanPaketName = paket.replace(/'/g, "\\'");
-            const cleanModelName = modelName.replace(/'/g, "\\'");
             const rowId = ('row-' + cardId + '-' + index).replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
 
             let toggleHtml = '';
             if (hasMT && hasAT) {
                 toggleHtml = `
-                    <div class="trans-toggle" onclick="event.stopPropagation(); toggleTrans(this, '${cardId}', '${rowId}', '${cleanModelName}', '${cleanPaketName}', '${kat}', ${v.harga_mt}, ${v.harga_at}, '${v.kode_tipe_mt || ''}', '${v.kode_tipe_at || ''}', '${(v.additional_mt || '').replace(/'/g, "\\'")}', '${(v.additional_at || '').replace(/'/g, "\\'")}', '${(v.accessories_mt || '').replace(/'/g, "\\'")}', '${(v.accessories_at || '').replace(/'/g, "\\'")}')">
+                    <div class="trans-toggle" onclick="event.stopPropagation(); toggleTrans(this, '${cardId}', '${rowId}', '${cleanModelName}', '${cleanPaketName}', '${kat}', ${v.harga_mt}, ${v.harga_at}, '${v.kode_tipe_mt || ''}', '${v.kode_tipe_at || ''}', '${(v.additional_mt || '').replace(/'/g, "\\'")}', '${(v.additional_at || '').replace(/'/g, "\\'")}', '${(v.accessories_mt || '').replace(/'/g, "\\'")}', '${(v.accessories_at || '').replace(/'/g, "\\'")}', '${vKey}')">
                         <div class="trans-btn active" data-trans="MT">MT</div>
                         <div class="trans-btn" data-trans="AT">AT</div>
                     </div>
                 `;
             } else if (hasMT) {
-                toggleHtml = `<span class="varian-badge badge-mt"><i class="fa-solid fa-gear" style="font-size:9px;margin-right:3px;"></i>MT</span>`;
+                toggleHtml = `<span class="varian-badge badge-mt"><i class="fa-solid fa-gear" style="font-size:9px;margin-right:3px;"></i>MT (Manual)</span>`;
             } else if (hasAT) {
-                toggleHtml = `<span class="varian-badge badge-at"><i class="fa-solid fa-rotate" style="font-size:9px;margin-right:3px;"></i>AT</span>`;
+                toggleHtml = `<span class="varian-badge badge-at"><i class="fa-solid fa-rotate" style="font-size:9px;margin-right:3px;"></i>AT (Auto)</span>`;
             }
 
             const clickHandler = hasPrice
@@ -191,9 +261,11 @@
             const isClickable = hasPrice ? 'clickable-varian' : '';
 
             html += `
-                <div class="varian-item ${isClickable}" id="${rowId}" ${clickHandler} data-trans="${defaultTrans}" data-harga="${defaultHarga}">
-                  <div class="varian-radio-col">
-                    ${hasPrice ? `<div class="varian-radio-indicator"></div>` : ''}
+                <div class="varian-item ${isClickable} ${isChecked ? 'is-checked-varian' : ''}" id="${rowId}" data-vkey="${vKey}" ${clickHandler} data-trans="${defaultTrans}" data-harga="${defaultHarga}">
+                  <div class="varian-check-col" onclick="toggleVarianCheckbox(event, '${vKey}')" title="Pilih tipe ini">
+                    <div class="varian-custom-check" id="chk-${vKey}">
+                      <i class="fa-solid fa-check"></i>
+                    </div>
                   </div>
                   <div class="varian-left">
                     <div class="varian-paket-name">${paket}</div>
@@ -222,44 +294,49 @@
 
           html += `
               </div>
-              <div class="deal-btn-wrapper" onclick="event.stopPropagation()" style="padding: 12px 14px; border-top: 1px dashed #e2e8f0; background: #fafcff; display: flex; justify-content: space-between; gap: 10px;">
-                  <button id="btn-share-${cardId}" class="btn-share-pricelist" style="
-                      flex: 1;
-                      padding: 12px;
-                      background: #e2e8f0;
-                      color: #94a3b8;
-                      border: none;
-                      border-radius: 10px;
-                      font-weight: 700;
-                      font-size: 13px;
-                      cursor: not-allowed;
-                      transition: all 0.2s ease;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      gap: 8px;
-                      outline: none;
-                  " disabled onclick="executePricelistShare(event, '${cardId}')">
-                      <i class="fa-brands fa-whatsapp"></i> Share
-                  </button>
-                  <button id="btn-deal-${cardId}" class="btn-deal-pricelist" style="
-                      flex: 1;
-                      padding: 12px;
-                      background: #e2e8f0;
-                      color: #94a3b8;
-                      border: none;
-                      border-radius: 10px;
-                      font-weight: 700;
-                      font-size: 13px;
-                      cursor: not-allowed;
-                      transition: all 0.2s ease;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      gap: 8px;
-                      outline: none;
-                  " disabled onclick="executePricelistDeal(event, '${cardId}')">
-                      <i class="fa-solid fa-handshake"></i> Pilih Varian Terlebih Dahulu
+              <div class="deal-btn-wrapper" onclick="event.stopPropagation()" style="padding: 12px 14px; border-top: 1px dashed #e2e8f0; background: #fafcff; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="display:flex; gap:10px;">
+                    <button id="btn-share-${cardId}" class="btn-share-pricelist" style="
+                        flex: 1;
+                        padding: 12px;
+                        background: #e2e8f0;
+                        color: #94a3b8;
+                        border: none;
+                        border-radius: 10px;
+                        font-weight: 700;
+                        font-size: 13px;
+                        cursor: not-allowed;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        outline: none;
+                    " disabled onclick="executePricelistShare(event, '${cardId}')">
+                        <i class="fa-brands fa-whatsapp"></i> Share
+                    </button>
+                    <button id="btn-deal-${cardId}" class="btn-deal-pricelist" style="
+                        flex: 1;
+                        padding: 12px;
+                        background: #e2e8f0;
+                        color: #94a3b8;
+                        border: none;
+                        border-radius: 10px;
+                        font-weight: 700;
+                        font-size: 13px;
+                        cursor: not-allowed;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        outline: none;
+                    " disabled onclick="executePricelistDeal(event, '${cardId}')">
+                        <i class="fa-solid fa-handshake"></i> Pilih Varian Terlebih Dahulu
+                    </button>
+                  </div>
+                  <button type="button" class="btn-share-all-model" onclick="shareEntireModel('${cleanModelName}', '${cardId}')" title="Share seluruh tipe ${modelName} sekaligus ke WhatsApp">
+                    <i class="fa-brands fa-whatsapp"></i> Bagikan Semua Tipe ${modelName} (Manual & Auto)
                   </button>
               </div>
             </div>`;
@@ -272,6 +349,7 @@
       }
 
       container.innerHTML = html;
+      updateMultiShareBar();
     }
 
     // ======================================================
@@ -429,13 +507,204 @@
     // ======================================================
     let selectedPricelistMap = {};
 
-    window.selectPricelistVarianRow = function(event, el, cardId, rowId, modelName, variantName, kategori) {
-      const trans = el.getAttribute('data-trans');
-      const harga = el.getAttribute('data-harga');
-      selectPricelistVarian(event, cardId, rowId, modelName, variantName, trans, harga, kategori);
+    // Helper kirim pesan WhatsApp (Mendukung Web Share API & Link WA Langsung)
+    async function sendWhatsAppPayload(text, imgSrc = '', title = 'Pricelist Toyota') {
+      let sharedViaApi = false;
+      if (imgSrc && navigator.canShare) {
+        try {
+          const response = await fetch(imgSrc);
+          const blob = await response.blob();
+          const extension = blob.type.split('/')[1] || 'jpg';
+          const file = new File([blob], `toyota-pricelist.${extension}`, { type: blob.type });
+
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: title,
+              text: text,
+              files: [file]
+            });
+            sharedViaApi = true;
+          }
+        } catch (err) {
+          console.warn("Web Share API tidak didukung atau dibatalkan:", err);
+        }
+      }
+
+      if (!sharedViaApi) {
+        if (imgSrc) {
+          text += `\n\nFoto Unit: ` + imgSrc;
+        }
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+    }
+
+    // Toggle Mode Pilih Banyak dari Header
+    window.toggleMultiSelectMode = function() {
+      isMultiSelectMode = !isMultiSelectMode;
+      const btn = document.getElementById('btnToggleMultiSelect');
+      const lbl = document.getElementById('lblMultiSelect');
+      const icon = document.getElementById('iconMultiSelect');
+
+      if (btn) {
+        btn.classList.toggle('active', isMultiSelectMode);
+      }
+      if (lbl) {
+        lbl.innerText = isMultiSelectMode ? 'Selesai' : 'Pilih Banyak';
+      }
+      if (icon) {
+        icon.className = isMultiSelectMode ? 'fa-solid fa-check' : 'fa-solid fa-list-check';
+      }
+
+      updateMultiShareBar();
     };
 
-    window.toggleTrans = function(toggleEl, cardId, rowId, modelName, variantName, kategori, hargaMt, hargaAt, kodeMt, kodeAt, addMt, addAt, accMt, accAt) {
+    // Update Tampilan Floating Bar Multi-Share
+    window.updateMultiShareBar = function() {
+      const bar = document.getElementById('multiShareBar');
+      const countEl = document.getElementById('msbCount');
+      const btnCountEl = document.getElementById('msbBtnCount');
+      const total = selectedMultiVariants.size;
+
+      if (!bar) return;
+
+      if (total > 0) {
+        bar.style.display = 'block';
+        if (countEl) countEl.innerText = `${total}`;
+        if (btnCountEl) btnCountEl.innerText = `${total}`;
+      } else {
+        bar.style.display = 'none';
+      }
+
+      // Update status tombol Pilih Semua per model card
+      document.querySelectorAll('.btn-card-select-all').forEach(btn => {
+        const model = btn.getAttribute('data-model');
+        if (!model) return;
+        const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === model.toLowerCase());
+        const allChecked = modelVariants.length > 0 && modelVariants.every(i => selectedMultiVariants.has(getVariantKey(i)));
+        btn.classList.toggle('active', allChecked);
+        const iconEl = btn.querySelector('i');
+        const textEl = btn.querySelector('span');
+        if (iconEl) iconEl.className = allChecked ? 'fa-solid fa-circle-check' : 'fa-regular fa-square-check';
+        if (textEl) textEl.innerText = allChecked ? 'Terpilih' : 'Pilih Semua';
+      });
+    };
+
+    // Bersihkan / Reset Semua Pilihan Multi-Select
+    window.clearMultiSelection = function() {
+      selectedMultiVariants.clear();
+      document.querySelectorAll('.varian-item').forEach(el => {
+        el.classList.remove('is-checked-varian');
+      });
+      document.querySelectorAll('.btn-card-select-all').forEach(btn => {
+        btn.classList.remove('active');
+        const iconEl = btn.querySelector('i');
+        const textEl = btn.querySelector('span');
+        if (iconEl) iconEl.className = 'fa-regular fa-square-check';
+        if (textEl) textEl.innerText = 'Pilih Semua';
+      });
+      updateMultiShareBar();
+    };
+
+    // Toggle Checkbox pada Varian
+    window.toggleVarianCheckbox = function(event, vKey) {
+      if (event && event.stopPropagation) event.stopPropagation();
+      const v = masterVariantsMap[vKey];
+      if (!v) return;
+
+      const row = document.querySelector(`.varian-item[data-vkey="${vKey}"]`);
+
+      if (selectedMultiVariants.has(vKey)) {
+        selectedMultiVariants.delete(vKey);
+        if (row) row.classList.remove('is-checked-varian');
+      } else {
+        selectedMultiVariants.set(vKey, v);
+        if (row) row.classList.add('is-checked-varian');
+      }
+
+      updateMultiShareBar();
+    };
+
+    // Toggle Pilih Semua Varian pada Satu Model Card
+    window.toggleSelectAllModel = function(cardId, modelName) {
+      const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === modelName.toLowerCase());
+      if (modelVariants.length === 0) return;
+
+      const allChecked = modelVariants.every(i => selectedMultiVariants.has(getVariantKey(i)));
+
+      modelVariants.forEach(v => {
+        const k = getVariantKey(v);
+        const row = document.querySelector(`.varian-item[data-vkey="${k}"]`);
+        if (allChecked) {
+          selectedMultiVariants.delete(k);
+          if (row) row.classList.remove('is-checked-varian');
+        } else {
+          selectedMultiVariants.set(k, v);
+          if (row) row.classList.add('is-checked-varian');
+        }
+      });
+
+      updateMultiShareBar();
+    };
+
+    // Bagikan Seluruh Tipe dalam Satu Model ke WhatsApp
+    window.shareEntireModel = async function(modelName, cardId) {
+      const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === modelName.toLowerCase());
+      if (modelVariants.length === 0) return;
+
+      let text = `📄 *INFORMASI HARGA OTR TOYOTA ${modelName.toUpperCase()} RESMI* 📄\n` +
+                 `📍 Wilayah: Bandung & Jawa Barat\n\n`;
+
+      text += modelVariants.map(v => formatSingleVariantPriceBlock(v)).join('\n\n') + '\n\n';
+      text += `━━━━━━━━━━━━━━━━━━━━━━\n` +
+              `_Dapatkan diskon promo spesial, paket kredit bunga ringan, dan bonus aksesoris khusus pemesanan minggu ini!_\n`;
+
+      if (typeof window.injectSocialSignature === 'function') {
+        text = window.injectSocialSignature(text);
+      }
+
+      const card = document.getElementById(cardId);
+      const imgSrc = card ? card.querySelector('.model-thumb')?.src : (modelVariants[0]?.img || '');
+
+      await sendWhatsAppPayload(text, imgSrc, `Pricelist Toyota ${modelName}`);
+    };
+
+    // Eksekusi Share Banyak Tipe Terpilih ke WhatsApp
+    window.executeMultiShare = async function() {
+      if (selectedMultiVariants.size === 0) return;
+
+      const items = Array.from(selectedMultiVariants.values());
+      let text = `📄 *INFORMASI HARGA OTR TOYOTA RESMI* 📄\n` +
+                 `📍 Wilayah: Bandung & Jawa Barat\n\n`;
+
+      text += items.map(v => formatSingleVariantPriceBlock(v)).join('\n\n') + '\n\n';
+      text += `━━━━━━━━━━━━━━━━━━━━━━\n` +
+              `_Dapatkan diskon promo spesial, paket kredit bunga ringan, dan bonus aksesoris khusus pemesanan minggu ini!_\n`;
+
+      if (typeof window.injectSocialSignature === 'function') {
+        text = window.injectSocialSignature(text);
+      }
+
+      const firstItem = items[0];
+      const imgSrc = firstItem?.img || '';
+
+      await sendWhatsAppPayload(text, imgSrc, `Pricelist ${items.length} Tipe Toyota`);
+    };
+
+    // Klik Baris Varian
+    window.selectPricelistVarianRow = function(event, el, cardId, rowId, modelName, variantName, kategori) {
+      const vKey = el.getAttribute('data-vkey');
+      if (isMultiSelectMode && vKey) {
+        toggleVarianCheckbox(event, vKey);
+        return;
+      }
+      const trans = el.getAttribute('data-trans');
+      const harga = el.getAttribute('data-harga');
+      selectPricelistVarian(event, cardId, rowId, modelName, variantName, trans, harga, kategori, vKey);
+    };
+
+    // Toggle Transmisi MT / AT pada Baris Varian
+    window.toggleTrans = function(toggleEl, cardId, rowId, modelName, variantName, kategori, hargaMt, hargaAt, kodeMt, kodeAt, addMt, addAt, accMt, accAt, vKey) {
       const row = document.getElementById(rowId);
       if (!row) return;
       
@@ -495,35 +764,38 @@
       }
 
       if (row.classList.contains('selected-varian')) {
-          selectPricelistVarian({stopPropagation: () => {}}, cardId, rowId, modelName, variantName, newTrans, newHarga, kategori);
+          selectPricelistVarian({stopPropagation: () => {}}, cardId, rowId, modelName, variantName, newTrans, newHarga, kategori, vKey);
       }
     };
 
-    window.selectPricelistVarian = function(event, cardId, rowId, modelName, variantName, transmisi, harga, kategori) {
-      event.stopPropagation(); // prevent collapsing the card
+    // Pilih Varian Tunggal untuk Deal & Share
+    window.selectPricelistVarian = function(event, cardId, rowId, modelName, variantName, transmisi, harga, kategori, vKey) {
+      if (event && event.stopPropagation) event.stopPropagation();
       
       const card = document.getElementById(cardId);
       if (!card) return;
       
-      // Remove selected-varian class from all rows in this card
       card.querySelectorAll('.varian-item').forEach(el => {
         el.classList.remove('selected-varian');
       });
 
-      // Highlight the clicked row
       const clickedRow = document.getElementById(rowId);
       if (clickedRow) {
         clickedRow.classList.add('selected-varian');
       }
 
-      // Save selection
+      const rawV = vKey ? masterVariantsMap[vKey] : null;
+
       selectedPricelistMap[cardId] = {
         model: modelName,
         varian: variantName,
         transmisi: transmisi,
         harga: harga,
-        kategori: kategori
+        kategori: kategori,
+        rawVarian: rawV
       };
+
+      const transLabel = formatTransmisiLabel(transmisi);
 
       // Enable Deal & Share button
       const dealBtn = document.getElementById(`btn-deal-${cardId}`);
@@ -533,7 +805,7 @@
         dealBtn.style.color = '#ffffff';
         dealBtn.style.cursor = 'pointer';
         dealBtn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.15)';
-        dealBtn.innerHTML = `<i class="fa-solid fa-handshake"></i> Deal ${variantName} (${transmisi})`;
+        dealBtn.innerHTML = `<i class="fa-solid fa-handshake"></i> Deal ${variantName} (${transLabel})`;
       }
 
       const shareBtn = document.getElementById(`btn-share-${cardId}`);
@@ -543,36 +815,41 @@
         shareBtn.style.color = '#ffffff';
         shareBtn.style.cursor = 'pointer';
         shareBtn.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.15)';
-        shareBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> Share`;
+        shareBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> Share ${variantName}`;
       }
     };
 
+    // Deal ke deal.html
     window.executePricelistDeal = function(event, cardId) {
-      event.stopPropagation(); // prevent collapsing card
+      if (event && event.stopPropagation) event.stopPropagation();
       const selection = selectedPricelistMap[cardId];
       if (!selection) return;
 
-      const fullUnitName = `${selection.model} ${selection.varian} (${selection.transmisi})`;
+      const transLabel = formatTransmisiLabel(selection.transmisi);
+      const fullUnitName = `${selection.model} ${selection.varian} (${transLabel})`;
       
-      // Redirect to deal.html
       const targetUrl = `deal.html?mobil=${encodeURIComponent(fullUnitName)}&paket=${encodeURIComponent(selection.kategori)}&skema=OTR (Pricelist Cash/Credit)&tdp=0&angsuran=0`;
       window.location.href = targetUrl;
     };
 
+    // Share Varian Tunggal ke WhatsApp (Menyertakan Harga Manual & Auto jika tersedia)
     window.executePricelistShare = async function(event, cardId) {
-      event.stopPropagation();
+      if (event && event.stopPropagation) event.stopPropagation();
       const selection = selectedPricelistMap[cardId];
       if (!selection) return;
 
-      const formatRp = (number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+      const v = selection.rawVarian || {
+        model: selection.model,
+        tipe_paket: selection.varian,
+        kategori_order: selection.kategori,
+        harga_mt: selection.transmisi === 'MT' ? selection.harga : 0,
+        harga_at: selection.transmisi === 'AT' ? selection.harga : 0,
+        harga: selection.harga
       };
 
-      const fullUnitName = `${selection.model} ${selection.varian} (${selection.transmisi})`;
-      let text = `📄 *INFORMASI HARGA OTR TOYOTA RESMI* 📄\n\n` +
-                 `🚗 *Unit*: *${fullUnitName}*\n` +
-                 `🔖 *Kategori*: ${selection.kategori}\n` +
-                 `💰 *Harga OTR Bandung*: *${formatRp(selection.harga)}*\n\n` +
+      let text = `📄 *INFORMASI HARGA OTR TOYOTA RESMI* 📄\n` +
+                 `📍 Wilayah: Bandung & Jawa Barat\n\n` +
+                 formatSingleVariantPriceBlock(v) + `\n\n` +
                  `_Dapatkan diskon promo spesial, paket kredit bunga ringan, dan bonus aksesoris khusus pemesanan minggu ini!_\n`;
       
       if (typeof window.injectSocialSignature === 'function') {
@@ -580,36 +857,9 @@
       }
 
       const card = document.getElementById(cardId);
-      const imgSrc = card ? card.querySelector('.model-thumb').src : '';
+      const imgSrc = card ? card.querySelector('.model-thumb')?.src : '';
 
-      let sharedViaApi = false;
-      if (imgSrc && navigator.canShare) {
-        try {
-          const response = await fetch(imgSrc);
-          const blob = await response.blob();
-          const extension = blob.type.split('/')[1] || 'jpg';
-          const file = new File([blob], `mobil-${selection.model}.${extension}`, { type: blob.type });
-          
-          if (navigator.canShare({ files: [file] })) {
-             await navigator.share({
-               title: 'Pricelist ' + fullUnitName,
-               text: text,
-               files: [file]
-             });
-             sharedViaApi = true;
-          }
-        } catch (err) {
-          console.error("Gagal menggunakan Web Share API:", err);
-        }
-      }
-
-      if (!sharedViaApi) {
-        if (imgSrc) {
-            text += `\n\nFoto Unit: ` + imgSrc;
-        }
-        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-        window.open(whatsappUrl, '_blank');
-      }
+      await sendWhatsAppPayload(text, imgSrc, `Pricelist ${v.model} ${v.tipe_paket || ''}`);
     };
 
     // Image Lightbox Functions

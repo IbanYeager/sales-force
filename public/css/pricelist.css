@@ -732,4 +732,218 @@
       transform: scale(0.98) !important;
     }
 
-    /* Selection is now handled at row level */
+    /* ══════════════════════════════════════════════════
+       MULTI-SELECT & BATCH SHARE TO WHATSAPP STYLES
+       ══════════════════════════════════════════════════ */
+    .btn-filter.active {
+      background: #0f172a !important;
+      color: #ffffff !important;
+      border-color: #0f172a !important;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+    }
+
+    /* Floating Multi-Share Bar */
+    .multi-share-bar {
+      position: fixed;
+      bottom: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 480px;
+      background: #0f172a;
+      color: white;
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      z-index: 999;
+      animation: slideUpMultiBar 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUpMultiBar {
+      from { opacity: 0; transform: translate(-50%, 25px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    .msb-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .msb-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .msb-badge {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .msb-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .msb-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-msb-clear {
+      background: rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-msb-clear:hover {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+
+    .btn-msb-share {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-msb-share:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+    }
+
+    /* Checkbox Column on Varian Item */
+    .varian-check-col {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .varian-custom-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: transparent;
+      font-size: 11px;
+    }
+
+    .varian-item.is-checked-varian {
+      background: linear-gradient(to right, #ecfdf5, #f8fafc) !important;
+      border-left-color: #10b981 !important;
+      box-shadow: 0 3px 12px rgba(16, 185, 129, 0.15) !important;
+    }
+
+    .varian-item.is-checked-varian .varian-custom-check {
+      background: #10b981;
+      border-color: #10b981;
+      color: #ffffff;
+    }
+
+    /* Model Card Select All Button */
+    .btn-card-select-all {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-card-select-all:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .btn-card-select-all.active {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #86efac;
+      font-weight: 800;
+    }
+
+    /* Share All Model Variants in Card Footer */
+    .btn-share-all-model {
+      width: 100%;
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 12.5px;
+      padding: 10px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-share-all-model:hover {
+      background: #dcfce7;
+      border-color: #86efac;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(22, 101, 52, 0.1);
+    }
+
+    @media (max-width: 480px) {
+      .hide-mobile-sm {
+        display: none !important;
+      }
+      .multi-share-bar {
+        width: calc(100% - 20px);
+        bottom: 70px;
+        padding: 10px 12px;
+      }
+      .btn-msb-share {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    }
+
