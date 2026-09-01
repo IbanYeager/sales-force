@@ -8,7 +8,7 @@
   <meta name="description" content="Daftar harga OTR Toyota Jawa Barat terlengkap per model dan tipe">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/pricelist.css">
+  <link rel="stylesheet" href="../css/pricelist.css?v=20260901_final">
 <script src="../js/sidebar_desktop.js"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
@@ -143,8 +143,8 @@
 
   <script src="../custom_alert.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-  <script src="../js/sales_signature.js"></script>
-  <script src="../js/pricelist.js"></script>
+  <script src="../js/sales_signature.js?v=20260901_final"></script>
+  <script src="../js/pricelist.js?v=20260901_final"></script>
 
   <!-- Image Lightbox Modal -->
   <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)">
