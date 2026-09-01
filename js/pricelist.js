@@ -57,19 +57,17 @@
       return trans;
     }
 
-    // Helper format blok harga per tipe mobil (menampilkan Manual & Auto sekaligus jika tersedia)
+    // Helper format blok harga per tipe mobil (menampilkan Manual & Auto sekaligus jika tersedia, tanpa kategori)
     function formatSingleVariantPriceBlock(v) {
       const modelName = (v.model || '').trim();
       const tipeName = (v.tipe_paket || v.nama || '').trim();
       const fullName = tipeName.toLowerCase().includes(modelName.toLowerCase()) ? tipeName : `${modelName} ${tipeName}`;
-      const kat = (v.kategori_order || 'Reguler').toUpperCase();
 
       const hasMT = v.harga_mt && Number(v.harga_mt) > 0;
       const hasAT = v.harga_at && Number(v.harga_at) > 0;
 
       let lines = [];
       lines.push(`🚗 *${fullName}*`);
-      lines.push(`🔖 *Kategori*: ${kat}`);
 
       if (hasMT && hasAT) {
         lines.push(`💰 *Harga OTR*:`);
@@ -89,7 +87,14 @@
     }
 
     function isModelAllSelected(modelName) {
-      const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === (modelName || '').toLowerCase());
+      let modelVariants = allData.filter(i => {
+        const isSameModel = (i.model || '').toLowerCase() === (modelName || '').toLowerCase();
+        const k = (i.kategori_order || '').toLowerCase();
+        return isSameModel && (k.includes('reguler') || k.includes('regular'));
+      });
+      if (modelVariants.length === 0) {
+        modelVariants = allData.filter(i => (i.model || '').toLowerCase() === (modelName || '').toLowerCase());
+      }
       if (modelVariants.length === 0) return false;
       return modelVariants.every(i => selectedMultiVariants.has(getVariantKey(i)));
     }
@@ -576,11 +581,18 @@
         bar.style.display = 'none';
       }
 
-      // Update status tombol Pilih Semua per model card
+      // Update status tombol Pilih Semua per model card (khusus varian reguler)
       document.querySelectorAll('.btn-card-select-all').forEach(btn => {
         const model = btn.getAttribute('data-model');
         if (!model) return;
-        const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === model.toLowerCase());
+        let modelVariants = allData.filter(i => {
+          const isSameModel = (i.model || '').toLowerCase() === model.toLowerCase();
+          const k = (i.kategori_order || '').toLowerCase();
+          return isSameModel && (k.includes('reguler') || k.includes('regular'));
+        });
+        if (modelVariants.length === 0) {
+          modelVariants = allData.filter(i => (i.model || '').toLowerCase() === model.toLowerCase());
+        }
         const allChecked = modelVariants.length > 0 && modelVariants.every(i => selectedMultiVariants.has(getVariantKey(i)));
         btn.classList.toggle('active', allChecked);
         const iconEl = btn.querySelector('i');
@@ -625,9 +637,18 @@
       updateMultiShareBar();
     };
 
-    // Toggle Pilih Semua Varian pada Satu Model Card
+    // Toggle Pilih Semua Varian pada Satu Model Card (Hanya Varian Reguler)
     window.toggleSelectAllModel = function(cardId, modelName) {
-      const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === modelName.toLowerCase());
+      let modelVariants = allData.filter(i => {
+        const isSameModel = (i.model || '').toLowerCase() === modelName.toLowerCase();
+        const k = (i.kategori_order || '').toLowerCase();
+        return isSameModel && (k.includes('reguler') || k.includes('regular'));
+      });
+
+      if (modelVariants.length === 0) {
+        modelVariants = allData.filter(i => (i.model || '').toLowerCase() === modelName.toLowerCase());
+      }
+
       if (modelVariants.length === 0) return;
 
       const allChecked = modelVariants.every(i => selectedMultiVariants.has(getVariantKey(i)));
@@ -647,15 +668,38 @@
       updateMultiShareBar();
     };
 
-    // Bagikan Seluruh Tipe dalam Satu Model ke WhatsApp
+    // Bagikan Seluruh Tipe dalam Satu Model ke WhatsApp (Pakai Harga Reguler Saja & Tanpa Kategori)
     window.shareEntireModel = async function(modelName, cardId) {
-      const modelVariants = allData.filter(i => (i.model || '').toLowerCase() === modelName.toLowerCase());
+      let modelVariants = allData.filter(i => {
+        const isSameModel = (i.model || '').toLowerCase() === modelName.toLowerCase();
+        const k = (i.kategori_order || '').toLowerCase();
+        return isSameModel && (k.includes('reguler') || k.includes('regular'));
+      });
+
+      // Fallback jika tidak ada tag bertuliskan reguler
+      if (modelVariants.length === 0) {
+        modelVariants = allData.filter(i => (i.model || '').toLowerCase() === modelName.toLowerCase());
+      }
+
       if (modelVariants.length === 0) return;
+
+      // Deduplikasi tipe paket jika ada nama kembar
+      const uniqueMap = new Map();
+      modelVariants.forEach(v => {
+        const nameKey = (v.tipe_paket || v.nama || '').trim().toLowerCase();
+        if (!uniqueMap.has(nameKey)) {
+          uniqueMap.set(nameKey, v);
+        }
+      });
+      const uniqueVariants = Array.from(uniqueMap.values());
+
+      // Urutkan varian dari harga terendah
+      uniqueVariants.sort((a, b) => (a.harga || 0) - (b.harga || 0));
 
       let text = `📄 *INFORMASI HARGA OTR TOYOTA ${modelName.toUpperCase()} RESMI* 📄\n` +
                  `📍 Wilayah: Bandung & Jawa Barat\n\n`;
 
-      text += modelVariants.map(v => formatSingleVariantPriceBlock(v)).join('\n\n') + '\n\n';
+      text += uniqueVariants.map(v => formatSingleVariantPriceBlock(v)).join('\n\n') + '\n\n';
       text += `━━━━━━━━━━━━━━━━━━━━━━\n` +
               `_Dapatkan diskon promo spesial, paket kredit bunga ringan, dan bonus aksesoris khusus pemesanan minggu ini!_\n`;
 
@@ -664,7 +708,7 @@
       }
 
       const card = document.getElementById(cardId);
-      const imgSrc = card ? card.querySelector('.model-thumb')?.src : (modelVariants[0]?.img || '');
+      const imgSrc = card ? card.querySelector('.model-thumb')?.src : (uniqueVariants[0]?.img || '');
 
       await sendWhatsAppPayload(text, imgSrc, `Pricelist Toyota ${modelName}`);
     };
