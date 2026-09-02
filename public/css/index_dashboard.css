@@ -1640,15 +1640,198 @@
     }
 }
 
+/* ── Fitur Utama (4 Fitur Kritis) Grid ────────────────────────── */
+.main-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-height: none;
+}
+
 @media (max-width: 480px) {
+    .main-feature-grid {
+        gap: 8px !important;
+    }
+
+    .main-feature-grid .category-item {
+        min-width: 0 !important;
+        padding: 4px 2px !important;
+    }
+
+    .main-feature-grid .category-icon {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 19px !important;
+    }
+
+    .main-feature-grid .category-text {
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+        word-break: break-word !important;
+        text-align: center !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .main-feature-grid {
+        gap: 5px !important;
+    }
+
+    .main-feature-grid .category-icon {
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 17px !important;
+    }
+
+    .main-feature-grid .category-text {
+        font-size: 9px !important;
+    }
+}
+
+/* ── AO Report Live Metrics Grid ──────────────────────────────── */
+.ao-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .ao-metrics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .ao-metrics-grid {
+        gap: 6px !important;
+    }
+}
+
+/* ── Target Card & Mobile Layout Refinements ───────────────────── */
+@media (max-width: 480px) {
+    .tgt-card {
+        padding: 16px 12px !important;
+    }
+
     .tgt-head {
         flex-direction: column;
         align-items: flex-start;
-        gap: 6px;
+        gap: 8px !important;
+    }
+
+    .tgt-title {
+        font-size: 13px !important;
+    }
+
+    .target-period {
+        font-size: 10.5px !important;
+    }
+
+    .tgt-grid {
+        gap: 6px !important;
+    }
+
+    .tgt-metric {
+        padding: 12px 4px 10px !important;
+        border-radius: 14px !important;
+        min-width: 0 !important;
+        height: 100% !important;
+        justify-content: space-between !important;
+    }
+
+    .tgt-metric-label {
+        font-size: 8.5px !important;
+        margin-bottom: 6px !important;
+        letter-spacing: 0.2px !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        gap: 3px !important;
+    }
+
+    .tgt-circle {
+        width: 46px !important;
+        height: 46px !important;
+        box-shadow: 0 0 0 3px var(--m-soft) !important;
+        margin-bottom: 8px !important;
+    }
+
+    .tgt-circle span {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 10px !important;
+        font-weight: 800 !important;
+    }
+
+    .tgt-metric-value {
+        font-size: 14px !important;
+    }
+
+    .tgt-metric-total {
+        font-size: 9px !important;
+    }
+
+    .linear-progress-bar {
+        height: 4px !important;
+        margin: 6px 0 !important;
+    }
+
+    .tgt-metric-note {
+        font-size: 8.5px !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        text-align: center !important;
     }
 
     .leaderboard-head {
         flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 360px) {
+    .tgt-card {
+        padding: 12px 8px !important;
+    }
+
+    .tgt-grid {
+        gap: 4px !important;
+    }
+
+    .tgt-circle {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .tgt-circle span {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 9px !important;
+    }
+
+    .tgt-metric-value {
+        font-size: 12px !important;
+    }
+
+    .tgt-metric-total {
+        font-size: 8px !important;
+    }
+
+    .tgt-metric-label {
+        font-size: 7.5px !important;
+    }
+
+    .tgt-metric-note {
+        font-size: 7.5px !important;
     }
 }
 

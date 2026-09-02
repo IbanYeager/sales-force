@@ -886,15 +886,16 @@
                 }
                 @media (max-width: 768px) {
                     .sft-scroll-top-btn {
-                        bottom: 145px;
-                        right: 18px;
-                        width: 42px;
-                        height: 42px;
-                        font-size: 15px;
-                        border-radius: 12px;
+                        bottom: calc(152px + env(safe-area-inset-bottom, 0px)) !important;
+                        right: 16px !important;
+                        width: 44px !important;
+                        height: 44px !important;
+                        font-size: 16px !important;
+                        border-radius: 12px !important;
+                        z-index: 9989 !important;
                     }
                     .sft-scroll-top-tooltip {
-                        display: none;
+                        display: none !important;
                     }
                 }
             `;

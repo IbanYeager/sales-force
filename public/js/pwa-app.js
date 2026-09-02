@@ -160,12 +160,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
                 }
                 @media (max-width: 768px) {
                     #custom-install-container {
-                        bottom: 145px !important;
-                        right: 14px !important;
+                        bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
                         left: 14px !important;
-                        max-width: calc(100vw - 28px) !important;
-                        margin-left: auto !important;
-                        padding: 10px 14px !important;
+                        right: auto !important;
+                        max-width: calc(100vw - 86px) !important;
+                        padding: 8px 12px !important;
+                        border-radius: 14px !important;
+                        z-index: 9980 !important;
                     }
                 }
             `;
@@ -176,21 +177,22 @@ window.addEventListener('beforeinstallprompt', (e) => {
         installContainer.id = 'custom-install-container';
 
         installContainer.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;" id="pwaClickArea">
-                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(215, 18, 58, 0.2); border: 1px solid rgba(215, 18, 58, 0.4); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 16px; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 9px; cursor: pointer; flex: 1; min-width: 0;" id="pwaClickArea">
+                <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(215, 18, 58, 0.2); border: 1px solid rgba(215, 18, 58, 0.4); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 15px; flex-shrink: 0;">
                     <i class="fa-solid fa-download"></i>
                 </div>
-                <div>
-                    <div style="font-size: 13px; font-weight: 800; line-height: 1.2;">Install Aplikasi SFT</div>
-                    <div style="font-size: 10.5px; opacity: 0.8; margin-top: 2px;">Akses lebih cepat & offline</div>
+                <div style="min-width: 0; flex: 1;">
+                    <div style="font-size: 12.5px; font-weight: 800; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Install Aplikasi SFT</div>
+                    <div style="font-size: 10px; opacity: 0.8; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Akses lebih cepat & offline</div>
                 </div>
             </div>
-            <button type="button" id="pwaCloseBtn" style="background: rgba(255,255,255,0.1); border: none; color: #94a3b8; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; transition: all 0.2s;" title="Tutup">
+            <button type="button" id="pwaCloseBtn" style="background: rgba(255,255,255,0.1); border: none; color: #94a3b8; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; transition: all 0.2s; flex-shrink: 0; margin-left: 6px;" title="Tutup">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         `;
 
         document.body.appendChild(installContainer);
+        document.body.classList.add('has-pwa-install');
 
         // Click action untuk install
         const clickArea = document.getElementById('pwaClickArea');
@@ -201,6 +203,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
                         installContainer.style.display = 'none';
+                        document.body.classList.remove('has-pwa-install');
                     }
                     deferredPrompt = null;
                 }
@@ -214,6 +217,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
                 evt.stopPropagation();
                 sessionStorage.setItem('pwaPromptDismissed', 'true');
                 installContainer.remove();
+                document.body.classList.remove('has-pwa-install');
             });
         }
     }
@@ -223,5 +227,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
     const installContainer = document.getElementById('custom-install-container');
     if (installContainer) installContainer.style.display = 'none';
+    document.body.classList.remove('has-pwa-install');
     sessionStorage.setItem('pwaPromptDismissed', 'true');
 });

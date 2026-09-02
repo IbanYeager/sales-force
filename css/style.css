@@ -3083,21 +3083,342 @@ tbody tr:last-child td {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SMALL PHONES
+   MOBILE RESPONSIVENESS & ADAPTIVE LAYOUT (ANY PHONE / RESOLUTION)
    ═══════════════════════════════════════════════════════════════ */
-@media (max-width: 390px) {
-    .category-grid {
-        gap: 12px 6px;
+
+/* Support for modern mobile viewport and notch / gesture bar */
+@supports (padding: max(0px)) {
+    .mobile-app {
+        padding-bottom: max(130px, calc(115px + env(safe-area-inset-bottom, 0px))) !important;
+    }
+    .bottom-nav {
+        bottom: max(16px, calc(12px + env(safe-area-inset-bottom, 0px))) !important;
+    }
+}
+
+/* Tablet & Mobile Breakpoint (<= 768px) */
+@media (max-width: 768px) {
+    .mobile-app {
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow-x: hidden !important;
     }
 
-    .category-icon {
+    /* Floating Action Buttons stacking */
+    #btnToggleAiCopilot {
+        bottom: max(96px, calc(90px + env(safe-area-inset-bottom, 0px))) !important;
+        right: 16px !important;
+        width: 48px !important;
+        height: 48px !important;
+        z-index: 9990 !important;
+    }
+
+    .sft-scroll-top-btn {
+        bottom: max(152px, calc(146px + env(safe-area-inset-bottom, 0px))) !important;
+        right: 16px !important;
+        width: 44px !important;
+        height: 44px !important;
+        z-index: 9989 !important;
+    }
+
+    /* PWA Install Banner when shown */
+    #custom-install-container {
+        bottom: max(96px, calc(90px + env(safe-area-inset-bottom, 0px))) !important;
+        left: 14px !important;
+        right: auto !important;
+        max-width: calc(100vw - 86px) !important;
+        z-index: 9980 !important;
+    }
+}
+
+/* Standard & Compact Smartphones (<= 480px) */
+@media (max-width: 480px) {
+    .header-home {
+        padding: 38px 16px 82px !important;
+        border-radius: 0 0 28px 28px !important;
+    }
+
+    .header-home .user-info {
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .header-home .profile-wrap {
+        gap: 12px;
+        min-width: 0;
+        flex: 1;
+        align-items: flex-start;
+    }
+
+    .header-home .avatar-container {
+        width: 58px;
+        height: 58px;
+        flex-shrink: 0;
+    }
+
+    .header-home .avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+    }
+
+    .header-home .greeting {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .header-home .greeting p {
+        font-size: 11.5px;
+        margin-bottom: 2px;
+    }
+
+    .header-home .greeting h2 {
+        font-size: 18px;
+        line-height: 1.25;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .header-home .greeting .role {
+        font-size: 9.5px;
+        padding: 3px 9px;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .greeting-meta {
+        gap: 2px;
+        margin-top: 3px;
+    }
+
+    .greeting-meta .spv-label,
+    .greeting-meta .location {
+        font-size: 10.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .header-home .bell-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        flex-shrink: 0;
+    }
+
+    .header-home .bell-icon i {
+        font-size: 18px;
+    }
+
+    .container {
+        padding: 0 14px;
+        margin-top: -48px;
+    }
+
+    .edge-pad {
+        padding: 0 14px;
+    }
+
+    .card {
+        padding: 16px;
+        border-radius: 18px;
+        margin-bottom: 16px;
+    }
+
+    /* CTA Buttons */
+    .btn-input-aktivitas,
+    .btn-input-spk {
+        padding: 14px 16px !important;
+        border-radius: 18px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .btn-input-left {
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .btn-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+        border-radius: 14px;
+    }
+
+    .btn-input-text h4 {
+        font-size: 13.5px;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .btn-input-text p {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Bottom Floating Dock */
+    .bottom-nav {
+        width: calc(100% - 24px) !important;
+        padding: 7px 10px !important;
+        border-radius: 26px !important;
+    }
+
+    .nav-item {
+        width: 50px;
+        height: 44px;
+    }
+
+    .nav-item i {
+        font-size: 17px;
+    }
+
+    .nav-text {
+        font-size: 9.5px;
+    }
+
+    .nav-item.center-btn {
+        width: 52px;
+        height: 52px;
+    }
+
+    .center-btn-inner {
         width: 48px;
         height: 48px;
-        font-size: 19px;
     }
 
-    .category-text {
+    .nav-item.center-btn i {
+        font-size: 20px;
+    }
+}
+
+/* Extra Small Phones (<= 360px: e.g. iPhone SE 1st, Galaxy Z Flip cover, compact phones) */
+@media (max-width: 360px) {
+    .header-home {
+        padding: 30px 10px 72px !important;
+        border-radius: 0 0 22px 22px !important;
+    }
+
+    .header-home .profile-wrap {
+        gap: 9px;
+    }
+
+    .header-home .avatar-container,
+    .header-home .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+    }
+
+    .header-home .greeting h2 {
+        font-size: 16px;
+    }
+
+    .header-home .greeting .role {
+        font-size: 9px;
+        padding: 2px 7px;
+    }
+
+    .greeting-meta .spv-label,
+    .greeting-meta .location {
+        font-size: 9.5px;
+    }
+
+    .header-home .bell-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+    }
+
+    .header-home .bell-icon i {
+        font-size: 16px;
+    }
+
+    .container {
+        padding: 0 10px;
+        margin-top: -42px;
+    }
+
+    .edge-pad {
+        padding: 0 10px;
+    }
+
+    .card {
+        padding: 13px 10px;
+        border-radius: 16px;
+        margin-bottom: 12px;
+    }
+
+    .btn-input-aktivitas,
+    .btn-input-spk {
+        padding: 11px 12px !important;
+        border-radius: 15px !important;
+    }
+
+    .btn-icon-wrapper {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+        border-radius: 12px;
+    }
+
+    .btn-input-text h4 {
+        font-size: 12.5px;
+    }
+
+    .btn-input-text p {
         font-size: 10px;
+    }
+
+    .bottom-nav {
+        width: calc(100% - 14px) !important;
+        padding: 5px 6px !important;
+        border-radius: 22px !important;
+    }
+
+    .nav-item {
+        width: 44px;
+        height: 40px;
+    }
+
+    .nav-item i {
+        font-size: 15px;
+    }
+
+    .nav-text {
+        font-size: 8.5px;
+    }
+
+    .center-btn-inner {
+        width: 44px;
+        height: 44px;
+    }
+
+    .nav-item.center-btn i {
+        font-size: 18px;
+    }
+
+    #btnToggleAiCopilot {
+        width: 42px !important;
+        height: 42px !important;
+        right: 12px !important;
+    }
+
+    .sft-scroll-top-btn {
+        width: 38px !important;
+        height: 38px !important;
+        right: 14px !important;
+        font-size: 14px !important;
     }
 }
 

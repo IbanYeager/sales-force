@@ -432,29 +432,30 @@ function injectFloatingAiWidget() {
 
         @media (max-width: 768px) {
             #btnToggleAiCopilot {
-                bottom: 110px !important;
+                bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
                 right: 16px !important;
                 padding: 0 !important;
-                width: 50px !important;
-                height: 50px !important;
+                width: 48px !important;
+                height: 48px !important;
                 border-radius: 50% !important;
                 justify-content: center !important;
-                box-shadow: 0 8px 22px rgba(200, 16, 46, 0.5) !important;
+                box-shadow: 0 8px 22px rgba(200, 16, 46, 0.45) !important;
+                z-index: 9990 !important;
             }
             #btnToggleAiCopilot .ai-label,
             #btnToggleAiCopilot .ai-badge {
                 display: none !important;
             }
             #btnToggleAiCopilot .ai-icon {
-                font-size: 24px !important;
+                font-size: 20px !important;
                 background: none !important;
                 width: auto !important;
                 height: auto !important;
             }
             #aiCopilotWindow {
-                bottom: 170px !important;
-                right: 4vw !important;
-                width: 92vw !important;
+                bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
+                right: 3vw !important;
+                width: 94vw !important;
                 height: 70vh !important;
             }
         }

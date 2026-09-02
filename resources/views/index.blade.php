@@ -354,7 +354,7 @@
                     ══════════════════════════════════════════════════════════════════════════════════════ 
                     -->
                     <div class="card category-card">
-                        <div class="category-grid" style="max-height: none; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                        <div class="category-grid main-feature-grid">
                             <a href="pages/pricelist.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-clipboard-list"></i></div>
                                 <span class="category-text">Pricelist OTR</span>
@@ -395,7 +395,7 @@
                             </a>
                         </div>
 
-                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; text-align:center;">
+                        <div class="ao-metrics-grid">
                             <div style="background:rgba(255,255,255,0.06); padding:10px 8px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
                                 <div style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Matching Ratio</div>
                                 <div style="font-size:18px; font-weight:900; color:#34d399; margin:2px 0;">86%</div>
