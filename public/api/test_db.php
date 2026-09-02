@@ -1,6 +1,19 @@
 <?php
 // api/test_db.php - Diagnostic Tool for Hosting / Server Setup
 header("Content-Type: text/html; charset=UTF-8");
+
+// Keamanan: Batasi akses hanya untuk localhost atau gunakan query parameter ?key=sft_diag_2026
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+$isLocal = in_array($clientIp, ['127.0.0.1', '::1', 'localhost']) || (strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false);
+$authKey = $_GET['key'] ?? '';
+$validKey = 'sft_diag_2026';
+
+if (!$isLocal && $authKey !== $validKey) {
+    http_response_code(403);
+    echo '<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:60px 20px;background:#0f172a;color:#f8fafc;"><div style="max-width:500px;margin:0 auto;background:#1e293b;padding:30px;border-radius:12px;border:1px solid #334155;"><h1 style="color:#ef4444;font-size:24px;margin-top:0;">403 Forbidden</h1><p style="color:#94a3b8;font-size:14px;">Akses langsung ke modul diagnostik database ini dibatasi untuk menjaga keamanan server.</p><p style="color:#64748b;font-size:12px;">Gunakan parameter kunci resmi untuk mengakses.</p></div></body></html>';
+    exit;
+}
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

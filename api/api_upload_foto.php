@@ -31,6 +31,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
+        // Keamanan: Validasi batas ukuran file (maksimal 5MB)
+        if (($file['size'] ?? 0) > 5 * 1024 * 1024) {
+            echo json_encode(["ok" => false, "message" => "Ukuran file terlalu besar (maksimal 5 MB)"]);
+            exit();
+        }
+
+        // Keamanan: Validasi integritas gambar asli (mencegah script berbahaya disamarkan)
+        $imgInfo = @getimagesize($file['tmp_name']);
+        if ($imgInfo === false) {
+            echo json_encode(["ok" => false, "message" => "File yang diunggah bukan gambar yang valid"]);
+            exit();
+        }
+        $mime = strtolower($imgInfo['mime'] ?? '');
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($mime, $allowedMimes)) {
+            echo json_encode(["ok" => false, "message" => "Tipe konten gambar tidak diizinkan"]);
+            exit();
+        }
+
         // Sanitasi nama file unik
         $fileName = time() . '_' . $sales_id . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
 

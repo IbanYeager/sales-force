@@ -1,0 +1,18 @@
+# public/uploads/.htaccess - Prevent script execution in uploads directory
+Options -Indexes -ExecCGI
+
+# Completely forbid execution or viewing of script files
+<FilesMatch "(?i)\.(php|phtml|php3|php4|php5|php7|php8|phps|sh|pl|cgi|exe|bat|py|rb|js)$">
+    Require all denied
+</FilesMatch>
+
+# If mod_php is active, turn engine off
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>

@@ -1,0 +1,7 @@
+# public/api/.htaccess - Protect internal data, databases, and logs
+Options -Indexes
+
+# Block direct access to databases, internal json data, sql, txt, and log files
+<FilesMatch "\.(sqlite|sqlite3|db|sql|json|txt|log|bat|sh|bak|ini)$">
+    Require all denied
+</FilesMatch>

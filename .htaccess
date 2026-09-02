@@ -9,13 +9,24 @@
 # Prevent direct listing of directories
 Options -Indexes
 
-# Block direct access to sensitive files
-<FilesMatch "\.(sql|log|env|git|htaccess|ini|sh|bak)$">
+# Block direct access to sensitive files and databases
+<FilesMatch "\.(sqlite|db|sql|log|env|git|htaccess|ini|sh|bat|cmd|bak)$">
     Require all denied
 </FilesMatch>
 
-# Ensure Service Worker and PWA Manifest are always fetched fresh
+# Block direct web access to internal configuration JSON files
+<FilesMatch "^(config_ai\.json|composer\.json|package\.json)$">
+    Require all denied
+</FilesMatch>
+
+# Security HTTP Headers
 <IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Ensure Service Worker and PWA Manifest are always fetched fresh
     <FilesMatch "^(sw\.js|manifest\.json)$">
         Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
         Header set Pragma "no-cache"

@@ -34,3 +34,9 @@ scratch/
 # Keep composer.json local only to prevent Hostinger auto composer trigger
 composer.json
 composer.lock
+
+# Database backups & local config overrides
+*.sqlite3
+*.db
+api/config_db.php
+public/api/config_db.php
