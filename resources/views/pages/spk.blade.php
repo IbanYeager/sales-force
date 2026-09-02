@@ -120,69 +120,259 @@
         <h3 class="section-title" style="margin-bottom:4px;">Buat Pengajuan SPK</h3>
         <p style="font-size:12px;color:var(--text-muted);margin-bottom:18px;">SPK yang diajukan akan berstatus Menunggu dan memerlukan persetujuan Supervisor.</p>
 
-        <!-- LUXURY SMART AI KTP SCANNER BANNER -->
-        <input type="file" id="ocrKtpInputSpk" accept="image/*" style="display:none;" onchange="SalesSuperpowers.scanKtpFile(this, {nama:'namaCustomer'})">
-        <div class="ocr-scanner-banner" onclick="document.getElementById('ocrKtpInputSpk').click()">
+        <!-- LUXURY SMART AI KTP & KK SCANNER BANNER -->
+        <div class="ocr-scanner-banner" onclick="SalesSuperpowers.openOcrModal('ktp')">
           <div class="ocr-banner-left">
             <div class="ocr-icon-glow">
               <i class="fa-solid fa-camera"></i>
             </div>
             <div>
               <div class="ocr-badge-chip"><i class="fa-solid fa-bolt"></i> SMART AI OCR SCANNER</div>
-              <h4 class="ocr-banner-title">Scan KTP &amp; Auto-Fill Data SPK</h4>
-              <p class="ocr-banner-sub">Foto KTP customer untuk mengisi Nama &amp; Identitas otomatis tanpa perlu ketik manual.</p>
+              <h4 class="ocr-banner-title">Scan KTP / KK &amp; Auto-Fill Data SPK</h4>
+              <p class="ocr-banner-sub">Buka kamera atau upload foto e-KTP / Kartu Keluarga untuk mengisi data identitas otomatis.</p>
             </div>
           </div>
-          <button type="button" class="btn-ocr-action">
-            <i class="fa-solid fa-camera"></i> Foto / Upload KTP
-          </button>
-        </div>
-
-        <div class="form-group">
-          <label>Nama Customer <span style="color:var(--primary-red);">*</span></label>
-          <input class="form-control" type="text" id="namaCustomer" placeholder="Nama customer" />
-        </div>
-
-        <div class="form-group">
-          <label>No. HP</label>
-          <input class="form-control" type="tel" id="noHp" placeholder="08xxxxxxxxxx" />
-        </div>
-
-        <div class="form-group">
-          <label>Tipe Mobil</label>
-          <select class="form-control" id="modelSelect" onchange="updateNominal()">
-            <option value="">-- Pilih Tipe Mobil --</option>
-          </select>
-          <input type="hidden" id="model" />
-        </div>
-
-        <div class="form-group">
-          <label>Harga Mobil (Rp)</label>
-          <input class="form-control" type="text" id="nominal" placeholder="Pilih tipe mobil terlebih dahulu" readonly style="background-color: #f1f5f9; cursor: not-allowed;" />
-        </div>
-
-        <div class="form-group">
-          <label>Tipe Pembelian</label>
-          <select class="form-control" id="tipePembelian">
-            <option value="Kredit">Kredit</option>
-            <option value="Cash">Cash</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Tanda Tangan Customer</label>
-          <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 4px; background: #fafafa; margin-bottom: 8px;">
-            <canvas id="signatureCanvas" style="width: 100%; height: 200px; display: block; border-radius: 8px; touch-action: none;"></canvas>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Silakan tanda tangan di atas</p>
-            <button class="btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="clearSignature(event)"><i class="fa-solid fa-eraser"></i> Hapus</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; z-index:2;">
+            <button type="button" class="btn-ocr-action" onclick="event.stopPropagation(); SalesSuperpowers.openOcrModal('ktp')">
+              <i class="fa-solid fa-id-card"></i> Scan KTP
+            </button>
+            <button type="button" class="btn-ocr-action" style="background:rgba(255,255,255,0.18);" onclick="event.stopPropagation(); SalesSuperpowers.openOcrModal('kk')">
+              <i class="fa-solid fa-users-rectangle"></i> Scan KK
+            </button>
           </div>
         </div>
 
-        <button class="btn-main" style="margin-top:8px;" onclick="submitSpk()">
+        <!-- ── BAGIAN 1: INFORMASI IDENTITAS KTP & KK ─────────────── -->
+        <div class="spk-form-section">
+          <div class="spk-section-header">
+            <div class="spk-section-title-wrap">
+              <div class="spk-section-icon"><i class="fa-solid fa-id-card"></i></div>
+              <div>
+                <h4 class="spk-section-title">Informasi Identitas (KTP &amp; KK)</h4>
+                <p style="margin:0; font-size:11px; color:var(--text-muted);">Data kependudukan pembeli untuk pengajuan STNK, BPKB &amp; Leasing</p>
+              </div>
+            </div>
+            <span class="spk-section-badge">IDENTITAS NASABAH</span>
+          </div>
+
+          <!-- NIK & No KK -->
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label>Nomor Induk Kependudukan (NIK KTP)</label>
+              <input class="form-control" type="text" id="spkNik" placeholder="16 digit NIK (misal: 3273xxxxxxxxxxxx)" maxlength="20" />
+            </div>
+            <div class="form-group">
+              <label>Nomor Kartu Keluarga (No. KK)</label>
+              <input class="form-control" type="text" id="spkNoKk" placeholder="16 digit Nomor KK" maxlength="20" />
+            </div>
+          </div>
+
+          <!-- Nama Lengkap & No HP -->
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label>Nama Customer (Sesuai KTP) <span style="color:var(--primary-red);">*</span></label>
+              <input class="form-control" type="text" id="namaCustomer" placeholder="Nama lengkap sesuai KTP" />
+            </div>
+            <div class="form-group">
+              <label>Nomor WhatsApp / HP <span style="color:var(--primary-red);">*</span></label>
+              <input class="form-control" type="tel" id="noHp" placeholder="08xxxxxxxxxx" />
+            </div>
+          </div>
+
+          <!-- Tempat & Tgl Lahir -->
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label>Tempat Lahir</label>
+              <input class="form-control" type="text" id="spkTempatLahir" placeholder="Kota tempat lahir (misal: Bandung)" />
+            </div>
+            <div class="form-group">
+              <label>Tanggal Lahir</label>
+              <input class="form-control" type="text" id="spkTanggalLahir" placeholder="DD-MM-YYYY (misal: 17-08-1990)" />
+            </div>
+          </div>
+
+          <!-- Jenis Kelamin & Status Perkawinan -->
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label>Jenis Kelamin</label>
+              <select class="form-control" id="spkJenisKelamin">
+                <option value="">-- Pilih Jenis Kelamin --</option>
+                <option value="LAKI-LAKI">LAKI-LAKI</option>
+                <option value="PEREMPUAN">PEREMPUAN</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status Perkawinan</label>
+              <select class="form-control" id="spkStatusPerkawinan">
+                <option value="">-- Pilih Status --</option>
+                <option value="BELUM KAWIN">Belum Kawin</option>
+                <option value="KAWIN">Kawin</option>
+                <option value="CERAI HIDUP">Cerai Hidup</option>
+                <option value="CERAI MATI">Cerai Mati</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Alamat KTP -->
+          <div class="form-group">
+            <label>Alamat Lengkap (Sesuai KTP)</label>
+            <textarea class="form-control" id="spkAlamat" rows="2" placeholder="Nama jalan, nomor rumah, gang, atau dusun..."></textarea>
+          </div>
+
+          <!-- RT/RW & Kelurahan -->
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label>RT / RW</label>
+              <input class="form-control" type="text" id="spkRtRw" placeholder="Contoh: 003/008" />
+            </div>
+            <div class="form-group">
+              <label>Kelurahan / Desa</label>
+              <input class="form-control" type="text" id="spkKelurahan" placeholder="Nama Kelurahan / Desa" />
+            </div>
+          </div>
+
+          <!-- Kecamatan & Kota -->
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label>Kecamatan</label>
+              <input class="form-control" type="text" id="spkKecamatan" placeholder="Nama Kecamatan" />
+            </div>
+            <div class="form-group">
+              <label>Kota / Kabupaten</label>
+              <input class="form-control" type="text" id="spkKota" placeholder="Contoh: Kota Bandung" />
+            </div>
+          </div>
+
+          <!-- Provinsi & Pekerjaan -->
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label>Provinsi</label>
+              <input class="form-control" type="text" id="spkProvinsi" placeholder="Contoh: Jawa Barat" />
+            </div>
+            <div class="form-group">
+              <label>Pekerjaan / Profesi</label>
+              <input class="form-control" type="text" id="spkPekerjaan" placeholder="Karyawan Swasta / Wiraswasta / PNS" />
+            </div>
+          </div>
+
+          <!-- Agama -->
+          <div class="form-group">
+            <label>Agama</label>
+            <select class="form-control" id="spkAgama">
+              <option value="">-- Pilih Agama --</option>
+              <option value="ISLAM">Islam</option>
+              <option value="KRISTEN">Kristen</option>
+              <option value="KATOLIK">Katolik</option>
+              <option value="HINDU">Hindu</option>
+              <option value="BUDDHA">Buddha</option>
+              <option value="KONGHUCU">Konghucu</option>
+            </select>
+          </div>
+
+          <!-- Dokumen Lampiran Foto KTP & KK -->
+          <div style="margin-top:14px;">
+            <label style="font-size:12.5px; font-weight:800; color:#334155; display:block; margin-bottom:6px;">
+              <i class="fa-solid fa-paperclip" style="color:var(--primary-red);"></i> Lampiran Berkas KTP &amp; KK
+            </label>
+            
+            <div class="spk-docs-grid">
+              <!-- Card KTP -->
+              <div class="spk-doc-card" id="spkDocCardKtp">
+                <div class="spk-doc-thumb" id="spkThumbKtp">
+                  <i class="fa-solid fa-id-card"></i>
+                </div>
+                <div class="spk-doc-info">
+                  <div class="spk-doc-name">Foto e-KTP</div>
+                  <div class="spk-doc-status" id="spkStatusKtp">Belum ada foto</div>
+                </div>
+                <button type="button" class="spk-doc-btn" onclick="SalesSuperpowers.openOcrModal('ktp')">
+                  <i class="fa-solid fa-camera"></i> <span id="spkBtnTextKtp">Foto / Scan</span>
+                </button>
+              </div>
+
+              <!-- Card KK -->
+              <div class="spk-doc-card" id="spkDocCardKk">
+                <div class="spk-doc-thumb" id="spkThumbKk">
+                  <i class="fa-solid fa-users-rectangle"></i>
+                </div>
+                <div class="spk-doc-info">
+                  <div class="spk-doc-name">Foto Kartu Keluarga</div>
+                  <div class="spk-doc-status" id="spkStatusKk">Belum ada foto</div>
+                </div>
+                <button type="button" class="spk-doc-btn" onclick="SalesSuperpowers.openOcrModal('kk')">
+                  <i class="fa-solid fa-camera"></i> <span id="spkBtnTextKk">Foto / Scan</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Hidden Inputs for Base64 Photos -->
+            <input type="hidden" id="spkFotoKtp" value="" />
+            <input type="hidden" id="spkFotoKk" value="" />
+          </div>
+        </div>
+
+        <!-- ── BAGIAN 2: DATA PEMESANAN KENDARAAN (SPK) ─────────── -->
+        <div class="spk-form-section">
+          <div class="spk-section-header">
+            <div class="spk-section-title-wrap">
+              <div class="spk-section-icon icon-red"><i class="fa-solid fa-car"></i></div>
+              <div>
+                <h4 class="spk-section-title">Detail Kendaraan &amp; Transaksi</h4>
+                <p style="margin:0; font-size:11px; color:var(--text-muted);">Pilih tipe mobil Toyota, warna, dan sistem pembayaran</p>
+              </div>
+            </div>
+            <span class="spk-section-badge">UNIT TOYOTA</span>
+          </div>
+
+          <div class="form-group">
+            <label>Tipe Mobil <span style="color:var(--primary-red);">*</span></label>
+            <select class="form-control" id="modelSelect" onchange="updateNominal()">
+              <option value="">-- Pilih Tipe Mobil --</option>
+            </select>
+            <input type="hidden" id="model" />
+          </div>
+
+          <div class="form-group">
+            <label>Harga Mobil OTR (Rp)</label>
+            <input class="form-control" type="text" id="nominal" placeholder="Pilih tipe mobil terlebih dahulu" readonly style="background-color: #f1f5f9; cursor: not-allowed; font-weight:700;" />
+          </div>
+
+          <div class="form-group">
+            <label>Tipe Pembelian</label>
+            <select class="form-control" id="tipePembelian">
+              <option value="Kredit">Kredit (Pembiayaan TAF / ACC / Bank)</option>
+              <option value="Cash">Cash (Tunai)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ── BAGIAN 3: TANDA TANGAN DIGITAL CUSTOMER ─────────── -->
+        <div class="spk-form-section">
+          <div class="spk-section-header">
+            <div class="spk-section-title-wrap">
+              <div class="spk-section-icon icon-green"><i class="fa-solid fa-signature"></i></div>
+              <div>
+                <h4 class="spk-section-title">Tanda Tangan Digital Customer</h4>
+                <p style="margin:0; font-size:11px; color:var(--text-muted);">Beri tanda tangan langsung pada layar sentuh atau mouse</p>
+              </div>
+            </div>
+            <span class="spk-section-badge">PERSETUJUAN</span>
+          </div>
+
+          <div class="form-group">
+            <div style="border: 2px dashed var(--border-color); border-radius: 14px; padding: 4px; background: #fafafa; margin-bottom: 8px;">
+              <canvas id="signatureCanvas" style="width: 100%; height: 180px; display: block; border-radius: 10px; touch-action: none; background:#ffffff;"></canvas>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Silakan bubuhkan tanda tangan customer di atas</p>
+              <button class="btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="clearSignature(event)"><i class="fa-solid fa-eraser"></i> Bersihkan Tanda Tangan</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-main" style="margin-top:8px; padding:15px;" onclick="submitSpk()">
           <i class="fa-solid fa-paper-plane" style="margin-right:10px;"></i>
-          Submit SPK
+          SUBMIT PENGAJUAN SPK LENGKAP
         </button>
       </div>
 
@@ -293,6 +483,142 @@
       </div>
     </div>
   </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SMART AI OCR SCANNER CAMERA & UPLOAD MODAL
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="smartOcrModal" class="ocr-modal-overlay" style="display:none;" onclick="SalesSuperpowers.closeOcrModal(event)">
+    <div class="ocr-modal-container" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="ocr-modal-header">
+        <div class="ocr-modal-title">
+          <div style="width:28px; height:28px; border-radius:8px; background:#d7123a; display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff;">
+            <i class="fa-solid fa-camera"></i>
+          </div>
+          <span>Smart AI OCR Scanner</span>
+        </div>
+        <button type="button" class="ocr-modal-close-btn" onclick="SalesSuperpowers.closeOcrModal()">&times;</button>
+      </div>
+
+      <!-- Mode Switcher: KTP vs KK -->
+      <div class="ocr-type-switcher">
+        <button type="button" id="btnOcrTypeKtp" class="ocr-type-btn active" onclick="SalesSuperpowers.setOcrDocType('ktp')">
+          <i class="fa-solid fa-id-card"></i> e-KTP Customer
+        </button>
+        <button type="button" id="btnOcrTypeKk" class="ocr-type-btn" onclick="SalesSuperpowers.setOcrDocType('kk')">
+          <i class="fa-solid fa-users-rectangle"></i> Kartu Keluarga (KK)
+        </button>
+      </div>
+
+      <!-- Source Tabs: Kamera Langsung vs Upload File -->
+      <div class="ocr-source-pills">
+        <button type="button" id="btnOcrSourceCam" class="ocr-source-pill active" onclick="SalesSuperpowers.setOcrSource('camera')">
+          <i class="fa-solid fa-video"></i> Kamera Langsung
+        </button>
+        <button type="button" id="btnOcrSourceUpload" class="ocr-source-pill" onclick="SalesSuperpowers.setOcrSource('upload')">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload dari File / Galeri
+        </button>
+      </div>
+
+      <!-- VIEWPORT 1: KAMERA LANGSUNG -->
+      <div id="ocrCameraSection" style="display:block;">
+        <div class="ocr-viewfinder-box">
+          <video id="ocrCameraVideo" autoplay playsinline muted></video>
+          
+          <!-- Card Target HUD Guides -->
+          <div class="ocr-hud-frame">
+            <span class="ocr-hud-corner ocr-corner-tl"></span>
+            <span class="ocr-hud-corner ocr-corner-tr"></span>
+            <span class="ocr-hud-corner ocr-corner-bl"></span>
+            <span class="ocr-hud-corner ocr-corner-br"></span>
+            <div class="ocr-laser-beam"></div>
+            <div class="ocr-hud-tip" id="ocrHudTip">Posisikan KTP di dalam kotak panduan</div>
+          </div>
+        </div>
+
+        <!-- Camera Controls -->
+        <div class="ocr-controls-bar">
+          <button type="button" class="btn-ocr-round" onclick="SalesSuperpowers.switchCamera()" title="Ganti Kamera Depan / Belakang">
+            <i class="fa-solid fa-camera-rotate"></i>
+          </button>
+          
+          <button type="button" class="btn-ocr-shutter" onclick="SalesSuperpowers.captureSnapshot()" title="Ambil Foto">
+            <div class="btn-ocr-shutter-inner">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+          </button>
+
+          <button type="button" class="btn-ocr-round" onclick="document.getElementById('ocrGalleryFileInput').click()" title="Pilih dari Galeri">
+            <i class="fa-solid fa-images"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEWPORT 2: UPLOAD DARI FILE / GALERI -->
+      <div id="ocrUploadSection" style="display:none;">
+        <input type="file" id="ocrGalleryFileInput" accept="image/*" style="display:none;" onchange="SalesSuperpowers.handleFileSelect(this)" />
+        <div class="ocr-dropzone-box" onclick="document.getElementById('ocrGalleryFileInput').click()">
+          <div style="font-size:38px; color:#ef4444; margin-bottom:12px;">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <h4 style="font-size:14px; font-weight:800; margin:0 0 6px 0; color:#ffffff;">Pilih Foto Dokumen</h4>
+          <p style="font-size:12px; color:#94a3b8; margin:0 0 14px 0;">Klik di sini untuk memilih foto KTP atau Kartu Keluarga dari perangkat Anda.</p>
+          <span style="font-size:11px; font-weight:700; background:rgba(255,255,255,0.1); padding:5px 12px; border-radius:8px; color:#cbd5e1;">
+            JPG, PNG, WEBP (Max 10MB)
+          </span>
+        </div>
+      </div>
+
+      <!-- VIEWPORT 3: PREVIEW FOTO HASIL TANGKAPAN -->
+      <div id="ocrPreviewSection" style="display:none;">
+        <div class="ocr-viewfinder-box" style="height:260px;">
+          <img id="ocrCapturedPreview" src="" alt="Preview Dokumen" />
+          <div id="ocrScanningOverlay" style="display:none; position:absolute; inset:0; background:rgba(15,23,42,0.85); flex-direction:column; align-items:center; justify-content:center;">
+            <div style="width:48px; height:48px; border-radius:50%; border:3px solid #ef4444; border-top-color:transparent; animation:radar-spin 1s linear infinite; margin-bottom:12px;"></div>
+            <span style="font-size:13px; font-weight:800; color:#fff;" id="ocrScanningStatusText">Mengekstrak Data AI OCR...</span>
+            <span style="font-size:11px; color:#94a3b8; margin-top:4px;">Mohon tunggu beberapa detik</span>
+          </div>
+        </div>
+
+        <!-- Action buttons after capture -->
+        <div id="ocrPreScanActions" class="ocr-controls-bar" style="justify-content:center; gap:14px;">
+          <button type="button" class="btn-ocr-retake" onclick="SalesSuperpowers.retakePhoto()">
+            <i class="fa-solid fa-rotate-left"></i> Foto Ulang
+          </button>
+          <button type="button" class="btn-ocr-apply" onclick="SalesSuperpowers.processOcr()">
+            <i class="fa-solid fa-bolt"></i> PROSES SCAN AI SEKARANG
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEWPORT 4: HASIL REVIEW EKSTRAKSI AI -->
+      <div id="ocrReviewSection" style="display:none;">
+        <div class="ocr-review-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:12px; font-weight:800; color:#10b981;">
+              <i class="fa-solid fa-circle-check"></i> Data Berhasil Diekstrak AI
+            </span>
+            <span style="font-size:10px; color:#94a3b8;" id="ocrEngineBadge">AI Smart Engine</span>
+          </div>
+
+          <div id="ocrReviewList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="ocr-bottom-actions">
+          <button type="button" class="btn-ocr-retake" onclick="SalesSuperpowers.retakePhoto()">
+            <i class="fa-solid fa-rotate-left"></i> Scan Lain
+          </button>
+          <button type="button" class="btn-ocr-apply" onclick="SalesSuperpowers.applyExtractedDataToForm()">
+            <i class="fa-solid fa-check-double"></i> TERAPKAN KE FORM SPK
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="ocrHiddenCanvas" style="display:none;"></canvas>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="../custom_alert.js"></script>

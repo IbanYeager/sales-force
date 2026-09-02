@@ -61,7 +61,7 @@ if ($method === 'GET') {
 
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_clean = str_replace('Pak ', '', $spv);
-        $query = "SELECT s.id, s.sales_account_id, sa.nama_lengkap as nama_sales, s.nama_customer, s.no_hp, s.model, s.nominal, s.tipe_pembelian, s.status, s.created_at 
+        $query = "SELECT s.id, s.sales_account_id, sa.nama_lengkap as nama_sales, s.nama_customer, s.no_hp, s.nik, s.no_kk, s.tempat_lahir, s.tanggal_lahir, s.jenis_kelamin, s.alamat, s.rt_rw, s.kelurahan, s.kecamatan, s.kota, s.provinsi, s.agama, s.status_perkawinan, s.pekerjaan, s.foto_ktp, s.foto_kk, s.model, s.nominal, s.tipe_pembelian, s.status, s.created_at 
                   FROM tabel_spk s
                   LEFT JOIN sales_accounts sa ON s.sales_account_id = sa.id
                   WHERE (sa.nama_spv = ? OR sa.nama_spv LIKE ?)
@@ -72,13 +72,13 @@ if ($method === 'GET') {
             $stmt->bind_param("ss", $spv, $likeSpv);
         }
     } elseif ($all || !empty($spv)) {
-        $query = "SELECT s.id, s.sales_account_id, sa.nama_lengkap as nama_sales, s.nama_customer, s.no_hp, s.model, s.nominal, s.tipe_pembelian, s.status, s.created_at 
+        $query = "SELECT s.id, s.sales_account_id, sa.nama_lengkap as nama_sales, s.nama_customer, s.no_hp, s.nik, s.no_kk, s.tempat_lahir, s.tanggal_lahir, s.jenis_kelamin, s.alamat, s.rt_rw, s.kelurahan, s.kecamatan, s.kota, s.provinsi, s.agama, s.status_perkawinan, s.pekerjaan, s.foto_ktp, s.foto_kk, s.model, s.nominal, s.tipe_pembelian, s.status, s.created_at 
                   FROM tabel_spk s
                   LEFT JOIN sales_accounts sa ON s.sales_account_id = sa.id
                   ORDER BY s.id DESC";
         $stmt = $conn->prepare($query);
     } else {
-        $query = "SELECT id, nama_customer, no_hp, model, nominal, tipe_pembelian, status, created_at 
+        $query = "SELECT id, nama_customer, no_hp, nik, no_kk, tempat_lahir, tanggal_lahir, jenis_kelamin, alamat, rt_rw, kelurahan, kecamatan, kota, provinsi, agama, status_perkawinan, pekerjaan, foto_ktp, foto_kk, model, nominal, tipe_pembelian, status, created_at 
                   FROM tabel_spk 
                   WHERE sales_account_id = ? 
                   ORDER BY id DESC";
@@ -113,6 +113,24 @@ if ($method === 'GET') {
         $model = $payload['model'] ?? $_POST['model'] ?? '';
         $tipe_pembelian = $payload['tipe_pembelian'] ?? $_POST['tipe_pembelian'] ?? 'Kredit';
         
+        // Identitas KTP & KK fields
+        $nik = $payload['nik'] ?? $_POST['nik'] ?? '';
+        $no_kk = $payload['no_kk'] ?? $_POST['no_kk'] ?? '';
+        $tempat_lahir = $payload['tempat_lahir'] ?? $_POST['tempat_lahir'] ?? '';
+        $tanggal_lahir = $payload['tanggal_lahir'] ?? $_POST['tanggal_lahir'] ?? '';
+        $jenis_kelamin = $payload['jenis_kelamin'] ?? $_POST['jenis_kelamin'] ?? '';
+        $alamat = $payload['alamat'] ?? $_POST['alamat'] ?? '';
+        $rt_rw = $payload['rt_rw'] ?? $_POST['rt_rw'] ?? '';
+        $kelurahan = $payload['kelurahan'] ?? $_POST['kelurahan'] ?? '';
+        $kecamatan = $payload['kecamatan'] ?? $_POST['kecamatan'] ?? '';
+        $kota = $payload['kota'] ?? $_POST['kota'] ?? '';
+        $provinsi = $payload['provinsi'] ?? $_POST['provinsi'] ?? '';
+        $agama = $payload['agama'] ?? $_POST['agama'] ?? '';
+        $status_perkawinan = $payload['status_perkawinan'] ?? $_POST['status_perkawinan'] ?? '';
+        $pekerjaan = $payload['pekerjaan'] ?? $_POST['pekerjaan'] ?? '';
+        $foto_ktp = $payload['foto_ktp'] ?? $_POST['foto_ktp'] ?? '';
+        $foto_kk = $payload['foto_kk'] ?? $_POST['foto_kk'] ?? '';
+
         $nominal = isset($payload['nominal']) ? intval($payload['nominal']) : (isset($_POST['nominal']) ? intval($_POST['nominal']) : 0);
         if ($nominal == 0) {
             if (stripos($model, 'avanza') !== false) $nominal = 285000000;
@@ -129,10 +147,24 @@ if ($method === 'GET') {
         $jenis_input = $payload['jenis_input'] ?? $_POST['jenis_input'] ?? 'SPK';
         $status = ($jenis_input === 'DO') ? 'Disetujui' : 'Menunggu';
 
-        $query = "INSERT INTO tabel_spk (sales_account_id, nama_customer, no_hp, model, nominal, tipe_pembelian, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO tabel_spk (
+            sales_account_id, nama_customer, no_hp, nik, no_kk, 
+            tempat_lahir, tanggal_lahir, jenis_kelamin, alamat, rt_rw, 
+            kelurahan, kecamatan, kota, provinsi, agama, 
+            status_perkawinan, pekerjaan, foto_ktp, foto_kk, 
+            model, nominal, tipe_pembelian, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
         $stmt = $conn->prepare($query);
         if ($stmt) {
-            $stmt->bind_param("isssiss", $sales_id, $nama, $hp, $model, $nominal, $tipe_pembelian, $status);
+            $stmt->bind_param(
+                "isssssssssssssssssssiss", 
+                $sales_id, $nama, $hp, $nik, $no_kk,
+                $tempat_lahir, $tanggal_lahir, $jenis_kelamin, $alamat, $rt_rw,
+                $kelurahan, $kecamatan, $kota, $provinsi, $agama,
+                $status_perkawinan, $pekerjaan, $foto_ktp, $foto_kk,
+                $model, $nominal, $tipe_pembelian, $status
+            );
             if ($stmt->execute()) {
                 $spk_id = $stmt->insert_id;
                 

@@ -109,11 +109,17 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
         if (s.status === 'Disetujui' || s.status === 'DO') badgeClass = 'chip-green';
         else if (s.status === 'Ditolak') badgeClass = 'chip-red';
 
+        const nikBadge = s.nik ? `<span style="font-size:10px; color:#1e40af; background:#eff6ff; border:1px solid #bfdbfe; padding:2px 6px; border-radius:6px; margin-left:6px; font-weight:700;"><i class="fa-solid fa-id-card"></i> NIK: ${s.nik}</span>` : '';
+        const kotaStr = s.kota ? ` • 📍 ${s.kota}` : '';
+
         return `
-          <div style="border-bottom: 1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="border-bottom: 1px solid var(--border-color); padding-bottom:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <h4 style="font-size:13px; margin:0 0 4px 0;">${s.nama_customer}</h4>
-              <p style="font-size:11px; color:var(--text-muted); margin:0;">${s.model} • Rp ${s.nominal_jt} Jt • ${s.tipe_pembelian}</p>
+              <h4 style="font-size:13px; margin:0 0 4px 0; display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                <span>${s.nama_customer}</span>
+                ${nikBadge}
+              </h4>
+              <p style="font-size:11px; color:var(--text-muted); margin:0;">${s.model} • Rp ${s.nominal_jt} Jt • ${s.tipe_pembelian}${kotaStr}</p>
             </div>
             <span class="chip ${badgeClass}" style="font-size:10px; font-weight:800; padding:4px 8px;">${s.status}</span>
           </div>
@@ -130,6 +136,7 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
       }
       const filtered = allSPKData.filter(s => 
         s.nama_customer.toLowerCase().includes(keyword) || 
+        (s.nik && s.nik.toLowerCase().includes(keyword)) ||
         s.model.toLowerCase().includes(keyword) || 
         s.status.toLowerCase().includes(keyword)
       );
@@ -137,7 +144,7 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
     }
 
     function fetchSpk() {
-      fetch(`../api/api_spk.php?sales_account_id=${sales_account_id}`)
+      fetch('../api/api_spk.php?sales_account_id=' + sales_account_id)
         .then(r => r.json())
         .then(res => {
           if (res.status === 'success' && res.data) {
@@ -156,6 +163,24 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
       const nominal = nominalRaw.replace(/\D/g, ''); // hapus titik
       const tipePembelian = document.getElementById('tipePembelian').value;
 
+      // New KTP & KK fields
+      const nik = (document.getElementById('spkNik')?.value || '').trim();
+      const no_kk = (document.getElementById('spkNoKk')?.value || '').trim();
+      const tempat_lahir = (document.getElementById('spkTempatLahir')?.value || '').trim();
+      const tanggal_lahir = (document.getElementById('spkTanggalLahir')?.value || '').trim();
+      const jenis_kelamin = (document.getElementById('spkJenisKelamin')?.value || '').trim();
+      const status_perkawinan = (document.getElementById('spkStatusPerkawinan')?.value || '').trim();
+      const alamat = (document.getElementById('spkAlamat')?.value || '').trim();
+      const rt_rw = (document.getElementById('spkRtRw')?.value || '').trim();
+      const kelurahan = (document.getElementById('spkKelurahan')?.value || '').trim();
+      const kecamatan = (document.getElementById('spkKecamatan')?.value || '').trim();
+      const kota = (document.getElementById('spkKota')?.value || '').trim();
+      const provinsi = (document.getElementById('spkProvinsi')?.value || '').trim();
+      const agama = (document.getElementById('spkAgama')?.value || '').trim();
+      const pekerjaan = (document.getElementById('spkPekerjaan')?.value || '').trim();
+      const foto_ktp = document.getElementById('spkFotoKtp')?.value || '';
+      const foto_kk = document.getElementById('spkFotoKk')?.value || '';
+
       if (!nama || !hp || !model) {
         alert('Nama customer, No. HP, dan Tipe Mobil wajib diisi.');
         return;
@@ -163,14 +188,13 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
 
       const btn = document.querySelector('.btn-main');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses Pengajuan SPK...';
 
       const signatureCanvas = document.getElementById('signatureCanvas');
       let signatureData = '';
       if (signatureCanvas) {
-        // Only capture if user drew something (simple check: data length > some minimum)
         const dataUrl = signatureCanvas.toDataURL();
-        if (dataUrl.length > 2000) { // arbitrary threshold to check if it's not empty
+        if (dataUrl.length > 2000) {
           signatureData = dataUrl;
         }
       }
@@ -183,6 +207,22 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
           sales_account_id,
           nama_customer: nama,
           no_hp: hp,
+          nik,
+          no_kk,
+          tempat_lahir,
+          tanggal_lahir,
+          jenis_kelamin,
+          status_perkawinan,
+          alamat,
+          rt_rw,
+          kelurahan,
+          kecamatan,
+          kota,
+          provinsi,
+          agama,
+          pekerjaan,
+          foto_ktp,
+          foto_kk,
           model,
           nominal,
           tipe_pembelian: tipePembelian,
@@ -192,7 +232,7 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
         .then(r => r.json())
         .then(res => {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:10px;"></i> Submit SPK';
+          btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:10px;"></i> SUBMIT PENGAJUAN SPK LENGKAP';
 
           if (res.status === 'success') {
             if (typeof confetti === 'function') {
@@ -202,13 +242,37 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
             }
 
             if (window.showCustomAlert) {
-              window.showCustomAlert('🎉 SELAMAT! SPK BERHASIL SUBMIT!', 'Pengajuan SPK baru berhasil dicatat & Lencana Prestasi "Top Closer" aktif!', 'success');
+              window.showCustomAlert('🎉 SELAMAT! SPK BERHASIL SUBMIT!', 'Pengajuan SPK baru berhasil dicatat lengkap dengan data KTP/KK & dikirim ke Supervisor!', 'success');
             } else {
               alert('Selamat! SPK baru berhasil submit!');
             }
 
-            document.getElementById('namaCustomer').value = '';
-            document.getElementById('noHp').value = '';
+            // Reset field form
+            ['spkNik', 'spkNoKk', 'namaCustomer', 'noHp', 'spkTempatLahir', 'spkTanggalLahir', 'spkJenisKelamin', 'spkStatusPerkawinan', 'spkAlamat', 'spkRtRw', 'spkKelurahan', 'spkKecamatan', 'spkKota', 'spkProvinsi', 'spkAgama', 'spkPekerjaan', 'spkFotoKtp', 'spkFotoKk', 'nominal'].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+            });
+
+            // Reset attachment preview cards
+            const cardKtp = document.getElementById('spkDocCardKtp');
+            const thumbKtp = document.getElementById('spkThumbKtp');
+            const statusKtp = document.getElementById('spkStatusKtp');
+            const btnTextKtp = document.getElementById('spkBtnTextKtp');
+            if (cardKtp) cardKtp.classList.remove('has-file');
+            if (thumbKtp) thumbKtp.innerHTML = '<i class="fa-solid fa-id-card"></i>';
+            if (statusKtp) statusKtp.textContent = 'Belum ada foto';
+            if (btnTextKtp) btnTextKtp.textContent = 'Foto / Scan';
+
+            const cardKk = document.getElementById('spkDocCardKk');
+            const thumbKk = document.getElementById('spkThumbKk');
+            const statusKk = document.getElementById('spkStatusKk');
+            const btnTextKk = document.getElementById('spkBtnTextKk');
+            if (cardKk) cardKk.classList.remove('has-file');
+            if (thumbKk) thumbKk.innerHTML = '<i class="fa-solid fa-users-rectangle"></i>';
+            if (statusKk) statusKk.textContent = 'Belum ada foto';
+            if (btnTextKk) btnTextKk.textContent = 'Foto / Scan';
+
+            if (window.clearSignature) window.clearSignature();
             fetchSpk();
           } else {
             alert('Gagal: ' + res.message);
@@ -216,7 +280,7 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
         })
         .catch(err => {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:10px;"></i> Submit SPK';
+          btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:10px;"></i> SUBMIT PENGAJUAN SPK LENGKAP';
           console.error(err);
           alert('Gagal terhubung ke server.');
         });

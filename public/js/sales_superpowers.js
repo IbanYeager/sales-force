@@ -338,106 +338,427 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
   // =========================================================================
   // 4. SCAN KTP & STNK OTOMATIS (OCR)
   // =========================================================================
-  async scanKtpFile(fileInput, targetFields = { nik: 'spkNik', nama: 'namaCustomer', alamat: 'newCustomerAddress' }) {
-    if (!fileInput.files || !fileInput.files[0]) return;
-    const file = fileInput.files[0];
-    
-    // Show SweetAlert Loading if available
-    if (typeof Swal !== 'undefined') {
-      Swal.fire({
-        title: '📷 Memindai KTP via AI OCR...',
-        html: `
-          <div style="text-align:center; padding:15px 0;">
-            <div style="width:50px; height:50px; border-radius:50%; border:3px solid #d7123a; border-top-color:transparent; animation:radar-spin 1s linear infinite; margin:0 auto 12px;"></div>
-            <p style="font-size:13px; color:#475569; margin:0;">Mengekstrak NIK, Nama Lengkap &amp; Alamat dari foto KTP...</p>
-          </div>
-        `,
-        showConfirmButton: false,
-        allowOutsideClick: false
-      });
+  // 4. SMART AI OCR SCANNER (KAMERA LIVE & DOKUMEN KTP / KK)
+  // =========================================================================
+  ocrDocType: 'ktp', // 'ktp' atau 'kk'
+  ocrSource: 'camera', // 'camera' atau 'upload'
+  cameraStream: null,
+  currentFacingMode: 'environment', // 'environment' (belakang) atau 'user' (depan)
+  capturedImageBase64: null,
+  extractedOcrData: null,
+
+  openOcrModal(docType = 'ktp') {
+    this.ocrDocType = docType;
+    const modal = document.getElementById('smartOcrModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    this.setOcrDocType(docType);
+    this.setOcrSource('camera');
+  },
+
+  closeOcrModal(e) {
+    if (e && e.target && e.target.id !== 'smartOcrModal') return;
+    this.stopCameraStream();
+    const modal = document.getElementById('smartOcrModal');
+    if (modal) modal.style.display = 'none';
+  },
+
+  setOcrDocType(type) {
+    this.ocrDocType = type;
+    const btnKtp = document.getElementById('btnOcrTypeKtp');
+    const btnKk = document.getElementById('btnOcrTypeKk');
+    const tip = document.getElementById('ocrHudTip');
+
+    if (type === 'kk') {
+      if (btnKtp) btnKtp.classList.remove('active');
+      if (btnKk) btnKk.classList.add('active');
+      if (tip) tip.textContent = 'Posisikan Kartu Keluarga di dalam kotak panduan';
+    } else {
+      if (btnKk) btnKk.classList.remove('active');
+      if (btnKtp) btnKtp.classList.add('active');
+      if (tip) tip.textContent = 'Posisikan e-KTP di dalam kotak panduan';
+    }
+  },
+
+  setOcrSource(source) {
+    this.ocrSource = source;
+    const btnCam = document.getElementById('btnOcrSourceCam');
+    const btnUpload = document.getElementById('btnOcrSourceUpload');
+    const secCam = document.getElementById('ocrCameraSection');
+    const secUpload = document.getElementById('ocrUploadSection');
+    const secPreview = document.getElementById('ocrPreviewSection');
+    const secReview = document.getElementById('ocrReviewSection');
+
+    if (secPreview) secPreview.style.display = 'none';
+    if (secReview) secReview.style.display = 'none';
+
+    if (source === 'upload') {
+      if (btnCam) btnCam.classList.remove('active');
+      if (btnUpload) btnUpload.classList.add('active');
+      if (secCam) secCam.style.display = 'none';
+      if (secUpload) secUpload.style.display = 'block';
+      this.stopCameraStream();
+    } else {
+      if (btnUpload) btnUpload.classList.remove('active');
+      if (btnCam) btnCam.classList.add('active');
+      if (secUpload) secUpload.style.display = 'none';
+      if (secCam) secCam.style.display = 'block';
+      this.startCameraStream();
+    }
+  },
+
+  async startCameraStream() {
+    this.stopCameraStream();
+
+    const videoEl = document.getElementById('ocrCameraVideo');
+    if (!videoEl) return;
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Browser ini tidak mendukung akses kamera langsung. Silakan gunakan opsi Upload File.');
+      this.setOcrSource('upload');
+      return;
     }
 
     try {
-      if (typeof Tesseract === 'undefined') {
-        await this.loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
-      }
+      const constraints = {
+        video: {
+          facingMode: { ideal: this.currentFacingMode },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      };
 
-      const worker = await Tesseract.createWorker('ind');
-      const ret = await worker.recognize(file);
-      await worker.terminate();
-
-      const text = ret.data.text;
-      console.log('OCR Raw Text:', text);
-
-      // Parse NIK, Name, Address
-      const parsed = this.parseKtpText(text);
-
-      if (targetFields.nik && document.getElementById(targetFields.nik) && parsed.nik) {
-        document.getElementById(targetFields.nik).value = parsed.nik;
-      }
-      if (targetFields.nama && document.getElementById(targetFields.nama) && parsed.nama) {
-        document.getElementById(targetFields.nama).value = parsed.nama;
-      }
-      if (targetFields.alamat && document.getElementById(targetFields.alamat) && parsed.alamat) {
-        document.getElementById(targetFields.alamat).value = parsed.alamat;
-      }
-
-      if (typeof Swal !== 'undefined') {
-        Swal.fire({
-          icon: 'success',
-          title: '✨ Scan KTP Berhasil!',
-          html: `
-            <div style="text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; font-size:12.5px; color:#1e293b; margin-top:8px;">
-              <div>👤 <b>Nama:</b> ${parsed.nama || '<span style="color:#dc2626;">(Perlu cek manual)</span>'}</div>
-              <div style="margin-top:4px;">🆔 <b>NIK:</b> ${parsed.nik || '-'}</div>
-              <div style="margin-top:4px;">📍 <b>Alamat:</b> ${parsed.alamat || '-'}</div>
-            </div>
-            <p style="font-size:12px; color:#16a34a; font-weight:700; margin:10px 0 0 0;">Data berhasil dimasukkan otomatis ke form!</p>
-          `,
-          confirmButtonColor: '#0d1b3e'
-        });
-      } else {
-        alert(`Scan KTP Berhasil!\nNama: ${parsed.nama}\nNIK: ${parsed.nik}\nAlamat: ${parsed.alamat}`);
-      }
-
+      this.cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+      videoEl.srcObject = this.cameraStream;
+      videoEl.play();
     } catch (err) {
-      console.error('OCR Error:', err);
-      if (typeof Swal !== 'undefined') {
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal Membaca KTP',
-          text: 'Pastikan foto KTP cukup terang, tidak buram, dan teks NIK terbaca jelas.',
-          confirmButtonColor: '#0d1b3e'
-        });
-      } else {
-        alert('Gagal memindai KTP. Pastikan foto KTP terlihat jelas.');
+      console.warn('Gagal mengakses kamera:', err);
+      // Coba fallback tanpa facingMode spesifik
+      try {
+        this.cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        videoEl.srcObject = this.cameraStream;
+        videoEl.play();
+      } catch (err2) {
+        console.error('Kamera tidak diizinkan atau tidak tersedia:', err2);
+        alert('Kamera tidak dapat diakses (izin ditolak atau kamera sedang digunakan aplikasi lain). Silakan pilih foto dari galeri/file.');
+        this.setOcrSource('upload');
       }
     }
   },
 
-  parseKtpText(text) {
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-    let nik = '', nama = '', alamat = '';
+  stopCameraStream() {
+    if (this.cameraStream) {
+      this.cameraStream.getTracks().forEach(track => {
+        try { track.stop(); } catch (e) {}
+      });
+      this.cameraStream = null;
+    }
+    const videoEl = document.getElementById('ocrCameraVideo');
+    if (videoEl) {
+      videoEl.srcObject = null;
+    }
+  },
 
-    // 1. Extract NIK (16 digits pattern)
-    const nikMatch = text.match(/\b([1-9][0-9]{15})\b/) || text.match(/NIK\D*([0-9\s]{16,20})/i);
-    if (nikMatch) {
-      nik = nikMatch[1].replace(/\D/g, '').slice(0, 16);
+  switchCamera() {
+    this.currentFacingMode = (this.currentFacingMode === 'environment') ? 'user' : 'environment';
+    this.startCameraStream();
+  },
+
+  captureSnapshot() {
+    const videoEl = document.getElementById('ocrCameraVideo');
+    const canvas = document.getElementById('ocrHiddenCanvas') || document.createElement('canvas');
+
+    if (!videoEl || !videoEl.videoWidth) {
+      alert('Kamera belum siap atau belum aktif.');
+      return;
     }
 
-    // 2. Extract Nama
+    canvas.width = videoEl.videoWidth;
+    canvas.height = videoEl.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+
+    this.capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.92);
+    this.stopCameraStream();
+
+    // Tampilkan Viewport Preview
+    this.showCapturedPreview(this.capturedImageBase64);
+  },
+
+  handleFileSelect(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      this.capturedImageBase64 = e.target.result;
+      this.showCapturedPreview(this.capturedImageBase64);
+    };
+    reader.readAsDataURL(file);
+  },
+
+  showCapturedPreview(dataUrl) {
+    const secCam = document.getElementById('ocrCameraSection');
+    const secUpload = document.getElementById('ocrUploadSection');
+    const secPreview = document.getElementById('ocrPreviewSection');
+    const secReview = document.getElementById('ocrReviewSection');
+    const imgEl = document.getElementById('ocrCapturedPreview');
+
+    if (secCam) secCam.style.display = 'none';
+    if (secUpload) secUpload.style.display = 'none';
+    if (secReview) secReview.style.display = 'none';
+    if (secPreview) secPreview.style.display = 'block';
+
+    if (imgEl) imgEl.src = dataUrl;
+  },
+
+  retakePhoto() {
+    this.capturedImageBase64 = null;
+    this.extractedOcrData = null;
+    this.setOcrSource(this.ocrSource || 'camera');
+  },
+
+  async processOcr() {
+    if (!this.capturedImageBase64) {
+      alert('Silakan ambil atau pilih foto dokumen terlebih dahulu.');
+      return;
+    }
+
+    const overlay = document.getElementById('ocrScanningOverlay');
+    const statusText = document.getElementById('ocrScanningStatusText');
+    const preScanActions = document.getElementById('ocrPreScanActions');
+
+    if (overlay) overlay.style.display = 'flex';
+    if (preScanActions) preScanActions.style.display = 'none';
+    if (statusText) statusText.textContent = 'Memindai & mengekstrak data identitas...';
+
+    try {
+      // 1. Panggil API AI OCR Backend
+      const res = await fetch(`${this.getApiPrefix()}api_ocr_scanner.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: this.capturedImageBase64,
+          doc_type: this.ocrDocType
+        })
+      });
+
+      const result = await res.json();
+      console.log('OCR API Response:', result);
+
+      if (result && result.status === 'success' && result.data) {
+        this.extractedOcrData = result.data;
+        this.renderOcrReview(this.extractedOcrData, result.engine || 'AI Engine');
+      } else {
+        throw new Error(result.message || 'Gagal mengenali data teks dokumen');
+      }
+
+    } catch (err) {
+      console.warn('API OCR Error, mencoba client-side fallback:', err);
+      if (statusText) statusText.textContent = 'Mencoba pengenalan karakter lokal...';
+
+      // 2. Client-side Fallback Tesseract.js (jika tersedia atau dapat diload)
+      try {
+        if (typeof Tesseract === 'undefined') {
+          await this.loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+        }
+
+        const ret = await Tesseract.recognize(this.capturedImageBase64, 'eng');
+        const text = ret.data.text;
+        console.log('Client OCR Fallback text:', text);
+
+        const parsed = this.parseKtpText(text);
+        this.extractedOcrData = parsed;
+        this.renderOcrReview(this.extractedOcrData, 'Client Heuristic OCR');
+
+      } catch (clientErr) {
+        console.error('Semua engine OCR gagal:', clientErr);
+        alert('Gagal membaca dokumen secara otomatis. Anda tetap dapat memasukkan data secara manual dan foto akan tetap terlampir.');
+        
+        // Tampilkan review kosong agar foto tetap bisa disimpan
+        this.extractedOcrData = {
+          nik: '',
+          no_kk: '',
+          nama: '',
+          alamat: ''
+        };
+        this.renderOcrReview(this.extractedOcrData, 'Manual Review');
+      }
+    } finally {
+      if (overlay) overlay.style.display = 'none';
+      if (preScanActions) preScanActions.style.display = 'flex';
+    }
+  },
+
+  renderOcrReview(data, engineName) {
+    const secPreview = document.getElementById('ocrPreviewSection');
+    const secReview = document.getElementById('ocrReviewSection');
+    const reviewList = document.getElementById('ocrReviewList');
+    const engineBadge = document.getElementById('ocrEngineBadge');
+
+    if (secPreview) secPreview.style.display = 'none';
+    if (secReview) secReview.style.display = 'block';
+
+    if (engineBadge) {
+      engineBadge.textContent = engineName || 'Smart AI Engine';
+    }
+
+    const items = [
+      { label: 'Nomor NIK', val: data.nik || '-' },
+      { label: 'No. Kartu Keluarga', val: data.no_kk || '-' },
+      { label: 'Nama Lengkap', val: data.nama || '-' },
+      { label: 'Tempat / Tgl Lahir', val: (data.tempat_lahir ? data.tempat_lahir + ', ' : '') + (data.tanggal_lahir || '-') },
+      { label: 'Jenis Kelamin', val: data.jenis_kelamin || '-' },
+      { label: 'Alamat', val: data.alamat || '-' },
+      { label: 'RT / RW', val: data.rt_rw || '-' },
+      { label: 'Kelurahan / Desa', val: data.kelurahan || '-' },
+      { label: 'Kecamatan', val: data.kecamatan || '-' },
+      { label: 'Kota / Kabupaten', val: data.kota || '-' },
+      { label: 'Status Perkawinan', val: data.status_perkawinan || '-' },
+      { label: 'Pekerjaan', val: data.pekerjaan || '-' }
+    ];
+
+    if (reviewList) {
+      reviewList.innerHTML = items.map(item => `
+        <div class="ocr-result-item">
+          <span class="ocr-result-lbl">${item.label}:</span>
+          <span class="ocr-result-val">${escapeHtml(item.val)}</span>
+        </div>
+      `).join('');
+    }
+  },
+
+  applyExtractedDataToForm() {
+    const d = this.extractedOcrData || {};
+
+    // 1. Auto-fill kolom identitas
+    const fieldMap = {
+      spkNik: d.nik,
+      spkNoKk: d.no_kk,
+      namaCustomer: d.nama,
+      spkTempatLahir: d.tempat_lahir,
+      spkTanggalLahir: d.tanggal_lahir,
+      spkJenisKelamin: d.jenis_kelamin,
+      spkStatusPerkawinan: d.status_perkawinan,
+      spkAlamat: d.alamat,
+      spkRtRw: d.rt_rw,
+      spkKelurahan: d.kelurahan,
+      spkKecamatan: d.kecamatan,
+      spkKota: d.kota,
+      spkProvinsi: d.provinsi,
+      spkAgama: d.agama,
+      spkPekerjaan: d.pekerjaan
+    };
+
+    for (const [id, val] of Object.entries(fieldMap)) {
+      const el = document.getElementById(id);
+      if (el && val) {
+        el.value = val;
+        // Efek visual highlighting
+        el.style.transition = 'background-color 0.3s';
+        el.style.backgroundColor = '#ecfdf5';
+        setTimeout(() => { el.style.backgroundColor = ''; }, 1500);
+      }
+    }
+
+    // 2. Simpan lampiran foto ke hidden input & update card preview
+    if (this.capturedImageBase64) {
+      if (this.ocrDocType === 'kk') {
+        const hidKk = document.getElementById('spkFotoKk');
+        if (hidKk) hidKk.value = this.capturedImageBase64;
+
+        const cardKk = document.getElementById('spkDocCardKk');
+        const thumbKk = document.getElementById('spkThumbKk');
+        const statusKk = document.getElementById('spkStatusKk');
+        const btnTextKk = document.getElementById('spkBtnTextKk');
+
+        if (cardKk) cardKk.classList.add('has-file');
+        if (thumbKk) thumbKk.innerHTML = `<img src="${this.capturedImageBase64}" alt="KK" />`;
+        if (statusKk) statusKk.textContent = '✅ Kartu Keluarga Terlampir';
+        if (btnTextKk) btnTextKk.textContent = 'Ganti Foto';
+      } else {
+        const hidKtp = document.getElementById('spkFotoKtp');
+        if (hidKtp) hidKtp.value = this.capturedImageBase64;
+
+        const cardKtp = document.getElementById('spkDocCardKtp');
+        const thumbKtp = document.getElementById('spkThumbKtp');
+        const statusKtp = document.getElementById('spkStatusKtp');
+        const btnTextKtp = document.getElementById('spkBtnTextKtp');
+
+        if (cardKtp) cardKtp.classList.add('has-file');
+        if (thumbKtp) thumbKtp.innerHTML = `<img src="${this.capturedImageBase64}" alt="KTP" />`;
+        if (statusKtp) statusKtp.textContent = '✅ e-KTP Terlampir';
+        if (btnTextKtp) btnTextKtp.textContent = 'Ganti Foto';
+      }
+    }
+
+    // Tutup modal
+    this.closeOcrModal();
+
+    if (window.showCustomAlert) {
+      window.showCustomAlert('✨ Auto-Fill Berhasil!', 'Data identitas ' + (this.ocrDocType === 'kk' ? 'Kartu Keluarga' : 'e-KTP') + ' berhasil dimasukkan ke formulir SPK.', 'success');
+    } else {
+      alert('Data identitas berhasil dimasukkan ke form SPK!');
+    }
+  },
+
+  // Backward compatibility method
+  async scanKtpFile(fileInput, targetFields = { nik: 'spkNik', nama: 'namaCustomer', alamat: 'spkAlamat' }) {
+    if (!fileInput.files || !fileInput.files[0]) return;
+    this.handleFileSelect(fileInput);
+    this.openOcrModal('ktp');
+  },
+
+  parseKtpText(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    let nik = '', no_kk = '', nama = '', alamat = '', tempat_lahir = '', tanggal_lahir = '', jenis_kelamin = '', rt_rw = '', kelurahan = '', kecamatan = '', kota = '';
+
+    // Extract NIK (16 digits)
+    const numClean = text.replace(/[oOD]/g, '0').replace(/[Il|]/g, '1');
+    const nikMatch = numClean.match(/\b([1-9][0-9]{15})\b/) || numClean.match(/NIK\D*([0-9\s]{16,22})/i);
+    if (nikMatch) {
+      nik = (nikMatch[1] || '').replace(/\D/g, '').slice(0, 16);
+    }
+
+    // Extract Nama
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (/nama/i.test(line)) {
-        nama = line.replace(/.*nama\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim();
+      if (/nama\b/i.test(line)) {
+        nama = line.replace(/.*nama\s*(?:lengkap|kepala\s*keluarga)?\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim();
         if (!nama && lines[i + 1]) {
-          nama = lines[i + 1].replace(/[^a-zA-Z\s]/g, '').trim();
+          nama = lines[i + 1].replace(/.*(?:lengkap|kepala\s*keluarga)?\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim();
         }
         break;
       }
     }
 
-    // 3. Extract Alamat
+    // Extract TTL
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (/tempat|tgl|lahir/i.test(line)) {
+        const val = line.replace(/.*(?:tempat|tgl|lahir)\s*[:=\-]?\s*/i, '').trim();
+        const m = val.match(/([a-zA-Z\s]+)[,\s]+([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{2,4})/);
+        if (m) {
+          tempat_lahir = m[1].trim().toUpperCase();
+          tanggal_lahir = m[2].trim();
+        }
+        break;
+      }
+    }
+
+    // Extract Jenis Kelamin
+    if (/LAKI[\-\s]*LAKI|PRIA/i.test(text)) jenis_kelamin = 'LAKI-LAKI';
+    else if (/PEREMPUAN|WANITA/i.test(text)) jenis_kelamin = 'PEREMPUAN';
+
+    // Extract RT/RW
+    const rtrwMatch = text.match(/RT[\/\.]?RW\D*([0-9]{1,3})\s*[\/\-]\s*([0-9]{1,3})/i);
+    if (rtrwMatch) {
+      rt_rw = `${rtrwMatch[1].padStart(3, '0')}/${rtrwMatch[2].padStart(3, '0')}`;
+    }
+
+    // Extract Alamat
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (/alamat/i.test(line)) {
@@ -449,7 +770,7 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
       }
     }
 
-    return { nik, nama, alamat };
+    return { nik, no_kk, nama, alamat, tempat_lahir, tanggal_lahir, jenis_kelamin, rt_rw, kelurahan, kecamatan, kota };
   },
 
   // =========================================================================

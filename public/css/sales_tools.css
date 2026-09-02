@@ -691,3 +691,552 @@
   color: #166534;
   line-height: 1.65;
 }
+
+/* ================================================================
+   SMART AI OCR CAMERA SCANNER & SPK FORM UPGRADE
+   ================================================================ */
+
+/* Section Grouping in SPK Form */
+.spk-form-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.spk-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid #f1f5f9;
+}
+
+.spk-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spk-section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #1d4ed8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.spk-section-icon.icon-red {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  color: #dc2626;
+}
+
+.spk-section-icon.icon-green {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  color: #16a34a;
+}
+
+.spk-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.spk-section-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .form-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Document Attachment Mini Cards */
+.spk-docs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 640px) {
+  .spk-docs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spk-doc-card {
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.spk-doc-card.has-file {
+  border-style: solid;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.spk-doc-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #64748b;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.spk-doc-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spk-doc-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.spk-doc-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spk-doc-status {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.spk-doc-card.has-file .spk-doc-status {
+  color: #16a34a;
+}
+
+.spk-doc-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.spk-doc-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* ================================================================
+   SMART AI OCR SCANNER MODAL (FULLSCREEN HUD VIEWPORT)
+   ================================================================ */
+.ocr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ocr-modal-container {
+  background: #0f172a;
+  color: #ffffff;
+  width: 100%;
+  max-width: 580px;
+  max-height: 92vh;
+  border-radius: 24px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ocr-modal-header {
+  padding: 18px 22px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ocr-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.ocr-modal-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #94a3b8;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.ocr-modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* Tab Selector KTP vs KK */
+.ocr-type-switcher {
+  display: flex;
+  gap: 8px;
+  padding: 12px 18px 6px 18px;
+  background: #0f172a;
+}
+
+.ocr-type-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.ocr-type-btn.active {
+  background: linear-gradient(135deg, #d7123a 0%, #b91c1c 100%);
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(215, 18, 58, 0.4);
+}
+
+/* Mode: Camera vs Gallery */
+.ocr-source-pills {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 18px;
+}
+
+.ocr-source-pill {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ocr-source-pill.active {
+  background: #3b82f6;
+  border-color: #60a5fa;
+  color: #ffffff;
+}
+
+/* Viewfinder Area */
+.ocr-viewfinder-box {
+  position: relative;
+  background: #000000;
+  width: 100%;
+  height: 310px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ocrCameraVideo, #ocrCapturedPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Card Target HUD Frame Overlay */
+.ocr-hud-frame {
+  position: absolute;
+  width: 85%;
+  height: 72%;
+  border-radius: 16px;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.ocr-hud-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: #ef4444;
+  border-style: solid;
+}
+
+.ocr-corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 14px; }
+.ocr-corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 14px; }
+.ocr-corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 14px; }
+.ocr-corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 14px; }
+
+/* Laser Beam Animation */
+.ocr-laser-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ef4444, #f43f5e, #ef4444, transparent);
+  box-shadow: 0 0 16px 3px rgba(239, 68, 68, 0.85);
+  animation: ocrLaserMove 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes ocrLaserMove {
+  0% { top: 5%; opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { top: 92%; opacity: 0.3; }
+}
+
+.ocr-hud-tip {
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Camera Action Bar */
+.ocr-controls-bar {
+  padding: 14px 20px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-ocr-round {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-ocr-round:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.05);
+}
+
+.btn-ocr-shutter {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 4px solid #ef4444;
+  padding: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+  transition: all 0.15s;
+}
+
+.btn-ocr-shutter-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+}
+
+.btn-ocr-shutter:hover {
+  transform: scale(1.08);
+}
+
+.btn-ocr-shutter:active {
+  transform: scale(0.92);
+}
+
+/* Upload Dropzone View */
+.ocr-dropzone-box {
+  padding: 36px 20px;
+  text-align: center;
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 18px;
+  margin: 16px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ocr-dropzone-box:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* Result Review Panel */
+.ocr-review-panel {
+  padding: 16px 20px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #1e293b;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ocr-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+}
+
+.ocr-result-lbl {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.ocr-result-val {
+  color: #f8fafc;
+  font-weight: 700;
+  text-align: right;
+  max-width: 65%;
+  word-break: break-word;
+}
+
+.ocr-bottom-actions {
+  padding: 14px 20px;
+  background: #0f172a;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 10px;
+}
+
+.btn-ocr-apply {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-ocr-apply:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-ocr-retake {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-ocr-retake:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
