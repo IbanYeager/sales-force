@@ -132,6 +132,27 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         'pakriva_reny' => 'reni'
     ];
 
+    // Daftar alias nama untuk akurasi 100%
+    $aliases = [
+        'pakryan_denia' => 'denia',
+        'pakryan_denis' => 'denis',
+        'pakryan_hadi' => 'hady',
+        'pakryan_hady' => 'hadi',
+        'pakalvin_ardian' => 'abdian',
+        'pakalvin_udil' => 'udu',
+        'pakalvin_yeni' => 'yenni',
+        'pakalvin_rizki' => 'rizky',
+        'pakalvin_rizky' => 'rizki',
+        'pakalvin_deri' => 'dery',
+        'pakalvin_dery' => 'deri',
+        'pakriva_reny' => 'reni',
+        'pakriva_reni' => 'reny',
+        'pakriva_giyono' => 'giono',
+        'pakriva_giono' => 'giyono',
+        'pakriva_shovie' => 'shovia',
+        'pakriva_shovia' => 'shovie'
+    ];
+
     // Target baseline default jika belum ada target khusus
     $whiteboard_targets = [
         'indah' => ['target_spk' => 4, 'target_do' => 3], 'dadi' => ['target_spk' => 3, 'target_do' => 2],
@@ -172,18 +193,33 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
             if (trim($line) === '') continue;
             $cols = str_getcsv($line);
 
-            // Deteksi SPV berdasarkan section dan nomor baris
-            if ($lineIdx >= 1 && $lineIdx <= 20) {
+            $c0 = trim($cols[0] ?? '');
+            $c1 = trim($cols[1] ?? '');
+
+            // Deteksi SPV berdasarkan section header text
+            $full_row_text = implode(' ', $cols);
+            if (stripos($full_row_text, 'Tim Pak Ryan') !== false || (stripos($c1, 'RYAN') !== false && !is_numeric($c0)) || (stripos($c0, 'Pak Ryan') !== false && !is_numeric($c0))) {
                 $current_spv = "Pak Ryan";
-            } elseif ($lineIdx >= 25 && $lineIdx <= 33) {
-                $current_spv = "Pak Riva";
-            } elseif ($lineIdx >= 38 && $lineIdx <= 55) {
+                continue;
+            } elseif (stripos($full_row_text, 'Tim Pak Alvin') !== false || (stripos($full_row_text, 'Alvin') !== false && !is_numeric($c0))) {
                 $current_spv = "Pak Alvin";
-            } else {
+                continue;
+            } elseif (stripos($full_row_text, 'Tim Pak Riva') !== false || (stripos($full_row_text, 'Riva') !== false && !is_numeric($c0))) {
+                $current_spv = "Pak Riva";
+                continue;
+            }
+
+            // Fallback untuk layout lama berdasarkan baris index jika tidak ada header teks terpisah
+            if (empty($c0) || !is_numeric($c0)) {
+                if ($lineIdx == 22 || $lineIdx == 23 || $lineIdx == 24) {
+                    $current_spv = "Pak Riva";
+                } elseif ($lineIdx == 35 || $lineIdx == 36 || $lineIdx == 37) {
+                    $current_spv = "Pak Alvin";
+                }
                 continue; // Header, Total, atau baris kosong
             }
 
-            $nama_sales = trim($cols[1] ?? '');
+            $nama_sales = $c1;
             if (empty($nama_sales) || $nama_sales === 'Sales' || stripos($nama_sales, 'Total') !== false) continue;
 
             $cur_spv_key = normalizeName($current_spv);
@@ -196,6 +232,8 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 $matched = $sales_map[$lookup_key];
             } elseif (isset($aliases[$lookup_key]) && isset($sales_map[$cur_spv_key . '_' . $aliases[$lookup_key]])) {
                 $matched = $sales_map[$cur_spv_key . '_' . $aliases[$lookup_key]];
+            } elseif (isset($aliases[$norm_name]) && isset($sales_map[$cur_spv_key . '_' . $aliases[$norm_name]])) {
+                $matched = $sales_map[$cur_spv_key . '_' . $aliases[$norm_name]];
             } elseif (isset($sales_map[$norm_name])) {
                 $matched = $sales_map[$norm_name];
             }
