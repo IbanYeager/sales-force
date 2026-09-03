@@ -1,7 +1,7 @@
 <?php
 // api/api_cron_kacab_sentinel.php
 // Script Cron Otomatis Pengiriman Laporan AI Sentinel ke WhatsApp Kepala Cabang (Kacab)
-// Dijadwalkan otomatis setiap hari pukul 06:00 WIB
+// Mendukung eksekusi via Windows Task Scheduler (CLI), Web-Cron Fallback, dan UI Manual Trigger
 
 error_reporting(0);
 mysqli_report(MYSQLI_REPORT_OFF);
@@ -49,23 +49,84 @@ if ($conn && !$conn->connect_error) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 }
 
-// 1. Tangani Simpan Pengaturan jika dipanggil via POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $raw = file_get_contents("php://input");
-    $data = json_decode($raw, true);
-
-    if (isset($data['action']) && $data['action'] === 'save_settings') {
-        $kacab_wa = $conn->real_escape_string(trim($data['kacab_wa'] ?? '081234567890'));
-        $schedule_time = trim($data['schedule_time'] ?? '06:00');
-        // Pastikan format HH:MM
-        if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time)) {
-            $schedule_time = '06:00';
+// Helper: Setup / Update Windows Task Scheduler dengan Setting Anti-Sleep & Anti-Battery-Delay
+function syncWindowsTaskScheduler($schedule_time) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        return false;
+    }
+    
+    // Cari path cron_sentinel_06am.bat
+    $possible_paths = [
+        dirname(__DIR__) . "\\cron_sentinel_06am.bat",
+        "c:\\laragon\\www\\sft - Copy\\cron_sentinel_06am.bat",
+        "c:\\laragon\\www\\sft\\cron_sentinel_06am.bat"
+    ];
+    $bat_path = "";
+    foreach ($possible_paths as $p) {
+        if (file_exists($p)) {
+            $bat_path = $p;
+            break;
         }
-        $schedule_time_db = $conn->real_escape_string($schedule_time);
-        $auto_send = intval($data['auto_send_enabled'] ?? 1);
-        $gateway_provider = $conn->real_escape_string(trim($data['gateway_provider'] ?? 'fonnte'));
-        $gateway_token = $conn->real_escape_string(trim($data['gateway_token'] ?? ''));
+    }
+    if (empty($bat_path)) {
+        $bat_path = dirname(__DIR__) . "\\cron_sentinel_06am.bat";
+    }
 
+    $task_name = "SFT_AI_Sentinel_Kacab_06AM";
+    // 1. Buat / Update Task Schedule Dasar dengan schtasks
+    @exec("schtasks /create /tn \"$task_name\" /tr \"\\\"$bat_path\\\"\" /sc daily /st $schedule_time /f 2>&1", $task_output, $task_code);
+
+    // 2. PowerShell: Izinkan jalan di baterai, jangan stop di baterai, bangunkan laptop jika tidur, dan jalankan segera jika waktu terlewat
+    $ps_cmd = "powershell -ExecutionPolicy Bypass -Command \"Set-ScheduledTask -TaskName '$task_name' -Settings (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -WakeToRun)\" 2>&1";
+    @exec($ps_cmd, $ps_output, $ps_code);
+
+    return ($task_code === 0);
+}
+
+// Parsing parameter dari CLI ($argv) atau HTTP request
+$action = $_GET['action'] ?? '';
+$data = [];
+
+if (php_sapi_name() === 'cli') {
+    $action = !empty($_GET['action']) ? $_GET['action'] : (!empty($_POST['action']) ? $_POST['action'] : 'execute_cron');
+    if (isset($argv) && count($argv) > 1) {
+        foreach (array_slice($argv, 1) as $arg) {
+            if (strpos($arg, '=') !== false) {
+                list($k, $v) = explode('=', $arg, 2);
+                $_GET[$k] = $v;
+                if ($k === 'action') $action = $v;
+            } else {
+                $_GET[$arg] = true;
+                if (in_array($arg, ['execute_cron', 'send_now', 'get_settings', 'save_settings'])) {
+                    $action = $arg;
+                }
+            }
+        }
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $raw = file_get_contents("php://input");
+    $data = json_decode($raw, true) ?: [];
+    if (!empty($data['action'])) {
+        $action = $data['action'];
+    } elseif (!empty($_POST['action'])) {
+        $action = $_POST['action'];
+    }
+}
+
+// 1. Tangani Simpan Pengaturan jika dipanggil via POST action=save_settings
+if ($action === 'save_settings') {
+    $kacab_wa = $conn ? $conn->real_escape_string(trim($data['kacab_wa'] ?? $_POST['kacab_wa'] ?? '081234567890')) : '081234567890';
+    $schedule_time = trim($data['schedule_time'] ?? $_POST['schedule_time'] ?? '06:00');
+    // Pastikan format HH:MM
+    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time)) {
+        $schedule_time = '06:00';
+    }
+    $schedule_time_db = $conn ? $conn->real_escape_string($schedule_time) : $schedule_time;
+    $auto_send = intval($data['auto_send_enabled'] ?? $_POST['auto_send_enabled'] ?? 1);
+    $gateway_provider = $conn ? $conn->real_escape_string(trim($data['gateway_provider'] ?? $_POST['gateway_provider'] ?? 'fonnte')) : 'fonnte';
+    $gateway_token = $conn ? $conn->real_escape_string(trim($data['gateway_token'] ?? $_POST['gateway_token'] ?? '')) : '';
+
+    if ($conn) {
         $conn->query("UPDATE tabel_sentinel_settings SET 
             kacab_wa = '$kacab_wa',
             schedule_time = '$schedule_time_db',
@@ -73,24 +134,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gateway_provider = '$gateway_provider',
             gateway_token = '$gateway_token'
             WHERE id = 1");
-
-        // Sinkronisasi otomatis ke Windows Task Scheduler
-        $bat_path = "c:\\laragon\\www\\sft\\cron_sentinel_06am.bat";
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            @exec("schtasks /create /tn \"SFT_AI_Sentinel_Kacab_06AM\" /tr \"$bat_path\" /sc daily /st $schedule_time /f 2>&1", $task_output, $task_code);
-        }
-
-        echo json_encode([
-            "status" => "success",
-            "schedule_time" => $schedule_time,
-            "message" => "Jadwal kirim otomatis berhasil diatur ke pukul " . $schedule_time . " WIB setiap hari!"
-        ]);
-        if ($conn) $conn->close();
-        exit();
     }
+
+    // Sinkronisasi otomatis ke Windows Task Scheduler dengan pengaturan Power & Wakeup
+    $synced = syncWindowsTaskScheduler($schedule_time);
+
+    echo json_encode([
+        "status" => "success",
+        "schedule_time" => $schedule_time,
+        "scheduler_synced" => $synced,
+        "message" => "Jadwal kirim otomatis berhasil disimpan ke pukul " . $schedule_time . " WIB setiap hari! (Proteksi baterai & anti-delay telah diaktifkan)"
+    ]);
+    if ($conn) $conn->close();
+    exit();
 }
 
-// 2. Ambil Pengaturan Aktif
+// 2. Ambil Pengaturan Aktif dari DB
 $settings = [
     'kacab_wa' => '081234567890',
     'schedule_time' => '06:00',
@@ -101,14 +160,60 @@ $settings = [
     'last_sent_status' => 'Ready'
 ];
 
-$res_set = $conn->query("SELECT * FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
-if ($res_set && $s_row = $res_set->fetch_assoc()) {
-    $settings = array_merge($settings, $s_row);
+if ($conn) {
+    $res_set = $conn->query("SELECT * FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
+    if ($res_set && $s_row = $res_set->fetch_assoc()) {
+        $settings = array_merge($settings, $s_row);
+    }
+}
+
+// 3. JIKA HANYA BACA PENGATURAN (GET biasa / action=get_settings) -> RETURN SETTINGS TANPA KIRIM PESAN!
+if ($action === 'get_settings' || (empty($action) && php_sapi_name() !== 'cli')) {
+    $today_str = date('Y-m-d');
+    $last_sent_date = !empty($settings['last_sent_at']) ? date('Y-m-d', strtotime($settings['last_sent_at'])) : '';
+    $already_sent_today = ($last_sent_date === $today_str && $settings['last_sent_status'] === 'Sent');
+
+    echo json_encode([
+        "status" => "success",
+        "settings" => $settings,
+        "server_time" => date('Y-m-d H:i:s'),
+        "today_already_sent" => $already_sent_today
+    ]);
+    if ($conn) $conn->close();
+    exit();
+}
+
+// 4. VALIDASI EKSEKUSI PENGIRIMAN (action=execute_cron atau action=send_now)
+$is_manual_test = ($action === 'send_now') || (isset($_GET['force']) && $_GET['force'] == 1);
+
+// Cek apakah auto-send diaktifkan (khusus eksekusi cron otomatis)
+if (!$is_manual_test && intval($settings['auto_send_enabled']) !== 1) {
+    echo json_encode([
+        "status" => "disabled",
+        "message" => "Pengiriman otomatis AI Sentinel sedang dinonaktifkan di pengaturan."
+    ]);
+    if ($conn) $conn->close();
+    exit();
+}
+
+// Cek Deduplikasi Harian (Mencegah pesan ganda terkirim berulang di hari yang sama)
+$today_str = date('Y-m-d');
+$last_sent_date = !empty($settings['last_sent_at']) ? date('Y-m-d', strtotime($settings['last_sent_at'])) : '';
+$already_sent_today = ($last_sent_date === $today_str && $settings['last_sent_status'] === 'Sent');
+
+if (!$is_manual_test && $already_sent_today) {
+    echo json_encode([
+        "status" => "skipped",
+        "message" => "Laporan AI Sentinel hari ini ($today_str) sudah terkirim pada {$settings['last_sent_at']} WIB. Pengiriman duplikat dilewati.",
+        "last_sent_at" => $settings['last_sent_at']
+    ]);
+    if ($conn) $conn->close();
+    exit();
 }
 
 require_once __DIR__ . '/api_sheets_sync.php';
 
-// 3. Helper: Hitung Laporan AI Sentinel Hari Ini
+// 5. Helper: Hitung Laporan AI Sentinel Hari Ini
 $current_day = intval(date('j'));
 $current_month = intval(date('n'));
 $current_year = date('Y');
@@ -141,6 +246,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     } else {
         $slice = 6; $min = 6; $range = "Hari 26 - Akhir Bulan";
     }
+    $range_label = $range;
 
     $whiteboard_targets = [
         'indah' => ['target_spk' => 4, 'target_do' => 3], 'dadi' => ['target_spk' => 3, 'target_do' => 2],
@@ -169,7 +275,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     $periode_str = $current_day . " " . $nama_bulan_list[$current_month] . " " . $current_year;
 
     // Ambil HANYA wiraniaga yang aktif di Google Spreadsheet saat ini
-    $q_sales = $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts WHERE is_active = 1 ORDER BY nama_spv ASC, nama_lengkap ASC");
+    $q_sales = $conn ? $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts WHERE is_active = 1 ORDER BY nama_spv ASC, nama_lengkap ASC") : null;
 
     $underperforming = [];
     $on_track = [];
@@ -256,7 +362,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
 
     $msg = "";
     if ($needs_alert) {
-        $msg .= "🚨 *LAPORAN HARIAN AI SENTINEL KACAB (06:00 WIB)* 🚨\n";
+        $msg .= "🚨 *LAPORAN HARIAN AI SENTINEL KACAB* 🚨\n";
         $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $msg .= "📅 *Tanggal*: {$periode_str}\n";
         $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
@@ -284,7 +390,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
         $msg .= "1. Instruksikan SPV untuk melakukan review harian dan mendampingi closing (Co-Closing).\n";
         $msg .= "2. Percepat proses approval diskon dan kredit untuk prospek yang sedang berjalan.";
     } else {
-        $msg .= "✅ *LAPORAN HARIAN AI SENTINEL KACAB: SEMUA ON-TRACK (06:00 WIB)* ✅\n";
+        $msg .= "✅ *LAPORAN HARIAN AI SENTINEL KACAB: SEMUA ON-TRACK* ✅\n";
         $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $msg .= "📅 *Tanggal*: {$periode_str}\n";
         $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
@@ -314,7 +420,7 @@ if (str_starts_with($clean_phone, '0')) {
     $clean_phone = '62' . substr($clean_phone, 1);
 }
 
-// 4. Pengiriman Nyata via Gateway WhatsApp (Jika Token Tersedia)
+// 6. Pengiriman Nyata via Gateway WhatsApp (Jika Token Tersedia)
 $dispatch_result = "Simulated / Logged";
 $http_status = 200;
 
@@ -381,21 +487,23 @@ if (!empty($settings['gateway_token'])) {
     $dispatch_result = "Auto-Logged (Ready for Gateway or Click-to-Send)";
 }
 
-// 5. Catat Log ke Database
+// 7. Catat Log ke Database
 $now_str = date('Y-m-d H:i:s');
 $today_str = date('Y-m-d');
 $status_log = ($http_status === 200) ? 'Sent' : 'Failed';
 
-$stmt = $conn->prepare("INSERT INTO tabel_ai_sentinel_logs 
-    (periode_tanggal, hari_ke, periode_slice, min_required, underperforming_count, on_track_count, report_message, sent_to_wa, status) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-if ($stmt) {
-    $stmt->bind_param("siiiiisss", $today_str, $current_day, $report['slice'], $report['min'], $report['underperforming_count'], $report['on_track_count'], $wa_message, $clean_phone, $status_log);
-    $stmt->execute();
-    $stmt->close();
-}
+if ($conn) {
+    $stmt = $conn->prepare("INSERT INTO tabel_ai_sentinel_logs 
+        (periode_tanggal, hari_ke, periode_slice, min_required, underperforming_count, on_track_count, report_message, sent_to_wa, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    if ($stmt) {
+        $stmt->bind_param("siiiiisss", $today_str, $current_day, $report['slice'], $report['min'], $report['underperforming_count'], $report['on_track_count'], $wa_message, $clean_phone, $status_log);
+        $stmt->execute();
+        $stmt->close();
+    }
 
-$conn->query("UPDATE tabel_sentinel_settings SET last_sent_at = '$now_str', last_sent_status = '$status_log' WHERE id = 1");
+    $conn->query("UPDATE tabel_sentinel_settings SET last_sent_at = '$now_str', last_sent_status = '$status_log' WHERE id = 1");
+}
 
 $wa_url = "https://api.whatsapp.com/send?phone=" . $clean_phone . "&text=" . urlencode($wa_message);
 

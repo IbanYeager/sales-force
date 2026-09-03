@@ -385,7 +385,7 @@ function toggleSentinelSettings() {
 
 async function loadSentinelSettingsIntoForm() {
   try {
-    const res = await fetch('../api/api_cron_kacab_sentinel.php');
+    const res = await fetch('../api/api_cron_kacab_sentinel.php?action=get_settings');
     const json = await res.json();
     if (json && json.settings) {
       const waInput = document.getElementById('kacabWaNumberInput');
@@ -451,15 +451,17 @@ async function testCronExecutionNow() {
   btn.disabled = true;
 
   try {
-    const res = await fetch('../api/api_cron_kacab_sentinel.php');
+    const res = await fetch('../api/api_cron_kacab_sentinel.php?action=send_now&force=1');
     const result = await res.json();
     if (result.status === 'success') {
       alert(`✅ Eksekusi Otomatis Berhasil!\nTarget WA: ${result.target_kacab_wa}\nWaktu: ${result.executed_at}\nStatus: ${result.dispatch_result}`);
       if (result.wa_share_url) {
         window.open(result.wa_share_url, '_blank');
       }
+    } else if (result.status === 'skipped') {
+      alert(`ℹ️ ${result.message}`);
     } else {
-      alert('Gagal mengeksekusi cron.');
+      alert('Gagal mengeksekusi cron: ' + (result.message || 'Error'));
     }
   } catch (err) {
     console.error('Cron test error:', err);

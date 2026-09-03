@@ -1,6 +1,6 @@
 <?php
 // api/api_heartbeat.php
-// Real-time Presence Engine for Sales & SPVs
+// Real-time Presence Engine for Sales & SPVs with Built-in Sentinel Auto-Dispatcher Fallback
 error_reporting(0);
 mysqli_report(MYSQLI_REPORT_OFF);
 
@@ -34,6 +34,40 @@ function formatRelativeTime($datetimeStr) {
     return date('d M Y H:i', $time);
 }
 
+// Helper: Web-Cron Fallback untuk AI Sentinel jika waktu jadwal tiba
+function checkAndTriggerSentinelWebCron($conn) {
+    if (!$conn) return;
+    $sentinel_check = $conn->query("SELECT id, schedule_time, auto_send_enabled, last_sent_at, last_sent_status FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
+    if ($sentinel_check && $s_set = $sentinel_check->fetch_assoc()) {
+        if (intval($s_set['auto_send_enabled']) === 1) {
+            $sched_time = $s_set['schedule_time'] ?: '06:00';
+            $now_time = date('H:i');
+            $today_date = date('Y-m-d');
+            $last_date = !empty($s_set['last_sent_at']) ? date('Y-m-d', strtotime($s_set['last_sent_at'])) : '';
+            $already_sent = ($last_date === $today_date && $s_set['last_sent_status'] === 'Sent');
+
+            // Jika sudah mencapai/melewati waktu jadwal hari ini dan belum terkirim sukses hari ini
+            if (!$already_sent && $now_time >= $sched_time) {
+                // Kunci lock atomik di database agar tidak dieksekusi dobel jika banyak user online
+                $conn->query("UPDATE tabel_sentinel_settings SET last_sent_status = 'In Progress', last_sent_at = NOW() 
+                              WHERE id = 1 AND auto_send_enabled = 1 
+                              AND (DATE(last_sent_at) != CURDATE() OR last_sent_at IS NULL OR last_sent_status != 'Sent')");
+                if ($conn->affected_rows > 0) {
+                    // Berhasil klaim lock! Trigger eksekusi di latar belakang tanpa memblokir request user
+                    $cron_script = __DIR__ . '/api_cron_kacab_sentinel.php';
+                    if (file_exists($cron_script)) {
+                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                            pclose(popen("start /B php \"$cron_script\" action=execute_cron > NUL 2>&1", "r"));
+                        } else {
+                            exec("php \"$cron_script\" action=execute_cron > /dev/null 2>&1 &");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 $action = $_GET['action'] ?? '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rawInput = file_get_contents("php://input");
@@ -61,6 +95,9 @@ if ($action === 'ping') {
         $conn->query("UPDATE sales_accounts SET last_active = NOW(), is_online = 1 WHERE $where");
         $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
     }
+
+    // Auto-check apakah ada jadwal Sentinel yang jatuh tempo
+    checkAndTriggerSentinelWebCron($conn);
 
     echo json_encode([
         "status" => "success",
@@ -155,6 +192,9 @@ if ($salesRes && $salesRes->num_rows > 0) {
         $sales_list[] = $sRow;
     }
 }
+
+// Auto-check apakah ada jadwal Sentinel yang jatuh tempo
+checkAndTriggerSentinelWebCron($conn);
 
 echo json_encode([
     "status" => "success",
