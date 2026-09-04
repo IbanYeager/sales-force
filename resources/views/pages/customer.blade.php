@@ -162,7 +162,7 @@
               <h4 class="ocr-banner-title" style="font-size:13.5px;">Scan KTP Otomatis</h4>
             </div>
           </div>
-          <button type="button" class="btn-ocr-action" style="padding:8px 14px; font-size:11.5px;">
+          <button type="button" class="btn-ocr-action" style="padding:8px 14px; font-size:11.5px;" onclick="event.stopPropagation(); document.getElementById('ocrKtpInputCustomer').click()">
             <i class="fa-solid fa-camera"></i> Foto KTP
           </button>
         </div>
@@ -187,7 +187,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../custom_alert.js?v=25"></script>
   <script src="../js/customer.js?v=25"></script>
-  <script src="../js/sales_superpowers.js?v=1.0"></script>
+  <script src="../js/sales_superpowers.js?v={{ time() }}"></script>
   <script src="../js/followup_sales.js?v=20260828_single_icons"></script>
   <script src="../js/pwa-app.js?v=20260828_single_icons"></script>
   <script>

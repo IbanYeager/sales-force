@@ -21,13 +21,13 @@ if (strtoupper($requestMethod) === 'OPTIONS') {
     exit;
 }
 
-$rawInput = file_get_contents('php://input');
-if (empty($rawInput)) {
-    if (isset($request) && is_object($request) && method_exists($request, 'getContent')) {
-        $rawInput = $request->getContent();
-    } elseif (!empty($GLOBALS['RAW_INPUT_CONTENT'])) {
-        $rawInput = $GLOBALS['RAW_INPUT_CONTENT'];
-    }
+$rawInput = '';
+if (!empty($GLOBALS['RAW_INPUT_CONTENT'])) {
+    $rawInput = $GLOBALS['RAW_INPUT_CONTENT'];
+} elseif (isset($request) && is_object($request) && method_exists($request, 'getContent')) {
+    $rawInput = $request->getContent();
+} elseif (php_sapi_name() !== 'cli') {
+    $rawInput = file_get_contents('php://input');
 }
 
 $payload = json_decode($rawInput, true);
@@ -68,20 +68,27 @@ if (empty($geminiKey)) {
     $geminiKey = trim($geminiKey);
 }
 
-if (empty($geminiKey) && file_exists(__DIR__ . '/../../.env')) {
-    $envContent = file_get_contents(__DIR__ . '/../../.env');
-    if (preg_match('/GEMINI_API_KEY\s*=\s*["\']?([^"\'\s\r\n]+)/', $envContent, $m)) {
-        $geminiKey = trim($m[1]);
-    }
-} elseif (empty($geminiKey) && file_exists(__DIR__ . '/../.env')) {
-    $envContent = file_get_contents(__DIR__ . '/../.env');
-    if (preg_match('/GEMINI_API_KEY\s*=\s*["\']?([^"\'\s\r\n]+)/', $envContent, $m)) {
-        $geminiKey = trim($m[1]);
+if (empty($geminiKey)) {
+    $envPaths = [
+        __DIR__ . '/../../.env',
+        __DIR__ . '/../.env',
+        __DIR__ . '/.env',
+        dirname(__DIR__, 2) . '/.env',
+        dirname(__DIR__, 1) . '/.env'
+    ];
+    foreach ($envPaths as $envPath) {
+        if (file_exists($envPath)) {
+            $envContent = file_get_contents($envPath);
+            if (preg_match('/GEMINI_API_KEY\s*=\s*["\']?([^"\'\s\r\n]+)/', $envContent, $m)) {
+                $geminiKey = trim($m[1]);
+                if (!empty($geminiKey)) break;
+            }
+        }
     }
 }
 
 // 2. Jika Gemini key tersedia dan data gambar dikirimkan -> Gunakan Gemini AI Vision
-if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
+if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 50) {
     $cleanBase64 = $imageData;
     $mimeType = 'image/jpeg';
     if (preg_match('/^data:(image\/[a-zA-Z0-9\+\-\.]+);base64,(.+)$/', $imageData, $matches)) {
@@ -124,8 +131,8 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
                 "parts" => [
                     ["text" => $promptInstruction],
                     [
-                        "inline_data" => [
-                            "mime_type" => $mimeType,
+                        "inlineData" => [
+                            "mimeType" => $mimeType,
                             "data" => $cleanBase64
                         ]
                     ]
@@ -134,17 +141,15 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
         ],
         "generationConfig" => [
             "temperature" => 0.1,
-            "response_mime_type" => "application/json"
+            "responseMimeType" => "application/json"
         ]
     ];
 
     // Model vision yang didukung secara resmi dengan fallback otomatis
     $visionModels = [
-        'gemini-3.1-flash-lite',
-        'gemini-flash-lite-latest',
         'gemini-2.5-flash',
-        'gemini-3.5-flash-lite',
-        'gemini-flash-latest'
+        'gemini-flash-lite-latest',
+        'gemini-3.1-flash-lite'
     ];
 
     foreach ($visionModels as $visionModel) {
@@ -154,9 +159,13 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($geminiPayload),
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_TIMEOUT => 20,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Expect:'
+            ],
+            CURLOPT_TIMEOUT => 25,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4
         ]);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -177,12 +186,29 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
 
             if (is_array($parsedData)) {
                 $cleanData = sanitizeExtractedData($parsedData, $docType);
-                if (!empty($cleanData['nik']) || !empty($cleanData['nama']) || !empty($cleanData['no_kk']) || !empty($cleanData['alamat'])) {
+                $hasFields = false;
+                foreach ($cleanData as $val) {
+                    if (!empty($val) && $val !== '-') {
+                        $hasFields = true;
+                        break;
+                    }
+                }
+
+                if ($hasFields) {
                     echo json_encode([
                         "status" => "success",
                         "engine" => "Gemini AI Vision (" . $visionModel . ")",
                         "doc_type" => $docType,
                         "data" => $cleanData
+                    ]);
+                    exit;
+                } else {
+                    echo json_encode([
+                        "status" => "unreadable",
+                        "engine" => "Gemini AI Vision (" . $visionModel . ")",
+                        "doc_type" => $docType,
+                        "data" => $cleanData,
+                        "message" => "Dokumen berhasil dipindai oleh AI, namun teks identitas (NIK/Nama/Alamat) tidak terdeteksi jelas. Pastikan foto tegak, terang, fokus, dan tidak terpotong."
                     ]);
                     exit;
                 }
@@ -226,6 +252,16 @@ function sanitizeExtractedData($data, $docType) {
     foreach (['data', 'ktp', 'kk', 'result', 'hasil', 'identitas'] as $wrap) {
         if (isset($data[$wrap]) && is_array($data[$wrap])) {
             $data = array_merge($data, $data[$wrap]);
+        }
+    }
+
+    // Support Kartu Keluarga nested member list (ambil kepala keluarga / anggota pertama)
+    foreach (['anggota', 'anggota_keluarga', 'keluarga', 'daftar_keluarga', 'members', 'daftar_anggota'] as $arrKey) {
+        if (isset($data[$arrKey]) && is_array($data[$arrKey]) && !empty($data[$arrKey])) {
+            $firstPerson = reset($data[$arrKey]);
+            if (is_array($firstPerson)) {
+                $data = array_merge($firstPerson, $data);
+            }
         }
     }
 
