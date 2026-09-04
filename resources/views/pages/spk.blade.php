@@ -635,7 +635,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="../custom_alert.js"></script>
-  <script src="../js/sales_superpowers.js?v=2.0"></script>
+  <script src="../js/sales_superpowers.js?v={{ time() }}"></script>
   <script src="../js/spk.js?v=2"></script>
   <script src="../js/spk_arcade_game.js?v=1"></script>
 

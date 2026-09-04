@@ -35,6 +35,12 @@ class ApiBridgeController extends Controller
             ob_start();
             try {
                 // Ensure legacy script has access to $_GET, $_POST, $_REQUEST, and php://input
+                $_SERVER['REQUEST_METHOD'] = $request->getMethod();
+                $_GET = $request->query->all();
+                $_POST = $request->request->all();
+                $_REQUEST = array_merge($_GET, $_POST);
+                $GLOBALS['RAW_INPUT_CONTENT'] = $request->getContent();
+
                 include $scriptFile;
                 $output = ob_get_clean();
                 restore_error_handler();

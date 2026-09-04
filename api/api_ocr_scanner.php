@@ -11,25 +11,48 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+$requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+if (isset($request) && is_object($request) && method_exists($request, 'getMethod')) {
+    $requestMethod = $request->getMethod();
+}
+
+if (strtoupper($requestMethod) === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["status" => "error", "message" => "Metode request tidak didukung."]);
+$rawInput = file_get_contents('php://input');
+if (empty($rawInput)) {
+    if (isset($request) && is_object($request) && method_exists($request, 'getContent')) {
+        $rawInput = $request->getContent();
+    } elseif (!empty($GLOBALS['RAW_INPUT_CONTENT'])) {
+        $rawInput = $GLOBALS['RAW_INPUT_CONTENT'];
+    }
+}
+
+$payload = json_decode($rawInput, true);
+if (!is_array($payload) || empty($payload)) {
+    if (isset($request) && is_object($request) && method_exists($request, 'all')) {
+        $payload = $request->all();
+    } elseif (!empty($_POST)) {
+        $payload = $_POST;
+    } else {
+        $payload = [];
+    }
+}
+
+$imageData = $payload['image'] ?? ($_POST['image'] ?? '');
+$docType = strtolower($payload['doc_type'] ?? ($_POST['doc_type'] ?? 'ktp')); // 'ktp' atau 'kk'
+$rawText = trim($payload['raw_text'] ?? ($_POST['raw_text'] ?? ''));
+$clientKey = trim($payload['api_key'] ?? ($_POST['api_key'] ?? ''));
+
+// Jika tidak ada data gambar dan tidak ada teks dokumen yang dikirimkan
+if (empty($imageData) && empty($rawText)) {
+    echo json_encode(["status" => "error", "message" => "Tidak ada data gambar atau teks dokumen yang diterima."]);
     exit;
 }
 
-$rawInput = file_get_contents('php://input');
-$payload = json_decode($rawInput, true) ?: [];
-
-$imageData = $payload['image'] ?? '';
-$docType = strtolower($payload['doc_type'] ?? 'ktp'); // 'ktp' atau 'kk'
-$rawText = trim($payload['raw_text'] ?? '');
-$clientKey = trim($payload['api_key'] ?? '');
-
-// 1. Periksa ketersediaan Gemini API Key (Client payload, config_ai.json, atau .env)
+// 1. Periksa ketersediaan Gemini API Key (Client payload, config_ai.json, getenv, atau .env)
 $geminiKey = $clientKey;
 
 if (empty($geminiKey)) {
@@ -38,6 +61,11 @@ if (empty($geminiKey)) {
         $cfg = json_decode(file_get_contents($configFile), true);
         $geminiKey = trim($cfg['gemini_api_key'] ?? '');
     }
+}
+
+if (empty($geminiKey)) {
+    $geminiKey = getenv('GEMINI_API_KEY') ?: ($_ENV['GEMINI_API_KEY'] ?? ($_SERVER['GEMINI_API_KEY'] ?? ''));
+    $geminiKey = trim($geminiKey);
 }
 
 if (empty($geminiKey) && file_exists(__DIR__ . '/../../.env')) {
@@ -111,7 +139,13 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
     ];
 
     // Model vision yang didukung secara resmi dengan fallback otomatis
-    $visionModels = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro'];
+    $visionModels = [
+        'gemini-3.1-flash-lite',
+        'gemini-flash-lite-latest',
+        'gemini-2.5-flash',
+        'gemini-3.5-flash-lite',
+        'gemini-flash-latest'
+    ];
 
     foreach ($visionModels as $visionModel) {
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$visionModel}:generateContent?key=" . urlencode($geminiKey);
@@ -122,7 +156,7 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
             CURLOPT_POSTFIELDS => json_encode($geminiPayload),
             CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
             CURLOPT_TIMEOUT => 20,
-            CURLOPT_SSL_VERIFYPEER => true
+            CURLOPT_SSL_VERIFYPEER => false
         ]);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -137,14 +171,21 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
             $rawJsonText = preg_replace('/```$/', '', trim($rawJsonText));
 
             $parsedData = json_decode($rawJsonText, true);
-            if (is_array($parsedData) && (!empty($parsedData['nik']) || !empty($parsedData['nama']) || !empty($parsedData['no_kk']))) {
-                echo json_encode([
-                    "status" => "success",
-                    "engine" => "Gemini AI Vision (" . $visionModel . ")",
-                    "doc_type" => $docType,
-                    "data" => sanitizeExtractedData($parsedData, $docType)
-                ]);
-                exit;
+            if (!is_array($parsedData) && preg_match('/\{[\s\S]*\}/', $rawJsonText, $jm)) {
+                $parsedData = json_decode($jm[0], true);
+            }
+
+            if (is_array($parsedData)) {
+                $cleanData = sanitizeExtractedData($parsedData, $docType);
+                if (!empty($cleanData['nik']) || !empty($cleanData['nama']) || !empty($cleanData['no_kk']) || !empty($cleanData['alamat'])) {
+                    echo json_encode([
+                        "status" => "success",
+                        "engine" => "Gemini AI Vision (" . $visionModel . ")",
+                        "doc_type" => $docType,
+                        "data" => $cleanData
+                    ]);
+                    exit;
+                }
             }
         }
     }
@@ -171,30 +212,55 @@ echo json_encode([
     "status" => "need_client_ocr",
     "engine" => "client-fallback-required",
     "doc_type" => $docType,
-    "message" => "Gemini AI Key belum disetel. Menjalankan Tesseract OCR lokal di browser..."
+    "message" => "Gemini AI Key belum disetel atau dokumen belum terbaca. Menjalankan Tesseract OCR lokal di browser..."
 ]);
 exit;
 
 /**
- * Sanitizes and fills missing keys
+ * Sanitizes and fills missing keys with case-insensitive normalization and alias resolution
  */
 function sanitizeExtractedData($data, $docType) {
+    if (!is_array($data)) return [];
+
+    // Check nested wrappers like 'data', 'ktp', 'kk', 'result', 'hasil', 'identitas'
+    foreach (['data', 'ktp', 'kk', 'result', 'hasil', 'identitas'] as $wrap) {
+        if (isset($data[$wrap]) && is_array($data[$wrap])) {
+            $data = array_merge($data, $data[$wrap]);
+        }
+    }
+
+    // Normalize keys: lowercase, alphanumeric and underscores only
+    $norm = [];
+    foreach ($data as $k => $v) {
+        $cleanK = strtolower(trim(preg_replace('/[^a-zA-Z0-9_]/', '_', $k)));
+        $norm[$cleanK] = is_string($v) ? trim($v) : $v;
+    }
+
+    $getVal = function(...$keys) use ($norm) {
+        foreach ($keys as $k) {
+            if (!empty($norm[$k]) && is_string($norm[$k])) {
+                return $norm[$k];
+            }
+        }
+        return '';
+    };
+
     return [
-        'nik' => preg_replace('/[^0-9]/', '', $data['nik'] ?? ''),
-        'no_kk' => preg_replace('/[^0-9]/', '', $data['no_kk'] ?? ''),
-        'nama' => strtoupper(trim(preg_replace('/[^a-zA-Z\s\.,\']/', '', $data['nama'] ?? ''))),
-        'tempat_lahir' => strtoupper(trim($data['tempat_lahir'] ?? '')),
-        'tanggal_lahir' => trim($data['tanggal_lahir'] ?? ''),
-        'jenis_kelamin' => strtoupper(trim($data['jenis_kelamin'] ?? '')),
-        'alamat' => trim($data['alamat'] ?? ''),
-        'rt_rw' => trim($data['rt_rw'] ?? ''),
-        'kelurahan' => strtoupper(trim($data['kelurahan'] ?? '')),
-        'kecamatan' => strtoupper(trim($data['kecamatan'] ?? '')),
-        'kota' => strtoupper(trim($data['kota'] ?? '')),
-        'provinsi' => strtoupper(trim($data['provinsi'] ?? '')),
-        'agama' => strtoupper(trim($data['agama'] ?? '')),
-        'status_perkawinan' => strtoupper(trim($data['status_perkawinan'] ?? '')),
-        'pekerjaan' => strtoupper(trim($data['pekerjaan'] ?? ''))
+        'nik' => preg_replace('/[^0-9]/', '', $getVal('nik', 'nomor_nik', 'nik_ktp', 'no_ktp', 'no_identitas')),
+        'no_kk' => preg_replace('/[^0-9]/', '', $getVal('no_kk', 'nomor_kk', 'nomor_kartu_keluarga', 'kartu_keluarga')),
+        'nama' => strtoupper(trim(preg_replace('/[^a-zA-Z\s\.,\']/', '', $getVal('nama', 'nama_lengkap', 'nama_customer', 'nama_kepala_keluarga')))),
+        'tempat_lahir' => strtoupper(trim($getVal('tempat_lahir', 'tempat'))),
+        'tanggal_lahir' => trim($getVal('tanggal_lahir', 'tgl_lahir')),
+        'jenis_kelamin' => strtoupper(trim($getVal('jenis_kelamin', 'kelamin', 'gender'))),
+        'alamat' => trim($getVal('alamat', 'alamat_lengkap', 'jalan')),
+        'rt_rw' => trim($getVal('rt_rw', 'rt_dan_rw', 'rtrw')),
+        'kelurahan' => strtoupper(trim($getVal('kelurahan', 'desa', 'kelurahan_desa', 'kel_desa'))),
+        'kecamatan' => strtoupper(trim($getVal('kecamatan', 'kec'))),
+        'kota' => strtoupper(trim($getVal('kota', 'kabupaten', 'kota_kabupaten', 'kab'))),
+        'provinsi' => strtoupper(trim($getVal('provinsi', 'prov'))),
+        'agama' => strtoupper(trim($getVal('agama'))),
+        'status_perkawinan' => strtoupper(trim($getVal('status_perkawinan', 'status'))),
+        'pekerjaan' => strtoupper(trim($getVal('pekerjaan', 'pekerjaan_profesi')))
     ];
 }
 

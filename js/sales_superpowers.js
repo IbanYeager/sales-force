@@ -651,12 +651,17 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
   },
 
   captureSnapshot(manual = true) {
-    if (this.isProcessingOcr) return;
+    if (manual) {
+      this.isProcessingOcr = false;
+    } else if (this.isProcessingOcr) {
+      return;
+    }
+
     const videoEl = document.getElementById('ocrCameraVideo');
     const canvas = document.getElementById('ocrHiddenCanvas') || document.createElement('canvas');
 
     if (!videoEl || !videoEl.videoWidth) {
-      if (manual) alert('Kamera belum siap atau belum aktif.');
+      if (manual) alert('Kamera belum siap atau belum aktif. Pastikan izin kamera telah diberikan.');
       return;
     }
 
@@ -769,49 +774,70 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
 
     if (overlay) overlay.style.display = 'flex';
     if (preScanActions) preScanActions.style.display = 'none';
-    if (statusText) statusText.textContent = 'Mempersiapkan gambar & menghubungkan AI...';
+    if (statusText) statusText.textContent = 'Mempersiapkan gambar & menghubungkan AI Vision...';
 
     const apiKey = localStorage.getItem('sft_gemini_api_key') || '';
 
     try {
-      // 1. Panggil API AI OCR Backend
-      let res;
-      try {
-        res = await fetch(`${this.getApiPrefix()}api_ocr_scanner.php`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: this.capturedImageBase64,
-            doc_type: this.ocrDocType,
-            api_key: apiKey
-          })
-        });
-      } catch (networkErr) {
-        // Coba fallback URL alternatif (misal dari /pages/spk vs /spk)
-        const altPrefix = this.getApiPrefix() === 'api/' ? '../api/' : 'api/';
-        res = await fetch(`${altPrefix}api_ocr_scanner.php`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: this.capturedImageBase64,
-            doc_type: this.ocrDocType,
-            api_key: apiKey
-          })
-        });
+      // 1. Panggil API AI OCR Backend dengan candidate endpoint fallback
+      const candidateEndpoints = Array.from(new Set([
+        `${this.getApiPrefix()}api_ocr_scanner.php`,
+        '../api/api_ocr_scanner.php',
+        'api/api_ocr_scanner.php',
+        '/api/api_ocr_scanner.php',
+        'public/api/api_ocr_scanner.php'
+      ]));
+
+      let result = null;
+      for (const endpoint of candidateEndpoints) {
+        try {
+          if (statusText) statusText.textContent = 'Menganalisis dokumen dengan AI Gemini Vision...';
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              image: this.capturedImageBase64,
+              doc_type: this.ocrDocType,
+              api_key: apiKey
+            })
+          });
+
+          if (res.ok) {
+            const txt = await res.text();
+            try {
+              const parsed = JSON.parse(txt);
+              if (parsed && parsed.status === 'success') {
+                result = parsed;
+                break;
+              } else if (parsed && parsed.status === 'need_client_ocr') {
+                result = parsed;
+                break;
+              }
+            } catch (je) {
+              console.warn(`Response from ${endpoint} is not valid JSON:`, txt.slice(0, 100));
+            }
+          }
+        } catch (e) {
+          // Lanjut ke candidate berikutnya
+        }
       }
 
-      const result = await res.json();
       console.log('OCR API Response:', result);
 
       // Jika backend berhasil dengan Gemini Vision
-      if (result && result.status === 'success' && result.data && (result.data.nik || result.data.nama || result.data.no_kk)) {
+      if (result && result.status === 'success' && result.data && (result.data.nik || result.data.nama || result.data.no_kk || result.data.alamat)) {
         this.extractedOcrData = result.data;
         this.renderOcrReview(this.extractedOcrData, result.engine || 'Gemini AI Vision');
+        // LANGSUNG AUTO-FILL DATA KE FORMULIR SPK OTOMATIS!
+        this.applyExtractedDataToForm(true);
         return;
       }
 
       // Jika backend meminta client-side OCR atau data tidak lengkap -> jalankan Tesseract.js
-      throw new Error(result.message || 'need_client_ocr');
+      throw new Error(result ? result.message : 'need_client_ocr');
 
     } catch (err) {
       console.log('Menjalankan Client OCR Fallback (Tesseract.js):', err);
@@ -833,21 +859,32 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
 
         // Kirim raw_text ke backend untuk parsing regex mendalam
         let parsed = null;
-        try {
-          const parseRes = await fetch(`${this.getApiPrefix()}api_ocr_scanner.php`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              raw_text: text,
-              doc_type: this.ocrDocType
-            })
-          });
-          const parseJson = await parseRes.json();
-          if (parseJson && parseJson.data) {
-            parsed = parseJson.data;
-          }
-        } catch (backendParseErr) {
-          console.warn('Backend parse failed, using client parser:', backendParseErr);
+        const candidateEndpoints = Array.from(new Set([
+          `${this.getApiPrefix()}api_ocr_scanner.php`,
+          '../api/api_ocr_scanner.php',
+          'api/api_ocr_scanner.php',
+          '/api/api_ocr_scanner.php',
+          'public/api/api_ocr_scanner.php'
+        ]));
+
+        for (const endpoint of candidateEndpoints) {
+          try {
+            const parseRes = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                raw_text: text,
+                doc_type: this.ocrDocType
+              })
+            });
+            if (parseRes.ok) {
+              const parseJson = await parseRes.json();
+              if (parseJson && parseJson.data) {
+                parsed = parseJson.data;
+                break;
+              }
+            }
+          } catch (backendParseErr) {}
         }
 
         // Fallback ke parser lokal jika backend tidak merespons
@@ -858,21 +895,25 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
         this.extractedOcrData = parsed;
         this.renderOcrReview(this.extractedOcrData, 'Smart Local OCR Engine');
 
-      } catch (clientErr) {
-        console.error('Semua engine OCR gagal:', clientErr);
-        if (window.showCustomAlert) {
-          window.showCustomAlert('Perhatian', 'Dokumen belum terbaca optimal. Anda dapat memasukkan data secara manual dan foto akan tetap tersimpan sebagai lampiran SPK.', 'info');
-        } else {
-          alert('Dokumen belum terbaca optimal. Anda tetap dapat memasukkan data manual dan foto tetap terlampir.');
+        // Jika data berhasil terbaca, LANGSUNG AUTO-FILL KE FORMULIR SPK!
+        if (parsed && (parsed.nik || parsed.nama || parsed.no_kk || parsed.alamat)) {
+          this.applyExtractedDataToForm(true);
+          return;
         }
 
-        this.extractedOcrData = {
-          nik: '',
-          no_kk: '',
-          nama: '',
-          alamat: ''
-        };
-        this.renderOcrReview(this.extractedOcrData, 'Manual Review');
+        // Jika teks sangat sedikit/tidak terbaca, tetap lampirkan foto ke form
+        this.applyExtractedDataToForm(true);
+
+      } catch (clientErr) {
+        console.error('Semua engine OCR gagal:', clientErr);
+        // Tetap simpan foto sebagai lampiran formulir SPK
+        this.applyExtractedDataToForm(true);
+
+        if (window.showCustomAlert) {
+          window.showCustomAlert('Perhatian', 'Foto dokumen berhasil dilampirkan. Mohon lengkapi kolom identitas yang belum terisi secara manual.', 'info');
+        } else {
+          alert('Foto dokumen berhasil dilampirkan. Mohon lengkapi kolom identitas secara manual.');
+        }
       }
     } finally {
       this.isProcessingOcr = false;
@@ -919,10 +960,10 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
     }
   },
 
-  applyExtractedDataToForm() {
+  applyExtractedDataToForm(isAuto = false) {
     const d = this.extractedOcrData || {};
 
-    // 1. Auto-fill kolom identitas
+    // 1. Auto-fill kolom identitas SPK
     const fieldMap = {
       spkNik: d.nik,
       spkNoKk: d.no_kk,
@@ -941,21 +982,62 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
       spkPekerjaan: d.pekerjaan
     };
 
-    for (const [id, val] of Object.entries(fieldMap)) {
+    let filledCount = 0;
+    for (let [id, val] of Object.entries(fieldMap)) {
       const el = document.getElementById(id);
       if (el && val) {
-        el.value = val;
-        // Efek visual highlighting
-        el.style.transition = 'background-color 0.3s';
-        el.style.backgroundColor = '#ecfdf5';
-        setTimeout(() => { el.style.backgroundColor = ''; }, 1500);
-      }
-    }
+        val = String(val).trim();
+        if (!val || val === '-') continue;
 
-    // Scroll ke bagian identitas agar user melihat hasilnya
-    const firstField = document.getElementById('spkNik') || document.getElementById('namaCustomer');
-    if (firstField) {
-      firstField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Normalisasi untuk dropdown/select
+        if (id === 'spkJenisKelamin') {
+          const u = val.toUpperCase();
+          if (u.includes('LAK') || u === 'L' || u.includes('PRIA')) {
+            el.value = 'LAKI-LAKI';
+          } else if (u.includes('PER') || u === 'P' || u.includes('WAN')) {
+            el.value = 'PEREMPUAN';
+          } else {
+            el.value = val;
+          }
+        } else if (id === 'spkStatusPerkawinan') {
+          const u = val.toUpperCase();
+          if (u.includes('BELUM')) {
+            el.value = 'BELUM KAWIN';
+          } else if (u.includes('CERAI HIDUP')) {
+            el.value = 'CERAI HIDUP';
+          } else if (u.includes('CERAI MATI')) {
+            el.value = 'CERAI MATI';
+          } else if (u.includes('KAWIN') || u.includes('NIKAH')) {
+            el.value = 'KAWIN';
+          } else {
+            el.value = val;
+          }
+        } else if (id === 'spkAgama') {
+          const u = val.toUpperCase();
+          for (let opt of el.options) {
+            if (opt.value && u.includes(opt.value.toUpperCase())) {
+              el.value = opt.value;
+              break;
+            }
+          }
+        } else {
+          el.value = val;
+        }
+
+        // Trigger event input dan change agar listener bereaksi
+        try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+        try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+
+        // Efek visual highlighting hijau lembut
+        el.style.transition = 'background-color 0.4s ease, border-color 0.4s ease';
+        el.style.backgroundColor = '#ecfdf5';
+        el.style.borderColor = '#10b981';
+        setTimeout(() => {
+          el.style.backgroundColor = '';
+          el.style.borderColor = '';
+        }, 3500);
+        filledCount++;
+      }
     }
 
     // 2. Simpan lampiran foto ke hidden input & update card preview
@@ -970,7 +1052,7 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
         const btnTextKk = document.getElementById('spkBtnTextKk');
 
         if (cardKk) cardKk.classList.add('has-file');
-        if (thumbKk) thumbKk.innerHTML = `<img src="${this.capturedImageBase64}" alt="KK" />`;
+        if (thumbKk) thumbKk.innerHTML = `<img src="${this.capturedImageBase64}" alt="KK" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />`;
         if (statusKk) statusKk.textContent = '✅ Kartu Keluarga Terlampir';
         if (btnTextKk) btnTextKk.textContent = 'Ganti Foto';
       } else {
@@ -983,19 +1065,36 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
         const btnTextKtp = document.getElementById('spkBtnTextKtp');
 
         if (cardKtp) cardKtp.classList.add('has-file');
-        if (thumbKtp) thumbKtp.innerHTML = `<img src="${this.capturedImageBase64}" alt="KTP" />`;
+        if (thumbKtp) thumbKtp.innerHTML = `<img src="${this.capturedImageBase64}" alt="KTP" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />`;
         if (statusKtp) statusKtp.textContent = '✅ e-KTP Terlampir';
         if (btnTextKtp) btnTextKtp.textContent = 'Ganti Foto';
       }
     }
 
-    // Tutup modal
+    // 3. Tutup modal secara otomatis
     this.closeOcrModal();
 
-    if (window.showCustomAlert) {
-      window.showCustomAlert('✨ Auto-Fill Berhasil!', 'Data identitas ' + (this.ocrDocType === 'kk' ? 'Kartu Keluarga' : 'e-KTP') + ' berhasil dimasukkan ke formulir SPK.', 'success');
-    } else {
-      alert('Data identitas berhasil dimasukkan ke form SPK!');
+    // 4. Scroll ke bagian identitas agar user langsung melihat data yang terisi
+    setTimeout(() => {
+      const firstField = document.getElementById('namaCustomer') || document.getElementById('spkNik');
+      if (firstField) {
+        firstField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstField.focus();
+      }
+    }, 250);
+
+    // 5. Tampilkan notifikasi status
+    const docLabel = (this.ocrDocType === 'kk' ? 'Kartu Keluarga' : 'e-KTP');
+    if (filledCount > 0) {
+      if (window.showCustomAlert) {
+        window.showCustomAlert(
+          '✨ Auto-Fill Berhasil!',
+          `Data identitas ${docLabel} berhasil diekstrak dan otomatis dimasukkan ke ${filledCount} kolom formulir SPK.`,
+          'success'
+        );
+      } else {
+        alert(`Data identitas ${docLabel} berhasil diisi otomatis ke formulir SPK!`);
+      }
     }
   },
 
