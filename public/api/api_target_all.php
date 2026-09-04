@@ -136,7 +136,7 @@ if ($method === 'GET') {
         }
     }
 
-    $q_sales = $conn->query("SELECT id as sales_account_id, username, nama_lengkap as nama_sales, tingkatan, nama_spv, created_at FROM sales_accounts $where_clause ORDER BY id ASC");
+    $q_sales = $conn->query("SELECT id as sales_account_id, username, nama_lengkap as nama_sales, tingkatan, nama_spv, created_at, is_active FROM sales_accounts $where_clause ORDER BY id ASC");
 
     $data = [];
     if ($q_sales && $q_sales->num_rows > 0) {
@@ -281,6 +281,8 @@ if ($method === 'GET') {
             $row['plan_spk'] = $plan;
             $row['id_target_bulanan'] = $id_tgt;
             $row['periode_label'] = $periode_str;
+            $row['is_active'] = intval($row['is_active'] ?? 1);
+            $row['status_sales'] = ($row['is_active'] === 1) ? 'Aktif' : 'Alumni / Resign';
 
             $data[] = $row;
         }

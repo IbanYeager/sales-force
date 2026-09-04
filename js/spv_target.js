@@ -158,7 +158,7 @@
               const tr = document.createElement('tr');
               tr.innerHTML = `
                 <td class="num" style="color:var(--muted);">${index + 1}</td>
-                <td class="sales-name">${row.nama_sales}</td>
+                <td class="sales-name">${row.nama_sales} ${row.is_active == 0 ? '<span style="font-size:0.68rem;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;">Alumni</span>' : ''}</td>
                 <td>
                   <select class="tier-select" onchange="updateTingkatan(${row.sales_account_id}, this.value)">
                     <option value="Magang" ${row.tingkatan === 'Magang' || row.tingkatan === 'Magang/Kontrak' ? 'selected' : ''}>Magang · 3/7</option>

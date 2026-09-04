@@ -79,7 +79,7 @@ function renderTargetMatrix() {
           <div class="tc-spv-info">
             <div class="tc-avatar"><i class="fa-solid fa-user-tie"></i></div>
             <div>
-              <h3>${escapeHtml(sales.nama_sales)}</h3>
+              <h3>${escapeHtml(sales.nama_sales)} ${sales.is_active == 0 ? '<span style="font-size: 0.68rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 2px 7px; border-radius: 6px; font-weight: 600; margin-left: 6px;"><i class="fa-solid fa-user-xmark"></i> Alumni</span>' : ''}</h3>
               <p class="tc-sub"><i class="fa-solid fa-graduation-cap"></i> Tingkatan: <strong>${escapeHtml(sales.tingkatan || 'Executive')}</strong> &middot; Periode: ${escapeHtml(selectedMonthName)}</p>
             </div>
           </div>
