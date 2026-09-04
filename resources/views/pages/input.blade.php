@@ -183,8 +183,8 @@
             <div class="card" style="margin-top: 24px; padding: 20px; border-radius: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
                     <div>
-                        <h3 class="section-title" style="margin: 0; font-size: 15px;">Timeline Sesi Aktivitas Hari Ini</h3>
-                        <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0 0;">Monitoring aktivitas & laporan hasil per Sesi Pagi, Siang & Sore.</p>
+                        <h3 class="section-title" style="margin: 0; font-size: 15px;">Timeline Sesi Aktivitas Saya</h3>
+                        <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0 0;">Monitoring aktivitas pribadi &amp; laporan hasil per Sesi Pagi, Siang &amp; Sore.</p>
                     </div>
                     <span id="sessionSummaryBadge" style="font-size: 11px; font-weight: 700; background: #e2e8f0; color: #334155; padding: 4px 10px; border-radius: 20px;">0 Aktivitas</span>
                 </div>

@@ -412,7 +412,7 @@ function escapeHtml(str) {
             formData.append('status', status);
             formData.append('sesi_waktu', sesiWaktu);
             formData.append('durasi', durasi);
-            formData.append('sales_account_id', localStorage.getItem('idSales') || 1);
+            formData.append('sales_account_id', localStorage.getItem('salesId') || localStorage.getItem('idSales') || '1');
             formData.append('nama_sales', localStorage.getItem('namaSales') || 'Sales Consultant');
             fotoAktivitasList.forEach((fotoObj) => { formData.append('foto[]', fotoObj.file); });
 
@@ -469,13 +469,80 @@ function escapeHtml(str) {
             }
         }
 
+        function formatAktivitasWaktu(createdAtStr) {
+            if (!createdAtStr) return { dayBadge: '-', timeBadge: '-', isToday: false };
+            
+            // Format MySQL timestamp YYYY-MM-DD HH:mm:ss
+            const cleanStr = String(createdAtStr).trim();
+            const parts = cleanStr.split(' ');
+            const dateParts = parts[0] ? parts[0].split('-') : [];
+            const timeParts = (parts[1] || '00:00:00').split(':');
+
+            if (dateParts.length < 3) return { dayBadge: createdAtStr, timeBadge: '', isToday: false };
+
+            const year = parseInt(dateParts[0], 10);
+            const month = parseInt(dateParts[1], 10);
+            const day = parseInt(dateParts[2], 10);
+            const hour = parseInt(timeParts[0] || '0', 10);
+            const minute = parseInt(timeParts[1] || '0', 10);
+
+            const actDate = new Date(year, month - 1, day, hour, minute);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const itemDay = new Date(year, month - 1, day);
+
+            const diffTime = today.getTime() - itemDay.getTime();
+            const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+
+            const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+            const dayName = namaHari[actDate.getDay()] || '';
+            const monthName = namaBulan[month - 1] || '';
+
+            let dayBadge = '';
+            let isToday = false;
+
+            if (diffDays === 0) {
+                dayBadge = `Hari Ini (${dayName}, ${day} ${monthName})`;
+                isToday = true;
+            } else if (diffDays === 1) {
+                dayBadge = `Kemarin (${dayName}, ${day} ${monthName})`;
+            } else {
+                dayBadge = `${dayName}, ${day} ${monthName} ${year}`;
+            }
+
+            const timeBadge = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} WIB`;
+
+            return { dayBadge, timeBadge, isToday, dayName, dateFormatted: `${day} ${monthName} ${year}` };
+        }
+
         async function loadDailySessionActivities() {
             const listEl = document.getElementById('sessionActivityList');
             const summaryBadge = document.getElementById('sessionSummaryBadge');
             if (!listEl) return;
 
             try {
-                let primaryUrl = getApiUrl('api_aktivitas.php?limit=50');
+                // Ambil identitas sales login dari localStorage (hanya sales penginput yang dapat melihat aktivitasnya)
+                const salesId = localStorage.getItem('salesId') || localStorage.getItem('idSales') || '';
+                const namaSales = localStorage.getItem('namaSales') || '';
+
+                if (!salesId && !namaSales) {
+                    listEl.innerHTML = `
+                    <div style="text-align:center; padding:32px 20px; background:#f8fafc; border-radius:12px; border:1px dashed #cbd5e1; margin-top:8px;">
+                        <i class="fa-solid fa-user-lock" style="font-size:26px; color:#94a3b8; display:block; margin-bottom:8px;"></i>
+                        <p style="font-weight:700; color:#334155; margin:0 0 4px; font-size:13px;">Sesi Aktivitas Terkunci</p>
+                        <p style="color:#64748b; font-size:11.5px; margin:0;">Silakan login akun Sales Consultant terlebih dahulu untuk melihat aktivitas Anda.</p>
+                    </div>`;
+                    if (summaryBadge) summaryBadge.textContent = '0 Selesai | 0 Pending';
+                    return;
+                }
+
+                let queryParams = 'limit=50';
+                if (salesId) queryParams += '&sales_account_id=' + encodeURIComponent(salesId);
+                if (namaSales) queryParams += '&nama_sales=' + encodeURIComponent(namaSales);
+
+                let primaryUrl = getApiUrl('api_aktivitas.php?' + queryParams);
                 let res = await fetch(primaryUrl);
                 
                 if (!res.ok) {
@@ -519,7 +586,13 @@ function escapeHtml(str) {
             }
 
             if (filtered.length === 0) {
-                listEl.innerHTML = `<p style="text-align:center; color:#64748b; padding:25px; font-size:13px;"><i class="fa-solid fa-calendar-check" style="font-size:20px; display:block; margin-bottom:6px; color:#cbd5e1;"></i>Belum ada aktivitas untuk sesi ${sessionFilter === 'All' ? 'hari ini' : sessionFilter}.</p>`;
+                const sessionLabel = sessionFilter === 'All' ? 'hari ini' : `sesi ${sessionFilter}`;
+                listEl.innerHTML = `
+                <div style="text-align:center; padding:30px 20px; background:#f8fafc; border-radius:12px; border:1.5px dashed #e2e8f0; margin-top:8px;">
+                    <i class="fa-regular fa-calendar-check" style="font-size:26px; color:#94a3b8; display:block; margin-bottom:8px;"></i>
+                    <p style="font-weight:700; color:#334155; margin:0 0 4px; font-size:13px;">Belum Ada Aktivitas Anda</p>
+                    <p style="color:#64748b; font-size:11.5px; margin:0;">Belum ada aktivitas pribadi Anda yang dicatat untuk ${sessionLabel}. Gunakan formulir di atas untuk mencatat aktivitas baru.</p>
+                </div>`;
                 return;
             }
 
@@ -531,22 +604,34 @@ function escapeHtml(str) {
                 const isProses = (statusStr === 'Sedang Dilakukan');
                 const isSelesai = (statusStr === 'Selesai');
 
+                const waktuInfo = formatAktivitasWaktu(item.created_at);
+
                 let statusBadge = '';
                 if (isRencana) {
-                    statusBadge = '<span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-weight:700; font-size:10px;"><i class="fa-regular fa-calendar"></i> Rencana</span>';
+                    statusBadge = '<span style="background:#e0f2fe; color:#0369a1; padding:4px 9px; border-radius:6px; font-weight:700; font-size:10.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-regular fa-calendar"></i> Rencana</span>';
                 } else if (isProses) {
-                    statusBadge = '<span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-weight:700; font-size:10px;"><i class="fa-solid fa-spinner fa-spin"></i> Sedang Dilakukan</span>';
+                    statusBadge = '<span style="background:#fef3c7; color:#b45309; padding:4px 9px; border-radius:6px; font-weight:700; font-size:10.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-spinner fa-spin"></i> Sedang Dilakukan</span>';
                 } else {
-                    statusBadge = '<span style="background:#d1fae5; color:#047857; padding:3px 8px; border-radius:6px; font-weight:700; font-size:10px;"><i class="fa-solid fa-circle-check"></i> Selesai</span>';
+                    statusBadge = '<span style="background:#d1fae5; color:#047857; padding:4px 9px; border-radius:6px; font-weight:700; font-size:10.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-circle-check"></i> Selesai</span>';
                 }
 
                 html += `
-                <div class="timeline-card">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-                        <span class="session-badge ${sesiClass}">
-                            <i class="fa-solid fa-clock"></i> Sesi ${escapeHtml(item.sesi_waktu || 'Pagi')}
-                        </span>
-                        ${statusBadge}
+                <div class="timeline-card" style="position:relative; margin-bottom:12px; border-left: 4px solid ${waktuInfo.isToday ? '#2563eb' : '#94a3b8'};">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                            <span class="session-badge ${sesiClass}">
+                                <i class="fa-solid fa-clock"></i> Sesi ${escapeHtml(item.sesi_waktu || 'Pagi')}
+                            </span>
+                            <span style="display:inline-flex; align-items:center; gap:5px; background:${waktuInfo.isToday ? '#eff6ff' : '#f8fafc'}; color:${waktuInfo.isToday ? '#1d4ed8' : '#334155'}; font-size:11px; font-weight:700; padding:3px 9px; border-radius:7px; border:1px solid ${waktuInfo.isToday ? '#bfdbfe' : '#e2e8f0'};">
+                                <i class="fa-regular fa-calendar-days" style="color:${waktuInfo.isToday ? '#2563eb' : '#64748b'};"></i> ${waktuInfo.dayBadge}
+                            </span>
+                            <span style="display:inline-flex; align-items:center; gap:4px; background:#f8fafc; color:#475569; font-size:11px; font-weight:700; padding:3px 8px; border-radius:7px; border:1px solid #e2e8f0;">
+                                <i class="fa-regular fa-clock" style="color:#0284c7;"></i> ${waktuInfo.timeBadge}
+                            </span>
+                        </div>
+                        <div>
+                            ${statusBadge}
+                        </div>
                     </div>
 
                     <div style="font-weight:800; font-size:14px; color:#0f172a; margin-bottom:4px;">${escapeHtml(item.tipe_aktivitas || '-')}</div>

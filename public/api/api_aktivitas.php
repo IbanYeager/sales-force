@@ -13,9 +13,11 @@ if ($limit <= 0) $limit = 50;
 
 $sesi = isset($_GET['sesi']) ? $conn->real_escape_string($_GET['sesi']) : '';
 $status = isset($_GET['status']) ? $conn->real_escape_string($_GET['status']) : '';
-$sales_id = isset($_GET['sales_account_id']) ? intval($_GET['sales_account_id']) : 0;
+$sales_id = isset($_GET['sales_account_id']) ? intval($_GET['sales_account_id']) : (isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0);
+$nama_sales = isset($_GET['nama_sales']) ? $conn->real_escape_string(trim($_GET['nama_sales'])) : '';
 
 $exclude_status = isset($_GET['exclude_status']) ? $conn->real_escape_string($_GET['exclude_status']) : '';
+$only_today = isset($_GET['only_today']) ? intval($_GET['only_today']) : 0;
 
 $where = ["1=1"];
 if (!empty($sesi)) {
@@ -27,8 +29,22 @@ if (!empty($status)) {
 if (!empty($exclude_status)) {
     $where[] = "status != '$exclude_status'";
 }
-if ($sales_id > 0) {
-    $where[] = "sales_account_id = $sales_id";
+if ($only_today == 1) {
+    $where[] = "DATE(created_at) = CURDATE()";
+}
+
+// Isolasi Aktivitas per Sales: Sales hanya melihat aktivitas miliknya sendiri
+$salesFilter = "";
+if ($sales_id > 0 && !empty($nama_sales)) {
+    $salesFilter = "((sales_account_id = $sales_id AND (LOWER(TRIM(nama_sales)) LIKE LOWER(TRIM('%$nama_sales%')) OR nama_sales IS NULL OR nama_sales = '')) OR (sales_account_id IS NULL AND LOWER(TRIM(nama_sales)) = LOWER(TRIM('$nama_sales'))))";
+} elseif ($sales_id > 0) {
+    $salesFilter = "sales_account_id = $sales_id";
+} elseif (!empty($nama_sales)) {
+    $salesFilter = "LOWER(TRIM(nama_sales)) = LOWER(TRIM('$nama_sales'))";
+}
+
+if (!empty($salesFilter)) {
+    $where[] = $salesFilter;
 }
 
 $whereSql = implode(" AND ", $where);
@@ -55,14 +71,20 @@ if ($stmt) {
             $data[] = $row;
         }
 
-        // Summary counts by session
+        // Summary counts by session for today (filtered by sales if provided)
+        $summaryWhere = ["DATE(created_at) = CURDATE()"];
+        if (!empty($salesFilter)) {
+            $summaryWhere[] = $salesFilter;
+        }
+        $summaryWhereSql = implode(" AND ", $summaryWhere);
+
         $resSummary = $conn->query("SELECT 
             SUM(CASE WHEN sesi_waktu = 'Pagi' OR (sesi_waktu IS NULL AND HOUR(created_at) < 12) THEN 1 ELSE 0 END) AS total_pagi,
             SUM(CASE WHEN sesi_waktu = 'Siang' OR (sesi_waktu IS NULL AND HOUR(created_at) >= 12 AND HOUR(created_at) < 15) THEN 1 ELSE 0 END) AS total_siang,
             SUM(CASE WHEN sesi_waktu = 'Sore' OR (sesi_waktu IS NULL AND HOUR(created_at) >= 15) THEN 1 ELSE 0 END) AS total_sore,
             SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) AS total_selesai,
             SUM(CASE WHEN status = 'Rencana' OR status = 'Sedang Dilakukan' THEN 1 ELSE 0 END) AS total_pending
-        FROM aktivitas WHERE DATE(created_at) = CURDATE()");
+        FROM aktivitas WHERE $summaryWhereSql");
 
         $summary = [
             "total_pagi" => 0,
