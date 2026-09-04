@@ -12,18 +12,25 @@
     /* =============================================
        STYLESHEET ULTRA-PREMIUM GOOGLE MAPS KACAB PANEL
        ============================================= */
+    /* Global Viewport Lock for Desktop Map */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
     .kpi-summary-strip {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 12px;
     }
 
     .kss-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 16px;
+      border-radius: 14px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -31,13 +38,14 @@
     }
 
     .kss-icon {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 15px;
+      flex-shrink: 0;
     }
 
     .kss-icon.red { background: #fef2f2; color: #cc1426; }
@@ -45,36 +53,33 @@
     .kss-icon.blue { background: #eff6ff; color: #1d4ed8; }
     .kss-icon.green { background: #f0fdf4; color: #15803d; }
 
-    .kss-info .title { font-size: 11px; font-weight: 700; color: var(--muted); display: block; }
-    .kss-info .val { font-size: 18px; font-weight: 900; color: var(--text); }
+    .kss-info .title { font-size: 10.5px; font-weight: 700; color: var(--muted); display: block; }
+    .kss-info .val { font-size: 17px; font-weight: 900; color: var(--text); }
 
     .map-layout {
       display: grid;
-      grid-template-columns: 1fr 370px;
-      gap: 20px;
-      height: calc(100vh - 230px);
-      min-height: 520px;
-    }
-
-    @media (max-width: 992px) {
-      .map-layout {
-        grid-template-columns: 1fr;
-        height: auto;
-      }
-      #visitMap {
-        height: 450px !important;
-      }
+      grid-template-columns: 1fr 390px;
+      grid-template-rows: minmax(0, 1fr);
+      gap: 16px;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
+      flex: 1 1 0;
+      overflow: hidden;
     }
 
     .map-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 22px;
+      border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
       position: relative;
       display: flex;
       flex-direction: column;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
     }
 
     /* Google Maps Bar Control Header */
@@ -264,40 +269,64 @@
     .map-sidebar-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 22px;
+      border-radius: 20px;
+      padding: 18px 20px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
       display: flex;
       flex-direction: column;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
     .filter-section-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 800;
       color: #1e1014;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 10px;
       letter-spacing: -0.3px;
+      flex-shrink: 0;
+    }
+
+    .filter-section-title .title-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .filter-section-title .title-icon-badge {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
       background: #fdf6e9;
       color: #d8a437;
       border: 1px solid #fef08a;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 12px;
+    }
+
+    .sales-counter-pill {
+      font-size: 11px;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: #64748d;
+      padding: 3px 8px;
+      border-radius: 999px;
+      letter-spacing: normal;
     }
 
     .map-search-wrap {
       position: relative;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
     }
 
     .map-search-wrap i.search-icon {
@@ -313,10 +342,10 @@
 
     .input-search-styled {
       width: 100%;
-      padding: 12px 14px 12px 42px;
+      padding: 11px 14px 11px 40px;
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
-      border-radius: 14px;
+      border-radius: 12px;
       font-size: 12px;
       font-weight: 600;
       color: #1e293b;
@@ -345,17 +374,18 @@
     .filter-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
     }
 
     .select-dropdown-styled {
       width: 100%;
-      padding: 11px 32px 11px 14px;
-      background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d8a437'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 10px center / 14px 14px;
+      padding: 10px 30px 10px 12px;
+      background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d8a437'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 10px center / 13px 13px;
       border: 1.5px solid #e2e8f0;
-      border-radius: 14px;
-      font-size: 12px;
+      border-radius: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       color: #1e1014;
       outline: none;
@@ -380,45 +410,79 @@
     }
 
     .map-list-scroll {
-      flex: 1;
+      flex: 1 1 0;
+      min-height: 0;
+      height: 100%;
       overflow-y: auto;
-      padding-right: 4px;
+      overflow-x: hidden;
+      padding-right: 6px;
+      overscroll-behavior: contain;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Modern Custom Scrollbar for Sales List */
+    .map-list-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .map-list-scroll::-webkit-scrollbar-track {
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+
+    .map-list-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .map-list-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .map-list-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f8fafc;
     }
 
     .map-list-item {
       background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
+      padding: 10px 12px;
+      margin-bottom: 0;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: flex-start;
       gap: 12px;
+      flex-shrink: 0;
     }
 
     .map-list-item:hover {
       background: #fdf6e9;
       border-color: #fde68a;
-      transform: translateX(3px);
+      transform: translateX(2px);
     }
 
     .mli-avatar {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 10px;
       background: linear-gradient(135deg, #1e1014, #3b141d);
       color: var(--gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 15px;
       flex-shrink: 0;
     }
 
     .mli-body {
       flex: 1;
+      min-width: 0;
     }
 
     .mli-sales {
@@ -426,12 +490,18 @@
       font-weight: 800;
       color: var(--text);
       line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .mli-spv {
       font-size: 11px;
       color: var(--muted);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .mli-type {
@@ -445,13 +515,17 @@
       font-size: 11px;
       color: var(--text-2);
       line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .mli-right {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 8px;
+      gap: 6px;
       flex-shrink: 0;
     }
 
@@ -459,6 +533,7 @@
       font-size: 10px;
       color: var(--muted);
       text-align: right;
+      line-height: 1.2;
     }
 
     .btn-focus-map {
@@ -480,6 +555,94 @@
       background: var(--brand);
       color: white;
       border-color: var(--brand);
+    }
+
+    /* Desktop Viewport Specifics */
+    @media (min-width: 993px) {
+      body {
+        overflow: hidden;
+        height: 100vh;
+        height: 100dvh;
+      }
+
+      .kcb-shell {
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100vh;
+        overflow: hidden;
+      }
+
+      .kcb-main {
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 16px 24px;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+
+      .kcb-topbar {
+        flex-shrink: 0;
+        margin-bottom: 12px;
+      }
+
+      .kpi-summary-strip {
+        flex-shrink: 0;
+        margin-bottom: 12px;
+      }
+    }
+
+    /* Mobile & Tablet Responsive */
+    @media (max-width: 992px) {
+      body {
+        overflow-y: auto;
+      }
+
+      .kcb-shell {
+        min-height: 100vh;
+        height: auto;
+      }
+
+      .kcb-main {
+        height: auto;
+        padding: 16px;
+      }
+
+      .kpi-summary-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .map-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        height: auto;
+      }
+
+      .map-card {
+        height: 400px;
+        min-height: 400px;
+        border-radius: 18px;
+      }
+
+      #visitMap {
+        height: 400px;
+        min-height: 400px;
+      }
+
+      .map-sidebar-card {
+        height: auto;
+        max-height: 520px;
+        padding: 16px;
+        border-radius: 18px;
+      }
+
+      .map-list-scroll {
+        max-height: 350px;
+        overflow-y: auto;
+      }
     }
   </style>
 
@@ -597,8 +760,11 @@
         <!-- SIDEBAR PANEL LIST & FILTER (NEW ULTRA-STYLED) -->
         <div class="map-sidebar-card">
           <h3 class="filter-section-title">
-            <span class="title-icon-badge"><i class="fa-solid fa-sliders"></i></span>
-            <span>Filter & Pencarian</span>
+            <div class="title-left">
+              <span class="title-icon-badge"><i class="fa-solid fa-sliders"></i></span>
+              <span>Filter & Pencarian</span>
+            </div>
+            <span class="sales-counter-pill" id="salesCounterBadge">Memuat...</span>
           </h3>
 
           <div class="map-search-wrap">
@@ -631,7 +797,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_peta.js?v=20260819_master"></script>
+  <script src="../js/kacab_peta.js?v=20260904_scrollfix"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>
 </body>

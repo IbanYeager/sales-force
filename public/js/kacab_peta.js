@@ -44,6 +44,15 @@ async function initVisitMap() {
     currentTileLayer = googleTileLayers.roadmap;
     currentTileLayer.addTo(map);
 
+    // Pastikan peta merender ukuran kontainer dengan presisi
+    setTimeout(() => {
+        if (map) map.invalidateSize();
+    }, 250);
+
+    window.addEventListener('resize', () => {
+        if (map) map.invalidateSize();
+    });
+
     await loadMasterAndCheckinData();
 }
 
@@ -260,6 +269,7 @@ function renderMapMarkers(dataList) {
             icon: createCustomIcon(item.jenis_kunjungan, item.has_gps)
         }).addTo(map).bindPopup(popupContent);
 
+        marker._salesId = item.id;
         markers.push(marker);
         bounds.push([item.latitude, item.longitude]);
     });
@@ -273,12 +283,18 @@ function renderCheckinList(dataList) {
     const listEl = document.getElementById('checkinListContainer');
     if (!listEl) return;
 
+    // Update sales counter badge
+    const counterBadge = document.getElementById('salesCounterBadge');
+    if (counterBadge) {
+        counterBadge.textContent = `${dataList.length} Sales`;
+    }
+
     if (dataList.length === 0) {
         listEl.innerHTML = `
-            <div class="empty-state" style="padding:30px 0;">
-                <div class="es-icon"><i class="fa-solid fa-users-slash"></i></div>
-                <div class="es-title">Tidak ada Sales ditemukan</div>
-                <div class="es-text">Tidak ada data Sales Consultant pada filter ini.</div>
+            <div class="empty-state" style="padding:36px 12px; text-align:center;">
+                <div class="es-icon" style="font-size:32px; color:#cbd5e1; margin-bottom:8px;"><i class="fa-solid fa-users-slash"></i></div>
+                <div class="es-title" style="font-size:13px; font-weight:800; color:#1e1014; margin-bottom:4px;">Tidak ada Sales ditemukan</div>
+                <div class="es-text" style="font-size:11px; color:#94a3b8;">Coba sesuaikan kata kunci pencarian atau filter SPV.</div>
             </div>
         `;
         return;
@@ -290,17 +306,17 @@ function renderCheckinList(dataList) {
         const dayStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 
         return `
-            <div class="map-list-item" onclick="focusMarker(${item.latitude}, ${item.longitude})">
+            <div class="map-list-item" onclick="focusMarker(${item.latitude}, ${item.longitude}, ${item.id})">
                 <div class="mli-avatar">
                     <i class="fa-solid ${item.has_gps ? 'fa-user-tie' : 'fa-building-user'}"></i>
                 </div>
                 <div class="mli-body">
-                    <div class="mli-sales">${escapeHtml(item.nama_sales)}</div>
-                    <div class="mli-spv">SPV: <strong>${escapeHtml(item.nama_spv)}</strong></div>
+                    <div class="mli-sales" title="${escapeHtml(item.nama_sales)}">${escapeHtml(item.nama_sales)}</div>
+                    <div class="mli-spv" title="SPV: ${escapeHtml(item.nama_spv)}">SPV: <strong>${escapeHtml(item.nama_spv)}</strong></div>
                     <div class="mli-type" style="${item.has_gps ? '' : 'color:var(--muted);'}">
                         <i class="fa-solid fa-circle" style="color:${item.has_gps ? '#10b981' : '#94a3b8'};font-size:8px;"></i> ${escapeHtml(item.jenis_kunjungan)}
                     </div>
-                    <div class="mli-loc"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(item.nama_lokasi)}</div>
+                    <div class="mli-loc" title="${escapeHtml(item.nama_lokasi)}"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(item.nama_lokasi)}</div>
                 </div>
                 <div class="mli-right">
                     <span class="mli-time">${item.created_at ? `${dayStr}<br>${timeStr}` : 'Baru'}</span>
@@ -313,9 +329,15 @@ function renderCheckinList(dataList) {
     }).join('');
 }
 
-function focusMarker(lat, lng) {
+function focusMarker(lat, lng, salesId) {
     if (!map) return;
-    map.flyTo([lat, lng], 16, { animate: true, duration: 1.2 });
+    map.flyTo([lat, lng], 16, { animate: true, duration: 1.0 });
+    if (salesId) {
+        const targetMarker = markers.find(m => m._salesId === salesId);
+        if (targetMarker) {
+            setTimeout(() => targetMarker.openPopup(), 350);
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
