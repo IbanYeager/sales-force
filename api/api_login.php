@@ -60,7 +60,8 @@ function checkOtherRoleMessage($username, $password, $loginType, $conn) {
 try {
     require_once 'koneksi.php';
 
-    $data = json_decode(file_get_contents("php://input"));
+    $rawInput = !empty($GLOBALS['RAW_INPUT_CONTENT']) ? $GLOBALS['RAW_INPUT_CONTENT'] : (php_sapi_name() !== 'cli' ? file_get_contents("php://input") : '');
+    $data = json_decode($rawInput);
 
     if (!empty($data->username) && !empty($data->password)) {
         $username = $conn->real_escape_string($data->username);
@@ -80,7 +81,8 @@ function normalizePhotoUrl($foto) {
 }
 
         if ($login_type === 'sales') {
-            $query = "SELECT id, username, password, nama_lengkap, tingkatan, foto, nama_spv FROM sales_accounts WHERE username = '$username'";
+            $u_clean = str_replace(' ', '', $username);
+            $query = "SELECT id, username, password, nama_lengkap, tingkatan, foto, nama_spv FROM sales_accounts WHERE username = '$username' OR LOWER(username) = LOWER('$username') OR REPLACE(username, ' ', '') = '$u_clean' LIMIT 1";
             $result = $conn ? $conn->query($query) : false;
 
             if ($result && $result->num_rows > 0) {
@@ -110,11 +112,14 @@ function normalizePhotoUrl($foto) {
                 'erick'      => ['name' => 'Erick', 'spv' => 'Pak Ryan'],
                 'erik'       => ['name' => 'Erick', 'spv' => 'Pak Ryan'],
                 'deno'       => ['name' => 'Deno', 'spv' => 'Pak Ryan'],
-                'yani'       => ['name' => 'Yani', 'spv' => 'Pak Ryan'],
+                'yani'       => ['name' => 'YANI ANDRIYANI', 'spv' => 'Pak Ryan'],
+                'yani drey'  => ['name' => 'YANI ANDRIYANI', 'spv' => 'Pak Ryan'],
+                'yanidrey'   => ['name' => 'YANI ANDRIYANI', 'spv' => 'Pak Ryan'],
                 'denia'      => ['name' => 'Deni A', 'spv' => 'Pak Ryan'],
                 'jajang'     => ['name' => 'Jajang', 'spv' => 'Pak Ryan'],
                 'juarna'     => ['name' => 'Juarna', 'spv' => 'Pak Ryan'],
-                'galih_ryan' => ['name' => 'Galih (Ryan)', 'spv' => 'Pak Ryan'],
+                'galih_ryan' => ['name' => 'GALIH HARISTIANTO', 'spv' => 'Pak Ryan'],
+                'galih haristianto' => ['name' => 'GALIH HARISTIANTO', 'spv' => 'Pak Ryan'],
                 'fanny'      => ['name' => 'Fanny', 'spv' => 'Pak Ryan'],
                 'fani'       => ['name' => 'Fanny', 'spv' => 'Pak Ryan'],
                 'dadan'      => ['name' => 'Dadan', 'spv' => 'Pak Ryan'],
@@ -127,17 +132,23 @@ function normalizePhotoUrl($foto) {
                 'irvan'      => ['name' => 'Irvan', 'spv' => 'Pak Ryan'],
                 'wendy'      => ['name' => 'Wendy', 'spv' => 'Pak Ryan'],
                 'rahma'      => ['name' => 'Rahma', 'spv' => 'Pak Ryan'],
+                'isna'       => ['name' => 'Isna Nurhayati', 'spv' => 'Pak Ryan'],
+                'neo'        => ['name' => 'Frederick Neo', 'spv' => 'Pak Ryan'],
 
                 // Tim Pak Alvin (17 Sales)
                 'dadi'       => ['name' => 'Dadi', 'spv' => 'Pak Alvin'],
                 'topik'      => ['name' => 'Topik', 'spv' => 'Pak Alvin'],
                 'indah'      => ['name' => 'Indah', 'spv' => 'Pak Alvin'],
-                'andri'      => ['name' => 'Andri', 'spv' => 'Pak Alvin'],
-                'rizky'      => ['name' => 'Rizky', 'spv' => 'Pak Alvin'],
-                'ardian'     => ['name' => 'Ardian', 'spv' => 'Pak Alvin'],
-                'abdian'     => ['name' => 'Ardian', 'spv' => 'Pak Alvin'],
-                'fadil'      => ['name' => 'Fadil', 'spv' => 'Pak Alvin'],
-                'fadhil'     => ['name' => 'Fadil', 'spv' => 'Pak Alvin'],
+                'andri'      => ['name' => 'Andri Jaya Laksana', 'spv' => 'Pak Alvin'],
+                'ndri'       => ['name' => 'Andri Jaya Laksana', 'spv' => 'Pak Alvin'],
+                'rizky'      => ['name' => 'Rizki Rismawan', 'spv' => 'Pak Alvin'],
+                'rizkitunastoyota47' => ['name' => 'Rizki Rismawan', 'spv' => 'Pak Alvin'],
+                'ardian'     => ['name' => 'ARDIAN PURNAMA', 'spv' => 'Pak Alvin'],
+                'abdian'     => ['name' => 'ARDIAN PURNAMA', 'spv' => 'Pak Alvin'],
+                'ardianpur28' => ['name' => 'ARDIAN PURNAMA', 'spv' => 'Pak Alvin'],
+                'fadil'      => ['name' => 'MUHAMMAD FADIL FAHMI RUSTANDI', 'spv' => 'Pak Alvin'],
+                'fadhil'     => ['name' => 'MUHAMMAD FADIL FAHMI RUSTANDI', 'spv' => 'Pak Alvin'],
+                'fadil.fahmi99' => ['name' => 'MUHAMMAD FADIL FAHMI RUSTANDI', 'spv' => 'Pak Alvin'],
                 'ahmad'      => ['name' => 'Ahmad', 'spv' => 'Pak Alvin'],
                 'arif'       => ['name' => 'Arif', 'spv' => 'Pak Alvin'],
                 'arief'      => ['name' => 'Arif', 'spv' => 'Pak Alvin'],
@@ -149,18 +160,22 @@ function normalizePhotoUrl($foto) {
                 'erlan'      => ['name' => 'Erlan', 'spv' => 'Pak Alvin'],
                 'yeni'       => ['name' => 'Yeni', 'spv' => 'Pak Alvin'],
                 'nova'       => ['name' => 'Nova', 'spv' => 'Pak Alvin'],
+                'rico'       => ['name' => 'Rico Ade Saputra', 'spv' => 'Pak Alvin'],
 
                 // Tim Pak Riva (10 Sales)
-                'galih_riva' => ['name' => 'Galih (Riva)', 'spv' => 'Pak Riva'],
+                'galih_riva' => ['name' => 'Kharisma Galih Putra', 'spv' => 'Pak Riva'],
+                'galih138'   => ['name' => 'Kharisma Galih Putra', 'spv' => 'Pak Riva'],
                 'dery'       => ['name' => 'Dery', 'spv' => 'Pak Riva'],
                 'giono'      => ['name' => 'Giono', 'spv' => 'Pak Riva'],
                 'giyono'     => ['name' => 'Giono', 'spv' => 'Pak Riva'],
                 'rizal'      => ['name' => 'Rizal', 'spv' => 'Pak Riva'],
                 'gugum'      => ['name' => 'Gugum', 'spv' => 'Pak Riva'],
-                'shovia'     => ['name' => 'Shovia', 'spv' => 'Pak Riva'],
+                'shovia'     => ['name' => 'Shovia Syafany', 'spv' => 'Pak Riva'],
                 'mustofa'    => ['name' => 'Mustofa', 'spv' => 'Pak Riva'],
-                'reni'       => ['name' => 'Reni', 'spv' => 'Pak Riva'],
-                'nuri'       => ['name' => 'Nuri', 'spv' => 'Pak Riva'],
+                'reni'       => ['name' => 'Reni Nurbayani', 'spv' => 'Pak Riva'],
+                'reninurbayani' => ['name' => 'Reni Nurbayani', 'spv' => 'Pak Riva'],
+                'nuri'       => ['name' => 'Nuri Lestari Kristianty', 'spv' => 'Pak Riva'],
+                'nurilestari' => ['name' => 'Nuri Lestari Kristianty', 'spv' => 'Pak Riva'],
                 'uki'        => ['name' => 'Uki', 'spv' => 'Pak Riva']
             ];
 

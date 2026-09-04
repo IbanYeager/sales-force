@@ -27,7 +27,13 @@ class AuthController extends Controller
         }
 
         if ($loginType === 'sales') {
-            $user = DB::table('sales_accounts')->where('username', $username)->first();
+            $u_clean = str_replace(' ', '', $username);
+            $user = DB::table('sales_accounts')
+                ->where('username', $username)
+                ->orWhereRaw('LOWER(username) = ?', [strtolower($username)])
+                ->orWhere('username', $u_clean)
+                ->orWhereRaw('REPLACE(username, " ", "") = ?', [$u_clean])
+                ->first();
 
             if ($user) {
                 if (Hash::check($password, $user->password) || password_verify($password, $user->password) || $password === $user->password) {
@@ -53,23 +59,41 @@ class AuthController extends Controller
                 'erick' => ['name' => 'Erick', 'spv' => 'Pak Ryan'],
                 'erik' => ['name' => 'Erick', 'spv' => 'Pak Ryan'],
                 'deno' => ['name' => 'Deno', 'spv' => 'Pak Ryan'],
-                'yani' => ['name' => 'Yani', 'spv' => 'Pak Ryan'],
+                'yani' => ['name' => 'YANI ANDRIYANI', 'spv' => 'Pak Ryan'],
+                'yani drey' => ['name' => 'YANI ANDRIYANI', 'spv' => 'Pak Ryan'],
+                'yanidrey' => ['name' => 'YANI ANDRIYANI', 'spv' => 'Pak Ryan'],
                 'denia' => ['name' => 'Deni A', 'spv' => 'Pak Ryan'],
                 'jajang' => ['name' => 'Jajang', 'spv' => 'Pak Ryan'],
                 'juarna' => ['name' => 'Juarna', 'spv' => 'Pak Ryan'],
-                'galih_ryan' => ['name' => 'Galih (Ryan)', 'spv' => 'Pak Ryan'],
+                'galih_ryan' => ['name' => 'GALIH HARISTIANTO', 'spv' => 'Pak Ryan'],
+                'galih haristianto' => ['name' => 'GALIH HARISTIANTO', 'spv' => 'Pak Ryan'],
                 'fanny' => ['name' => 'Fanny', 'spv' => 'Pak Ryan'],
                 'dadan' => ['name' => 'Dadan', 'spv' => 'Pak Ryan'],
                 'igo' => ['name' => 'Igo', 'spv' => 'Pak Ryan'],
+                'isna' => ['name' => 'Isna Nurhayati', 'spv' => 'Pak Ryan'],
+                'neo' => ['name' => 'Frederick Neo', 'spv' => 'Pak Ryan'],
                 'dadi' => ['name' => 'Dadi', 'spv' => 'Pak Alvin'],
                 'topik' => ['name' => 'Topik', 'spv' => 'Pak Alvin'],
                 'indah' => ['name' => 'Indah', 'spv' => 'Pak Alvin'],
-                'andri' => ['name' => 'Andri', 'spv' => 'Pak Alvin'],
-                'rizky' => ['name' => 'Rizky', 'spv' => 'Pak Alvin'],
-                'galih_riva' => ['name' => 'Galih (Riva)', 'spv' => 'Pak Riva'],
+                'andri' => ['name' => 'Andri Jaya Laksana', 'spv' => 'Pak Alvin'],
+                'ndri' => ['name' => 'Andri Jaya Laksana', 'spv' => 'Pak Alvin'],
+                'rizky' => ['name' => 'Rizki Rismawan', 'spv' => 'Pak Alvin'],
+                'rizkitunastoyota47' => ['name' => 'Rizki Rismawan', 'spv' => 'Pak Alvin'],
+                'ardian' => ['name' => 'ARDIAN PURNAMA', 'spv' => 'Pak Alvin'],
+                'ardianpur28' => ['name' => 'ARDIAN PURNAMA', 'spv' => 'Pak Alvin'],
+                'fadil' => ['name' => 'MUHAMMAD FADIL FAHMI RUSTANDI', 'spv' => 'Pak Alvin'],
+                'fadil.fahmi99' => ['name' => 'MUHAMMAD FADIL FAHMI RUSTANDI', 'spv' => 'Pak Alvin'],
+                'rico' => ['name' => 'Rico Ade Saputra', 'spv' => 'Pak Alvin'],
+                'galih_riva' => ['name' => 'Kharisma Galih Putra', 'spv' => 'Pak Riva'],
+                'galih138' => ['name' => 'Kharisma Galih Putra', 'spv' => 'Pak Riva'],
                 'dery' => ['name' => 'Dery', 'spv' => 'Pak Riva'],
                 'giono' => ['name' => 'Giono', 'spv' => 'Pak Riva'],
                 'rizal' => ['name' => 'Rizal', 'spv' => 'Pak Riva'],
+                'shovia' => ['name' => 'Shovia Syafany', 'spv' => 'Pak Riva'],
+                'nuri' => ['name' => 'Nuri Lestari Kristianty', 'spv' => 'Pak Riva'],
+                'nurilestari' => ['name' => 'Nuri Lestari Kristianty', 'spv' => 'Pak Riva'],
+                'reni' => ['name' => 'Reni Nurbayani', 'spv' => 'Pak Riva'],
+                'reninurbayani' => ['name' => 'Reni Nurbayani', 'spv' => 'Pak Riva']
             ];
 
             $userLower = strtolower($username);
