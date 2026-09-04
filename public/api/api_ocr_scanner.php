@@ -26,25 +26,33 @@ $payload = json_decode($rawInput, true) ?: [];
 
 $imageData = $payload['image'] ?? '';
 $docType = strtolower($payload['doc_type'] ?? 'ktp'); // 'ktp' atau 'kk'
-$rawText = $payload['raw_text'] ?? '';
+$rawText = trim($payload['raw_text'] ?? '');
+$clientKey = trim($payload['api_key'] ?? '');
 
-// Check if Gemini API key exists
-$configFile = __DIR__ . '/config_ai.json';
-$geminiKey = '';
-if (file_exists($configFile)) {
-    $cfg = json_decode(file_get_contents($configFile), true);
-    $geminiKey = trim($cfg['gemini_api_key'] ?? '');
+// 1. Periksa ketersediaan Gemini API Key (Client payload, config_ai.json, atau .env)
+$geminiKey = $clientKey;
+
+if (empty($geminiKey)) {
+    $configFile = __DIR__ . '/config_ai.json';
+    if (file_exists($configFile)) {
+        $cfg = json_decode(file_get_contents($configFile), true);
+        $geminiKey = trim($cfg['gemini_api_key'] ?? '');
+    }
 }
 
-// Fallback check .env
-if (empty($geminiKey) && file_exists(__DIR__ . '/../.env')) {
+if (empty($geminiKey) && file_exists(__DIR__ . '/../../.env')) {
+    $envContent = file_get_contents(__DIR__ . '/../../.env');
+    if (preg_match('/GEMINI_API_KEY\s*=\s*["\']?([^"\'\s\r\n]+)/', $envContent, $m)) {
+        $geminiKey = trim($m[1]);
+    }
+} elseif (empty($geminiKey) && file_exists(__DIR__ . '/../.env')) {
     $envContent = file_get_contents(__DIR__ . '/../.env');
     if (preg_match('/GEMINI_API_KEY\s*=\s*["\']?([^"\'\s\r\n]+)/', $envContent, $m)) {
         $geminiKey = trim($m[1]);
     }
 }
 
-// If Gemini key is available and image data is provided, use Gemini Vision for 99.9% accuracy!
+// 2. Jika Gemini key tersedia dan data gambar dikirimkan -> Gunakan Gemini AI Vision
 if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
     $cleanBase64 = $imageData;
     $mimeType = 'image/jpeg';
@@ -55,9 +63,9 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
 
     $promptInstruction = ($docType === 'kk')
         ? "Ekstrak data dari gambar Kartu Keluarga (KK) Indonesia ini menjadi JSON murni tanpa markdown/backticks. Field yang wajib dicari:
-           - no_kk (Nomor KK 16 digit)
+           - no_kk (Nomor KK 16 digit angka bersih)
            - nama (Nama Kepala Keluarga atau Nama Anggota)
-           - nik (NIK 16 digit)
+           - nik (NIK 16 digit angka bersih)
            - alamat (Alamat lengkap jalan/dusun)
            - rt_rw (contoh: 002/005)
            - kelurahan (Desa / Kelurahan)
@@ -102,49 +110,70 @@ if (!empty($geminiKey) && !empty($imageData) && strlen($imageData) > 100) {
         ]
     ];
 
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . urlencode($geminiKey);
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode($geminiPayload),
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_TIMEOUT => 15
-    ]);
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    // Model vision yang didukung secara resmi dengan fallback otomatis
+    $visionModels = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro'];
 
-    if ($httpCode === 200 && !empty($response)) {
-        $geminiRes = json_decode($response, true);
-        $rawJsonText = $geminiRes['candidates'][0]['content']['parts'][0]['text'] ?? '';
-        
-        // Clean markdown backticks if any
-        $rawJsonText = preg_replace('/^```json\s*/i', '', trim($rawJsonText));
-        $rawJsonText = preg_replace('/```$/', '', trim($rawJsonText));
-        
-        $parsedData = json_decode($rawJsonText, true);
-        if (is_array($parsedData) && (!empty($parsedData['nik']) || !empty($parsedData['nama']) || !empty($parsedData['no_kk']))) {
-            echo json_encode([
-                "status" => "success",
-                "engine" => "gemini-vision",
-                "doc_type" => $docType,
-                "data" => sanitizeExtractedData($parsedData, $docType)
-            ]);
-            exit;
+    foreach ($visionModels as $visionModel) {
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$visionModel}:generateContent?key=" . urlencode($geminiKey);
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($geminiPayload),
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_SSL_VERIFYPEER => true
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 && !empty($response)) {
+            $geminiRes = json_decode($response, true);
+            $rawJsonText = $geminiRes['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
+            // Bersihkan backticks markdown jika ada
+            $rawJsonText = preg_replace('/^```(?:json)?\s*/i', '', trim($rawJsonText));
+            $rawJsonText = preg_replace('/```$/', '', trim($rawJsonText));
+
+            $parsedData = json_decode($rawJsonText, true);
+            if (is_array($parsedData) && (!empty($parsedData['nik']) || !empty($parsedData['nama']) || !empty($parsedData['no_kk']))) {
+                echo json_encode([
+                    "status" => "success",
+                    "engine" => "Gemini AI Vision (" . $visionModel . ")",
+                    "doc_type" => $docType,
+                    "data" => sanitizeExtractedData($parsedData, $docType)
+                ]);
+                exit;
+            }
         }
     }
 }
 
-// Fallback: Smart Local Heuristic Regex Parser (works with client OCR text or direct text)
-$extracted = parseIndonesianIdCardText($rawText, $docType);
+// 3. Fallback: Jika client menyertakan raw_text (dari Tesseract.js client OCR)
+if (!empty($rawText)) {
+    $extracted = parseIndonesianIdCardText($rawText, $docType);
+    $hasContent = !empty($extracted['nik']) || !empty($extracted['nama']) || !empty($extracted['no_kk']);
 
+    echo json_encode([
+        "status" => $hasContent ? "success" : "partial",
+        "engine" => "Smart Local OCR Parser",
+        "doc_type" => $docType,
+        "data" => $extracted,
+        "raw_length" => strlen($rawText)
+    ]);
+    exit;
+}
+
+// 4. Jika tidak ada Gemini Key dan client belum menjalankan OCR lokal:
+// Beritahu frontend agar menjalankan client-side OCR Tesseract lokal!
 echo json_encode([
-    "status" => "success",
-    "engine" => "smart-heuristic-parser",
+    "status" => "need_client_ocr",
+    "engine" => "client-fallback-required",
     "doc_type" => $docType,
-    "data" => $extracted
+    "message" => "Gemini AI Key belum disetel. Menjalankan Tesseract OCR lokal di browser..."
 ]);
+exit;
 
 /**
  * Sanitizes and fills missing keys
@@ -198,24 +227,37 @@ function parseIndonesianIdCardText($text, $docType = 'ktp') {
     $numCleanText = strtr($text, [
         'O' => '0', 'o' => '0', 'D' => '0',
         'I' => '1', 'l' => '1', '|' => '1',
-        'Z' => '2',
+        'Z' => '2', 'z' => '2',
         'S' => '5', 's' => '5',
         'B' => '8'
     ]);
 
+    // Bersihkan spasi antar angka berdekatan (misal "3273 1612 0590 0003" -> "3273161205900003")
+    $numCondensed = preg_replace('/(\d)\s+(\d)/', '$1$2', $numCleanText);
+    $numCondensed = preg_replace('/(\d)\s+(\d)/', '$1$2', $numCondensed);
+
     // 1. Extract NIK (16 digits)
-    if (preg_match('/\b([1-9][0-9]{15})\b/', $numCleanText, $m)) {
-        $result['nik'] = $m[1];
-    } elseif (preg_match('/NIK\D*([0-9\s]{16,22})/i', $numCleanText, $m)) {
+    if (preg_match('/N[I1l|][Kk]\D*([0-9\s]{16,24})/i', $numCleanText, $m)) {
         $digits = preg_replace('/\D/', '', $m[1]);
-        if (strlen($digits) >= 16) $result['nik'] = substr($digits, 0, 16);
+        if (strlen($digits) >= 16) {
+            $result['nik'] = substr($digits, 0, 16);
+        }
+    }
+    if (empty($result['nik']) && preg_match('/\b([1-9][0-9]{15})\b/', $numCondensed, $m)) {
+        $result['nik'] = $m[1];
+    }
+    if (empty($result['nik']) && preg_match('/\b([0-9]{16})\b/', $numCondensed, $m)) {
+        $result['nik'] = $m[1];
     }
 
     // 2. Extract No KK (16 digits)
     if ($docType === 'kk') {
-        if (preg_match('/(?:NO|NOMOR)\D*([1-9][0-9]{15})/i', $numCleanText, $m)) {
+        if (preg_match('/(?:NO|NOMOR)\D*K(?:ARTU)?\D*K(?:ELUARGA)?\D*([0-9\s]{16,24})/i', $numCleanText, $m)) {
+            $digits = preg_replace('/\D/', '', $m[1]);
+            if (strlen($digits) >= 16) $result['no_kk'] = substr($digits, 0, 16);
+        } elseif (preg_match('/(?:NO|NOMOR)\D*([1-9][0-9]{15})/i', $numCondensed, $m)) {
             $result['no_kk'] = $m[1];
-        } elseif (preg_match('/\b([1-9][0-9]{15})\b/', $numCleanText, $m)) {
+        } elseif (preg_match('/\b([1-9][0-9]{15})\b/', $numCondensed, $m)) {
             $result['no_kk'] = $m[1];
         }
     }
@@ -228,7 +270,7 @@ function parseIndonesianIdCardText($text, $docType = 'ktp') {
             if (!empty(trim($val))) {
                 $result['nama'] = strtoupper(trim($val));
                 break;
-            } elseif (isset($lines[$idx + 1]) && !preg_match('/nik|tempat|tgl|lahir|alamat|jenis|kelamin/i', $lines[$idx + 1])) {
+            } elseif (isset($lines[$idx + 1]) && !preg_match('/nik|tempat|tgl|lahir|alamat|jenis|kelamin|agama|status/i', $lines[$idx + 1])) {
                 $val = preg_replace('/.*(?:lengkap|kepala\s*keluarga)?\s*[:=\-]?\s*/i', '', $lines[$idx + 1]);
                 $val = preg_replace('/[^a-zA-Z\s\.,\']/', '', $val);
                 $result['nama'] = strtoupper(trim($val));
@@ -237,16 +279,36 @@ function parseIndonesianIdCardText($text, $docType = 'ktp') {
         }
     }
 
+    // Fallback Nama jika baris berlabel Nama tidak terbaca: Cari baris huruf kapital setelah baris NIK
+    if (empty($result['nama'])) {
+        $foundNikLine = false;
+        foreach ($lines as $line) {
+            if ($foundNikLine) {
+                $cleanLine = preg_replace('/[^a-zA-Z\s]/', '', $line);
+                $cleanLine = trim(preg_replace('/\s+/', ' ', $cleanLine));
+                if (strlen($cleanLine) >= 3 && !preg_match('/provinsi|republik|indonesia|nik|tempat|lahir|jakarta|bandung/i', $cleanLine)) {
+                    $result['nama'] = strtoupper($cleanLine);
+                    break;
+                }
+            }
+            if (preg_match('/nik\b/i', $line) || (!empty($result['nik']) && strpos($line, $result['nik']) !== false)) {
+                $foundNikLine = true;
+            }
+        }
+    }
+
     // 4. Extract Tempat / Tanggal Lahir
     foreach ($lines as $line) {
         if (preg_match('/(?:tempat|tgl|lahir)/i', $line)) {
             $val = preg_replace('/.*(?:tempat|tgl|lahir)\s*[:=\-]?\s*/i', '', $line);
-            // Example: BANDUNG, 17-08-1990 or JAKARTA 12/05/1985
+            // Contoh: BANDUNG, 17-08-1990 atau JAKARTA, 12/05/1985
             if (preg_match('/([a-zA-Z\s]+)[,\s]+([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{2,4})/', $val, $m)) {
                 $result['tempat_lahir'] = strtoupper(trim($m[1]));
                 $result['tanggal_lahir'] = trim($m[2]);
             } elseif (preg_match('/([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{2,4})/', $val, $m)) {
                 $result['tanggal_lahir'] = trim($m[1]);
+                $place = preg_replace('/[0-9\/\-\.,:]/', '', $val);
+                if (!empty(trim($place))) $result['tempat_lahir'] = strtoupper(trim($place));
             }
             break;
         }
@@ -260,7 +322,7 @@ function parseIndonesianIdCardText($text, $docType = 'ktp') {
     }
 
     // 6. Extract RT / RW
-    if (preg_match('/RT[\/\.]?RW\D*([0-9]{1,3})\s*[\/\-]\s*([0-9]{1,3})/i', $text, $m)) {
+    if (preg_match('/RT[\/\.]?RW\D*([0-9]{1,3})\s*[\/\-]\s*([0-9]{1,3})/i', $numCleanText, $m)) {
         $result['rt_rw'] = sprintf("%03d/%03d", intval($m[1]), intval($m[2]));
     }
 
@@ -270,7 +332,7 @@ function parseIndonesianIdCardText($text, $docType = 'ktp') {
             $val = preg_replace('/.*alamat\s*[:=\-]?\s*/i', '', $line);
             if (!empty(trim($val))) {
                 $result['alamat'] = trim($val);
-            } elseif (isset($lines[$idx + 1]) && !preg_match('/rt|rw|kel|kec/i', $lines[$idx + 1])) {
+            } elseif (isset($lines[$idx + 1]) && !preg_match('/rt|rw|kel|kec|agama|status/i', $lines[$idx + 1])) {
                 $result['alamat'] = trim($lines[$idx + 1]);
             }
             break;

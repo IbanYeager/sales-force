@@ -491,11 +491,14 @@
     <div class="ocr-modal-container" onclick="event.stopPropagation()">
       <!-- Modal Header -->
       <div class="ocr-modal-header">
-        <div class="ocr-modal-title">
+        <div class="ocr-modal-title" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <div style="width:28px; height:28px; border-radius:8px; background:#d7123a; display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff;">
             <i class="fa-solid fa-camera"></i>
           </div>
           <span>Smart AI OCR Scanner</span>
+          <span id="ocrHeaderEngineBadge" class="ocr-engine-pill" onclick="SalesSuperpowers.promptApiKey()" title="Klik untuk cek / setel Gemini AI Key">
+            <i class="fa-solid fa-bolt"></i> <span id="ocrHeaderEngineText">Smart OCR</span> <i class="fa-solid fa-key" style="font-size:9px; opacity:0.7;"></i>
+          </span>
         </div>
         <button type="button" class="ocr-modal-close-btn" onclick="SalesSuperpowers.closeOcrModal()">&times;</button>
       </div>
@@ -526,13 +529,18 @@
           <video id="ocrCameraVideo" autoplay playsinline muted></video>
           
           <!-- Card Target HUD Guides -->
-          <div class="ocr-hud-frame">
+          <div class="ocr-hud-frame" id="ocrHudFrame">
+            <div id="ocrAutoScanBadge" class="ocr-autoscan-badge"><i class="fa-solid fa-bolt fa-fade"></i> Auto-Scan Aktif</div>
             <span class="ocr-hud-corner ocr-corner-tl"></span>
             <span class="ocr-hud-corner ocr-corner-tr"></span>
             <span class="ocr-hud-corner ocr-corner-bl"></span>
             <span class="ocr-hud-corner ocr-corner-br"></span>
             <div class="ocr-laser-beam"></div>
-            <div class="ocr-hud-tip" id="ocrHudTip">Posisikan KTP di dalam kotak panduan</div>
+            <div class="ocr-hud-tip" id="ocrHudTip">Posisikan e-KTP di dalam kotak panduan</div>
+            <div id="ocrAutoScanCountdown" class="ocr-autoscan-countdown" style="display:none;">
+              <div class="ocr-pulse-ring"></div>
+              <span id="ocrCountdownText">⚡ Mendeteksi Dokumen...</span>
+            </div>
           </div>
         </div>
 
@@ -542,10 +550,14 @@
             <i class="fa-solid fa-camera-rotate"></i>
           </button>
           
-          <button type="button" class="btn-ocr-shutter" onclick="SalesSuperpowers.captureSnapshot()" title="Ambil Foto">
+          <button type="button" class="btn-ocr-shutter" onclick="SalesSuperpowers.captureSnapshot(true)" title="Ambil Foto Manual">
             <div class="btn-ocr-shutter-inner">
               <i class="fa-solid fa-camera"></i>
             </div>
+          </button>
+
+          <button type="button" id="btnOcrAutoScanToggle" class="btn-ocr-round active" onclick="SalesSuperpowers.toggleAutoScan()" title="Nyalakan / Matikan Auto-Scan">
+            <i class="fa-solid fa-bolt"></i>
           </button>
 
           <button type="button" class="btn-ocr-round" onclick="document.getElementById('ocrGalleryFileInput').click()" title="Pilih dari Galeri">
@@ -621,8 +633,9 @@
   <canvas id="ocrHiddenCanvas" style="display:none;"></canvas>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="../custom_alert.js"></script>
-  <script src="../js/sales_superpowers.js?v=1.0"></script>
+  <script src="../js/sales_superpowers.js?v=2.0"></script>
   <script src="../js/spk.js?v=2"></script>
   <script src="../js/spk_arcade_game.js?v=1"></script>
 

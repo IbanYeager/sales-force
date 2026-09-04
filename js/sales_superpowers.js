@@ -346,6 +346,11 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
   currentFacingMode: 'environment', // 'environment' (belakang) atau 'user' (depan)
   capturedImageBase64: null,
   extractedOcrData: null,
+  ocrAutoScanEnabled: true,
+  autoScanTimer: null,
+  stabilityCount: 0,
+  prevSampleData: null,
+  isProcessingOcr: false,
 
   openOcrModal(docType = 'ktp') {
     this.ocrDocType = docType;
@@ -355,13 +360,69 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
     modal.style.display = 'flex';
     this.setOcrDocType(docType);
     this.setOcrSource('camera');
+    this.updateEngineBadge();
   },
 
   closeOcrModal(e) {
     if (e && e.target && e.target.id !== 'smartOcrModal') return;
+    this.stopAutoScanLoop();
     this.stopCameraStream();
     const modal = document.getElementById('smartOcrModal');
     if (modal) modal.style.display = 'none';
+  },
+
+  promptApiKey() {
+    const current = localStorage.getItem('sft_gemini_api_key') || '';
+    const key = prompt('Kunci Google Gemini AI (Opsional untuk AI Vision 99.9%):\nBiarkan kosong untuk menggunakan Smart Local OCR (Gratis & Cepat).', current);
+    if (key !== null) {
+      if (key.trim()) {
+        localStorage.setItem('sft_gemini_api_key', key.trim());
+        if (window.showCustomAlert) {
+          window.showCustomAlert('Gemini AI Aktif', 'Kunci Gemini AI berhasil disimpan.', 'success');
+        } else {
+          alert('Kunci Gemini AI berhasil disimpan.');
+        }
+      } else {
+        localStorage.removeItem('sft_gemini_api_key');
+        if (window.showCustomAlert) {
+          window.showCustomAlert('Smart Local OCR', 'Kunci AI dihapus, kembali ke OCR Lokal.', 'info');
+        }
+      }
+      this.updateEngineBadge();
+    }
+  },
+
+  updateEngineBadge() {
+    const badgeText = document.getElementById('ocrHeaderEngineText');
+    const badgeEl = document.getElementById('ocrHeaderEngineBadge');
+    const hasKey = !!localStorage.getItem('sft_gemini_api_key');
+    if (badgeText) {
+      badgeText.textContent = hasKey ? 'Gemini AI Vision' : 'Smart Local OCR';
+    }
+    if (badgeEl) {
+      badgeEl.style.borderColor = hasKey ? '#10b981' : 'rgba(239,68,68,0.4)';
+      badgeEl.style.color = hasKey ? '#34d399' : '#fca5a5';
+      badgeEl.title = hasKey ? 'Gemini AI Vision Aktif (Klik untuk ganti kunci)' : 'Klik untuk atur Kunci Gemini AI';
+    }
+  },
+
+  toggleAutoScan() {
+    this.ocrAutoScanEnabled = !this.ocrAutoScanEnabled;
+    const btn = document.getElementById('btnOcrAutoScanToggle');
+    const badge = document.getElementById('ocrAutoScanBadge');
+    if (btn) {
+      btn.classList.toggle('active', this.ocrAutoScanEnabled);
+      btn.title = this.ocrAutoScanEnabled ? 'Auto-Scan: AKTIF' : 'Auto-Scan: MANUAL';
+    }
+    if (badge) {
+      badge.style.display = this.ocrAutoScanEnabled ? 'inline-flex' : 'none';
+    }
+    if (!this.ocrAutoScanEnabled) {
+      this.stopAutoScanLoop();
+      this.resetHudFeedback();
+    } else if (this.cameraStream) {
+      this.startAutoScanLoop();
+    }
   },
 
   setOcrDocType(type) {
@@ -398,6 +459,7 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
       if (btnUpload) btnUpload.classList.add('active');
       if (secCam) secCam.style.display = 'none';
       if (secUpload) secUpload.style.display = 'block';
+      this.stopAutoScanLoop();
       this.stopCameraStream();
     } else {
       if (btnUpload) btnUpload.classList.remove('active');
@@ -410,6 +472,7 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
 
   async startCameraStream() {
     this.stopCameraStream();
+    this.stopAutoScanLoop();
 
     const videoEl = document.getElementById('ocrCameraVideo');
     if (!videoEl) return;
@@ -432,23 +495,31 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
 
       this.cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
       videoEl.srcObject = this.cameraStream;
-      videoEl.play();
+      await videoEl.play();
+      
+      // Mulai Auto-Scan loop jika aktif
+      if (this.ocrAutoScanEnabled) {
+        this.startAutoScanLoop();
+      }
     } catch (err) {
       console.warn('Gagal mengakses kamera:', err);
-      // Coba fallback tanpa facingMode spesifik
       try {
         this.cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         videoEl.srcObject = this.cameraStream;
-        videoEl.play();
+        await videoEl.play();
+        if (this.ocrAutoScanEnabled) {
+          this.startAutoScanLoop();
+        }
       } catch (err2) {
         console.error('Kamera tidak diizinkan atau tidak tersedia:', err2);
-        alert('Kamera tidak dapat diakses (izin ditolak atau kamera sedang digunakan aplikasi lain). Silakan pilih foto dari galeri/file.');
+        alert('Kamera tidak dapat diakses (izin ditolak atau kamera sedang digunakan). Silakan pilih foto dari galeri/file.');
         this.setOcrSource('upload');
       }
     }
   },
 
   stopCameraStream() {
+    this.stopAutoScanLoop();
     if (this.cameraStream) {
       this.cameraStream.getTracks().forEach(track => {
         try { track.stop(); } catch (e) {}
@@ -461,17 +532,131 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
     }
   },
 
+  startAutoScanLoop() {
+    this.stopAutoScanLoop();
+    this.stabilityCount = 0;
+    this.prevSampleData = null;
+    this.autoScanTimer = setInterval(() => {
+      this.checkCameraFrameForAutoScan();
+    }, 900);
+  },
+
+  stopAutoScanLoop() {
+    if (this.autoScanTimer) {
+      clearInterval(this.autoScanTimer);
+      this.autoScanTimer = null;
+    }
+    this.resetHudFeedback();
+  },
+
+  resetHudFeedback() {
+    this.stabilityCount = 0;
+    this.prevSampleData = null;
+    const hudFrame = document.getElementById('ocrHudFrame');
+    const tip = document.getElementById('ocrHudTip');
+    const countdown = document.getElementById('ocrAutoScanCountdown');
+    if (hudFrame) hudFrame.classList.remove('detecting', 'locked');
+    if (countdown) countdown.style.display = 'none';
+    if (tip) {
+      tip.textContent = this.ocrDocType === 'kk'
+        ? 'Posisikan Kartu Keluarga di dalam kotak panduan'
+        : 'Posisikan e-KTP di dalam kotak panduan';
+    }
+  },
+
+  checkCameraFrameForAutoScan() {
+    if (!this.ocrAutoScanEnabled || !this.cameraStream || this.isProcessingOcr) return;
+    const videoEl = document.getElementById('ocrCameraVideo');
+    if (!videoEl || !videoEl.videoWidth || videoEl.paused || videoEl.ended) return;
+
+    // Grab thumbnail sample to measure frame stability & presence
+    const sampleW = 160;
+    const sampleH = 100;
+    if (!this._sampleCanvas) {
+      this._sampleCanvas = document.createElement('canvas');
+      this._sampleCanvas.width = sampleW;
+      this._sampleCanvas.height = sampleH;
+    }
+    const sCtx = this._sampleCanvas.getContext('2d', { willReadFrequently: true });
+    sCtx.drawImage(videoEl, 0, 0, sampleW, sampleH);
+
+    const imgData = sCtx.getImageData(0, 0, sampleW, sampleH).data;
+    let totalLum = 0;
+    let totalDiff = 0;
+    const pixelCount = sampleW * sampleH;
+
+    for (let i = 0; i < imgData.length; i += 4) {
+      const lum = 0.299 * imgData[i] + 0.587 * imgData[i + 1] + 0.114 * imgData[i + 2];
+      totalLum += lum;
+      if (this.prevSampleData) {
+        totalDiff += Math.abs(lum - this.prevSampleData[i / 4]);
+      }
+    }
+
+    const avgLum = totalLum / pixelCount;
+    const avgDiff = this.prevSampleData ? (totalDiff / pixelCount) : 999;
+
+    // Cache current sample
+    if (!this.prevSampleData) {
+      this.prevSampleData = new Float32Array(pixelCount);
+    }
+    for (let i = 0; i < imgData.length; i += 4) {
+      this.prevSampleData[i / 4] = 0.299 * imgData[i] + 0.587 * imgData[i + 1] + 0.114 * imgData[i + 2];
+    }
+
+    const hudFrame = document.getElementById('ocrHudFrame');
+    const tip = document.getElementById('ocrHudTip');
+    const countdown = document.getElementById('ocrAutoScanCountdown');
+    const countdownText = document.getElementById('ocrCountdownText');
+
+    // Kondisi steady: Perubahan antar frame rendah (< 8.5) dan pencahayaan memadai (35 - 235)
+    const isSteady = avgDiff < 8.5 && avgLum > 35 && avgLum < 235;
+
+    if (isSteady) {
+      this.stabilityCount = (this.stabilityCount || 0) + 1;
+      if (this.stabilityCount === 1) {
+        if (hudFrame) hudFrame.classList.add('detecting');
+        if (tip) tip.textContent = '⚡ Mendeteksi dokumen... Tahan posisi kamera...';
+      } else if (this.stabilityCount >= 2) {
+        if (hudFrame) {
+          hudFrame.classList.remove('detecting');
+          hudFrame.classList.add('locked');
+        }
+        if (countdown) countdown.style.display = 'flex';
+        if (countdownText) countdownText.textContent = '🎯 Memindai Otomatis...';
+        if (tip) tip.textContent = '✨ Dokumen Pas! Mengambil foto...';
+
+        // Auto snapshot & scan
+        setTimeout(() => {
+          this.captureSnapshot(false);
+        }, 350);
+      }
+    } else {
+      if (this.stabilityCount > 0) {
+        this.stabilityCount = 0;
+        if (hudFrame) hudFrame.classList.remove('detecting', 'locked');
+        if (countdown) countdown.style.display = 'none';
+        if (tip) {
+          tip.textContent = this.ocrDocType === 'kk'
+            ? 'Posisikan Kartu Keluarga di dalam kotak panduan'
+            : 'Posisikan e-KTP di dalam kotak panduan';
+        }
+      }
+    }
+  },
+
   switchCamera() {
     this.currentFacingMode = (this.currentFacingMode === 'environment') ? 'user' : 'environment';
     this.startCameraStream();
   },
 
-  captureSnapshot() {
+  captureSnapshot(manual = true) {
+    if (this.isProcessingOcr) return;
     const videoEl = document.getElementById('ocrCameraVideo');
     const canvas = document.getElementById('ocrHiddenCanvas') || document.createElement('canvas');
 
     if (!videoEl || !videoEl.videoWidth) {
-      alert('Kamera belum siap atau belum aktif.');
+      if (manual) alert('Kamera belum siap atau belum aktif.');
       return;
     }
 
@@ -481,10 +666,12 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
     ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
 
     this.capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.92);
+    this.stopAutoScanLoop();
     this.stopCameraStream();
 
-    // Tampilkan Viewport Preview
+    // Tampilkan Viewport Preview dan LANGSUNG proses OCR otomatis!
     this.showCapturedPreview(this.capturedImageBase64);
+    this.processOcr();
   },
 
   handleFileSelect(input) {
@@ -495,6 +682,8 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
     reader.onload = (e) => {
       this.capturedImageBase64 = e.target.result;
       this.showCapturedPreview(this.capturedImageBase64);
+      // LANGSUNG proses OCR otomatis!
+      this.processOcr();
     };
     reader.readAsDataURL(file);
   },
@@ -515,9 +704,56 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
   },
 
   retakePhoto() {
+    this.isProcessingOcr = false;
     this.capturedImageBase64 = null;
     this.extractedOcrData = null;
+    this.resetHudFeedback();
     this.setOcrSource(this.ocrSource || 'camera');
+  },
+
+  // Pre-process canvas to increase OCR accuracy
+  preprocessImageForOcr(sourceDataUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 1200;
+        let w = img.naturalWidth || img.width;
+        let h = img.naturalHeight || img.height;
+
+        if (w > maxW) {
+          h = Math.round(h * (maxW / w));
+          w = maxW;
+        }
+
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const d = imgData.data;
+
+        // Grayscale + Adaptive Contrast Enhancement for sharp text
+        for (let i = 0; i < d.length; i += 4) {
+          let gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          // Contrast stretch
+          gray = (gray - 128) * 1.45 + 128;
+          if (gray < 0) gray = 0;
+          if (gray > 255) gray = 255;
+          // Slight thresholding for crisp characters
+          const finalVal = gray < 138 ? Math.max(0, gray - 30) : Math.min(255, gray + 30);
+          d[i] = finalVal;
+          d[i + 1] = finalVal;
+          d[i + 2] = finalVal;
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        resolve(canvas.toDataURL('image/jpeg', 0.9));
+      };
+      img.onerror = () => resolve(sourceDataUrl);
+      img.src = sourceDataUrl;
+    });
   },
 
   async processOcr() {
@@ -526,58 +762,110 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
       return;
     }
 
+    this.isProcessingOcr = true;
     const overlay = document.getElementById('ocrScanningOverlay');
     const statusText = document.getElementById('ocrScanningStatusText');
     const preScanActions = document.getElementById('ocrPreScanActions');
 
     if (overlay) overlay.style.display = 'flex';
     if (preScanActions) preScanActions.style.display = 'none';
-    if (statusText) statusText.textContent = 'Memindai & mengekstrak data identitas...';
+    if (statusText) statusText.textContent = 'Mempersiapkan gambar & menghubungkan AI...';
+
+    const apiKey = localStorage.getItem('sft_gemini_api_key') || '';
 
     try {
       // 1. Panggil API AI OCR Backend
-      const res = await fetch(`${this.getApiPrefix()}api_ocr_scanner.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: this.capturedImageBase64,
-          doc_type: this.ocrDocType
-        })
-      });
+      let res;
+      try {
+        res = await fetch(`${this.getApiPrefix()}api_ocr_scanner.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: this.capturedImageBase64,
+            doc_type: this.ocrDocType,
+            api_key: apiKey
+          })
+        });
+      } catch (networkErr) {
+        // Coba fallback URL alternatif (misal dari /pages/spk vs /spk)
+        const altPrefix = this.getApiPrefix() === 'api/' ? '../api/' : 'api/';
+        res = await fetch(`${altPrefix}api_ocr_scanner.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: this.capturedImageBase64,
+            doc_type: this.ocrDocType,
+            api_key: apiKey
+          })
+        });
+      }
 
       const result = await res.json();
       console.log('OCR API Response:', result);
 
-      if (result && result.status === 'success' && result.data) {
+      // Jika backend berhasil dengan Gemini Vision
+      if (result && result.status === 'success' && result.data && (result.data.nik || result.data.nama || result.data.no_kk)) {
         this.extractedOcrData = result.data;
-        this.renderOcrReview(this.extractedOcrData, result.engine || 'AI Engine');
-      } else {
-        throw new Error(result.message || 'Gagal mengenali data teks dokumen');
+        this.renderOcrReview(this.extractedOcrData, result.engine || 'Gemini AI Vision');
+        return;
       }
 
-    } catch (err) {
-      console.warn('API OCR Error, mencoba client-side fallback:', err);
-      if (statusText) statusText.textContent = 'Mencoba pengenalan karakter lokal...';
+      // Jika backend meminta client-side OCR atau data tidak lengkap -> jalankan Tesseract.js
+      throw new Error(result.message || 'need_client_ocr');
 
-      // 2. Client-side Fallback Tesseract.js (jika tersedia atau dapat diload)
+    } catch (err) {
+      console.log('Menjalankan Client OCR Fallback (Tesseract.js):', err);
+      if (statusText) statusText.textContent = '🔍 Membaca teks dokumen via Smart OCR lokal...';
+
       try {
         if (typeof Tesseract === 'undefined') {
           await this.loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
         }
 
-        const ret = await Tesseract.recognize(this.capturedImageBase64, 'eng');
-        const text = ret.data.text;
-        console.log('Client OCR Fallback text:', text);
+        // Preprocess image agar teks hitam dan kontras tajam
+        if (statusText) statusText.textContent = '⚡ Mengoptimalkan kontras karakter & NIK...';
+        const preprocessedImg = await this.preprocessImageForOcr(this.capturedImageBase64);
 
-        const parsed = this.parseKtpText(text);
+        if (statusText) statusText.textContent = '🤖 Menganalisis karakter dokumen identitas...';
+        const ret = await Tesseract.recognize(preprocessedImg, 'eng');
+        const text = ret.data.text || '';
+        console.log('Tesseract Extracted Text:\n', text);
+
+        // Kirim raw_text ke backend untuk parsing regex mendalam
+        let parsed = null;
+        try {
+          const parseRes = await fetch(`${this.getApiPrefix()}api_ocr_scanner.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              raw_text: text,
+              doc_type: this.ocrDocType
+            })
+          });
+          const parseJson = await parseRes.json();
+          if (parseJson && parseJson.data) {
+            parsed = parseJson.data;
+          }
+        } catch (backendParseErr) {
+          console.warn('Backend parse failed, using client parser:', backendParseErr);
+        }
+
+        // Fallback ke parser lokal jika backend tidak merespons
+        if (!parsed) {
+          parsed = this.parseKtpText(text);
+        }
+
         this.extractedOcrData = parsed;
-        this.renderOcrReview(this.extractedOcrData, 'Client Heuristic OCR');
+        this.renderOcrReview(this.extractedOcrData, 'Smart Local OCR Engine');
 
       } catch (clientErr) {
         console.error('Semua engine OCR gagal:', clientErr);
-        alert('Gagal membaca dokumen secara otomatis. Anda tetap dapat memasukkan data secara manual dan foto akan tetap terlampir.');
-        
-        // Tampilkan review kosong agar foto tetap bisa disimpan
+        if (window.showCustomAlert) {
+          window.showCustomAlert('Perhatian', 'Dokumen belum terbaca optimal. Anda dapat memasukkan data secara manual dan foto akan tetap tersimpan sebagai lampiran SPK.', 'info');
+        } else {
+          alert('Dokumen belum terbaca optimal. Anda tetap dapat memasukkan data manual dan foto tetap terlampir.');
+        }
+
         this.extractedOcrData = {
           nik: '',
           no_kk: '',
@@ -587,6 +875,7 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
         this.renderOcrReview(this.extractedOcrData, 'Manual Review');
       }
     } finally {
+      this.isProcessingOcr = false;
       if (overlay) overlay.style.display = 'none';
       if (preScanActions) preScanActions.style.display = 'flex';
     }
@@ -663,6 +952,12 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
       }
     }
 
+    // Scroll ke bagian identitas agar user melihat hasilnya
+    const firstField = document.getElementById('spkNik') || document.getElementById('namaCustomer');
+    if (firstField) {
+      firstField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     // 2. Simpan lampiran foto ke hidden input & update card preview
     if (this.capturedImageBase64) {
       if (this.ocrDocType === 'kk') {
@@ -713,24 +1008,58 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
 
   parseKtpText(text) {
     const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-    let nik = '', no_kk = '', nama = '', alamat = '', tempat_lahir = '', tanggal_lahir = '', jenis_kelamin = '', rt_rw = '', kelurahan = '', kecamatan = '', kota = '';
+    let nik = '', no_kk = '', nama = '', alamat = '', tempat_lahir = '', tanggal_lahir = '', jenis_kelamin = '', rt_rw = '', kelurahan = '', kecamatan = '', kota = '', provinsi = '', agama = '', status_perkawinan = '', pekerjaan = '';
+
+    // Normalize OCR digit confusions
+    const numClean = text.replace(/[oOD]/g, '0').replace(/[Il|]/g, '1').replace(/[Zz]/g, '2').replace(/[Ss]/g, '5').replace(/B/g, '8');
+    const numCondensed = numClean.replace(/(\d)\s+(\d)/g, '$1$2').replace(/(\d)\s+(\d)/g, '$1$2');
 
     // Extract NIK (16 digits)
-    const numClean = text.replace(/[oOD]/g, '0').replace(/[Il|]/g, '1');
-    const nikMatch = numClean.match(/\b([1-9][0-9]{15})\b/) || numClean.match(/NIK\D*([0-9\s]{16,22})/i);
+    const nikMatch = numCondensed.match(/\b([1-9][0-9]{15})\b/) || numClean.match(/N[I1l|][Kk]\D*([0-9\s]{16,24})/i);
     if (nikMatch) {
-      nik = (nikMatch[1] || '').replace(/\D/g, '').slice(0, 16);
+      const d = (nikMatch[1] || '').replace(/\D/g, '');
+      if (d.length >= 16) nik = d.slice(0, 16);
+    }
+    if (!nik) {
+      const any16 = numCondensed.match(/\b([0-9]{16})\b/);
+      if (any16) nik = any16[1];
+    }
+
+    // Extract No KK
+    if (this.ocrDocType === 'kk') {
+      const kkMatch = numClean.match(/(?:NO|NOMOR)\D*K(?:ARTU)?\D*K(?:ELUARGA)?\D*([0-9\s]{16,24})/i) || numCondensed.match(/\b([1-9][0-9]{15})\b/);
+      if (kkMatch) {
+        const d = (kkMatch[1] || '').replace(/\D/g, '');
+        if (d.length >= 16) no_kk = d.slice(0, 16);
+      }
     }
 
     // Extract Nama
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (/nama\b/i.test(line)) {
-        nama = line.replace(/.*nama\s*(?:lengkap|kepala\s*keluarga)?\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim();
-        if (!nama && lines[i + 1]) {
-          nama = lines[i + 1].replace(/.*(?:lengkap|kepala\s*keluarga)?\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim();
+        nama = line.replace(/.*nama\s*(?:lengkap|kepala\s*keluarga)?\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
+        if (!nama && lines[i + 1] && !/nik|tempat|tgl|lahir|alamat|jenis|kelamin|agama|status/i.test(lines[i + 1])) {
+          nama = lines[i + 1].replace(/.*(?:lengkap|kepala\s*keluarga)?\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
         }
         break;
+      }
+    }
+
+    // Fallback Nama jika baris berlabel Nama tidak terbaca
+    if (!nama && nik) {
+      let foundNik = false;
+      for (let i = 0; i < lines.length; i++) {
+        if (foundNik) {
+          const clean = lines[i].replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
+          if (clean.length >= 3 && !/PROVINSI|REPUBLIK|INDONESIA|NIK|TEMPAT|LAHIR|BANDUNG|JAKARTA/i.test(clean)) {
+            nama = clean;
+            break;
+          }
+        }
+        if (/nik\b/i.test(lines[i]) || lines[i].includes(nik)) {
+          foundNik = true;
+        }
       }
     }
 
@@ -743,6 +1072,11 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
         if (m) {
           tempat_lahir = m[1].trim().toUpperCase();
           tanggal_lahir = m[2].trim();
+        } else {
+          const dateOnly = val.match(/([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{2,4})/);
+          if (dateOnly) tanggal_lahir = dateOnly[1].trim();
+          const placeOnly = val.replace(/[0-9\/\-\.,:]/g, '').trim().toUpperCase();
+          if (placeOnly) tempat_lahir = placeOnly;
         }
         break;
       }
@@ -763,14 +1097,68 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
       const line = lines[i];
       if (/alamat/i.test(line)) {
         alamat = line.replace(/.*alamat\s*[:=\-]?\s*/i, '').trim();
-        if (lines[i + 1] && !/rt|rw|kel|kec/i.test(lines[i + 1])) {
+        if (lines[i + 1] && !/rt|rw|kel|kec|agama|status/i.test(lines[i + 1])) {
           alamat += ' ' + lines[i + 1].trim();
         }
         break;
       }
     }
 
-    return { nik, no_kk, nama, alamat, tempat_lahir, tanggal_lahir, jenis_kelamin, rt_rw, kelurahan, kecamatan, kota };
+    // Extract Kelurahan / Desa
+    for (let i = 0; i < lines.length; i++) {
+      if (/kelurahan|desa/i.test(lines[i])) {
+        kelurahan = lines[i].replace(/.*(?:kelurahan|kel|desa)\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
+        break;
+      }
+    }
+
+    // Extract Kecamatan
+    for (let i = 0; i < lines.length; i++) {
+      if (/kecamatan/i.test(lines[i])) {
+        kecamatan = lines[i].replace(/.*kecamatan\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
+        break;
+      }
+    }
+
+    // Extract Kota / Kabupaten
+    const kotaMatch = text.match(/(?:KOTA|KABUPATEN|KAB\.?)\s+([A-Z\s]+)/i);
+    if (kotaMatch) {
+      const firstPart = kotaMatch[1].split('\n')[0].replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
+      if (firstPart) {
+        const prefix = /KAB/i.test(kotaMatch[0]) ? 'KABUPATEN ' : 'KOTA ';
+        kota = prefix + firstPart;
+      }
+    }
+
+    // Extract Provinsi
+    const provMatch = text.match(/PROVINSI\s+([A-Z\s]+)/i);
+    if (provMatch) {
+      provinsi = provMatch[1].split('\n')[0].replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
+    }
+
+    // Extract Agama
+    if (/ISLAM/i.test(text)) agama = 'ISLAM';
+    else if (/KRISTEN|PROTESTAN/i.test(text)) agama = 'KRISTEN';
+    else if (/KATOLIK/i.test(text)) agama = 'KATOLIK';
+    else if (/HINDU/i.test(text)) agama = 'HINDU';
+    else if (/BUDDHA|BUDHA/i.test(text)) agama = 'BUDDHA';
+    else if (/KONGHUCU/i.test(text)) agama = 'KONGHUCU';
+
+    // Extract Status Perkawinan
+    if (/BELUM\s*KAWIN/i.test(text)) status_perkawinan = 'BELUM KAWIN';
+    else if (/CERAI\s*HIDUP/i.test(text)) status_perkawinan = 'CERAI HIDUP';
+    else if (/CERAI\s*MATI/i.test(text)) status_perkawinan = 'CERAI MATI';
+    else if (/KAWIN/i.test(text)) status_perkawinan = 'KAWIN';
+
+    // Extract Pekerjaan
+    for (let i = 0; i < lines.length; i++) {
+      if (/pekerjaan/i.test(lines[i])) {
+        pekerjaan = lines[i].replace(/.*pekerjaan\s*[:=\-]?\s*/i, '').replace(/[^a-zA-Z\s]/g, '').trim().toUpperCase();
+        break;
+      }
+    }
+
+    return { nik, no_kk, nama, alamat, tempat_lahir, tanggal_lahir, jenis_kelamin, rt_rw, kelurahan, kecamatan, kota, provinsi, agama, status_perkawinan, pekerjaan };
   },
 
   // =========================================================================
