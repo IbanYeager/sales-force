@@ -19,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/koneksi.php';
 
-$SPREADSHEET_ID = "1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc";
+$SPREADSHEET_ID = "1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs";
+$DEFAULT_SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/{$SPREADSHEET_ID}/edit?usp=sharing";
 $CSV_EXPORT_URL = "https://docs.google.com/spreadsheets/d/{$SPREADSHEET_ID}/gviz/tq?tqx=out:csv";
 $APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec";
 
@@ -27,8 +28,8 @@ $APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheV
 if ($conn && !$conn->connect_error) {
     $conn->query("CREATE TABLE IF NOT EXISTS tabel_sheets_sync_config (
         id INT PRIMARY KEY DEFAULT 1,
-        spreadsheet_url VARCHAR(255) DEFAULT 'https://docs.google.com/spreadsheets/d/1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc/edit?usp=sharing',
-        spreadsheet_id VARCHAR(100) DEFAULT '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc',
+        spreadsheet_url VARCHAR(255) DEFAULT '$DEFAULT_SPREADSHEET_URL',
+        spreadsheet_id VARCHAR(100) DEFAULT '$SPREADSHEET_ID',
         apps_script_webhook_url TEXT,
         auto_sync_enabled INT DEFAULT 1,
         last_sync_at DATETIME DEFAULT NULL,
@@ -36,11 +37,19 @@ if ($conn && !$conn->connect_error) {
         last_sync_summary TEXT
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    $conn->query("INSERT INTO tabel_sheets_sync_config (id, spreadsheet_id, spreadsheet_url, apps_script_webhook_url, auto_sync_enabled) 
-                  VALUES (1, '$SPREADSHEET_ID', 'https://docs.google.com/spreadsheets/d/1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc/edit?usp=sharing', '$APPS_SCRIPT_URL', 1)
-                  ON DUPLICATE KEY UPDATE 
-                    spreadsheet_id = '$SPREADSHEET_ID',
-                    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc/edit?usp=sharing'");
+    $c_check = $conn->query("SELECT spreadsheet_id FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+    if (!$c_check || $c_check->num_rows === 0) {
+        $conn->query("INSERT INTO tabel_sheets_sync_config (id, spreadsheet_id, spreadsheet_url, apps_script_webhook_url, auto_sync_enabled) 
+                      VALUES (1, '$SPREADSHEET_ID', '$DEFAULT_SPREADSHEET_URL', '$APPS_SCRIPT_URL', 1)");
+    } else {
+        $cur_row = $c_check->fetch_assoc();
+        if (empty($cur_row['spreadsheet_id']) || $cur_row['spreadsheet_id'] === '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc') {
+            $conn->query("UPDATE tabel_sheets_sync_config SET 
+                            spreadsheet_id = '$SPREADSHEET_ID', 
+                            spreadsheet_url = '$DEFAULT_SPREADSHEET_URL' 
+                          WHERE id = 1");
+        }
+    }
 
     try {
         $conn->query("ALTER TABLE sales_accounts ADD COLUMN is_active INT DEFAULT 1");
@@ -62,17 +71,28 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     if (!$month) $month = intval(date('n'));
     if (!$year) $year = intval(date('Y'));
 
+    // Cek parameter khusus dari query/request jika ada
+    $custom_id = trim($_GET['sheet_id'] ?? $_POST['sheet_id'] ?? '');
+    if (empty($custom_id)) {
+        $custom_url = trim($_GET['url'] ?? $_POST['url'] ?? '');
+        if (!empty($custom_url) && preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $custom_url, $m_id)) {
+            $custom_id = $m_id[1];
+        }
+    }
+
+    $active_sheet_id = !empty($custom_id) ? $custom_id : $SPREADSHEET_ID;
+
     // Ambil URL/ID Spreadsheet dari Database jika ada
-    $fetch_url = $CSV_EXPORT_URL;
-    if ($conn) {
+    if (empty($custom_id) && $conn) {
         $res_cfg = $conn->query("SELECT spreadsheet_id FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
         if ($res_cfg && $c_row = $res_cfg->fetch_assoc()) {
-            if (!empty($c_row['spreadsheet_id'])) {
-                $s_id = trim($c_row['spreadsheet_id']);
-                $fetch_url = "https://docs.google.com/spreadsheets/d/{$s_id}/gviz/tq?tqx=out:csv";
+            if (!empty($c_row['spreadsheet_id']) && $c_row['spreadsheet_id'] !== '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc') {
+                $active_sheet_id = trim($c_row['spreadsheet_id']);
             }
         }
     }
+
+    $fetch_url = "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/gviz/tq?tqx=out:csv";
 
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -121,16 +141,6 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
             if (!isset($sales_map[$user_norm])) $sales_map[$user_norm] = $row;
         }
     }
-
-    // Daftar alias nama untuk akurasi 100%
-    $aliases = [
-        'pakryan_denia' => 'denia',
-        'pakryan_denis' => 'denis',
-        'pakalvin_ardian' => 'abdian',
-        'pakalvin_udil' => 'udu',
-        'pakalvin_yeni' => 'yenni',
-        'pakriva_reny' => 'reni'
-    ];
 
     // Daftar alias nama untuk akurasi 100%
     $aliases = [
@@ -340,33 +350,44 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         }
 
     } else {
-        // ── MODE B: FALLBACK PARSER FORMAT STANDAR BULANAN ──
+        // ── MODE B: FALLBACK PARSER FORMAT STANDAR BULANAN (REAL-TIME SPK/DO) ──
         foreach ($lines as $line) {
             if (trim($line) === '') continue;
             $cols = str_getcsv($line);
 
+            $full_row_text = implode(' ', $cols);
             $col0 = trim($cols[0] ?? '');
             $col1 = trim($cols[1] ?? '');
 
-            if (stripos($col0, 'Pak Ryan') !== false || stripos($col1, 'Pak Ryan') !== false) {
+            // Deteksi pergantian Tim SPV secara fleksibel (di kolom 0, 1, atau seluruh baris teks)
+            if (stripos($full_row_text, 'Tim Pak Ryan') !== false || stripos($col0, 'Pak Ryan') !== false || stripos($col1, 'Pak Ryan') !== false) {
                 $current_spv = "Pak Ryan"; continue;
-            } elseif (stripos($col0, 'Pak Alvin') !== false || stripos($col1, 'Pak Alvin') !== false) {
+            } elseif (stripos($full_row_text, 'Tim Pak Alvin') !== false || stripos($col0, 'Pak Alvin') !== false || stripos($col1, 'Pak Alvin') !== false) {
                 $current_spv = "Pak Alvin"; continue;
-            } elseif (stripos($col0, 'Pak Riva') !== false || stripos($col1, 'Pak Riva') !== false) {
+            } elseif (stripos($full_row_text, 'Tim Pak Riva') !== false || stripos($col0, 'Pak Riva') !== false || stripos($col1, 'Pak Riva') !== false) {
                 $current_spv = "Pak Riva"; continue;
             }
 
-            if (stripos($col0, 'No') !== false || stripos($col0, 'Jumlah') !== false || stripos($col0, 'Total') !== false || stripos($col1, 'Sales') !== false) {
+            // Validasi baris data: harus ada nomor urut di col0 dan nama sales di col1
+            if (!is_numeric($col0) || empty($col1) || stripos($col1, 'Sales') !== false || stripos($col1, 'Total') !== false) {
                 continue;
             }
 
-            $nama_sales = trim($cols[1] ?? '');
-            if (empty($nama_sales)) continue;
-
+            $nama_sales = $col1;
             $target_spk = intval(trim($cols[2] ?? '0'));
             $target_do = intval(trim($cols[3] ?? '0'));
             $actual_spk = intval(trim($cols[4] ?? '0'));
             $actual_do = intval(trim($cols[5] ?? '0'));
+
+            // Fallback target baseline jika target di sheet kosong atau 0
+            if ($target_spk <= 0) {
+                $wb_key = str_replace(['_', ' '], '', normalizeName($nama_sales));
+                $target_spk = $whiteboard_targets[$wb_key]['target_spk'] ?? 3;
+            }
+            if ($target_do <= 0) {
+                $wb_key = str_replace(['_', ' '], '', normalizeName($nama_sales));
+                $target_do = $whiteboard_targets[$wb_key]['target_do'] ?? 2;
+            }
 
             $total_spk += $actual_spk;
             $total_do += $actual_do;
@@ -391,12 +412,15 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
 
             $norm_name = normalizeName($nama_sales);
             $cur_spv_key = normalizeName($current_spv);
+            $lookup_key = $cur_spv_key . '_' . $norm_name;
             $matched = null;
 
-            if (isset($sales_map[$cur_spv_key . '_' . $norm_name])) {
-                $matched = $sales_map[$cur_spv_key . '_' . $norm_name];
-            } elseif (isset($aliases[$cur_spv_key . '_' . $norm_name]) && isset($sales_map[$cur_spv_key . '_' . $aliases[$cur_spv_key . '_' . $norm_name]])) {
-                $matched = $sales_map[$cur_spv_key . '_' . $aliases[$cur_spv_key . '_' . $norm_name]];
+            if (isset($sales_map[$lookup_key])) {
+                $matched = $sales_map[$lookup_key];
+            } elseif (isset($aliases[$lookup_key]) && isset($sales_map[$cur_spv_key . '_' . $aliases[$lookup_key]])) {
+                $matched = $sales_map[$cur_spv_key . '_' . $aliases[$lookup_key]];
+            } elseif (isset($aliases[$norm_name]) && isset($sales_map[$cur_spv_key . '_' . $aliases[$norm_name]])) {
+                $matched = $sales_map[$cur_spv_key . '_' . $aliases[$norm_name]];
             } elseif (isset($sales_map[$norm_name])) {
                 $matched = $sales_map[$norm_name];
             }
@@ -416,12 +440,13 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 $conn->query("INSERT INTO sales_accounts (username, password, nama_lengkap, tingkatan, nama_spv, is_active) 
                               VALUES ('$username', '$pass_hash', '$nama_sales', 'Executive', '$current_spv', 1)");
                 $sales_id = $conn->insert_id;
-                $sales_map[$cur_spv_key . '_' . $norm_name] = [
+                $matched = [
                     'id' => $sales_id,
                     'username' => $username,
                     'nama_lengkap' => $nama_sales,
                     'nama_spv' => $current_spv
                 ];
+                $sales_map[$lookup_key] = $matched;
             }
 
             $active_sheet_ids[] = $sales_id;
@@ -464,7 +489,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     $bulan_str = $nama_bulan_list[$month] ?? "Bulan ke-$month";
 
     $now_str = date('Y-m-d H:i:s');
-    $summary = "Berhasil sinkronisasi " . count($synced_rows) . " wiraniaga dari Spreadsheet Rekap Tahunan untuk $bulan_str $year (Total: $total_spk SPK | $total_do DO)";
+    $summary = "Berhasil sinkronisasi " . count($synced_rows) . " wiraniaga dari Google Spreadsheet untuk $bulan_str $year (Total: $total_spk SPK | $total_do DO)";
     if (!empty($recap_months_synced)) {
         sort($recap_months_synced);
         $m_names = array_map(function($m_num) use ($nama_bulan_list) { return $nama_bulan_list[$m_num] ?? $m_num; }, $recap_months_synced);

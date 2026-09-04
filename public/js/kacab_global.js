@@ -88,10 +88,11 @@ async function fetchBranchHierarchy(forceFresh = false) {
     } catch(e) {}
   }
 
+  const ts = forceFresh ? `?t=${Date.now()}` : '';
   const [spvRes, wirRes, tgtRes] = await Promise.all([
-    fetch('../api/api_spv_list.php'),
-    fetch('../api/api_wiraniaga.php'),
-    fetch('../api/api_target_all.php')
+    fetch(`../api/api_spv_list.php${ts}`),
+    fetch(`../api/api_wiraniaga.php${ts}`),
+    fetch(`../api/api_target_all.php${ts}`)
   ]);
   const spvJson = await spvRes.json();
   const wirJson = await wirRes.json();

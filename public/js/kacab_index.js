@@ -1,8 +1,8 @@
 // kacab_index.js — Dashboard Kepala Cabang: KPI cabang, peringkat SPV, feed aktivitas.
 
-async function loadDashboard() {
+async function loadDashboard(forceFresh = false) {
   try {
-    const { hierarchy, periode, evaluasi_do_label } = await fetchBranchHierarchy();
+    const { hierarchy, periode, evaluasi_do_label } = await fetchBranchHierarchy(forceFresh);
 
     const periodeEl = document.getElementById('dashPeriode');
     if (periodeEl) {
@@ -265,7 +265,7 @@ async function loadAiSentinelKacab(customDay = null, forceFresh = false) {
   }
 
   try {
-    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${dayParam}&bulan=${monthParam}`);
+    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${dayParam}&bulan=${monthParam}${forceFresh ? '&t=' + Date.now() : ''}`);
     const json = await res.json();
 
     if (json.status === 'success') {
@@ -502,8 +502,9 @@ async function syncGoogleSheetNow() {
       alert(`✅ ${data.message}\nTotal SPK: ${data.totals.total_actual_spk} | Total DO: ${data.totals.total_actual_do}\nJumlah Wiraniaga Aktif: ${data.synced_count} Orang`);
       
       // Force refresh Dashboard & Sentinel UI
-      await loadDashboard();
+      await loadDashboard(true);
       await loadAiSentinelKacab(null, true);
+      await loadGoogleSheetSyncStatus();
     } else {
       alert('Gagal sinkron: ' + (data.message || 'Error'));
     }
@@ -518,9 +519,36 @@ async function syncGoogleSheetNow() {
   }
 }
 
+async function loadGoogleSheetSyncStatus() {
+  const statusEl = document.getElementById('googleSheetSyncStatus');
+  if (!statusEl) return;
+  try {
+    const res = await fetch('../api/api_sheets_sync.php?action=status&t=' + Date.now());
+    const json = await res.json();
+    if (json.status === 'success' && json.config) {
+      if (json.config.last_sync_summary) {
+        const summary = json.config.last_sync_summary;
+        const match = summary.match(/\(Total:\s*(\d+)\s*SPK\s*\|\s*(\d+)\s*DO\)/i);
+        const matchSales = summary.match(/sinkronisasi\s*(\d+)\s*wiraniaga/i);
+        if (match) {
+          const spk = match[1];
+          const doCount = match[2];
+          const count = matchSales ? matchSales[1] : '50';
+          statusEl.innerHTML = `Tersinkron (${spk} SPK | ${doCount} DO) &middot; ${count} Wiraniaga`;
+          return;
+        }
+        statusEl.textContent = summary;
+      }
+    }
+  } catch(e) {
+    console.error('Error fetching sheets status:', e);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   guardKacab();
   renderKacabUser();
+  loadGoogleSheetSyncStatus();
   loadDashboard();
   loadFeed();
   loadAiSentinelKacab();

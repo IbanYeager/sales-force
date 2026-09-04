@@ -222,7 +222,7 @@
           <div style="font-size:12px; color:#166534; font-weight:700; display:flex; align-items:center; gap:6px;">
             <i class="fa-solid fa-cloud-arrow-down" style="color:#0f9d58;"></i>
             <span>Google Sheet Sinkronisasi:</span>
-            <span id="googleSheetSyncStatus" style="font-weight:800; color:#14532d;">Tersinkron (57 SPK | 25 DO)</span>
+            <span id="googleSheetSyncStatus" style="font-weight:800; color:#14532d;">Memuat status sinkronisasi...</span>
           </div>
           <a href="https://docs.google.com/spreadsheets/d/1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs/edit?usp=sharing" target="_blank" style="font-size:11.5px; color:#0f9d58; text-decoration:none; font-weight:800; display:inline-flex; align-items:center; gap:4px;">
             <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Spreadsheet
@@ -359,8 +359,8 @@
   </div>
 
   <script src="../custom_alert.js"></script>
-  <script src="../js/kacab_global.js?v=20260831_realtime_ritme"></script>
-  <script src="../js/kacab_index.js?v=20260831_realtime_ritme"></script>
+  <script src="../js/kacab_global.js?v=20260904_sheet_sync_fix"></script>
+  <script src="../js/kacab_index.js?v=20260904_sheet_sync_fix"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>
 </body>
