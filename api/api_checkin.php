@@ -69,6 +69,7 @@ try {
             $stmt->bind_param("sssddds", $sales_id, $nama_sales, $nama_spv, $latitude, $longitude, $accuracy, $status_aktif);
 
             if ($stmt->execute()) {
+                @$conn->query("UPDATE sales_accounts SET last_active = NOW(), is_online = 1 WHERE id = CAST('$sales_id' AS UNSIGNED) OR nama_lengkap = '$nama_sales' COLLATE utf8mb4_general_ci");
                 echo json_encode(["ok" => true, "message" => "Auto ping lokasi berhasil diperbarui"]);
             } else {
                 echo json_encode(["ok" => false, "message" => "Gagal auto ping: " . $conn->error]);
@@ -146,13 +147,32 @@ try {
         $type = isset($_GET['type']) ? $_GET['type'] : 'all';
 
         if ($type === 'last_locations') {
-            $result = $conn->query("SELECT sales_id, nama_sales, nama_spv, latitude, longitude, accuracy, status_aktif, updated_at FROM sales_last_locations ORDER BY updated_at DESC");
+            $onlyOnline = isset($_GET['only_online']) ? ($_GET['only_online'] === '1' || $_GET['only_online'] === 'true') : false;
+
+            @$conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
+            @$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
+
+            $sql = "SELECT s.sales_id, s.nama_sales, s.nama_spv, s.latitude, s.longitude, s.accuracy, s.status_aktif, s.updated_at,
+                           CASE 
+                               WHEN (a.last_active >= DATE_SUB(NOW(), INTERVAL 3 MINUTE) OR s.updated_at >= DATE_SUB(NOW(), INTERVAL 3 MINUTE)) THEN 1 
+                               ELSE 0 
+                           END as is_online,
+                           a.last_active
+                    FROM sales_last_locations s
+                    LEFT JOIN sales_accounts a ON (a.id = CAST(s.sales_id AS UNSIGNED) OR a.nama_lengkap = s.nama_sales COLLATE utf8mb4_general_ci)
+                    ORDER BY s.updated_at DESC";
+
+            $result = $conn->query($sql);
             $last_locs = [];
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $row['latitude'] = floatval($row['latitude']);
                     $row['longitude'] = floatval($row['longitude']);
                     $row['accuracy'] = isset($row['accuracy']) ? floatval($row['accuracy']) : 10.0;
+                    $row['is_online'] = intval($row['is_online']) === 1;
+                    if ($onlyOnline && !$row['is_online']) {
+                        continue;
+                    }
                     $last_locs[] = $row;
                 }
             }

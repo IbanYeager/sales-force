@@ -415,6 +415,52 @@
       letter-spacing: normal;
     }
 
+    .filter-status-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .filter-pill-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .filter-pill-btn:hover {
+      color: #1e293b;
+    }
+
+    .filter-pill-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .pill-dot-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: lt-pulse 1.8s infinite;
+    }
+
     .map-search-wrap {
       position: relative;
       margin-bottom: 10px;
@@ -803,31 +849,31 @@
       <!-- KPI STRIP -->
       <div class="kpi-summary-strip">
         <div class="kss-card">
-          <div class="kss-icon red"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="kss-icon green"><i class="fa-solid fa-satellite-dish"></i></div>
           <div class="kss-info">
-            <span class="title">Total Check-in Lokasi</span>
+            <span class="title">Sales Online Aktif</span>
             <div class="val" id="kpiTotalCheckin">0</div>
           </div>
         </div>
         <div class="kss-card">
-          <div class="kss-icon gold"><i class="fa-solid fa-store"></i></div>
+          <div class="kss-icon blue"><i class="fa-solid fa-building"></i></div>
           <div class="kss-info">
-            <span class="title">Pameran & Booth</span>
-            <div class="val" id="kpiPameran">0</div>
+            <span class="title">Di Kantor Cabang</span>
+            <div class="val" id="kpiKantor">0</div>
           </div>
         </div>
         <div class="kss-card">
-          <div class="kss-icon blue"><i class="fa-solid fa-user-check"></i></div>
+          <div class="kss-icon gold"><i class="fa-solid fa-person-walking"></i></div>
+          <div class="kss-info">
+            <span class="title">Lapangan / Canvassing</span>
+            <div class="val" id="kpiCanvassing">0</div>
+          </div>
+        </div>
+        <div class="kss-card">
+          <div class="kss-icon red"><i class="fa-solid fa-user-check"></i></div>
           <div class="kss-info">
             <span class="title">Kunjungan Prospek</span>
             <div class="val" id="kpiProspek">0</div>
-          </div>
-        </div>
-        <div class="kss-card">
-          <div class="kss-icon green"><i class="fa-solid fa-map-location-dot"></i></div>
-          <div class="kss-info">
-            <span class="title">Canvassing Wilayah</span>
-            <div class="val" id="kpiCanvassing">0</div>
           </div>
         </div>
       </div>
@@ -865,6 +911,15 @@
             <span class="sales-counter-pill" id="salesCounterBadge">Memuat...</span>
           </h3>
 
+          <div class="filter-status-toggle">
+            <button id="btnFilterOnlineOnly" class="filter-pill-btn active" onclick="setStatusFilter('online')">
+              <span class="pill-dot-live"></span> <span>Hanya Sales Online</span>
+            </button>
+            <button id="btnFilterAllStatus" class="filter-pill-btn" onclick="setStatusFilter('all')">
+              <i class="fa-solid fa-users"></i> <span>Semua Sales</span>
+            </button>
+          </div>
+
           <div class="map-search-wrap">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="text" id="inputSearchMap" class="input-search-styled" placeholder="Cari nama sales atau lokasi..." onkeyup="applyMapFilter()" />
@@ -895,7 +950,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_peta.js?v=20260905_live_autotracking_v3"></script>
+  <script src="../js/kacab_peta.js?v=20260905_online_tracking_v5"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>
 </body>

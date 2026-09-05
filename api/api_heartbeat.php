@@ -158,7 +158,7 @@ if ($spvQuery && $spvQuery->num_rows > 0) {
 
 // Ambil Sales
 $spv = $conn->real_escape_string(trim($_GET['spv'] ?? ''));
-$salesQuery = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, status, last_active, is_online FROM sales_accounts";
+$salesQuery = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, is_active, last_active, is_online FROM sales_accounts";
 if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
     $spv_clean = str_replace('Pak ', '', $spv);
     $salesQuery .= " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";

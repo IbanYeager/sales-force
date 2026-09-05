@@ -1,5 +1,5 @@
 // kacab_peta.js — Interactive Google Maps Field Visit Map & Live Auto-Tracking for Kepala Cabang (Kacab Panel)
-// Tunas Toyota Kiara Condong - Akurasi Presisi Tinggi & Auto-Tracking Real-time
+// Tunas Toyota Kiara Condong - Akurasi Presisi Tinggi & Auto-Tracking Real-Time Sales Online
 
 const OFFICE_LAT = -6.944425;
 const OFFICE_LNG = 107.642250;
@@ -20,7 +20,9 @@ let masterSpvList = [];
 let masterSalesList = [];
 let checkinList = [];
 let lastLocationList = [];
+let heartbeatSalesList = [];
 
+let currentStatusFilter = 'online'; // Default: 'online' (Hanya tracking sales yang sedang online!)
 let liveTrackingTimer = null;
 let isSyncing = false;
 let hasInitialBoundsFitted = false;
@@ -153,25 +155,46 @@ function switchMapLayer(layerType) {
     if (btnActive) btnActive.classList.add('active');
 }
 
-// Muat data master awal (SPV, Sales Master, Checkins, Last Locations)
+// Toggle filter status: 'online' (hanya yang online) vs 'all' (semua sales)
+function setStatusFilter(status) {
+    currentStatusFilter = status;
+
+    const btnOnline = document.getElementById('btnFilterOnlineOnly');
+    const btnAll = document.getElementById('btnFilterAllStatus');
+
+    if (status === 'online') {
+        btnOnline?.classList.add('active');
+        btnAll?.classList.remove('active');
+    } else {
+        btnAll?.classList.add('active');
+        btnOnline?.classList.remove('active');
+    }
+
+    applyMapFilter(false);
+}
+
+// Muat data master awal (SPV, Sales Master, Checkins, Last Locations, Heartbeat Online)
 async function loadMasterAndCheckinData() {
     try {
-        const [resSpv, resSales, resCheckins, resLastLocs] = await Promise.all([
+        const [resSpv, resSales, resCheckins, resLastLocs, resHeartbeat] = await Promise.all([
             fetch('../api/api_spv_list.php'),
             fetch('../api/api_wiraniaga.php'),
             fetch('../api/api_checkin.php?limit=100'),
-            fetch('../api/api_checkin.php?type=last_locations')
+            fetch('../api/api_checkin.php?type=last_locations&t=' + Date.now()),
+            fetch('../api/api_heartbeat.php?t=' + Date.now())
         ]);
 
         const jsonSpv = await resSpv.json();
         const jsonSales = await resSales.json();
         const jsonCheckins = await resCheckins.json();
         const jsonLastLocs = await resLastLocs.json();
+        const jsonHeartbeat = await resHeartbeat.json();
 
         masterSpvList = (jsonSpv.ok && Array.isArray(jsonSpv.data)) ? jsonSpv.data : [];
         masterSalesList = (jsonSales.status === 'success' && Array.isArray(jsonSales.data)) ? jsonSales.data : [];
         checkinList = (jsonCheckins.ok && Array.isArray(jsonCheckins.data)) ? jsonCheckins.data : [];
         lastLocationList = (jsonLastLocs.ok && Array.isArray(jsonLastLocs.data)) ? jsonLastLocs.data : [];
+        heartbeatSalesList = (jsonHeartbeat && jsonHeartbeat.sales && Array.isArray(jsonHeartbeat.sales.data)) ? jsonHeartbeat.sales.data : [];
 
         populateSpvDropdown(masterSpvList, masterSalesList);
         applyMapFilter(true); // true = fit bounds pertama kali
@@ -187,15 +210,28 @@ async function syncLiveTracking() {
     isSyncing = true;
 
     try {
-        const res = await fetch('../api/api_checkin.php?type=last_locations&t=' + Date.now());
-        if (res.ok) {
-            const json = await res.json();
-            if (json.ok && Array.isArray(json.data)) {
-                lastLocationList = json.data;
-                applyMapFilter(false); // false = jangan ubah zoom map saat user sedang melihat
-                updateLiveStatusBadge(true);
+        const [resLastLocs, resHeartbeat] = await Promise.all([
+            fetch('../api/api_checkin.php?type=last_locations&t=' + Date.now()),
+            fetch('../api/api_heartbeat.php?t=' + Date.now())
+        ]);
+
+        if (resLastLocs.ok) {
+            const jsonLast = await resLastLocs.json();
+            if (jsonLast.ok && Array.isArray(jsonLast.data)) {
+                lastLocationList = jsonLast.data;
             }
         }
+
+        if (resHeartbeat.ok) {
+            const jsonHeart = await resHeartbeat.json();
+            if (jsonHeart && jsonHeart.sales && Array.isArray(jsonHeart.sales.data)) {
+                heartbeatSalesList = jsonHeart.sales.data;
+            }
+        }
+
+        applyMapFilter(false); // false = jangan ubah zoom map saat user sedang melihat
+        updateLiveStatusBadge(true);
+
     } catch (e) {
         console.warn("[Live Auto-Tracking] Gagal polling:", e);
         updateLiveStatusBadge(false);
@@ -208,8 +244,10 @@ function updateLiveStatusBadge(isOnline) {
     const badge = document.getElementById('liveTrackerIndicator');
     if (!badge) return;
 
+    const countOnline = heartbeatSalesList.filter(s => s.is_online).length;
+
     if (isOnline) {
-        badge.innerHTML = `<span class="lt-pulse"></span> <span class="lt-text">Auto-Tracking Live</span>`;
+        badge.innerHTML = `<span class="lt-pulse"></span> <span class="lt-text">${countOnline} Sales Online (Live)</span>`;
         badge.style.color = '#15803d';
         badge.style.background = '#f0fdf4';
         badge.style.borderColor = '#bbf7d0';
@@ -237,7 +275,7 @@ function populateSpvDropdown(spvNames, salesList) {
     selectSpv.value = currentVal || 'Semua';
 }
 
-// Deteksi apakah lokasi masih real-time (aktif dalam 45 menit terakhir)
+// Deteksi apakah lokasi masih real-time (aktif dalam 3 menit terakhir)
 function isLocationLive(dateStr) {
     if (!dateStr) return false;
     const locDate = new Date(String(dateStr).replace(/-/g, '/'));
@@ -245,7 +283,7 @@ function isLocationLive(dateStr) {
     const diffMs = now - locDate;
     const diffMins = Math.floor(diffMs / 60000);
     const isToday = locDate.toDateString() === now.toDateString();
-    return isToday && diffMins <= 45;
+    return isToday && diffMins <= 3;
 }
 
 // Hitung jarak dalam KM ke Kantor Cabang Kiara Condong
@@ -262,12 +300,28 @@ function applyMapFilter(shouldFitBounds = false) {
     const selectedJenis = document.getElementById('selectFilterJenis')?.value || 'Semua';
     const searchQuery = document.getElementById('inputSearchMap')?.value?.toLowerCase()?.trim() || '';
 
+    // Indeks status online dari tabel heartbeat (presence)
+    const onlineSalesIds = new Set();
+    const onlineSalesNames = new Set();
+    heartbeatSalesList.forEach(s => {
+        if (s.is_online) {
+            onlineSalesIds.add(String(s.id));
+            onlineSalesNames.add(s.nama_lengkap.toLowerCase().trim());
+        }
+    });
+
     // Indeks lokasi terakhir per sales_id & per nama_sales
     const locBySalesId = {};
     const locByName = {};
     lastLocationList.forEach(loc => {
         locBySalesId[String(loc.sales_id)] = loc;
         locByName[loc.nama_sales.toLowerCase().trim()] = loc;
+
+        // Jika ada update lokasi dalam 3 menit terakhir, tandai online
+        if (loc.is_online || isLocationLive(loc.updated_at)) {
+            onlineSalesIds.add(String(loc.sales_id));
+            onlineSalesNames.add(loc.nama_sales.toLowerCase().trim());
+        }
     });
 
     // Indeks checkin per sales_id & per nama_sales
@@ -286,12 +340,14 @@ function applyMapFilter(shouldFitBounds = false) {
         const lastLoc = locBySalesId[String(s.id)] || locByName[sName.toLowerCase()];
         const lastCheck = checkinBySalesId[String(s.id)] || checkinByName[sName.toLowerCase()];
 
+        // Periksa apakah sales ini sedang ONLINE di website
+        const isOnline = onlineSalesIds.has(String(s.id)) || onlineSalesNames.has(sName.toLowerCase());
+
         let lat = null, lng = null, acc = null, jenis = 'Belum Check-in', lokasi = 'Menunggu Sinyal GPS', time = '';
         let hasGps = false;
 
-        // Prioritaskan check-in formal hari ini jika ada, atau lokasi ping GPS real-time
+        // Ambil lokasi terbaru
         if (lastLoc && lastCheck) {
-            // Bandingkan mana yang lebih baru
             const timeLoc = new Date(String(lastLoc.updated_at).replace(/-/g, '/')).getTime();
             const timeCheck = new Date(String(lastCheck.created_at).replace(/-/g, '/')).getTime();
 
@@ -329,7 +385,6 @@ function applyMapFilter(shouldFitBounds = false) {
             time = lastCheck.created_at;
             hasGps = true;
         } else {
-            // Sales yang belum punya GPS: JANGAN buat koordinat acak!
             lat = null;
             lng = null;
             acc = null;
@@ -339,12 +394,11 @@ function applyMapFilter(shouldFitBounds = false) {
             hasGps = false;
         }
 
-        let isLive = false;
+        let isLive = isOnline;
         let isAtOffice = false;
         let distToOffice = 999;
 
         if (hasGps && lat && lng) {
-            isLive = isLocationLive(time);
             distToOffice = calcOfficeDistKm(lat, lng);
             isAtOffice = distToOffice <= OFFICE_GEOFENCE_KM;
 
@@ -368,14 +422,19 @@ function applyMapFilter(shouldFitBounds = false) {
             accuracy: acc,
             created_at: time,
             has_gps: hasGps,
+            is_online: isOnline,
             is_live: isLive,
             is_at_office: isAtOffice,
             dist_to_office_km: distToOffice
         });
     });
 
-    // Filter berdasarkan SPV, Jenis Kunjungan, dan Search Query
+    // FILTER UTAMA: Jika mode 'online' (DEFAULT), HANYA sales yang sedang ONLINE yang lolos!
     const filtered = displayList.filter(item => {
+        if (currentStatusFilter === 'online' && !item.is_online) {
+            return false; // Yang offline langsung disaring keluar!
+        }
+
         const matchSpv = (selectedSpv === 'Semua' || item.nama_spv === selectedSpv);
         const matchJenis = (selectedJenis === 'Semua' || item.jenis_kunjungan.includes(selectedJenis) || (selectedJenis === 'Kantor' && item.is_at_office));
         const matchSearch = searchQuery === '' ||
@@ -386,22 +445,25 @@ function applyMapFilter(shouldFitBounds = false) {
         return matchSpv && matchJenis && matchSearch;
     });
 
-    updateKpiCounters(filtered);
+    updateKpiCounters(filtered, displayList);
     renderMapMarkers(filtered, shouldFitBounds);
     renderCheckinList(filtered);
 }
 
-function updateKpiCounters(dataList) {
-    const withGpsList = dataList.filter(i => i.has_gps);
-    const cntTotal = withGpsList.length;
-    const cntPameran = withGpsList.filter(i => (i.jenis_kunjungan || '').includes('Pameran')).length;
-    const cntProspek = withGpsList.filter(i => (i.jenis_kunjungan || '').includes('Prospek')).length;
-    const cntCanvassing = withGpsList.filter(i => (i.jenis_kunjungan || '').includes('Canvassing') || (i.jenis_kunjungan || '').includes('On-Duty') || (i.jenis_kunjungan || '').includes('Aplikasi')).length;
+function updateKpiCounters(filteredList, fullList) {
+    const onlineSales = fullList.filter(i => i.is_online);
+    const cntOnline = onlineSales.length;
 
-    document.getElementById('kpiTotalCheckin') && (document.getElementById('kpiTotalCheckin').textContent = cntTotal);
-    document.getElementById('kpiPameran') && (document.getElementById('kpiPameran').textContent = cntPameran);
-    document.getElementById('kpiProspek') && (document.getElementById('kpiProspek').textContent = cntProspek);
+    // Hitung berdasarkan sales yang sedang ditampilkan
+    const targetList = (currentStatusFilter === 'online') ? onlineSales : filteredList;
+    const cntKantor = targetList.filter(i => i.is_at_office).length;
+    const cntCanvassing = targetList.filter(i => !i.is_at_office && (i.jenis_kunjungan.includes('Canvassing') || i.jenis_kunjungan.includes('On-Duty') || i.jenis_kunjungan.includes('Aplikasi'))).length;
+    const cntProspek = targetList.filter(i => i.jenis_kunjungan.includes('Prospek') || i.jenis_kunjungan.includes('Pameran')).length;
+
+    document.getElementById('kpiTotalCheckin') && (document.getElementById('kpiTotalCheckin').textContent = cntOnline);
+    document.getElementById('kpiKantor') && (document.getElementById('kpiKantor').textContent = cntKantor);
     document.getElementById('kpiCanvassing') && (document.getElementById('kpiCanvassing').textContent = cntCanvassing);
+    document.getElementById('kpiProspek') && (document.getElementById('kpiProspek').textContent = cntProspek);
 }
 
 function showAccuracyRadius(lat, lng, accuracy, salesId) {
@@ -451,7 +513,7 @@ function createCustomIcon(jenis, hasGps, isLive, isAtOffice) {
         pinClass = 'gmaps-pin pin-stale';
     }
 
-    const hasPulse = isLive && !isAtOffice;
+    const hasPulse = isLive; // Pulse berdenyut untuk semua sales online
 
     return L.divIcon({
         className: 'gmaps-custom-marker',
@@ -467,19 +529,14 @@ function buildPopupHtml(item) {
     const date = item.created_at ? new Date(String(item.created_at).replace(/-/g, '/')) : new Date();
     const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     const dayStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-    const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-    const diffMins = Math.floor((now - date) / 60000);
 
     const googleMapsUrl = `https://www.google.com/maps?q=${item.latitude},${item.longitude}`;
 
     let statusBadgeHtml = '';
     if (item.is_at_office) {
         statusBadgeHtml = `<div class="gpu-badge" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;"><i class="fa-solid fa-building"></i> DI KANTOR CABANG</div>`;
-    } else if (item.is_live) {
-        statusBadgeHtml = `<div class="gpu-badge" style="background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;"><i class="fa-solid fa-circle" style="color:#10b981;font-size:7px;"></i> LIVE REAL-TIME (${diffMins} mnt lalu)</div>`;
     } else {
-        statusBadgeHtml = `<div class="gpu-badge" style="background:#f1f5f9;color:#64748d;border:1px solid #e2e8f0;"><i class="fa-solid fa-clock-rotate-left"></i> POSISI TERAKHIR (${isToday ? `${Math.floor(diffMins/60)} jam lalu` : `Kemarin, ${dayStr}`})</div>`;
+        statusBadgeHtml = `<div class="gpu-badge" style="background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;"><i class="fa-solid fa-circle" style="color:#10b981;font-size:7px;"></i> ONLINE SEKARANG (LIVE)</div>`;
     }
 
     let accBadgeHtml = '';
@@ -506,11 +563,11 @@ function buildPopupHtml(item) {
             <h4 class="gpu-name">${escapeHtml(item.nama_sales)}</h4>
             <p class="gpu-spv">SPV: <strong>${escapeHtml(item.nama_spv)}</strong></p>
             <div class="gpu-loc">
-                <i class="fa-solid fa-location-dot" style="${item.is_at_office ? 'color:#2563eb;' : (item.is_live ? 'color:#cc1426;' : 'color:#64748d;')}"></i> ${escapeHtml(item.nama_lokasi)}
+                <i class="fa-solid fa-location-dot" style="${item.is_at_office ? 'color:#2563eb;' : 'color:#059669;'}"></i> ${escapeHtml(item.nama_lokasi)}
             </div>
             ${accBadgeHtml}
             <div class="gpu-meta">
-                <span><i class="fa-regular fa-clock"></i> ${dayStr} - ${timeStr} WIB</span>
+                <span><i class="fa-regular fa-clock"></i> Aktif: ${timeStr} WIB</span>
                 <span>Lat: ${item.latitude.toFixed(4)}, ${item.longitude.toFixed(4)}</span>
             </div>
             <a href="${googleMapsUrl}" target="_blank" class="btn-gmaps-link">
@@ -521,16 +578,16 @@ function buildPopupHtml(item) {
     `;
 }
 
-// Render marker Leaflet secara dinamis (Hanya untuk Sales yang memiliki GPS valid!)
+// Render marker Leaflet secara dinamis (Hanya untuk Sales yang LOLOS FILTER & MEMILIKI GPS!)
 function renderMapMarkers(dataList, shouldFitBounds = false) {
     if (!map) return;
 
-    // Filter HANYA data yang memiliki GPS nyata (tidak ada marker acak/palsu!)
+    // HANYA data yang memiliki GPS valid
     const validGpsList = dataList.filter(item => item.has_gps && item.latitude && item.longitude);
     const activeSalesIds = new Set(validGpsList.map(i => i.sales_id));
     const bounds = [[OFFICE_LAT, OFFICE_LNG]]; // Selalu masukkan kantor cabang
 
-    // Hapus marker yang sudah tidak ada di data GPS valid atau kena filter
+    // Hapus marker yang sales-nya sudah OFFLINE atau kena filter
     Object.keys(markersMap).forEach(salesId => {
         if (!activeSalesIds.has(salesId)) {
             map.removeLayer(markersMap[salesId]);
@@ -538,7 +595,7 @@ function renderMapMarkers(dataList, shouldFitBounds = false) {
         }
     });
 
-    // Update atau buat marker baru
+    // Update atau buat marker baru untuk sales yang online
     validGpsList.forEach(item => {
         const newLatLng = [item.latitude, item.longitude];
         bounds.push(newLatLng);
@@ -550,26 +607,23 @@ function renderMapMarkers(dataList, shouldFitBounds = false) {
             const existingMarker = markersMap[item.sales_id];
             const oldPos = existingMarker.getLatLng();
 
-            // Smooth update posisi jika koordinat bergeser
+            // Smooth gliding pergerakan posisi
             if (Math.abs(oldPos.lat - item.latitude) > 0.000005 || Math.abs(oldPos.lng - item.longitude) > 0.000005) {
                 existingMarker.setLatLng(newLatLng);
 
-                // Update juga lingkaran akurasi jika sedang fokus pada sales ini
                 if (activeAccuracySalesId === item.sales_id && activeAccuracyCircle) {
                     activeAccuracyCircle.setLatLng(newLatLng);
                 }
             }
 
-            // Update icon jika status live / office berubah
             existingMarker.setIcon(newIcon);
 
-            // Update popup content tanpa menutup popup jika sedang terbuka
             const popup = existingMarker.getPopup();
             if (popup) {
                 popup.setContent(popupContent);
             }
         } else {
-            // Marker baru ditemukan
+            // Marker baru online
             const marker = L.marker(newLatLng, {
                 icon: newIcon
             }).addTo(map);
@@ -591,46 +645,49 @@ function renderMapMarkers(dataList, shouldFitBounds = false) {
         }
     });
 
-    // Fit bounds hanya saat load pertama atau jika eksplisit diminta
+    // Fit bounds hanya saat load pertama atau jika ada perubahan titik signifikan
     if (shouldFitBounds && bounds.length > 1 && !hasInitialBoundsFitted) {
         hasInitialBoundsFitted = true;
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
     }
 }
 
-// Render daftar seluruh Sales di sidebar kanan
+// Render daftar Sales di sidebar kanan
 function renderCheckinList(dataList) {
     const listEl = document.getElementById('checkinListContainer');
     if (!listEl) return;
 
-    // Pisahkan: Sales yang aktif GPS vs Sales yang belum kirim GPS
-    const withGps = dataList.filter(i => i.has_gps);
-    const withoutGps = dataList.filter(i => !i.has_gps);
-    const sortedList = [...withGps, ...withoutGps];
-
     const counterBadge = document.getElementById('salesCounterBadge');
     if (counterBadge) {
-        counterBadge.textContent = `${withGps.length} Terdeteksi / ${dataList.length} Total`;
+        if (currentStatusFilter === 'online') {
+            counterBadge.textContent = `${dataList.length} Sales Online`;
+        } else {
+            counterBadge.textContent = `${dataList.length} Total Sales`;
+        }
     }
 
+    // Jika tidak ada sales yang sedang online
     if (dataList.length === 0) {
         listEl.innerHTML = `
-            <div class="empty-state" style="padding:36px 12px; text-align:center;">
-                <div class="es-icon" style="font-size:32px; color:#cbd5e1; margin-bottom:8px;"><i class="fa-solid fa-users-slash"></i></div>
-                <div class="es-title" style="font-size:13px; font-weight:800; color:#1e1014; margin-bottom:4px;">Tidak ada Sales ditemukan</div>
-                <div class="es-text" style="font-size:11px; color:#94a3b8;">Coba sesuaikan kata kunci pencarian atau filter SPV.</div>
+            <div class="empty-state" style="padding: 40px 16px; text-align: center;">
+                <div class="es-icon" style="font-size: 38px; color: #10b981; margin-bottom: 12px;">
+                    <i class="fa-solid fa-satellite-dish fa-fade"></i>
+                </div>
+                <div class="es-title" style="font-size: 14px; font-weight: 800; color: #1e1014; margin-bottom: 6px;">
+                    Tidak Ada Sales yang Sedang Online
+                </div>
+                <div class="es-text" style="font-size: 11.5px; color: #64748b; line-height: 1.5;">
+                    Saat ini belum ada Sales Consultant yang aktif membuka website atau aplikasi.<br><br>
+                    Begitu sales login ke akunnya, lokasi GPS mereka akan <strong>otomatis terlacak secara live</strong> di sini.
+                </div>
             </div>
         `;
         return;
     }
 
-    listEl.innerHTML = sortedList.map(item => {
+    listEl.innerHTML = dataList.map(item => {
         const date = item.created_at ? new Date(String(item.created_at).replace(/-/g, '/')) : null;
         const timeStr = date ? date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-        const dayStr = date ? date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '';
-        const now = new Date();
-        const isToday = date ? date.toDateString() === now.toDateString() : false;
-        const diffMins = date ? Math.floor((now - date) / 60000) : 999;
 
         let accPill = '';
         if (item.has_gps && item.accuracy) {
@@ -641,22 +698,18 @@ function renderCheckinList(dataList) {
 
         let liveIndicator = '';
         if (item.is_at_office) {
-            liveIndicator = `<i class="fa-solid fa-building" style="color:#2563eb;font-size:10px;"></i> <span style="color:#1d4ed8;font-weight:700;">Di Kantor Cabang</span>`;
-        } else if (item.is_live) {
-            liveIndicator = `<i class="fa-solid fa-circle" style="color:#10b981;font-size:8px;"></i> <span style="color:#059669;font-weight:700;">Live Real-Time (${diffMins}m lalu)</span>`;
-        } else if (item.has_gps) {
-            liveIndicator = `<i class="fa-solid fa-clock-rotate-left" style="color:#94a3b8;font-size:9px;"></i> <span style="color:#64748d;">Offline (${isToday ? `${Math.floor(diffMins/60)}j lalu` : `Kemarin ${timeStr}`}</span>`;
+            liveIndicator = `<i class="fa-solid fa-building" style="color:#2563eb;font-size:10px;"></i> <span style="color:#1d4ed8;font-weight:800;">Di Kantor Cabang</span> • <span style="color:#059669;font-weight:700;"><i class="fa-solid fa-circle" style="color:#10b981;font-size:7px;"></i> Online</span>`;
+        } else if (item.is_online) {
+            liveIndicator = `<i class="fa-solid fa-circle" style="color:#10b981;font-size:8px;"></i> <span style="color:#059669;font-weight:800;">Online Sekarang (Live)</span>`;
         } else {
-            liveIndicator = `<i class="fa-solid fa-satellite-dish" style="color:#cbd5e1;font-size:9px;"></i> <span style="color:#94a3b8;">Menunggu Sinyal GPS</span>`;
+            liveIndicator = `<i class="fa-solid fa-clock-rotate-left" style="color:#94a3b8;font-size:9px;"></i> <span style="color:#64748d;">Offline</span>`;
         }
 
         let avatarIcon = 'fa-user-tie';
         if (item.is_at_office) {
             avatarIcon = 'fa-building';
-        } else if (item.is_live) {
+        } else if (item.is_online) {
             avatarIcon = 'fa-person-walking';
-        } else if (!item.has_gps) {
-            avatarIcon = 'fa-user-clock';
         }
 
         const clickHandler = item.has_gps ? 
@@ -664,8 +717,8 @@ function renderCheckinList(dataList) {
             `notifyNoGps('${escapeHtml(item.nama_sales)}')`;
 
         return `
-            <div class="map-list-item" onclick="${clickHandler}" style="${!item.has_gps ? 'opacity: 0.72;' : ''}">
-                <div class="mli-avatar" style="${item.is_at_office ? 'background:#eff6ff;color:#2563eb;' : (item.is_live ? 'background:#ecfdf5;color:#059669;' : (!item.has_gps ? 'background:#f1f5f9;color:#94a3b8;' : ''))}">
+            <div class="map-list-item" onclick="${clickHandler}">
+                <div class="mli-avatar" style="${item.is_at_office ? 'background:#eff6ff;color:#2563eb;' : 'background:#ecfdf5;color:#059669;'}">
                     <i class="fa-solid ${avatarIcon}"></i>
                 </div>
                 <div class="mli-body">
@@ -680,8 +733,8 @@ function renderCheckinList(dataList) {
                     <div class="mli-loc" title="${escapeHtml(item.nama_lokasi)}"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(item.nama_lokasi)}</div>
                 </div>
                 <div class="mli-right">
-                    <span class="mli-time">${item.created_at ? `${dayStr}<br>${timeStr}` : 'Belum Ada<br>Data GPS'}</span>
-                    <button class="btn-focus-map" title="${item.has_gps ? 'Fokus ke Titik GPS' : 'GPS Belum Aktif'}" style="${!item.has_gps ? 'opacity:0.4;cursor:default;' : ''}">
+                    <span class="mli-time">${timeStr ? `${timeStr} WIB` : 'Live'}</span>
+                    <button class="btn-focus-map" title="${item.has_gps ? 'Fokus ke Titik GPS' : 'GPS Belum Aktif'}">
                         <i class="fa-solid ${item.has_gps ? 'fa-crosshairs' : 'fa-location-slash'}"></i>
                     </button>
                 </div>
@@ -695,11 +748,11 @@ function notifyNoGps(salesName) {
         Swal.fire({
             icon: 'info',
             title: 'Sinyal GPS Belum Tersedia',
-            text: `Sales "${salesName}" belum mengaktifkan izin GPS atau belum masuk ke aplikasi hari ini. Lokasi akan otomatis muncul saat sales membuka akunnya.`,
+            text: `Sales "${salesName}" sedang online tetapi belum mengaktifkan izin GPS pada perangkatnya.`,
             confirmButtonColor: '#1e1014'
         });
     } else {
-        alert(`Sales "${salesName}" belum mengaktifkan izin GPS pada perangkatnya.`);
+        alert(`Sales "${salesName}" sedang online tetapi belum mengaktifkan izin GPS pada perangkatnya.`);
     }
 }
 
