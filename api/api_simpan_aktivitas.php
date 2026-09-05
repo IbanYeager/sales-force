@@ -165,6 +165,38 @@ try {
         }
 
         $foto_string = implode(',', $uploaded_files);
+
+        // Sync ke public/uploads/lokasi dan direktori aktivitas jika kategori pameran/event
+        if (!empty($uploaded_files)) {
+            $publicUploadDir = __DIR__ . '/../public/uploads/lokasi/';
+            if (!is_dir($publicUploadDir)) @mkdir($publicUploadDir, 0777, true);
+
+            $tipeLower = strtolower($tipe);
+            $ketLower = strtolower($keterangan);
+            $isPameranOrEvent = (
+                (strpos($tipeLower, 'pameran') !== false || strpos($tipeLower, 'event') !== false || strpos($tipeLower, 'booth') !== false || strpos($tipeLower, 'gathering') !== false || strpos($ketLower, 'pameran') !== false || strpos($ketLower, 'event') !== false)
+                && strpos($tipeLower, 'tiktok') === false
+                && strpos($tipeLower, 'database') === false
+            );
+
+            $galeriDir = __DIR__ . '/../aktivitas/';
+            $publicGaleriDir = __DIR__ . '/../public/aktivitas/';
+            if ($isPameranOrEvent) {
+                if (!is_dir($galeriDir)) @mkdir($galeriDir, 0777, true);
+                if (!is_dir($publicGaleriDir)) @mkdir($publicGaleriDir, 0777, true);
+            }
+
+            foreach ($uploaded_files as $uf) {
+                $src = $upload_dir . $uf;
+                if (file_exists($src)) {
+                    if (is_dir($publicUploadDir)) @copy($src, $publicUploadDir . $uf);
+                    if ($isPameranOrEvent) {
+                        if (is_dir($galeriDir)) @copy($src, $galeriDir . $uf);
+                        if (is_dir($publicGaleriDir)) @copy($src, $publicGaleriDir . $uf);
+                    }
+                }
+            }
+        }
         
         // Parse sales_account_id safely to support any BIGINT or string ID
         $raw_sales_id = $_POST['sales_account_id'] ?? '1';

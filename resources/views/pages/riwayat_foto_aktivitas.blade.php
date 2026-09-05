@@ -36,7 +36,7 @@
             <i class="fa-solid fa-images" style="color: #ef4444;"></i>
             Galeri Dokumentasi Foto
           </h1>
-          <p>Seluruh foto kegiatan sales lapangan &amp; canvassing</p>
+          <p>Khusus dokumentasi foto kegiatan pameran &amp; event cabang</p>
         </div>
 
         <div class="hero-right-actions">
@@ -105,7 +105,7 @@
     </div>
   </div>
 
-  <script src="../js/riwayat_foto_aktivitas.js?v=20260819_2"></script>
+  <script src="../js/riwayat_foto_aktivitas.js?v=20260905_pameran_event"></script>
 </body>
 
 </html>

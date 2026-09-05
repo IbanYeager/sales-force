@@ -51,7 +51,22 @@ function setViewDensity(mode) {
 }
 
 function applyFiltersAndRender() {
-  currentFilteredPhotos = [...allPhotos];
+  currentFilteredPhotos = allPhotos.filter(item => {
+    const tipe = (item.tipe_aktivitas || '').toLowerCase();
+    const ket = (item.keterangan || '').toLowerCase();
+
+    // Strict exclusion for non-pameran/event
+    if (tipe.includes('tiktok') || tipe.includes('database') || tipe.includes('digital marketing') || tipe.includes('meeting') || tipe.includes('kebersamaan') || tipe.includes('makan')) {
+      return false;
+    }
+
+    const isAllowed = tipe.includes('pameran') || tipe.includes('event') || tipe.includes('booth') || tipe.includes('gathering') || ket.includes('pameran') || ket.includes('event');
+    return isAllowed;
+  });
+
+  const countEl = document.getElementById('photoTotalCount');
+  if (countEl) countEl.textContent = currentFilteredPhotos.length;
+
   renderGalleryTimeline(currentFilteredPhotos);
 }
 
@@ -65,11 +80,8 @@ function renderGalleryTimeline(photos) {
         <div style="width:50px; height:50px; border-radius:50%; background:#f1f5f9; color:#94a3b8; display:inline-flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:10px;">
           <i class="fa-solid fa-camera-slash"></i>
         </div>
-        <div style="font-size:14px; font-weight:800; color:#1e293b;">Tidak Ada Foto Ditemukan</div>
-        <div style="font-size:11.5px; color:#64748b; margin-top:4px;">Coba gunakan kata kunci pencarian lain.</div>
-        <button class="btn-secondary" style="margin-top:12px; padding:6px 14px; font-size:11.5px;" onclick="resetGalleryFilters()">
-          <i class="fa-solid fa-rotate-left"></i> Reset Pencarian
-        </button>
+        <div style="font-size:14px; font-weight:800; color:#1e293b;">Belum Ada Foto Pameran & Event</div>
+        <div style="font-size:11.5px; color:#64748b; margin-top:4px;">Foto aktivitas pameran dan event lapangan akan otomatis muncul di sini.</div>
       </div>
     `;
     return;
@@ -84,7 +96,7 @@ function renderGalleryTimeline(photos) {
 
     html += `
       <div class="gallery-photo-card" onclick="openLightbox(${globalIndex})" title="Klik untuk perbesar">
-        <img src="${encodedUrl}" alt="Foto Aktivitas" loading="lazy">
+        <img src="${encodedUrl}" alt="${item.tipe_aktivitas || 'Foto Aktivitas'}" loading="lazy">
         <div class="photo-clean-hover">
           <div class="hover-expand-circle">
             <i class="fa-solid fa-expand"></i>
@@ -121,7 +133,10 @@ function updateLightboxContent() {
   if (imgEl) imgEl.src = encodedUrl;
 
   const dateLabel = document.getElementById('lightboxDateLabel');
-  if (dateLabel) dateLabel.textContent = 'Foto Aktivitas';
+  if (dateLabel) {
+    const tipeTag = item.tipe_aktivitas ? ` • ${item.tipe_aktivitas}` : '';
+    dateLabel.textContent = `${item.date_formatted || 'Foto Kegiatan'}${tipeTag}`;
+  }
   
   const tagEl = document.getElementById('lightboxSessionTag');
   if (tagEl) tagEl.style.display = 'none';
@@ -130,7 +145,10 @@ function updateLightboxContent() {
   if (timeLabel) timeLabel.style.display = 'none';
 
   const fnLabel = document.getElementById('lightboxFilenameLabel');
-  if (fnLabel) fnLabel.textContent = `${item.file_name || 'Foto Kegiatan'}`;
+  if (fnLabel) {
+    const salesText = item.nama_sales ? `<strong>${item.nama_sales}</strong> — ` : '';
+    fnLabel.innerHTML = `${salesText}${item.keterangan || item.tipe_aktivitas || item.file_name || 'Foto Kegiatan'}`;
+  }
 
   const counterEl = document.getElementById('lightboxIndexCounter');
   if (counterEl) counterEl.textContent = `Foto ${currentLightboxIndex + 1} dari ${currentFilteredPhotos.length}`;

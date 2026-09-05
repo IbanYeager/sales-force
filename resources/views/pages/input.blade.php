@@ -49,7 +49,7 @@
                     </div>
                     <div>
                         <div style="font-size: 13px; font-weight: 800; color: #0f172a;">Lihat Riwayat Galeri Foto Aktivitas</div>
-                        <div style="font-size: 11px; color: #64748b;">Arsip 51 foto kegiatan sales &amp; canvassing yang telah terlewat</div>
+                        <div style="font-size: 11px; color: #64748b;">Arsip foto kegiatan pameran &amp; event cabang</div>
                     </div>
                 </div>
                 <i class="fa-solid fa-chevron-right" style="color: #94a3b8; font-size: 12px;"></i>
