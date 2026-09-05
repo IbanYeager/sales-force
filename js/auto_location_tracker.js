@@ -70,7 +70,6 @@
                 lastSentLat = lat;
                 lastSentLng = lng;
                 lastSentTime = Date.now();
-                updateLivePill(true, acc, statusAktif);
             }
         } catch (e) {
             console.warn('[GPS Tracker] Gagal mengirim ping lokasi:', e);
@@ -108,7 +107,6 @@
         console.warn('[GPS Tracker] Posisi GPS gagal diperoleh:', err.message);
         if (err.code === err.PERMISSION_DENIED) {
             showPermissionBanner(true);
-            updateLivePill(false, null, 'Izin Ditolak');
         }
     }
 
@@ -400,52 +398,15 @@
         if (banner) banner.remove();
     }
 
-    // Pill status live kecil di pojok
-    function updateLivePill(isActive, acc, statusText) {
-        let pill = document.getElementById('gpsLiveTrackingPill');
-        if (!pill) {
-            pill = document.createElement('div');
-            pill.id = 'gpsLiveTrackingPill';
-            pill.style.cssText = `
-                position: fixed;
-                bottom: 16px;
-                left: 16px;
-                z-index: 9997;
-                background: rgba(15, 23, 42, 0.88);
-                backdrop-filter: blur(8px);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                border-radius: 30px;
-                padding: 6px 12px;
-                color: #ffffff;
-                font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-                font-size: 10px;
-                font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-                transition: all 0.3s ease;
-                pointer-events: none;
-            `;
-            document.body.appendChild(pill);
-        }
-
-        if (isActive) {
-            pill.innerHTML = `
-                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; display: inline-block;"></span>
-                <span>GPS Live ${acc ? `(±${acc}m)` : ''} • ${statusText || 'Aktif'}</span>
-            `;
-            pill.style.opacity = '1';
-        } else {
-            pill.innerHTML = `
-                <span style="width: 7px; height: 7px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                <span>${statusText || 'GPS Nonaktif'}</span>
-            `;
-        }
+    // Pastikan tidak ada pill live GPS yang muncul di tampilan sales
+    function removeExistingPill() {
+        const pill = document.getElementById('gpsLiveTrackingPill');
+        if (pill) pill.remove();
     }
 
     // Inisialisasi saat halaman selesai dimuat
     document.addEventListener('DOMContentLoaded', () => {
+        removeExistingPill();
         if (isSalesRole()) {
             setTimeout(checkAndPromptPermission, 800);
         }
