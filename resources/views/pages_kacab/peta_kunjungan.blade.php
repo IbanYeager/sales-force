@@ -139,6 +139,11 @@
       z-index: 1;
     }
 
+    /* Smooth Marker Gliding Animation */
+    .leaflet-marker-icon {
+      transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    }
+
     /* Custom Google Marker Pin */
     .gmaps-custom-marker {
       position: relative;
@@ -159,6 +164,34 @@
       justify-content: center;
       box-shadow: 0 6px 14px rgba(204, 20, 38, 0.4);
       border: 2px solid white;
+    }
+
+    .gmaps-pin.pin-dealership-hq {
+      width: 40px;
+      height: 40px;
+      margin: -20px 0 0 -20px;
+      background: linear-gradient(135deg, #1e1014, #cc1426);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 8px 22px rgba(204, 20, 38, 0.55);
+    }
+
+    .gmaps-pin.pin-dealership-hq i {
+      color: #facc15;
+      font-size: 16px;
+    }
+
+    .pulse-hq {
+      background: rgba(204, 20, 38, 0.35);
+      border-radius: 50%;
+      height: 20px;
+      width: 20px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin: 10px 0 0 -10px;
+      transform: rotateX(55deg);
+      z-index: -1;
+      animation: pulse-ring 2.0s ease-out infinite;
     }
 
     .gmaps-pin.pin-offline {
@@ -199,6 +232,55 @@
     @keyframes pulse-ring {
       0% { transform: rotateX(55deg) scale(0.5); opacity: 1; }
       100% { transform: rotateX(55deg) scale(2.8); opacity: 0; }
+    }
+
+    .live-tracker-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #15803d;
+      margin-left: 6px;
+    }
+
+    .lt-pulse {
+      width: 7px;
+      height: 7px;
+      background: #16a34a;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+      animation: lt-pulse 1.8s infinite;
+    }
+
+    @keyframes lt-pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+
+    .btn-recenter-office {
+      padding: 5px 10px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .btn-recenter-office:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
     }
 
     /* Popup Box */
@@ -762,6 +844,12 @@
             <button id="btnLayerRoadmap" class="map-layer-btn active" onclick="switchMapLayer('roadmap')">Peta Google</button>
             <button id="btnLayerSatellite" class="map-layer-btn" onclick="switchMapLayer('satellite')">Satelit</button>
             <button id="btnLayerTerrain" class="map-layer-btn" onclick="switchMapLayer('terrain')">Medan</button>
+            <div class="live-tracker-indicator" id="liveTrackerIndicator">
+              <span class="lt-pulse"></span> <span class="lt-text">Auto-Tracking Live</span>
+            </div>
+            <button class="btn-recenter-office" onclick="recenterToOffice()" title="Pusatkan ke Kantor Tunas Toyota Kiara Condong">
+              <i class="fa-solid fa-building" style="color:#cc1426;"></i> Kantor Kircon
+            </button>
           </div>
 
           <div id="visitMap"></div>
@@ -807,7 +895,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_peta.js?v=20260905_live_office_fix"></script>
+  <script src="../js/kacab_peta.js?v=20260905_live_autotracking_v3"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>
 </body>

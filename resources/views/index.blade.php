@@ -1328,6 +1328,7 @@
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
+    <script src="js/auto_location_tracker.js?v=20260905_live"></script>
     <script src="./js/pwa-app.js?v=3"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
