@@ -2,7 +2,7 @@
 (function() {
     if (!document.querySelector('script[src*="auto_location_tracker.js"]')) {
         const script = document.createElement('script');
-        const scriptPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../js/auto_location_tracker.js' : 'js/auto_location_tracker.js';
+        const scriptPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../js/auto_location_tracker.js?v=20260905_v6' : 'js/auto_location_tracker.js?v=20260905_v6';
         script.src = scriptPath;
         document.head.appendChild(script);
     }
