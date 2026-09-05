@@ -305,7 +305,62 @@ $pameranEventStaticMap = [
     ]
 ];
 
-foreach ($pameranEventStaticMap as $f => $meta) {
+// Sinkronisasi otomatis antara folder aktivitas/ dan public/aktivitas/
+$rootAktivitasDir = $projectRoot . '/aktivitas';
+$publicAktivitasDir = $projectRoot . '/public/aktivitas';
+
+if (is_dir($rootAktivitasDir)) {
+    if (!is_dir($publicAktivitasDir)) {
+        @mkdir($publicAktivitasDir, 0777, true);
+    }
+    $rFiles = @scandir($rootAktivitasDir) ?: [];
+    foreach ($rFiles as $rf) {
+        if ($rf === '.' || $rf === '..') continue;
+        $srcPath = $rootAktivitasDir . '/' . $rf;
+        $destPath = $publicAktivitasDir . '/' . $rf;
+        if (is_file($srcPath) && !file_exists($destPath)) {
+            @copy($srcPath, $destPath);
+        }
+    }
+}
+if (is_dir($publicAktivitasDir)) {
+    if (!is_dir($rootAktivitasDir)) {
+        @mkdir($rootAktivitasDir, 0777, true);
+    }
+    $pFiles = @scandir($publicAktivitasDir) ?: [];
+    foreach ($pFiles as $pf) {
+        if ($pf === '.' || $pf === '..') continue;
+        $srcPath = $publicAktivitasDir . '/' . $pf;
+        $destPath = $rootAktivitasDir . '/' . $pf;
+        if (is_file($srcPath) && !file_exists($destPath)) {
+            @copy($srcPath, $destPath);
+        }
+    }
+}
+
+// 2. Scan SEMUA file foto dari folder aktivitas secara dinamis dan otomatis
+$allAktivitasFiles = [];
+
+// Dahulukan file yang sudah terdefinisi di static map agar deskripsinya terpakai
+foreach (array_keys($pameranEventStaticMap) as $mappedFile) {
+    $allAktivitasFiles[$mappedFile] = true;
+}
+
+// Pindai direktori aktivitas untuk mencari SEMUA foto yang ditambahkan
+foreach ([$rootAktivitasDir, $publicAktivitasDir] as $scanDir) {
+    if (is_dir($scanDir)) {
+        $scanned = @scandir($scanDir) ?: [];
+        foreach ($scanned as $sf) {
+            if ($sf === '.' || $sf === '..') continue;
+            $ext = strtolower(pathinfo($sf, PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                $allAktivitasFiles[$sf] = true;
+            }
+        }
+    }
+}
+
+foreach (array_keys($allAktivitasFiles) as $f) {
     if (isset($seenFiles[$f])) continue;
 
     $fileInfo = resolvePhotoFile($f, $projectRoot);
@@ -334,12 +389,17 @@ foreach ($pameranEventStaticMap as $f => $meta) {
     $session = determineSession($timeStr);
     $dateFormatted = formatIndonesianDate($dateStr);
 
+    $meta = $pameranEventStaticMap[$f] ?? null;
+    $namaSales = $meta['nama_sales'] ?? 'Sales Lapangan';
+    $tipeAktivitas = $meta['tipe_aktivitas'] ?? 'Pameran (Exhibition)';
+    $keterangan = $meta['keterangan'] ?? ('Dokumentasi foto aktivitas pameran & event cabang (' . date('d/m/Y', $timestamp) . ')');
+
     $photos[] = [
         'file_name' => $f,
         'file_url' => $fileInfo['rel'],
-        'nama_sales' => $meta['nama_sales'],
-        'keterangan' => $meta['keterangan'],
-        'tipe_aktivitas' => $meta['tipe_aktivitas'],
+        'nama_sales' => $namaSales,
+        'keterangan' => $keterangan,
+        'tipe_aktivitas' => $tipeAktivitas,
         'date' => $dateStr,
         'date_formatted' => $dateFormatted,
         'time' => substr($timeStr, 0, 5),

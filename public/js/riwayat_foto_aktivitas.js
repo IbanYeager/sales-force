@@ -60,7 +60,7 @@ function applyFiltersAndRender() {
       return false;
     }
 
-    const isAllowed = tipe.includes('pameran') || tipe.includes('event') || tipe.includes('booth') || tipe.includes('gathering') || ket.includes('pameran') || ket.includes('event');
+    const isAllowed = tipe.includes('pameran') || tipe.includes('event') || tipe.includes('booth') || tipe.includes('gathering') || ket.includes('pameran') || ket.includes('event') || (item.file_url && item.file_url.includes('aktivitas'));
     return isAllowed;
   });
 
