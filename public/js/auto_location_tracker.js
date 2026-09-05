@@ -6,9 +6,10 @@
 
     function sendLocationPing() {
         const loggedIn = localStorage.getItem('loggedIn') === 'true';
-        if (!loggedIn) return;
+        const peran = localStorage.getItem('peranSales') || '';
+        if (!loggedIn || peran === 'Supervisor' || peran === 'Kepala Cabang') return;
 
-        const salesId = localStorage.getItem('salesId') || '1';
+        const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || '1';
         const namaSales = localStorage.getItem('namaSales') || 'Sales Consultant';
         const spvSales = localStorage.getItem('spvSales') || 'Supervisor';
 
@@ -20,19 +21,35 @@
                 if (now - lastPingTime < PING_INTERVAL_MS - 5000) return;
                 lastPingTime = now;
 
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const acc = position.coords.accuracy ? Math.round(position.coords.accuracy * 10) / 10 : 10;
+
+                // Hitung jarak ke Kantor Tunas Toyota Kiara Condong (-6.9387, 107.6433)
+                const dLat = (lat - (-6.9387)) * 111.32;
+                const dLng = (lng - 107.6433) * 111.32 * Math.cos(lat * Math.PI / 180);
+                const distKm = Math.sqrt(dLat * dLat + dLng * dLng);
+
+                let statusAktif = 'On-Duty';
+                if (distKm <= 0.45) {
+                    statusAktif = 'Di Kantor Cabang';
+                }
+
                 const payload = {
                     action: 'auto_ping',
                     sales_id: salesId,
                     nama_sales: namaSales,
                     nama_spv: spvSales,
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: position.coords.accuracy ? Math.round(position.coords.accuracy * 10) / 10 : 10,
-                    status_aktif: 'On-Duty'
+                    latitude: lat,
+                    longitude: lng,
+                    accuracy: acc,
+                    status_aktif: statusAktif
                 };
 
+                const prefix = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../' : '';
+
                 try {
-                    await fetch('../api/api_checkin.php', {
+                    await fetch(prefix + 'api/api_checkin.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
@@ -51,5 +68,11 @@
     document.addEventListener('DOMContentLoaded', () => {
         sendLocationPing();
         setInterval(sendLocationPing, PING_INTERVAL_MS);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            sendLocationPing();
+        }
     });
 })();

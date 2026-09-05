@@ -166,6 +166,16 @@
       box-shadow: 0 4px 10px rgba(51, 65, 85, 0.3);
     }
 
+    .gmaps-pin.pin-office {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.45);
+    }
+
+    .gmaps-pin.pin-stale {
+      background: linear-gradient(135deg, #64748d, #475569);
+      box-shadow: 0 4px 10px rgba(71, 85, 105, 0.3);
+    }
+
     .gmaps-pin i {
       transform: rotate(45deg);
       color: white;
@@ -797,7 +807,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_peta.js?v=20260905_gps_accuracy"></script>
+  <script src="../js/kacab_peta.js?v=20260905_live_office_fix"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>
 </body>
