@@ -62,14 +62,14 @@ function initLeafletMap(lat, lng) {
 
         markerInstance.on('dragend', function (e) {
             const newPos = e.target.getLatLng();
-            updateCoordinates(newPos.lat, newPos.lng, null, false);
+            updateCoordinates(newPos.lat, newPos.lng, 5, true);
             reverseGeocode(newPos.lat, newPos.lng);
         });
 
         mapInstance.on('click', function (e) {
             if (markerInstance) {
                 markerInstance.setLatLng(e.latlng);
-                updateCoordinates(e.latlng.lat, e.latlng.lng, null, false);
+                updateCoordinates(e.latlng.lat, e.latlng.lng, 5, true);
                 reverseGeocode(e.latlng.lat, e.latlng.lng);
             }
         });
@@ -86,8 +86,14 @@ function initLeafletMap(lat, lng) {
 }
 
 // ==========================================
-// 3. GPS DETECTION & REVERSE GEOCODING
+// 3. GPS DETECTION & REVERSE GEOCODING (HIGH ACCURACY STABILIZATION)
 // ==========================================
+let gpsWatcher = null;
+let gpsTimeout = null;
+let bestPosition = null;
+const TARGET_AKURASI = 15; // Target akurasi satelit presisi tinggi (<= 15 meter)
+const MAX_WAIT_TIME_MS = 12000; // Maksimal tunggu penguncian satelit
+
 function detectLocation() {
     const statusEl = document.getElementById('geoStatus');
     const coordsEl = document.getElementById('geoCoords');
@@ -103,36 +109,91 @@ function detectLocation() {
         return;
     }
 
+    if (gpsWatcher) {
+        navigator.geolocation.clearWatch(gpsWatcher);
+        gpsWatcher = null;
+    }
+    if (gpsTimeout) {
+        clearTimeout(gpsTimeout);
+        gpsTimeout = null;
+    }
+    bestPosition = null;
+
     if (statusEl) {
         statusEl.className = 'geo-badge geo-loading';
-        statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunci Satelit GPS...';
+        statusEl.innerHTML = '<i class="fa-solid fa-satellite-dish fa-spin"></i> Mengunci Satelit GPS Presisi Tinggi...';
     }
 
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const accuracy = Math.round(position.coords.accuracy);
+    const finalizeLock = (position, isTimeoutFallback = false) => {
+        if (gpsWatcher) {
+            navigator.geolocation.clearWatch(gpsWatcher);
+            gpsWatcher = null;
+        }
+        if (gpsTimeout) {
+            clearTimeout(gpsTimeout);
+            gpsTimeout = null;
+        }
 
-            updateCoordinates(lat, lng, accuracy, true);
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const accuracy = Math.round(position.coords.accuracy);
 
-            if (statusEl) {
+        updateCoordinates(lat, lng, accuracy, true);
+
+        if (statusEl) {
+            if (accuracy <= 15) {
+                statusEl.className = 'geo-badge geo-success';
+                statusEl.innerHTML = `<i class="fa-solid fa-satellite-dish"></i> GPS Satelit Terkunci (Presisi ±${accuracy}m)`;
+            } else if (accuracy <= 35) {
                 statusEl.className = 'geo-badge geo-success';
                 statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> GPS Terkunci (±${accuracy}m)`;
+            } else {
+                statusEl.className = 'geo-badge geo-warn';
+                statusEl.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i> GPS Terkunci (±${accuracy}m - Sinyal Sedang)`;
+            }
+        }
+
+        if (btnGmaps) {
+            btnGmaps.href = `https://www.google.com/maps?q=${lat},${lng}`;
+            btnGmaps.style.display = 'inline-flex';
+        }
+
+        if (btnSubmit) btnSubmit.disabled = false;
+
+        initLeafletMap(lat, lng);
+        reverseGeocode(lat, lng);
+    };
+
+    // Timeout: jika dalam 12 detik satelit belum mencapai target <= 15m, pakai posisi terbaik yang sudah tertangkap
+    gpsTimeout = setTimeout(() => {
+        if (bestPosition) {
+            finalizeLock(bestPosition, true);
+        } else {
+            fallbackDefaultLocation();
+        }
+    }, MAX_WAIT_TIME_MS);
+
+    gpsWatcher = navigator.geolocation.watchPosition(
+        (position) => {
+            const acc = Math.round(position.coords.accuracy);
+            if (!bestPosition || acc < bestPosition.coords.accuracy) {
+                bestPosition = position;
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fa-solid fa-satellite-dish fa-spin"></i> Menstabilkan Satelit... (Akurasi: ±${acc}m)`;
+                }
             }
 
-            if (btnGmaps) {
-                btnGmaps.href = `https://www.google.com/maps?q=${lat},${lng}`;
-                btnGmaps.style.display = 'inline-flex';
+            // Jika akurasi sudah sangat presisi (<= 15 meter), langsung kunci seketika
+            if (acc <= TARGET_AKURASI) {
+                finalizeLock(position, false);
             }
-
-            if (btnSubmit) btnSubmit.disabled = false;
-
-            initLeafletMap(lat, lng);
-            reverseGeocode(lat, lng);
         },
         (error) => {
             console.warn("GPS detection warning:", error);
+            if (bestPosition) {
+                finalizeLock(bestPosition, true);
+                return;
+            }
             let msg = "Gagal mengambil lokasi GPS.";
             if (error.code === error.PERMISSION_DENIED) msg = "Izin lokasi GPS belum diizinkan.";
             else if (error.code === error.POSITION_UNAVAILABLE) msg = "Sinyal GPS tidak tersedia.";
@@ -145,14 +206,14 @@ function detectLocation() {
 
             fallbackDefaultLocation();
         },
-        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
 }
 
 function fallbackDefaultLocation() {
     const lat = -6.9387;
     const lng = 107.6433;
-    updateCoordinates(lat, lng, 50, false);
+    updateCoordinates(lat, lng, 30, false);
 
     const coordsEl = document.getElementById('geoCoords');
     if (coordsEl) {
@@ -178,13 +239,37 @@ function updateCoordinates(lat, lng, accuracy, updateText = true) {
 
     const coordsEl = document.getElementById('geoCoords');
     if (coordsEl && updateText) {
-        coordsEl.textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}${accuracy ? ` (Akurasi: ±${accuracy}m)` : ''}`;
+        let accInfo = '';
+        if (accuracy) {
+            if (accuracy <= 15) {
+                accInfo = ` <span style="color:#059669;font-weight:700;"><i class="fa-solid fa-satellite-dish"></i> (Satelit Presisi: ±${accuracy}m)</span>`;
+            } else if (accuracy <= 35) {
+                accInfo = ` <span style="color:#2563eb;font-weight:700;">(Akurasi: ±${accuracy}m)</span>`;
+            } else {
+                accInfo = ` <span style="color:#d97706;font-weight:700;">(Akurasi: ±${accuracy}m)</span>`;
+            }
+        }
+        coordsEl.innerHTML = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}${accInfo}`;
     }
 
     const btnGmaps = document.getElementById('btnGmapsLink');
     if (btnGmaps) {
         btnGmaps.href = `https://www.google.com/maps?q=${lat},${lng}`;
         btnGmaps.style.display = 'inline-flex';
+    }
+
+    // Gambar visualisasi radius akurasi di peta mini
+    if (mapInstance && accuracy) {
+        if (accuracyCircle) {
+            mapInstance.removeLayer(accuracyCircle);
+        }
+        accuracyCircle = L.circle([lat, lng], {
+            radius: Math.max(accuracy, 8),
+            color: '#059669',
+            fillColor: '#10b981',
+            fillOpacity: 0.15,
+            weight: 1.5
+        }).addTo(mapInstance);
     }
 }
 
@@ -385,6 +470,7 @@ async function submitCheckin() {
         formData.append('nama_lokasi', namaLokasi);
         formData.append('latitude', currentCoords.lat);
         formData.append('longitude', currentCoords.lng);
+        formData.append('accuracy', currentCoords.accuracy || 10);
         formData.append('keterangan', keterangan || '');
 
         if (selectedPhotoFile) {

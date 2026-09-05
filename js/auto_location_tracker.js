@@ -27,6 +27,7 @@
                     nama_spv: spvSales,
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy ? Math.round(position.coords.accuracy * 10) / 10 : 10,
                     status_aktif: 'On-Duty'
                 };
 
@@ -43,7 +44,7 @@
             (err) => {
                 // Silent fail jika izin belum diberikan
             },
-            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
     }
 

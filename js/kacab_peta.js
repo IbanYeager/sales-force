@@ -146,17 +146,19 @@ function applyMapFilter() {
         const lastLoc = locBySalesId[String(s.id)] || locByName[sName.toLowerCase()];
         const lastCheck = checkinBySalesId[String(s.id)] || checkinByName[sName.toLowerCase()];
 
-        let lat = null, lng = null, jenis = 'Belum Check-in', lokasi = 'Belum ada lokasi terdeteksi', time = s.created_at || '';
+        let lat = null, lng = null, acc = null, jenis = 'Belum Check-in', lokasi = 'Belum ada lokasi terdeteksi', time = s.created_at || '';
 
         if (lastCheck) {
             lat = lastCheck.latitude;
             lng = lastCheck.longitude;
+            acc = lastCheck.accuracy ? parseFloat(lastCheck.accuracy) : null;
             jenis = lastCheck.jenis_kunjungan;
             lokasi = lastCheck.nama_lokasi;
             time = lastCheck.created_at;
         } else if (lastLoc) {
             lat = lastLoc.latitude;
             lng = lastLoc.longitude;
+            acc = lastLoc.accuracy ? parseFloat(lastLoc.accuracy) : null;
             jenis = lastLoc.status_aktif || 'Aplikasi Aktif (On-Duty)';
             lokasi = `Lokasi Terkini (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
             time = lastLoc.updated_at;
@@ -164,6 +166,7 @@ function applyMapFilter() {
             // Default titik koordinat cabang Tunas Toyota Kiara Condong jika sales belum pernah kirim GPS
             lat = -6.9360 + (Math.random() * 0.01 - 0.005);
             lng = 107.6430 + (Math.random() * 0.01 - 0.005);
+            acc = null;
             lokasi = 'Tunas Toyota Kiara Condong (Belum ada GPS)';
         }
 
@@ -176,6 +179,7 @@ function applyMapFilter() {
             nama_lokasi: lokasi,
             latitude: lat,
             longitude: lng,
+            accuracy: acc,
             created_at: time,
             has_gps: !!(lastCheck || lastLoc)
         });
@@ -210,9 +214,36 @@ function updateKpiCounters(dataList) {
     document.getElementById('kpiCanvassing') && (document.getElementById('kpiCanvassing').textContent = cntCanvassing);
 }
 
+let activeAccuracyCircle = null;
+
+function showAccuracyRadius(lat, lng, accuracy) {
+    if (activeAccuracyCircle && map) {
+        map.removeLayer(activeAccuracyCircle);
+        activeAccuracyCircle = null;
+    }
+    if (!map) return;
+    const radiusMeters = (accuracy && accuracy > 0) ? Math.max(accuracy, 10) : 15;
+    activeAccuracyCircle = L.circle([lat, lng], {
+        radius: radiusMeters,
+        color: '#059669',
+        fillColor: '#10b981',
+        fillOpacity: 0.18,
+        weight: 1.5,
+        dashArray: '4, 4'
+    }).addTo(map);
+}
+
+function clearAccuracyRadius() {
+    if (activeAccuracyCircle && map) {
+        map.removeLayer(activeAccuracyCircle);
+        activeAccuracyCircle = null;
+    }
+}
+
 function renderMapMarkers(dataList) {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
+    clearAccuracyRadius();
 
     if (dataList.length === 0) return;
 
@@ -245,6 +276,33 @@ function renderMapMarkers(dataList) {
 
         const googleMapsUrl = `https://www.google.com/maps?q=${item.latitude},${item.longitude}`;
 
+        let accBadgeHtml = '';
+        if (item.has_gps) {
+            const accVal = item.accuracy ? Math.round(item.accuracy) : null;
+            if (accVal !== null && accVal <= 15) {
+                accBadgeHtml = `
+                    <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                        <i class="fa-solid fa-satellite-dish" style="color:#059669;font-size:12px;"></i>
+                        <span>Akurasi Satelit: Presisi (±${accVal}m)</span>
+                    </div>
+                `;
+            } else if (accVal !== null && accVal <= 40) {
+                accBadgeHtml = `
+                    <div style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                        <i class="fa-solid fa-location-crosshairs" style="color:#2563eb;font-size:12px;"></i>
+                        <span>Akurasi GPS: Baik (±${accVal}m)</span>
+                    </div>
+                `;
+            } else if (accVal !== null) {
+                accBadgeHtml = `
+                    <div style="background:#fefce8;border:1px solid #fef08a;color:#854d0e;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                        <i class="fa-solid fa-tower-cell" style="color:#ca8a04;font-size:12px;"></i>
+                        <span>Akurasi: Sinyal Seluler / Standar (±${accVal}m)</span>
+                    </div>
+                `;
+            }
+        }
+
         const popupContent = `
             <div class="gmaps-popup-box">
                 <div class="gpu-badge" style="${item.has_gps ? '' : 'background:#f1f5f9;color:#64748d;'}">${escapeHtml(item.jenis_kunjungan)}</div>
@@ -253,6 +311,7 @@ function renderMapMarkers(dataList) {
                 <div class="gpu-loc">
                     <i class="fa-solid fa-location-dot" style="${item.has_gps ? 'color:#cc1426;' : 'color:#64748d;'}"></i> ${escapeHtml(item.nama_lokasi)}
                 </div>
+                ${accBadgeHtml}
                 ${item.foto_bukti ? `<img src="${escapeHtml(item.foto_bukti)}" class="gpu-img" />` : ''}
                 <div class="gpu-meta">
                     <span><i class="fa-regular fa-clock"></i> ${dayStr} - ${timeStr}</span>
@@ -270,6 +329,17 @@ function renderMapMarkers(dataList) {
         }).addTo(map).bindPopup(popupContent);
 
         marker._salesId = item.id;
+        marker._accuracy = item.accuracy;
+
+        marker.on('click', () => {
+            if (item.has_gps) {
+                showAccuracyRadius(item.latitude, item.longitude, item.accuracy);
+            }
+        });
+        marker.on('popupclose', () => {
+            clearAccuracyRadius();
+        });
+
         markers.push(marker);
         bounds.push([item.latitude, item.longitude]);
     });
@@ -305,13 +375,23 @@ function renderCheckinList(dataList) {
         const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         const dayStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 
+        let accPill = '';
+        if (item.has_gps && item.accuracy) {
+            const accVal = Math.round(item.accuracy);
+            const isUltra = accVal <= 15;
+            accPill = `<span style="font-size:9.5px;font-weight:700;color:${isUltra ? '#059669' : '#2563eb'};background:${isUltra ? '#ecfdf5' : '#eff6ff'};border:1px solid ${isUltra ? '#a7f3d0' : '#bfdbfe'};padding:1px 5px;border-radius:4px;margin-left:5px;display:inline-flex;align-items:center;gap:3px;" title="Radius Akurasi GPS Satelit"><i class="fa-solid fa-satellite-dish"></i> ±${accVal}m</span>`;
+        }
+
         return `
             <div class="map-list-item" onclick="focusMarker(${item.latitude}, ${item.longitude}, ${item.id})">
                 <div class="mli-avatar">
                     <i class="fa-solid ${item.has_gps ? 'fa-user-tie' : 'fa-building-user'}"></i>
                 </div>
                 <div class="mli-body">
-                    <div class="mli-sales" title="${escapeHtml(item.nama_sales)}">${escapeHtml(item.nama_sales)}</div>
+                    <div class="mli-sales" title="${escapeHtml(item.nama_sales)}">
+                        <span>${escapeHtml(item.nama_sales)}</span>
+                        ${accPill}
+                    </div>
                     <div class="mli-spv" title="SPV: ${escapeHtml(item.nama_spv)}">SPV: <strong>${escapeHtml(item.nama_spv)}</strong></div>
                     <div class="mli-type" style="${item.has_gps ? '' : 'color:var(--muted);'}">
                         <i class="fa-solid fa-circle" style="color:${item.has_gps ? '#10b981' : '#94a3b8'};font-size:8px;"></i> ${escapeHtml(item.jenis_kunjungan)}
@@ -331,11 +411,16 @@ function renderCheckinList(dataList) {
 
 function focusMarker(lat, lng, salesId) {
     if (!map) return;
-    map.flyTo([lat, lng], 16, { animate: true, duration: 1.0 });
+    map.flyTo([lat, lng], 17, { animate: true, duration: 1.0 });
     if (salesId) {
         const targetMarker = markers.find(m => m._salesId === salesId);
         if (targetMarker) {
-            setTimeout(() => targetMarker.openPopup(), 350);
+            setTimeout(() => {
+                targetMarker.openPopup();
+                if (targetMarker._accuracy) {
+                    showAccuracyRadius(lat, lng, targetMarker._accuracy);
+                }
+            }, 350);
         }
     }
 }

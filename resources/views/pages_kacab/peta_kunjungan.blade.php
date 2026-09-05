@@ -797,7 +797,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_peta.js?v=20260904_scrollfix"></script>
+  <script src="../js/kacab_peta.js?v=20260905_gps_accuracy"></script>
 
   <script src="../js/pwa-app.js?v=3"></script>
 </body>

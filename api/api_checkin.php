@@ -22,6 +22,7 @@ try {
         nama_lokasi VARCHAR(255) NOT NULL,
         latitude DECIMAL(10, 8) NOT NULL,
         longitude DECIMAL(11, 8) NOT NULL,
+        accuracy DECIMAL(8, 2) DEFAULT 10.0,
         keterangan TEXT,
         foto_bukti VARCHAR(255) DEFAULT '',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -34,9 +35,20 @@ try {
         nama_spv VARCHAR(100) DEFAULT '',
         latitude DECIMAL(10, 8) NOT NULL,
         longitude DECIMAL(11, 8) NOT NULL,
+        accuracy DECIMAL(8, 2) DEFAULT 10.0,
         status_aktif VARCHAR(50) DEFAULT 'On-Duty',
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )");
+
+    // Auto-migrasi kolom accuracy jika belum ada
+    $colChk1 = $conn->query("SHOW COLUMNS FROM sales_checkins LIKE 'accuracy'");
+    if ($colChk1 && $colChk1->num_rows == 0) {
+        @$conn->query("ALTER TABLE sales_checkins ADD COLUMN accuracy DECIMAL(8, 2) DEFAULT 10.0 AFTER longitude");
+    }
+    $colChk2 = $conn->query("SHOW COLUMNS FROM sales_last_locations LIKE 'accuracy'");
+    if ($colChk2 && $colChk2->num_rows == 0) {
+        @$conn->query("ALTER TABLE sales_last_locations ADD COLUMN accuracy DECIMAL(8, 2) DEFAULT 10.0 AFTER longitude");
+    }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $raw_input = file_get_contents("php://input");
@@ -50,10 +62,11 @@ try {
             $nama_spv = $conn->real_escape_string($data->nama_spv ?? $_POST['nama_spv'] ?? 'Supervisor');
             $latitude = floatval($data->latitude ?? $_POST['latitude']);
             $longitude = floatval($data->longitude ?? $_POST['longitude']);
+            $accuracy = floatval($data->accuracy ?? $_POST['accuracy'] ?? 10.0);
             $status_aktif = $conn->real_escape_string($data->status_aktif ?? $_POST['status_aktif'] ?? 'On-Duty');
 
-            $stmt = $conn->prepare("INSERT INTO sales_last_locations (sales_id, nama_sales, nama_spv, latitude, longitude, status_aktif) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE nama_sales = VALUES(nama_sales), nama_spv = VALUES(nama_spv), latitude = VALUES(latitude), longitude = VALUES(longitude), status_aktif = VALUES(status_aktif), updated_at = CURRENT_TIMESTAMP");
-            $stmt->bind_param("sssdds", $sales_id, $nama_sales, $nama_spv, $latitude, $longitude, $status_aktif);
+            $stmt = $conn->prepare("INSERT INTO sales_last_locations (sales_id, nama_sales, nama_spv, latitude, longitude, accuracy, status_aktif) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE nama_sales = VALUES(nama_sales), nama_spv = VALUES(nama_spv), latitude = VALUES(latitude), longitude = VALUES(longitude), accuracy = VALUES(accuracy), status_aktif = VALUES(status_aktif), updated_at = CURRENT_TIMESTAMP");
+            $stmt->bind_param("sssddds", $sales_id, $nama_sales, $nama_spv, $latitude, $longitude, $accuracy, $status_aktif);
 
             if ($stmt->execute()) {
                 echo json_encode(["ok" => true, "message" => "Auto ping lokasi berhasil diperbarui"]);
@@ -71,6 +84,7 @@ try {
         $nama_lokasi = $conn->real_escape_string($data->nama_lokasi ?? $_POST['nama_lokasi'] ?? 'Lokasi Lapangan');
         $latitude = floatval($data->latitude ?? $_POST['latitude'] ?? 0);
         $longitude = floatval($data->longitude ?? $_POST['longitude'] ?? 0);
+        $accuracy = floatval($data->accuracy ?? $_POST['accuracy'] ?? 10.0);
         $keterangan = $conn->real_escape_string($data->keterangan ?? $_POST['keterangan'] ?? '');
         $foto_bukti = $conn->real_escape_string($data->foto_bukti ?? $_POST['foto_bukti'] ?? '');
 
@@ -102,18 +116,22 @@ try {
         }
 
         if (!empty($nama_sales) && !empty($jenis_kunjungan) && $latitude != 0 && $longitude != 0) {
-            $stmt = $conn->prepare("INSERT INTO sales_checkins (sales_id, nama_sales, nama_spv, jenis_kunjungan, nama_lokasi, latitude, longitude, keterangan, foto_bukti) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssddss", $sales_id, $nama_sales, $nama_spv, $jenis_kunjungan, $nama_lokasi, $latitude, $longitude, $keterangan, $foto_bukti);
+            $stmt = $conn->prepare("INSERT INTO sales_checkins (sales_id, nama_sales, nama_spv, jenis_kunjungan, nama_lokasi, latitude, longitude, accuracy, keterangan, foto_bukti) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssdddss", $sales_id, $nama_sales, $nama_spv, $jenis_kunjungan, $nama_lokasi, $latitude, $longitude, $accuracy, $keterangan, $foto_bukti);
 
             if ($stmt->execute()) {
                 // Update juga last location
-                @$conn->query("INSERT INTO sales_last_locations (sales_id, nama_sales, nama_spv, latitude, longitude, status_aktif) VALUES ('$sales_id', '$nama_sales', '$nama_spv', $latitude, $longitude, '$jenis_kunjungan') ON DUPLICATE KEY UPDATE latitude = $latitude, longitude = $longitude, status_aktif = '$jenis_kunjungan', updated_at = CURRENT_TIMESTAMP");
+                $stmtLoc = $conn->prepare("INSERT INTO sales_last_locations (sales_id, nama_sales, nama_spv, latitude, longitude, accuracy, status_aktif) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE latitude = VALUES(latitude), longitude = VALUES(longitude), accuracy = VALUES(accuracy), status_aktif = VALUES(status_aktif), updated_at = CURRENT_TIMESTAMP");
+                $stmtLoc->bind_param("sssddds", $sales_id, $nama_sales, $nama_spv, $latitude, $longitude, $accuracy, $jenis_kunjungan);
+                $stmtLoc->execute();
+                $stmtLoc->close();
 
                 echo json_encode([
                     "ok" => true,
                     "message" => "Check-in kunjungan lapangan berhasil disimpan",
                     "id" => $conn->insert_id,
-                    "foto_bukti" => $foto_bukti
+                    "foto_bukti" => $foto_bukti,
+                    "accuracy" => $accuracy
                 ]);
             } else {
                 echo json_encode(["ok" => false, "message" => "Gagal menyimpan check-in: " . $conn->error]);
@@ -128,12 +146,13 @@ try {
         $type = isset($_GET['type']) ? $_GET['type'] : 'all';
 
         if ($type === 'last_locations') {
-            $result = $conn->query("SELECT sales_id, nama_sales, nama_spv, latitude, longitude, status_aktif, updated_at FROM sales_last_locations ORDER BY updated_at DESC");
+            $result = $conn->query("SELECT sales_id, nama_sales, nama_spv, latitude, longitude, accuracy, status_aktif, updated_at FROM sales_last_locations ORDER BY updated_at DESC");
             $last_locs = [];
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $row['latitude'] = floatval($row['latitude']);
                     $row['longitude'] = floatval($row['longitude']);
+                    $row['accuracy'] = isset($row['accuracy']) ? floatval($row['accuracy']) : 10.0;
                     $last_locs[] = $row;
                 }
             }
@@ -152,7 +171,7 @@ try {
         }
         $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
 
-        $result = $conn->query("SELECT id, sales_id, nama_sales, nama_spv, jenis_kunjungan, nama_lokasi, latitude, longitude, keterangan, foto_bukti, created_at FROM sales_checkins $whereSql ORDER BY created_at DESC LIMIT $limit");
+        $result = $conn->query("SELECT id, sales_id, nama_sales, nama_spv, jenis_kunjungan, nama_lokasi, latitude, longitude, accuracy, keterangan, foto_bukti, created_at FROM sales_checkins $whereSql ORDER BY created_at DESC LIMIT $limit");
 
         $checkins = [];
         if ($result && $result->num_rows > 0) {
@@ -160,6 +179,7 @@ try {
                 $row['id'] = intval($row['id']);
                 $row['latitude'] = floatval($row['latitude']);
                 $row['longitude'] = floatval($row['longitude']);
+                $row['accuracy'] = isset($row['accuracy']) ? floatval($row['accuracy']) : 10.0;
                 $checkins[] = $row;
             }
         }

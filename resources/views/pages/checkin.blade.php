@@ -506,7 +506,7 @@
     </div>
 
     <script src="../js/script.js"></script>
-    <script src="../js/checkin.js"></script>
+    <script src="../js/checkin.js?v=20260905_gps_accuracy"></script>
     <script src="../js/pwa-app.js?v=3"></script>
 </body>
 
