@@ -360,9 +360,9 @@
     }
   </style>
   <script src="../js/elibrary_data.js?v=4"></script>
-  <script src="../js/elibrary.js?v=4"></script>
+  <script src="../js/elibrary.js?v={{ time() }}"></script>
 
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260907_01"></script>
 </body>
 
 </html>

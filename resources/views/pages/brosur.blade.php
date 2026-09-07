@@ -236,9 +236,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="../custom_alert.js"></script>
   <script src="../js/sales_signature.js"></script>
-  <script src="../js/brosur.js"></script>
+  <script src="../js/brosur.js?v={{ time() }}"></script>
 
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260907_01"></script>
 </body>
 
 </html>

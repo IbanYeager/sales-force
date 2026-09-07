@@ -377,15 +377,13 @@ window.shareBrosur = async function (nama, url) {
 
   // Resolving URL absolut file PDF
   let finalUrl = url;
-  if (finalUrl && !finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
-    let cleanPath = finalUrl;
-    if (cleanPath.startsWith('../')) {
-      cleanPath = cleanPath.substring(3);
+  try {
+    finalUrl = new URL(url, window.location.href).href;
+  } catch (e) {
+    if (finalUrl && !finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+      let cleanPath = finalUrl.replace(/^\.\.\//, '').replace(/^\//, '');
+      finalUrl = window.location.origin + '/' + cleanPath;
     }
-    if (!cleanPath.startsWith('/')) {
-      cleanPath = '/' + cleanPath;
-    }
-    finalUrl = window.location.origin + cleanPath;
   }
 
   // Tampilkan notifikasi loading sementara file PDF disiapkan
@@ -397,22 +395,39 @@ window.shareBrosur = async function (nama, url) {
 
   try {
     // 1. Fetch file PDF sebagai Blob
-    let response = await fetch(finalUrl);
-    // Jika fetch langsung gagal (misal CORS/jalur relatif), coba lewat proxy PHP
-    if (!response.ok) {
+    let response = null;
+    try {
+      response = await fetch(finalUrl);
+    } catch (e) {
+      console.warn("Direct fetch error:", e);
+    }
+
+    if (!response || !response.ok) {
       const proxyUrl = `../api/proxy_pdf.php?file=${encodeURIComponent(url)}`;
       response = await fetch(proxyUrl);
     }
 
-    if (!response.ok) {
-      throw new Error(`Gagal memuat file PDF (${response.status})`);
+    if (!response || !response.ok) {
+      throw new Error(`Gagal memuat file PDF`);
     }
 
     const blob = await response.blob();
     const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
 
+    // Salin caption ke clipboard sebagai backup
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(captionText).catch(() => {});
+    }
+
     // 2. Jika browser mendukung Web Share API Level 2 (berkas file di HP Android / iOS / PWA)
-    if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+    let canShare = false;
+    try {
+      canShare = !!(navigator.canShare && navigator.canShare({ files: [pdfFile] }));
+    } catch (e) {
+      canShare = false;
+    }
+
+    if (canShare) {
       if (toast) toast.classList.remove('show');
       isSharingPdf = false;
       await navigator.share({
