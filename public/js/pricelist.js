@@ -575,10 +575,12 @@
 
       if (total > 0) {
         bar.style.display = 'block';
+        document.body.classList.add('has-multi-share-bar');
         if (countEl) countEl.innerText = `${total}`;
         if (btnCountEl) btnCountEl.innerText = `${total}`;
       } else {
         bar.style.display = 'none';
+        document.body.classList.remove('has-multi-share-bar');
       }
 
       // Update status tombol Pilih Semua per model card (khusus varian reguler)

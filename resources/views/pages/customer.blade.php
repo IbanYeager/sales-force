@@ -7,7 +7,7 @@
   <title>Sales App - Customer</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css" />
-  <script src="../js/sidebar_desktop.js?v=20260827_scroll_top"></script>
+  <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
   <link rel="stylesheet" href="../css/customer.css">
   <link rel="stylesheet" href="../css/followup.css?v=20260826_numbering">
   <link rel="stylesheet" href="../css/sales_tools.css?v=1.0">
@@ -189,7 +189,7 @@
   <script src="../js/customer.js?v=25"></script>
   <script src="../js/sales_superpowers.js?v={{ time() }}"></script>
   <script src="../js/followup_sales.js?v=20260828_single_icons"></script>
-  <script src="../js/pwa-app.js?v=20260828_single_icons"></script>
+  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Initialize Voice Note for Follow-up modal

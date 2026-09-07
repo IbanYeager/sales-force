@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="../css/penjualan_kircon.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/sidebar_desktop.js"></script>
+    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#CC0000">
 </head>

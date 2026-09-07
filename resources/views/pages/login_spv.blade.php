@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/login_spv.css">
-    <script src="../js/sidebar_desktop.js"></script>
+    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#CC0000">
 </head>
@@ -122,7 +122,7 @@
     <script src="../js/script.js"></script>
     <script src="../js/login_spv.js"></script>
 
-    <script src="../js/pwa-app.js?v=3"></script>
+    <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 
 </html>

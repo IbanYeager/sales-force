@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="../css/style.css">
-    <script src="../js/sidebar_desktop.js"></script>
+    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
 
     <style>
         .checkin-hero-banner {
@@ -517,7 +517,7 @@
 
     <script src="../js/script.js"></script>
     <script src="../js/checkin.js?v=20260905_gps_accuracy"></script>
-    <script src="../js/pwa-app.js?v=3"></script>
+    <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 
 </html>

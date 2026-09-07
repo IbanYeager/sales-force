@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="../css/velg.css" />
-    <script src="../js/sidebar_desktop.js"></script>
+    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#0d1b3e">
 </head>
@@ -101,7 +101,7 @@
 
     <script src="../custom_alert.js"></script>
     <script src="../js/velg.js"></script>
-    <script src="../js/pwa-app.js?v=3"></script>
+    <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 
 </html>

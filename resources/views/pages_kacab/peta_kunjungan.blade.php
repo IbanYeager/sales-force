@@ -952,7 +952,7 @@
   <script src="../js/kacab_global.js"></script>
   <script src="../js/kacab_peta.js?v=20260905_online_tracking_v5"></script>
 
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 
 </html>

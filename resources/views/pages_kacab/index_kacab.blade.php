@@ -971,7 +971,7 @@
   <script src="../js/sales_charts.js"></script>
   <script src="../js/sales_dashboard.js"></script>
 
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 
   <script>
     function switchKacabMainView(view) {

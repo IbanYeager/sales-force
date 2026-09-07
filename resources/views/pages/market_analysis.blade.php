@@ -13,14 +13,14 @@
     <link rel="stylesheet" href="../css/style.css?v=5.0" />
     <link rel="stylesheet" href="../css/market_analysis.css?v=5.0" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/sidebar_desktop.js"></script>
+    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#0d1b3e">
 </head>
 
 <body>
     <div class="mobile-app">
-        <!-- Header Page (Upgraded by sidebar_desktop.js) -->
+        <!-- Header Page (Upgraded by sidebar_desktop.js?v=20260907_layout_fix) -->
         <header class="header-page">
             <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
             <h2>Analisis Pasar Kecamatan</h2>

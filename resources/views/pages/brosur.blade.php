@@ -9,7 +9,7 @@
     content="Temukan lebih banyak tentang produk terbaik Toyota. E-Brosur digital lengkap semua model." />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css" />
-  <script src="../js/sidebar_desktop.js"></script>
+  <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
   <link rel="stylesheet" href="../css/brosur.css">
 
   <link rel="manifest" href="../manifest.json">
@@ -238,7 +238,7 @@
   <script src="../js/sales_signature.js"></script>
   <script src="../js/brosur.js?v={{ time() }}"></script>
 
-  <script src="../js/pwa-app.js?v=20260907_01"></script>
+  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 
 </html>

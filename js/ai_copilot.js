@@ -581,6 +581,7 @@ function toggleAiCopilotWindow(forceState) {
         isAiCopilotOpen = !isAiCopilotOpen;
     }
     win.style.display = isAiCopilotOpen ? 'flex' : 'none';
+    document.body.classList.toggle('ai-window-open', isAiCopilotOpen);
     sessionStorage.setItem('sft_tstock_open', isAiCopilotOpen ? '1' : '0');
     if (isAiCopilotOpen) {
         const history = document.getElementById('aiChatHistory');

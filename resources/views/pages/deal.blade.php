@@ -11,7 +11,7 @@
     <!-- jsPDF UMD build -->
     <script src="../custom_alert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="../js/sidebar_desktop.js"></script>
+<script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 </head>
@@ -128,7 +128,7 @@
     <script src="../js/deal.js"></script>
 
 
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 
 </html>

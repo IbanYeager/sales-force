@@ -610,6 +610,6 @@
   <script src="/custom_alert.js?v=25"></script>
   <script src="/js/kacab_global.js?v=20260824_dendi"></script>
   <script src="/js/followup_master.js?v=20260829_executive_dashboard"></script>
-  <script src="/js/pwa-app.js?v=3"></script>
+  <script src="/js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 </html>

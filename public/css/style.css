@@ -3114,21 +3114,60 @@ tbody tr:last-child td {
     }
 
     .sft-scroll-top-btn {
-        bottom: max(152px, calc(146px + env(safe-area-inset-bottom, 0px))) !important;
+        bottom: max(156px, calc(150px + env(safe-area-inset-bottom, 0px))) !important;
         right: 16px !important;
         width: 44px !important;
         height: 44px !important;
         z-index: 9989 !important;
     }
 
-    /* PWA Install Banner when shown */
+    /* PWA Install Banner when shown on mobile: place cleanly below top header */
     #custom-install-container {
-        bottom: max(96px, calc(90px + env(safe-area-inset-bottom, 0px))) !important;
-        left: 14px !important;
-        right: auto !important;
-        max-width: calc(100vw - 86px) !important;
-        z-index: 9980 !important;
+        top: 62px !important;
+        bottom: auto !important;
+        left: 12px !important;
+        right: 12px !important;
+        max-width: min(440px, calc(100vw - 24px)) !important;
+        margin: 0 auto !important;
+        padding: 9px 12px !important;
+        border-radius: 14px !important;
+        z-index: 99990 !important;
     }
+}
+
+/* Desktop PWA Install Banner (positioned safely at bottom-left, never overlapping right buttons) */
+#custom-install-container {
+    position: fixed !important;
+    left: 288px !important;
+    right: auto !important;
+    bottom: 24px !important;
+    top: auto !important;
+    z-index: 99980 !important;
+}
+
+@media (min-width: 1024px) {
+    #custom-install-container {
+        left: 290px !important;
+        right: auto !important;
+        bottom: 24px !important;
+        top: auto !important;
+    }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+    #custom-install-container {
+        left: 96px !important;
+        right: auto !important;
+        bottom: 24px !important;
+        top: auto !important;
+    }
+}
+
+/* Multi-Share Bar Active: elevate floating right buttons so they never collide */
+body.has-multi-share-bar #btnToggleAiCopilot {
+    bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.has-multi-share-bar .sft-scroll-top-btn {
+    bottom: calc(210px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 /* Standard & Compact Smartphones (<= 480px) */

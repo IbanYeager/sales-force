@@ -7,7 +7,7 @@
     <title>Sales App - Profil</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
-    <script src="../js/sidebar_desktop.js"></script>
+    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
@@ -633,7 +633,7 @@
             window.location.href = 'login.html';
         };
     </script>
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
 </body>
 
 </html>

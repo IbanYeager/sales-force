@@ -782,7 +782,7 @@
             return;
         }
         const script = document.createElement('script');
-        script.src = prefix + 'js/ai_copilot.js?v=20260819_tstock_wa_share';
+        script.src = prefix + 'js/ai_copilot.js?v=20260907_layout_fix';
         (document.head || document.documentElement).appendChild(script);
     })();
 
@@ -809,10 +809,10 @@
             style.innerHTML = `
                 .sft-scroll-top-btn {
                     position: fixed;
-                    bottom: 85px;
+                    bottom: 80px;
                     right: 24px;
-                    width: 45px;
-                    height: 45px;
+                    width: 44px;
+                    height: 44px;
                     border-radius: 14px;
                     background: linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 60%, #c8102e 100%);
                     color: #ffffff !important;
@@ -823,7 +823,7 @@
                     align-items: center;
                     justify-content: center;
                     font-size: 17px;
-                    z-index: 99999;
+                    z-index: 99995;
                     opacity: 0;
                     visibility: hidden;
                     transform: translateY(16px) scale(0.85);
@@ -831,6 +831,11 @@
                     outline: none;
                     user-select: none;
                     text-decoration: none;
+                }
+                body.ai-window-open .sft-scroll-top-btn {
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                    pointer-events: none !important;
                 }
                 .sft-scroll-top-btn.show {
                     opacity: 1 !important;
@@ -877,7 +882,7 @@
                 }
                 @media (max-width: 768px) {
                     .sft-scroll-top-btn {
-                        bottom: calc(152px + env(safe-area-inset-bottom, 0px)) !important;
+                        bottom: calc(156px + env(safe-area-inset-bottom, 0px)) !important;
                         right: 16px !important;
                         width: 44px !important;
                         height: 44px !important;

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales App - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=5.0">
+    <link rel="stylesheet" href="css/style.css?v=20260907_layout_fix">
     <link rel="stylesheet" href="css/index_dashboard.css?v=5.0">
     <link rel="stylesheet" href="css/sales_tools.css?v=1.0">
 
@@ -1282,14 +1282,14 @@
         </div><!-- /desktop-content -->
     </div><!-- /desktop-shell -->
 
-    <script src="js/sidebar_desktop.js"></script>
-    <script src="js/ai_copilot.js"></script>
+    <script src="js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+    <script src="js/ai_copilot.js?v=20260907_layout_fix"></script>
     <script src="js/script.js?v=20260808_07"></script>
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
     <script src="js/auto_location_tracker.js?v=20260905_v6"></script>
-    <script src="./js/pwa-app.js?v=3"></script>
+    <script src="./js/pwa-app.js?v=20260907_layout_fix"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {

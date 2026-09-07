@@ -139,34 +139,59 @@ window.addEventListener('beforeinstallprompt', (e) => {
                     from { transform: translateY(20px); opacity: 0; }
                     to { transform: translateY(0); opacity: 1; }
                 }
+                @keyframes slideDownPwa {
+                    from { transform: translateY(-20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
                 #custom-install-container {
-                    position: fixed;
-                    bottom: 82px;
-                    right: 24px;
-                    z-index: 99998;
+                    position: fixed !important;
+                    bottom: 24px !important;
+                    left: 288px !important;
+                    right: auto !important;
+                    top: auto !important;
+                    z-index: 99980 !important;
                     display: flex;
                     align-items: center;
                     gap: 12px;
                     background: #0f172a;
                     color: #ffffff;
-                    padding: 12px 16px;
+                    padding: 11px 16px;
                     border-radius: 14px;
-                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
                     border: 1px solid rgba(255, 255, 255, 0.15);
                     font-family: 'Inter', sans-serif;
                     max-width: 360px;
                     animation: slideUpPwa 0.4s ease-out;
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
-                @media (max-width: 768px) {
+                @media (min-width: 1024px) {
                     #custom-install-container {
-                        bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
-                        left: 14px !important;
+                        left: 290px !important;
                         right: auto !important;
-                        max-width: calc(100vw - 86px) !important;
-                        padding: 8px 12px !important;
+                        bottom: 24px !important;
+                        top: auto !important;
+                    }
+                }
+                @media (min-width: 768px) and (max-width: 1023px) {
+                    #custom-install-container {
+                        left: 96px !important;
+                        right: auto !important;
+                        bottom: 24px !important;
+                        top: auto !important;
+                    }
+                }
+                @media (max-width: 767px) {
+                    #custom-install-container {
+                        top: 62px !important;
+                        bottom: auto !important;
+                        left: 12px !important;
+                        right: 12px !important;
+                        max-width: min(440px, calc(100vw - 24px)) !important;
+                        margin: 0 auto !important;
+                        padding: 9px 12px !important;
                         border-radius: 14px !important;
-                        z-index: 9980 !important;
+                        z-index: 99990 !important;
+                        animation: slideDownPwa 0.35s ease-out !important;
                     }
                 }
             `;
@@ -193,6 +218,39 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
         document.body.appendChild(installContainer);
         document.body.classList.add('has-pwa-install');
+
+        function positionPwaInstall() {
+            if (!installContainer) return;
+            if (window.innerWidth >= 1024) {
+                const sidebar = document.getElementById('desktopSidebar') || document.querySelector('.desktop-sidebar');
+                if (sidebar && sidebar.offsetWidth > 0 && window.getComputedStyle(sidebar).display !== 'none') {
+                    installContainer.style.setProperty('left', (sidebar.offsetWidth + 20) + 'px', 'important');
+                } else {
+                    installContainer.style.setProperty('left', '24px', 'important');
+                }
+                installContainer.style.setProperty('right', 'auto', 'important');
+                installContainer.style.setProperty('bottom', '24px', 'important');
+                installContainer.style.setProperty('top', 'auto', 'important');
+            } else if (window.innerWidth >= 768) {
+                const sidebar = document.getElementById('desktopSidebar') || document.querySelector('.desktop-sidebar');
+                if (sidebar && sidebar.offsetWidth > 0 && window.getComputedStyle(sidebar).display !== 'none') {
+                    installContainer.style.setProperty('left', (sidebar.offsetWidth + 16) + 'px', 'important');
+                } else {
+                    installContainer.style.setProperty('left', '16px', 'important');
+                }
+                installContainer.style.setProperty('right', 'auto', 'important');
+                installContainer.style.setProperty('bottom', '24px', 'important');
+                installContainer.style.setProperty('top', 'auto', 'important');
+            } else {
+                installContainer.style.setProperty('left', '12px', 'important');
+                installContainer.style.setProperty('right', '12px', 'important');
+                installContainer.style.setProperty('top', '62px', 'important');
+                installContainer.style.setProperty('bottom', 'auto', 'important');
+            }
+        }
+
+        positionPwaInstall();
+        window.addEventListener('resize', positionPwaInstall);
 
         // Click action untuk install
         const clickArea = document.getElementById('pwaClickArea');

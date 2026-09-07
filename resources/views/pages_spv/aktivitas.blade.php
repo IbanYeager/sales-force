@@ -200,7 +200,7 @@
   <script src="../custom_alert.js"></script>
   <script src="../js/spv_aktivitas.js?v=20260819_master"></script>
 
-  <script src="../js/pwa-app.js?v=3"></script>
+  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
   <script src="../js/spv_global.js"></script>
 </body>
 
