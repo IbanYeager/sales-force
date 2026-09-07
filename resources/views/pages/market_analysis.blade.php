@@ -27,6 +27,18 @@
         </header>
 
         <div class="container market-container">
+            <!-- ═══ TOP SEGMENTED TAB BAR ═══ -->
+            <div class="market-main-tabs" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); padding: 6px; border-radius: 16px; border: 1.5px solid #e2e8f0; display: flex; gap: 6px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); position: sticky; top: 65px; z-index: 99;">
+                <button type="button" class="market-nav-btn active" id="btnTabMarket" onclick="switchMarketTab('market')" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #0d1b3e, #1e3a8a); color:white;">
+                    <i class="fa-solid fa-chart-pie"></i> Intelijen Pasar &amp; Dominasi
+                </button>
+                <button type="button" class="market-nav-btn" id="btnTabHousing" onclick="switchMarketTab('housing')" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:transparent; color:#64748b;">
+                    <i class="fa-solid fa-city"></i> Komplek Perumahan (Kanvasing)
+                </button>
+                <button type="button" class="market-nav-btn" id="btnTabPolreg" onclick="switchMarketTab('polreg')" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:transparent; color:#64748b;">
+                    <i class="fa-solid fa-map-location-dot"></i> Registrasi Polreg Detail
+                </button>
+            </div>
             <!-- Executive Hero Banner Header -->
             <div class="district-hero-card">
                 <div class="hero-glow-bg"></div>
@@ -301,6 +313,48 @@
 
     <script src="../custom_alert.js"></script>
     <script src="../js/market_analysis.js"></script>
+    <script>
+        function switchMarketTab(tabName) {
+            document.querySelectorAll('.market-nav-btn').forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = '#64748b';
+            });
+
+            if (tabName === 'housing') {
+                const btn = document.getElementById('btnTabHousing');
+                if (btn) {
+                    btn.style.background = 'linear-gradient(135deg, #0d1b3e, #1e3a8a)';
+                    btn.style.color = 'white';
+                }
+                const sec = document.getElementById('housingSection');
+                if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+            } else if (tabName === 'polreg') {
+                const btn = document.getElementById('btnTabPolreg');
+                if (btn) {
+                    btn.style.background = 'linear-gradient(135deg, #0d1b3e, #1e3a8a)';
+                    btn.style.color = 'white';
+                }
+                if (typeof switchMode === 'function') switchMode('market_share');
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+            } else {
+                const btn = document.getElementById('btnTabMarket');
+                if (btn) {
+                    btn.style.background = 'linear-gradient(135deg, #0d1b3e, #1e3a8a)';
+                    btn.style.color = 'white';
+                }
+                if (typeof switchMode === 'function') switchMode('composition');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reqTab = urlParams.get('tab');
+            if (reqTab) {
+                switchMarketTab(reqTab);
+            }
+        });
+    </script>
 </body>
 
 </html>

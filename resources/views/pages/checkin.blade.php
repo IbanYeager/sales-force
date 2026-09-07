@@ -312,6 +312,16 @@
         </header>
 
         <div class="container" style="margin-top: 18px;">
+            <!-- Segmen Switcher Aktivitas & Check-in Lapangan -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #e2e8f0; padding: 4px; border-radius: 14px; margin-bottom: 18px;">
+                <a href="input.html" style="text-align: center; padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; text-decoration: none; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                    <i class="fa-solid fa-list-check"></i> Form Laporan Sesi
+                </a>
+                <a href="checkin.html" style="text-align: center; padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 800; text-decoration: none; background: #ffffff; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-solid fa-location-dot" style="color: #c8102e;"></i> Check-in Geotagging
+                </a>
+            </div>
+
             <!-- Hero Top Banner -->
             <div class="checkin-hero-banner">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">

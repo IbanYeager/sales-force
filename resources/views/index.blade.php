@@ -64,7 +64,7 @@
                     <i class="fa-solid fa-chalkboard-user"></i> Papan AO Report
                 </a>
                 <a href="pages/input.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-camera"></i> Input Aktivitas
+                    <i class="fa-solid fa-camera"></i> Laporan &amp; Check-in Aktivitas
                 </a>
                 <a href="pages/riwayat_foto_aktivitas.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-images"></i> Riwayat Foto Aktivitas
@@ -80,17 +80,14 @@
                 <a href="pages/order_tracker.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-truck-ramp-box"></i> Live Delivery Tracker
                 </a>
-                <a href="pages/leasing_matrix.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-scale-balanced"></i> Leasing Approval Odds
+                <a href="pages/kalkulator.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-calculator"></i> Kalkulator &amp; Smart Quotation
                 </a>
                 <a href="pages/tradein.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-right-left"></i> Trade-In &amp; Over-Kredit
+                    <i class="fa-solid fa-right-left"></i> Trade-In &amp; Mobil Bekas Center
                 </a>
                 <a href="pages/ai_copilot.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> AI Sales Copilot
-                </a>
-                <a href="pages/quotation.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-file-signature"></i> Smart Quotation
                 </a>
                 <a href="pages/wa_studio.html" class="sidebar-nav-link">
                     <i class="fa-brands fa-whatsapp"></i> WA Studio
@@ -113,20 +110,14 @@
                 <a href="pages/promo.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-percent"></i> Promo
                 </a>
-                <a href="pages/kalkulator.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-calculator"></i> Kalkulator Multi-Leasing
-                </a>
                 <a href="pages/inventory.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-warehouse"></i> Live Inventory
-                </a>
-                <a href="pages/polreg.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-map-location-dot"></i> Polreg
                 </a>
                 <a href="pages/penjualan_kircon.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-chart-line"></i> Penjualan Kiara Condong
                 </a>
                 <a href="pages/market_analysis.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-chart-pie"></i> Analisis Pasar Kecamatan
+                    <i class="fa-solid fa-chart-pie"></i> Intelijen Pasar &amp; Polreg
                 </a>
                 <a href="pages/velg.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-compact-disc"></i> Velg &amp; Ban
@@ -143,7 +134,7 @@
                     <i class="fa-solid fa-award"></i> Delivery Ceremony
                 </a>
                 <a href="pages/testdrive.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-car-side"></i> Test Drive
+                    <i class="fa-solid fa-car-side"></i> Pusat Test Drive &amp; Booking
                 </a>
                 <a href="pages/dokumen.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-receipt"></i> Dokumen
@@ -176,9 +167,6 @@
                 </a>
                 <a href="pages/tco.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-car-tunnel"></i> Aksesoris TCO
-                </a>
-                <a href="pages/olx.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-exchange-alt"></i> Trade In
                 </a>
                 <a href="pages/brosur.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-book-open"></i> Brosur
@@ -630,23 +618,23 @@
 
                     <!-- Quick Access: Inspeksi Customer & Jadwal Showroom -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
-                        <a href="pages/inspeksi.html" style="text-decoration: none;">
+                        <a href="pages/tradein.html?tab=inspeksi" style="text-decoration: none;">
                             <div class="card" style="padding: 16px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; border-radius: 16px; height: 100%; box-shadow: 0 6px 20px rgba(15,23,42,0.2);">
                                 <div style="width: 40px; height: 40px; border-radius: 12px; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px;">
                                     <i class="fa-solid fa-car-rear"></i>
                                 </div>
-                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Prospek Inspeksi Mobil</h4>
-                                <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Upload data & estimasi otomatis</p>
+                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Checklist Inspeksi Mobil</h4>
+                                <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Upload data &amp; taksiran Trade-in</p>
                             </div>
                         </a>
 
-                        <a href="pages/jadwal_inspeksi.html" style="text-decoration: none;">
+                        <a href="pages/tradein.html?tab=jadwal" style="text-decoration: none;">
                             <div class="card" style="padding: 16px; background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%); color: #fff; border-radius: 16px; height: 100%; box-shadow: 0 6px 20px rgba(49,46,129,0.2);">
                                 <div style="width: 40px; height: 40px; border-radius: 12px; background: #6366f1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px;">
                                     <i class="fa-solid fa-calendar-check"></i>
                                 </div>
-                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Jadwal Inspeksi Showroom</h4>
-                                <p style="font-size: 0.75rem; color: #a5b4fc; margin: 0;">Monitoring janji temu customer</p>
+                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Jadwal Janji Temu Showroom</h4>
+                                <p style="font-size: 0.75rem; color: #a5b4fc; margin: 0;">Monitoring booking appraisal</p>
                             </div>
                         </a>
                     </div>
@@ -781,7 +769,7 @@
                             </a>
                             <a href="pages/kalkulator.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-calculator"></i></div>
-                                <span class="category-text">Kalkulator Kredit</span>
+                                <span class="category-text">Kalkulator &amp; Quotation</span>
                             </a>
                             <a href="pages/inventory.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-warehouse"></i></div>
@@ -799,10 +787,6 @@
                                 <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>
                                 <span class="category-text">Form SPK</span>
                             </a>
-                            <a href="pages/quotation.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>
-                                <span class="category-text">Smart Quotation</span>
-                            </a>
                             <a href="pages/promo.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-percent"></i></div>
                                 <span class="category-text">Promo &amp; Tenor</span>
@@ -813,11 +797,7 @@
                             </a>
                             <a href="pages/tradein.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-right-left"></i></div>
-                                <span class="category-text">Trade-In Calc</span>
-                            </a>
-                            <a href="pages/leasing_matrix.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-scale-balanced"></i></div>
-                                <span class="category-text">Leasing Odds</span>
+                                <span class="category-text">Trade-In Center</span>
                             </a>
 
                             <!-- Tier 2: Komunikasi, AI Superpowers, Purna Jual & Delivery -->
@@ -847,11 +827,7 @@
                             </a>
                             <a href="pages/testdrive.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-car-side"></i></div>
-                                <span class="category-text">Test Drive</span>
-                            </a>
-                            <a href="pages/rental_testdrive.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-handshake-simple"></i></div>
-                                <span class="category-text">TD Rental</span>
+                                <span class="category-text">Test Drive Center</span>
                             </a>
                             <a href="pages/approval.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-check-to-slot"></i></div>
@@ -881,30 +857,14 @@
                             </a>
                             <a href="pages/market_analysis.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chart-pie"></i></div>
-                                <span class="category-text">Analisis Pasar</span>
-                            </a>
-                            <a href="pages/polreg.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-map-location-dot"></i></div>
-                                <span class="category-text">Peta Polreg</span>
+                                <span class="category-text">Intelijen Pasar &amp; Polreg</span>
                             </a>
                             <a href="pages/penjualan_kircon.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chart-line"></i></div>
                                 <span class="category-text">Penjualan Kircon</span>
                             </a>
 
-                            <!-- Tier 4: Trade-In, Inspeksi, Aksesoris & Merchandise -->
-                            <a href="pages/olx.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-exchange-alt"></i></div>
-                                <span class="category-text">OLX Appraisal</span>
-                            </a>
-                            <a href="pages/inspeksi.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-car-rear"></i></div>
-                                <span class="category-text">Inspeksi Unit</span>
-                            </a>
-                            <a href="pages/jadwal_inspeksi.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                                <span class="category-text">Jadwal Inspeksi</span>
-                            </a>
+                            <!-- Tier 4: Trade-In, Aksesoris & Merchandise -->
                             <a href="pages/tco.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-car-tunnel"></i></div>
                                 <span class="category-text">Aksesoris TCO</span>

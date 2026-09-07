@@ -228,24 +228,20 @@
                 <p class="sidebar-nav-label">Menu Utama</p>
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
                 ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
-                ${navLink('pages/input.html', 'fa-solid fa-camera', 'Input Aktivitas', 'input aktivitas laporan suara mic voice spm')}
+                ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
-                ${navLink('pages/checkin.html', 'fa-solid fa-location-crosshairs', 'Check-In Canvassing GPS', 'gps checkin absen lokasi canvassing')}
                 ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Jadwal Aktivitas', 'kalender jadwal agenda aktivitas')}
 
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
                 ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR', 'harga pricelist otr brosur daftar')}
-                ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Multi-Leasing', 'kalkulator leasing kredit dp cicilan angsuran tenor')}
+                ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator & Smart Quotation', 'kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf')}
                 ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)', 'stok stock live inventory unit mobil t-stock')}
                 ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar', 'customer crm radar prospek data database')}
                 ${navLink('pages/battle_card.html', 'fa-solid fa-shield-halved', 'Battle Card &amp; Objection', 'battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata')}
                 ${navLink('pages/spk.html', 'fa-solid fa-file-signature', 'Form SPK', 'spk pesanan form surat tanda jadi')}
-                ${navLink('pages/quotation.html', 'fa-solid fa-file-contract', 'Smart Digital Quotation', 'quotation penawaran harga simulasi pdf')}
                 ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor', 'promo diskon paket kredit tenor program')}
                 ${navLink('pages/order_tracker.html', 'fa-solid fa-truck-ramp-box', 'Live Delivery Tracker', 'tracking status mobil tracker delivery')}
-                ${navLink('pages/tradein.html', 'fa-solid fa-right-left', 'Trade-In & Over-Kredit', 'trade in tukar tambah over kredit mobil bekas')}
-                ${navLink('pages/leasing_matrix.html', 'fa-solid fa-scale-balanced', 'Leasing Approval Odds', 'leasing matrix peluang approval acc taf bca bsi')}
 
                 <p class="sidebar-nav-label">Tier 2: AI Tools, Komunikasi & Delivery</p>
                 ${navLink('pages/wa_studio.html', 'fa-brands fa-whatsapp', 'WA Broadcast Studio', 'wa whatsapp broadcast blast pesan template')}
@@ -255,8 +251,7 @@
                 ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony', 'handover ceremony serah terima piagam')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
-                ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Test Drive Showroom', 'test drive uji coba mobil showroom')}
-                ${navLink('pages/rental_testdrive.html', 'fa-solid fa-handshake-simple', 'Test Drive Rekanan Rental', 'rental rekanan test drive')}
+                ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Pusat Test Drive & Booking', 'test drive uji coba mobil showroom rental rekanan riwayat booking')}
                 ${navLink('pages/approval.html', 'fa-solid fa-check-to-slot', 'Approval Diskon <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>', 'approval diskon persetujuan spv')}
                 ${navLink('pages/dokumen.html', 'fa-solid fa-receipt', 'Manajemen Dokumen', 'dokumen berkas ktp kk berkas leasing')}
 
@@ -265,15 +260,11 @@
                 ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°', 'komparasi lawan rival competitor banding')}
                 ${navLink('pages/brosur.html', 'fa-solid fa-book-open', 'Brosur Digital', 'brosur pdf katalog spesifikasi')}
                 ${navLink('pages/elibrary.html', 'fa-solid fa-book-medical', 'E-Library Panduan Sales', 'library panduan tips trik materi pelatihan')}
-                ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Analisis Pasar Kecamatan', 'pasar market analisis wilayah pangsa')}
-                ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Wilayah Polreg', 'polreg plat nomor d z bbn stnk')}
-                ${navLink('pages/kecamatan.html', 'fa-solid fa-map-pin', 'Lookup Kecamatan & Kodepos', 'kecamatan kodepos kelurahan bandung')}
+                ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Intelijen Pasar & Polreg', 'pasar market analisis wilayah pangsa polreg bbn plat kodepos kecamatan komplek')}
                 ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong', 'penjualan kircon kiara condong rekap cabang')}
 
                 <p class="sidebar-nav-label">Tier 4: Trade-In, Aksesoris & Merch</p>
-                ${navLink('pages/olx.html', 'fa-solid fa-exchange-alt', 'OLX Appraisal', 'olx appraisal taksir harga pasaran mobil bekas')}
-                ${navLink('pages/inspeksi.html', 'fa-solid fa-car-rear', 'Prospek Inspeksi Mobil', 'inspeksi cek kondisi fisik appraisal')}
-                ${navLink('pages/jadwal_inspeksi.html', 'fa-solid fa-calendar-check', 'Jadwal Inspeksi Showroom', 'jadwal booking inspeksi')}
+                ${navLink('pages/tradein.html', 'fa-solid fa-right-left', 'Trade-In & Mobil Bekas Center', 'trade in tukar tambah over kredit mobil bekas inspeksi fisik jadwal appraisal olx riset pasar')}
                 ${navLink('pages/tco.html', 'fa-solid fa-car-tunnel', 'Aksesoris TCO & Builder', 'tco aksesoris custom bodykit kaca film karpet')}
                 ${navLink('pages/velg.html', 'fa-solid fa-compact-disc', 'Velg & Ban Customizer', 'velg ban wheel variasi')}
                 ${navLink('pages/merchandise.html', 'fa-solid fa-shirt', 'Merchandise Toyota', 'merch baju kaos topi gantungan payung jaket')}
