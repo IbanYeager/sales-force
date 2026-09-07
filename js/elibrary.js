@@ -1072,10 +1072,9 @@ async function shareCarBrochurePdf(customModel = null) {
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
             if (toast) toast.classList.remove('show');
             isSharingElibPdf = false;
+            // Kirim HANYA berkas PDF dokumen tanpa teks caption
             await navigator.share({
-                files: [pdfFile],
-                title: captionText,
-                text: captionText
+                files: [pdfFile]
             });
             return;
         }
@@ -1099,8 +1098,7 @@ async function shareCarBrochurePdf(customModel = null) {
     a.click();
     document.body.removeChild(a);
 
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
-    window.open(waUrl, '_blank');
+    window.open('https://web.whatsapp.com', '_blank');
 
     if (toast) {
         toast.innerHTML = `<i class="fa-solid fa-circle-check" style="margin-right:6px;color:#10b981;"></i> File PDF diunduh! Silakan lampirkan ke WhatsApp.`;

@@ -414,11 +414,6 @@ window.shareBrosur = async function (nama, url) {
     const blob = await response.blob();
     const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
 
-    // Salin caption ke clipboard sebagai backup
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(captionText).catch(() => {});
-    }
-
     // 2. Jika browser mendukung Web Share API Level 2 (berkas file di HP Android / iOS / PWA)
     let canShare = false;
     try {
@@ -430,10 +425,9 @@ window.shareBrosur = async function (nama, url) {
     if (canShare) {
       if (toast) toast.classList.remove('show');
       isSharingPdf = false;
+      // Kirim HANYA berkas PDF dokumen tanpa caption teks tambahan (sesuai format bersih)
       await navigator.share({
-        files: [pdfFile],
-        title: captionText,
-        text: captionText
+        files: [pdfFile]
       });
       return;
     }
@@ -463,9 +457,8 @@ function fallbackShareDesktop(fileUrl, fileName, captionText) {
   a.click();
   document.body.removeChild(a);
 
-  // Buka WhatsApp Web / Apps dengan teks caption siap kirim
-  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
-  window.open(waUrl, '_blank');
+  // Buka WhatsApp Web bersih tanpa teks tambahan
+  window.open('https://web.whatsapp.com', '_blank');
 
   // Beri notifikasi panduan ke pengguna
   const toast = document.getElementById('shareToast');
