@@ -276,8 +276,19 @@ window.openPdfModal = function (nama, url) {
   const finalUrl = url.startsWith('http') ? url : '../' + url;
 
   // Set Download & Share attributes
-  document.getElementById('btnDownloadPdf').href = finalUrl;
-  document.getElementById('btnSharePdf').onclick = () => shareBrosur(nama, url);
+  const captionText = getSalesBrochureCaption(nama);
+  const fileName = `${captionText}.pdf`;
+  const btnDownload = document.getElementById('btnDownloadPdf');
+  if (btnDownload) {
+    btnDownload.href = finalUrl;
+    btnDownload.setAttribute('download', fileName);
+    btnDownload.title = `Unduh ${fileName}`;
+  }
+  const btnShare = document.getElementById('btnSharePdf');
+  if (btnShare) {
+    btnShare.onclick = () => window.shareBrosur(nama, url);
+    btnShare.title = `Bagikan ${fileName}`;
+  }
 
   document.getElementById('pdfModalTitle').textContent = nama;
   document.getElementById('pdfModal').classList.add('show');
@@ -329,25 +340,134 @@ window.openImageLightbox = function (src) {
   document.getElementById('imageLightbox').classList.add('show');
 };
 
-// ─── Share / copy link ───────────────────────────────────
-function shareBrosur(nama, url) {
-  let fullUrl = url;
-  if (fullUrl && !fullUrl.startsWith('http')) {
-    fullUrl = window.location.origin + (fullUrl.startsWith('/') ? '' : '/') + fullUrl;
+// ─── Format Caption & Nama Sales ─────────────────────────
+function getSalesBrochureCaption(carName) {
+  let salesName = localStorage.getItem('namaSales') || '';
+  if (!salesName && typeof window.getCurrentSalesProfile === 'function') {
+    const prof = window.getCurrentSalesProfile();
+    if (prof && prof.nama && prof.nama !== 'Sales Consultant') {
+      salesName = prof.nama;
+    }
+  }
+  if (!salesName) {
+    salesName = localStorage.getItem('user_nama') || localStorage.getItem('spvSales') || 'Sales';
   }
 
-  let text = `📄 *BROSUR & E-KATALOG RESMI TOYOTA* 📄\n\n` +
-             `Berikut link unduh brosur digital resmi untuk unit *Toyota ${nama}*:\n` +
-             `🔗 *Link Brosur (PDF)*: ${fullUrl}\n\n` +
-             `_Silakan unduh untuk melihat detail spesifikasi, pilihan varian, dan fitur unggulan lengkap._\n`;
+  // Bersihkan embel-embel peran jika ada (misal: "Reza (Sales Consultant)" -> "Reza")
+  salesName = salesName.replace(/\(.*?\)/g, '').trim();
+  // Bersihkan jika nama sudah ada kata "Tunas" atau "KC" agar tidak berulang
+  salesName = salesName.replace(/tunas\s*(toyota|kc|kiara\s*condong)?/gi, '').trim();
+  if (!salesName) salesName = 'Sales';
 
-  if (typeof window.injectSocialSignature === 'function') {
-    text = window.injectSocialSignature(text);
-  }
+  let cleanCarName = (carName || 'Toyota').replace(/^toyota\s+/i, '').trim();
 
-  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-  window.open(waUrl, '_blank');
+  // Format baku sesuai permintaan: "E catalog [Model] - [Sales] Tunas KC"
+  return `E catalog ${cleanCarName} - ${salesName} Tunas KC`;
 }
+
+// ─── Share Berkas Dokumen PDF Langsung ke WhatsApp ────────
+let isSharingPdf = false;
+
+window.shareBrosur = async function (nama, url) {
+  if (isSharingPdf) return;
+  isSharingPdf = true;
+
+  const captionText = getSalesBrochureCaption(nama);
+  const fileName = `${captionText}.pdf`;
+
+  // Resolving URL absolut file PDF
+  let finalUrl = url;
+  if (finalUrl && !finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+    let cleanPath = finalUrl;
+    if (cleanPath.startsWith('../')) {
+      cleanPath = cleanPath.substring(3);
+    }
+    if (!cleanPath.startsWith('/')) {
+      cleanPath = '/' + cleanPath;
+    }
+    finalUrl = window.location.origin + cleanPath;
+  }
+
+  // Tampilkan notifikasi loading sementara file PDF disiapkan
+  const toast = document.getElementById('shareToast');
+  if (toast) {
+    toast.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;color:#38bdf8;"></i> Menyiapkan file PDF ${escHtml(nama)}...`;
+    toast.classList.add('show');
+  }
+
+  try {
+    // 1. Fetch file PDF sebagai Blob
+    let response = await fetch(finalUrl);
+    // Jika fetch langsung gagal (misal CORS/jalur relatif), coba lewat proxy PHP
+    if (!response.ok) {
+      const proxyUrl = `../api/proxy_pdf.php?file=${encodeURIComponent(url)}`;
+      response = await fetch(proxyUrl);
+    }
+
+    if (!response.ok) {
+      throw new Error(`Gagal memuat file PDF (${response.status})`);
+    }
+
+    const blob = await response.blob();
+    const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
+
+    // 2. Jika browser mendukung Web Share API Level 2 (berkas file di HP Android / iOS / PWA)
+    if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+      if (toast) toast.classList.remove('show');
+      isSharingPdf = false;
+      await navigator.share({
+        files: [pdfFile],
+        title: captionText,
+        text: captionText
+      });
+      return;
+    }
+  } catch (err) {
+    console.warn("Native file sharing dibatalkan atau tidak didukung:", err);
+    if (err.name === 'AbortError') {
+      // User membatalkan jendela dialog share
+      if (toast) toast.classList.remove('show');
+      isSharingPdf = false;
+      return;
+    }
+  }
+
+  if (toast) toast.classList.remove('show');
+  isSharingPdf = false;
+
+  // 3. Fallback jika dibuka di PC / browser yang belum mendukung share file langsung:
+  fallbackShareDesktop(finalUrl, fileName, captionText);
+};
+
+function fallbackShareDesktop(fileUrl, fileName, captionText) {
+  // Unduh otomatis file PDF dengan nama custom
+  const a = document.createElement('a');
+  a.href = fileUrl;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // Buka WhatsApp Web / Apps dengan teks caption siap kirim
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
+  window.open(waUrl, '_blank');
+
+  // Beri notifikasi panduan ke pengguna
+  const toast = document.getElementById('shareToast');
+  if (toast) {
+    toast.innerHTML = `<i class="fa-solid fa-circle-check" style="margin-right:6px;color:#10b981;"></i> File PDF diunduh! Silakan lampirkan ke chat WhatsApp.`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+}
+
+window.shareBrosurModal = function () {
+  const title = document.getElementById('pdfModalTitle');
+  const btnDownload = document.getElementById('btnDownloadPdf');
+  if (title && btnDownload) {
+    window.shareBrosur(title.textContent, btnDownload.href);
+  }
+};
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text)

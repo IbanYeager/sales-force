@@ -980,3 +980,133 @@ async function quickShareCar(model) {
     window.open(waUrl, '_blank');
 }
 
+// ─── Direct PDF Brochure Sharing (E-Catalog) ────────────
+function getCarBrochureFilename(modelName) {
+    const m = (modelName || '').toLowerCase().trim();
+    if (m.includes('alphard')) return 'alphard.pdf';
+    if (m.includes('vellfire')) return 'vellfire.pdf';
+    if (m.includes('zenix')) return 'innova-zenix.pdf';
+    if (m.includes('reborn') || m.includes('kijang')) return 'kijang-innova.pdf';
+    if (m.includes('veloz')) return 'veloz.pdf';
+    if (m.includes('avanza')) return 'avanza.pdf';
+    if (m.includes('calya')) return 'calya.pdf';
+    if (m.includes('agya')) return 'agya.pdf';
+    if (m.includes('rush')) return 'rush.pdf';
+    if (m.includes('raize')) return 'raize.pdf';
+    if (m.includes('fortuner')) return 'fortuner.pdf';
+    if (m.includes('yaris cross')) return 'yaris-cross.pdf';
+    if (m.includes('yaris')) return 'yaris.pdf';
+    if (m.includes('vios')) return 'vios.pdf';
+    if (m.includes('altis')) return 'corolla-altis.pdf';
+    if (m.includes('camry')) return 'camry.pdf';
+    if (m.includes('corolla cross') || m.includes('cross')) return 'corolla-cross.pdf';
+    if (m.includes('bz4x')) return 'bz4x.pdf';
+    if (m.includes('land cruiser')) return 'land-cruiser.pdf';
+    if (m.includes('rangga')) return 'hilux-rangga.pdf';
+    if (m.includes('hilux')) return 'hilux.pdf';
+    if (m.includes('hiace')) return 'hiace.pdf';
+    if (m.includes('dyna')) return 'dyna.pdf';
+    if (m.includes('gr 86') || m.includes('gr86')) return 'gr-86.pdf';
+    if (m.includes('gr yaris')) return 'gr-yaris.pdf';
+    return null;
+}
+
+function getSalesBrochureCaptionElib(carName) {
+    let salesName = localStorage.getItem('namaSales') || '';
+    if (!salesName && typeof window.getCurrentSalesProfile === 'function') {
+        const prof = window.getCurrentSalesProfile();
+        if (prof && prof.nama && prof.nama !== 'Sales Consultant') {
+            salesName = prof.nama;
+        }
+    }
+    if (!salesName) {
+        salesName = localStorage.getItem('user_nama') || localStorage.getItem('spvSales') || 'Sales';
+    }
+
+    salesName = salesName.replace(/\(.*?\)/g, '').trim();
+    salesName = salesName.replace(/tunas\s*(toyota|kc|kiara\s*condong)?/gi, '').trim();
+    if (!salesName) salesName = 'Sales';
+
+    let cleanCarName = (carName || 'Toyota').replace(/^toyota\s+/i, '').trim();
+    return `E catalog ${cleanCarName} - ${salesName} Tunas KC`;
+}
+
+let isSharingElibPdf = false;
+async function shareCarBrochurePdf(customModel = null) {
+    if (isSharingElibPdf) return;
+    isSharingElibPdf = true;
+
+    const model = customModel || currentElibModel || 'Toyota';
+    const pdfFileName = getCarBrochureFilename(model);
+
+    if (!pdfFileName) {
+        isSharingElibPdf = false;
+        alert(`Brosur PDF resmi untuk ${model} sedang diperbarui.`);
+        return;
+    }
+
+    const captionText = getSalesBrochureCaptionElib(model);
+    const fileName = `${captionText}.pdf`;
+    const finalUrl = `${window.location.origin}/uploads/brosur/${pdfFileName}`;
+
+    const toast = document.getElementById('shareToast');
+    if (toast) {
+        toast.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;color:#38bdf8;"></i> Menyiapkan berkas PDF ${model}...`;
+        toast.classList.add('show');
+    }
+
+    try {
+        let response = await fetch(finalUrl);
+        if (!response.ok) {
+            const proxyUrl = `../api/proxy_pdf.php?file=../uploads/brosur/${pdfFileName}`;
+            response = await fetch(proxyUrl);
+        }
+
+        if (!response.ok) {
+            throw new Error(`Gagal memuat file PDF (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            if (toast) toast.classList.remove('show');
+            isSharingElibPdf = false;
+            await navigator.share({
+                files: [pdfFile],
+                title: captionText,
+                text: captionText
+            });
+            return;
+        }
+    } catch (err) {
+        console.warn("Direct file sharing Web Share API gagal / dibatalkan:", err);
+        if (err.name === 'AbortError') {
+            if (toast) toast.classList.remove('show');
+            isSharingElibPdf = false;
+            return;
+        }
+    }
+
+    if (toast) toast.classList.remove('show');
+    isSharingElibPdf = false;
+
+    // Desktop fallback
+    const a = document.createElement('a');
+    a.href = finalUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
+    window.open(waUrl, '_blank');
+
+    if (toast) {
+        toast.innerHTML = `<i class="fa-solid fa-circle-check" style="margin-right:6px;color:#10b981;"></i> File PDF diunduh! Silakan lampirkan ke WhatsApp.`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+}
+
+

@@ -324,9 +324,14 @@
       <!-- Action Buttons: WhatsApp Share & Copy -->
       <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
         <button type="button" class="btn-main"
-          style="width:100%; justify-content:center; padding:13px 16px; border-radius:14px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; font-weight:800; font-size:13.5px; box-shadow: 0 6px 20px rgba(37,211,102,0.35); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
+          style="width:100%; justify-content:center; padding:13px 16px; border-radius:14px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#ffffff; font-weight:800; font-size:13.5px; box-shadow: 0 6px 20px rgba(200,16,46,0.3); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
+          onclick="shareCarBrochurePdf()">
+          <i class="fa-solid fa-file-pdf" style="font-size:18px;"></i> Kirim File E-Catalog PDF
+        </button>
+        <button type="button" class="btn-main"
+          style="width:100%; justify-content:center; padding:12px 16px; border-radius:14px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; font-weight:800; font-size:13px; box-shadow: 0 4px 15px rgba(37,211,102,0.25); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
           onclick="shareCarToWhatsApp()">
-          <i class="fa-brands fa-whatsapp" style="font-size:19px;"></i> Bagikan Info Lengkap ke WA
+          <i class="fa-brands fa-whatsapp" style="font-size:18px;"></i> Bagikan Info Lengkap ke WA
         </button>
         <button type="button" class="btn-main"
           style="width:100%; justify-content:center; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,0.9); color:#0f172a; font-weight:700; font-size:12px; border:1.5px solid #cbd5e1; cursor:pointer; display:flex; align-items:center; gap:6px;"
@@ -342,6 +347,18 @@
       </button>
     </div>
   </div>
+
+  <!-- Share toast -->
+  <div class="share-toast" id="shareToast" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0f172a; color: white; font-size: 12px; font-weight: 600; padding: 10px 18px; border-radius: 999px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 9999; white-space: nowrap;">
+    <i class="fa-solid fa-check" style="margin-right:6px;color:#10b981;"></i>
+    Berhasil
+  </div>
+  <style>
+    .share-toast.show {
+      opacity: 1 !important;
+      transform: translateX(-50%) translateY(0) !important;
+    }
+  </style>
   <script src="../js/elibrary_data.js?v=4"></script>
   <script src="../js/elibrary.js?v=4"></script>
 
