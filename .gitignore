@@ -40,3 +40,57 @@ composer.lock
 *.db
 api/config_db.php
 public/api/config_db.php
+
+# -------------------------------------------------------------
+# PROTEKSI FOLDER UPLOAD HOSTINGER (PENTING AGAR TIDAK HILANG)
+# Mengabaikan file upload dinamis agar tidak dihapus saat git auto-deploy di hosting
+# -------------------------------------------------------------
+# Root uploads
+uploads/*
+!uploads/.gitkeep
+!uploads/.htaccess
+!uploads/brosur/
+!uploads/merchandise/
+!uploads/laporan/
+!uploads/lokasi/
+!uploads/profil/
+!uploads/olx/
+!uploads/dokumen/
+uploads/laporan/*
+!uploads/laporan/.gitkeep
+uploads/lokasi/*
+!uploads/lokasi/.gitkeep
+uploads/profil/*
+!uploads/profil/.gitkeep
+uploads/olx/*
+!uploads/olx/.gitkeep
+uploads/dokumen/*
+!uploads/dokumen/.gitkeep
+
+# Public uploads
+public/uploads/*
+!public/uploads/.gitkeep
+!public/uploads/.htaccess
+!public/uploads/brosur/
+!public/uploads/merchandise/
+!public/uploads/laporan/
+!public/uploads/lokasi/
+!public/uploads/profil/
+!public/uploads/olx/
+!public/uploads/dokumen/
+public/uploads/laporan/*
+!public/uploads/laporan/.gitkeep
+public/uploads/lokasi/*
+!public/uploads/lokasi/.gitkeep
+public/uploads/profil/*
+!public/uploads/profil/.gitkeep
+public/uploads/olx/*
+!public/uploads/olx/.gitkeep
+public/uploads/dokumen/*
+!public/uploads/dokumen/.gitkeep
+
+# Galeri aktivitas
+aktivitas/*
+!aktivitas/.gitkeep
+public/aktivitas/*
+!public/aktivitas/.gitkeep
