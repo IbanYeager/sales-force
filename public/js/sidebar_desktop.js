@@ -5,6 +5,36 @@
  */
 (function initDesktopSidebar() {
 
+    // ── Suppress & Permanently Kill PWA Update Green Toast ───
+    try {
+        sessionStorage.removeItem('sft_pwa_updated_toast');
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+            const origSetItem = sessionStorage.setItem.bind(sessionStorage);
+            sessionStorage.setItem = function (k, v) {
+                if (k === 'sft_pwa_updated_toast') return;
+                return origSetItem(k, v);
+            };
+        }
+    } catch (e) {}
+
+    (function suppressUpdateToast() {
+        function removeToast() {
+            try {
+                sessionStorage.removeItem('sft_pwa_updated_toast');
+                document.querySelectorAll('div, span, p').forEach(el => {
+                    if (el.textContent && el.textContent.includes('Aplikasi diperbarui ke versi terbaru')) {
+                        el.remove();
+                    }
+                });
+            } catch (e) {}
+        }
+        removeToast();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', removeToast);
+        }
+        setInterval(removeToast, 200);
+    })();
+
     // ── Determine path prefix ───────────────────────────────
     const path = window.location.pathname;
     const isRoot = !path.includes('/pages/') && !path.includes('/pages_spv/') && !path.includes('/pages_kacab/');

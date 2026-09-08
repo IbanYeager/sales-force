@@ -4868,3 +4868,17 @@ tbody tr:last-child td {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SUPPRESSION OF GREEN UPDATE NOTIFICATION TOAST
+   ═══════════════════════════════════════════════════════════════ */
+[style*="background: #059669"],
+[style*="background:#059669"],
+[style*="background: rgb(5, 150, 105)"],
+[style*="background:rgb(5, 150, 105)"],
+[style*="background:rgb(5,150,105)"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

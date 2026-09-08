@@ -517,7 +517,7 @@
 
     <script src="../js/script.js"></script>
     <script src="../js/checkin.js?v=20260905_gps_accuracy"></script>
-    <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
+    <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
 </html>

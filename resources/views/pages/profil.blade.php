@@ -636,7 +636,7 @@
             window.location.href = 'login.html';
         };
     </script>
-  <script src="../js/pwa-app.js?v=20260908_v8"></script>
+  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
 </html>

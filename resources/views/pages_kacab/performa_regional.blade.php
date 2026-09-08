@@ -270,7 +270,7 @@
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
   <script src="../js/performa_regional.js?v=20260901_1"></script>
-  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
+  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
 </html>

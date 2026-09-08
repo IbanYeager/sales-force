@@ -1293,7 +1293,7 @@
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
     <script src="js/auto_location_tracker.js?v=20260908_v8"></script>
-    <script src="./js/pwa-app.js?v=20260908_v8"></script>
+    <script src="./js/pwa-app.js?v=20260908_no_toast"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {

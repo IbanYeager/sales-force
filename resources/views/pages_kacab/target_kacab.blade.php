@@ -376,7 +376,7 @@
   <script src="../js/kacab_global.js?v=20260826_sheets_live"></script>
   <script src="../js/kacab_target.js?v=20260826_sheets_live"></script>
 
-  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
+  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
 </html>

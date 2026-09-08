@@ -79,8 +79,17 @@ if ('serviceWorker' in navigator) {
     }, 5 * 60 * 1000);
 }
 
-// Bersihkan session storage toast jika ada yang tersisa dari versi sebelumnya
-try { sessionStorage.removeItem('sft_pwa_updated_toast'); } catch (e) {}
+// Bersihkan dan blokir session storage toast agar tidak pernah muncul
+try {
+    sessionStorage.removeItem('sft_pwa_updated_toast');
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+        const _origSet = sessionStorage.setItem.bind(sessionStorage);
+        sessionStorage.setItem = function(key, val) {
+            if (key === 'sft_pwa_updated_toast') return;
+            return _origSet(key, val);
+        };
+    }
+} catch (e) {}
 
 // =========================================================================
 // 2. UNIVERSAL PWA INSTALLATION SYSTEM (Mobile & Desktop)

@@ -639,7 +639,7 @@
   <script src="../js/spk.js?v=2"></script>
   <script src="../js/spk_arcade_game.js?v=1"></script>
 
-  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
+  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
 </html>

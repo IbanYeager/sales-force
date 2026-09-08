@@ -3,7 +3,7 @@
 // Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20260908-ecatalog-title-v13';
+const CACHE_VERSION = 'sft-pwa-v20260908-no-update-toast-v14';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',

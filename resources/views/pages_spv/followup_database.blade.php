@@ -326,6 +326,6 @@
   <script src="../custom_alert.js?v=25"></script>
   <script src="../js/spv_global.js"></script>
   <script src="../js/followup_master.js?v=20260828_unassign_feature"></script>
-  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
+  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 </html>

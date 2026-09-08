@@ -189,7 +189,7 @@
   <script src="../js/customer.js?v=25"></script>
   <script src="../js/sales_superpowers.js?v={{ time() }}"></script>
   <script src="../js/followup_sales.js?v=20260828_single_icons"></script>
-  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
+  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Initialize Voice Note for Follow-up modal
