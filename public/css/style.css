@@ -1794,13 +1794,178 @@ select.form-control {
     max-width: 95vw !important;
     height: auto !important;
     max-height: 94vh !important;
-    padding: 12px 16px !important;
+    padding: 12px 14px !important;
     display: flex !important;
     flex-direction: column !important;
     border-radius: 18px !important;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
+}
+
+/* ── PDF Modal Header & Controls Layout ── */
+.pdf-modal-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    box-sizing: border-box;
+}
+
+.pdf-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.pdf-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.pdf-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(227, 24, 55, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-red, #E31837);
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.pdf-title-info {
+    min-width: 0;
+}
+
+.pdf-title-info h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-dark, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.pdf-title-info span {
+    font-size: 10.5px;
+    color: #64748b;
+    font-weight: 500;
+    display: block;
+}
+
+.pdf-main-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.pdf-btn-action {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 12px;
+    transition: transform 0.15s ease;
+}
+
+.pdf-btn-download {
+    background: #0284c7;
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(2, 132, 199, 0.25);
+}
+
+.pdf-btn-share {
+    background: #25D366;
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(37, 211, 102, 0.25);
+}
+
+.pdf-btn-close {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+.pdf-header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+}
+
+.pdf-page-controls,
+.pdf-zoom-bar {
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 2px 4px;
+    gap: 2px;
+    border: 1px solid #e2e8f0;
+}
+
+.pdf-ctrl-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: #ffffff;
+    color: #334155;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.pdf-btn-fit {
+    width: auto;
+    padding: 0 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    gap: 3px;
+}
+
+.pdf-zoom-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
+    min-width: 38px;
+    text-align: center;
+}
+
+.pdf-page-indicator {
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
+    padding: 0 4px;
+    white-space: nowrap;
+}
+
+.pdf-page-indicator span:first-child {
+    color: var(--primary-red, #E31837);
 }
 
 #pdfModal #pdfViewerContainer {
@@ -1824,17 +1989,35 @@ select.form-control {
     margin: 0 auto !important;
 }
 
+@media (min-width: 769px) {
+    .pdf-modal-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+    .pdf-header-top {
+        width: auto;
+        flex: 1;
+    }
+    .pdf-header-controls {
+        width: auto;
+        justify-content: flex-end;
+    }
+}
+
 @media (max-width: 768px) {
     #pdfModal {
-        padding: 8px !important;
+        padding: 6px !important;
     }
     #pdfModal .modal-content {
-        max-width: 98vw !important;
+        width: 95vw !important;
+        max-width: 95vw !important;
         padding: 10px 10px !important;
         border-radius: 14px !important;
     }
     #pdfModal #pdfViewerContainer {
-        max-height: calc(94vh - 60px) !important;
+        max-height: calc(85vh - 90px) !important;
     }
 }
 

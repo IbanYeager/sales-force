@@ -433,75 +433,69 @@
   <!-- PDF Viewer Modal -->
   <!-- PDF Viewer Modal -->
   <div class="modal-overlay" id="pdfModal" style="align-items: center; justify-content: center; padding: 12px;">
-    <div class="modal-content pdf-modal-container"
-      style="width: fit-content !important; max-width: 95vw !important; height: auto !important; max-height: 94vh !important; padding: 12px 14px !important; display: flex !important; flex-direction: column !important; border-radius: 16px !important; box-shadow: 0 20px 50px rgba(0,0,0,0.3) !important;">
+    <div class="modal-content pdf-modal-container">
       
       <!-- Modal Header -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--border-color, #e2e8f0); gap:8px; width:100%; box-sizing:border-box;">
-        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-          <div style="width:32px; height:32px; border-radius:8px; background:rgba(227, 24, 55, 0.1); display:flex; align-items:center; justify-content:center; color:var(--primary-red, #E31837); font-size:15px; flex-shrink:0;">
-            <i class="fa-solid fa-file-pdf"></i>
+      <div class="pdf-modal-header">
+        <!-- Top Row: Title & Main Actions (Download, Share, Close) -->
+        <div class="pdf-header-top">
+          <div class="pdf-title-wrap">
+            <div class="pdf-icon-badge">
+              <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <div class="pdf-title-info">
+              <h3 id="pdfModalTitle">Lihat Brosur</h3>
+              <span>Brosur Resmi Toyota</span>
+            </div>
           </div>
-          <div style="min-width:0;">
-            <h3 style="margin:0; font-size:15px; font-weight:800; color:var(--text-dark, #0f172a); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2;" id="pdfModalTitle">Lihat Brosur</h3>
-            <span style="font-size:10.5px; color:#64748b; font-weight:500;">Brosur Resmi Toyota</span>
+
+          <div class="pdf-main-actions">
+            <a id="btnDownloadPdf" href="#" target="_blank" download title="Unduh File PDF" class="pdf-btn-action pdf-btn-download">
+              <i class="fa-solid fa-download"></i>
+            </a>
+            <button id="btnSharePdf" type="button" title="Bagikan ke WhatsApp" class="pdf-btn-action pdf-btn-share">
+              <i class="fa-solid fa-share-nodes"></i>
+            </button>
+            <button class="btn-close-modal pdf-btn-action pdf-btn-close" onclick="closePdfModal()" type="button" title="Tutup">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </div>
 
-        <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
-          <!-- Zoom Controls -->
-          <div class="pdf-zoom-bar" style="display:inline-flex; align-items:center; background:#f1f5f9; border-radius:8px; padding:2px 4px; gap:2px; border:1px solid #e2e8f0;">
-            <button type="button" onclick="zoomPdf(-0.2)" title="Perkecil (-)"
-              style="width:28px; height:28px; border-radius:6px; border:none; background:#ffffff; color:#334155; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 2px rgba(0,0,0,0.06);">
+        <!-- Secondary Controls: Page Navigation & Zoom Bar -->
+        <div class="pdf-header-controls">
+          <!-- Page Navigation -->
+          <div id="pdfControls" class="pdf-page-controls" style="display:none;">
+            <button id="btnPrevPdf" type="button" title="Halaman Sebelumnya" class="pdf-ctrl-btn">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="pdf-page-indicator">
+              Hal <span id="pdfPageNum">1</span>/<span id="pdfPageCount">-</span>
+            </span>
+            <button id="btnNextPdf" type="button" title="Halaman Selanjutnya" class="pdf-ctrl-btn">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- Zoom Bar -->
+          <div class="pdf-zoom-bar">
+            <button type="button" onclick="zoomPdf(-0.2)" title="Perkecil (-)" class="pdf-ctrl-btn">
               <i class="fa-solid fa-magnifying-glass-minus"></i>
             </button>
-            <span id="pdfZoomLabel" style="font-size:11px; font-weight:700; color:#334155; min-width:38px; text-align:center;">100%</span>
-            <button type="button" onclick="zoomPdf(0.2)" title="Perbesar (+)"
-              style="width:28px; height:28px; border-radius:6px; border:none; background:#ffffff; color:#334155; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 2px rgba(0,0,0,0.06);">
+            <span id="pdfZoomLabel" class="pdf-zoom-label">100%</span>
+            <button type="button" onclick="zoomPdf(0.2)" title="Perbesar (+)" class="pdf-ctrl-btn">
               <i class="fa-solid fa-magnifying-glass-plus"></i>
             </button>
-            <button type="button" onclick="fitPdfWidth()" title="Pas Ukuran (Fit)"
-              style="padding:0 6px; height:28px; border-radius:6px; border:none; background:#ffffff; color:#334155; font-size:10.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px; box-shadow:0 1px 2px rgba(0,0,0,0.06);">
+            <button type="button" onclick="fitPdfWidth()" title="Pas Layar" class="pdf-ctrl-btn pdf-btn-fit">
               <i class="fa-solid fa-arrows-left-right"></i> Fit
             </button>
           </div>
-
-          <!-- Page Navigation -->
-          <div id="pdfControls" style="display:none; align-items:center; gap:3px; background:#f1f5f9; border-radius:8px; padding:2px 4px; border:1px solid #e2e8f0;">
-            <button id="btnPrevPdf" type="button" title="Halaman Sebelumnya"
-              style="width:28px; height:28px; border-radius:6px; border:none; background:#ffffff; color:#334155; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 2px rgba(0,0,0,0.06);">
-              <i class="fa-solid fa-chevron-left" style="font-size:11px;"></i>
-            </button>
-            <span style="font-size:11px; font-weight:700; color:#334155; padding:0 3px; white-space:nowrap;">
-              Hal <span id="pdfPageNum" style="color:var(--primary-red, #E31837);">1</span>/<span id="pdfPageCount">-</span>
-            </span>
-            <button id="btnNextPdf" type="button" title="Halaman Selanjutnya"
-              style="width:28px; height:28px; border-radius:6px; border:none; background:#ffffff; color:#334155; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 2px rgba(0,0,0,0.06);">
-              <i class="fa-solid fa-chevron-right" style="font-size:11px;"></i>
-            </button>
-          </div>
-
-          <!-- Action Buttons -->
-          <a id="btnDownloadPdf" href="#" target="_blank" download title="Unduh File PDF"
-             style="width:30px; height:30px; border-radius:8px; border:none; background:#0284c7; color:#fff; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 2px 5px rgba(2,132,199,0.25);">
-            <i class="fa-solid fa-download" style="font-size:12px;"></i>
-          </a>
-          <button id="btnSharePdf" type="button" title="Bagikan ke WhatsApp"
-             style="width:30px; height:30px; border-radius:8px; border:none; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 5px rgba(37,211,102,0.25);">
-            <i class="fa-solid fa-share-nodes" style="font-size:12px;"></i>
-          </button>
-
-          <!-- Close Modal -->
-          <button class="btn-close-modal" onclick="closePdfModal()" type="button" title="Tutup"
-            style="width:30px; height:30px; border-radius:8px; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; margin-left:2px;">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
         </div>
       </div>
 
       <!-- Viewer Container -->
       <div id="pdfViewerContainer"
-        style="background:transparent; border:none; overflow-y:auto; overflow-x:auto; position:relative; display:flex; justify-content:center; align-items:center; padding:0; margin:0 auto; max-height:calc(92vh - 60px); -webkit-overflow-scrolling:touch;">
+        style="background:transparent; border:none; overflow-y:auto; overflow-x:auto; position:relative; display:flex; justify-content:center; align-items:center; padding:0; margin:0 auto; -webkit-overflow-scrolling:touch;">
         <div id="pdfLoading"
           style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; flex-direction:column; align-items:center; gap:8px; background:rgba(15,23,42,0.85); padding:14px 20px; border-radius:12px; z-index:10; backdrop-filter:blur(6px);">
           <i class="fa-solid fa-spinner fa-spin" style="font-size:24px; color:#38bdf8;"></i>
