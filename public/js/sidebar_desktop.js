@@ -259,7 +259,7 @@
                 ${navLink('pages/eco_calculator.html', 'fa-solid fa-leaf', 'Toyota Eco Calc (Hybrid)', 'eco hybrid bbm hemat emisi')}
                 ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°', 'komparasi lawan rival competitor banding')}
                 ${navLink('pages/brosur.html', 'fa-solid fa-book-open', 'Brosur Digital', 'brosur pdf katalog spesifikasi')}
-                ${navLink('pages/elibrary.html', 'fa-solid fa-book-medical', 'E-Library Panduan Sales', 'library panduan tips trik materi pelatihan')}
+                ${navLink('pages/elibrary.html', 'fa-solid fa-book-medical', 'E-Catalog', 'catalog ecatalog e-catalog library panduan tips trik materi pelatihan')}
                 ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Intelijen Pasar & Polreg', 'pasar market analisis wilayah pangsa polreg bbn plat kodepos kecamatan komplek')}
                 ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong', 'penjualan kircon kiara condong rekap cabang')}
 

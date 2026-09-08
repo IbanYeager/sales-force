@@ -51,10 +51,10 @@ $salesPages = [
 ];
 
 Route::get('/e-catalog', function () {
-    return app(PageController::class)->showSalesPage('catalog');
+    return app(PageController::class)->showSalesPage('elibrary');
 });
 Route::get('/katalog', function () {
-    return app(PageController::class)->showSalesPage('catalog');
+    return app(PageController::class)->showSalesPage('elibrary');
 });
 
 foreach ($salesPages as $page) {

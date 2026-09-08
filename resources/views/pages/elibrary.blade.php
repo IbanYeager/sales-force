@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sales App - E-Library</title>
+  <title>Sales App - E-Catalog</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/animations-premium.css">
@@ -18,7 +18,7 @@
   <div class="mobile-app" style="max-width: 1200px; margin: 0 auto; min-height: 100vh; background: #f8fafc;">
     <header class="header-page">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
-      <h2>E-Library (Product Knowledge)</h2>
+      <h2>E-Catalog</h2>
     </header>
 
     <div class="container" style="margin-top:18px;">

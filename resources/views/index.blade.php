@@ -102,7 +102,7 @@
                     <i class="fa-solid fa-leaf"></i> Toyota Eco Calc (Hybrid)
                 </a>
                 <a href="pages/elibrary.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-book-medical"></i> E-Library
+                    <i class="fa-solid fa-book-medical"></i> E-Catalog
                 </a>
                 <a href="pages/pricelist.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-clipboard-list"></i> Pricelist
@@ -855,13 +855,9 @@
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">Brosur Digital</span>
                             </a>
-                            <a href="pages/catalog.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-book-open-reader"></i></div>
-                                <span class="category-text">E-Catalog</span>
-                            </a>
                             <a href="pages/elibrary.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-book-medical"></i></div>
-                                <span class="category-text">E-Library</span>
+                                <span class="category-text">E-Catalog</span>
                             </a>
                             <a href="pages/market_analysis.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chart-pie"></i></div>
