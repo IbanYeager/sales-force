@@ -351,7 +351,7 @@
                                 <div class="category-icon"><i class="fa-solid fa-clipboard-list"></i></div>
                                 <span class="category-text">Pricelist OTR</span>
                             </a>
-                            <a href="pages/catalog.html" class="category-item">
+                            <a href="pages/elibrary.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-book-open-reader"></i></div>
                                 <span class="category-text">E-Catalog</span>
                             </a>
