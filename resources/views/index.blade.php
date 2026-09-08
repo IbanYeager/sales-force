@@ -175,6 +175,10 @@
 
             <!-- Bawah: Notifikasi & Profil -->
             <div class="sidebar-bottom">
+                <a href="javascript:void(0)" onclick="if(window.triggerPwaInstall) window.triggerPwaInstall();" class="sidebar-notif-btn" id="sidebarPwaInstallBtn" style="margin-bottom:4px; display:none; color: #cc1426; font-weight: 700;">
+                    <i class="fa-solid fa-download"></i>
+                    Install SFT App
+                </a>
                 <a href="pages/notifikasi.html" class="sidebar-notif-btn">
                     <i class="fa-regular fa-bell"></i>
                     Notifikasi
@@ -223,11 +227,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="bell-icon" onclick="window.location.href='pages/notifikasi.html'">
-                            <a href="pages/notifikasi.html" style="color: inherit;">
-                                <i class="fa-regular fa-bell"></i>
-                            </a>
-                            <div class="badge badge-count-red" id="bellBadge" style="display:none;">0</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="pwa-header-pill" id="pwaHeaderInstallPill" style="display: none;">
+                                <button type="button" onclick="if(window.triggerPwaInstall) window.triggerPwaInstall();" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #cc1426, #991b1b); color: #ffffff; border: none; border-radius: 20px; padding: 6px 12px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(204,20,38,0.35); font-family: inherit; transition: transform 0.2s;">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Install App</span>
+                                </button>
+                            </div>
+                            <div class="bell-icon" onclick="window.location.href='pages/notifikasi.html'">
+                                <a href="pages/notifikasi.html" style="color: inherit;">
+                                    <i class="fa-regular fa-bell"></i>
+                                </a>
+                                <div class="badge badge-count-red" id="bellBadge" style="display:none;">0</div>
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -758,6 +770,11 @@
                         </div>
 
                         <div class="category-grid feature-modal-grid">
+                            <!-- PWA Quick Install Tile -->
+                            <a href="javascript:void(0)" onclick="closeFeatureModal(); if(window.triggerPwaInstall) window.triggerPwaInstall();" class="category-item" id="featureModalPwaItem" style="display:none;">
+                                <div class="category-icon" style="background: rgba(204, 20, 38, 0.1); color: #cc1426;"><i class="fa-solid fa-download"></i></div>
+                                <span class="category-text">Install Aplikasi</span>
+                            </a>
                             <!-- Tier 1: Operasional Harian & Closing Transaksi (Paling Kritis) -->
                             <a href="pages/ao_report.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
@@ -1288,8 +1305,8 @@
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
-    <script src="js/auto_location_tracker.js?v=20260908_v7"></script>
-    <script src="./js/pwa-app.js?v=20260908_v7"></script>
+    <script src="js/auto_location_tracker.js?v=20260908_v8"></script>
+    <script src="./js/pwa-app.js?v=20260908_v8"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {

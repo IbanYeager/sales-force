@@ -152,6 +152,9 @@
 
                 <h3 class="section-title" style="margin-top:18px;">Pengaturan</h3>
                 <div class="card" style="padding:14px 18px;">
+                    <button id="btnPwaInstallProfil" class="btn-main" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px; background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);" onclick="if(window.triggerPwaInstall) window.triggerPwaInstall();">
+                        <i class="fa-solid fa-download" style="color:#ef4444;"></i> Install Aplikasi SFT (PWA)
+                    </button>
                     <button class="btn-main" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px; background: var(--primary-blue);" onclick="openEditProfilModal()">
                         <i class="fa-solid fa-user-pen"></i> Edit Profil & Link Sosmed
                     </button>
@@ -633,7 +636,7 @@
             window.location.href = 'login.html';
         };
     </script>
-  <script src="../js/pwa-app.js?v=20260907_layout_fix"></script>
+  <script src="../js/pwa-app.js?v=20260908_v8"></script>
 </body>
 
 </html>
