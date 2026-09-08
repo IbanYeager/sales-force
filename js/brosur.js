@@ -239,16 +239,16 @@ function updatePdfZoomDisplay() {
   }
 }
 
-function applyPdfCanvasSize() {
-  if (!canvas) return;
-  const container = document.getElementById('pdfViewerContainer');
-  const availableWidth = Math.max(320, (container ? container.clientWidth : window.innerWidth) - 36);
-  if (!pdfBaseFitWidth) pdfBaseFitWidth = availableWidth;
+let pdfBaseDisplayWidth = 0;
+let pdfBaseDisplayHeight = 0;
 
-  const targetWidth = Math.round(pdfBaseFitWidth * pdfCurrentZoom);
+function applyPdfCanvasSize() {
+  if (!canvas || !pdfBaseDisplayWidth) return;
+  const targetWidth = Math.round(pdfBaseDisplayWidth * pdfCurrentZoom);
+  const targetHeight = Math.round(pdfBaseDisplayHeight * pdfCurrentZoom);
   canvas.style.width = targetWidth + 'px';
+  canvas.style.height = targetHeight + 'px';
   canvas.style.maxWidth = 'none';
-  canvas.style.height = 'auto';
   updatePdfZoomDisplay();
 }
 
@@ -272,15 +272,23 @@ function renderPage(num) {
   if (loadingEl) loadingEl.style.display = 'flex';
 
   pdfDoc.getPage(num).then(page => {
-    const container = document.getElementById('pdfViewerContainer');
-    const containerWidth = Math.max(320, (container ? container.clientWidth : window.innerWidth) - 36);
-    pdfBaseFitWidth = containerWidth;
-
     const unscaledViewport = page.getViewport({ scale: 1.0 });
-    const fitScale = containerWidth / unscaledViewport.width;
 
-    // Render at crisp high-DPI (2.0x base scale) so text stays razor sharp when zoomed
-    const renderScale = fitScale * 2.0;
+    // Calculate maximum available space in viewport
+    const maxAvailW = Math.min(window.innerWidth * 0.90, 1050);
+    const maxAvailH = Math.min(window.innerHeight * 0.80, 800);
+
+    // Compute base scale that fits BOTH width and height snugly without empty letterboxes
+    const scaleW = maxAvailW / unscaledViewport.width;
+    const scaleH = maxAvailH / unscaledViewport.height;
+    const baseFitScale = Math.min(scaleW, scaleH);
+
+    // Exact display dimensions fitting the brochure proportions
+    pdfBaseDisplayWidth = Math.round(unscaledViewport.width * baseFitScale);
+    pdfBaseDisplayHeight = Math.round(unscaledViewport.height * baseFitScale);
+
+    // Render at crisp high-DPI (2.0x base scale)
+    const renderScale = baseFitScale * 2.0;
     const viewport = page.getViewport({ scale: renderScale });
 
     canvas.width = Math.floor(viewport.width);

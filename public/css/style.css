@@ -1781,26 +1781,60 @@ select.form-control {
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 }
 
-/* ── Expanded High-Clarity PDF Viewer Modal ── */
+/* ── Snug High-Clarity PDF Viewer Modal (Fits Brochure Proportions) ── */
+#pdfModal {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px !important;
+}
+
 #pdfModal .modal-content {
-    max-width: 1350px !important;
-    width: 96vw !important;
-    height: 93vh !important;
-    max-height: 95vh !important;
-    padding: 14px 18px !important;
+    width: -moz-fit-content !important;
+    width: fit-content !important;
+    max-width: 95vw !important;
+    height: auto !important;
+    max-height: 94vh !important;
+    padding: 12px 16px !important;
     display: flex !important;
     flex-direction: column !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
     overflow: hidden !important;
-    border-radius: 20px !important;
+    box-sizing: border-box !important;
+}
+
+#pdfModal #pdfViewerContainer {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: auto !important;
+    max-height: calc(92vh - 65px) !important;
+    max-width: 100% !important;
+}
+
+#pdfModal #pdfCanvas {
+    display: block !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    background: #ffffff !important;
+    margin: 0 auto !important;
 }
 
 @media (max-width: 768px) {
+    #pdfModal {
+        padding: 8px !important;
+    }
     #pdfModal .modal-content {
-        width: 98vw !important;
-        height: 95vh !important;
-        max-height: 96vh !important;
-        padding: 10px 12px !important;
+        max-width: 98vw !important;
+        padding: 10px 10px !important;
         border-radius: 14px !important;
+    }
+    #pdfModal #pdfViewerContainer {
+        max-height: calc(94vh - 60px) !important;
     }
 }
 
