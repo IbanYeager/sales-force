@@ -13,7 +13,7 @@ let pwaRefreshing = false;
 
 // 1. SMART AUTO-UPDATING SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
-    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20260908_v7' : 'sw.js?v=20260908_v7';
+    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20260908_v10' : 'sw.js?v=20260908_v10';
 
     navigator.serviceWorker.register(swPath)
         .then(registration => {
@@ -286,170 +286,17 @@ function updateAllPwaInstallButtons() {
     }
 }
 
-// Render floating install banner jika belum terpasang
+// Render floating install banner dinonaktifkan permanen per instruksi user agar tampilan iPhone & mobile bersih
 function renderPwaBanner() {
-    if (isAppInstalled()) return;
-
-    // Jangan tampilkan di halaman formulir, cetak, atau publik
-    const pathLower = window.location.pathname.toLowerCase();
-    if (pathLower.includes('cetak') || pathLower.includes('print') || pathLower.includes('dokumen') || pathLower.includes('formulir') || pathLower.includes('track_public') || pathLower.includes('public_card')) {
-        return;
-    }
-
-    // Jangan tampilkan jika user sudah pernah menutup banner di sesi ini
-    if (sessionStorage.getItem('pwaPromptDismissed') === 'true') {
-        return;
-    }
-
-    let installContainer = document.getElementById('custom-install-container');
-    if (installContainer) return;
-
-    if (!document.getElementById('pwaInstallStyles')) {
-        const styleElement = document.createElement('style');
-        styleElement.id = 'pwaInstallStyles';
-        styleElement.textContent = `
-            @keyframes slideUpPwa {
-                from { transform: translateY(20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-            @keyframes slideDownPwa {
-                from { transform: translateY(-20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-            #custom-install-container {
-                position: fixed !important;
-                bottom: 24px !important;
-                left: 288px !important;
-                right: auto !important;
-                top: auto !important;
-                z-index: 99980 !important;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                background: #0f172a;
-                color: #ffffff;
-                padding: 11px 16px;
-                border-radius: 14px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                font-family: 'Inter', sans-serif;
-                max-width: 360px;
-                animation: slideUpPwa 0.4s ease-out;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            @media (min-width: 1024px) {
-                #custom-install-container {
-                    left: 290px !important;
-                    right: auto !important;
-                    bottom: 24px !important;
-                    top: auto !important;
-                }
-            }
-            @media (min-width: 768px) and (max-width: 1023px) {
-                #custom-install-container {
-                    left: 96px !important;
-                    right: auto !important;
-                    bottom: 24px !important;
-                    top: auto !important;
-                }
-            }
-            @media (max-width: 767px) {
-                #custom-install-container {
-                    top: 64px !important;
-                    bottom: auto !important;
-                    left: 12px !important;
-                    right: 12px !important;
-                    max-width: min(440px, calc(100vw - 24px)) !important;
-                    margin: 0 auto !important;
-                    padding: 9px 12px !important;
-                    border-radius: 14px !important;
-                    z-index: 99990 !important;
-                    animation: slideDownPwa 0.35s ease-out !important;
-                }
-            }
-        `;
-        document.head.appendChild(styleElement);
-    }
-
-    installContainer = document.createElement('div');
-    installContainer.id = 'custom-install-container';
-
-    installContainer.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 9px; cursor: pointer; flex: 1; min-width: 0;" id="pwaClickArea">
-            <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(215, 18, 58, 0.2); border: 1px solid rgba(215, 18, 58, 0.4); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 15px; flex-shrink: 0;">
-                <i class="fa-solid fa-download"></i>
-            </div>
-            <div style="min-width: 0; flex: 1;">
-                <div style="font-size: 12.5px; font-weight: 800; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Install Aplikasi SFT</div>
-                <div style="font-size: 10px; opacity: 0.8; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Akses lebih cepat & offline</div>
-            </div>
-        </div>
-        <button type="button" id="pwaCloseBtn" style="background: rgba(255,255,255,0.1); border: none; color: #94a3b8; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; transition: all 0.2s; flex-shrink: 0; margin-left: 6px;" title="Tutup">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-    `;
-
-    document.body.appendChild(installContainer);
-    document.body.classList.add('has-pwa-install');
-
-    function positionPwaInstall() {
-        if (!installContainer) return;
-        if (window.innerWidth >= 1024) {
-            const sidebar = document.getElementById('desktopSidebar') || document.querySelector('.desktop-sidebar');
-            if (sidebar && sidebar.offsetWidth > 0 && window.getComputedStyle(sidebar).display !== 'none') {
-                installContainer.style.setProperty('left', (sidebar.offsetWidth + 20) + 'px', 'important');
-            } else {
-                installContainer.style.setProperty('left', '24px', 'important');
-            }
-            installContainer.style.setProperty('right', 'auto', 'important');
-            installContainer.style.setProperty('bottom', '24px', 'important');
-            installContainer.style.setProperty('top', 'auto', 'important');
-        } else if (window.innerWidth >= 768) {
-            const sidebar = document.getElementById('desktopSidebar') || document.querySelector('.desktop-sidebar');
-            if (sidebar && sidebar.offsetWidth > 0 && window.getComputedStyle(sidebar).display !== 'none') {
-                installContainer.style.setProperty('left', (sidebar.offsetWidth + 16) + 'px', 'important');
-            } else {
-                installContainer.style.setProperty('left', '16px', 'important');
-            }
-            installContainer.style.setProperty('right', 'auto', 'important');
-            installContainer.style.setProperty('bottom', '24px', 'important');
-            installContainer.style.setProperty('top', 'auto', 'important');
-        } else {
-            installContainer.style.setProperty('left', '12px', 'important');
-            installContainer.style.setProperty('right', '12px', 'important');
-            installContainer.style.setProperty('top', '64px', 'important');
-            installContainer.style.setProperty('bottom', 'auto', 'important');
-        }
-    }
-
-    positionPwaInstall();
-    window.addEventListener('resize', positionPwaInstall);
-
-    // Klik area banner memanggil trigger install universal
-    const clickArea = document.getElementById('pwaClickArea');
-    if (clickArea) {
-        clickArea.addEventListener('click', () => {
-            window.triggerPwaInstall();
-        });
-    }
-
-    // Klik tombol tutup
-    const closeBtn = document.getElementById('pwaCloseBtn');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', (evt) => {
-            evt.stopPropagation();
-            sessionStorage.setItem('pwaPromptDismissed', 'true');
-            installContainer.remove();
-            document.body.classList.remove('has-pwa-install');
-        });
-    }
+    const installContainer = document.getElementById('custom-install-container');
+    if (installContainer) installContainer.remove();
+    document.body.classList.remove('has-pwa-install');
 }
 
 // Menangkap event sebelum prompt install dari browser (Chromium/Android)
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    renderPwaBanner();
     updateAllPwaInstallButtons();
 });
 
@@ -465,9 +312,16 @@ window.addEventListener('appinstalled', () => {
 
 // Inisialisasi awal saat DOM siap
 document.addEventListener('DOMContentLoaded', () => {
+    // Pastikan tidak ada banner melayang atau tombol install di header / fitur modal
+    const installContainer = document.getElementById('custom-install-container');
+    if (installContainer) installContainer.remove();
+    document.body.classList.remove('has-pwa-install');
+
+    const headerPill = document.getElementById('pwaHeaderInstallPill');
+    if (headerPill) headerPill.remove();
+
+    const featureTile = document.getElementById('featureModalPwaItem');
+    if (featureTile) featureTile.remove();
+
     updateAllPwaInstallButtons();
-    setTimeout(() => {
-        renderPwaBanner();
-        updateAllPwaInstallButtons();
-    }, 1200);
 });
