@@ -3164,10 +3164,13 @@ tbody tr:last-child td {
 
 /* Multi-Share Bar Active: elevate floating right buttons so they never collide */
 body.has-multi-share-bar #btnToggleAiCopilot {
-    bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: calc(175px + env(safe-area-inset-bottom, 0px)) !important;
 }
 body.has-multi-share-bar .sft-scroll-top-btn {
-    bottom: calc(210px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: calc(235px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.has-multi-share-bar .mobile-app {
+    padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 /* Standard & Compact Smartphones (<= 480px) */
