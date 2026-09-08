@@ -351,17 +351,17 @@
                                 <div class="category-icon"><i class="fa-solid fa-clipboard-list"></i></div>
                                 <span class="category-text">Pricelist OTR</span>
                             </a>
-                            <a href="pages/kalkulator.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-calculator"></i></div>
-                                <span class="category-text">Kalkulator Kredit</span>
+                            <a href="pages/elibrary.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-book-medical"></i></div>
+                                <span class="category-text">E-Library</span>
                             </a>
-                            <a href="pages/inventory.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-warehouse"></i></div>
-                                <span class="category-text">Live Inventory</span>
+                            <a href="pages/brosur.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
+                                <span class="category-text">Brosur Digital</span>
                             </a>
-                            <a href="pages/customer.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-users"></i></div>
-                                <span class="category-text">Customer CRM</span>
+                            <a href="pages/promo.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-percent"></i></div>
+                                <span class="category-text">Promo &amp; Tenor</span>
                             </a>
                         </div>
                     </div>
