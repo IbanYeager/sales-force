@@ -3162,15 +3162,27 @@ tbody tr:last-child td {
     }
 }
 
-/* Multi-Share Bar Active: elevate floating right buttons so they never collide */
-body.has-multi-share-bar #btnToggleAiCopilot {
-    bottom: calc(175px + env(safe-area-inset-bottom, 0px)) !important;
+/* Multi-Share Bar Active: elevate floating right buttons on mobile only so they never collide */
+@media (max-width: 768px) {
+    body.has-multi-share-bar #btnToggleAiCopilot {
+        bottom: calc(175px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    body.has-multi-share-bar .sft-scroll-top-btn {
+        bottom: calc(235px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    body.has-multi-share-bar .mobile-app {
+        padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px)) !important;
+    }
 }
-body.has-multi-share-bar .sft-scroll-top-btn {
-    bottom: calc(235px + env(safe-area-inset-bottom, 0px)) !important;
-}
-body.has-multi-share-bar .mobile-app {
-    padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px)) !important;
+@media (min-width: 769px) {
+    body.has-multi-share-bar #btnToggleAiCopilot {
+        bottom: 24px !important;
+        right: 24px !important;
+    }
+    body.has-multi-share-bar .sft-scroll-top-btn {
+        bottom: 84px !important;
+        right: 24px !important;
+    }
 }
 
 /* Standard & Compact Smartphones (<= 480px) */

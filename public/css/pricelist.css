@@ -742,10 +742,10 @@
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
     }
 
-    /* Floating Multi-Share Bar */
+    /* Floating Multi-Share Bar (Desktop Default) */
     .multi-share-bar {
       position: fixed;
-      bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+      bottom: 24px !important;
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 32px);
@@ -764,14 +764,32 @@
       to { opacity: 1; transform: translate(-50%, 0); }
     }
 
-    body.has-multi-share-bar #btnToggleAiCopilot {
-      bottom: calc(175px + env(safe-area-inset-bottom, 0px)) !important;
+    /* On Desktop: keep T-STOCK AI and scroll-to-top at normal bottom right */
+    @media (min-width: 769px) {
+      body.has-multi-share-bar #btnToggleAiCopilot {
+        bottom: 24px !important;
+        right: 24px !important;
+      }
+      body.has-multi-share-bar .sft-scroll-top-btn {
+        bottom: 84px !important;
+        right: 24px !important;
+      }
     }
-    body.has-multi-share-bar .sft-scroll-top-btn {
-      bottom: calc(235px + env(safe-area-inset-bottom, 0px)) !important;
-    }
-    body.has-multi-share-bar .mobile-app {
-      padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px)) !important;
+
+    /* On Mobile / Tablet: lift multi-share-bar and FABs above bottom dock */
+    @media (max-width: 768px) {
+      .multi-share-bar {
+        bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      body.has-multi-share-bar #btnToggleAiCopilot {
+        bottom: calc(175px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      body.has-multi-share-bar .sft-scroll-top-btn {
+        bottom: calc(235px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      body.has-multi-share-bar .mobile-app {
+        padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px)) !important;
+      }
     }
 
     .msb-content {
