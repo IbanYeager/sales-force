@@ -351,9 +351,9 @@
                                 <div class="category-icon"><i class="fa-solid fa-clipboard-list"></i></div>
                                 <span class="category-text">Pricelist OTR</span>
                             </a>
-                            <a href="pages/elibrary.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-book-medical"></i></div>
-                                <span class="category-text">E-Library</span>
+                            <a href="pages/catalog.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+                                <span class="category-text">E-Catalog</span>
                             </a>
                             <a href="pages/brosur.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
@@ -859,6 +859,10 @@
                             <a href="pages/brosur.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">Brosur Digital</span>
+                            </a>
+                            <a href="pages/catalog.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+                                <span class="category-text">E-Catalog</span>
                             </a>
                             <a href="pages/elibrary.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-book-medical"></i></div>
