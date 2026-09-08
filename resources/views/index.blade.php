@@ -227,19 +227,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div class="pwa-header-pill" id="pwaHeaderInstallPill" style="display: none;">
-                                <button type="button" onclick="if(window.triggerPwaInstall) window.triggerPwaInstall();" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #cc1426, #991b1b); color: #ffffff; border: none; border-radius: 20px; padding: 6px 12px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(204,20,38,0.35); font-family: inherit; transition: transform 0.2s;">
-                                    <i class="fa-solid fa-download"></i>
-                                    <span>Install App</span>
-                                </button>
-                            </div>
-                            <div class="bell-icon" onclick="window.location.href='pages/notifikasi.html'">
-                                <a href="pages/notifikasi.html" style="color: inherit;">
-                                    <i class="fa-regular fa-bell"></i>
-                                </a>
-                                <div class="badge badge-count-red" id="bellBadge" style="display:none;">0</div>
-                            </div>
+                        <div class="bell-icon" onclick="window.location.href='pages/notifikasi.html'">
+                            <a href="pages/notifikasi.html" style="color: inherit;">
+                                <i class="fa-regular fa-bell"></i>
+                            </a>
+                            <div class="badge badge-count-red" id="bellBadge" style="display:none;">0</div>
                         </div>
                     </div>
                 </header>

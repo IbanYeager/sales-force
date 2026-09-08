@@ -265,13 +265,7 @@ window.triggerPwaInstall = async function() {
 function updateAllPwaInstallButtons() {
     const installed = isAppInstalled();
 
-    // 1. Header Home Mobile Pill
-    const headerPill = document.getElementById('pwaHeaderInstallPill');
-    if (headerPill) {
-        headerPill.style.display = installed ? 'none' : 'inline-flex';
-    }
-
-    // 2. Tombol di Halaman Profil
+    // 1. Tombol di Halaman Profil
     const btnProfil = document.getElementById('btnPwaInstallProfil');
     if (btnProfil) {
         if (installed) {
