@@ -1781,6 +1781,29 @@ select.form-control {
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 }
 
+/* ── Expanded High-Clarity PDF Viewer Modal ── */
+#pdfModal .modal-content {
+    max-width: 1350px !important;
+    width: 96vw !important;
+    height: 93vh !important;
+    max-height: 95vh !important;
+    padding: 14px 18px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border-radius: 20px !important;
+}
+
+@media (max-width: 768px) {
+    #pdfModal .modal-content {
+        width: 98vw !important;
+        height: 95vh !important;
+        max-height: 96vh !important;
+        padding: 10px 12px !important;
+        border-radius: 14px !important;
+    }
+}
+
 .modal-overlay.show {
     opacity: 1;
     visibility: visible;

@@ -140,49 +140,91 @@
   </div>
 
   <!-- PDF Viewer Modal -->
-  <div class="modal-overlay" id="pdfModal" style="align-items: center;">
-    <div class="modal-content"
-      style="max-width:1000px; width:95%; max-height:95vh; height:auto; padding:15px; display:flex; flex-direction:column;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <h3 style="margin:0; font-size:16px; font-weight:800;" id="pdfModalTitle">Lihat Brosur</h3>
+  <div class="modal-overlay" id="pdfModal" style="align-items: center; padding: 10px;">
+    <div class="modal-content pdf-modal-container"
+      style="max-width: 1350px !important; width: 96vw !important; height: 93vh !important; max-height: 95vh !important; padding: 14px 18px !important; display: flex !important; flex-direction: column !important; border-radius: 20px !important; box-shadow: 0 25px 60px rgba(0,0,0,0.35) !important;">
+      
+      <!-- Modal Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color, #e2e8f0); flex-wrap: wrap; gap: 8px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(227, 24, 55, 0.1); display:flex; align-items:center; justify-content:center; color:var(--primary-red, #E31837); font-size:18px;">
+            <i class="fa-solid fa-file-pdf"></i>
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-dark, #0f172a); line-height:1.2;" id="pdfModalTitle">Lihat Brosur</h3>
+            <span style="font-size:11px; color:#64748b; font-weight:500;">Brosur Resmi Toyota &bull; Kualitas Tajam</span>
+          </div>
+        </div>
 
-        <div style="display:flex; align-items:center; gap:8px;">
-          <a id="btnDownloadPdf" href="#" target="_blank" download
-             style="width:36px; height:36px; border-radius:6px; border:none; background:var(--primary-blue); color:#fff; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
+          <!-- Zoom Controls -->
+          <div class="pdf-zoom-bar" style="display:inline-flex; align-items:center; background:#f1f5f9; border-radius:10px; padding:3px 6px; gap:4px; border:1px solid #e2e8f0;">
+            <button type="button" onclick="zoomPdf(-0.2)" title="Perkecil (-)"
+              style="width:30px; height:30px; border-radius:8px; border:none; background:#ffffff; color:#334155; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); transition:background 0.2s;">
+              <i class="fa-solid fa-magnifying-glass-minus"></i>
+            </button>
+            <span id="pdfZoomLabel" style="font-size:11.5px; font-weight:700; color:#334155; min-width:44px; text-align:center;">100%</span>
+            <button type="button" onclick="zoomPdf(0.2)" title="Perbesar (+)"
+              style="width:30px; height:30px; border-radius:8px; border:none; background:#ffffff; color:#334155; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); transition:background 0.2s;">
+              <i class="fa-solid fa-magnifying-glass-plus"></i>
+            </button>
+            <button type="button" onclick="fitPdfWidth()" title="Sesuaikan Lebar (Fit Width)"
+              style="padding:0 8px; height:30px; border-radius:8px; border:none; background:#ffffff; color:#334155; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(0,0,0,0.06); transition:background 0.2s;">
+              <i class="fa-solid fa-arrows-left-right"></i> Fit
+            </button>
+          </div>
+
+          <!-- Page Navigation -->
+          <div id="pdfControls" style="display:none; align-items:center; gap:6px; background:#f1f5f9; border-radius:10px; padding:3px 6px; border:1px solid #e2e8f0;">
+            <button id="btnPrevPdf" type="button" title="Halaman Sebelumnya"
+              style="width:30px; height:30px; border-radius:8px; border:none; background:#ffffff; color:#334155; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span style="font-size:11.5px; font-weight:700; color:#334155; padding:0 4px; white-space:nowrap;">
+              Hal <span id="pdfPageNum" style="color:var(--primary-red, #E31837);">1</span>/<span id="pdfPageCount">-</span>
+            </span>
+            <button id="btnNextPdf" type="button" title="Halaman Selanjutnya"
+              style="width:30px; height:30px; border-radius:8px; border:none; background:#ffffff; color:#334155; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- Action Buttons -->
+          <a id="btnDownloadPdf" href="#" target="_blank" download title="Unduh File PDF"
+             style="width:36px; height:36px; border-radius:10px; border:none; background:#0284c7; color:#fff; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 2px 6px rgba(2,132,199,0.3); transition:transform 0.15s;">
             <i class="fa-solid fa-download"></i>
           </a>
-          <button id="btnSharePdf" type="button"
-             style="width:36px; height:36px; border-radius:6px; border:none; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="shareBrosurModal()">
+          <button id="btnSharePdf" type="button" title="Bagikan ke WhatsApp"
+             style="width:36px; height:36px; border-radius:10px; border:none; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(37,211,102,0.3); transition:transform 0.15s;">
             <i class="fa-solid fa-share-nodes"></i>
           </button>
 
-          <div id="pdfControls" style="display:none; align-items:center; gap:8px; margin-left: 10px; padding-left:10px; border-left:1px solid var(--border-color);">
-            <button id="btnPrevPdf"
-              style="width:30px; height:30px; border-radius:6px; border:1px solid var(--border-color); background:#fff; cursor:pointer;"><i
-                class="fa-solid fa-chevron-left"></i></button>
-            <span style="font-size:12px; font-weight:bold; color:var(--text-dark);">Hal <span
-                id="pdfPageNum">1</span>/<span id="pdfPageCount">-</span></span>
-            <button id="btnNextPdf"
-              style="width:30px; height:30px; border-radius:6px; border:1px solid var(--border-color); background:#fff; cursor:pointer;"><i
-                class="fa-solid fa-chevron-right"></i></button>
-          </div>
-
-          <button class="btn-close-modal" onclick="closePdfModal()" style="margin-left:8px;">
+          <!-- Close Modal -->
+          <button class="btn-close-modal" onclick="closePdfModal()" type="button" title="Tutup"
+            style="width:36px; height:36px; border-radius:10px; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; margin-left:4px; transition:all 0.2s;">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
       </div>
+
+      <!-- Viewer Container -->
       <div id="pdfViewerContainer"
-        style="flex:1; background:#cbd5e1; border-radius:12px; border:1px solid var(--border-color); overflow-y:auto; overflow-x:auto; position:relative; text-align:center; padding:4px;">
+        style="flex:1; min-height:0; height:100%; background:#1e293b; border-radius:14px; border:1px solid #334155; overflow-y:auto; overflow-x:auto; position:relative; display:flex; justify-content:center; align-items:flex-start; padding:16px; -webkit-overflow-scrolling:touch;">
         <div id="pdfLoading"
-          style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; flex-direction:column; align-items:center;">
-          <i class="fa-solid fa-spinner fa-spin"
-            style="font-size:24px; color:var(--primary-red); margin-bottom:10px;"></i>
-          <span style="font-size:12px; font-weight:600; color:var(--text-dark);">Memuat PDF...</span>
+          style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; flex-direction:column; align-items:center; gap:10px; background:rgba(15,23,42,0.85); padding:18px 26px; border-radius:14px; border:1px solid #334155; z-index:10; backdrop-filter:blur(6px);">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size:28px; color:#38bdf8;"></i>
+          <span style="font-size:13px; font-weight:600; color:#f8fafc; letter-spacing:0.3px;">Memuat Brosur...</span>
         </div>
         <canvas id="pdfCanvas"
-          style="box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius:4px; margin: 0 auto; display: block; max-width: 100%;"></canvas>
+          style="box-shadow: 0 12px 36px rgba(0,0,0,0.45); border-radius:6px; margin: auto; display: block; background:#ffffff; transition: width 0.18s ease-out;"></canvas>
       </div>
+
+      <!-- Footer Quick Note -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; font-size:11px; color:#94a3b8;">
+        <span><i class="fa-solid fa-circle-info" style="margin-right:4px;"></i> Gunakan tombol zoom atau ketuk brosur untuk perbesar tampilan</span>
+        <span class="desktop-only"><kbd style="background:#e2e8f0; color:#475569; padding:1px 5px; border-radius:4px; font-size:10px;">+/-</kbd> Zoom &bull; <kbd style="background:#e2e8f0; color:#475569; padding:1px 5px; border-radius:4px; font-size:10px;">&larr;/&rarr;</kbd> Ganti Hal</span>
+      </div>
+
     </div>
   </div>
 

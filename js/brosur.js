@@ -183,24 +183,22 @@ let pdfDoc = null,
 let canvas = null,
   ctx = null;
 
+let pdfCurrentZoom = 1.0;
+let pdfBaseFitWidth = 0;
+
 function getPdfCanvas() {
   if (!canvas) {
     canvas = document.getElementById('pdfCanvas');
     if (canvas) {
       ctx = canvas.getContext('2d');
+      // Tap/click canvas to zoom in or zoom out
       canvas.addEventListener('click', () => {
         if (!canvas || !pdfDoc) return;
-        const dataUrl = canvas.toDataURL('image/png');
-        const lbImg = document.getElementById('pdfLightboxImg');
-        const lbBg = document.getElementById('pdfLightboxBg');
-        if (lbImg) lbImg.src = dataUrl;
-        if (lbBg) lbBg.style.backgroundImage = `url(${dataUrl})`;
-        const pNum = document.getElementById('pdfLightboxPageNum');
-        if (pNum) pNum.textContent = pageNum;
-        const pCount = document.getElementById('pdfLightboxPageCount');
-        if (pCount) pCount.textContent = pdfDoc.numPages;
-        const lb = document.getElementById('pdfLightbox');
-        if (lb) lb.classList.add('show');
+        if (pdfCurrentZoom <= 1.05) {
+          window.zoomPdf(0.4);
+        } else {
+          window.fitPdfWidth();
+        }
       });
     }
   }
@@ -215,43 +213,94 @@ if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 }
 
+window.zoomPdf = function (delta) {
+  if (!pdfDoc) return;
+  let newZoom = Math.round((pdfCurrentZoom + delta) * 10) / 10;
+  if (newZoom < 0.6) newZoom = 0.6;
+  if (newZoom > 3.0) newZoom = 3.0;
+  if (newZoom === pdfCurrentZoom) return;
+  pdfCurrentZoom = newZoom;
+  updatePdfZoomDisplay();
+  applyPdfCanvasSize();
+};
+
+window.fitPdfWidth = function () {
+  if (!pdfDoc) return;
+  pdfCurrentZoom = 1.0;
+  updatePdfZoomDisplay();
+  applyPdfCanvasSize();
+};
+
+function updatePdfZoomDisplay() {
+  const lbl = document.getElementById('pdfZoomLabel');
+  if (lbl) lbl.textContent = Math.round(pdfCurrentZoom * 100) + '%';
+  if (canvas) {
+    canvas.style.cursor = pdfCurrentZoom <= 1.05 ? 'zoom-in' : 'zoom-out';
+  }
+}
+
+function applyPdfCanvasSize() {
+  if (!canvas) return;
+  const container = document.getElementById('pdfViewerContainer');
+  const availableWidth = Math.max(320, (container ? container.clientWidth : window.innerWidth) - 36);
+  if (!pdfBaseFitWidth) pdfBaseFitWidth = availableWidth;
+
+  const targetWidth = Math.round(pdfBaseFitWidth * pdfCurrentZoom);
+  canvas.style.width = targetWidth + 'px';
+  canvas.style.maxWidth = 'none';
+  canvas.style.height = 'auto';
+  updatePdfZoomDisplay();
+}
+
+let currentRenderTask = null;
+
 function renderPage(num) {
+  if (currentRenderTask) {
+    try {
+      currentRenderTask.cancel();
+    } catch (e) {}
+    currentRenderTask = null;
+  }
   pageIsRendering = true;
   getPdfCanvas();
-  if (!canvas || !ctx) {
+  if (!canvas || !ctx || !pdfDoc) {
     pageIsRendering = false;
     return;
   }
+
+  const loadingEl = document.getElementById('pdfLoading');
+  if (loadingEl) loadingEl.style.display = 'flex';
+
   pdfDoc.getPage(num).then(page => {
-    // Calculate dynamic scale to fit the container width
     const container = document.getElementById('pdfViewerContainer');
-    const padding = 24; // 10px padding on each side + some safe margin
-    const containerWidth = (container ? container.clientWidth : window.innerWidth) - padding;
+    const containerWidth = Math.max(320, (container ? container.clientWidth : window.innerWidth) - 36);
+    pdfBaseFitWidth = containerWidth;
 
     const unscaledViewport = page.getViewport({ scale: 1.0 });
-    const scaleToFit = Math.max(0.5, containerWidth / unscaledViewport.width);
+    const fitScale = containerWidth / unscaledViewport.width;
 
-    // Render at a higher resolution (e.g., 2.5x of the fitted size) for sharpness when zoomed
-    const renderScale = scaleToFit * 2.5;
+    // Render at crisp high-DPI (2.0x base scale) so text stays razor sharp when zoomed
+    const renderScale = fitScale * 2.0;
     const viewport = page.getViewport({ scale: renderScale });
 
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    // Keep it responsive
-    canvas.style.width = containerWidth + 'px';
-    canvas.style.maxWidth = '100%';
-    canvas.style.cursor = 'zoom-in';
-    canvas.style.height = 'auto';
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    applyPdfCanvasSize();
 
     const renderCtx = { canvasContext: ctx, viewport: viewport };
-    page.render(renderCtx).promise.then(() => {
+    currentRenderTask = page.render(renderCtx);
+    currentRenderTask.promise.then(() => {
       pageIsRendering = false;
+      currentRenderTask = null;
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (canvas) canvas.style.display = 'block';
+
       if (pageNumIsPending !== null) {
         renderPage(pageNumIsPending);
         pageNumIsPending = null;
       }
 
-      // Update lightbox if it is open
+      // Update lightbox if active
       const lightbox = document.getElementById('pdfLightbox');
       if (lightbox && lightbox.classList.contains('show')) {
         const dataUrl = canvas.toDataURL('image/png');
@@ -262,9 +311,22 @@ function renderPage(num) {
         const pNum = document.getElementById('pdfLightboxPageNum');
         if (pNum) pNum.textContent = num;
       }
+    }).catch(err => {
+      if (err && err.name === 'RenderingCancelledException') {
+        return;
+      }
+      console.error("page.render error:", err);
+      pageIsRendering = false;
+      currentRenderTask = null;
+      if (loadingEl) loadingEl.style.display = 'none';
     });
+
     const pNumEl = document.getElementById('pdfPageNum');
     if (pNumEl) pNumEl.textContent = num;
+  }).catch(err => {
+    console.error("pdfDoc.getPage error:", err);
+    pageIsRendering = false;
+    if (loadingEl) loadingEl.style.display = 'none';
   });
 }
 
@@ -299,13 +361,44 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnNextLb) btnNextLb.addEventListener('click', showNextPage);
 });
 
+// Keyboard Navigation & Shortcuts
+document.addEventListener('keydown', (e) => {
+  const modal = document.getElementById('pdfModal');
+  if (!modal || !modal.classList.contains('show')) return;
+
+  if (e.key === 'Escape') {
+    closePdfModal();
+  } else if (e.key === 'ArrowLeft') {
+    showPrevPage();
+  } else if (e.key === 'ArrowRight') {
+    showNextPage();
+  } else if (e.key === '+' || e.key === '=') {
+    zoomPdf(0.2);
+  } else if (e.key === '-' || e.key === '_') {
+    zoomPdf(-0.2);
+  }
+});
+
+let pdfResizeTimer = null;
+window.addEventListener('resize', () => {
+  const modal = document.getElementById('pdfModal');
+  if (modal && modal.classList.contains('show') && pdfDoc) {
+    clearTimeout(pdfResizeTimer);
+    pdfResizeTimer = setTimeout(() => {
+      renderPage(pageNum);
+    }, 200);
+  }
+});
+
 window.closePdfLightbox = function () {
   const lb = document.getElementById('pdfLightbox');
   if (lb) lb.classList.remove('show');
 };
 
 window.openPdfModal = function (nama, url) {
-  const finalUrl = url.startsWith('http') ? url : '../' + url;
+  const cleanFilename = (url || '').split('/').pop().split('?')[0];
+  const finalUrl = url.startsWith('http') ? url : `../uploads/brosur/${cleanFilename}`;
+  const proxyUrl = `../api/proxy_pdf.php?file=${encodeURIComponent(cleanFilename)}`;
 
   // Set Download & Share attributes
   const captionText = getSalesBrochureCaption(nama);
@@ -325,43 +418,74 @@ window.openPdfModal = function (nama, url) {
   document.getElementById('pdfModalTitle').textContent = nama;
   document.getElementById('pdfModal').classList.add('show');
   document.body.style.overflow = 'hidden';
+
   const loadingEl = document.getElementById('pdfLoading');
   const controlsEl = document.getElementById('pdfControls');
 
-  loadingEl.style.display = 'flex';
-  controlsEl.style.display = 'none';
-  canvas.style.display = 'none';
+  if (loadingEl) {
+    loadingEl.innerHTML = `
+      <i class="fa-solid fa-spinner fa-spin" style="font-size:28px; color:#38bdf8;"></i>
+      <span style="font-size:13px; font-weight:600; color:#f8fafc; letter-spacing:0.3px;">Memuat Brosur...</span>
+    `;
+    loadingEl.style.display = 'flex';
+  }
+  if (controlsEl) controlsEl.style.display = 'none';
+  getPdfCanvas();
+  if (canvas) canvas.style.display = 'none';
 
-  // Load PDF via PHP proxy to bypass IDM/Download Managers
-  const proxyUrl = '../api/proxy_pdf.php?file=' + encodeURIComponent(url);
+  // Reset zoom
+  pdfCurrentZoom = 1.0;
+  updatePdfZoomDisplay();
 
   if (window.pdfjsLib) {
-    pdfjsLib.getDocument(proxyUrl).promise.then(pdfDoc_ => {
+    // Try direct native static URL first (native HTTP 206 Partial Content in Apache)
+    pdfjsLib.getDocument(finalUrl).promise.then(pdfDoc_ => {
       pdfDoc = pdfDoc_;
-      document.getElementById('pdfPageCount').textContent = pdfDoc.numPages;
-      controlsEl.style.display = 'flex';
-      loadingEl.style.display = 'none';
-      canvas.style.display = 'block';
+      const pCount = document.getElementById('pdfPageCount');
+      if (pCount) pCount.textContent = pdfDoc.numPages;
+      if (controlsEl) controlsEl.style.display = 'flex';
 
       pageNum = 1;
       renderPage(pageNum);
     }).catch(err => {
-      console.error("PDF load error:", err);
-      loadingEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:24px; color:var(--primary-red); margin-bottom:10px;"></i><span style="font-size:12px;">Gagal memuat PDF</span>';
+      console.warn("Direct PDF load failed, falling back to proxy:", err);
+      pdfjsLib.getDocument(proxyUrl).promise.then(pdfDoc_ => {
+        pdfDoc = pdfDoc_;
+        const pCount = document.getElementById('pdfPageCount');
+        if (pCount) pCount.textContent = pdfDoc.numPages;
+        if (controlsEl) controlsEl.style.display = 'flex';
+
+        pageNum = 1;
+        renderPage(pageNum);
+      }).catch(err2 => {
+        console.error("PDF load error via proxy:", err2);
+        if (loadingEl) {
+          loadingEl.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:24px; color:var(--primary-red); margin-bottom:8px;"></i>
+            <span style="font-size:12px; color:#f8fafc; text-align:center;">Gagal memuat PDF.<br>Silakan klik tombol unduh di atas.</span>
+          `;
+        }
+      });
     });
   } else {
-    loadingEl.innerHTML = '<span style="font-size:12px;">PDF Viewer tidak didukung</span>';
+    if (loadingEl) {
+      loadingEl.innerHTML = '<span style="font-size:12px; color:#f8fafc;">PDF Viewer tidak didukung di browser ini.</span>';
+    }
   }
 };
 
 window.closePdfModal = function () {
-  document.getElementById('pdfModal').classList.remove('show');
+  const modal = document.getElementById('pdfModal');
+  if (modal) modal.classList.remove('show');
   document.body.style.overflow = '';
   setTimeout(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById('pdfControls').style.display = 'none';
-    document.getElementById('pdfLoading').style.display = 'none';
+    if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const controls = document.getElementById('pdfControls');
+    if (controls) controls.style.display = 'none';
+    const loading = document.getElementById('pdfLoading');
+    if (loading) loading.style.display = 'none';
     pdfDoc = null;
+    pdfCurrentZoom = 1.0;
   }, 300);
 };
 
