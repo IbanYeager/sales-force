@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sales App - E-Catalog</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/animations-premium.css">
-  <link rel="stylesheet" href="../css/brosur.css">
+  <link rel="stylesheet" href="../css/style.css?v=20260908_v24" />
+  <link rel="stylesheet" href="../css/animations-premium.css?v=20260908_v24">
+  <link rel="stylesheet" href="../css/brosur.css?v=20260908_v24">
   <script src="../js/sidebar_desktop.js?v=20260908_ecatalog"></script>
 
   <link rel="manifest" href="../manifest.json">
@@ -295,6 +295,198 @@
       align-items: center;
       padding: 16px;
     }
+
+    /* PDF Modal Specific Styles */
+    .pdf-modal-container {
+      width: fit-content !important;
+      max-width: 95vw !important;
+      height: auto !important;
+      max-height: 94vh !important;
+      padding: 12px 14px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      border-radius: 16px !important;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3) !important;
+      background: #ffffff !important;
+      box-sizing: border-box !important;
+    }
+    .pdf-modal-header {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      width: 100% !important;
+      margin-bottom: 8px !important;
+      padding-bottom: 8px !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      box-sizing: border-box !important;
+    }
+    .pdf-header-top {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      gap: 8px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .pdf-title-wrap {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      min-width: 0 !important;
+      flex: 1 !important;
+    }
+    .pdf-icon-badge {
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 8px !important;
+      background: rgba(227, 24, 55, 0.1) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: #E31837 !important;
+      font-size: 15px !important;
+      flex-shrink: 0 !important;
+    }
+    .pdf-title-info {
+      min-width: 0 !important;
+    }
+    .pdf-title-info h3 {
+      margin: 0 !important;
+      font-size: 15px !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      line-height: 1.2 !important;
+    }
+    .pdf-title-info span {
+      font-size: 10.5px !important;
+      color: #64748b !important;
+      font-weight: 500 !important;
+      display: block !important;
+      line-height: 1.2 !important;
+    }
+    .pdf-main-actions {
+      display: flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      flex-shrink: 0 !important;
+    }
+    .pdf-btn-action {
+      width: 30px !important;
+      height: 30px !important;
+      border-radius: 8px !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      text-decoration: none !important;
+      font-size: 12px !important;
+      box-sizing: border-box !important;
+    }
+    .pdf-btn-download {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 5px rgba(2,132,199,0.25) !important;
+    }
+    .pdf-btn-share {
+      background: #25D366 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 5px rgba(37,211,102,0.25) !important;
+    }
+    .pdf-btn-close {
+      background: #f8fafc !important;
+      color: #64748b !important;
+      border: 1px solid #e2e8f0 !important;
+      font-size: 14px !important;
+    }
+    .pdf-header-controls {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 6px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .pdf-page-controls,
+    .pdf-zoom-bar {
+      display: inline-flex !important;
+      align-items: center !important;
+      background: #f1f5f9 !important;
+      border-radius: 8px !important;
+      padding: 2px 4px !important;
+      gap: 2px !important;
+      border: 1px solid #e2e8f0 !important;
+      box-sizing: border-box !important;
+    }
+    .pdf-ctrl-btn {
+      width: 28px !important;
+      height: 28px !important;
+      border-radius: 6px !important;
+      border: none !important;
+      background: #ffffff !important;
+      color: #334155 !important;
+      font-size: 11px !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+      box-sizing: border-box !important;
+    }
+    .pdf-btn-fit {
+      width: auto !important;
+      padding: 0 6px !important;
+      font-size: 10.5px !important;
+      font-weight: 700 !important;
+      gap: 3px !important;
+    }
+    .pdf-zoom-label {
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      color: #334155 !important;
+      min-width: 38px !important;
+      text-align: center !important;
+    }
+    .pdf-page-indicator {
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      color: #334155 !important;
+      padding: 0 4px !important;
+      white-space: nowrap !important;
+    }
+    .pdf-page-indicator span:first-child {
+      color: #E31837 !important;
+    }
+    @media (min-width: 769px) {
+      .pdf-modal-header {
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 12px !important;
+      }
+      .pdf-header-top {
+        width: auto !important;
+        flex: 1 !important;
+      }
+      .pdf-header-controls {
+        width: auto !important;
+        justify-content: flex-end !important;
+      }
+    }
+    @media (max-width: 768px) {
+      #pdfModal {
+        padding: 6px !important;
+      }
+      #pdfModal .modal-content {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        padding: 10px 10px !important;
+        border-radius: 14px !important;
+      }
+    }
   </style>
 
   <!-- Modal Spek (Car Details & Specifications) -->
@@ -431,62 +623,70 @@
   </div>
 
   <!-- PDF Viewer Modal -->
-  <!-- PDF Viewer Modal -->
-  <div class="modal-overlay" id="pdfModal" style="align-items: center; justify-content: center; padding: 12px;">
-    <div class="modal-content pdf-modal-container">
+  <div class="modal-overlay" id="pdfModal" style="align-items: center; justify-content: center; padding: 10px;">
+    <div class="modal-content pdf-modal-container"
+      style="width: fit-content !important; max-width: 95vw !important; height: auto !important; max-height: 94vh !important; padding: 12px 14px !important; display: flex !important; flex-direction: column !important; border-radius: 16px !important; box-shadow: 0 20px 50px rgba(0,0,0,0.3) !important; background: #ffffff !important; box-sizing: border-box !important;">
       
       <!-- Modal Header -->
-      <div class="pdf-modal-header">
+      <div class="pdf-modal-header" style="display: flex !important; flex-direction: column !important; gap: 8px !important; width: 100% !important; margin-bottom: 8px !important; padding-bottom: 8px !important; border-bottom: 1px solid #e2e8f0 !important; box-sizing: border-box !important;">
         <!-- Top Row: Title & Main Actions (Download, Share, Close) -->
-        <div class="pdf-header-top">
-          <div class="pdf-title-wrap">
-            <div class="pdf-icon-badge">
+        <div class="pdf-header-top" style="display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 8px !important; width: 100% !important; box-sizing: border-box !important;">
+          <div class="pdf-title-wrap" style="display: flex !important; align-items: center !important; gap: 8px !important; min-width: 0 !important; flex: 1 !important;">
+            <div class="pdf-icon-badge" style="width: 32px !important; height: 32px !important; border-radius: 8px !important; background: rgba(227, 24, 55, 0.1) !important; display: flex !important; align-items: center !important; justify-content: center !important; color: #E31837 !important; font-size: 15px !important; flex-shrink: 0 !important;">
               <i class="fa-solid fa-file-pdf"></i>
             </div>
-            <div class="pdf-title-info">
-              <h3 id="pdfModalTitle">Lihat Brosur</h3>
-              <span>Brosur Resmi Toyota</span>
+            <div class="pdf-title-info" style="min-width: 0 !important;">
+              <h3 id="pdfModalTitle" style="margin: 0 !important; font-size: 15px !important; font-weight: 800 !important; color: #0f172a !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.2 !important;">Lihat Brosur</h3>
+              <span style="font-size: 10.5px !important; color: #64748b !important; font-weight: 500 !important; display: block !important; line-height: 1.2 !important;">Brosur Resmi Toyota</span>
             </div>
           </div>
 
-          <div class="pdf-main-actions">
-            <a id="btnDownloadPdf" href="#" target="_blank" download title="Unduh File PDF" class="pdf-btn-action pdf-btn-download">
+          <div class="pdf-main-actions" style="display: flex !important; align-items: center !important; gap: 5px !important; flex-shrink: 0 !important;">
+            <a id="btnDownloadPdf" href="#" target="_blank" download title="Unduh File PDF" class="pdf-btn-action pdf-btn-download"
+               style="width: 30px !important; height: 30px !important; border-radius: 8px !important; border: none !important; background: #0284c7 !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important; text-decoration: none !important; font-size: 12px !important; box-shadow: 0 2px 5px rgba(2,132,199,0.25) !important; cursor: pointer !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-download"></i>
             </a>
-            <button id="btnSharePdf" type="button" title="Bagikan ke WhatsApp" class="pdf-btn-action pdf-btn-share">
+            <button id="btnSharePdf" type="button" title="Bagikan ke WhatsApp" class="pdf-btn-action pdf-btn-share"
+               style="width: 30px !important; height: 30px !important; border-radius: 8px !important; border: none !important; background: #25D366 !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 12px !important; box-shadow: 0 2px 5px rgba(37,211,102,0.25) !important; cursor: pointer !important; border: none !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-share-nodes"></i>
             </button>
-            <button class="btn-close-modal pdf-btn-action pdf-btn-close" onclick="closePdfModal()" type="button" title="Tutup">
+            <button class="btn-close-modal pdf-btn-action pdf-btn-close" onclick="closePdfModal()" type="button" title="Tutup"
+               style="width: 30px !important; height: 30px !important; border-radius: 8px !important; border: 1px solid #e2e8f0 !important; background: #f8fafc !important; color: #64748b !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 14px !important; cursor: pointer !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
         </div>
 
         <!-- Secondary Controls: Page Navigation & Zoom Bar -->
-        <div class="pdf-header-controls">
+        <div class="pdf-header-controls" style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 6px !important; width: 100% !important; box-sizing: border-box !important;">
           <!-- Page Navigation -->
-          <div id="pdfControls" class="pdf-page-controls" style="display:none;">
-            <button id="btnPrevPdf" type="button" title="Halaman Sebelumnya" class="pdf-ctrl-btn">
+          <div id="pdfControls" class="pdf-page-controls" style="display: none; align-items: center !important; background: #f1f5f9 !important; border-radius: 8px !important; padding: 2px 4px !important; gap: 2px !important; border: 1px solid #e2e8f0 !important; box-sizing: border-box !important;">
+            <button id="btnPrevPdf" type="button" title="Halaman Sebelumnya" class="pdf-ctrl-btn"
+              style="width: 28px !important; height: 28px !important; border-radius: 6px !important; border: none !important; background: #ffffff !important; color: #334155 !important; font-size: 11px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <span class="pdf-page-indicator">
-              Hal <span id="pdfPageNum">1</span>/<span id="pdfPageCount">-</span>
+            <span class="pdf-page-indicator" style="font-size: 11px !important; font-weight: 700 !important; color: #334155 !important; padding: 0 4px !important; white-space: nowrap !important;">
+              Hal <span id="pdfPageNum" style="color: #E31837 !important;">1</span>/<span id="pdfPageCount">-</span>
             </span>
-            <button id="btnNextPdf" type="button" title="Halaman Selanjutnya" class="pdf-ctrl-btn">
+            <button id="btnNextPdf" type="button" title="Halaman Selanjutnya" class="pdf-ctrl-btn"
+              style="width: 28px !important; height: 28px !important; border-radius: 6px !important; border: none !important; background: #ffffff !important; color: #334155 !important; font-size: 11px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
 
           <!-- Zoom Bar -->
-          <div class="pdf-zoom-bar">
-            <button type="button" onclick="zoomPdf(-0.2)" title="Perkecil (-)" class="pdf-ctrl-btn">
+          <div class="pdf-zoom-bar" style="display: inline-flex !important; align-items: center !important; background: #f1f5f9 !important; border-radius: 8px !important; padding: 2px 4px !important; gap: 2px !important; border: 1px solid #e2e8f0 !important; margin-left: auto !important; box-sizing: border-box !important;">
+            <button type="button" onclick="zoomPdf(-0.2)" title="Perkecil (-)" class="pdf-ctrl-btn"
+              style="width: 28px !important; height: 28px !important; border-radius: 6px !important; border: none !important; background: #ffffff !important; color: #334155 !important; font-size: 11px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-magnifying-glass-minus"></i>
             </button>
-            <span id="pdfZoomLabel" class="pdf-zoom-label">100%</span>
-            <button type="button" onclick="zoomPdf(0.2)" title="Perbesar (+)" class="pdf-ctrl-btn">
+            <span id="pdfZoomLabel" class="pdf-zoom-label" style="font-size: 11px !important; font-weight: 700 !important; color: #334155 !important; min-width: 38px !important; text-align: center !important;">100%</span>
+            <button type="button" onclick="zoomPdf(0.2)" title="Perbesar (+)" class="pdf-ctrl-btn"
+              style="width: 28px !important; height: 28px !important; border-radius: 6px !important; border: none !important; background: #ffffff !important; color: #334155 !important; font-size: 11px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-magnifying-glass-plus"></i>
             </button>
-            <button type="button" onclick="fitPdfWidth()" title="Pas Layar" class="pdf-ctrl-btn pdf-btn-fit">
+            <button type="button" onclick="fitPdfWidth()" title="Pas Layar" class="pdf-ctrl-btn pdf-btn-fit"
+              style="width: auto !important; padding: 0 6px !important; height: 28px !important; border-radius: 6px !important; border: none !important; background: #ffffff !important; color: #334155 !important; font-size: 10.5px !important; font-weight: 700 !important; cursor: pointer !important; display: flex !important; align-items: center !important; gap: 3px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important; box-sizing: border-box !important;">
               <i class="fa-solid fa-arrows-left-right"></i> Fit
             </button>
           </div>
