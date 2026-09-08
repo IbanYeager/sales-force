@@ -2,7 +2,7 @@
 (function() {
     if (!document.querySelector('script[src*="auto_location_tracker.js"]')) {
         const script = document.createElement('script');
-        const scriptPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../js/auto_location_tracker.js?v=20260905_v6' : 'js/auto_location_tracker.js?v=20260905_v6';
+        const scriptPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../js/auto_location_tracker.js?v=20260908_v7' : 'js/auto_location_tracker.js?v=20260908_v7';
         script.src = scriptPath;
         document.head.appendChild(script);
     }
@@ -13,7 +13,7 @@ let pwaRefreshing = false;
 
 // 1. SMART AUTO-UPDATING SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
-    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20260907_pdf_v5' : 'sw.js?v=20260907_pdf_v5';
+    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20260908_v7' : 'sw.js?v=20260908_v7';
 
     navigator.serviceWorker.register(swPath)
         .then(registration => {

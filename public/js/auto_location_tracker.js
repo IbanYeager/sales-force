@@ -15,6 +15,27 @@
     let lastKnownPos = null;
     let heartbeatTimer = null;
 
+    // Helper cek status izin GPS (localStorage + cookie fallback)
+    function hasGpsPermission() {
+        try {
+            if (localStorage.getItem('sales_gps_permitted') === 'true') return true;
+        } catch (e) {}
+        try {
+            if (document.cookie.split(';').some(item => item.trim() === 'sales_gps_permitted=true')) return true;
+        } catch (e) {}
+        return false;
+    }
+
+    // Helper simpan status izin GPS secara permanen
+    function setGpsPermission() {
+        try {
+            localStorage.setItem('sales_gps_permitted', 'true');
+        } catch (e) {}
+        try {
+            document.cookie = "sales_gps_permitted=true; path=/; max-age=31536000; SameSite=Lax";
+        } catch (e) {}
+    }
+
     // Helper hitung jarak dalam KM
     function calcDistanceKm(lat1, lon1, lat2, lon2) {
         const dLat = (lat2 - lat1) * 111.32;
@@ -81,7 +102,7 @@
     // Callback saat posisi diperoleh
     function onPositionSuccess(pos) {
         lastKnownPos = pos;
-        localStorage.setItem('sales_gps_permitted', 'true');
+        setGpsPermission();
         hidePermissionModal();
 
         const now = Date.now();
@@ -120,8 +141,8 @@
 
         const geoOptions = {
             enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
+            timeout: 20000,
+            maximumAge: 5000
         };
 
         navigator.geolocation.getCurrentPosition(
@@ -146,6 +167,14 @@
 
     // Modal UI untuk meminta izin lokasi sekali saja
     function showPermissionModal() {
+        // Jangan pernah munculkan modal jika sudah pernah diizinkan!
+        if (hasGpsPermission()) return;
+
+        // Jangan munculkan lagi jika user telah menolak / dismiss di sesi browser ini
+        try {
+            if (sessionStorage.getItem('sales_gps_dismissed_session') === 'true') return;
+        } catch (e) {}
+
         if (document.getElementById('modalGpsPermission')) return;
 
         const modalHtml = `
@@ -269,30 +298,41 @@
         document.getElementById('btnAktifkanGps')?.addEventListener('click', () => {
             const btn = document.getElementById('btnAktifkanGps');
             if (btn) {
-                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menghubungkan Satelit...';
+                btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Izin Diberikan';
+                btn.style.background = '#059669';
                 btn.disabled = true;
             }
 
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    localStorage.setItem('sales_gps_permitted', 'true');
-                    hidePermissionModal();
-                    onPositionSuccess(pos);
-                    startLiveWatch();
-                },
-                (err) => {
-                    if (btn) {
-                        btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Coba Izinkan Lagi';
-                        btn.disabled = false;
-                    }
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-            );
+            // SIMPAN SEGERA KE LOCALSTORAGE & COOKIE: Sekali user menekan izin, modal tidak boleh muncul lagi!
+            setGpsPermission();
+
+            // Sembunyikan modal dengan segera agar pengguna leluasa beraktivitas
+            setTimeout(() => {
+                hidePermissionModal();
+            }, 350);
+
+            // Minta posisi awal ke browser dan aktifkan live tracker
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        onPositionSuccess(pos);
+                        startLiveWatch();
+                    },
+                    (err) => {
+                        console.warn('[GPS] Initial position lock notice:', err.message);
+                        // Walau initial lock timeout/indoor, tetap start watchPosition di latar belakang
+                        startLiveWatch();
+                    },
+                    { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
+                );
+            }
         });
 
         document.getElementById('btnNantiGps')?.addEventListener('click', () => {
-            // Jika menekan "Nanti Saja", JANGAN simpan sales_gps_permitted ke localStorage!
-            // Sehingga modal akan terus muncul di sesi/kunjungan berikutnya sampai diizinkan.
+            // Sembunyikan untuk sisa sesi kerja ini agar tidak mengganggu saat refresh / berpindah halaman
+            try {
+                sessionStorage.setItem('sales_gps_dismissed_session', 'true');
+            } catch (e) {}
             hidePermissionModal();
         });
     }
@@ -316,42 +356,44 @@
 
         cleanAllGpsUi();
 
-        // 1. Cek apakah di browser / localStorage SUDAH PERNAH DIIZINKAN
-        const isPermittedInStorage = localStorage.getItem('sales_gps_permitted') === 'true';
+        // 1. PRIORITAS UTAMA: Jika SUDAH PERNAH DIIZINKAN (di localStorage / cookie), JANGAN TAMPILKAN POPUP LAGI!
+        if (hasGpsPermission()) {
+            hidePermissionModal();
+            startLiveWatch();
+            return;
+        }
 
+        // 2. Jika di sesi ini user sudah memilih 'Nanti Saja', jangan munculkan lagi saat refresh / navigasi
+        try {
+            if (sessionStorage.getItem('sales_gps_dismissed_session') === 'true') {
+                hidePermissionModal();
+                return;
+            }
+        } catch (e) {}
+
+        // 3. Periksa status izin di browser native via Permissions API
         if (navigator.permissions && navigator.permissions.query) {
             try {
                 const status = await navigator.permissions.query({ name: 'geolocation' });
                 if (status.state === 'granted') {
-                    // SUDAH DIIZINKAN: Jangan tampilkan modal lagi! Langsung jalankan senyap.
-                    localStorage.setItem('sales_gps_permitted', 'true');
+                    // Browser sudah mengizinkan: simpan status dan jalankan pelacakan secara senyap
+                    setGpsPermission();
                     hidePermissionModal();
                     startLiveWatch();
                     return;
-                } else if (status.state === 'prompt') {
-                    // Belum diizinkan: tampilkan modal permintaan izin
-                    showPermissionModal();
-                    status.onchange = () => {
-                        if (status.state === 'granted') {
-                            localStorage.setItem('sales_gps_permitted', 'true');
-                            hidePermissionModal();
-                            startLiveWatch();
-                        }
-                    };
+                } else if (status.state === 'denied') {
+                    // Pengguna memblokir lokasi di setting browser, jangan spam popup yang tidak bisa diizinkan
+                    console.warn('[GPS] Geolocation is denied in browser settings.');
                     return;
                 }
-            } catch (e) {}
+                // Jika status.state === 'prompt', lanjutkan ke showPermissionModal() di bawah
+            } catch (e) {
+                // Fallback jika query geolocation tidak didukung (misal versi lama iOS Safari)
+            }
         }
 
-        // Fallback jika Permissions API tidak didukung:
-        if (isPermittedInStorage) {
-            // Sudah pernah diizinkan, langsung start senyap
-            hidePermissionModal();
-            startLiveWatch();
-        } else {
-            // Belum diizinkan (atau pernah klik Nanti Saja), munculkan modal
-            showPermissionModal();
-        }
+        // 4. Jika benar-benar belum diizinkan, baru tampilkan modal permintaan izin
+        showPermissionModal();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
