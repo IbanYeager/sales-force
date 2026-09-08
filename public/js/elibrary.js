@@ -306,15 +306,15 @@ function renderLibrary() {
                                 <span style="background:rgba(255,255,255,0.8); padding:4px 10px; border-radius:12px; font-size:10px; font-weight:700; color:var(--text-muted); box-shadow:0 2px 4px rgba(0,0,0,0.02);"><i class="fa-solid fa-users" style="color:var(--primary-blue);"></i> ${specs.seats}</span>
                             </div>
                         </div>
-                        <div class="elib-card-actions" style="display:grid; grid-template-columns: 1fr 1fr 38px; gap:6px; align-items:center;">
-                            <button class="btn-main" onclick="showSpecs('${model}')" title="Detail & Spesifikasi Lengkap" style="font-size:11.5px; font-weight:700; padding:10px 4px; justify-content:center; border-radius:10px; background:linear-gradient(135deg, var(--primary-blue), #003d99); color:#fff; border:none; cursor:pointer; box-shadow: 0 3px 8px rgba(0,82,204,0.25);">
-                                <i class="fa-solid fa-list-ul" style="margin-right:4px;"></i> Detail
+                        <div class="elib-card-actions">
+                            <button class="btn-card-action btn-card-detail" onclick="showSpecs('${model}')" title="Detail & Spesifikasi Lengkap">
+                                <i class="fa-solid fa-list-ul"></i> <span>Detail</span>
                             </button>
-                            <button class="btn-main" onclick="viewCarBrochure('${model}')" title="Buka Brosur PDF Resmi" style="font-size:11.5px; font-weight:700; padding:10px 4px; justify-content:center; border-radius:10px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#fff; border:none; cursor:pointer; box-shadow: 0 3px 8px rgba(200,16,46,0.25);">
-                                <i class="fa-solid fa-file-pdf" style="margin-right:4px;"></i> Brosur
+                            <button class="btn-card-action btn-card-brosur" onclick="viewCarBrochure('${model}')" title="Buka Brosur PDF Resmi">
+                                <i class="fa-solid fa-file-pdf"></i> <span>Brosur</span>
                             </button>
-                            <button class="btn-main" onclick="quickShareCar('${model}')" title="Bagikan ke WhatsApp" style="width:38px; height:38px; padding:0; justify-content:center; border-radius:10px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#fff; border:none; cursor:pointer; flex-shrink:0; box-shadow: 0 3px 8px rgba(37,211,102,0.25);">
-                                <i class="fa-brands fa-whatsapp" style="font-size:17px;"></i>
+                            <button class="btn-card-action btn-card-wa" onclick="quickShareCar('${model}')" title="Bagikan ke WhatsApp">
+                                <i class="fa-brands fa-whatsapp"></i>
                             </button>
                         </div>
                     </div>
@@ -1117,6 +1117,13 @@ window.switchCatalogTab = function (tab) {
     const contentLibrary = document.getElementById('contentLibrary');
     if (contentLibrary) contentLibrary.style.display = 'block';
 };
+
+// Clean up any stale query parameters (?tab=brosur) from address bar
+try {
+    if (window.location.search && window.location.search.includes('tab=')) {
+        window.history.replaceState(null, '', window.location.pathname);
+    }
+} catch (e) {}
 
 // ─── Direct Interactive PDF Brochure Opener ──────────────
 window.viewCarBrochure = function (carName) {

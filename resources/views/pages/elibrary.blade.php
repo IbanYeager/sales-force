@@ -16,10 +16,13 @@
 </head>
 
 <body>
-  <div class="mobile-app" style="max-width: 1200px; margin: 0 auto; min-height: 100vh; background: #f8fafc;">
+  <div class="mobile-app" style="max-width: 1200px; margin: 0 auto; min-height: 100vh; background: #f8fafc; padding-bottom: 110px;">
     <header class="header-page">
-      <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
+      <a href="../index.html" title="Kembali ke Dashboard"><i class="fa-solid fa-arrow-left"></i></a>
       <h2>E-Catalog</h2>
+      <span class="header-pill-badge" style="font-size:11px; font-weight:700; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); padding:4px 10px; border-radius:20px; color:#fff; display:flex; align-items:center; gap:5px;">
+        <i class="fa-solid fa-book-open" style="color:#ff4d6d;"></i> Brosur &amp; Spek
+      </span>
     </header>
 
     <div class="container" style="margin-top:18px;">
@@ -62,10 +65,10 @@
 
             .elib-unified-grid {
               display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-              gap: 14px;
+              grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+              gap: 16px;
             }
-            @media (max-width: 640px) {
+            @media (max-width: 768px) {
               .elib-unified-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 10px;
@@ -92,12 +95,96 @@
       </div>
 
     </div>
+
+    <!-- ═══ FLOATING BOTTOM NAVIGATION (MOBILE) ═══ -->
+    <nav class="bottom-nav">
+      <a href="../index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
+      <a href="pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
+      <a href="input.html" class="nav-item center-btn">
+        <div class="center-btn-inner">
+          <i class="fa-solid fa-camera"></i>
+        </div>
+      </a>
+      <a href="elibrary.html" class="nav-item active"><i class="fa-solid fa-book-open"></i><span class="nav-text">Katalog</span></a>
+      <a href="profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
+    </nav>
   </div>
 
   <style>
     /* Premium Glassmorphism UI for E-Catalog */
     .mobile-app {
       background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    }
+
+    .elib-card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 38px;
+      gap: 6px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .btn-card-action {
+      height: 36px;
+      border: none;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-card-action:active {
+      transform: scale(0.96);
+    }
+
+    .btn-card-detail {
+      background: linear-gradient(135deg, var(--primary-blue), #003d99);
+      color: #ffffff;
+      box-shadow: 0 3px 8px rgba(0, 82, 204, 0.25);
+    }
+
+    .btn-card-brosur {
+      background: linear-gradient(135deg, #c8102e 0%, #99001c 100%);
+      color: #ffffff;
+      box-shadow: 0 3px 8px rgba(200, 16, 46, 0.25);
+    }
+
+    .btn-card-wa {
+      width: 38px;
+      height: 36px;
+      padding: 0;
+      background: linear-gradient(135deg, #25D366 0%, #15803d 100%);
+      color: #ffffff;
+      font-size: 17px;
+      box-shadow: 0 3px 8px rgba(37, 211, 102, 0.25);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 480px) {
+      .elib-card-actions {
+        grid-template-columns: 1fr 1fr 34px !important;
+        gap: 4px !important;
+      }
+      .btn-card-action {
+        height: 34px !important;
+        font-size: 11px !important;
+        padding: 0 2px !important;
+        gap: 3px !important;
+      }
+      .btn-card-action span {
+        font-size: 10px !important;
+      }
+      .btn-card-wa {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 16px !important;
+      }
     }
 
     .glass-card {
