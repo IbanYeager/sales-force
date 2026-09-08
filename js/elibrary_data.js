@@ -173,7 +173,18 @@ window.carColorData = {
         { name: "Sparkling Cupper Gray", hex: "", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/u6vLq9vC4qrqDyaGrZ6lcDkQm6AKC6cjiqumfxsI.png" }
     ],
 
+    "Prius": [
+        { name: "Platinum White Pearl", hex: "#ffffff", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/YRWA1533J3Ke0TEom5AReQWCgL3TuWaonNGBjIQt.png" },
+        { name: "Attitude Black", hex: "#1a1a1a", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/e1pSymDWsPV2ixCLc3vETEkIpx796ZIRTCNoLH94.png" },
+        { name: "Emotional Red", hex: "#cc0000", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/f4Pd0uPnMYP4jO3iyKAtufvoWUX7a8Ia7yAgIA4I.png" },
+        { name: "Ash Gray", hex: "#666666", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/w1QgLJPxXuNDCvd557CC2YKsuT6T1UmFkImG4Zes.png" }
+    ],
+
     // === COMMERCIAL ===
+    "Dyna": [
+        { name: "Turquoise Blue", hex: "#0891b2", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/Kx2yv8FvET1LFQZ4hiduMz9nHTXFkMiq2kQE7HoN.png" },
+        { name: "White", hex: "#ffffff", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/LCZq9tKPKoh62BaWau7aNHVrItJOqUakykp8JnFy.png" }
+    ],
     "Single Cabin": [
         { name: "Super White", hex: "#ffffff", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/LCZq9tKPKoh62BaWau7aNHVrItJOqUakykp8JnFy.png" },
         { name: "Attitude Black", hex: "#1a1a1a", img: "https://d1g6w7sntckt92.cloudfront.net/public/images/color_option_images/HDkRIDYHythy3knZUyBLrQ6ZKlf0DuIIEwKabfK9.png" },

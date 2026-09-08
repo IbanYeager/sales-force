@@ -33,6 +33,8 @@ function getUnitImage(model) {
     if (m.includes('gr 86')) return 'gr-86.webp';
     if (m.includes('gr yaris')) return 'gr-yaris.webp';
     if (m.includes('gr corolla')) return 'gr-corolla.webp';
+    if (m.includes('supra')) return 'supra.webp';
+    if (m.includes('prius')) return 'prius.webp';
 
     return m.replace(/\s+/g, '-') + '.webp';
 }
@@ -54,7 +56,7 @@ function getUnitSpecs(model, type = '') {
         seats = '10 Kursi';
     } else if (m.match(/hiace/)) {
         seats = '15 Kursi';
-    } else if (m.match(/dyna|rangga|single cabin/)) {
+    } else if (m.match(/dyna|rangga|single cabin|supra/)) {
         seats = '2 Kursi';
     } else if (m.match(/gr 86|gr yaris/)) {
         seats = '4 Kursi';
@@ -64,7 +66,7 @@ function getUnitSpecs(model, type = '') {
     if (m.match(/fortuner|innova reborn|hilux|hiace|dyna|land cruiser/)) {
         fuel = 'Diesel / Bensin';
     }
-    if (m.match(/hybrid|hev/)) fuel = 'Hybrid';
+    if (m.match(/hybrid|hev|prius/)) fuel = 'Hybrid';
     if (m.match(/bz4x/)) fuel = 'Listrik (EV)';
     if (t.match(/ev/)) fuel = 'Listrik (EV)';
 
@@ -79,6 +81,8 @@ function getUnitSpecs(model, type = '') {
     else if (m.match(/agya|raize 1.2/)) engine = '1.2L (1,198 cc 3 Silinder Dual VVT-i)';
     else if (m.match(/raize|raize 1.0/)) engine = '1.0L Turbo';
     else if (m.match(/gr yaris|gr corolla/)) engine = '1.6L Turbo 3-Silinder';
+    else if (m.match(/supra/)) engine = '3.0L Inline-6 Twin-Scroll Turbo (387 PS)';
+    else if (m.match(/prius/)) engine = '2.0L 4-Silinder Hybrid EV (M20A-FXS)';
     else if (m.match(/corolla cross|corolla altis|c-hr/)) {
         if (t.match(/hybrid|hev/)) engine = '1.8L Hybrid Synergy Drive';
         else engine = '1.8L 4-Silinder Dual VVT-i';
@@ -107,24 +111,25 @@ function getUnitSpecs(model, type = '') {
         else engine = '2.0L (M20A-FKS) Bensin';
     }
     else if (m.match(/rangga/)) engine = '2.0L Bensin / 2.4L Turbo Diesel';
+    else if (m.match(/dyna/)) engine = '4.0L Turbo Diesel Intercooler (136 PS)';
     else if (m.match(/bz4x/)) engine = '71.4 kWh (Baterai)';
     else if (m.match(/vios|yaris/)) engine = '1.5L (2NR-VE) 4 Silinder';
     else if (m.match(/rush/)) engine = '1.5L (2NR-VE) 4 Silinder';
 
     // Transmisi Configurations
-    if (m.match(/bz4x|hybrid|hev/) || t.match(/hybrid|hev|hv/)) transmisi = 'e-CVT / EV';
+    if (m.match(/bz4x|hybrid|hev|prius/) || t.match(/hybrid|hev|hv/)) transmisi = 'e-CVT / EV';
     else if (t.match(/mt|m\/t/)) transmisi = 'Manual (MT)';
     else if (t.match(/at|a\/t|cvt/)) transmisi = 'Otomatis (AT/CVT)';
     else if (m.match(/calya/)) transmisi = '4-Speed AT / 5-Speed MT';
-    else if (m.match(/fortuner|innova reborn|rush|alphard|vellfire|land cruiser/)) transmisi = 'Otomatis (AT)';
+    else if (m.match(/fortuner|innova reborn|rush|alphard|vellfire|land cruiser|supra/)) transmisi = 'Otomatis (AT)';
     else if (m.match(/gr yaris|gr corolla/)) transmisi = '6-Speed MT';
     else if (m.match(/dyna|hiace|rangga|single cabin/)) transmisi = 'Manual (MT)';
 
     // Penggerak Configurations
-    if (m.match(/rush|innova reborn|fortuner|hiace|dyna|rangga|gr 86/)) penggerak = 'RWD (Belakang)';
+    if (m.match(/rush|innova reborn|fortuner|hiace|dyna|rangga|gr 86|supra/)) penggerak = 'RWD (Belakang)';
     else if (m.match(/land cruiser|hilux double|hilux single/)) penggerak = '4x4 / AWD / RWD';
     else if (m.match(/gr yaris|gr corolla/)) penggerak = 'GR-FOUR (AWD)';
-    else if (m.match(/bz4x/)) penggerak = 'FWD (Depan)';
+    else if (m.match(/bz4x|prius/)) penggerak = 'FWD (Depan)';
 
     // Fitur Dynamic based on Type
     if (m.match(/alphard|vellfire/)) {
