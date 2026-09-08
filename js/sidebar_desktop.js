@@ -288,7 +288,7 @@
                 <p class="sidebar-nav-label">Tier 3: Product Knowledge & Pasar</p>
                 ${navLink('pages/eco_calculator.html', 'fa-solid fa-leaf', 'Toyota Eco Calc (Hybrid)', 'eco hybrid bbm hemat emisi')}
                 ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°', 'komparasi lawan rival competitor banding')}
-                ${navLink('pages/brosur.html', 'fa-solid fa-book-open', 'Brosur Digital', 'brosur pdf katalog spesifikasi')}
+                ${navLink('pages/elibrary.html?tab=brosur', 'fa-solid fa-book-open', 'Brosur Digital', 'brosur pdf katalog spesifikasi')}
                 ${navLink('pages/elibrary.html', 'fa-solid fa-book-medical', 'E-Catalog', 'catalog ecatalog e-catalog library panduan tips trik materi pelatihan')}
                 ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Intelijen Pasar & Polreg', 'pasar market analisis wilayah pangsa polreg bbn plat kodepos kecamatan komplek')}
                 ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong', 'penjualan kircon kiara condong rekap cabang')}
@@ -730,13 +730,22 @@
         let currentClean = currentPath.split('/').pop().split('?')[0].split('#')[0];
         if (!currentClean) currentClean = 'index';
         currentClean = currentClean.replace('.html', '');
+        const hasTabBrosur = window.location.search.includes('tab=brosur');
 
         navLinks.forEach(link => {
             link.classList.remove('active');
             const linkHref = link.getAttribute('href');
             if (linkHref) {
                 const linkClean = linkHref.split('/').pop().split('?')[0].split('#')[0].replace('.html', '');
-                if (currentClean === linkClean || (currentClean === '' && linkClean === 'index')) {
+                const isBrosurLink = linkHref.includes('tab=brosur') || linkClean === 'brosur';
+
+                if (currentClean === 'elibrary' || currentClean === 'catalog') {
+                    if (hasTabBrosur && isBrosurLink) {
+                        link.classList.add('active');
+                    } else if (!hasTabBrosur && !isBrosurLink && (linkClean === 'elibrary' || linkClean === 'catalog')) {
+                        link.classList.add('active');
+                    }
+                } else if (currentClean === linkClean || (currentClean === '' && linkClean === 'index')) {
                     link.classList.add('active');
                 }
             }

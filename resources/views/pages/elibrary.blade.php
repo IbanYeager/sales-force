@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/animations-premium.css">
+  <link rel="stylesheet" href="../css/brosur.css">
   <script src="../js/sidebar_desktop.js?v=20260908_ecatalog"></script>
 
   <link rel="manifest" href="../manifest.json">
@@ -23,10 +24,20 @@
 
     <div class="container" style="margin-top:18px;">
 
-      <!-- LIBRARY CONTENT -->
+      <!-- SEGMENT SWITCHER TABS (Katalog vs Brosur PDF) -->
+      <div class="segment-control-container" style="display:flex; background:#e2e8f0; padding:4px; border-radius:14px; margin-bottom:18px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);">
+        <button type="button" id="tabBtnCatalog" class="tab-btn active" onclick="switchCatalogTab('catalog')" style="flex:1; padding:11px 14px; border-radius:10px; border:none; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.25s ease;">
+          <i class="fa-solid fa-car"></i> Katalog Mobil
+        </button>
+        <button type="button" id="tabBtnBrosur" class="tab-btn" onclick="switchCatalogTab('brosur')" style="flex:1; padding:11px 14px; border-radius:10px; border:none; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.25s ease;">
+          <i class="fa-solid fa-book-open"></i> Brosur PDF Resmi
+        </button>
+      </div>
+
+      <!-- TAB 1: KATALOG MOBIL & SPESIFIKASI TEKNIS -->
       <div id="contentLibrary">
         <div class="form-group" style="margin-bottom:12px;">
-          <input class="form-control" type="text" id="searchInput" placeholder="Cari mobil (misal: Innova)..."
+          <input class="form-control" type="text" id="searchInput" placeholder="Cari mobil (misal: Innova, Fortuner, Agya)..."
             oninput="renderLibrary()" />
         </div>
 
@@ -72,41 +83,91 @@
         </div>
       </div>
 
+      <!-- TAB 2: BROSUR DIGITAL (PDF LIBRARY) -->
+      <div id="contentBrosur" style="display:none; padding-bottom:24px;">
+        <!-- Hero Banner -->
+        <div class="brosur-hero" style="margin-bottom:14px;">
+          <div class="brosur-hero-row">
+            <div class="brosur-hero-icon">
+              <i class="fa-solid fa-book-open"></i>
+            </div>
+            <div>
+              <h2>Brosur Toyota Resmi</h2>
+              <p>Temukan &amp; bagikan katalog brosur resmi Toyota lengkap semua model</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search bar -->
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass search-icon-brosur"></i>
+          <input type="text" class="brosur-search-input" id="searchBrosurInput" placeholder="Cari model brosur..."
+            autocomplete="off" />
+          <button class="search-clear" id="searchBrosurClear" title="Hapus pencarian">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Category tabs -->
+        <div class="kat-tabs" id="katTabs">
+          <button class="kat-tab active" data-kat="ALL">
+            <i class="fa-solid fa-th-large" style="margin-right:4px;font-size:9px;"></i> All
+          </button>
+          <!-- Tabs diisi via JS -->
+        </div>
+
+        <!-- Result info -->
+        <div class="result-count" id="resultCount" style="display:none;"></div>
+
+        <!-- Brochure list container -->
+        <div id="brosurContainer">
+          <!-- Skeleton loading -->
+          <div class="skeleton-grid" id="skeletonGrid">
+            <div class="skeleton-card">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-body">
+                <div class="skeleton-line" style="height:14px;width:70%;"></div>
+                <div class="skeleton-line" style="height:10px;width:90%;"></div>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <div class="skeleton-line" style="height:30px;flex:1;border-radius:8px;"></div>
+                  <div class="skeleton-line" style="height:30px;width:32px;border-radius:8px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-body">
+                <div class="skeleton-line" style="height:14px;width:60%;"></div>
+                <div class="skeleton-line" style="height:10px;width:85%;"></div>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <div class="skeleton-line" style="height:30px;flex:1;border-radius:8px;"></div>
+                  <div class="skeleton-line" style="height:30px;width:32px;border-radius:8px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <style>
-    /* Premium Glassmorphism UI for E-Library */
+    /* Premium Glassmorphism UI for E-Catalog */
     .mobile-app {
       background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
     }
 
-    .segment-control-container {
-      display: flex;
-      background: #e2e8f0;
-      padding: 4px;
-      border-radius: 14px;
-      margin-bottom: 22px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
+    .segment-control-container .tab-btn {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       background: transparent;
       color: var(--text-muted);
     }
 
-    .tab-btn.active {
-      background: #ffffff;
-      color: var(--primary-blue);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    .segment-control-container .tab-btn.active {
+      background: #ffffff !important;
+      color: var(--primary-blue) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     }
 
     .glass-card {
@@ -215,14 +276,13 @@
 
     #modalSpek {
       align-items: center;
-      /* override flex-end so it centers on desktop/mobile */
       padding: 16px;
     }
   </style>
 
-  <!-- Modal Spek -->
+  <!-- Modal Spek (Car Details & Specifications) -->
   <div class="modal-overlay" id="modalSpek" onclick="if(event.target === this) this.classList.remove('show')">
-    <div class="modal-box glass-modal" style="text-align:center; padding: 24px 20px; width: 90%; max-width: 360px;">
+    <div class="modal-box glass-modal" style="text-align:center; padding: 24px 20px; width: 90%; max-width: 380px;">
       <h3 class="modal-title" id="spekTitle"
         style="font-size:22px; font-weight:900; background:linear-gradient(90deg, var(--primary-blue), #003d99); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom:4px;">
         Spek Mobil</h3>
@@ -231,7 +291,7 @@
         <img id="spekImg" src="" alt="Spek">
       </div>
 
-      <!-- Color Selector (NEW) -->
+      <!-- Color Selector -->
       <div id="colorSelectorContainer" style="margin-bottom: 20px; display: none;">
         <label
           style="display:block; text-align:center; font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;">PILIHAN
@@ -321,12 +381,17 @@
         </div>
       </div>
 
-      <!-- Action Buttons: WhatsApp Share & Copy -->
+      <!-- Action Buttons: Brochure View, WhatsApp Share & Copy -->
       <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
         <button type="button" class="btn-main"
-          style="width:100%; justify-content:center; padding:13px 16px; border-radius:14px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#ffffff; font-weight:800; font-size:13.5px; box-shadow: 0 6px 20px rgba(200,16,46,0.3); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
+          style="width:100%; justify-content:center; padding:13px 16px; border-radius:14px; background:linear-gradient(135deg, var(--primary-blue), #003d99); color:#ffffff; font-weight:800; font-size:13.5px; box-shadow: 0 6px 20px rgba(0,82,204,0.3); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
+          onclick="viewCarBrochure()">
+          <i class="fa-solid fa-book-open" style="font-size:17px;"></i> Buka Brosur Resmi PDF
+        </button>
+        <button type="button" class="btn-main"
+          style="width:100%; justify-content:center; padding:12px 16px; border-radius:14px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#ffffff; font-weight:800; font-size:13px; box-shadow: 0 6px 20px rgba(200,16,46,0.25); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
           onclick="shareCarBrochurePdf()">
-          <i class="fa-solid fa-file-pdf" style="font-size:18px;"></i> Kirim File E-Catalog PDF
+          <i class="fa-solid fa-file-pdf" style="font-size:17px;"></i> Kirim File E-Catalog PDF
         </button>
         <button type="button" class="btn-main"
           style="width:100%; justify-content:center; padding:12px 16px; border-radius:14px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; font-weight:800; font-size:13px; box-shadow: 0 4px 15px rgba(37,211,102,0.25); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
@@ -348,6 +413,96 @@
     </div>
   </div>
 
+  <!-- PDF Viewer Modal -->
+  <div class="modal-overlay" id="pdfModal" style="align-items: center;">
+    <div class="modal-content"
+      style="max-width:1000px; width:95%; max-height:95vh; height:auto; padding:15px; display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="margin:0; font-size:16px; font-weight:800;" id="pdfModalTitle">Lihat Brosur</h3>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <a id="btnDownloadPdf" href="#" target="_blank" download
+             style="width:36px; height:36px; border-radius:6px; border:none; background:var(--primary-blue); color:#fff; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+            <i class="fa-solid fa-download"></i>
+          </a>
+          <button id="btnSharePdf" type="button"
+             style="width:36px; height:36px; border-radius:6px; border:none; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="shareBrosurModal()">
+            <i class="fa-solid fa-share-nodes"></i>
+          </button>
+
+          <div id="pdfControls" style="display:none; align-items:center; gap:8px; margin-left: 10px; padding-left:10px; border-left:1px solid var(--border-color);">
+            <button id="btnPrevPdf"
+              style="width:30px; height:30px; border-radius:6px; border:1px solid var(--border-color); background:#fff; cursor:pointer;"><i
+                class="fa-solid fa-chevron-left"></i></button>
+            <span style="font-size:12px; font-weight:bold; color:var(--text-dark);">Hal <span
+                id="pdfPageNum">1</span>/<span id="pdfPageCount">-</span></span>
+            <button id="btnNextPdf"
+              style="width:30px; height:30px; border-radius:6px; border:1px solid var(--border-color); background:#fff; cursor:pointer;"><i
+                class="fa-solid fa-chevron-right"></i></button>
+          </div>
+
+          <button class="btn-close-modal" onclick="closePdfModal()" style="margin-left:8px;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+      <div id="pdfViewerContainer"
+        style="flex:1; background:#cbd5e1; border-radius:12px; border:1px solid var(--border-color); overflow-y:auto; overflow-x:auto; position:relative; text-align:center; padding:4px;">
+        <div id="pdfLoading"
+          style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; flex-direction:column; align-items:center;">
+          <i class="fa-solid fa-spinner fa-spin"
+            style="font-size:24px; color:var(--primary-red); margin-bottom:10px;"></i>
+          <span style="font-size:12px; font-weight:600; color:var(--text-dark);">Memuat PDF...</span>
+        </div>
+        <canvas id="pdfCanvas"
+          style="box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius:4px; margin: 0 auto; display: block; max-width: 100%;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Focus Lightbox -->
+  <div class="modal-overlay" id="pdfLightbox" style="align-items: center; background: rgba(0,0,0,0.85);">
+    <div style="position:relative; width:95%; max-width:900px; height:85vh; border-radius:12px; overflow:hidden; display:flex; justify-content:center; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.5); background:#1e1e1e;">
+      <!-- Blurred background -->
+      <div id="pdfLightboxBg" style="position:absolute; top:0; left:0; width:100%; height:100%; background-size:cover; background-position:center; filter:blur(25px); opacity:0.5; z-index:1; transform: scale(1.1);"></div>
+
+      <!-- Controls -->
+      <button class="btn-close-modal" style="position:absolute; top:15px; right:15px; z-index:10; background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;" onclick="closePdfLightbox()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <button id="btnPrevLightbox" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); z-index:10; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+
+      <button id="btnNextLightbox" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); z-index:10; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <div style="position:absolute; bottom:15px; left:50%; transform:translateX(-50%); z-index:10; background:rgba(0,0,0,0.6); color:#fff; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:bold; letter-spacing:0.5px;">
+        Hal <span id="pdfLightboxPageNum">1</span>/<span id="pdfLightboxPageCount">-</span>
+      </div>
+
+      <!-- Clear image -->
+      <img id="pdfLightboxImg" src="" style="position:relative; z-index:5; width:100%; height:100%; object-fit:contain;">
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div class="modal-overlay" id="imageLightbox"
+    onclick="if(event.target===this) document.getElementById('imageLightbox').classList.remove('show')">
+    <div
+      style="position:relative; width:95%; max-width:800px; display:flex; justify-content:center; align-items:center;">
+      <button class="btn-close-modal"
+        style="position:absolute; top:-40px; right:0; background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;"
+        onclick="document.getElementById('imageLightbox').classList.remove('show')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="lightboxImage" src=""
+        style="width:100%; height:auto; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+    </div>
+  </div>
+
   <!-- Share toast -->
   <div class="share-toast" id="shareToast" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0f172a; color: white; font-size: 12px; font-weight: 600; padding: 10px 18px; border-radius: 999px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 9999; white-space: nowrap;">
     <i class="fa-solid fa-check" style="margin-right:6px;color:#10b981;"></i>
@@ -359,9 +514,14 @@
       transform: translateX(-50%) translateY(0) !important;
     }
   </style>
+
+  <!-- PDF.js Library & Core Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="../custom_alert.js"></script>
+  <script src="../js/sales_signature.js"></script>
+  <script src="../js/brosur.js?v={{ time() }}"></script>
   <script src="../js/elibrary_data.js?v=4"></script>
   <script src="../js/elibrary.js?v={{ time() }}"></script>
-
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 

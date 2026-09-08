@@ -168,7 +168,7 @@
                 <a href="pages/tco.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-car-tunnel"></i> Aksesoris TCO
                 </a>
-                <a href="pages/brosur.html" class="sidebar-nav-link">
+                <a href="pages/elibrary.html?tab=brosur" class="sidebar-nav-link">
                     <i class="fa-solid fa-book-open"></i> Brosur
                 </a>
             </div>
@@ -355,7 +355,7 @@
                                 <div class="category-icon"><i class="fa-solid fa-book-open-reader"></i></div>
                                 <span class="category-text">E-Catalog</span>
                             </a>
-                            <a href="pages/brosur.html" class="category-item">
+                            <a href="pages/elibrary.html?tab=brosur" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">Brosur Digital</span>
                             </a>
@@ -851,7 +851,7 @@
                                 <div class="category-icon"><i class="fa-solid fa-scale-balanced"></i></div>
                                 <span class="category-text">Komparasi 360°</span>
                             </a>
-                            <a href="pages/brosur.html" class="category-item">
+                            <a href="pages/elibrary.html?tab=brosur" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">Brosur Digital</span>
                             </a>

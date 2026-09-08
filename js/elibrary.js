@@ -307,8 +307,11 @@ function renderLibrary() {
                             </div>
                         </div>
                         <div style="display:flex; gap:6px; align-items:center;">
-                            <button class="btn-main" onclick="showSpecs('${model}')" style="flex:1; font-size:11.5px; padding:10px 6px; justify-content:center; border-radius:12px; background:linear-gradient(135deg, var(--primary-blue), #003d99); box-shadow: 0 4px 12px rgba(0,82,204,0.25);">
-                                <i class="fa-solid fa-list-ul" style="margin-right:4px;"></i> Lihat Detail
+                            <button class="btn-main" onclick="showSpecs('${model}')" style="flex:1; font-size:11px; padding:10px 4px; justify-content:center; border-radius:12px; background:linear-gradient(135deg, var(--primary-blue), #003d99); box-shadow: 0 4px 12px rgba(0,82,204,0.25);">
+                                <i class="fa-solid fa-list-ul" style="margin-right:4px;"></i> Detail
+                            </button>
+                            <button class="btn-main" onclick="viewCarBrochure('${model}')" title="Lihat Brosur PDF Resmi" style="width:38px; height:38px; padding:0; justify-content:center; border-radius:12px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#ffffff; box-shadow: 0 4px 12px rgba(200,16,46,0.3); border:none; cursor:pointer; flex-shrink:0;">
+                                <i class="fa-solid fa-file-pdf" style="font-size:16px;"></i>
                             </button>
                             <button class="btn-main" onclick="quickShareCar('${model}')" title="Bagikan Info & Spek ke WhatsApp" style="width:38px; height:38px; padding:0; justify-content:center; border-radius:12px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; box-shadow: 0 4px 12px rgba(37,211,102,0.3); border:none; cursor:pointer; flex-shrink:0;">
                                 <i class="fa-brands fa-whatsapp" style="font-size:17px;"></i>
@@ -1106,5 +1109,61 @@ async function shareCarBrochurePdf(customModel = null) {
         setTimeout(() => toast.classList.remove('show'), 3500);
     }
 }
+
+// ─── Unified E-Catalog Tab Switcher ───────────────────────
+window.switchCatalogTab = function (tab) {
+    const tabBtnCatalog = document.getElementById('tabBtnCatalog');
+    const tabBtnBrosur = document.getElementById('tabBtnBrosur');
+    const contentLibrary = document.getElementById('contentLibrary');
+    const contentBrosur = document.getElementById('contentBrosur');
+
+    if (tab === 'brosur') {
+        if (tabBtnCatalog) tabBtnCatalog.classList.remove('active');
+        if (tabBtnBrosur) tabBtnBrosur.classList.add('active');
+        if (contentLibrary) contentLibrary.style.display = 'none';
+        if (contentBrosur) contentBrosur.style.display = 'block';
+
+        if (typeof window.fetchBrosur === 'function') {
+            window.fetchBrosur();
+        }
+    } else {
+        if (tabBtnCatalog) tabBtnCatalog.classList.add('active');
+        if (tabBtnBrosur) tabBtnBrosur.classList.remove('active');
+        if (contentLibrary) contentLibrary.style.display = 'block';
+        if (contentBrosur) contentBrosur.style.display = 'none';
+    }
+};
+
+// Auto-activate tab from URL parameter (?tab=brosur)
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'brosur') {
+        window.switchCatalogTab('brosur');
+    }
+});
+
+// ─── Direct Interactive PDF Brochure Opener ──────────────
+window.viewCarBrochure = function (carName) {
+    const model = carName || currentElibModel || 'Toyota';
+    const pdfFileName = getCarBrochureFilename(model);
+
+    if (!pdfFileName) {
+        // Fallback: switch to brosur tab and search
+        window.switchCatalogTab('brosur');
+        const bInput = document.getElementById('searchBrosurInput') || document.getElementById('searchInput');
+        if (bInput) {
+            bInput.value = model;
+            bInput.dispatchEvent(new Event('input'));
+        }
+        return;
+    }
+
+    const pdfUrl = `uploads/brosur/${pdfFileName}`;
+    if (typeof window.openPdfModal === 'function') {
+        window.openPdfModal(model, pdfUrl);
+    } else {
+        window.open(`../${pdfUrl}`, '_blank');
+    }
+};
 
 

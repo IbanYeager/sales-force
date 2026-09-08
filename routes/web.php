@@ -56,6 +56,12 @@ Route::get('/e-catalog', function () {
 Route::get('/katalog', function () {
     return app(PageController::class)->showSalesPage('elibrary');
 });
+Route::get('/brosur', function () {
+    return redirect('/pages/elibrary?tab=brosur');
+});
+Route::get('/e-brosur', function () {
+    return redirect('/pages/elibrary?tab=brosur');
+});
 
 foreach ($salesPages as $page) {
     Route::get("/{$page}", function () use ($page) {

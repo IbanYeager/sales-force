@@ -176,9 +176,32 @@ let pdfDoc = null,
   pageIsRendering = false,
   pageNumIsPending = null;
 
-const scale = 1.2,
-  canvas = document.getElementById('pdfCanvas'),
-  ctx = canvas.getContext('2d');
+let canvas = null,
+  ctx = null;
+
+function getPdfCanvas() {
+  if (!canvas) {
+    canvas = document.getElementById('pdfCanvas');
+    if (canvas) {
+      ctx = canvas.getContext('2d');
+      canvas.addEventListener('click', () => {
+        if (!canvas || !pdfDoc) return;
+        const dataUrl = canvas.toDataURL('image/png');
+        const lbImg = document.getElementById('pdfLightboxImg');
+        const lbBg = document.getElementById('pdfLightboxBg');
+        if (lbImg) lbImg.src = dataUrl;
+        if (lbBg) lbBg.style.backgroundImage = `url(${dataUrl})`;
+        const pNum = document.getElementById('pdfLightboxPageNum');
+        if (pNum) pNum.textContent = pageNum;
+        const pCount = document.getElementById('pdfLightboxPageCount');
+        if (pCount) pCount.textContent = pdfDoc.numPages;
+        const lb = document.getElementById('pdfLightbox');
+        if (lb) lb.classList.add('show');
+      });
+    }
+  }
+  return canvas;
+}
 
 // Pastikan worker pdf.js dimuat
 if (window['pdfjs-dist/build/pdf']) {
@@ -190,14 +213,19 @@ if (window.pdfjsLib) {
 
 function renderPage(num) {
   pageIsRendering = true;
+  getPdfCanvas();
+  if (!canvas || !ctx) {
+    pageIsRendering = false;
+    return;
+  }
   pdfDoc.getPage(num).then(page => {
     // Calculate dynamic scale to fit the container width
     const container = document.getElementById('pdfViewerContainer');
     const padding = 24; // 10px padding on each side + some safe margin
-    const containerWidth = container.clientWidth - padding;
+    const containerWidth = (container ? container.clientWidth : window.innerWidth) - padding;
 
     const unscaledViewport = page.getViewport({ scale: 1.0 });
-    const scaleToFit = containerWidth / unscaledViewport.width;
+    const scaleToFit = Math.max(0.5, containerWidth / unscaledViewport.width);
 
     // Render at a higher resolution (e.g., 2.5x of the fitted size) for sharpness when zoomed
     const renderScale = scaleToFit * 2.5;
@@ -223,12 +251,16 @@ function renderPage(num) {
       const lightbox = document.getElementById('pdfLightbox');
       if (lightbox && lightbox.classList.contains('show')) {
         const dataUrl = canvas.toDataURL('image/png');
-        document.getElementById('pdfLightboxImg').src = dataUrl;
-        document.getElementById('pdfLightboxBg').style.backgroundImage = `url(${dataUrl})`;
-        document.getElementById('pdfLightboxPageNum').textContent = num;
+        const lbImg = document.getElementById('pdfLightboxImg');
+        const lbBg = document.getElementById('pdfLightboxBg');
+        if (lbImg) lbImg.src = dataUrl;
+        if (lbBg) lbBg.style.backgroundImage = `url(${dataUrl})`;
+        const pNum = document.getElementById('pdfLightboxPageNum');
+        if (pNum) pNum.textContent = num;
       }
     });
-    document.getElementById('pdfPageNum').textContent = num;
+    const pNumEl = document.getElementById('pdfPageNum');
+    if (pNumEl) pNumEl.textContent = num;
   });
 }
 
@@ -247,30 +279,26 @@ function showPrevPage() {
 }
 
 function showNextPage() {
-  if (pageNum >= pdfDoc.numPages) return;
+  if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
   pageNum++;
   queueRenderPage(pageNum);
 }
 
-document.getElementById('btnPrevPdf').addEventListener('click', showPrevPage);
-document.getElementById('btnNextPdf').addEventListener('click', showNextPage);
-
-// Open Lightbox Focus on click
-canvas.addEventListener('click', () => {
-  const dataUrl = canvas.toDataURL('image/png');
-  document.getElementById('pdfLightboxImg').src = dataUrl;
-  document.getElementById('pdfLightboxBg').style.backgroundImage = `url(${dataUrl})`;
-  document.getElementById('pdfLightboxPageNum').textContent = pageNum;
-  document.getElementById('pdfLightboxPageCount').textContent = pdfDoc.numPages;
-  document.getElementById('pdfLightbox').classList.add('show');
+document.addEventListener('DOMContentLoaded', () => {
+  const btnPrev = document.getElementById('btnPrevPdf');
+  if (btnPrev) btnPrev.addEventListener('click', showPrevPage);
+  const btnNext = document.getElementById('btnNextPdf');
+  if (btnNext) btnNext.addEventListener('click', showNextPage);
+  const btnPrevLb = document.getElementById('btnPrevLightbox');
+  if (btnPrevLb) btnPrevLb.addEventListener('click', showPrevPage);
+  const btnNextLb = document.getElementById('btnNextLightbox');
+  if (btnNextLb) btnNextLb.addEventListener('click', showNextPage);
 });
 
 window.closePdfLightbox = function () {
-  document.getElementById('pdfLightbox').classList.remove('show');
+  const lb = document.getElementById('pdfLightbox');
+  if (lb) lb.classList.remove('show');
 };
-
-document.getElementById('btnPrevLightbox').addEventListener('click', showPrevPage);
-document.getElementById('btnNextLightbox').addEventListener('click', showNextPage);
 
 window.openPdfModal = function (nama, url) {
   const finalUrl = url.startsWith('http') ? url : '../' + url;
@@ -499,22 +527,28 @@ function showToast() {
 }
 
 // ─── Search handlers ─────────────────────────────────────
-const searchInput = document.getElementById('searchInput');
-const searchClear = document.getElementById('searchClear');
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchBrosurInput') || document.getElementById('searchInput');
+  const searchClear = document.getElementById('searchBrosurClear') || document.getElementById('searchClear');
 
-searchInput.addEventListener('input', () => {
-  searchQuery = searchInput.value.trim();
-  searchClear.classList.toggle('visible', searchQuery.length > 0);
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => fetchBrosur(), 350);
-});
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      searchQuery = searchInput.value.trim();
+      if (searchClear) searchClear.classList.toggle('visible', searchQuery.length > 0);
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => fetchBrosur(), 350);
+    });
+  }
 
-searchClear.addEventListener('click', () => {
-  searchInput.value = '';
-  searchQuery = '';
-  searchClear.classList.remove('visible');
-  fetchBrosur();
-  searchInput.focus();
+  if (searchClear && searchInput) {
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchQuery = '';
+      searchClear.classList.remove('visible');
+      fetchBrosur();
+      searchInput.focus();
+    });
+  }
 });
 
 // ─── Helpers ─────────────────────────────────────────────
