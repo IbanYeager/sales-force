@@ -762,11 +762,6 @@
                         </div>
 
                         <div class="category-grid feature-modal-grid">
-                            <!-- PWA Quick Install Tile -->
-                            <a href="javascript:void(0)" onclick="closeFeatureModal(); if(window.triggerPwaInstall) window.triggerPwaInstall();" class="category-item" id="featureModalPwaItem" style="display:none;">
-                                <div class="category-icon" style="background: rgba(204, 20, 38, 0.1); color: #cc1426;"><i class="fa-solid fa-download"></i></div>
-                                <span class="category-text">Install Aplikasi</span>
-                            </a>
                             <!-- Tier 1: Operasional Harian & Closing Transaksi (Paling Kritis) -->
                             <a href="pages/ao_report.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chalkboard-user"></i></div>

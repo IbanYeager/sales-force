@@ -279,13 +279,7 @@ function updateAllPwaInstallButtons() {
         }
     }
 
-    // 3. Item di Modal Semua Fitur
-    const modalItem = document.getElementById('featureModalPwaItem');
-    if (modalItem) {
-        modalItem.style.display = installed ? 'none' : 'flex';
-    }
-
-    // 4. Tombol di Sidebar Desktop
+    // 2. Tombol di Sidebar Desktop
     const sidebarBtn = document.getElementById('sidebarPwaInstallBtn');
     if (sidebarBtn) {
         sidebarBtn.style.display = installed ? 'none' : 'flex';
