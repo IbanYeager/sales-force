@@ -27,6 +27,9 @@ function getKatSlug(kat) {
 
 // ─── Fetch data ──────────────────────────────────────────
 function fetchBrosur() {
+  const container = document.getElementById('brosurContainer');
+  if (!container) return;
+
   const params = new URLSearchParams();
   if (searchQuery) params.set('search', searchQuery);
   if (activeKat && activeKat !== 'ALL') params.set('kategori', activeKat);
@@ -49,6 +52,7 @@ function fetchBrosur() {
 // ─── Render category tabs ────────────────────────────────
 function renderTabs() {
   const tabsEl = document.getElementById('katTabs');
+  if (!tabsEl) return;
   // Hapus tab selain "All"
   tabsEl.querySelectorAll('.kat-tab:not([data-kat="ALL"])').forEach(t => t.remove());
 
@@ -528,8 +532,8 @@ function showToast() {
 
 // ─── Search handlers ─────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.getElementById('searchBrosurInput') || document.getElementById('searchInput');
-  const searchClear = document.getElementById('searchBrosurClear') || document.getElementById('searchClear');
+  const searchInput = document.getElementById('searchBrosurInput');
+  const searchClear = document.getElementById('searchBrosurClear');
 
   if (searchInput) {
     searchInput.addEventListener('input', () => {

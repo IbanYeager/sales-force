@@ -102,7 +102,7 @@
                     <i class="fa-solid fa-leaf"></i> Toyota Eco Calc (Hybrid)
                 </a>
                 <a href="pages/elibrary.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-book-medical"></i> E-Catalog
+                    <i class="fa-solid fa-book-open"></i> E-Catalog
                 </a>
                 <a href="pages/pricelist.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-clipboard-list"></i> Pricelist
@@ -167,9 +167,6 @@
                 </a>
                 <a href="pages/tco.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-car-tunnel"></i> Aksesoris TCO
-                </a>
-                <a href="pages/elibrary.html?tab=brosur" class="sidebar-nav-link">
-                    <i class="fa-solid fa-book-open"></i> Brosur
                 </a>
             </div>
 
@@ -352,11 +349,11 @@
                                 <span class="category-text">Pricelist OTR</span>
                             </a>
                             <a href="pages/elibrary.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+                                <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">E-Catalog</span>
                             </a>
-                            <a href="pages/elibrary.html?tab=brosur" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
+                            <a href="pages/elibrary.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-file-pdf"></i></div>
                                 <span class="category-text">Brosur Digital</span>
                             </a>
                             <a href="pages/promo.html" class="category-item">
@@ -851,12 +848,8 @@
                                 <div class="category-icon"><i class="fa-solid fa-scale-balanced"></i></div>
                                 <span class="category-text">Komparasi 360°</span>
                             </a>
-                            <a href="pages/elibrary.html?tab=brosur" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
-                                <span class="category-text">Brosur Digital</span>
-                            </a>
                             <a href="pages/elibrary.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-book-medical"></i></div>
+                                <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">E-Catalog</span>
                             </a>
                             <a href="pages/market_analysis.html" class="category-item">

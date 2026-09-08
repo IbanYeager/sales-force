@@ -306,14 +306,14 @@ function renderLibrary() {
                                 <span style="background:rgba(255,255,255,0.8); padding:4px 10px; border-radius:12px; font-size:10px; font-weight:700; color:var(--text-muted); box-shadow:0 2px 4px rgba(0,0,0,0.02);"><i class="fa-solid fa-users" style="color:var(--primary-blue);"></i> ${specs.seats}</span>
                             </div>
                         </div>
-                        <div style="display:flex; gap:6px; align-items:center;">
-                            <button class="btn-main" onclick="showSpecs('${model}')" style="flex:1; font-size:11px; padding:10px 4px; justify-content:center; border-radius:12px; background:linear-gradient(135deg, var(--primary-blue), #003d99); box-shadow: 0 4px 12px rgba(0,82,204,0.25);">
+                        <div class="elib-card-actions" style="display:grid; grid-template-columns: 1fr 1fr 38px; gap:6px; align-items:center;">
+                            <button class="btn-main" onclick="showSpecs('${model}')" title="Detail & Spesifikasi Lengkap" style="font-size:11.5px; font-weight:700; padding:10px 4px; justify-content:center; border-radius:10px; background:linear-gradient(135deg, var(--primary-blue), #003d99); color:#fff; border:none; cursor:pointer; box-shadow: 0 3px 8px rgba(0,82,204,0.25);">
                                 <i class="fa-solid fa-list-ul" style="margin-right:4px;"></i> Detail
                             </button>
-                            <button class="btn-main" onclick="viewCarBrochure('${model}')" title="Lihat Brosur PDF Resmi" style="width:38px; height:38px; padding:0; justify-content:center; border-radius:12px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#ffffff; box-shadow: 0 4px 12px rgba(200,16,46,0.3); border:none; cursor:pointer; flex-shrink:0;">
-                                <i class="fa-solid fa-file-pdf" style="font-size:16px;"></i>
+                            <button class="btn-main" onclick="viewCarBrochure('${model}')" title="Buka Brosur PDF Resmi" style="font-size:11.5px; font-weight:700; padding:10px 4px; justify-content:center; border-radius:10px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#fff; border:none; cursor:pointer; box-shadow: 0 3px 8px rgba(200,16,46,0.25);">
+                                <i class="fa-solid fa-file-pdf" style="margin-right:4px;"></i> Brosur
                             </button>
-                            <button class="btn-main" onclick="quickShareCar('${model}')" title="Bagikan Info & Spek ke WhatsApp" style="width:38px; height:38px; padding:0; justify-content:center; border-radius:12px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; box-shadow: 0 4px 12px rgba(37,211,102,0.3); border:none; cursor:pointer; flex-shrink:0;">
+                            <button class="btn-main" onclick="quickShareCar('${model}')" title="Bagikan ke WhatsApp" style="width:38px; height:38px; padding:0; justify-content:center; border-radius:10px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#fff; border:none; cursor:pointer; flex-shrink:0; box-shadow: 0 3px 8px rgba(37,211,102,0.25);">
                                 <i class="fa-brands fa-whatsapp" style="font-size:17px;"></i>
                             </button>
                         </div>
@@ -1011,6 +1011,8 @@ function getCarBrochureFilename(modelName) {
     if (m.includes('dyna')) return 'dyna.pdf';
     if (m.includes('gr 86') || m.includes('gr86')) return 'gr-86.pdf';
     if (m.includes('gr yaris')) return 'gr-yaris.pdf';
+    if (m.includes('voxy')) return 'voxy.pdf';
+    if (m.includes('urban cruiser') || m.includes('urban-cruiser')) return 'urban-cruiser.pdf';
     return null;
 }
 
@@ -1110,37 +1112,11 @@ async function shareCarBrochurePdf(customModel = null) {
     }
 }
 
-// ─── Unified E-Catalog Tab Switcher ───────────────────────
+// ─── Unified E-Catalog Direct Opener ───────────────────────
 window.switchCatalogTab = function (tab) {
-    const tabBtnCatalog = document.getElementById('tabBtnCatalog');
-    const tabBtnBrosur = document.getElementById('tabBtnBrosur');
     const contentLibrary = document.getElementById('contentLibrary');
-    const contentBrosur = document.getElementById('contentBrosur');
-
-    if (tab === 'brosur') {
-        if (tabBtnCatalog) tabBtnCatalog.classList.remove('active');
-        if (tabBtnBrosur) tabBtnBrosur.classList.add('active');
-        if (contentLibrary) contentLibrary.style.display = 'none';
-        if (contentBrosur) contentBrosur.style.display = 'block';
-
-        if (typeof window.fetchBrosur === 'function') {
-            window.fetchBrosur();
-        }
-    } else {
-        if (tabBtnCatalog) tabBtnCatalog.classList.add('active');
-        if (tabBtnBrosur) tabBtnBrosur.classList.remove('active');
-        if (contentLibrary) contentLibrary.style.display = 'block';
-        if (contentBrosur) contentBrosur.style.display = 'none';
-    }
+    if (contentLibrary) contentLibrary.style.display = 'block';
 };
-
-// Auto-activate tab from URL parameter (?tab=brosur)
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tab') === 'brosur') {
-        window.switchCatalogTab('brosur');
-    }
-});
 
 // ─── Direct Interactive PDF Brochure Opener ──────────────
 window.viewCarBrochure = function (carName) {
@@ -1148,12 +1124,10 @@ window.viewCarBrochure = function (carName) {
     const pdfFileName = getCarBrochureFilename(model);
 
     if (!pdfFileName) {
-        // Fallback: switch to brosur tab and search
-        window.switchCatalogTab('brosur');
-        const bInput = document.getElementById('searchBrosurInput') || document.getElementById('searchInput');
-        if (bInput) {
-            bInput.value = model;
-            bInput.dispatchEvent(new Event('input'));
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert(`Brosur PDF resmi untuk ${model} sedang disiapkan.`);
+        } else {
+            alert(`Brosur PDF resmi untuk ${model} sedang disiapkan.`);
         }
         return;
     }

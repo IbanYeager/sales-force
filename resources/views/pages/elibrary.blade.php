@@ -24,17 +24,7 @@
 
     <div class="container" style="margin-top:18px;">
 
-      <!-- SEGMENT SWITCHER TABS (Katalog vs Brosur PDF) -->
-      <div class="segment-control-container" style="display:flex; background:#e2e8f0; padding:4px; border-radius:14px; margin-bottom:18px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);">
-        <button type="button" id="tabBtnCatalog" class="tab-btn active" onclick="switchCatalogTab('catalog')" style="flex:1; padding:11px 14px; border-radius:10px; border:none; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.25s ease;">
-          <i class="fa-solid fa-car"></i> Katalog Mobil
-        </button>
-        <button type="button" id="tabBtnBrosur" class="tab-btn" onclick="switchCatalogTab('brosur')" style="flex:1; padding:11px 14px; border-radius:10px; border:none; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.25s ease;">
-          <i class="fa-solid fa-book-open"></i> Brosur PDF Resmi
-        </button>
-      </div>
-
-      <!-- TAB 1: KATALOG MOBIL & SPESIFIKASI TEKNIS -->
+      <!-- KATALOG & BROSUR MOBIL TOYOTA TERPADU (1 HALAMAN) -->
       <div id="contentLibrary">
         <div class="form-group" style="margin-bottom:12px;">
           <input class="form-control" type="text" id="searchInput" placeholder="Cari mobil (misal: Innova, Fortuner, Agya)..."
@@ -69,6 +59,24 @@
               border-color: var(--primary-red);
               box-shadow: 0 4px 10px rgba(212, 22, 60, 0.3);
             }
+
+            .elib-unified-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+              gap: 14px;
+            }
+            @media (max-width: 640px) {
+              .elib-unified-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+              }
+            }
+            @media (max-width: 360px) {
+              .elib-unified-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+              }
+            }
           </style>
           <button class="cat-btn active" onclick="filterCategory('All', this)">Semua</button>
           <button class="cat-btn" onclick="filterCategory('MPV', this)">MPV</button>
@@ -78,74 +86,8 @@
           <button class="cat-btn" onclick="filterCategory('Commercial', this)">Commercial</button>
         </div>
 
-        <div id="libGrid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div id="libGrid" class="elib-unified-grid">
           <!-- Rendered via elibrary.js -->
-        </div>
-      </div>
-
-      <!-- TAB 2: BROSUR DIGITAL (PDF LIBRARY) -->
-      <div id="contentBrosur" style="display:none; padding-bottom:24px;">
-        <!-- Hero Banner -->
-        <div class="brosur-hero" style="margin-bottom:14px;">
-          <div class="brosur-hero-row">
-            <div class="brosur-hero-icon">
-              <i class="fa-solid fa-book-open"></i>
-            </div>
-            <div>
-              <h2>Brosur Toyota Resmi</h2>
-              <p>Temukan &amp; bagikan katalog brosur resmi Toyota lengkap semua model</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Search bar -->
-        <div class="search-wrap">
-          <i class="fa-solid fa-magnifying-glass search-icon-brosur"></i>
-          <input type="text" class="brosur-search-input" id="searchBrosurInput" placeholder="Cari model brosur..."
-            autocomplete="off" />
-          <button class="search-clear" id="searchBrosurClear" title="Hapus pencarian">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <!-- Category tabs -->
-        <div class="kat-tabs" id="katTabs">
-          <button class="kat-tab active" data-kat="ALL">
-            <i class="fa-solid fa-th-large" style="margin-right:4px;font-size:9px;"></i> All
-          </button>
-          <!-- Tabs diisi via JS -->
-        </div>
-
-        <!-- Result info -->
-        <div class="result-count" id="resultCount" style="display:none;"></div>
-
-        <!-- Brochure list container -->
-        <div id="brosurContainer">
-          <!-- Skeleton loading -->
-          <div class="skeleton-grid" id="skeletonGrid">
-            <div class="skeleton-card">
-              <div class="skeleton-img"></div>
-              <div class="skeleton-body">
-                <div class="skeleton-line" style="height:14px;width:70%;"></div>
-                <div class="skeleton-line" style="height:10px;width:90%;"></div>
-                <div style="display:flex;gap:6px;margin-top:4px;">
-                  <div class="skeleton-line" style="height:30px;flex:1;border-radius:8px;"></div>
-                  <div class="skeleton-line" style="height:30px;width:32px;border-radius:8px;"></div>
-                </div>
-              </div>
-            </div>
-            <div class="skeleton-card">
-              <div class="skeleton-img"></div>
-              <div class="skeleton-body">
-                <div class="skeleton-line" style="height:14px;width:60%;"></div>
-                <div class="skeleton-line" style="height:10px;width:85%;"></div>
-                <div style="display:flex;gap:6px;margin-top:4px;">
-                  <div class="skeleton-line" style="height:30px;flex:1;border-radius:8px;"></div>
-                  <div class="skeleton-line" style="height:30px;width:32px;border-radius:8px;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -156,18 +98,6 @@
     /* Premium Glassmorphism UI for E-Catalog */
     .mobile-app {
       background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
-    }
-
-    .segment-control-container .tab-btn {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: transparent;
-      color: var(--text-muted);
-    }
-
-    .segment-control-container .tab-btn.active {
-      background: #ffffff !important;
-      color: var(--primary-blue) !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     }
 
     .glass-card {

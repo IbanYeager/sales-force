@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <script>
-    // Dialihkan ke halaman terpadu E-Catalog (Tab Brosur)
-    window.location.replace('elibrary.html?tab=brosur');
+    // Dialihkan langsung ke halaman terpadu E-Catalog
+    window.location.replace('elibrary.html');
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sales App - E-Brosur Toyota</title>
