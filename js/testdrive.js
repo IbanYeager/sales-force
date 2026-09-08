@@ -44,26 +44,27 @@ const salesName = localStorage.getItem('namaSales') || 'Sales';
                 
                 card.innerHTML = `
                 <div class="unit-card-header">
-                    <div class="unit-img-wrap" style="cursor: pointer;" onclick="openImageLightbox('../assets/img/mobil/${getUnitImage(u.model)}')">
+                    <div class="unit-img-wrap" onclick="openImageLightbox('../assets/img/mobil/${getUnitImage(u.model)}')">
                         <img src="../assets/img/mobil/${getUnitImage(u.model)}" onerror="this.src='../assets/img/mobil/avanza.webp'" alt="${u.model}">
+                        <span class="unit-img-preview-tag"><i class="fa-solid fa-expand"></i> Foto</span>
                     </div>
                     <div class="unit-info">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                            <div class="unit-model" style="margin-bottom:0;">${u.model}</div>
-                            <span class="unit-badge badge-avail">Tersedia</span>
+                        <div class="unit-title-row">
+                            <h4 class="unit-model">${u.model}</h4>
+                            <span class="unit-badge badge-avail"><i class="fa-solid fa-circle-check"></i> Tersedia</span>
                         </div>
                         <div class="unit-meta">
                             <span class="meta-chip"><i class="fa-solid fa-gear"></i> ${u.type}</span>
                             <span class="meta-chip"><i class="fa-solid fa-palette"></i> ${u.warna}</span>
                             <span class="meta-chip"><i class="fa-regular fa-calendar"></i> ${u.tahun}</span>
                         </div>
-                        <div style="display:flex; flex-direction:column; gap:4px; margin-top:8px; border-top:1px dashed #e2e8f0; padding-top:8px;">
+                        <div class="unit-specs-row">
                             ${(() => {
                                 const s = getUnitSpecs(u.model);
                                 return `
-                                <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center;"><i class="fa-solid fa-users" style="color:#94a3b8; margin-right:6px; width:12px; text-align:center;"></i> ${s.seats}</div>
-                                <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center;"><i class="fa-solid fa-gas-pump" style="color:#94a3b8; margin-right:6px; width:12px; text-align:center;"></i> ${s.fuel}</div>
-                                <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center;"><i class="fa-solid fa-gauge-high" style="color:#94a3b8; margin-right:6px; width:12px; text-align:center;"></i> ${s.engine}</div>
+                                <div class="spec-item"><i class="fa-solid fa-users"></i> ${s.seats}</div>
+                                <div class="spec-item"><i class="fa-solid fa-gas-pump"></i> ${s.fuel}</div>
+                                <div class="spec-item"><i class="fa-solid fa-gauge-high"></i> ${s.engine}</div>
                                 `;
                             })()}
                         </div>
@@ -72,7 +73,7 @@ const salesName = localStorage.getItem('namaSales') || 'Sales';
                 <div class="unit-divider"></div>
                 <div class="unit-actions">
                     <button class="btn-select-unit ${isSelected ? 'selected-btn' : ''}" onclick="pickUnit('${u.id}')">
-                        ${isSelected ? '<i class="fa-solid fa-check-circle"></i> Terpilih' : '<i class="fa-solid fa-circle-dot"></i> Pilih Unit'}
+                        ${isSelected ? '<i class="fa-solid fa-check-circle"></i> Unit Terpilih - Siap Ajukan' : '<i class="fa-solid fa-circle-dot"></i> Pilih Unit Ini'}
                     </button>
                 </div>
                 `;

@@ -135,7 +135,7 @@ function updateModelOptionsByPartner() {
 }
 
 function renderBookingHistory(bookings) {
-    const container = document.getElementById('historyBookingContainer');
+    const container = document.getElementById('historyBookingContainer') || document.getElementById('rentalHistoryList');
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
@@ -199,15 +199,29 @@ async function submitRentalBooking(event) {
     event.preventDefault();
 
     const salesAccountId = localStorage.getItem('idSales') || 7;
-    const namaSales = document.getElementById('salesName').value;
-    const namaCustomer = document.getElementById('customerName').value.trim();
-    const noHpCustomer = document.getElementById('customerPhone').value.trim();
-    const mitraRental = document.getElementById('selectMitraRental').value;
-    const modelUnit = document.getElementById('selectModelUnit').value;
-    const durasi = document.getElementById('selectDurasi').value;
-    const tanggalTestdrive = document.getElementById('tanggalTestdrive').value;
-    const alasanPengajuan = document.getElementById('selectAlasan').value;
-    const lokasiPenjemputan = document.getElementById('lokasiPenjemputan').value.trim();
+    const namaSales = document.getElementById('salesName') ? document.getElementById('salesName').value : 'Sales Consultant';
+
+    let namaCustomer = '';
+    let noHpCustomer = '';
+    const custNameEl = document.getElementById('customerName');
+    const custPhoneEl = document.getElementById('customerPhone');
+    const custInfoEl = document.getElementById('customerRentalInfo');
+
+    if (custNameEl && custNameEl.value) {
+        namaCustomer = custNameEl.value.trim();
+        noHpCustomer = custPhoneEl ? custPhoneEl.value.trim() : '';
+    } else if (custInfoEl && custInfoEl.value) {
+        const parts = custInfoEl.value.split('-');
+        namaCustomer = parts[0].trim();
+        noHpCustomer = parts[1] ? parts[1].trim() : '08123456789';
+    }
+
+    const mitraRental = document.getElementById('selectMitraRental') ? document.getElementById('selectMitraRental').value : 'TRAC Astra Rent a Car';
+    const modelUnit = (document.getElementById('selectModelUnit') || document.getElementById('modelMobilDiminta')) ? (document.getElementById('selectModelUnit') || document.getElementById('modelMobilDiminta')).value : '';
+    const durasi = document.getElementById('selectDurasi') ? document.getElementById('selectDurasi').value : '1 Hari (24 Jam)';
+    const tanggalTestdrive = document.getElementById('tanggalTestdrive') ? document.getElementById('tanggalTestdrive').value : '';
+    const alasanPengajuan = (document.getElementById('selectAlasan') || document.getElementById('catatanRental')) ? (document.getElementById('selectAlasan') || document.getElementById('catatanRental')).value : 'Uji Coba Konsumen';
+    const lokasiPenjemputan = document.getElementById('lokasiPenjemputan') ? document.getElementById('lokasiPenjemputan').value.trim() : 'Showroom Tunas Toyota Kiara Condong';
 
     const payload = {
         sales_account_id: salesAccountId,

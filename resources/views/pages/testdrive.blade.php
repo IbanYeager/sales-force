@@ -11,136 +11,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/testdrive.css">
+    <link rel="stylesheet" href="../css/testdrive.css?v=20260908_v11">
     <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
 
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#0d1b3e">
-
-    <style>
-        /* ── SEGMENTED TOP TAB BAR ── */
-        .td-tabs-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            padding: 6px;
-            border-radius: 16px;
-            border: 1.5px solid #e2e8f0;
-            display: flex;
-            gap: 6px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-            position: sticky;
-            top: 65px;
-            z-index: 99;
-        }
-
-        .td-tab-btn {
-            flex: 1;
-            padding: 10px 12px;
-            border: none;
-            background: transparent;
-            color: #64748b;
-            font-size: 12.5px;
-            font-weight: 700;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
-        .td-tab-btn.active {
-            background: linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(13, 27, 62, 0.25);
-        }
-
-        /* ── RENTAL TEST DRIVE STYLES ── */
-        .rental-hero-sub {
-            background: linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 55%, #0f172a 100%);
-            color: white;
-            padding: 24px 22px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(13, 27, 62, 0.15);
-        }
-
-        .partner-card {
-            background: white;
-            border-radius: 18px;
-            border: 1px solid #e2e8f0;
-            padding: 18px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
-        }
-
-        .partner-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            padding-bottom: 10px;
-            border-bottom: 1.5px dashed #e2e8f0;
-        }
-
-        .fleet-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px;
-        }
-
-        .fleet-item {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-
-        .fleet-item:hover {
-            border-color: #c8102e;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-        }
-
-        .history-card {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            padding: 18px;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 800;
-        }
-        .status-badge.disetujui { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-        .status-badge.menunggu { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-        .status-badge.penggunaan { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-    </style>
 </head>
 
 <body>
-    <div class="mobile-app" style="max-width: 1200px; padding-bottom: 80px;">
+    <div class="mobile-app" style="max-width: 1200px;">
+        <!-- ═══ HEADER NAV TOP BAR ═══ -->
         <header class="header-page">
-            <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
-            <h2>Integrated Test Drive Center</h2>
+            <a href="../index.html" title="Kembali ke Dashboard"><i class="fa-solid fa-arrow-left"></i></a>
+            <h2>Test Drive Center</h2>
+            <span class="header-pill-badge">
+                <i class="fa-solid fa-car-side"></i> Official Fleet
+            </span>
         </header>
 
         <div class="container" style="margin-top: 15px;">
@@ -148,13 +34,19 @@
             <!-- ═══ TOP TAB NAVIGATION ═══ -->
             <div class="td-tabs-nav">
                 <button type="button" class="td-tab-btn active" id="tabBtnCabang" onclick="switchMainTdTab('cabang')">
-                    <i class="fa-solid fa-building-flag"></i> Unit Cabang Dealer
+                    <i class="fa-solid fa-building-flag"></i>
+                    <span class="tab-label-full">Unit Cabang Dealer</span>
+                    <span class="tab-label-short">Unit Dealer</span>
                 </button>
                 <button type="button" class="td-tab-btn" id="tabBtnRental" onclick="switchMainTdTab('rental')">
-                    <i class="fa-solid fa-handshake"></i> Unit Rekanan Rental (TRAC)
+                    <i class="fa-solid fa-handshake"></i>
+                    <span class="tab-label-full">Unit Rekanan Rental (TRAC)</span>
+                    <span class="tab-label-short">Mitra Rental</span>
                 </button>
                 <button type="button" class="td-tab-btn" id="tabBtnRiwayat" onclick="switchMainTdTab('riwayat')">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Pengajuan
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span class="tab-label-full">Riwayat Pengajuan</span>
+                    <span class="tab-label-short">Riwayat</span>
                 </button>
             </div>
 
@@ -169,7 +61,7 @@
                         <p>Unit Dipilih</p>
                         <h4 id="selectedUnitName">—</h4>
                     </div>
-                    <button type="button" onclick="openModal()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.2);color:white;padding:8px 14px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">
+                    <button type="button" class="btn-banner-ajukan" onclick="openModal()">
                         Ajukan Jadwal <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
@@ -189,11 +81,11 @@
             ══════════════════════════════════════════════════════════════════════════════ -->
             <div id="sectionRental" style="display:none;">
                 <div class="rental-hero-sub">
-                    <span style="background:rgba(255,255,255,0.2); color:#93c5fd; font-size:11px; font-weight:800; padding:4px 10px; border-radius:14px; text-transform:uppercase;">
+                    <span class="rental-hero-badge">
                         <i class="fa-solid fa-handshake"></i> TOYOTA FLEET PARTNERSHIP
                     </span>
-                    <h3 style="font-size:20px; font-weight:900; margin:8px 0 4px; color:white;">Armada Ready Rekanan Rental</h3>
-                    <p style="font-size:12.5px; color:#cbd5e1; margin:0;">Gunakan armada kemitraan resmi (TRAC Astra / Partner) jika unit test drive cabang sedang terpakai atau varian tertentu tidak tersedia di showroom.</p>
+                    <h3>Armada Ready Rekanan Rental</h3>
+                    <p>Gunakan armada kemitraan resmi (TRAC Astra / Partner) jika unit test drive cabang sedang terpakai atau varian tertentu tidak tersedia di showroom.</p>
                 </div>
 
                 <!-- Partner Fleet Container -->
@@ -204,20 +96,20 @@
                 </div>
 
                 <!-- Form Permintaan Rental -->
-                <div class="card" style="margin-top:20px; padding:22px; border-radius:18px;">
-                    <h3 style="font-size:15px; font-weight:800; margin:0 0 16px; color:#0f172a; border-bottom:1.5px solid #f1f5f9; padding-bottom:10px;">
-                        <i class="fa-solid fa-file-pen" style="color:#c8102e; margin-right:6px;"></i> Form Permintaan Unit Test Drive Rekanan
+                <div class="rental-form-card">
+                    <h3 class="rental-form-title">
+                        <i class="fa-solid fa-file-pen" style="color:var(--td-red);"></i> Form Permintaan Unit Test Drive Rekanan
                     </h3>
 
                     <form id="rentalTestDriveForm" onsubmit="submitRentalBooking(event)">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
-                            <div>
-                                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Nama Sales Consultant</label>
-                                <input type="text" id="salesName" class="form-control" readonly required style="background:#e2e8f0; width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
+                        <div class="rental-form-row">
+                            <div class="form-group-custom">
+                                <label>Nama Sales Consultant</label>
+                                <input type="text" id="salesName" class="form-control" readonly required>
                             </div>
-                            <div>
-                                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Pilih Mitra Rental</label>
-                                <select id="selectMitraRental" class="form-control" required onchange="updateModelOptionsByPartner()" style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
+                            <div class="form-group-custom">
+                                <label>Pilih Mitra Rental</label>
+                                <select id="selectMitraRental" class="form-control" required onchange="updateModelOptionsByPartner()">
                                     <option value="TRAC Astra Rent a Car (Bandung Branch)">TRAC Astra Rent a Car (Bandung Branch)</option>
                                     <option value="FR Group Braga (Toyota &amp; Premium SUV Fleet)">FR Group Braga (Toyota &amp; Premium SUV Fleet)</option>
                                     <option value="FR Group Luxury &amp; Commercial (All-in Driver + BBM)">FR Group Luxury &amp; Commercial</option>
@@ -225,10 +117,10 @@
                             </div>
                         </div>
 
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
-                            <div>
-                                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Model Mobil Diminta</label>
-                                <select id="modelMobilDiminta" class="form-control" required style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
+                        <div class="rental-form-row">
+                            <div class="form-group-custom">
+                                <label>Model Mobil Diminta</label>
+                                <select id="selectModelUnit" class="form-control" required>
                                     <option value="Innova Zenix Q Hybrid">Innova Zenix Q Hybrid</option>
                                     <option value="Yaris Cross S Hybrid">Yaris Cross S Hybrid</option>
                                     <option value="All New Veloz 1.5 Q">All New Veloz 1.5 Q</option>
@@ -236,24 +128,45 @@
                                     <option value="Toyota Alphard 2.5 HEV">Toyota Alphard 2.5 HEV</option>
                                 </select>
                             </div>
-                            <div>
-                                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Jadwal Test Drive Rekanan</label>
-                                <input type="datetime-local" id="tanggalTestdrive" class="form-control" required style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
+                            <div class="form-group-custom">
+                                <label>Jadwal Test Drive Rekanan</label>
+                                <input type="datetime-local" id="tanggalTestdrive" class="form-control" required>
                             </div>
                         </div>
 
-                        <div style="margin-bottom:14px;">
-                            <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Nama Calon Konsumen &amp; No. WhatsApp</label>
-                            <input type="text" id="customerRentalInfo" class="form-control" placeholder="Contoh: Bpk. Gunawan - 08123456789" required style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
+                        <div class="rental-form-row">
+                            <div class="form-group-custom">
+                                <label>Nama Calon Konsumen</label>
+                                <input type="text" id="customerName" class="form-control" placeholder="Contoh: Bpk. Gunawan" required>
+                            </div>
+                            <div class="form-group-custom">
+                                <label>No. WhatsApp Konsumen</label>
+                                <input type="tel" id="customerPhone" class="form-control" placeholder="Contoh: 081234567890" required>
+                            </div>
                         </div>
 
-                        <div style="margin-bottom:16px;">
-                            <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Alasan Penggunaan Unit Rekanan</label>
-                            <textarea id="catatanRental" class="form-control" rows="2" placeholder="Contoh: Unit Innova Zenix showroom sedang servis / konsumen request tipe Hybrid ke rumah" style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1;"></textarea>
+                        <div class="rental-form-row">
+                            <div class="form-group-custom">
+                                <label>Durasi Peminjaman</label>
+                                <select id="selectDurasi" class="form-control" required>
+                                    <option value="1 Hari (24 Jam)">1 Hari (24 Jam)</option>
+                                    <option value="2 Hari">2 Hari</option>
+                                    <option value="3 Hari">3 Hari</option>
+                                </select>
+                            </div>
+                            <div class="form-group-custom">
+                                <label>Lokasi Penjemputan / Test Drive</label>
+                                <input type="text" id="lokasiPenjemputan" class="form-control" value="Showroom Tunas Toyota Kiara Condong" required>
+                            </div>
                         </div>
 
-                        <button type="submit" class="btn-main" style="width:100%; background:linear-gradient(135deg, #c8102e, #990e24); color:white; padding:12px; border-radius:12px; font-weight:800; border:none; cursor:pointer;">
-                            <i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Kirim Pengajuan ke SPV &amp; Admin Rental
+                        <div class="form-group-custom">
+                            <label>Alasan Penggunaan Unit Rekanan</label>
+                            <textarea id="selectAlasan" class="form-control" rows="2" placeholder="Contoh: Unit Innova Zenix showroom sedang servis / konsumen request tipe Hybrid ke rumah"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit-rental">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Pengajuan ke SPV &amp; Admin Rental
                         </button>
                     </form>
                 </div>
@@ -263,13 +176,13 @@
                  TAB 3: RIWAYAT PENGAJUAN (INTERNAL & RENTAL TERPADU)
             ══════════════════════════════════════════════════════════════════════════════ -->
             <div id="sectionRiwayat" style="display:none;">
-                <div style="margin-bottom: 14px; position:relative;">
-                    <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:14px; top:12px; color:var(--text-muted); font-size:13px;"></i>
-                    <input type="text" id="searchTd" class="form-control" style="padding-left:36px; font-size:12.5px; border-radius:12px;" placeholder="Cari nama customer / mobil..." onkeyup="filterTdList()">
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchTd" class="form-control search-input-modern" placeholder="Cari nama customer / mobil..." onkeyup="filterTdList()">
                 </div>
 
                 <!-- Riwayat Internal Dealer -->
-                <h4 style="font-size:13px; font-weight:800; color:#475569; text-transform:uppercase; margin:16px 0 8px;">
+                <h4 class="riwayat-section-title">
                     <i class="fa-solid fa-building-flag" style="color:#0284c7;"></i> Riwayat Unit Dealer Cabang
                 </h4>
                 <div id="tdContainer">
@@ -277,45 +190,61 @@
                 </div>
 
                 <!-- Riwayat Unit Rental -->
-                <h4 style="font-size:13px; font-weight:800; color:#475569; text-transform:uppercase; margin:24px 0 8px;">
-                    <i class="fa-solid fa-handshake" style="color:#c8102e;"></i> Riwayat Unit Rekanan Rental
+                <h4 class="riwayat-section-title" style="margin-top:24px;">
+                    <i class="fa-solid fa-handshake" style="color:var(--td-red);"></i> Riwayat Unit Rekanan Rental
                 </h4>
-                <div id="rentalHistoryList">
-                    <p style="text-align:center; color:var(--text-muted); font-size:12px; padding:20px;">Memuat riwayat rental...</p>
+                <div id="historyBookingContainer">
+                    <div id="rentalHistoryList">
+                        <p style="text-align:center; color:var(--text-muted); font-size:12px; padding:20px;">Memuat riwayat rental...</p>
+                    </div>
                 </div>
             </div>
 
         </div>
+
+        <!-- ═══════════════ FLOATING BOTTOM NAVIGATION (MOBILE) ═══════════════ -->
+        <nav class="bottom-nav">
+            <a href="../index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
+            <a href="pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
+            <a href="input.html" class="nav-item center-btn">
+                <div class="center-btn-inner">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+            </a>
+            <a href="testdrive.html" class="nav-item active"><i class="fa-solid fa-car-side"></i><span class="nav-text">Tes Drive</span></a>
+            <a href="profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
+        </nav>
     </div>
 
     <!-- Modal Input Internal Test Drive -->
     <div class="modal-overlay" id="inputModal" onclick="if(event.target===this) closeModal()">
         <div class="modal-sheet">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="margin:0; font-size:15px; font-weight:900; color:var(--text-dark); text-transform:uppercase;">Pengajuan Test Drive Cabang</h3>
-                <button style="background:none; border:none; font-size:22px; color:var(--text-muted); cursor:pointer;" onclick="closeModal()">&times;</button>
+            <div class="modal-sheet-handle"></div>
+            <div class="modal-sheet-header">
+                <h3>Pengajuan Test Drive Cabang</h3>
+                <button type="button" class="modal-sheet-close" onclick="closeModal()">&times;</button>
             </div>
 
             <form id="tdForm" onsubmit="submitTestDrive(event)">
                 <div class="form-group" style="display:none;">
                     <input type="hidden" id="inputIdUnit">
                 </div>
-                <div class="form-group">
+                <div class="form-group-custom">
                     <label>Nama Customer</label>
                     <input type="text" class="form-control" id="inputCustomer" placeholder="Contoh: Bpk. Budi Santoso" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group-custom">
                     <label>Jadwal Test Drive</label>
                     <input type="datetime-local" class="form-control" id="inputJadwal" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group-custom">
                     <label>Rencana Rute</label>
                     <textarea class="form-control" id="inputRute" rows="2" placeholder="Contoh: Showroom - Jl. Kiara Condong - Rumah Konsumen" required></textarea>
                 </div>
 
-                <div style="display:flex; gap:12px; margin-top:24px;">
-                    <button type="button" class="btn-main" style="background:#f1f5f9; color:#475569; margin:0; border:none; flex:1;" onclick="closeModal()">Batal</button>
-                    <button type="submit" class="btn-main" style="margin:0; flex:2;" id="submitBtn"><i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i>Kirim ke SPV</button>
+                <div style="display:flex; gap:12px; margin-top:20px;">
+                    <button type="button" class="btn-main" style="background:#f1f5f9; color:#475569; margin:0; border:none; flex:1; border-radius:12px; padding:12px; font-weight:700; cursor:pointer;" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn-main" style="margin:0; flex:2; border-radius:12px; padding:12px; font-weight:800; background:linear-gradient(135deg, var(--td-navy), var(--td-navy-light)); color:white; border:none; cursor:pointer;" id="submitBtn"><i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i>Kirim ke SPV</button>
                 </div>
             </form>
         </div>
@@ -333,8 +262,8 @@
 
     <!-- Scripts -->
     <script src="../custom_alert.js"></script>
-    <script src="../js/testdrive.js"></script>
-    <script src="../js/rental_testdrive.js"></script>
+    <script src="../js/testdrive.js?v=20260908_v11"></script>
+    <script src="../js/rental_testdrive.js?v=20260908_v11"></script>
 
     <script>
         function switchMainTdTab(tabId) {
@@ -350,7 +279,7 @@
             } else if (tabId === 'riwayat') {
                 document.getElementById('tabBtnRiwayat').classList.add('active');
                 document.getElementById('sectionRiwayat').style.display = 'block';
-                if (typeof loadRiwayat === 'function') loadRiwayat();
+                if (typeof loadHistory === 'function') loadHistory();
                 if (typeof fetchRentalData === 'function') fetchRentalData();
             } else {
                 document.getElementById('tabBtnCabang').classList.add('active');

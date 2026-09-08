@@ -3,7 +3,7 @@
 // Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20260908-clean-ui-v10';
+const CACHE_VERSION = 'sft-pwa-v20260908-testdrive-mobile-v11';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',
