@@ -1281,7 +1281,7 @@
 
     <script src="js/sidebar_desktop.js?v=20260907_layout_fix"></script>
     <script src="js/ai_copilot.js?v=20260907_layout_fix"></script>
-    <script src="js/script.js?v=20260808_07"></script>
+    <script src="js/script.js?v=20260908_rank_fix_v19"></script>
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 

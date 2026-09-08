@@ -95,12 +95,10 @@ if ($result) {
     }
 }
 
-// Filter 0 DO if mode is 'all', but keep team members if mode is 'team'
-if ($mode !== 'team') {
-    $data = array_values(array_filter($data, function($item) {
-        return $item['do_count'] > 0;
-    }));
-}
+// Filter out 0 DO: only show sales who have at least 1 DO (for both 'all' and 'team' modes)
+$data = array_values(array_filter($data, function($item) {
+    return (int)($item['do_count'] ?? 0) > 0;
+}));
 
 // Sort by DO Count DESC, then Name ASC
 usort($data, function($a, $b) {

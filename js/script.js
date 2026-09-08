@@ -737,7 +737,8 @@ function renderLeaderboard() {
     fetch(`api/api_leaderboard.php?mode=${mode}&sales_account_id=${encodeURIComponent(idSales)}`)
         .then(r => r.json())
         .then(res => {
-            if (res.status === 'success' && res.data && res.data.length > 0) {
+            const activeSales = (res.data || []).filter(s => parseInt(s.do_count || 0, 10) > 0);
+            if (res.status === 'success' && activeSales.length > 0) {
                 let html = '';
                 const rankStyles = [
                     { bg: 'linear-gradient(135deg, #fef3c7, #fde68a)', color: '#92400e', icon: '🥇' },
@@ -745,7 +746,7 @@ function renderLeaderboard() {
                     { bg: 'linear-gradient(135deg, #fef3e2, #fed7aa)', color: '#9a3412', icon: '🥉' }
                 ];
                 
-                res.data.slice(0, 3).forEach((sales, index) => {
+                activeSales.slice(0, 3).forEach((sales, index) => {
                     const rs = rankStyles[index] || { bg: '#f8fafc', color: 'var(--text-muted)', icon: `${index+1}` };
                     const spvText = sales.nama_spv ? ` • ${sales.nama_spv}` : '';
                     html += `
@@ -767,7 +768,13 @@ function renderLeaderboard() {
                 });
                 leaderboardList.innerHTML = html;
             } else {
-                leaderboardList.innerHTML = '<div style="text-align:center; padding:20px 10px;"><i class="fa-regular fa-chart-bar" style="font-size:20px; color:var(--text-light); margin-bottom:6px; display:block;"></i><p style="font-size:12px; color:var(--text-muted); margin:0; font-weight:600;">Belum ada DO bulan ini</p></div>';
+                leaderboardList.innerHTML = `
+                    <div style="text-align:center; padding:22px 14px; background:#f8fafc; border-radius:14px; border:1px dashed var(--border-color);">
+                        <i class="fa-solid fa-trophy" style="font-size:22px; color:#cbd5e1; margin-bottom:8px; display:block;"></i>
+                        <p style="font-size:13px; color:var(--text-dark); margin:0 0 4px 0; font-weight:700;">Belum Ada DO ${mode === 'team' ? 'Tim Saya' : 'Bulan Ini'}</p>
+                        <p style="font-size:11px; color:var(--text-muted); margin:0; line-height:1.4;">Hanya sales yang telah memiliki realisasi DO yang ditampilkan di papan peringkat.</p>
+                    </div>
+                `;
             }
         })
         .catch(err => {
