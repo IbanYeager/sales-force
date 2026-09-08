@@ -352,9 +352,9 @@
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">E-Catalog</span>
                             </a>
-                            <a href="pages/elibrary.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-file-pdf"></i></div>
-                                <span class="category-text">Brosur Digital</span>
+                            <a href="pages/inventory.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-warehouse"></i></div>
+                                <span class="category-text">Live Inventory</span>
                             </a>
                             <a href="pages/promo.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-percent"></i></div>
