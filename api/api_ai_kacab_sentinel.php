@@ -402,6 +402,14 @@ if ($session === 'pagi') {
     }
 }
 
+$compliance_notice = "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" .
+    "🚨 *PATUH SOP & PREVENSI KESALAHAN FATAL SALES:* 🚨\n" .
+    "1. 🛑 *Dilarang Transfer Ke Rekening Pribadi*: Seluruh pembayaran (Booking Fee, DP, Pelunasan) WAJIB ditransfer ke rekening resmi Dealer Tunas Toyota. Pelanggaran transaksi pribadi berakibat sanksi tegas / PHK!\n" .
+    "2. 📝 *Keabsahan Data & Diskon Resmi*: Dilarang memberikan janji promo/diskon di luar ketentuan resmi tanpa persetujuan SPV/Kacab. Data SPK wajib valid.\n" .
+    "3. ⚡ *Disiplin Input System*: Dilarang menunda/memalsukan tanggal SPK/DO. Seluruh transaksi wajib terdata di sistem harian.";
+
+$wa_message .= $compliance_notice;
+
 $wa_url = "https://api.whatsapp.com/send?text=" . urlencode($wa_message);
 
 // Response JSON
