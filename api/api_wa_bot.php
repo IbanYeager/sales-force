@@ -72,7 +72,39 @@ if ($stmt) {
     $stmt->close();
 }
 
-// 4. Return standard response compatible with WhatsApp Gateways (Fonnte / Wablas)
+// 4. Send direct active reply via Fonnte API if token is configured in DB settings
+if ($conn && !empty($sender) && strlen(preg_replace('/[^0-9]/', '', $sender)) >= 8) {
+    $q_set = $conn->query("SELECT gateway_token FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
+    if ($q_set && $s_row = $q_set->fetch_assoc()) {
+        $token = trim($s_row['gateway_token'] ?? '');
+        if (!empty($token)) {
+            $target_phone = preg_replace('/[^0-9]/', '', $sender);
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.fonnte.com/send',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 15,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                    'target' => $target_phone,
+                    'message' => $waFormattedReply,
+                    'countryCode' => '62',
+                ),
+                CURLOPT_HTTPHEADER => array(
+                    'Authorization: ' . $token
+                ),
+            ));
+            @curl_exec($curl);
+            @curl_close($curl);
+        }
+    }
+}
+
+// 5. Return standard response compatible with WhatsApp Gateways (Fonnte / Wablas)
 echo json_encode([
     'status' => 'success',
     'sender' => $sender,
