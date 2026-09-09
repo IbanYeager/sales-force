@@ -100,36 +100,6 @@ $subQuery = "
     UNION ALL
 
     SELECT 
-        (100000 + f.id) AS id,
-        f.sales_id AS sales_account_id,
-        COALESCE(s.nama_lengkap, f.sales_name, 'Sales Consultant') COLLATE utf8mb4_general_ci AS nama_sales,
-        'Follow Up Database' COLLATE utf8mb4_general_ci AS tipe_aktivitas,
-        COALESCE(f.note, 'Follow up prospek CRM') COLLATE utf8mb4_general_ci AS keterangan,
-        'Tunas Toyota Kiara Condong (CRM)' COLLATE utf8mb4_general_ci AS lokasi,
-        '' COLLATE utf8mb4_general_ci AS foto,
-        'Selesai' COLLATE utf8mb4_general_ci AS status,
-        CASE 
-            WHEN HOUR(f.created_at) < 12 THEN 'Pagi'
-            WHEN HOUR(f.created_at) < 15 THEN 'Siang'
-            ELSE 'Sore'
-        END COLLATE utf8mb4_general_ci AS sesi_waktu,
-        DATE_FORMAT(f.created_at, '%H:%i') AS waktu_pelaksanaan,
-        '30 Menit' COLLATE utf8mb4_general_ci AS durasi,
-        f.note COLLATE utf8mb4_general_ci AS laporan_hasil,
-        1 AS jumlah_prospek,
-        '' COLLATE utf8mb4_general_ci AS foto_laporan,
-        DATE_FORMAT(f.created_at, '%H:%i') AS waktu_selesai,
-        f.created_at,
-        fc.name COLLATE utf8mb4_general_ci AS customer_name,
-        fc.car_model COLLATE utf8mb4_general_ci AS customer_car_model
-    FROM followup_logs f
-    LEFT JOIN sales_accounts s ON (s.id = CAST(f.sales_id AS UNSIGNED) OR s.nama_lengkap COLLATE utf8mb4_general_ci = f.sales_name COLLATE utf8mb4_general_ci)
-    LEFT JOIN followup_customers fc ON f.customer_id = fc.id
-    WHERE f.action_type = 'sales_fu_submission' OR (f.note IS NOT NULL AND f.note LIKE '%Follow-Up%')
-
-    UNION ALL
-
-    SELECT 
         (200000 + c.id) AS id,
         c.sales_id AS sales_account_id,
         c.nama_sales COLLATE utf8mb4_general_ci AS nama_sales,
