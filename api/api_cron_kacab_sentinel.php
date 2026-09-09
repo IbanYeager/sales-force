@@ -1,6 +1,6 @@
 <?php
 // api/api_cron_kacab_sentinel.php
-// Script Cron Otomatis Pengiriman Laporan AI Sentinel ke WhatsApp Kepala Cabang (Kacab)
+// Script Cron Otomatis Pengiriman Laporan AI Sentinel (3x Sehari: Pagi 07:00, Siang 12:00, Sore 17:00) ke WhatsApp Kacab
 // Mendukung eksekusi via Windows Task Scheduler (CLI), Web-Cron Fallback, dan UI Manual Trigger
 
 error_reporting(0);
@@ -18,12 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/koneksi.php';
 
-// Pastikan tabel pengaturan otomasi ada
+// Migration / Pastikan tabel dan kolom otomasi 3x harian tersedia
 if ($conn && !$conn->connect_error) {
     $conn->query("CREATE TABLE IF NOT EXISTS tabel_sentinel_settings (
         id INT PRIMARY KEY DEFAULT 1,
         kacab_wa VARCHAR(50) DEFAULT '081234567890',
-        schedule_time VARCHAR(10) DEFAULT '06:00',
+        schedule_time VARCHAR(10) DEFAULT '07:00',
+        schedule_time_pagi VARCHAR(10) DEFAULT '07:00',
+        schedule_time_siang VARCHAR(10) DEFAULT '12:00',
+        schedule_time_sore VARCHAR(10) DEFAULT '17:00',
         auto_send_enabled INT DEFAULT 1,
         gateway_provider VARCHAR(50) DEFAULT 'fonnte',
         gateway_token VARCHAR(255) DEFAULT '',
@@ -31,12 +34,21 @@ if ($conn && !$conn->connect_error) {
         last_sent_status VARCHAR(100) DEFAULT 'Ready'
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    $conn->query("INSERT IGNORE INTO tabel_sentinel_settings (id, kacab_wa, schedule_time, auto_send_enabled, gateway_provider) 
-                  VALUES (1, '081234567890', '06:00', 1, 'fonnte')");
+    $conn->query("INSERT IGNORE INTO tabel_sentinel_settings (id, kacab_wa, schedule_time, schedule_time_pagi, schedule_time_siang, schedule_time_sore, auto_send_enabled, gateway_provider) 
+                  VALUES (1, '081234567890', '07:00', '07:00', '12:00', '17:00', 1, 'fonnte')");
+
+    // Pastikan kolom schedule_time_pagi, schedule_time_siang, schedule_time_sore ada
+    $check_col = $conn->query("SHOW COLUMNS FROM tabel_sentinel_settings LIKE 'schedule_time_pagi'");
+    if ($check_col && $check_col->num_rows === 0) {
+        $conn->query("ALTER TABLE tabel_sentinel_settings ADD COLUMN schedule_time_pagi VARCHAR(10) DEFAULT '07:00' AFTER schedule_time");
+        $conn->query("ALTER TABLE tabel_sentinel_settings ADD COLUMN schedule_time_siang VARCHAR(10) DEFAULT '12:00' AFTER schedule_time_pagi");
+        $conn->query("ALTER TABLE tabel_sentinel_settings ADD COLUMN schedule_time_sore VARCHAR(10) DEFAULT '17:00' AFTER schedule_time_siang");
+    }
 
     $conn->query("CREATE TABLE IF NOT EXISTS tabel_ai_sentinel_logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
         periode_tanggal DATE NOT NULL,
+        session VARCHAR(20) DEFAULT 'pagi',
         hari_ke INT NOT NULL,
         periode_slice INT NOT NULL,
         min_required INT NOT NULL,
@@ -47,15 +59,19 @@ if ($conn && !$conn->connect_error) {
         status VARCHAR(50) DEFAULT 'Generated',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+    $check_log_session = $conn->query("SHOW COLUMNS FROM tabel_ai_sentinel_logs LIKE 'session'");
+    if ($check_log_session && $check_log_session->num_rows === 0) {
+        $conn->query("ALTER TABLE tabel_ai_sentinel_logs ADD COLUMN session VARCHAR(20) DEFAULT 'pagi' AFTER periode_tanggal");
+    }
 }
 
-// Helper: Setup / Update Windows Task Scheduler dengan Setting Anti-Sleep & Anti-Battery-Delay
-function syncWindowsTaskScheduler($schedule_time) {
+// Helper: Setup / Update 3 Windows Task Scheduler (Pagi, Siang, Sore)
+function syncWindowsTaskScheduler($time_pagi, $time_siang, $time_sore) {
     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
         return false;
     }
     
-    // Cari path cron_sentinel_06am.bat
     $possible_paths = [
         dirname(__DIR__) . "\\cron_sentinel_06am.bat",
         "c:\\laragon\\www\\sft - Copy\\cron_sentinel_06am.bat",
@@ -72,19 +88,41 @@ function syncWindowsTaskScheduler($schedule_time) {
         $bat_path = dirname(__DIR__) . "\\cron_sentinel_06am.bat";
     }
 
-    $task_name = "SFT_AI_Sentinel_Kacab_06AM";
-    // 1. Buat / Update Task Schedule Dasar dengan schtasks
-    @exec("schtasks /create /tn \"$task_name\" /tr \"\\\"$bat_path\\\"\" /sc daily /st $schedule_time /f 2>&1", $task_output, $task_code);
+    $php_executable = "php";
+    $script_path = __DIR__ . "\\api_cron_kacab_sentinel.php";
 
-    // 2. PowerShell: Izinkan jalan di baterai, jangan stop di baterai, bangunkan laptop jika tidur, dan jalankan segera jika waktu terlewat
-    $ps_cmd = "powershell -ExecutionPolicy Bypass -Command \"Set-ScheduledTask -TaskName '$task_name' -Settings (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -WakeToRun)\" 2>&1";
-    @exec($ps_cmd, $ps_output, $ps_code);
+    $tasks = [
+        'pagi' => ['name' => 'SFT_AI_Sentinel_Kacab_Pagi', 'time' => $time_pagi],
+        'siang' => ['name' => 'SFT_AI_Sentinel_Kacab_Siang', 'time' => $time_siang],
+        'sore' => ['name' => 'SFT_AI_Sentinel_Kacab_Sore', 'time' => $time_sore]
+    ];
 
-    return ($task_code === 0);
+    $all_success = true;
+
+    foreach ($tasks as $sess => $info) {
+        $t_name = $info['name'];
+        $t_time = $info['time'];
+
+        $cmd = "\"$php_executable\" \"$script_path\" action=execute_cron session=$sess";
+        @exec("schtasks /create /tn \"$t_name\" /tr \"$cmd\" /sc daily /st $t_time /f 2>&1", $output, $code);
+
+        if ($code === 0) {
+            $ps_cmd = "powershell -ExecutionPolicy Bypass -Command \"Set-ScheduledTask -TaskName '$t_name' -Settings (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -WakeToRun)\" 2>&1";
+            @exec($ps_cmd);
+        } else {
+            $all_success = false;
+        }
+    }
+
+    // Clean legacy task name if exists
+    @exec("schtasks /delete /tn \"SFT_AI_Sentinel_Kacab_06AM\" /f 2>&1");
+
+    return $all_success;
 }
 
 // Parsing parameter dari CLI ($argv) atau HTTP request
 $action = $_GET['action'] ?? '';
+$session_param = $_GET['session'] ?? '';
 $data = [];
 
 if (php_sapi_name() === 'cli') {
@@ -95,6 +133,7 @@ if (php_sapi_name() === 'cli') {
                 list($k, $v) = explode('=', $arg, 2);
                 $_GET[$k] = $v;
                 if ($k === 'action') $action = $v;
+                if ($k === 'session') $session_param = $v;
             } else {
                 $_GET[$arg] = true;
                 if (in_array($arg, ['execute_cron', 'send_now', 'get_settings', 'save_settings'])) {
@@ -111,17 +150,36 @@ if (php_sapi_name() === 'cli') {
     } elseif (!empty($_POST['action'])) {
         $action = $_POST['action'];
     }
+    if (!empty($data['session'])) {
+        $session_param = $data['session'];
+    }
+}
+
+// Determine active session: pagi, siang, sore
+$current_hour = intval(date('G'));
+$session = strtolower(trim($session_param));
+if (!in_array($session, ['pagi', 'siang', 'sore'])) {
+    if ($current_hour < 11) {
+        $session = 'pagi';
+    } elseif ($current_hour < 16) {
+        $session = 'siang';
+    } else {
+        $session = 'sore';
+    }
 }
 
 // 1. Tangani Simpan Pengaturan jika dipanggil via POST action=save_settings
 if ($action === 'save_settings') {
     $kacab_wa = $conn ? $conn->real_escape_string(trim($data['kacab_wa'] ?? $_POST['kacab_wa'] ?? '081234567890')) : '081234567890';
-    $schedule_time = trim($data['schedule_time'] ?? $_POST['schedule_time'] ?? '06:00');
-    // Pastikan format HH:MM
-    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time)) {
-        $schedule_time = '06:00';
-    }
-    $schedule_time_db = $conn ? $conn->real_escape_string($schedule_time) : $schedule_time;
+    
+    $schedule_time_pagi = trim($data['schedule_time_pagi'] ?? $_POST['schedule_time_pagi'] ?? '07:00');
+    $schedule_time_siang = trim($data['schedule_time_siang'] ?? $_POST['schedule_time_siang'] ?? '12:00');
+    $schedule_time_sore = trim($data['schedule_time_sore'] ?? $_POST['schedule_time_sore'] ?? '17:00');
+
+    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time_pagi)) $schedule_time_pagi = '07:00';
+    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time_siang)) $schedule_time_siang = '12:00';
+    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time_sore)) $schedule_time_sore = '17:00';
+
     $auto_send = intval($data['auto_send_enabled'] ?? $_POST['auto_send_enabled'] ?? 1);
     $gateway_provider = $conn ? $conn->real_escape_string(trim($data['gateway_provider'] ?? $_POST['gateway_provider'] ?? 'fonnte')) : 'fonnte';
     $gateway_token = $conn ? $conn->real_escape_string(trim($data['gateway_token'] ?? $_POST['gateway_token'] ?? '')) : '';
@@ -129,21 +187,26 @@ if ($action === 'save_settings') {
     if ($conn) {
         $conn->query("UPDATE tabel_sentinel_settings SET 
             kacab_wa = '$kacab_wa',
-            schedule_time = '$schedule_time_db',
+            schedule_time = '$schedule_time_pagi',
+            schedule_time_pagi = '$schedule_time_pagi',
+            schedule_time_siang = '$schedule_time_siang',
+            schedule_time_sore = '$schedule_time_sore',
             auto_send_enabled = $auto_send,
             gateway_provider = '$gateway_provider',
             gateway_token = '$gateway_token'
             WHERE id = 1");
     }
 
-    // Sinkronisasi otomatis ke Windows Task Scheduler dengan pengaturan Power & Wakeup
-    $synced = syncWindowsTaskScheduler($schedule_time);
+    // Sinkronisasi otomatis 3 jadwal di Task Scheduler Windows
+    $synced = syncWindowsTaskScheduler($schedule_time_pagi, $schedule_time_siang, $schedule_time_sore);
 
     echo json_encode([
         "status" => "success",
-        "schedule_time" => $schedule_time,
+        "schedule_time_pagi" => $schedule_time_pagi,
+        "schedule_time_siang" => $schedule_time_siang,
+        "schedule_time_sore" => $schedule_time_sore,
         "scheduler_synced" => $synced,
-        "message" => "Jadwal kirim otomatis berhasil disimpan ke pukul " . $schedule_time . " WIB setiap hari! (Proteksi baterai & anti-delay telah diaktifkan)"
+        "message" => "Jadwal 3x kirim otomatis berhasil disimpan (Pagi $schedule_time_pagi, Siang $schedule_time_siang, Sore $schedule_time_sore WIB)! (Proteksi baterai & anti-delay telah diaktifkan)"
     ]);
     if ($conn) $conn->close();
     exit();
@@ -152,7 +215,10 @@ if ($action === 'save_settings') {
 // 2. Ambil Pengaturan Aktif dari DB
 $settings = [
     'kacab_wa' => '081234567890',
-    'schedule_time' => '06:00',
+    'schedule_time' => '07:00',
+    'schedule_time_pagi' => '07:00',
+    'schedule_time_siang' => '12:00',
+    'schedule_time_sore' => '17:00',
     'auto_send_enabled' => 1,
     'gateway_provider' => 'fonnte',
     'gateway_token' => '',
@@ -170,14 +236,24 @@ if ($conn) {
 // 3. JIKA HANYA BACA PENGATURAN (GET biasa / action=get_settings) -> RETURN SETTINGS TANPA KIRIM PESAN!
 if ($action === 'get_settings' || (empty($action) && php_sapi_name() !== 'cli')) {
     $today_str = date('Y-m-d');
-    $last_sent_date = !empty($settings['last_sent_at']) ? date('Y-m-d', strtotime($settings['last_sent_at'])) : '';
-    $already_sent_today = ($last_sent_date === $today_str && $settings['last_sent_status'] === 'Sent');
+    
+    // Check per session sent status today
+    $sent_sessions = [];
+    if ($conn) {
+        $q_log = $conn->query("SELECT session FROM tabel_ai_sentinel_logs WHERE periode_tanggal = '$today_str' AND status = 'Sent'");
+        if ($q_log) {
+            while ($l = $q_log->fetch_assoc()) {
+                $sent_sessions[] = strtolower($l['session']);
+            }
+        }
+    }
 
     echo json_encode([
         "status" => "success",
         "settings" => $settings,
+        "current_session" => $session,
         "server_time" => date('Y-m-d H:i:s'),
-        "today_already_sent" => $already_sent_today
+        "sent_sessions_today" => array_unique($sent_sessions)
     ]);
     if ($conn) $conn->close();
     exit();
@@ -186,7 +262,7 @@ if ($action === 'get_settings' || (empty($action) && php_sapi_name() !== 'cli'))
 // 4. VALIDASI EKSEKUSI PENGIRIMAN (action=execute_cron atau action=send_now)
 $is_manual_test = ($action === 'send_now') || (isset($_GET['force']) && $_GET['force'] == 1);
 
-// Cek apakah auto-send diaktifkan (khusus eksekusi cron otomatis)
+// Cek apakah auto-send diaktifkan
 if (!$is_manual_test && intval($settings['auto_send_enabled']) !== 1) {
     echo json_encode([
         "status" => "disabled",
@@ -196,16 +272,22 @@ if (!$is_manual_test && intval($settings['auto_send_enabled']) !== 1) {
     exit();
 }
 
-// Cek Deduplikasi Harian (Mencegah pesan ganda terkirim berulang di hari yang sama)
+// Cek Deduplikasi Harian Per Sesi (Mencegah pesan sesi ganda terkirim berulang di hari & sesi yang sama)
 $today_str = date('Y-m-d');
-$last_sent_date = !empty($settings['last_sent_at']) ? date('Y-m-d', strtotime($settings['last_sent_at'])) : '';
-$already_sent_today = ($last_sent_date === $today_str && $settings['last_sent_status'] === 'Sent');
+$already_sent_session = false;
 
-if (!$is_manual_test && $already_sent_today) {
+if ($conn) {
+    $q_chk = $conn->query("SELECT id, created_at FROM tabel_ai_sentinel_logs WHERE periode_tanggal = '$today_str' AND session = '$session' AND status = 'Sent' LIMIT 1");
+    if ($q_chk && $q_chk->num_rows > 0) {
+        $already_sent_session = true;
+    }
+}
+
+if (!$is_manual_test && $already_sent_session) {
     echo json_encode([
         "status" => "skipped",
-        "message" => "Laporan AI Sentinel hari ini ($today_str) sudah terkirim pada {$settings['last_sent_at']} WIB. Pengiriman duplikat dilewati.",
-        "last_sent_at" => $settings['last_sent_at']
+        "session" => $session,
+        "message" => "Laporan AI Sentinel sesi " . strtoupper($session) . " hari ini ($today_str) sudah pernah terkirim. Pengiriman duplikat dilewati."
     ]);
     if ($conn) $conn->close();
     exit();
@@ -223,7 +305,6 @@ if (function_exists('syncGoogleSheetsToDb')) {
     syncGoogleSheetsToDb($conn, $current_month, $current_year);
 }
 
-// Parameter simulasi jika dipanggil dengan ?hari=X
 if (isset($_GET['hari'])) {
     $current_day = intval($_GET['hari']);
 }
@@ -231,8 +312,8 @@ if (isset($_GET['bulan'])) {
     $current_month = intval($_GET['bulan']);
 }
 
-// Panggil logika Sentinel internal
-function getInternalSentinelReport($conn, $current_day, $current_month, $current_year) {
+// Logic Sentinel internal
+function getInternalSentinelReport($conn, $current_day, $current_month, $current_year, $session) {
     if ($current_day <= 5) {
         $slice = 1; $min = 1; $range = "Hari 1 - 5";
     } elseif ($current_day <= 10) {
@@ -248,25 +329,6 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     }
     $range_label = $range;
 
-    $whiteboard_targets = [
-        'indah' => ['target_spk' => 4, 'target_do' => 3], 'dadi' => ['target_spk' => 3, 'target_do' => 2],
-        'topik' => ['target_spk' => 5, 'target_do' => 4], 'andri' => ['target_spk' => 4, 'target_do' => 3],
-        'abdian' => ['target_spk' => 4, 'target_do' => 3], 'fadhil' => ['target_spk' => 4, 'target_do' => 3],
-        'rizky' => ['target_spk' => 3, 'target_do' => 2], 'udu' => ['target_spk' => 3, 'target_do' => 2],
-        'nova' => ['target_spk' => 4, 'target_do' => 3], 'cici' => ['target_spk' => 3, 'target_do' => 2],
-        'galih_riva' => ['target_spk' => 4, 'target_do' => 3], 'deni_rv' => ['target_spk' => 4, 'target_do' => 3],
-        'mustofa' => ['target_spk' => 4, 'target_do' => 3], 'sinta' => ['target_spk' => 4, 'target_do' => 3],
-        'rizal' => ['target_spk' => 4, 'target_do' => 3], 'reni' => ['target_spk' => 3, 'target_do' => 2],
-        'nuri' => ['target_spk' => 3, 'target_do' => 2], 'egy' => ['target_spk' => 5, 'target_do' => 3],
-        'deno' => ['target_spk' => 4, 'target_do' => 3], 'erik' => ['target_spk' => 4, 'target_do' => 3],
-        'denia' => ['target_spk' => 4, 'target_do' => 3], 'yani' => ['target_spk' => 3, 'target_do' => 2],
-        'jajang' => ['target_spk' => 3, 'target_do' => 2], 'juarna' => ['target_spk' => 3, 'target_do' => 2],
-        'galih_ryan' => ['target_spk' => 3, 'target_do' => 2], 'reza' => ['target_spk' => 3, 'target_do' => 2],
-        'dadan' => ['target_spk' => 3, 'target_do' => 2], 'fani' => ['target_spk' => 3, 'target_do' => 2],
-        'igo' => ['target_spk' => 3, 'target_do' => 2], 'fia' => ['target_spk' => 5, 'target_do' => 2],
-        'rahma' => ['target_spk' => 3, 'target_do' => 2]
-    ];
-
     $nama_bulan_list = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
         5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
@@ -274,11 +336,12 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     ];
     $periode_str = $current_day . " " . $nama_bulan_list[$current_month] . " " . $current_year;
 
-    // Ambil HANYA wiraniaga yang aktif di Google Spreadsheet saat ini
     $q_sales = $conn ? $conn->query("SELECT id, username, nama_lengkap, tingkatan, nama_spv FROM sales_accounts WHERE is_active = 1 ORDER BY nama_spv ASC, nama_lengkap ASC") : null;
 
     $underperforming = [];
     $on_track = [];
+    $total_spk_cabang = 0;
+    $total_do_cabang = 0;
 
     if ($q_sales && $q_sales->num_rows > 0) {
         while ($row = $q_sales->fetch_assoc()) {
@@ -292,7 +355,6 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
             $real_spk = 0; 
             $real_do = 0;
 
-            // Target & Realisasi langsung dari Google Spreadsheet yang tersimpan di target_do_bulanan
             $q_target = $conn->query("SELECT target_spk, target_do, realisasi_spk, realisasi_do FROM target_do_bulanan WHERE sales_account_id = $sales_id AND periode_bulan = $current_month LIMIT 1");
             if ($q_target && $t_row = $q_target->fetch_assoc()) {
                 $tgt_spk = intval($t_row['target_spk']) > 0 ? intval($t_row['target_spk']) : 3;
@@ -312,22 +374,41 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
                 }
             }
 
-            $sales_target = max($tgt_spk, $tgt_do);
-            if ($sales_target <= 0) $sales_target = 3;
+            $total_spk_cabang += $real_spk;
+            $total_do_cabang += $real_do;
 
-            $sales_min_required = min($min, $sales_target);
-            $highest_actual = max($real_spk, $real_do);
+            // Minimal SPK 5-harian
+            $sales_min_required = min($min, $tgt_spk);
 
-            $is_passed = ($highest_actual >= $sales_target) || ($highest_actual >= $sales_min_required);
-            $deficit = max(0, $sales_min_required - $highest_actual);
+            // ATURAN SPK: Evaluasi defisit dilakukan KHUSUS untuk SPK
+            $is_passed = ($real_spk >= $tgt_spk) || ($real_spk >= $sales_min_required);
+            $deficit = max(0, $sales_min_required - $real_spk);
 
             $ai_advice = "";
-            if ($highest_actual == 0) {
-                $ai_advice = "Belum ada SPK / DO (0 Unit). Wajib pendampingan co-closing bersama SPV $spv_name.";
-            } elseif ($deficit > 0) {
-                $ai_advice = "Kurang $deficit unit dari target minimal $sales_min_required unit. SPV disarankan evaluasi database Hot Prospect & percepat test drive.";
-            } else {
-                $ai_advice = "Target terpenuhi / on-track.";
+            if ($session === 'pagi') {
+                if ($real_spk == 0) {
+                    $ai_advice = "Fokus Pagi: Belum ada SPK (0 Unit). Evaluasi list prospek & jadwalkan min 3 canvassing/test-drive hari ini. Wajib pendampingan SPV $spv_name.";
+                } elseif ($deficit > 0) {
+                    $ai_advice = "Fokus Pagi: Defisit -$deficit SPK dari min. $sales_min_required SPK. SPV $spv_name mohon dorong penutupan SPK dari database Hot Prospect hari ini.";
+                } else {
+                    $ai_advice = "Pagi: Target SPK aman ($real_spk SPK). Fokus pendampingan closing sales lain & dorong penyelesaian DO ($real_do DO).";
+                }
+            } elseif ($session === 'siang') {
+                if ($real_spk == 0) {
+                    $ai_advice = "Update Siang: Belum ada SPK (0 Unit). SPV $spv_name mohon cek hasil follow-up prospek pagi ini.";
+                } elseif ($deficit > 0) {
+                    $ai_advice = "Update Siang: Kurang $deficit SPK dari min. $sales_min_required SPK. Dorong penutupan transaksi prospek hangat siang ini.";
+                } else {
+                    $ai_advice = "Update Siang: SPK On-track ($real_spk SPK | $real_do DO). Pertahankan ritme hingga sore.";
+                }
+            } else { // sore
+                if ($real_spk == 0) {
+                    $ai_advice = "Closing Sore: 0 SPK. Wajib evaluasi komprehensif bersama SPV $spv_name untuk penyusunan strategi esok hari.";
+                } elseif ($deficit > 0) {
+                    $ai_advice = "Closing Sore: Masih defisit -$deficit SPK. Siapkan daftar konsumen prioritas untuk di-follow up besok pagi.";
+                } else {
+                    $ai_advice = "Closing Sore: Kinerja SPK tercapai ($real_spk SPK | $real_do DO). Siapkan pengiriman unit DO selanjutnya.";
+                }
             }
 
             $entry = [
@@ -361,43 +442,121 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     $needs_alert = (count($underperforming) > 0);
 
     $msg = "";
-    if ($needs_alert) {
-        $msg .= "🚨 *LAPORAN HARIAN AI SENTINEL KACAB* 🚨\n";
-        $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
-        $msg .= "📅 *Tanggal*: {$periode_str}\n";
-        $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
-        $msg .= "🎯 *Standar Minimal 5-Harian*: Minimal *{$min} SPK / DO*\n";
-        $msg .= "📊 *Kondisi Cabang*: *" . count($underperforming) . " dari {$total_count} Sales* belum mencapai target minimal\n";
-        $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        $msg .= "📋 *DAFTAR WIRANIAGA PERLU REVIEW SPV:*\n\n";
+    if ($session === 'pagi') {
+        if ($needs_alert) {
+            $msg .= "🌅 *SARAN BRIEFING PAGI KACAB - AI SENTINEL* 🌅\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            $msg .= "📅 *Tanggal*: {$periode_str}\n";
+            $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
+            $msg .= "🎯 *Target Minimal SPK*: Minimal *{$min} SPK* (s.d. hari ini)\n";
+            $msg .= "📊 *Status Sales*: *" . count($underperforming) . " dari {$total_count} Sales* belum capai target minimal SPK\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $msg .= "📋 *FOKUS BRIEFING & REKOMENDASI UNTUK SALES:*\n\n";
 
-        $no = 1;
-        foreach ($underperforming as $u) {
-            $msg .= "{$no}. 👤 *{$u['nama_sales']}* ({$u['nama_spv']})\n";
-            $msg .= "   • Target: {$u['target_spk']} SPK / {$u['target_do']} DO (Min. Hari Ini: {$u['min_required']} Unit)\n";
-            $msg .= "   • Aktual: *{$u['realisasi_spk']} SPK* | *{$u['realisasi_do']} DO*\n";
-            $msg .= "   • Defisit: *-{$u['deficit']} Unit*\n";
-            $msg .= "   • Saran AI: {$u['ai_advice']}\n\n";
-            $no++;
+            $no = 1;
+            foreach ($underperforming as $u) {
+                $msg .= "{$no}. 👤 *{$u['nama_sales']}* ({$u['nama_spv']})\n";
+                $msg .= "   • SPK: *{$u['realisasi_spk']} / {$u['target_spk']}* (Min. Hari Ini: {$u['min_required']} | Defisit: -{$u['deficit']} SPK)\n";
+                $msg .= "   • Realisasi DO: *{$u['realisasi_do']} DO* (Target: {$u['target_do']} DO)\n";
+                $msg .= "   • 💡 *Saran Briefing Pagi*: {$u['ai_advice']}\n\n";
+                $no++;
+            }
+
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            if (count($on_track) > 0) {
+                $msg .= "✅ *Sales Target SPK Aman*: " . count($on_track) . " Wiraniaga on-track.\n\n";
+            }
+
+            $msg .= "📌 *Rekomendasi Arahan Kepala Cabang saat Briefing Pagi:*\n";
+            $msg .= "1. Instruksikan SPV untuk mendampingi closing (Co-Closing) pada wiraniaga yang defisit SPK hari ini.\n";
+            $msg .= "2. Evaluasi daftar Hot Prospect & pastikan jadwal test drive tercatat rapi.";
+        } else {
+            $msg .= "✅ *BRIEFING PAGI KACAB: SELURUH SALES ON-TRACK* ✅\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            $msg .= "📅 *Tanggal*: {$periode_str}\n";
+            $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
+            $msg .= "🎯 *Target Minimal SPK*: Minimal *{$min} SPK*\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $msg .= "Yth. Bapak Kepala Cabang,\n";
+            $msg .= "Seluruh *{$total_count} Wiraniaga Cabang* telah berhasil mencapai target minimal SPK pada periode ini. Briefing pagi dapat difokuskan pada dorongan akselerasi DO dan perolehan SPK tambahan! 💪🔥";
         }
+    } elseif ($session === 'siang') {
+        if ($needs_alert) {
+            $msg .= "☀️ *UPDATE SPK & DO SIANG (12:00 WIB) - AI SENTINEL* ☀️\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            $msg .= "📅 *Tanggal*: {$periode_str}\n";
+            $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
+            $msg .= "🎯 *Target Minimal SPK*: Minimal *{$min} SPK*\n";
+            $msg .= "📊 *Capaian Cabang*: Total *{$total_spk_cabang} SPK* & *{$total_do_cabang} DO*\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $msg .= "📋 *PROGRESS WIRANIAGA PERLU MONITORING SPK:*\n\n";
 
-        $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
-        if (count($on_track) > 0) {
-            $msg .= "✅ *Sales Capai Target / On-Track*: " . count($on_track) . " Wiraniaga aman (tidak perlu review).\n\n";
+            $no = 1;
+            foreach ($underperforming as $u) {
+                $msg .= "{$no}. 👤 *{$u['nama_sales']}* ({$u['nama_spv']})\n";
+                $msg .= "   • SPK: *{$u['realisasi_spk']} SPK* (Min: {$u['min_required']} | Defisit: -{$u['deficit']} SPK)\n";
+                $msg .= "   • Realisasi DO: *{$u['realisasi_do']} DO* (Target Bulan: {$u['target_do']} DO)\n";
+                $msg .= "   • Status Siang: {$u['ai_advice']}\n\n";
+                $no++;
+            }
+
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            if (count($on_track) > 0) {
+                $msg .= "✅ *Sales SPK On-Track*: " . count($on_track) . " Wiraniaga aman.\n\n";
+            }
+
+            $msg .= "📌 *Rekomendasi Siang Kepala Cabang:*\n";
+            $msg .= "1. Pantau progress follow-up siang oleh tim SPV terhadap prospek yang berpotensi closing hari ini.\n";
+            $msg .= "2. Pastikan proses berkas kredit & penyiapan unit DO berjalan tanpa kendala.";
+        } else {
+            $msg .= "✅ *UPDATE SPK & DO SIANG: PERFORMA OPTIMAL* ✅\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            $msg .= "📅 *Tanggal*: {$periode_str}\n";
+            $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
+            $msg .= "🎯 *Target Minimal SPK*: Minimal *{$min} SPK*\n";
+            $msg .= "📊 *Capaian Cabang*: Total *{$total_spk_cabang} SPK* & *{$total_do_cabang} DO*\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $msg .= "Yth. Bapak Kepala Cabang,\n";
+            $msg .= "Performa cabang hingga siang ini sangat baik. Seluruh sales telah memenuhi standar ritme SPK. Kinerja operasional cabang berjalan lancar! 👍🔥";
         }
-
-        $msg .= "📌 *Rekomendasi Tindakan Kepala Cabang:*\n";
-        $msg .= "1. Instruksikan SPV untuk melakukan review harian dan mendampingi closing (Co-Closing).\n";
-        $msg .= "2. Percepat proses approval diskon dan kredit untuk prospek yang sedang berjalan.";
     } else {
-        $msg .= "✅ *LAPORAN HARIAN AI SENTINEL KACAB: SEMUA ON-TRACK* ✅\n";
-        $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
-        $msg .= "📅 *Tanggal*: {$periode_str}\n";
-        $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
-        $msg .= "🎯 *Standar Minimal 5-Harian*: Minimal *{$min} SPK / DO*\n";
-        $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        $msg .= "Yth. Bapak Kepala Cabang,\n";
-        $msg .= "Seluruh *{$total_count} Wiraniaga Cabang* telah berhasil mencapai target minimal pada periode ini. Kinerja operasional cabang berjalan optimal. 💪🔥";
+        if ($needs_alert) {
+            $msg .= "🌆 *UPDATE CLOSING SPK & DO SORE (17:00 WIB) - AI SENTINEL* 🌆\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            $msg .= "📅 *Tanggal*: {$periode_str}\n";
+            $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
+            $msg .= "🎯 *Target Minimal SPK*: Minimal *{$min} SPK*\n";
+            $msg .= "🏆 *Hasil Closing Cabang*: Total *{$total_spk_cabang} SPK* & *{$total_do_cabang} DO*\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $msg .= "📋 *REKAP WIRANIAGA PERLU PERHATIAN BESOK:*\n\n";
+
+            $no = 1;
+            foreach ($underperforming as $u) {
+                $msg .= "{$no}. 👤 *{$u['nama_sales']}* ({$u['nama_spv']})\n";
+                $msg .= "   • Realisasi SPK: *{$u['realisasi_spk']} SPK* (Min: {$u['min_required']} | Defisit: -{$u['deficit']} SPK)\n";
+                $msg .= "   • Realisasi DO: *{$u['realisasi_do']} DO* (Target: {$u['target_do']} DO)\n";
+                $msg .= "   • Evaluasi Sore: {$u['ai_advice']}\n\n";
+                $no++;
+            }
+
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            if (count($on_track) > 0) {
+                $msg .= "✅ *Sales Capai Target SPK*: " . count($on_track) . " Wiraniaga tuntas.\n\n";
+            }
+
+            $msg .= "📌 *Rekomendasi Closing Sore Kepala Cabang:*\n";
+            $msg .= "1. Evaluasi rekap prospek harian bersama SPV dan siapkan prioritas pengawalan besok pagi.\n";
+            $msg .= "2. Pastikan input SPK baru dan jadwal serah terima unit DO esok hari sudah terverifikasi.";
+        } else {
+            $msg .= "✅ *UPDATE CLOSING SORE: TARGET MINIMAL TERPENUHI* ✅\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
+            $msg .= "📅 *Tanggal*: {$periode_str}\n";
+            $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
+            $msg .= "🏆 *Hasil Closing Hari Ini*: Total *{$total_spk_cabang} SPK* & *{$total_do_cabang} DO*\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $msg .= "Yth. Bapak Kepala Cabang,\n";
+            $msg .= "Closing harian cabang berjalan sukses! Seluruh wiraniaga berhasil memenuhi standar ritme SPK untuk periode ini. Terima kasih atas kepemimpinan Anda! 🎉💪";
+        }
     }
 
     return [
@@ -410,7 +569,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     ];
 }
 
-$report = getInternalSentinelReport($conn, $current_day, $current_month, $current_year);
+$report = getInternalSentinelReport($conn, $current_day, $current_month, $current_year, $session);
 $wa_message = $report['message'];
 $target_phone = $settings['kacab_wa'];
 
@@ -487,17 +646,17 @@ if (!empty($settings['gateway_token'])) {
     $dispatch_result = "Auto-Logged (Ready for Gateway or Click-to-Send)";
 }
 
-// 7. Catat Log ke Database
+// 7. Catat Log ke Database (Termasuk Kolom Session)
 $now_str = date('Y-m-d H:i:s');
 $today_str = date('Y-m-d');
 $status_log = ($http_status === 200) ? 'Sent' : 'Failed';
 
 if ($conn) {
     $stmt = $conn->prepare("INSERT INTO tabel_ai_sentinel_logs 
-        (periode_tanggal, hari_ke, periode_slice, min_required, underperforming_count, on_track_count, report_message, sent_to_wa, status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (periode_tanggal, session, hari_ke, periode_slice, min_required, underperforming_count, on_track_count, report_message, sent_to_wa, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt) {
-        $stmt->bind_param("siiiiisss", $today_str, $current_day, $report['slice'], $report['min'], $report['underperforming_count'], $report['on_track_count'], $wa_message, $clean_phone, $status_log);
+        $stmt->bind_param("ssiiiiisss", $today_str, $session, $current_day, $report['slice'], $report['min'], $report['underperforming_count'], $report['on_track_count'], $wa_message, $clean_phone, $status_log);
         $stmt->execute();
         $stmt->close();
     }
@@ -507,9 +666,12 @@ if ($conn) {
 
 $wa_url = "https://api.whatsapp.com/send?phone=" . $clean_phone . "&text=" . urlencode($wa_message);
 
+$sched_time_display = ($session === 'pagi' ? $settings['schedule_time_pagi'] : ($session === 'siang' ? $settings['schedule_time_siang'] : $settings['schedule_time_sore'])) . " WIB";
+
 echo json_encode([
     "status" => "success",
-    "scheduled_time" => $settings['schedule_time'] . " WIB",
+    "session" => $session,
+    "scheduled_time" => $sched_time_display,
     "executed_at" => $now_str,
     "target_kacab_wa" => $clean_phone,
     "underperforming_sales_count" => $report['underperforming_count'],

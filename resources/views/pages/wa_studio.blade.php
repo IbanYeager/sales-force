@@ -291,39 +291,52 @@
               <i class="fa-solid fa-shield-halved"></i>
             </div>
             <div>
-              <h3 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0;">AI Sentinel: Aturan 5-Harian Kacab</h3>
-              <p style="font-size: 11.5px; color: #64748b; margin: 0;">Early Warning System target minimal berjenjang SPK/DO</p>
+              <h3 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0;">AI Sentinel: Aturan 5-Harian SPK Kacab</h3>
+              <p style="font-size: 11.5px; color: #64748b; margin: 0;">Early Warning System target minimal berjenjang SPK (3x Kirim WA Harian)</p>
             </div>
           </div>
 
           <!-- Rules Summary -->
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-bottom: 16px;">
             <div style="font-size: 12px; font-weight: 800; color: #1e293b; margin-bottom: 6px;">
-              <i class="fa-solid fa-list-ol" style="color: #4f46e5;"></i> Skema Evaluasi 5-Harian:
+              <i class="fa-solid fa-list-ol" style="color: #4f46e5;"></i> Skema Evaluasi Ritme SPK 5-Harian:
             </div>
             <ul style="font-size: 11.5px; color: #475569; margin: 0; padding-left: 18px; line-height: 1.6;">
-              <li><strong>Hari 1 - 5:</strong> Minimal aktual <strong>1 SPK/DO</strong> (Jika 0 ➡️ Lapor WA Kacab)</li>
-              <li><strong>Hari 6 - 10:</strong> Minimal aktual <strong>2 SPK/DO</strong> (Jika &lt; 2 ➡️ Lapor WA Kacab)</li>
-              <li><strong>Hari 11 - 15:</strong> Minimal aktual <strong>3 SPK/DO</strong> (Jika &lt; 3 ➡️ Lapor WA Kacab)</li>
-              <li><strong>Hari 16 - 20:</strong> Minimal aktual <strong>4 SPK/DO</strong> (Jika &lt; 4 ➡️ Lapor WA Kacab)</li>
-              <li><strong>Hari 21 - 25:</strong> Minimal aktual <strong>5 SPK/DO</strong> (Jika &lt; 5 ➡️ Lapor WA Kacab)</li>
-              <li><strong>Hari 26 - 31:</strong> Minimal aktual <strong>6 SPK/DO</strong> (Jika &lt; 6 ➡️ Lapor WA Kacab)</li>
+              <li><strong>Hari 1 - 5:</strong> Minimal aktual <strong>1 SPK</strong></li>
+              <li><strong>Hari 6 - 10:</strong> Minimal aktual <strong>2 SPK</strong></li>
+              <li><strong>Hari 11 - 15:</strong> Minimal aktual <strong>3 SPK</strong></li>
+              <li><strong>Hari 16 - 20:</strong> Minimal aktual <strong>4 SPK</strong></li>
+              <li><strong>Hari 21 - 25:</strong> Minimal aktual <strong>5 SPK</strong></li>
+              <li><strong>Hari 26 - 31:</strong> Minimal aktual <strong>6 SPK</strong></li>
             </ul>
+            <p style="font-size:11px; color:#64748b; margin:8px 0 0 0; font-style:italic;">
+              * Note: Realisasi DO tetap dilaporkan sebagai progres cabang tanpa batas minimal ritme.
+            </p>
           </div>
 
-          <!-- Simulation Selector -->
-          <div style="margin-bottom: 16px;">
-            <label class="form-group-label">Pilih Hari / Ritme Evaluasi:</label>
-            <select id="sentinelStudioDaySelect" class="styled-input" onchange="fetchSentinelStudioReport(this.value)">
-              <option value="">Memuat tanggal hari ini...</option>
-            </select>
+          <!-- Simulation & Session Selector -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom: 16px;">
+            <div>
+              <label class="form-group-label">Pilih Hari / Ritme:</label>
+              <select id="sentinelStudioDaySelect" class="styled-input" onchange="fetchSentinelStudioReport(this.value, null)">
+                <option value="">Memuat hari ini...</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-group-label">Pilih Sesi Laporan:</label>
+              <select id="sentinelStudioSessionSelect" class="styled-input" onchange="fetchSentinelStudioReport(null, this.value)">
+                <option value="pagi">🌅 Pagi (Briefing 07:00)</option>
+                <option value="siang">☀️ Siang (Update 12:00)</option>
+                <option value="sore">🌆 Sore (Closing 17:00)</option>
+              </select>
+            </div>
           </div>
 
           <!-- Cron / Automation Guide -->
           <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 12px; padding: 14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
               <div style="font-size: 12px; font-weight: 800; color: #3730a3;">
-                <i class="fa-solid fa-clock"></i> Jadwal Otomatis: 06:00 WIB Setiap Hari
+                <i class="fa-solid fa-clock"></i> Otomasi 3 Sesi: 07:00 | 12:00 | 17:00 WIB
               </div>
               <span style="background:#dcfce7; color:#166534; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; border:1px solid #bbf7d0;">
                 🟢 Active
@@ -333,7 +346,7 @@
               http://localhost/sft/api/api_cron_kacab_sentinel.php
             </code>
             <p style="font-size: 11px; color: #4338ca; margin: 6px 0 0;">
-              Otomasi Windows Scheduler (<code>SFT_AI_Sentinel_Kacab_06AM</code>) telah aktif di server untuk auto-audit pukul 06.00 WIB setiap pagi.
+              Otomasi Windows Scheduler (<code>SFT_AI_Sentinel_Kacab_Pagi/Siang/Sore</code>) aktif di server untuk pengiriman harian.
             </p>
           </div>
         </div>

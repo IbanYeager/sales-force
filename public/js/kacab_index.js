@@ -1,3 +1,5 @@
+// public/js/kacab_index.js
+// Mirror file for public assets
 // kacab_index.js — Dashboard Kepala Cabang: KPI cabang, peringkat SPV, feed aktivitas.
 
 async function loadDashboard(forceFresh = false) {
@@ -196,6 +198,36 @@ function activityIcon(tipe) {
 }
 
 let aiSentinelData = null;
+let currentSentinelSession = 'pagi';
+
+function switchSentinelSessionTab(session) {
+  currentSentinelSession = session;
+
+  const btnPagi = document.getElementById('tabSessPagi');
+  const btnSiang = document.getElementById('tabSessSiang');
+  const btnSore = document.getElementById('tabSessSore');
+
+  [btnPagi, btnSiang, btnSore].forEach(b => {
+    if (b) {
+      b.style.background = '#e2e8f0';
+      b.style.color = '#475569';
+      b.classList.remove('active');
+    }
+  });
+
+  let activeBtn = null;
+  if (session === 'pagi') activeBtn = btnPagi;
+  else if (session === 'siang') activeBtn = btnSiang;
+  else if (session === 'sore') activeBtn = btnSore;
+
+  if (activeBtn) {
+    activeBtn.style.background = '#6366f1';
+    activeBtn.style.color = '#ffffff';
+    activeBtn.classList.add('active');
+  }
+
+  loadAiSentinelKacab(null, true, session);
+}
 
 function populateSentinelDayOptions(selectedDay) {
   const selectEl = document.getElementById('selectSimulasiHari');
@@ -205,12 +237,12 @@ function populateSentinelDayOptions(selectedDay) {
   const activeDay = (selectedDay !== null && selectedDay !== undefined && selectedDay !== '') ? parseInt(selectedDay) : today;
   
   const milestoneIntervals = [
-    { day: 5, label: 'Ritme Hari 1 - 5 (Min. 1 SPK/DO)' },
-    { day: 10, label: 'Ritme Hari 6 - 10 (Min. 2 SPK/DO)' },
-    { day: 15, label: 'Ritme Hari 11 - 15 (Min. 3 SPK/DO)' },
-    { day: 20, label: 'Ritme Hari 16 - 20 (Min. 4 SPK/DO)' },
-    { day: 25, label: 'Ritme Hari 21 - 25 (Min. 5 SPK/DO)' },
-    { day: 31, label: 'Ritme Hari 26 - Akhir Bulan (Min. 6 SPK/DO)' }
+    { day: 5, label: 'Ritme Hari 1 - 5 (Min. 1 SPK)' },
+    { day: 10, label: 'Ritme Hari 6 - 10 (Min. 2 SPK)' },
+    { day: 15, label: 'Ritme Hari 11 - 15 (Min. 3 SPK)' },
+    { day: 20, label: 'Ritme Hari 16 - 20 (Min. 4 SPK)' },
+    { day: 25, label: 'Ritme Hari 21 - 25 (Min. 5 SPK)' },
+    { day: 31, label: 'Ritme Hari 26 - Akhir Bulan (Min. 6 SPK)' }
   ];
 
   let optionsHtml = '';
@@ -224,7 +256,7 @@ function populateSentinelDayOptions(selectedDay) {
   selectEl.value = String(activeDay);
 }
 
-async function loadAiSentinelKacab(customDay = null, forceFresh = false) {
+async function loadAiSentinelKacab(customDay = null, forceFresh = false, session = null) {
   const selectEl = document.getElementById('selectSimulasiHari');
   const today = new Date().getDate();
   let dayParam;
@@ -244,13 +276,40 @@ async function loadAiSentinelKacab(customDay = null, forceFresh = false) {
     }
   }
 
+  const currentHour = new Date().getHours();
+  let sessParam = session;
+  if (!sessParam) {
+    if (currentHour < 11) sessParam = 'pagi';
+    else if (currentHour < 16) sessParam = 'siang';
+    else sessParam = 'sore';
+  }
+  currentSentinelSession = sessParam;
+
+  // Update session active tab
+  const btnPagi = document.getElementById('tabSessPagi');
+  const btnSiang = document.getElementById('tabSessSiang');
+  const btnSore = document.getElementById('tabSessSore');
+  [btnPagi, btnSiang, btnSore].forEach(b => {
+    if (b) {
+      b.style.background = '#e2e8f0';
+      b.style.color = '#475569';
+      b.classList.remove('active');
+    }
+  });
+  let activeBtn = (sessParam === 'pagi') ? btnPagi : ((sessParam === 'siang') ? btnSiang : btnSore);
+  if (activeBtn) {
+    activeBtn.style.background = '#6366f1';
+    activeBtn.style.color = '#ffffff';
+    activeBtn.classList.add('active');
+  }
+
   const monthParam = new Date().getMonth() + 1;
 
   const sentinelCard = document.getElementById('aiSentinelContainer');
   if (!sentinelCard) return;
 
-  const cacheKey = `kacab_sentinel_cache_${dayParam}_${monthParam}`;
-  const cacheTimeKey = `kacab_sentinel_cache_time_${dayParam}_${monthParam}`;
+  const cacheKey = `kacab_sentinel_cache_${dayParam}_${monthParam}_${sessParam}`;
+  const cacheTimeKey = `kacab_sentinel_cache_time_${dayParam}_${monthParam}_${sessParam}`;
 
   if (!forceFresh) {
     try {
@@ -265,7 +324,7 @@ async function loadAiSentinelKacab(customDay = null, forceFresh = false) {
   }
 
   try {
-    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${dayParam}&bulan=${monthParam}${forceFresh ? '&t=' + Date.now() : ''}`);
+    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${dayParam}&bulan=${monthParam}&session=${sessParam}${forceFresh ? '&t=' + Date.now() : ''}`);
     const json = await res.json();
 
     if (json.status === 'success') {
@@ -288,6 +347,7 @@ function renderAiSentinelUI(data) {
   const m = data.milestone;
   const s = data.summary;
   const under = data.underperforming_sales || [];
+  const sessLabel = (data.session === 'pagi' ? '🌅 Pagi' : (data.session === 'siang' ? '☀️ Siang' : '🌆 Sore'));
 
   // Update badges
   const badgeEl = document.getElementById('sentinelStatusBadge');
@@ -295,16 +355,16 @@ function renderAiSentinelUI(data) {
     if (s.needs_alert) {
       badgeEl.className = 'badge-warn';
       badgeEl.style.cssText = 'background:#fef2f2; color:#dc2626; border:1px solid #fecaca; font-weight:800; padding:4px 10px; border-radius:20px; font-size:11px;';
-      badgeEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${s.underperforming_count} Sales Perlu Review`;
+      badgeEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${s.underperforming_count} Sales Perlu Review SPK (${sessLabel})`;
     } else {
       badgeEl.style.cssText = 'background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; font-weight:800; padding:4px 10px; border-radius:20px; font-size:11px;';
-      badgeEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Seluruh Tim On-Track`;
+      badgeEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Seluruh Tim SPK On-Track (${sessLabel})`;
     }
   }
 
   const periodLabel = document.getElementById('sentinelPeriodLabel');
   if (periodLabel) {
-    periodLabel.textContent = `${m.range_label} (Target Min. ${m.min_required_spk_do} SPK/DO)`;
+    periodLabel.textContent = `${m.range_label} (Target Min. ${m.min_required_spk_do} SPK)`;
   }
 
   const listContainer = document.getElementById('sentinelListContainer');
@@ -314,8 +374,8 @@ function renderAiSentinelUI(data) {
     listContainer.innerHTML = `
       <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:14px; padding:18px; text-align:center; color:#166534;">
         <div style="font-size:32px; margin-bottom:6px;">🎉</div>
-        <h4 style="font-weight:800; font-size:15px; margin:0 0 4px;">Luar Biasa! Tidak Ada Defisit Target</h4>
-        <p style="font-size:12px; margin:0; color:#15803d;">Seluruh ${s.total_sales} wiraniaga telah mencapai atau melampaui batas minimal <strong>${m.min_required_spk_do} SPK / DO</strong> untuk periode ini. Laporan WhatsApp tidak perlu dikirim karena performa aman.</p>
+        <h4 style="font-weight:800; font-size:15px; margin:0 0 4px;">Luar Biasa! Tidak Ada Defisit Target SPK (${sessLabel})</h4>
+        <p style="font-size:12px; margin:0; color:#15803d;">Seluruh ${s.total_sales} wiraniaga telah mencapai atau melampaui batas minimal <strong>${m.min_required_spk_do} SPK</strong> untuk periode ini. Laporan WhatsApp aman.</p>
       </div>
     `;
     return;
@@ -327,12 +387,12 @@ function renderAiSentinelUI(data) {
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <span style="background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px;">Defisit -${u.deficit} Unit</span>
+              <span style="background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px;">Defisit -${u.deficit} SPK</span>
               <strong style="font-size:13px; color:#0f172a;">${i + 1}. ${escapeHtml(u.nama_sales)}</strong>
               <span style="font-size:11px; color:#64748b;">(${escapeHtml(u.nama_spv)})</span>
             </div>
             <div style="font-size:12px; color:#475569; margin:4px 0 2px;">
-              Target: <strong>${u.target_spk} SPK / ${u.target_do} DO</strong> &middot; Aktual: <strong>${u.realisasi_spk} SPK / ${u.realisasi_do} DO</strong> <span style="color:#94a3b8;">(Min. Hari Ini: ${u.min_required} Unit)</span>
+              Target: <strong>${u.target_spk} SPK / ${u.target_do} DO</strong> &middot; Aktual: <strong>${u.realisasi_spk} SPK / ${u.realisasi_do} DO</strong> <span style="color:#94a3b8;">(Min. Hari Ini: ${u.min_required} SPK)</span>
             </div>
             <div style="font-size:11px; color:#6b21a8; background:#f3e8ff; padding:4px 8px; border-radius:6px; margin-top:4px; display:inline-block;">
               <i class="fa-solid fa-robot"></i> <em>${escapeHtml(u.ai_advice)}</em>
@@ -356,11 +416,11 @@ function sendKacabAiReportWA() {
 }
 
 function sendSingleNudgeWA(namaSales, namaSpv, defisit, minRequired) {
-  const text = `🚨 *REVIEW SPV DARI KACAB: PERINGATAN TARGET 5-HARIAN* 🚨\n` +
+  const text = `🚨 *REVIEW SPV DARI KACAB: PERINGATAN TARGET SPK 5-HARIAN* 🚨\n` +
     `Yth. ${namaSpv},\n\n` +
     `Mohon atensi dan review khusus untuk wiraniaga tim Anda:\n` +
     `👤 *Nama*: ${namaSales}\n` +
-    `📊 *Status*: Belum mencapai target minimal ritme 5-harian (${minRequired} SPK/DO). Defisit: -${defisit} Unit.\n\n` +
+    `📊 *Status*: Belum mencapai target minimal ritme SPK 5-harian (${minRequired} SPK). Defisit: -${defisit} SPK.\n\n` +
     `Instruksi Kepala Cabang:\n` +
     `1. Segera lakukan review harian & pendampingan prospek (Co-Closing).\n` +
     `2. Evaluasi daftar database Hot Prospect & percepat jadwal test drive.\n\n` +
@@ -370,7 +430,7 @@ function sendSingleNudgeWA(namaSales, namaSpv, defisit, minRequired) {
 }
 
 function changeSentinelDay(day) {
-  loadAiSentinelKacab(parseInt(day));
+  loadAiSentinelKacab(parseInt(day), true, currentSentinelSession);
 }
 
 function toggleSentinelSettings() {
@@ -389,15 +449,20 @@ async function loadSentinelSettingsIntoForm() {
     const json = await res.json();
     if (json && json.settings) {
       const waInput = document.getElementById('kacabWaNumberInput');
-      const timeInput = document.getElementById('kacabScheduleTimeInput');
+      const pagiInput = document.getElementById('kacabSchedulePagiInput');
+      const siangInput = document.getElementById('kacabScheduleSiangInput');
+      const soreInput = document.getElementById('kacabScheduleSoreInput');
       const tokenInput = document.getElementById('kacabGatewayTokenInput');
       const badge = document.getElementById('schedulerActiveBadge');
       
       if (waInput) waInput.value = json.settings.kacab_wa || '';
-      if (timeInput && json.settings.schedule_time) timeInput.value = json.settings.schedule_time;
+      if (pagiInput && json.settings.schedule_time_pagi) pagiInput.value = json.settings.schedule_time_pagi;
+      if (siangInput && json.settings.schedule_time_siang) siangInput.value = json.settings.schedule_time_siang;
+      if (soreInput && json.settings.schedule_time_sore) soreInput.value = json.settings.schedule_time_sore;
       if (tokenInput) tokenInput.value = json.settings.gateway_token || '';
-      if (badge && json.settings.schedule_time) {
-        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Scheduler Aktif: ${json.settings.schedule_time} WIB`;
+      
+      if (badge && json.settings.schedule_time_pagi) {
+        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Scheduler 3 Sesi Aktif (${json.settings.schedule_time_pagi} | ${json.settings.schedule_time_siang || '12:00'} | ${json.settings.schedule_time_sore || '17:00'})`;
       }
     }
   } catch (err) {
@@ -407,7 +472,9 @@ async function loadSentinelSettingsIntoForm() {
 
 async function saveSentinelSettings() {
   const wa = document.getElementById('kacabWaNumberInput')?.value?.trim();
-  const time = document.getElementById('kacabScheduleTimeInput')?.value?.trim() || '06:00';
+  const timePagi = document.getElementById('kacabSchedulePagiInput')?.value?.trim() || '07:00';
+  const timeSiang = document.getElementById('kacabScheduleSiangInput')?.value?.trim() || '12:00';
+  const timeSore = document.getElementById('kacabScheduleSoreInput')?.value?.trim() || '17:00';
   const token = document.getElementById('kacabGatewayTokenInput')?.value?.trim();
 
   if (!wa) {
@@ -422,7 +489,9 @@ async function saveSentinelSettings() {
       body: JSON.stringify({
         action: 'save_settings',
         kacab_wa: wa,
-        schedule_time: time,
+        schedule_time_pagi: timePagi,
+        schedule_time_siang: timeSiang,
+        schedule_time_sore: timeSore,
         auto_send_enabled: 1,
         gateway_provider: 'fonnte',
         gateway_token: token
@@ -433,7 +502,7 @@ async function saveSentinelSettings() {
       alert('✅ ' + result.message);
       const badge = document.getElementById('schedulerActiveBadge');
       if (badge) {
-        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Scheduler Aktif: ${time} WIB`;
+        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Scheduler 3 Sesi Aktif (${timePagi} | ${timeSiang} | ${timeSore})`;
       }
     } else {
       alert('Gagal menyimpan: ' + (result.message || 'Error'));
@@ -451,10 +520,11 @@ async function testCronExecutionNow() {
   btn.disabled = true;
 
   try {
-    const res = await fetch('../api/api_cron_kacab_sentinel.php?action=send_now&force=1');
+    const sess = currentSentinelSession || 'pagi';
+    const res = await fetch(`../api/api_cron_kacab_sentinel.php?action=send_now&force=1&session=${sess}`);
     const result = await res.json();
     if (result.status === 'success') {
-      alert(`✅ Eksekusi Otomatis Berhasil!\nTarget WA: ${result.target_kacab_wa}\nWaktu: ${result.executed_at}\nStatus: ${result.dispatch_result}`);
+      alert(`✅ Eksekusi Otomatis Sesi ${sess.toUpperCase()} Berhasil!\nTarget WA: ${result.target_kacab_wa}\nWaktu: ${result.executed_at}\nStatus: ${result.dispatch_result}`);
       if (result.wa_share_url) {
         window.open(result.wa_share_url, '_blank');
       }
@@ -553,4 +623,3 @@ document.addEventListener('DOMContentLoaded', () => {
   loadFeed();
   loadAiSentinelKacab();
 });
-

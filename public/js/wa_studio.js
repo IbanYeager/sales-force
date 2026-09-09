@@ -1,3 +1,5 @@
+// public/js/wa_studio.js
+// Mirror file for public assets
 /**
  * wa_studio.js
  * WhatsApp Sales Fast-Reply, Broadcast Studio & T-STOCK AI Bot Hub
@@ -83,6 +85,8 @@ function switchWaTab(tab) {
   }
 }
 
+let currentSentinelStudioSession = 'pagi';
+
 function populateSentinelStudioDayOptions(selectedDay) {
   const selectEl = document.getElementById('sentinelStudioDaySelect');
   if (!selectEl) return;
@@ -91,12 +95,12 @@ function populateSentinelStudioDayOptions(selectedDay) {
   const activeDay = (selectedDay !== null && selectedDay !== undefined && selectedDay !== '') ? parseInt(selectedDay) : today;
   
   const milestoneIntervals = [
-    { day: 5, label: 'Ritme Hari 1 - 5 (Min. 1 SPK/DO)' },
-    { day: 10, label: 'Ritme Hari 6 - 10 (Min. 2 SPK/DO)' },
-    { day: 15, label: 'Ritme Hari 11 - 15 (Min. 3 SPK/DO)' },
-    { day: 20, label: 'Ritme Hari 16 - 20 (Min. 4 SPK/DO)' },
-    { day: 25, label: 'Ritme Hari 21 - 25 (Min. 5 SPK/DO)' },
-    { day: 31, label: 'Ritme Hari 26 - Akhir Bulan (Min. 6 SPK/DO)' }
+    { day: 5, label: 'Ritme Hari 1 - 5 (Min. 1 SPK)' },
+    { day: 10, label: 'Ritme Hari 6 - 10 (Min. 2 SPK)' },
+    { day: 15, label: 'Ritme Hari 11 - 15 (Min. 3 SPK)' },
+    { day: 20, label: 'Ritme Hari 16 - 20 (Min. 4 SPK)' },
+    { day: 25, label: 'Ritme Hari 21 - 25 (Min. 5 SPK)' },
+    { day: 31, label: 'Ritme Hari 26 - Akhir Bulan (Min. 6 SPK)' }
   ];
 
   let optionsHtml = '';
@@ -110,11 +114,18 @@ function populateSentinelStudioDayOptions(selectedDay) {
   selectEl.value = String(activeDay);
 }
 
-async function fetchSentinelStudioReport(day = null) {
+async function fetchSentinelStudioReport(day = null, session = null) {
   const selectEl = document.getElementById('sentinelStudioDaySelect');
+  const sessionEl = document.getElementById('sentinelStudioSessionSelect');
   const today = new Date().getDate();
   const currentMonth = new Date().getMonth() + 1;
-  const targetDay = (day !== null && day !== undefined && day !== '') ? parseInt(day) : today;
+  const targetDay = (day !== null && day !== undefined && day !== '') ? parseInt(day) : (selectEl && selectEl.value ? parseInt(selectEl.value) : today);
+
+  if (session) {
+    currentSentinelStudioSession = session;
+  } else if (sessionEl) {
+    currentSentinelStudioSession = sessionEl.value || 'pagi';
+  }
 
   if (selectEl) {
     if (!selectEl.dataset.initialized || selectEl.options.length <= 1) {
@@ -126,10 +137,10 @@ async function fetchSentinelStudioReport(day = null) {
   }
 
   const bubble = document.getElementById('sentinelWaBubble');
-  if (bubble) bubble.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memuat laporan AI Sentinel hari ke-${targetDay}...`;
+  if (bubble) bubble.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memuat laporan AI Sentinel hari ke-${targetDay} (${currentSentinelStudioSession.toUpperCase()})...`;
 
   try {
-    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${targetDay}&bulan=${currentMonth}`);
+    const res = await fetch(`../api/api_ai_kacab_sentinel.php?hari=${targetDay}&bulan=${currentMonth}&session=${currentSentinelStudioSession}`);
     const json = await res.json();
     if (json.status === 'success') {
       currentSentinelStudioData = json;

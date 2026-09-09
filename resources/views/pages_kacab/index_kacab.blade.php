@@ -740,20 +740,20 @@
           </div>
         </section>
 
-        <!-- ===== AI SENTINEL EARLY WARNING (STANDAR 5-HARIAN SPK/DO) ===== -->
+        <!-- ===== AI SENTINEL EARLY WARNING (STANDAR 5-HARIAN SPK) ===== -->
         <section class="kcb-card" id="aiSentinelContainer" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
-                  <i class="fa-solid fa-robot" style="color:#6366f1; margin-right:6px;"></i>AI Sentinel: Pengawas Target Harian Kacab
+                  <i class="fa-solid fa-robot" style="color:#6366f1; margin-right:6px;"></i>AI Sentinel: Pengawas Target Harian Kacab (3x Kirim WA)
                 </h3>
                 <span id="sentinelStatusBadge" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; font-weight:800; padding:4px 10px; border-radius:20px; font-size:11px;">
                   <i class="fa-solid fa-spinner fa-spin"></i> Menganalisis Ritme...
                 </span>
               </div>
               <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">
-                Sistem AI mengevaluasi pencapaian SPK/DO per interval 5 hari (Hari 1-5: Min 1 | Hari 6-10: Min 2 | Hari 11-15: Min 3 | dst).
+                Sistem AI mengevaluasi target minimal <strong>SPK</strong> per interval 5 hari (Hari 1-5: Min 1 | Hari 6-10: Min 2 | dst) &amp; laporan DO harian. Otomasi WhatsApp 3x: 🌅 <strong>07:00 Pagi</strong> (Briefing), ☀️ <strong>12:00 Siang</strong> (Progress SPK &amp; DO), 🌆 <strong>17:00 Sore</strong> (Closing Harian).
               </p>
             </div>
 
@@ -770,7 +770,7 @@
               </button>
 
               <button class="btn btn-sm" onclick="toggleSentinelSettings()" style="background:#e0e7ff; color:#4338ca; font-weight:800; font-size:12px; border:1px solid #c7d2fe; padding:8px 12px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
-                <i class="fa-solid fa-clock"></i> Atur Jadwal Otomasi
+                <i class="fa-solid fa-clock"></i> Atur 3 Jadwal Otomasi
               </button>
 
               <button class="btn btn-sm" onclick="sendKacabAiReportWA()" style="background:linear-gradient(135deg, #25D366, #128C7E); color:white; font-weight:800; font-size:12px; border:none; padding:8px 14px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(37,211,102,0.25); cursor:pointer;">
@@ -791,42 +791,64 @@
             </a>
           </div>
 
+          <!-- SESSION TAB FILTER: PAGI, SIANG, SORE -->
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; background:#f8fafc; padding:6px; border-radius:12px; border:1px solid #e2e8f0; width:fit-content;">
+            <span style="font-size:11.5px; font-weight:800; color:#475569; padding:0 8px;"><i class="fa-solid fa-business-time" style="color:#6366f1;"></i> Sesi Laporan:</span>
+            <button type="button" class="sentinel-session-tab active" id="tabSessPagi" onclick="switchSentinelSessionTab('pagi')" style="padding:6px 14px; border-radius:8px; border:none; font-size:12px; font-weight:800; cursor:pointer; background:#6366f1; color:white; display:flex; align-items:center; gap:6px;">
+              <span>🌅 Pagi (Briefing 07:00)</span>
+            </button>
+            <button type="button" class="sentinel-session-tab" id="tabSessSiang" onclick="switchSentinelSessionTab('siang')" style="padding:6px 14px; border-radius:8px; border:none; font-size:12px; font-weight:800; cursor:pointer; background:#e2e8f0; color:#475569; display:flex; align-items:center; gap:6px;">
+              <span>☀️ Siang (Update 12:00)</span>
+            </button>
+            <button type="button" class="sentinel-session-tab" id="tabSessSore" onclick="switchSentinelSessionTab('sore')" style="padding:6px 14px; border-radius:8px; border:none; font-size:12px; font-weight:800; cursor:pointer; background:#e2e8f0; color:#475569; display:flex; align-items:center; gap:6px;">
+              <span>🌆 Sore (Closing 17:00)</span>
+            </button>
+          </div>
+
           <!-- Panel Pengaturan Otomasi Jadwal Jam Kirim (Collapsible) -->
           <div id="sentinelSettingsPanel" style="display:none; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:16px; margin-bottom:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
               <div style="font-size:13px; font-weight:800; color:#1e293b;">
-                <i class="fa-solid fa-clock-rotate-left" style="color:#4f46e5;"></i> Pengaturan Jadwal Jam Pengiriman Otomatis ke WhatsApp Kacab
+                <i class="fa-solid fa-clock-rotate-left" style="color:#4f46e5;"></i> Pengaturan 3 Jadwal Jam Pengiriman Otomatis ke WhatsApp Kacab
               </div>
               <span id="schedulerActiveBadge" style="font-size:11px; background:#dcfce7; color:#166534; font-weight:800; padding:3px 8px; border-radius:6px; border:1px solid #bbf7d0;">
-                <i class="fa-solid fa-circle-check"></i> Scheduler Aktif: 06:00 WIB
+                <i class="fa-solid fa-circle-check"></i> Scheduler 3 Sesi Aktif (07:00 | 12:00 | 17:00)
               </span>
             </div>
 
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:12px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:12px;">
               <div>
                 <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Nomor WhatsApp Kacab:</label>
                 <input type="text" id="kacabWaNumberInput" placeholder="081234567890" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px; font-weight:700; color:#0f172a; box-sizing:border-box;">
               </div>
               <div>
-                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;"><i class="fa-regular fa-clock"></i> Jam Pengiriman Otomatis (Bisa Diubah):</label>
-                <input type="time" id="kacabScheduleTimeInput" value="06:00" style="width:100%; padding:7px 10px; border-radius:8px; border:1.5px solid #6366f1; font-size:13px; font-weight:800; color:#1e1b4b; background:#eef2ff; box-sizing:border-box; cursor:pointer;">
+                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">🌅 Jam Pagi (Briefing Sales):</label>
+                <input type="time" id="kacabSchedulePagiInput" value="07:00" style="width:100%; padding:7px 10px; border-radius:8px; border:1.5px solid #6366f1; font-size:13px; font-weight:800; color:#1e1b4b; background:#eef2ff; box-sizing:border-box; cursor:pointer;">
+              </div>
+              <div>
+                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">☀️ Jam Siang (Update SPK/DO):</label>
+                <input type="time" id="kacabScheduleSiangInput" value="12:00" style="width:100%; padding:7px 10px; border-radius:8px; border:1.5px solid #0284c7; font-size:13px; font-weight:800; color:#0c4a6e; background:#f0f9ff; box-sizing:border-box; cursor:pointer;">
+              </div>
+              <div>
+                <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">🌆 Jam Sore (Closing Harian):</label>
+                <input type="time" id="kacabScheduleSoreInput" value="17:00" style="width:100%; padding:7px 10px; border-radius:8px; border:1.5px solid #d97706; font-size:13px; font-weight:800; color:#78350f; background:#fffbeb; box-sizing:border-box; cursor:pointer;">
               </div>
               <div>
                 <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Token Gateway (Opsional Fonnte):</label>
-                <input type="password" id="kacabGatewayTokenInput" placeholder="Masukkan token jika pakai Fonnte API" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px; box-sizing:border-box;">
+                <input type="password" id="kacabGatewayTokenInput" placeholder="Masukkan token Fonnte API" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px; box-sizing:border-box;">
               </div>
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
               <p style="font-size:11.5px; color:#64748b; margin:0;">
-                <i class="fa-solid fa-circle-info"></i> Laporan otomatis dikirim setiap hari pada jam yang Anda tentukan di atas jika ada sales yang perlu di-review.
+                <i class="fa-solid fa-circle-info"></i> Laporan otomatis dikirim 3x sehari ke WhatsApp Kacab sesuai jadwal waktu di atas.
               </p>
               <div style="display:flex; gap:8px;">
                 <button class="btn btn-sm" onclick="saveSentinelSettings()" style="background:#4f46e5; color:white; font-weight:700; font-size:11.5px; border:none; padding:7px 14px; border-radius:8px; cursor:pointer;">
-                  <i class="fa-solid fa-floppy-disk"></i> Simpan Jadwal & No. WA
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan 3 Jadwal & No. WA
                 </button>
                 <button class="btn btn-sm" onclick="testCronExecutionNow()" style="background:#0284c7; color:white; font-weight:700; font-size:11.5px; border:none; padding:7px 14px; border-radius:8px; cursor:pointer;">
-                  <i class="fa-solid fa-bolt"></i> Test Kirim Sekarang
+                  <i class="fa-solid fa-bolt"></i> Test Kirim Sesi Ini
                 </button>
               </div>
             </div>

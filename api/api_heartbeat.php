@@ -34,33 +34,34 @@ function formatRelativeTime($datetimeStr) {
     return date('d M Y H:i', $time);
 }
 
-// Helper: Web-Cron Fallback untuk AI Sentinel jika waktu jadwal tiba
+// Helper: Web-Cron Fallback untuk AI Sentinel jika waktu jadwal tiba (3 Sesi: Pagi, Siang, Sore)
 function checkAndTriggerSentinelWebCron($conn) {
     if (!$conn) return;
-    $sentinel_check = $conn->query("SELECT id, schedule_time, auto_send_enabled, last_sent_at, last_sent_status FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
+    $sentinel_check = $conn->query("SELECT id, schedule_time_pagi, schedule_time_siang, schedule_time_sore, auto_send_enabled, last_sent_at, last_sent_status FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
     if ($sentinel_check && $s_set = $sentinel_check->fetch_assoc()) {
         if (intval($s_set['auto_send_enabled']) === 1) {
-            $sched_time = $s_set['schedule_time'] ?: '06:00';
             $now_time = date('H:i');
             $today_date = date('Y-m-d');
-            $last_date = !empty($s_set['last_sent_at']) ? date('Y-m-d', strtotime($s_set['last_sent_at'])) : '';
-            $already_sent = ($last_date === $today_date && $s_set['last_sent_status'] === 'Sent');
 
-            // Jika sudah mencapai/melewati waktu jadwal hari ini dan belum terkirim sukses hari ini
-            if (!$already_sent && $now_time >= $sched_time) {
-                // Kunci lock atomik di database agar tidak dieksekusi dobel jika banyak user online
-                $conn->query("UPDATE tabel_sentinel_settings SET last_sent_status = 'In Progress', last_sent_at = NOW() 
-                              WHERE id = 1 AND auto_send_enabled = 1 
-                              AND (DATE(last_sent_at) != CURDATE() OR last_sent_at IS NULL OR last_sent_status != 'Sent')");
-                if ($conn->affected_rows > 0) {
-                    // Berhasil klaim lock! Trigger eksekusi di latar belakang tanpa memblokir request user
-                    $cron_script = __DIR__ . '/api_cron_kacab_sentinel.php';
-                    if (file_exists($cron_script)) {
-                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                            pclose(popen("start /B php \"$cron_script\" action=execute_cron > NUL 2>&1", "r"));
-                        } else {
-                            exec("php \"$cron_script\" action=execute_cron > /dev/null 2>&1 &");
+            $sessions_config = [
+                'pagi' => !empty($s_set['schedule_time_pagi']) ? $s_set['schedule_time_pagi'] : '07:00',
+                'siang' => !empty($s_set['schedule_time_siang']) ? $s_set['schedule_time_siang'] : '12:00',
+                'sore' => !empty($s_set['schedule_time_sore']) ? $s_set['schedule_time_sore'] : '17:00'
+            ];
+
+            foreach ($sessions_config as $sess => $sched_time) {
+                if ($now_time >= $sched_time) {
+                    $chk_log = $conn->query("SELECT id FROM tabel_ai_sentinel_logs WHERE periode_tanggal = '$today_date' AND session = '$sess' AND status = 'Sent' LIMIT 1");
+                    if (!$chk_log || $chk_log->num_rows === 0) {
+                        $cron_script = __DIR__ . '/api_cron_kacab_sentinel.php';
+                        if (file_exists($cron_script)) {
+                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                pclose(popen("start /B php \"$cron_script\" action=execute_cron session=$sess > NUL 2>&1", "r"));
+                            } else {
+                                exec("php \"$cron_script\" action=execute_cron session=$sess > /dev/null 2>&1 &");
+                            }
                         }
+                        break;
                     }
                 }
             }
