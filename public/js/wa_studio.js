@@ -1,5 +1,3 @@
-// public/js/wa_studio.js
-// Mirror file for public assets
 /**
  * wa_studio.js
  * WhatsApp Sales Fast-Reply, Broadcast Studio & T-STOCK AI Bot Hub
@@ -114,6 +112,25 @@ function populateSentinelStudioDayOptions(selectedDay) {
   selectEl.value = String(activeDay);
 }
 
+function updateWaStudioScheduleUI(times) {
+  if (!times) return;
+  const tPagi = times.pagi || times.schedule_time_pagi || '07:00';
+  const tSiang = times.siang || times.schedule_time_siang || '12:00';
+  const tSore = times.sore || times.schedule_time_sore || '17:00';
+
+  const optPagi = document.getElementById('studioOptPagi');
+  const optSiang = document.getElementById('studioOptSiang');
+  const optSore = document.getElementById('studioOptSore');
+  if (optPagi) optPagi.textContent = `🌅 Pagi (Briefing ${tPagi})`;
+  if (optSiang) optSiang.textContent = `☀️ Siang (Update ${tSiang})`;
+  if (optSore) optSore.textContent = `🌆 Sore (Closing ${tSore})`;
+
+  const infoEl = document.getElementById('studioScheduleInfo');
+  if (infoEl) {
+    infoEl.innerHTML = `<i class="fa-solid fa-clock"></i> Otomasi 3 Sesi: ${tPagi} | ${tSiang} | ${tSore} WIB`;
+  }
+}
+
 async function fetchSentinelStudioReport(day = null, session = null) {
   const selectEl = document.getElementById('sentinelStudioDaySelect');
   const sessionEl = document.getElementById('sentinelStudioSessionSelect');
@@ -144,6 +161,9 @@ async function fetchSentinelStudioReport(day = null, session = null) {
     const json = await res.json();
     if (json.status === 'success') {
       currentSentinelStudioData = json;
+      if (json.schedule_times) {
+        updateWaStudioScheduleUI(json.schedule_times);
+      }
       if (bubble) bubble.innerText = json.wa_report_message;
     } else {
       if (bubble) bubble.innerText = '⚠️ Gagal memuat audit AI Sentinel.';

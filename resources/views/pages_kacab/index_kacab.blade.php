@@ -753,7 +753,7 @@
                 </span>
               </div>
               <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">
-                Sistem AI mengevaluasi target minimal <strong>SPK</strong> per interval 5 hari (Hari 1-5: Min 1 | Hari 6-10: Min 2 | dst) &amp; laporan DO harian. Otomasi WhatsApp 3x: 🌅 <strong>07:00 Pagi</strong> (Briefing), ☀️ <strong>12:00 Siang</strong> (Progress SPK &amp; DO), 🌆 <strong>17:00 Sore</strong> (Closing Harian).
+                Sistem AI mengevaluasi target minimal <strong>SPK</strong> per interval 5 hari (Hari 1-5: Min 1 | Hari 6-10: Min 2 | dst) &amp; laporan DO harian. Otomasi WhatsApp 3x: 🌅 <strong id="scheduleTextPagi">07:00 Pagi</strong> (Briefing), ☀️ <strong id="scheduleTextSiang">12:00 Siang</strong> (Progress SPK &amp; DO), 🌆 <strong id="scheduleTextSore">17:00 Sore</strong> (Closing Harian).
               </p>
             </div>
 
@@ -795,13 +795,13 @@
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; background:#f8fafc; padding:6px; border-radius:12px; border:1px solid #e2e8f0; width:fit-content;">
             <span style="font-size:11.5px; font-weight:800; color:#475569; padding:0 8px;"><i class="fa-solid fa-business-time" style="color:#6366f1;"></i> Sesi Laporan:</span>
             <button type="button" class="sentinel-session-tab active" id="tabSessPagi" onclick="switchSentinelSessionTab('pagi')" style="padding:6px 14px; border-radius:8px; border:none; font-size:12px; font-weight:800; cursor:pointer; background:#6366f1; color:white; display:flex; align-items:center; gap:6px;">
-              <span>🌅 Pagi (Briefing 07:00)</span>
+              <span id="tabLabelPagi">🌅 Pagi (Briefing 07:00)</span>
             </button>
             <button type="button" class="sentinel-session-tab" id="tabSessSiang" onclick="switchSentinelSessionTab('siang')" style="padding:6px 14px; border-radius:8px; border:none; font-size:12px; font-weight:800; cursor:pointer; background:#e2e8f0; color:#475569; display:flex; align-items:center; gap:6px;">
-              <span>☀️ Siang (Update 12:00)</span>
+              <span id="tabLabelSiang">☀️ Siang (Update 12:00)</span>
             </button>
             <button type="button" class="sentinel-session-tab" id="tabSessSore" onclick="switchSentinelSessionTab('sore')" style="padding:6px 14px; border-radius:8px; border:none; font-size:12px; font-weight:800; cursor:pointer; background:#e2e8f0; color:#475569; display:flex; align-items:center; gap:6px;">
-              <span>🌆 Sore (Closing 17:00)</span>
+              <span id="tabLabelSore">🌆 Sore (Closing 17:00)</span>
             </button>
           </div>
 

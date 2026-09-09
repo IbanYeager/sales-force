@@ -451,13 +451,27 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
     }
     unset($s_list);
 
+    // Fetch dynamic schedule times from DB
+    $time_pagi = '07:00';
+    $time_siang = '12:00';
+    $time_sore = '17:00';
+
+    if ($conn) {
+        $q_set = $conn->query("SELECT schedule_time_pagi, schedule_time_siang, schedule_time_sore FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
+        if ($q_set && $s_row = $q_set->fetch_assoc()) {
+            if (!empty($s_row['schedule_time_pagi'])) $time_pagi = $s_row['schedule_time_pagi'];
+            if (!empty($s_row['schedule_time_siang'])) $time_siang = $s_row['schedule_time_siang'];
+            if (!empty($s_row['schedule_time_sore'])) $time_sore = $s_row['schedule_time_sore'];
+        }
+    }
+
     $total_count = count($underperforming) + count($on_track);
     $needs_alert = (count($underperforming) > 0);
 
     $msg = "";
     if ($session === 'pagi') {
         if ($needs_alert) {
-            $msg .= "🌅 *SARAN BRIEFING PAGI KACAB - AI SENTINEL* 🌅\n";
+            $msg .= "🌅 *SARAN BRIEFING PAGI KACAB ({$time_pagi} WIB) - AI SENTINEL* 🌅\n";
             $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
             $msg .= "📅 *Tanggal*: {$periode_str}\n";
             $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
@@ -500,7 +514,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
             $msg .= "2. Evaluasi daftar Hot Prospect & pastikan jadwal test drive harian terdaftar.\n";
             $msg .= "3. Percepat proses approval diskon dan permohonan kredit pending.";
         } else {
-            $msg .= "✅ *BRIEFING PAGI KACAB: SELURUH SALES ON-TRACK* ✅\n";
+            $msg .= "✅ *BRIEFING PAGI KACAB ({$time_pagi} WIB): SELURUH SALES ON-TRACK* ✅\n";
             $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
             $msg .= "📅 *Tanggal*: {$periode_str}\n";
             $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
@@ -511,7 +525,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
         }
     } elseif ($session === 'siang') {
         if ($needs_alert) {
-            $msg .= "☀️ *UPDATE SPK & DO SIANG (12:00 WIB) - AI SENTINEL* ☀️\n";
+            $msg .= "☀️ *UPDATE SPK & DO SIANG ({$time_siang} WIB) - AI SENTINEL* ☀️\n";
             $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
             $msg .= "📅 *Tanggal*: {$periode_str}\n";
             $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
@@ -542,7 +556,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
             $msg .= "1. Cek progress follow-up siang tim SPV terhadap konsumen prospek hangat.\n";
             $msg .= "2. Pastikan pengiriman unit DO yang dijadwalkan hari ini berjalan lancar.";
         } else {
-            $msg .= "✅ *UPDATE SPK & DO SIANG: PERFORMA OPTIMAL* ✅\n";
+            $msg .= "✅ *UPDATE SPK & DO SIANG ({$time_siang} WIB): PERFORMA OPTIMAL* ✅\n";
             $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
             $msg .= "📅 *Tanggal*: {$periode_str}\n";
             $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
@@ -554,7 +568,7 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
         }
     } else {
         if ($needs_alert) {
-            $msg .= "🌆 *UPDATE CLOSING SPK & DO SORE (17:00 WIB) - AI SENTINEL* 🌆\n";
+            $msg .= "🌆 *UPDATE CLOSING SORE ({$time_sore} WIB) - AI SENTINEL* 🌆\n";
             $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
             $msg .= "📅 *Tanggal*: {$periode_str}\n";
             $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";
@@ -583,9 +597,9 @@ function getInternalSentinelReport($conn, $current_day, $current_month, $current
 
             $msg .= "📌 *REKOMENDASI CLOSING SORE KEPALA CABANG:*\n";
             $msg .= "1. Rekap hasil perolehan SPK harian & evaluasi hambatan penutupan prospek bersama SPV.\n";
-            $msg .= "2. Pastikan input SPK baru dan jadwal serah terima unit DO esok hari terverifikasi.";
+            $msg .= "2. Pastikan input SPK baru dan jadwal serah terima unit DO esok hari sudah terverifikasi.";
         } else {
-            $msg .= "✅ *UPDATE CLOSING SORE: TARGET MINIMAL TERPENUHI* ✅\n";
+            $msg .= "✅ *UPDATE CLOSING SORE ({$time_sore} WIB): TARGET MINIMAL TERPENUHI* ✅\n";
             $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n";
             $msg .= "📅 *Tanggal*: {$periode_str}\n";
             $msg .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice})\n";

@@ -342,6 +342,9 @@ async function loadAiSentinelKacab(customDay = null, forceFresh = false, session
 }
 
 function renderAiSentinelUI(data) {
+  if (data && data.schedule_times) {
+    updateSentinelScheduleUI(data.schedule_times);
+  }
   const m = data.milestone;
   const s = data.summary;
   const under = data.underperforming_sales || [];
@@ -441,6 +444,32 @@ function toggleSentinelSettings() {
   }
 }
 
+function updateSentinelScheduleUI(times) {
+  if (!times) return;
+  const tPagi = times.pagi || times.schedule_time_pagi || '07:00';
+  const tSiang = times.siang || times.schedule_time_siang || '12:00';
+  const tSore = times.sore || times.schedule_time_sore || '17:00';
+
+  const labelPagi = document.getElementById('tabLabelPagi');
+  const labelSiang = document.getElementById('tabLabelSiang');
+  const labelSore = document.getElementById('tabLabelSore');
+  if (labelPagi) labelPagi.textContent = `🌅 Pagi (Briefing ${tPagi})`;
+  if (labelSiang) labelSiang.textContent = `☀️ Siang (Update ${tSiang})`;
+  if (labelSore) labelSore.textContent = `🌆 Sore (Closing ${tSore})`;
+
+  const textPagi = document.getElementById('scheduleTextPagi');
+  const textSiang = document.getElementById('scheduleTextSiang');
+  const textSore = document.getElementById('scheduleTextSore');
+  if (textPagi) textPagi.textContent = `${tPagi} Pagi`;
+  if (textSiang) textSiang.textContent = `${tSiang} Siang`;
+  if (textSore) textSore.textContent = `${tSore} Sore`;
+
+  const badge = document.getElementById('schedulerActiveBadge');
+  if (badge) {
+    badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Scheduler 3 Sesi Aktif (${tPagi} | ${tSiang} | ${tSore})`;
+  }
+}
+
 async function loadSentinelSettingsIntoForm() {
   try {
     const res = await fetch('../api/api_cron_kacab_sentinel.php?action=get_settings');
@@ -451,7 +480,6 @@ async function loadSentinelSettingsIntoForm() {
       const siangInput = document.getElementById('kacabScheduleSiangInput');
       const soreInput = document.getElementById('kacabScheduleSoreInput');
       const tokenInput = document.getElementById('kacabGatewayTokenInput');
-      const badge = document.getElementById('schedulerActiveBadge');
       
       if (waInput) waInput.value = json.settings.kacab_wa || '';
       if (pagiInput && json.settings.schedule_time_pagi) pagiInput.value = json.settings.schedule_time_pagi;
@@ -459,9 +487,7 @@ async function loadSentinelSettingsIntoForm() {
       if (soreInput && json.settings.schedule_time_sore) soreInput.value = json.settings.schedule_time_sore;
       if (tokenInput) tokenInput.value = json.settings.gateway_token || '';
       
-      if (badge && json.settings.schedule_time_pagi) {
-        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Scheduler 3 Sesi Aktif (${json.settings.schedule_time_pagi} | ${json.settings.schedule_time_siang || '12:00'} | ${json.settings.schedule_time_sore || '17:00'})`;
-      }
+      updateSentinelScheduleUI(json.settings);
     }
   } catch (err) {
     console.error('Error fetching settings:', err);
@@ -498,10 +524,11 @@ async function saveSentinelSettings() {
     const result = await res.json();
     if (result.status === 'success') {
       alert('✅ ' + result.message);
-      const badge = document.getElementById('schedulerActiveBadge');
-      if (badge) {
-        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Scheduler 3 Sesi Aktif (${timePagi} | ${timeSiang} | ${timeSore})`;
-      }
+      updateSentinelScheduleUI({
+        pagi: timePagi,
+        siang: timeSiang,
+        sore: timeSore
+      });
     } else {
       alert('Gagal menyimpan: ' + (result.message || 'Error'));
     }

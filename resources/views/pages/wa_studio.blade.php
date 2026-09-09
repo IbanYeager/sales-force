@@ -325,9 +325,9 @@
             <div>
               <label class="form-group-label">Pilih Sesi Laporan:</label>
               <select id="sentinelStudioSessionSelect" class="styled-input" onchange="fetchSentinelStudioReport(null, this.value)">
-                <option value="pagi">🌅 Pagi (Briefing 07:00)</option>
-                <option value="siang">☀️ Siang (Update 12:00)</option>
-                <option value="sore">🌆 Sore (Closing 17:00)</option>
+                <option value="pagi" id="studioOptPagi">🌅 Pagi (Briefing 07:00)</option>
+                <option value="siang" id="studioOptSiang">☀️ Siang (Update 12:00)</option>
+                <option value="sore" id="studioOptSore">🌆 Sore (Closing 17:00)</option>
               </select>
             </div>
           </div>
@@ -335,7 +335,7 @@
           <!-- Cron / Automation Guide -->
           <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 12px; padding: 14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
-              <div style="font-size: 12px; font-weight: 800; color: #3730a3;">
+              <div style="font-size: 12px; font-weight: 800; color: #3730a3;" id="studioScheduleInfo">
                 <i class="fa-solid fa-clock"></i> Otomasi 3 Sesi: 07:00 | 12:00 | 17:00 WIB
               </div>
               <span style="background:#dcfce7; color:#166534; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; border:1px solid #bbf7d0;">

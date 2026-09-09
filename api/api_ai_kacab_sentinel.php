@@ -239,13 +239,27 @@ unset($s_list);
 $total_sales_count = count($underperforming) + count($on_track);
 $needs_alert = (count($underperforming) > 0);
 
+// Fetch dynamic schedule times from settings DB
+$time_pagi = '07:00';
+$time_siang = '12:00';
+$time_sore = '17:00';
+
+if ($conn) {
+    $q_set = $conn->query("SELECT schedule_time_pagi, schedule_time_siang, schedule_time_sore FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
+    if ($q_set && $s_row = $q_set->fetch_assoc()) {
+        if (!empty($s_row['schedule_time_pagi'])) $time_pagi = $s_row['schedule_time_pagi'];
+        if (!empty($s_row['schedule_time_siang'])) $time_siang = $s_row['schedule_time_siang'];
+        if (!empty($s_row['schedule_time_sore'])) $time_sore = $s_row['schedule_time_sore'];
+    }
+}
+
 // 3. Susun Format Pesan WhatsApp Terstruktur & Rapi Per Tim SPV
 $wa_message = "";
 
 if ($session === 'pagi') {
     // ── SESI PAGI (07:00 WIB) - SARAN BRIEFING PAGI ──
     if ($needs_alert) {
-        $wa_message .= "🌅 *SARAN BRIEFING PAGI KACAB - AI SENTINEL* 🌅\n";
+        $wa_message .= "🌅 *SARAN BRIEFING PAGI KACAB ({$time_pagi} WIB) - AI SENTINEL* 🌅\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $wa_message .= "📅 *Tanggal*: {$periode_str}\n";
         $wa_message .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice_index})\n";
@@ -288,7 +302,7 @@ if ($session === 'pagi') {
         $wa_message .= "2. Evaluasi daftar Hot Prospect & pastikan jadwal test drive harian terdaftar.\n";
         $wa_message .= "3. Percepat proses approval diskon dan permohonan kredit pending.";
     } else {
-        $wa_message .= "✅ *BRIEFING PAGI KACAB: SELURUH SALES ON-TRACK* ✅\n";
+        $wa_message .= "✅ *BRIEFING PAGI KACAB ({$time_pagi} WIB): SELURUH SALES ON-TRACK* ✅\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $wa_message .= "📅 *Tanggal*: {$periode_str}\n";
         $wa_message .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice_index})\n";
@@ -301,7 +315,7 @@ if ($session === 'pagi') {
 } elseif ($session === 'siang') {
     // ── SESI SIANG (12:00 WIB) - UPDATE SPK & DO ──
     if ($needs_alert) {
-        $wa_message .= "☀️ *UPDATE SPK & DO SIANG (12:00 WIB) - AI SENTINEL* ☀️\n";
+        $wa_message .= "☀️ *UPDATE SPK & DO SIANG ({$time_siang} WIB) - AI SENTINEL* ☀️\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $wa_message .= "📅 *Tanggal*: {$periode_str}\n";
         $wa_message .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice_index})\n";
@@ -332,7 +346,7 @@ if ($session === 'pagi') {
         $wa_message .= "1. Cek progress follow-up siang tim SPV terhadap konsumen prospek hangat.\n";
         $wa_message .= "2. Pastikan pengiriman unit DO yang dijadwalkan hari ini berjalan lancar.";
     } else {
-        $wa_message .= "✅ *UPDATE SPK & DO SIANG: PERFORMA OPTIMAL* ✅\n";
+        $wa_message .= "✅ *UPDATE SPK & DO SIANG ({$time_siang} WIB): PERFORMA OPTIMAL* ✅\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $wa_message .= "📅 *Tanggal*: {$periode_str}\n";
         $wa_message .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice_index})\n";
@@ -346,7 +360,7 @@ if ($session === 'pagi') {
 } else {
     // ── SESI SORE (17:00 WIB) - UPDATE CLOSING SORE ──
     if ($needs_alert) {
-        $wa_message .= "🌆 *UPDATE CLOSING SPK & DO SORE (17:00 WIB) - AI SENTINEL* 🌆\n";
+        $wa_message .= "🌆 *UPDATE CLOSING SPK & DO SORE ({$time_sore} WIB) - AI SENTINEL* 🌆\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $wa_message .= "📅 *Tanggal*: {$periode_str}\n";
         $wa_message .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice_index})\n";
@@ -375,9 +389,9 @@ if ($session === 'pagi') {
 
         $wa_message .= "📌 *REKOMENDASI CLOSING SORE KEPALA CABANG:*\n";
         $wa_message .= "1. Rekap hasil perolehan SPK harian & evaluasi hambatan penutupan prospek bersama SPV.\n";
-        $wa_message .= "2. Pastikan input SPK baru dan jadwal serah terima unit DO esok hari terverifikasi.";
+        $wa_message .= "2. Pastikan input SPK baru dan jadwal serah terima unit DO esok hari sudah terverifikasi.";
     } else {
-        $wa_message .= "✅ *UPDATE CLOSING SORE: TARGET MINIMAL TERPENUHI* ✅\n";
+        $wa_message .= "✅ *UPDATE CLOSING SORE ({$time_sore} WIB): TARGET MINIMAL TERPENUHI* ✅\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         $wa_message .= "📅 *Tanggal*: {$periode_str}\n";
         $wa_message .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice_index})\n";
@@ -394,6 +408,11 @@ $wa_url = "https://api.whatsapp.com/send?text=" . urlencode($wa_message);
 echo json_encode([
     "status" => "success",
     "session" => $session,
+    "schedule_times" => [
+        "pagi" => $time_pagi,
+        "siang" => $time_siang,
+        "sore" => $time_sore
+    ],
     "milestone" => [
         "current_day" => $current_day,
         "periode_bulan" => $current_month,
