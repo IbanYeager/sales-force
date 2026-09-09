@@ -19,6 +19,9 @@ function getImageUrl(photoStr) {
   if (first.startsWith('../uploads/')) {
     return first;
   }
+  if (first.includes('_lap_')) {
+    return '../uploads/laporan/' + first;
+  }
   return '../uploads/lokasi/' + first;
 }
 
