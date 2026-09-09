@@ -142,6 +142,7 @@ function applyActivityFilters() {
   }
 
   container.innerHTML = filtered.map(act => {
+    const index = activitiesList.indexOf(act);
     const icon = activityIcon(act.tipe_aktivitas);
 
     let photoHtml = '';
