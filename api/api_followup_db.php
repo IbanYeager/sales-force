@@ -114,6 +114,53 @@ if (!function_exists('clean_phone_number')) {
     }
 }
 
+if (!function_exists('get_sales_list')) {
+    function get_sales_list($spv = '') {
+        global $is_mysql, $conn;
+        $salesList = [];
+
+        if ($is_mysql && $conn) {
+            try {
+                $where = "1=1";
+                if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
+                    $spvClean = str_replace('Pak ', '', $conn->real_escape_string($spv));
+                    $where .= " AND (nama_spv = '" . $conn->real_escape_string($spv) . "' OR nama_spv LIKE '%$spvClean%')";
+                }
+                $res = $conn->query("SELECT id, nama_lengkap as name, no_hp as phone, tingkatan as role, foto, nama_spv FROM sales_accounts WHERE $where ORDER BY nama_spv ASC, nama_lengkap ASC");
+                if ($res && $res->num_rows > 0) {
+                    while ($r = $res->fetch_assoc()) {
+                        $f = trim($r['foto'] ?? '');
+                        if ($f !== '' && str_starts_with($f, 'http://') && !str_contains($f, 'localhost')) {
+                            $f = 'https://' . substr($f, 7);
+                        }
+                        $salesList[] = [
+                            'id' => (int)$r['id'],
+                            'name' => $r['name'],
+                            'phone' => clean_phone_number($r['phone'] ?: '6281223344551'),
+                            'role' => $r['role'] ?: 'Sales Consultant',
+                            'foto' => $f,
+                            'spv' => $r['nama_spv'] ?: 'Umum',
+                            'target_monthly' => 30
+                        ];
+                    }
+                }
+            } catch (Throwable $e) {}
+        }
+
+        if (empty($salesList)) {
+            $salesList = [
+                ['id' => 1, 'name' => 'Rian Pratama', 'phone' => '6281223344551', 'role' => 'Senior Sales Executive', 'spv' => 'Pak Riva', 'target_monthly' => 35],
+                ['id' => 2, 'name' => 'Siti Nurhaliza', 'phone' => '6281399887766', 'role' => 'Sales Executive', 'spv' => 'Pak Ryan', 'target_monthly' => 30],
+                ['id' => 3, 'name' => 'Dimas Anggoro', 'phone' => '6285712345678', 'role' => 'Sales Executive', 'spv' => 'Bu Rahma', 'target_monthly' => 25],
+                ['id' => 4, 'name' => 'Agus Setiawan', 'phone' => '6287811223344', 'role' => 'Sales Counter & CRM', 'spv' => 'Pak Alvin', 'target_monthly' => 40],
+                ['id' => 5, 'name' => 'Putri Maharani', 'phone' => '6282155667788', 'role' => 'Sales Executive', 'spv' => 'Pak Riva', 'target_monthly' => 30]
+            ];
+        }
+
+        return $salesList;
+    }
+}
+
 /**
  * Auto-initialize database tables
  */

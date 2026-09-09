@@ -228,6 +228,9 @@ const SalesSuperpowers = {
                 <span>Prioritas: <b>${escapeHtml(item.priority || 'Warm')}</b></span>
                 <span>Status: <b style="color:#2563eb;">${escapeHtml(item.status || 'Follow Up')}</b></span>
               </div>
+              <div style="margin-top:4px; font-size:11px; color:#475569;">
+                <span><i class="fa-solid fa-user-check" style="color:#059669;"></i> PIC Sales: <b>${escapeHtml(item.sales_name || 'Terbuka Untuk Semua Sales')}</b></span>
+              </div>
             </div>
           </div>
 

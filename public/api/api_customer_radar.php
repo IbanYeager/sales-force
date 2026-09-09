@@ -98,15 +98,15 @@ $salesId = isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0;
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 50;
 
 try {
-    // 1. Fetch Followup Customers
-    $whereFu = "1=1";
-    $paramsFu = [];
-    if ($salesId > 0) {
-        $whereFu .= " AND (assigned_sales_id = ? OR assigned_sales_id IS NULL OR assigned_sales_id = 0)";
-        $paramsFu[] = $salesId;
+    // Helper sales map
+    $salesList = get_sales_list();
+    $salesMap = [];
+    foreach ($salesList as $s) {
+        $salesMap[(int)$s['id']] = $s['name'];
     }
-    
-    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, priority, followup_status, cluster_name, outlet_do, notes FROM followup_customers WHERE $whereFu LIMIT 250", $paramsFu);
+
+    // 1. Fetch Followup Customers (All nearby database leads for public GPS radar)
+    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id FROM followup_customers ORDER BY id DESC LIMIT 500", []);
     
     $results = [];
 
@@ -119,6 +119,8 @@ try {
             if ($dist <= $maxRadius) {
                 $phoneClean = clean_phone_number($row['phone'] ?? '');
                 $car = $row['car_model'] ?: ($row['last_car_model'] ?: 'Toyota Unit');
+                $sid = (int)($row['assigned_sales_id'] ?? 0);
+                $salesName = isset($salesMap[$sid]) ? $salesMap[$sid] : 'Terbuka (Siapa Saja)';
                 
                 $results[] = [
                     'id' => (int)$row['id'],
@@ -129,6 +131,7 @@ try {
                     'district' => $row['district'] ?: 'Bandung Area',
                     'priority' => $row['priority'] ?: 'Warm',
                     'status' => $row['followup_status'] ?: 'Belum Dihubungi',
+                    'sales_name' => $salesName,
                     'lat' => round($coords[0], 6),
                     'lng' => round($coords[1], 6),
                     'distance_km' => round($dist, 2),
@@ -142,11 +145,7 @@ try {
 
     // 2. Also Fetch from tabel_customer (Kanban CRM) if available
     if ($conn) {
-        $whereCust = "1=1";
-        if ($salesId > 0) {
-            $whereCust .= " AND sales_account_id = $salesId";
-        }
-        $custRes = $conn->query("SELECT id, nama, no_telp, alamat, status FROM tabel_customer WHERE $whereCust LIMIT 100");
+        $custRes = $conn->query("SELECT id, nama, no_telp, alamat, status FROM tabel_customer ORDER BY id DESC LIMIT 200");
         if ($custRes && $custRes->num_rows > 0) {
             while ($c = $custRes->fetch_assoc()) {
                 $coords = getCoordinatesForLocation($c['alamat'] ?: '', $districtCoords);
@@ -163,6 +162,7 @@ try {
                         'district' => $c['alamat'] ?: 'Bandung',
                         'priority' => 'Hot Lead',
                         'status' => $c['status'] ?: 'Follow Up',
+                        'sales_name' => 'Pipeline Sales',
                         'lat' => round($coords[0], 6),
                         'lng' => round($coords[1], 6),
                         'distance_km' => round($dist, 2),
