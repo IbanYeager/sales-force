@@ -896,15 +896,19 @@ async function loadMasterCustomers(resetPage = true) {
     const res = await fetch(url);
     const data = await res.json();
 
-    if (data.success) {
+    if (data && data.success) {
       masterState.customers = data.data || [];
       renderCustomerTable();
+    } else {
+      throw new Error(data?.message || data?.error || 'Gagal memuat data');
     }
   } catch (e) {
+    console.error('Error loading master customers:', e);
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="9" style="text-align:center; padding:30px; color:red;">
+          <td colspan="9" style="text-align:center; padding:30px; color:#dc2626;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:20px; margin-bottom:8px;"></i><br>
             Gagal memuat data customer dari server.
           </td>
         </tr>

@@ -46,7 +46,7 @@ function followup_query($sql, $params = []) {
             return $data;
         } else {
             $stmt = $conn->prepare($sql);
-            if (!$stmt) return false;
+            if (!$stmt) return [];
             
             $types = "";
             $bindParams = [];
@@ -366,22 +366,23 @@ function init_followup_tables() {
         }
     }
 
-    // Ensure followup_templates has created_by and sales_id columns
-    try {
-        if ($is_mysql) {
-            followup_execute("ALTER TABLE followup_templates ADD COLUMN sales_id INT DEFAULT NULL");
-        } else {
-            followup_execute("ALTER TABLE followup_templates ADD COLUMN sales_id INTEGER DEFAULT NULL");
-        }
-    } catch (Exception $e) {}
-
-    try {
-        if ($is_mysql) {
-            followup_execute("ALTER TABLE followup_templates ADD COLUMN created_by VARCHAR(150) DEFAULT ''");
-        } else {
-            followup_execute("ALTER TABLE followup_templates ADD COLUMN created_by TEXT DEFAULT ''");
-        }
-    } catch (Exception $e) {}
+    // Ensure followup_templates has created_by and sales_id columns safely
+    $tmplCols = [
+        'sales_id' => $is_mysql ? "INT DEFAULT NULL" : "INTEGER DEFAULT NULL",
+        'created_by' => $is_mysql ? "VARCHAR(150) DEFAULT ''" : "TEXT DEFAULT ''"
+    ];
+    foreach ($tmplCols as $colName => $colDef) {
+        try {
+            if ($is_mysql) {
+                $check = followup_query("SHOW COLUMNS FROM followup_templates LIKE '$colName'");
+                if (empty($check)) {
+                    followup_execute("ALTER TABLE followup_templates ADD COLUMN $colName $colDef");
+                }
+            } else {
+                followup_execute("ALTER TABLE followup_templates ADD COLUMN $colName $colDef");
+            }
+        } catch (Throwable $e) {}
+    }
 
     // Seed or update default templates
     $templates = [

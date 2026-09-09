@@ -197,6 +197,7 @@ if ($action === 'customers') {
     $sql = "SELECT * FROM followup_customers $whereSql ORDER BY id DESC LIMIT 5000";
 
     $customers = followup_query($sql, $params);
+    $customers = is_array($customers) ? $customers : [];
     $salesList = get_sales_list();
     $salesMap = [];
     foreach ($salesList as $s) {

@@ -235,6 +235,9 @@ function initFollowupTabs() {
             </table>
           </div>
         </div>
+
+        <!-- 3.5 RADAR GPS CONTAINER -->
+        <div id="followupRadarContainer" style="display:none;"></div>
       </div>
     `;
 
@@ -299,21 +302,7 @@ function switchCustomerTab(tab) {
   }
 }
 
-async function switchFollowupSubTab(subTab) {
-  followupState.subTab = subTab;
-  const btnMy = document.getElementById('subBtnMyTasks');
-  const btnPool = document.getElementById('subBtnOrphanPool');
 
-  if (subTab === 'orphan_pool') {
-    if (btnMy) btnMy.className = 'sub-nav-fu-btn';
-    if (btnPool) btnPool.className = 'sub-nav-fu-btn pool-tab active';
-    await loadOrphanLeads();
-  } else {
-    if (btnMy) btnMy.className = 'sub-nav-fu-btn active';
-    if (btnPool) btnPool.className = 'sub-nav-fu-btn pool-tab';
-    renderCustomerCards();
-  }
-}
 
 async function loadTemplates() {
   try {
@@ -2756,6 +2745,8 @@ function switchFollowupSubTab(tab) {
   const btnOrphan = document.getElementById('subBtnOrphanPool');
   const btnRadar = document.getElementById('subBtnRadar');
   const filterCard = document.getElementById('fuFilterCard');
+  const dataContainer = document.getElementById('followupDataContainer');
+  const radarContainer = document.getElementById('followupRadarContainer');
 
   if (btnMyTasks) btnMyTasks.classList.toggle('active', tab === 'my_tasks');
   if (btnOrphan) btnOrphan.classList.toggle('active', tab === 'orphan_pool');
@@ -2763,11 +2754,18 @@ function switchFollowupSubTab(tab) {
 
   if (tab === 'radar') {
     if (filterCard) filterCard.style.display = 'none';
-    if (window.SalesSuperpowers) {
-      SalesSuperpowers.renderRadarCockpit('followupDataContainer', 5);
+    if (dataContainer) dataContainer.style.display = 'none';
+    if (radarContainer) {
+      radarContainer.style.display = 'block';
+      if (window.SalesSuperpowers) {
+        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 5);
+      }
     }
   } else {
     if (filterCard) filterCard.style.display = 'block';
+    if (dataContainer) dataContainer.style.display = 'block';
+    if (radarContainer) radarContainer.style.display = 'none';
+
     if (tab === 'orphan_pool') {
       loadOrphanLeads();
     } else {

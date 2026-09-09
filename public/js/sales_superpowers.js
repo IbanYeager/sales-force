@@ -149,8 +149,8 @@ const SalesSuperpowers = {
             <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Prospek dalam Radius ${radiusKm} KM</h4>
             <p style="font-size:12.5px; color:#64748b; margin:0 0 16px; max-width:400px; margin-inline:auto;">Coba perbesar radius radar untuk mendeteksi database di kecamatan sekitar.</p>
             <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
-              <button class="btn-fu btn-fu-navy" onclick="SalesSuperpowers.renderRadarCockpit('followupDataContainer', 10)">Perluas Radius 10 KM</button>
-              <button class="btn-fu btn-fu-crimson" onclick="SalesSuperpowers.renderRadarCockpit('followupDataContainer', 25)">Perluas Radius 25 KM</button>
+              <button class="btn-fu btn-fu-navy" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 10)">Perluas Radius 10 KM</button>
+              <button class="btn-fu btn-fu-crimson" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 25)">Perluas Radius 25 KM</button>
             </div>
           </div>
         `;
