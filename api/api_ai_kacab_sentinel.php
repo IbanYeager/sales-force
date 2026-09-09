@@ -5,6 +5,7 @@
 // Hari 1-5: Min 1 SPK | Hari 6-10: Min 2 SPK | Hari 11-15: Min 3 SPK | Hari 16-20: Min 4 SPK | Hari 21-25: Min 5 SPK | Hari 26-31: Min 6 SPK
 // Note: Realisasi DO dilaporkan untuk tracking progress, tetapi DO TIDAK memiliki batas minimal & tidak menyebabkan defisit penalty.
 // Memiliki 3 Siklus Sesi Laporan: Pagi (Briefing 07:00), Siang (Update 12:00), Sore (Closing 17:00).
+// Laporan WhatsApp dikelompokkan secara rapi per Tim SPV (tidak berulang per sales).
 
 error_reporting(0);
 mysqli_report(MYSQLI_REPORT_OFF);
@@ -159,12 +160,10 @@ if ($q_sales && $q_sales->num_rows > 0) {
         // Standar minimal 5-harian DITERAPKAN KHUSUS UNTUK SPK
         $sales_min_required = min($min_required, $tgt_spk);
 
-        // ATURAN SPK: Jika realisasi SPK sudah mencapai target SPK bulanan atau mencapai target minimal 5-harian saat ini, ON TRACK.
-        // DO (Delivery Order) dilaporkan informatif tanpa syarat minimal.
         $is_passed = ($real_spk >= $tgt_spk) || ($real_spk >= $sales_min_required);
         $deficit = max(0, $sales_min_required - $real_spk);
 
-        // Rekomendasi Coaching AI sesuai Sesi (Pagi / Siang / Sore)
+        // Individual AI advice (for Web UI card view)
         $ai_advice = "";
         if ($session === 'pagi') {
             if ($real_spk == 0) {
@@ -182,7 +181,7 @@ if ($q_sales && $q_sales->num_rows > 0) {
             } else {
                 $ai_advice = "Update Siang: SPK On-track ($real_spk SPK | $real_do DO). Pertahankan ritme hingga sore.";
             }
-        } else { // sore
+        } else {
             if ($real_spk == 0) {
                 $ai_advice = "Closing Sore: 0 SPK. Wajib evaluasi komprehensif bersama SPV $spv_name untuk penyusunan strategi esok hari.";
             } elseif ($deficit > 0) {
@@ -216,18 +215,31 @@ if ($q_sales && $q_sales->num_rows > 0) {
     }
 }
 
-// Urutkan underperforming dari defisit SPK tertinggi ke terendah, lalu berdasarkan SPV
-usort($underperforming, function($a, $b) {
-    if ($b['deficit'] !== $a['deficit']) {
-        return $b['deficit'] - $a['deficit'];
+// Group underperforming sales by SPV team
+$under_by_spv = [];
+foreach ($underperforming as $u) {
+    $spv = $u['nama_spv'] ?: 'Supervisor';
+    if (!isset($under_by_spv[$spv])) {
+        $under_by_spv[$spv] = [];
     }
-    return strcmp($a['nama_spv'], $b['nama_spv']);
-});
+    $under_by_spv[$spv][] = $u;
+}
+
+// Sort each SPV team's sales by deficit descending
+foreach ($under_by_spv as $spv_key => &$s_list) {
+    usort($s_list, function($a, $b) {
+        if ($b['deficit'] !== $a['deficit']) {
+            return $b['deficit'] - $a['deficit'];
+        }
+        return strcmp($a['nama_sales'], $b['nama_sales']);
+    });
+}
+unset($s_list);
 
 $total_sales_count = count($underperforming) + count($on_track);
 $needs_alert = (count($underperforming) > 0);
 
-// 3. Susun Format Pesan WhatsApp Khusus Berdasarkan Sesi (Pagi / Siang / Sore)
+// 3. Susun Format Pesan WhatsApp Terstruktur & Rapi Per Tim SPV
 $wa_message = "";
 
 if ($session === 'pagi') {
@@ -238,27 +250,43 @@ if ($session === 'pagi') {
         $wa_message .= "📅 *Tanggal*: {$periode_str}\n";
         $wa_message .= "⏱️ *Siklus*: {$range_label} (Periode Ke-{$slice_index})\n";
         $wa_message .= "🎯 *Target Minimal SPK*: Minimal *{$min_required} SPK* (s.d. hari ini)\n";
-        $wa_message .= "📊 *Status Sales*: *" . count($underperforming) . " dari {$total_sales_count} Sales* belum capai target minimal SPK\n";
+        $wa_message .= "📊 *Status Tim*: *" . count($underperforming) . " dari {$total_sales_count} Sales* belum mencapai target minimal SPK\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        $wa_message .= "📋 *FOKUS BRIEFING & REKOMENDASI UNTUK SALES:*\n\n";
+        $wa_message .= "📋 *FOKUS BRIEFING PER TIM SUPERVISOR (SPV):*\n\n";
 
-        $no = 1;
-        foreach ($underperforming as $u) {
-            $wa_message .= "{$no}. 👤 *{$u['nama_sales']}* ({$u['nama_spv']})\n";
-            $wa_message .= "   • SPK: *{$u['realisasi_spk']} / {$u['target_spk']}* (Min. Hari Ini: {$u['min_required']} | Defisit: -{$u['deficit']} SPK)\n";
-            $wa_message .= "   • Realisasi DO: *{$u['realisasi_do']} DO* (Target: {$u['target_do']} DO)\n";
-            $wa_message .= "   • 💡 *Saran Briefing Pagi*: {$u['ai_advice']}\n\n";
-            $no++;
+        foreach ($under_by_spv as $spv_name => $sales_list) {
+            $cnt_spv = count($sales_list);
+            $wa_message .= "👔 *TIM {$spv_name}* ({$cnt_spv} Sales Perlu Review):\n";
+
+            $no_spv = 1;
+            $zero_spk_cnt = 0;
+            foreach ($sales_list as $u) {
+                if ($u['realisasi_spk'] == 0) $zero_spk_cnt++;
+                $wa_message .= "   {$no_spv}. *{$u['nama_sales']}* — SPK: *{$u['realisasi_spk']}/{$u['target_spk']}* (Defisit: -{$u['deficit']}) | DO: *{$u['realisasi_do']}/{$u['target_do']}*\n";
+                $no_spv++;
+            }
+
+            $team_advice = "";
+            if ($zero_spk_cnt == $cnt_spv) {
+                $team_advice = "Seluruh {$cnt_spv} sales tim {$spv_name} belum mencatat SPK (0 Unit). SPV {$spv_name} wajib evaluasi ulang list prospek & lakukan pendampingan co-closing harian.";
+            } elseif ($zero_spk_cnt > 0) {
+                $team_advice = "{$zero_spk_cnt} dari {$cnt_spv} sales tim {$spv_name} masih 0 SPK. SPV {$spv_name} mohon prioritaskan pendampingan closing & pastikan min. 3 canvassing/test-drive per sales hari ini.";
+            } else {
+                $team_advice = "{$cnt_spv} sales tim {$spv_name} masih defisit SPK. SPV {$spv_name} mohon dorong penutupan SPK dari database Hot Prospect tim hari ini.";
+            }
+
+            $wa_message .= "   💡 *Saran Briefing Tim {$spv_name}*: {$team_advice}\n\n";
         }
 
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         if (count($on_track) > 0) {
-            $wa_message .= "✅ *Sales Target SPK Aman*: " . count($on_track) . " Wiraniaga on-track.\n\n";
+            $wa_message .= "✅ *Wiraniaga SPK On-Track*: " . count($on_track) . " Sales aman (tidak perlu review).\n\n";
         }
 
-        $wa_message .= "📌 *Rekomendasi Arahan Kepala Cabang saat Briefing Pagi:*\n";
-        $wa_message .= "1. Instruksikan SPV untuk mendampingi closing (Co-Closing) pada wiraniaga yang defisit SPK hari ini.\n";
-        $wa_message .= "2. Evaluasi daftar Hot Prospect & pastikan jadwal test drive tercatat rapi.";
+        $wa_message .= "📌 *REKOMENDASI ARAHAN UTAMA KECABANGAN (BRIEFING PAGI):*\n";
+        $wa_message .= "1. Instruksikan setiap SPV untuk melakukan review harian dan mendampingi closing (Co-Closing) sales yang defisit SPK.\n";
+        $wa_message .= "2. Evaluasi daftar Hot Prospect & pastikan jadwal test drive harian terdaftar.\n";
+        $wa_message .= "3. Percepat proses approval diskon dan permohonan kredit pending.";
     } else {
         $wa_message .= "✅ *BRIEFING PAGI KACAB: SELURUH SALES ON-TRACK* ✅\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
@@ -280,25 +308,29 @@ if ($session === 'pagi') {
         $wa_message .= "🎯 *Target Minimal SPK*: Minimal *{$min_required} SPK*\n";
         $wa_message .= "📊 *Capaian Cabang*: Total *{$total_spk_cabang} SPK* & *{$total_do_cabang} DO*\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        $wa_message .= "📋 *PROGRESS WIRANIAGA PERLU MONITORING SPK:*\n\n";
+        $wa_message .= "📋 *PROGRESS MONITORING PER TIM SPV:*\n\n";
 
-        $no = 1;
-        foreach ($underperforming as $u) {
-            $wa_message .= "{$no}. 👤 *{$u['nama_sales']}* ({$u['nama_spv']})\n";
-            $wa_message .= "   • SPK: *{$u['realisasi_spk']} SPK* (Min: {$u['min_required']} | Defisit: -{$u['deficit']} SPK)\n";
-            $wa_message .= "   • Realisasi DO: *{$u['realisasi_do']} DO* (Target Bulan: {$u['target_do']} DO)\n";
-            $wa_message .= "   • Status Siang: {$u['ai_advice']}\n\n";
-            $no++;
+        foreach ($under_by_spv as $spv_name => $sales_list) {
+            $cnt_spv = count($sales_list);
+            $wa_message .= "👔 *TIM {$spv_name}* ({$cnt_spv} Sales Monitoring SPK):\n";
+
+            $no_spv = 1;
+            foreach ($sales_list as $u) {
+                $wa_message .= "   {$no_spv}. *{$u['nama_sales']}* — SPK: *{$u['realisasi_spk']} SPK* (Min: {$u['min_required']} | Defisit: -{$u['deficit']}) | DO: *{$u['realisasi_do']} DO*\n";
+                $no_spv++;
+            }
+
+            $wa_message .= "   💡 *Status Siang Tim {$spv_name}*: SPV {$spv_name} mohon pantau progress follow-up siang. Dorong penutupan transaksi prospek hangat sebelum sore.\n\n";
         }
 
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         if (count($on_track) > 0) {
-            $wa_message .= "✅ *Sales SPK On-Track*: " . count($on_track) . " Wiraniaga aman.\n\n";
+            $wa_message .= "✅ *Wiraniaga SPK On-Track*: " . count($on_track) . " Sales aman.\n\n";
         }
 
-        $wa_message .= "📌 *Rekomendasi Siang Kepala Cabang:*\n";
-        $wa_message .= "1. Pantau progress follow-up siang oleh tim SPV terhadap prospek yang berpotensi closing hari ini.\n";
-        $wa_message .= "2. Pastikan proses berkas kredit & penyiapan unit DO berjalan tanpa kendala.";
+        $wa_message .= "📌 *REKOMENDASI SIANG KEPALA CABANG:*\n";
+        $wa_message .= "1. Cek progress follow-up siang tim SPV terhadap konsumen prospek hangat.\n";
+        $wa_message .= "2. Pastikan pengiriman unit DO yang dijadwalkan hari ini berjalan lancar.";
     } else {
         $wa_message .= "✅ *UPDATE SPK & DO SIANG: PERFORMA OPTIMAL* ✅\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
@@ -321,25 +353,29 @@ if ($session === 'pagi') {
         $wa_message .= "🎯 *Target Minimal SPK*: Minimal *{$min_required} SPK*\n";
         $wa_message .= "🏆 *Hasil Closing Cabang*: Total *{$total_spk_cabang} SPK* & *{$total_do_cabang} DO*\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        $wa_message .= "📋 *REKAP WIRANIAGA PERLU PERHATIAN BESOK:*\n\n";
+        $wa_message .= "📋 *REKAP CLOSING SORE PER TIM SPV:*\n\n";
 
-        $no = 1;
-        foreach ($underperforming as $u) {
-            $wa_message .= "{$no}. 👤 *{$u['nama_sales']}* ({$u['nama_spv']})\n";
-            $wa_message .= "   • Realisasi SPK: *{$u['realisasi_spk']} SPK* (Min: {$u['min_required']} | Defisit: -{$u['deficit']} SPK)\n";
-            $wa_message .= "   • Realisasi DO: *{$u['realisasi_do']} DO* (Target: {$u['target_do']} DO)\n";
-            $wa_message .= "   • Evaluasi Sore: {$u['ai_advice']}\n\n";
-            $no++;
+        foreach ($under_by_spv as $spv_name => $sales_list) {
+            $cnt_spv = count($sales_list);
+            $wa_message .= "👔 *TIM {$spv_name}* ({$cnt_spv} Sales Perlu Perhatian Besok):\n";
+
+            $no_spv = 1;
+            foreach ($sales_list as $u) {
+                $wa_message .= "   {$no_spv}. *{$u['nama_sales']}* — SPK: *{$u['realisasi_spk']} SPK* (Defisit: -{$u['deficit']}) | DO: *{$u['realisasi_do']} DO*\n";
+                $no_spv++;
+            }
+
+            $wa_message .= "   💡 *Evaluasi Sore Tim {$spv_name}*: Wajib evaluasi komprehensif bersama tim {$spv_name} untuk menyusun prioritas prospek esok pagi.\n\n";
         }
 
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
         if (count($on_track) > 0) {
-            $wa_message .= "✅ *Sales Capai Target SPK*: " . count($on_track) . " Wiraniaga tuntas.\n\n";
+            $wa_message .= "✅ *Wiraniaga SPK On-Track*: " . count($on_track) . " Sales tuntas.\n\n";
         }
 
-        $wa_message .= "📌 *Rekomendasi Closing Sore Kepala Cabang:*\n";
-        $wa_message .= "1. Evaluasi rekap prospek harian bersama SPV dan siapkan prioritas pengawalan besok pagi.\n";
-        $wa_message .= "2. Pastikan input SPK baru dan jadwal serah terima unit DO esok hari sudah terverifikasi.";
+        $wa_message .= "📌 *REKOMENDASI CLOSING SORE KEPALA CABANG:*\n";
+        $wa_message .= "1. Rekap hasil perolehan SPK harian & evaluasi hambatan penutupan prospek bersama SPV.\n";
+        $wa_message .= "2. Pastikan input SPK baru dan jadwal serah terima unit DO esok hari terverifikasi.";
     } else {
         $wa_message .= "✅ *UPDATE CLOSING SORE: TARGET MINIMAL TERPENUHI* ✅\n";
         $wa_message .= "━━━━━━━━━━━━━━━━━━━━━━\n";
