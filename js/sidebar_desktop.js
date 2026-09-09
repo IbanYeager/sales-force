@@ -105,7 +105,7 @@
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
-                ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data 46 Wiraniaga')}
+                ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data ' + (localStorage.getItem('total_sales_count') || 50) + ' Wiraniaga')}
                 ${navLinkKacab('pages_kacab/approval_kacab.html', 'fa-solid fa-clipboard-check', 'Otorisasi & Approval')}
                 ${navLinkKacab('pages_kacab/target_kacab.html', 'fa-solid fa-bullseye', 'Target & Produktivitas')}
                 ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}

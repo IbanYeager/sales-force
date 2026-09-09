@@ -36,7 +36,7 @@
         <a href="followup_database.html" id="navFollowup" class="active"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
         <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
         <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
-        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 46 Wiraniaga</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 50 Wiraniaga</a>
         <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi & Approval</a>
         <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target & Produktivitas</a>
         <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
@@ -343,7 +343,7 @@
         <div class="fu-table-card">
           <div class="fu-table-head-bar">
             <h3><i class="fa-solid fa-trophy" style="color:#f59e0b;"></i> Leaderboard Performa Follow-Up Wiraniaga (Sales PIC)</h3>
-            <span style="font-size:12px; color:#64748b; font-weight:600;" id="salesLeaderboardCount">46 Wiraniaga</span>
+            <span style="font-size:12px; color:#64748b; font-weight:600;" id="salesLeaderboardCount">50 Wiraniaga</span>
           </div>
           <div class="fu-table-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> Geser tabel ke samping untuk melihat detail lengkap</div>
           <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
@@ -542,7 +542,7 @@
 
           <div>
             <select id="filterSalesSelect" class="fu-select" onchange="masterState.filters.sales_id = this.value; loadMasterCustomers();">
-              <option value="all">Semua Sales PIC (46 Wiraniaga)</option>
+              <option value="all">Semua Sales PIC (50 Wiraniaga)</option>
             </select>
           </div>
 

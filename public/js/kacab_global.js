@@ -201,6 +201,12 @@ async function fetchBranchHierarchy(forceFresh = false) {
     sessionStorage.setItem(cacheTimeKey, String(Date.now()));
   } catch(e) {}
 
+  if (result.sales_total) {
+    try {
+      updateSidebarSalesCount(result.sales_total);
+    } catch(errCount) {}
+  }
+
   return result;
 }
 
@@ -323,3 +329,77 @@ if (typeof window.kcbDrawerInit === 'undefined') {
     });
   });
 }
+
+// ── Dynamic Sales Count Sync across Kacab Sidebar & Headers ──────────
+function updateSidebarSalesCount(total) {
+  if (!total || isNaN(total)) return;
+  const count = parseInt(total, 10);
+  try {
+    localStorage.setItem('total_sales_count', count);
+  } catch(e) {}
+
+  // 1. Update Kacab sidebar links
+  const navLinks = document.querySelectorAll('#navWiraniaga, a[href*="wiraniaga.html"], a[href*="wiraniaga"]');
+  navLinks.forEach(link => {
+    if (link.closest('.kcb-nav') || link.closest('.desktop-sidebar') || link.classList.contains('sidebar-nav-link')) {
+      const icon = link.querySelector('i');
+      const iconHtml = icon ? icon.outerHTML : '<i class="fa-solid fa-users"></i>';
+      link.innerHTML = `${iconHtml} Data ${count} Wiraniaga`;
+    }
+  });
+
+  // 2. If on wiraniaga page, update headers & filters
+  const pageTitle = document.getElementById('pageTitle');
+  if (pageTitle && pageTitle.textContent.includes('Wiraniaga')) {
+    pageTitle.textContent = `Data ${count} Wiraniaga Cabang`;
+  }
+  const cardTitle = document.querySelector('.spv-card .card-head h1.title');
+  if (cardTitle && cardTitle.textContent.includes('Wiraniaga')) {
+    cardTitle.innerHTML = `<i class="fa-solid fa-users" style="color:#d7123a; margin-right:8px;"></i> Seluruh Wiraniaga Cabang (${count} Sales)`;
+  }
+  const allOption = document.querySelector('#selectFilterSpvWiraniaga option[value="Semua"]');
+  if (allOption) {
+    allOption.textContent = `Semua Tim (Master - ${count} Sales)`;
+  }
+  if (document.title && document.title.includes('Wiraniaga')) {
+    document.title = `Kacab Desktop - Data ${count} Wiraniaga`;
+  }
+}
+window.updateSidebarSalesCount = updateSidebarSalesCount;
+
+async function syncDynamicSalesCount() {
+  // 1. Instantly use cached count if present
+  try {
+    const cached = localStorage.getItem('total_sales_count');
+    if (cached) {
+      updateSidebarSalesCount(cached);
+    }
+  } catch(e) {}
+
+  // 2. Fetch fresh actual count from API
+  try {
+    const apiPath = (window.location.pathname.includes('/pages_kacab/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages/'))
+      ? '../api/api_wiraniaga.php?count_only=1'
+      : '/api/api_wiraniaga.php?count_only=1';
+    const res = await fetch(apiPath);
+    const data = await res.json();
+    if (data && data.status === 'success' && data.total) {
+      updateSidebarSalesCount(data.total);
+    }
+  } catch (e) {
+    try {
+      const resAbs = await fetch('/api/api_wiraniaga.php?count_only=1');
+      const dataAbs = await resAbs.json();
+      if (dataAbs && dataAbs.status === 'success' && dataAbs.total) {
+        updateSidebarSalesCount(dataAbs.total);
+      }
+    } catch(err) {}
+  }
+}
+window.syncDynamicSalesCount = syncDynamicSalesCount;
+
+// Run sync immediately, on DOM ready, and on pageshow
+syncDynamicSalesCount();
+document.addEventListener('DOMContentLoaded', syncDynamicSalesCount);
+window.addEventListener('pageshow', syncDynamicSalesCount);
+

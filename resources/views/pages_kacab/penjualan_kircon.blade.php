@@ -42,7 +42,7 @@
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
         <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
         <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
-        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 46 Wiraniaga</a>
+        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 50 Wiraniaga</a>
         <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi & Approval</a>
         <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target & Produktivitas</a>
         <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
@@ -65,7 +65,7 @@
       <div class="kcb-topbar">
         <div>
           <h2 id="pageTitle">Statistik Penjualan Kiara Condong (KC 2026)</h2>
-          <p class="page-sub">Monitoring performa penjualan unit, omset OTR, analisis leasing &amp; 46 wiraniaga</p>
+          <p class="page-sub">Monitoring performa penjualan unit, omset OTR, analisis leasing &amp; seluruh wiraniaga</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
@@ -430,7 +430,7 @@
           <div class="content-card">
             <div class="table-toolbar">
               <div class="card-title-group">
-                <h3><i data-lucide="users"></i> Matriks Performa 46 Salesman (Januari &ndash; Juli)</h3>
+                <h3><i data-lucide="users"></i> Matriks Performa Seluruh Salesman (Januari &ndash; Juli)</h3>
                 <p>Rincian unit bulanan, total omset OTR, dan rata-rata diskon per salesman</p>
               </div>
               <div class="table-search-box">

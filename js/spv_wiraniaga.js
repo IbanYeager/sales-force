@@ -75,8 +75,9 @@ let listDataWiraniaga = [];
           window.currentWiraniagaSpvFilter = namaSpv;
         } else {
           // Kepala Cabang / Branch Manager can see all teams
+          const currentCount = listDataWiraniaga.length || localStorage.getItem('total_sales_count') || 50;
           filterSpvEl.innerHTML = `
-            <option value="Semua">Semua Tim (Master - 46 Sales)</option>
+            <option value="Semua">Semua Tim (Master - ${currentCount} Sales)</option>
             <option value="Pak Ryan">Tim Pak Ryan</option>
             <option value="Pak Alvin">Tim Pak Alvin</option>
             <option value="Pak Riva">Tim Pak Riva</option>
@@ -126,6 +127,13 @@ let listDataWiraniaga = [];
 
         if (result.status === 'success') {
           listDataWiraniaga = result.data || [];
+          if (spv === 'Semua' || spv === 'all' || !spv) {
+            if (typeof updateSidebarSalesCount === 'function') {
+              updateSidebarSalesCount(listDataWiraniaga.length);
+            } else {
+              try { localStorage.setItem('total_sales_count', listDataWiraniaga.length); } catch(e){}
+            }
+          }
           renderWiraniagaRows();
         } else {
           subTitleCount.textContent = 'Gagal memuat data.';
@@ -158,6 +166,28 @@ let listDataWiraniaga = [];
       const totalOffline = listDataWiraniaga.length - totalOnline;
       if (subTitleCount) {
         subTitleCount.innerHTML = `<strong>${listDataWiraniaga.length}</strong> wiraniaga &middot; <span style="color:#10b981; font-weight:800;"><i class="fa-solid fa-circle" style="font-size:8px;"></i> ${totalOnline} Online</span> &middot; <span style="color:#94a3b8;">${totalOffline} Offline</span>`;
+      }
+
+      // Sync titles and sidebar dynamically
+      const totalCount = listDataWiraniaga.length;
+      if (window.currentWiraniagaSpvFilter === 'Semua' || !window.currentWiraniagaSpvFilter) {
+        if (typeof updateSidebarSalesCount === 'function') {
+          updateSidebarSalesCount(totalCount);
+        } else {
+          const navWir = document.getElementById('navWiraniaga');
+          if (navWir) navWir.innerHTML = `<i class="fa-solid fa-users"></i> Data ${totalCount} Wiraniaga`;
+        }
+        const pageTitleEl = document.getElementById('pageTitle');
+        if (pageTitleEl) pageTitleEl.textContent = `Data ${totalCount} Wiraniaga Cabang`;
+        if (document.title && document.title.includes('Wiraniaga')) {
+          document.title = `Kacab Desktop - Data ${totalCount} Wiraniaga`;
+        }
+        const headTitle = document.querySelector('.spv-card .card-head h1.title');
+        if (headTitle) {
+          headTitle.innerHTML = `<i class="fa-solid fa-users" style="color:#d7123a; margin-right:8px;"></i> Seluruh Wiraniaga Cabang (${totalCount} Sales)`;
+        }
+        const allOpt = document.querySelector('#selectFilterSpvWiraniaga option[value="Semua"]');
+        if (allOpt) allOpt.textContent = `Semua Tim (Master - ${totalCount} Sales)`;
       }
 
       // Calculate KPI Stats

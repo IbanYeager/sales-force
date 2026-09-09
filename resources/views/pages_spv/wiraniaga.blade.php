@@ -76,7 +76,7 @@
             <span class="wira-kpi-label">Total Wiraniaga</span>
             <div class="wira-kpi-icon icon-blue"><i class="fa-solid fa-users"></i></div>
           </div>
-          <div class="wira-kpi-val" id="kpiTotalSales">46 Sales</div>
+          <div class="wira-kpi-val" id="kpiTotalSales">50 Sales</div>
           <div class="wira-kpi-sub"><i class="fa-solid fa-sitemap" style="color:#2563eb;"></i> 3 Tim SPV (Ryan, Alvin, Riva)</div>
         </div>
 
@@ -86,7 +86,7 @@
             <div class="wira-kpi-icon icon-emerald"><i class="fa-solid fa-signal"></i></div>
           </div>
           <div class="wira-kpi-val" id="kpiOnlineCount">0 Online</div>
-          <div class="wira-kpi-sub" id="kpiOfflineCount"><i class="fa-solid fa-moon" style="color:#94a3b8;"></i> 46 Wiraniaga Offline</div>
+          <div class="wira-kpi-sub" id="kpiOfflineCount"><i class="fa-solid fa-moon" style="color:#94a3b8;"></i> 50 Wiraniaga Offline</div>
         </div>
 
         <div class="wira-kpi-card card-amber">
@@ -117,7 +117,7 @@
           </div>
           <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 10px 14px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
-              <option value="Semua">Semua Tim (Master - 46 Sales)</option>
+              <option value="Semua">Semua Tim (Master - 50 Sales)</option>
               <option value="Pak Ryan">Tim Pak Ryan</option>
               <option value="Pak Alvin">Tim Pak Alvin</option>
               <option value="Pak Riva">Tim Pak Riva</option>

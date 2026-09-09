@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kacab Desktop - Data 46 Wiraniaga</title>
+  <title>Kacab Desktop - Data 50 Wiraniaga</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_kacab.css">
   <link rel="stylesheet" href="../css/spv_wiraniaga.css">
@@ -34,7 +34,7 @@
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
         <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
         <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
-        <a href="wiraniaga.html" id="navWiraniaga" class="active"><i class="fa-solid fa-users"></i>Data 46 Wiraniaga</a>
+        <a href="wiraniaga.html" id="navWiraniaga" class="active"><i class="fa-solid fa-users"></i>Data 50 Wiraniaga</a>
         <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi & Approval</a>
         <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target & Produktivitas</a>
         <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
@@ -56,7 +56,7 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
-          <h2 id="pageTitle">Data 46 Wiraniaga Cabang</h2>
+          <h2 id="pageTitle">Data 50 Wiraniaga Cabang</h2>
           <p class="page-sub" id="subTitleCount">Memuat data seluruh wiraniaga cabang...</p>
         </div>
         <div class="kcb-user">
@@ -78,7 +78,7 @@
             <span class="wira-kpi-label">Total Wiraniaga</span>
             <div class="wira-kpi-icon icon-blue"><i class="fa-solid fa-users"></i></div>
           </div>
-          <div class="wira-kpi-val" id="kpiTotalSales">46 Sales</div>
+          <div class="wira-kpi-val" id="kpiTotalSales">50 Sales</div>
           <div class="wira-kpi-sub"><i class="fa-solid fa-sitemap" style="color:#2563eb;"></i> 3 Tim SPV (Ryan, Alvin, Riva)</div>
         </div>
 
@@ -88,7 +88,7 @@
             <div class="wira-kpi-icon icon-emerald"><i class="fa-solid fa-signal"></i></div>
           </div>
           <div class="wira-kpi-val" id="kpiOnlineCount">0 Online</div>
-          <div class="wira-kpi-sub" id="kpiOfflineCount"><i class="fa-solid fa-moon" style="color:#94a3b8;"></i> 46 Wiraniaga Offline</div>
+          <div class="wira-kpi-sub" id="kpiOfflineCount"><i class="fa-solid fa-moon" style="color:#94a3b8;"></i> 50 Wiraniaga Offline</div>
         </div>
 
         <div class="wira-kpi-card card-amber">
@@ -114,12 +114,12 @@
       <section class="spv-card">
         <div class="card-head">
           <div>
-            <h1 class="title" style="font-size:18px; font-weight:800; color:#0f172a; margin:0;"><i class="fa-solid fa-users" style="color:#d7123a; margin-right:8px;"></i> Seluruh Wiraniaga Cabang (46 Sales)</h1>
+            <h1 class="title" style="font-size:18px; font-weight:800; color:#0f172a; margin:0;"><i class="fa-solid fa-users" style="color:#d7123a; margin-right:8px;"></i> Seluruh Wiraniaga Cabang (50 Sales)</h1>
             <p class="subtitle" style="font-size:13px; color:#64748b; margin:4px 0 0;">Monitoring akun, konversi, presensi real-time, dan evaluasi AI coaching seluruh wiraniaga cabang</p>
           </div>
           <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 10px 14px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
-              <option value="Semua">Semua Tim (Master - 46 Sales)</option>
+              <option value="Semua">Semua Tim (Master - 50 Sales)</option>
               <option value="Pak Ryan">Tim Pak Ryan</option>
               <option value="Pak Alvin">Tim Pak Alvin</option>
               <option value="Pak Riva">Tim Pak Riva</option>

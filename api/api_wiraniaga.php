@@ -39,6 +39,14 @@ if ($checkTable) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
+    if (isset($_GET['count_only']) && $_GET['count_only'] == '1') {
+        $resCount = $conn->query("SELECT COUNT(*) as total FROM sales_accounts WHERE is_active = 1");
+        $total = ($resCount && $row = $resCount->fetch_assoc()) ? intval($row['total']) : 50;
+        echo json_encode(["status" => "success", "total" => $total]);
+        $conn->close();
+        exit();
+    }
+
     $spv = isset($_GET['spv']) ? $conn->real_escape_string(trim($_GET['spv'])) : '';
     
     // Update online status threshold (2 minutes)
