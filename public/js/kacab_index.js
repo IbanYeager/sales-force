@@ -529,6 +529,15 @@ async function saveSentinelSettings() {
         siang: timeSiang,
         sore: timeSore
       });
+      try {
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const k = sessionStorage.key(i);
+          if (k && k.startsWith('kacab_sentinel_cache')) {
+            sessionStorage.removeItem(k);
+          }
+        }
+      } catch(e) {}
+      loadAiSentinelKacab(null, true);
     } else {
       alert('Gagal menyimpan: ' + (result.message || 'Error'));
     }
@@ -643,6 +652,7 @@ async function loadGoogleSheetSyncStatus() {
 document.addEventListener('DOMContentLoaded', () => {
   guardKacab();
   renderKacabUser();
+  loadSentinelSettingsIntoForm();
   loadGoogleSheetSyncStatus();
   loadDashboard();
   loadFeed();
