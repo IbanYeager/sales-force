@@ -19,6 +19,62 @@ $nama_sales = isset($_GET['nama_sales']) ? $conn->real_escape_string(trim($_GET[
 $exclude_status = isset($_GET['exclude_status']) ? $conn->real_escape_string($_GET['exclude_status']) : '';
 $only_today = isset($_GET['only_today']) ? intval($_GET['only_today']) : 0;
 
+function cleanActivityKeterangan($note, $custName = '', $carModel = '') {
+    $note = trim($note ?? '');
+    if (empty($note)) {
+        $res = "Follow-Up Database CRM";
+        if (!empty($custName)) $res .= " (Customer: $custName)";
+        return $res;
+    }
+
+    if (strpos($note, 'Follow-Up TAM:') !== false || strpos($note, 'Connected=') !== false || strpos($note, 'Remarks=') !== false) {
+        $remarks = '';
+        $alasan = '';
+        $connected = '';
+        $contacted = '';
+
+        if (preg_match('/Remarks=([^,\.]+)/i', $note, $m)) {
+            $remarks = trim($m[1]);
+        }
+        if (preg_match('/Alasan:\s*([^\n\r]+)/i', $note, $m)) {
+            $alasan = trim($m[1]);
+        }
+        if (preg_match('/Connected=([^,\.]+)/i', $note, $m)) {
+            $connected = strtoupper(trim($m[1])) === 'TRUE' ? 'Terhubung' : 'Tidak Terhubung';
+        }
+        if (preg_match('/Contacted=([^,\.]+)/i', $note, $m)) {
+            $contacted = strtoupper(trim($m[1])) === 'TRUE' ? 'Kontak Berhasil' : 'Tidak Berhasil Kontak';
+        }
+
+        $parts = [];
+        if (!empty($custName)) {
+            $custStr = "Customer: " . $custName;
+            if (!empty($carModel)) $custStr .= " (" . $carModel . ")";
+            $parts[] = $custStr;
+        }
+
+        if (!empty($remarks)) {
+            $parts[] = "Hasil: " . $remarks;
+        } elseif (!empty($connected)) {
+            $parts[] = "Koneksi: " . $connected;
+        }
+
+        if (!empty($alasan) && $alasan !== $remarks) {
+            $parts[] = "Catatan: " . $alasan;
+        }
+
+        if (!empty($parts)) {
+            return implode(' | ', $parts);
+        }
+    }
+
+    if (!empty($custName) && strpos($note, $custName) === false) {
+        return "Customer: " . $custName . (!empty($carModel) ? " ($carModel) - " : " - ") . $note;
+    }
+
+    return $note;
+}
+
 $subQuery = "
     SELECT 
         a.id, 
@@ -36,7 +92,9 @@ $subQuery = "
         a.jumlah_prospek, 
         a.foto_laporan COLLATE utf8mb4_general_ci AS foto_laporan, 
         a.waktu_selesai, 
-        a.created_at 
+        a.created_at,
+        '' COLLATE utf8mb4_general_ci AS customer_name,
+        '' COLLATE utf8mb4_general_ci AS customer_car_model
     FROM aktivitas a
 
     UNION ALL
@@ -61,9 +119,12 @@ $subQuery = "
         1 AS jumlah_prospek,
         '' COLLATE utf8mb4_general_ci AS foto_laporan,
         DATE_FORMAT(f.created_at, '%H:%i') AS waktu_selesai,
-        f.created_at
+        f.created_at,
+        fc.name COLLATE utf8mb4_general_ci AS customer_name,
+        fc.car_model COLLATE utf8mb4_general_ci AS customer_car_model
     FROM followup_logs f
     LEFT JOIN sales_accounts s ON (s.id = CAST(f.sales_id AS UNSIGNED) OR s.nama_lengkap COLLATE utf8mb4_general_ci = f.sales_name COLLATE utf8mb4_general_ci)
+    LEFT JOIN followup_customers fc ON f.customer_id = fc.id
     WHERE f.action_type = 'sales_fu_submission' OR (f.note IS NOT NULL AND f.note LIKE '%Follow-Up%')
 
     UNION ALL
@@ -88,7 +149,9 @@ $subQuery = "
         1 AS jumlah_prospek,
         c.foto_bukti COLLATE utf8mb4_general_ci AS foto_laporan,
         DATE_FORMAT(c.created_at, '%H:%i') AS waktu_selesai,
-        c.created_at
+        c.created_at,
+        '' COLLATE utf8mb4_general_ci AS customer_name,
+        '' COLLATE utf8mb4_general_ci AS customer_car_model
     FROM sales_checkins c
 ";
 
@@ -122,7 +185,7 @@ if (!empty($salesFilter)) {
 
 $whereSql = implode(" AND ", $where);
 
-$query = "SELECT id, sales_account_id, nama_sales, tipe_aktivitas, keterangan, lokasi, foto, status, sesi_waktu, waktu_pelaksanaan, durasi, laporan_hasil, jumlah_prospek, foto_laporan, waktu_selesai, created_at FROM ($subQuery) AS combined_aktivitas WHERE $whereSql ORDER BY created_at DESC LIMIT $limit";
+$query = "SELECT id, sales_account_id, nama_sales, tipe_aktivitas, keterangan, lokasi, foto, status, sesi_waktu, waktu_pelaksanaan, durasi, laporan_hasil, jumlah_prospek, foto_laporan, waktu_selesai, created_at, customer_name, customer_car_model FROM ($subQuery) AS combined_aktivitas WHERE $whereSql ORDER BY created_at DESC LIMIT $limit";
 
 $result = $conn->query($query);
 
@@ -136,6 +199,8 @@ if ($result) {
             else if ($hour < 15.5) $row['sesi_waktu'] = 'Siang';
             else $row['sesi_waktu'] = 'Sore';
         }
+        $row['keterangan'] = cleanActivityKeterangan($row['keterangan'], $row['customer_name'] ?? '', $row['customer_car_model'] ?? '');
+        $row['laporan_hasil'] = cleanActivityKeterangan($row['laporan_hasil'], $row['customer_name'] ?? '', $row['customer_car_model'] ?? '');
         $data[] = $row;
     }
 

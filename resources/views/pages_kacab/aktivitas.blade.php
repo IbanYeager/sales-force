@@ -144,6 +144,14 @@
           <div id="detThumbs" class="detail-thumbs"></div>
         </div>
 
+        <div id="detNoPhotoBanner" class="detail-no-photo-banner" style="display:none;">
+          <i class="fa-solid fa-phone-volume"></i>
+          <div>
+            <strong>Aktivitas Telepon / WhatsApp CRM</strong>
+            <span>Perekaman aktivitas sistem tanpa lampiran foto fisik.</span>
+          </div>
+        </div>
+
         <div class="detail-info-list">
           <div class="detail-info-row">
             <div class="detail-info-icon violet"><i class="fa-solid fa-user"></i></div>
@@ -197,7 +205,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_aktivitas.js?v=20260909_master_v2"></script>
+  <script src="../js/kacab_aktivitas.js?v=20260909_master_v3"></script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>

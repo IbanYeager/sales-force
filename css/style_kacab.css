@@ -1650,6 +1650,35 @@ button {
   border-color: var(--gold);
 }
 
+/* Banner jika tidak ada foto */
+.detail-no-photo-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px dashed rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  margin-bottom: 18px;
+  color: #64748b;
+  font-size: 13px;
+}
+.detail-no-photo-banner i {
+  font-size: 22px;
+  color: #6366f1;
+}
+.detail-no-photo-banner strong {
+  display: block;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.detail-no-photo-banner span {
+  color: #64748b;
+  font-size: 12px;
+}
+
 /* Info rows */
 .detail-info-list {
   display: flex;

@@ -37,6 +37,22 @@ let activitiesList = [];
 let currentPhotoList = [];
 let currentPhotoIndex = 0;
 
+function getImageUrl(photoStr) {
+  if (!photoStr) return '';
+  const first = String(photoStr).split(',')[0].trim();
+  if (!first) return '';
+  if (first.startsWith('http://') || first.startsWith('https://') || first.startsWith('/')) {
+    return first;
+  }
+  if (first.startsWith('uploads/')) {
+    return '../' + first;
+  }
+  if (first.startsWith('../uploads/')) {
+    return first;
+  }
+  return '../uploads/lokasi/' + first;
+}
+
 function activityIcon(tipe) {
   if (tipe === 'Live Tiktok') return 'fa-video';
   if (tipe === 'Digital Marketing') return 'fa-share-nodes';
@@ -126,14 +142,13 @@ function applyActivityFilters() {
   }
 
   container.innerHTML = filtered.map(act => {
-    const index = activitiesList.indexOf(act);
     const icon = activityIcon(act.tipe_aktivitas);
 
     let photoHtml = '';
-    if (act.foto) {
-      const files = act.foto.split(',');
-      if (files[0].trim() !== '') {
-        photoHtml = `<img src="../uploads/lokasi/${files[0]}" class="activity-photo" alt="Foto aktivitas" onclick="zoomImage(event, '../uploads/lokasi/${files[0]}')">`;
+    if (act.foto && String(act.foto).trim() !== '') {
+      const imgUrl = getImageUrl(act.foto);
+      if (imgUrl) {
+        photoHtml = `<img src="${imgUrl}" class="activity-photo" alt="Foto aktivitas" onclick="zoomImage(event, '${imgUrl}')">`;
       }
     }
 
@@ -207,28 +222,38 @@ function showActivityDetails(index) {
   }
 
   const photoArea = document.getElementById('detPhotoArea');
+  const noPhotoBanner = document.getElementById('detNoPhotoBanner');
   const thumbs = document.getElementById('detThumbs');
 
   currentPhotoList = [];
   currentPhotoIndex = 0;
 
-  if (act.foto && act.foto.trim() !== '') {
-    currentPhotoList = act.foto.split(',').map(f => `../uploads/lokasi/${f.trim()}`);
-    document.getElementById('detMainPhoto').src = currentPhotoList[0];
-    photoArea.style.display = 'flex';
+  if (act.foto && String(act.foto).trim() !== '') {
+    const rawPhotos = String(act.foto).split(',').map(f => f.trim()).filter(Boolean);
+    currentPhotoList = rawPhotos.map(f => getImageUrl(f));
 
-    if (currentPhotoList.length > 1) {
-      thumbs.style.display = 'flex';
-      thumbs.innerHTML = currentPhotoList.map((src, i) => `
-        <div class="detail-thumb ${i === 0 ? 'selected' : ''}" onclick="selectDetailPhoto(event, ${i})">
-          <img src="${src}" alt="Thumbnail ${i + 1}">
-        </div>
-      `).join('');
+    if (currentPhotoList.length > 0) {
+      document.getElementById('detMainPhoto').src = currentPhotoList[0];
+      photoArea.style.display = 'flex';
+      if (noPhotoBanner) noPhotoBanner.style.display = 'none';
+
+      if (currentPhotoList.length > 1) {
+        thumbs.style.display = 'flex';
+        thumbs.innerHTML = currentPhotoList.map((src, i) => `
+          <div class="detail-thumb ${i === 0 ? 'selected' : ''}" onclick="selectDetailPhoto(event, ${i})">
+            <img src="${src}" alt="Thumbnail ${i + 1}">
+          </div>
+        `).join('');
+      } else {
+        thumbs.style.display = 'none';
+      }
     } else {
-      thumbs.style.display = 'none';
+      photoArea.style.display = 'none';
+      if (noPhotoBanner) noPhotoBanner.style.display = 'flex';
     }
   } else {
     photoArea.style.display = 'none';
+    if (noPhotoBanner) noPhotoBanner.style.display = 'flex';
   }
 
   document.getElementById('activityDetailModal').style.display = 'flex';

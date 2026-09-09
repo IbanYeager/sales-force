@@ -154,6 +154,14 @@
           <div id="detThumbs" class="detail-thumbs"></div>
         </div>
 
+        <div id="detNoPhotoBanner" class="detail-no-photo-banner" style="display:none;">
+          <i class="fa-solid fa-phone-volume"></i>
+          <div>
+            <strong>Aktivitas Telepon / WhatsApp CRM</strong>
+            <span>Perekaman aktivitas sistem tanpa lampiran foto fisik.</span>
+          </div>
+        </div>
+
         <!-- Info rows -->
         <div class="detail-info-list">
           <div class="detail-info-row">
@@ -198,7 +206,7 @@
   </div>
 
   <script src="../custom_alert.js"></script>
-  <script src="../js/spv_aktivitas.js?v=20260819_master"></script>
+  <script src="../js/spv_aktivitas.js?v=20260909_master_v3"></script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
   <script src="../js/spv_global.js"></script>
