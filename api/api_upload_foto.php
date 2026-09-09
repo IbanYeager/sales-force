@@ -21,6 +21,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    $action = trim($_POST['action'] ?? '');
+    $remove_foto = isset($_POST['remove_foto']) && ($_POST['remove_foto'] === '1' || $_POST['remove_foto'] === 'true');
+
+    if ($action === 'delete' || $action === 'delete_foto' || ($remove_foto && !isset($_FILES['foto']))) {
+        $dirs = [
+            __DIR__ . '/../uploads/',
+            __DIR__ . '/../public/uploads/',
+            __DIR__ . '/../../public/uploads/',
+            __DIR__ . '/uploads/'
+        ];
+        $qOld = $conn->query("SELECT foto FROM sales_accounts WHERE id = $sales_id LIMIT 1");
+        if ($qOld && $rOld = $qOld->fetch_assoc()) {
+            $oldFoto = trim($rOld['foto'] ?? '');
+            if ($oldFoto && !str_contains($oldFoto, 'ui-avatars.com')) {
+                $oldName = basename($oldFoto);
+                foreach ($dirs as $d) {
+                    $oldFile = rtrim($d, '/\\') . '/' . $oldName;
+                    if (file_exists($oldFile) && is_file($oldFile)) {
+                        @unlink($oldFile);
+                    }
+                }
+            }
+        }
+
+        $sql = "UPDATE sales_accounts SET foto = '' WHERE id = $sales_id";
+        if ($conn->query($sql)) {
+            echo json_encode([
+                "ok" => true,
+                "status" => "success",
+                "message" => "Foto profil berhasil dihapus!",
+                "path" => "",
+                "foto" => ""
+            ]);
+        } else {
+            echo json_encode(["ok" => false, "message" => "Gagal mengosongkan foto di database: " . $conn->error]);
+        }
+        $conn->close();
+        exit();
+    }
+
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
         $file = $_FILES['foto'];
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));

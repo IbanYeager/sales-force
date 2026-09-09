@@ -55,6 +55,48 @@ if ($method === 'GET') {
         exit;
     }
 
+    $action = trim($_POST['action'] ?? '');
+    $remove_foto = isset($_POST['remove_foto']) && ($_POST['remove_foto'] === '1' || $_POST['remove_foto'] === 'true');
+
+    // Handle direct delete photo action
+    if ($action === 'delete_foto' && !isset($_FILES['foto'])) {
+        $qOld = $conn->query("SELECT foto FROM sales_accounts WHERE id = $sales_id LIMIT 1");
+        if ($qOld && $rOld = $qOld->fetch_assoc()) {
+            $oldFoto = trim($rOld['foto'] ?? '');
+            if ($oldFoto && !str_contains($oldFoto, 'ui-avatars.com')) {
+                $oldName = basename($oldFoto);
+                $dirs = [
+                    __DIR__ . '/../uploads/',
+                    __DIR__ . '/../public/uploads/',
+                    __DIR__ . '/../../public/uploads/',
+                    __DIR__ . '/uploads/'
+                ];
+                foreach ($dirs as $d) {
+                    $oldFile = rtrim($d, '/\\') . '/' . $oldName;
+                    if (file_exists($oldFile) && is_file($oldFile)) {
+                        @unlink($oldFile);
+                    }
+                }
+            }
+        }
+
+        $sql = "UPDATE sales_accounts SET foto = '' WHERE id = $sales_id";
+        if ($conn->query($sql)) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Foto profil berhasil dihapus!",
+                "data" => [
+                    "id" => $sales_id,
+                    "foto" => ""
+                ]
+            ]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Gagal menghapus foto: " . $conn->error]);
+        }
+        $conn->close();
+        exit;
+    }
+
     $nama = trim($_POST['nama_lengkap'] ?? '');
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
@@ -129,7 +171,28 @@ if ($method === 'GET') {
         $params[] = &$hashed_password;
     }
 
-    if (!empty($fotoPath)) {
+    if ($remove_foto && empty($fotoPath)) {
+        $qOld = $conn->query("SELECT foto FROM sales_accounts WHERE id = $sales_id LIMIT 1");
+        if ($qOld && $rOld = $qOld->fetch_assoc()) {
+            $oldFoto = trim($rOld['foto'] ?? '');
+            if ($oldFoto && !str_contains($oldFoto, 'ui-avatars.com')) {
+                $oldName = basename($oldFoto);
+                $dirs = [
+                    __DIR__ . '/../uploads/',
+                    __DIR__ . '/../public/uploads/',
+                    __DIR__ . '/../../public/uploads/',
+                    __DIR__ . '/uploads/'
+                ];
+                foreach ($dirs as $d) {
+                    $oldFile = rtrim($d, '/\\') . '/' . $oldName;
+                    if (file_exists($oldFile) && is_file($oldFile)) {
+                        @unlink($oldFile);
+                    }
+                }
+            }
+        }
+        $query .= ", foto = ''";
+    } elseif (!empty($fotoPath)) {
         $query .= ", foto = ?";
         $types .= "s";
         $params[] = &$fotoPath;

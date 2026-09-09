@@ -313,7 +313,7 @@
     <div class="modal-overlay" id="photoChoiceModal" style="z-index: 10001;" onclick="closePhotoChoiceModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3>Pilih Foto</h3>
+                <h3>Pilih Foto Profil</h3>
                 <button class="btn-close-modal" onclick="closePhotoChoiceModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -322,6 +322,9 @@
                 </button>
                 <button class="btn-main" style="justify-content: center; background:var(--primary-blue);" onclick="triggerGallerySelect()">
                     <i class="fa-regular fa-image"></i> Pilih dari Galeri
+                </button>
+                <button class="btn-main" id="btnDeletePhotoChoice" style="justify-content: center; background: #dc2626; color: #ffffff;" onclick="deletePhotoFromProfile()">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Foto Profil
                 </button>
             </div>
         </div>
@@ -334,6 +337,51 @@
     <script src="../js/sales_signature.js"></script>
     <script>
         let selectedFile = null;
+        let removePhotoFlag = false;
+
+        function deletePhotoFromProfile() {
+            closePhotoChoiceModal();
+            if (!confirm('Apakah Anda yakin ingin menghapus foto profil?')) return;
+
+            const salesId = localStorage.getItem('salesId');
+            const namaFallback = localStorage.getItem('namaSales') || 'User';
+            const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(namaFallback)}&background=f4f7f6&color=c8102e`;
+
+            selectedFile = null;
+            removePhotoFlag = true;
+
+            const editPreview = document.getElementById('editProfilPreview');
+            if (editPreview) editPreview.src = defaultAvatarUrl;
+
+            const mainAvatar = document.querySelector('.avatar');
+            if (mainAvatar) mainAvatar.src = defaultAvatarUrl;
+
+            const fileGal = document.getElementById('fileInputGallery');
+            if (fileGal) fileGal.value = '';
+            const fileCam = document.getElementById('fileInputCamera');
+            if (fileCam) fileCam.value = '';
+
+            if (salesId) {
+                const formData = new FormData();
+                formData.append('sales_id', salesId);
+                formData.append('action', 'delete_foto');
+                formData.append('remove_foto', '1');
+
+                fetch('../api/api_edit_profil.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        localStorage.setItem('fotoSales', '');
+                        localStorage.removeItem('fotoSales');
+                        alert('Foto profil berhasil dihapus!');
+                    }
+                })
+                .catch(err => console.error('Error deleting photo:', err));
+            }
+        }
 
         function switchModalTab(tab) {
             const paneAkun = document.getElementById('modalPaneAkun');
@@ -446,6 +494,7 @@
 
                         document.getElementById('editProfilPreview').src = fotoPath;
                         selectedFile = null;
+                        removePhotoFlag = false;
 
                         updateSocialBadges(d);
                     }
@@ -474,6 +523,7 @@
             const file = event.target.files[0];
             if (file) {
                 selectedFile = file;
+                removePhotoFlag = false;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('editProfilPreview').src = e.target.result;
@@ -517,6 +567,7 @@
             formData.append('website_url', website);
             if(password) formData.append('password', password);
             if(selectedFile) formData.append('foto', selectedFile);
+            if(removePhotoFlag) formData.append('remove_foto', '1');
 
             try {
                 const res = await fetch('../api/api_edit_profil.php', {
@@ -534,7 +585,12 @@
                     if (data.data.tiktok_url !== undefined) localStorage.setItem('salesTiktok', data.data.tiktok_url);
                     if (data.data.facebook_url !== undefined) localStorage.setItem('salesFacebook', data.data.facebook_url);
                     if (data.data.website_url !== undefined) localStorage.setItem('salesWebsite', data.data.website_url);
-                    if (data.data.foto) localStorage.setItem('fotoSales', data.data.foto);
+                    if (data.data.foto) {
+                        localStorage.setItem('fotoSales', data.data.foto);
+                    } else {
+                        localStorage.setItem('fotoSales', '');
+                        localStorage.removeItem('fotoSales');
+                    }
 
                     closeEditProfilModal();
                     window.location.reload();

@@ -7,6 +7,47 @@ const avatarEl = document.querySelector('.avatar');
         function triggerFileSelect() { document.getElementById('fileInput').click(); closePhotoModal(); }
         function triggerCameraSelect() { document.getElementById('cameraInput').click(); closePhotoModal(); }
 
+        async function deleteProfilePhoto() {
+            const salesId = localStorage.getItem('salesId');
+            if (!salesId) return;
+            if (!confirm('Apakah Anda yakin ingin menghapus foto profil?')) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('sales_id', salesId);
+                formData.append('action', 'delete');
+
+                const avatar = document.querySelector('.avatar');
+                if (avatar) avatar.style.opacity = '0.5';
+
+                const res = await fetch('/api/api_upload_foto.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.ok || data.status === 'success') {
+                    const nama = localStorage.getItem('namaSales') || 'Sales';
+                    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=f4f7f6&color=c8102e`;
+                    if (avatar) avatar.src = defaultAvatar;
+                    localStorage.setItem('fotoSales', '');
+                    localStorage.removeItem('fotoSales');
+                    if (typeof showCustomAlert === 'function') {
+                        showCustomAlert('Foto profil berhasil dihapus!', 'success');
+                    } else {
+                        alert('Foto profil berhasil dihapus!');
+                    }
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            } catch(e) {
+                console.error("Terjadi kesalahan:", e);
+                alert('Gagal menghapus foto profil.');
+            } finally {
+                const avatar = document.querySelector('.avatar');
+                if (avatar) avatar.style.opacity = '1';
+            }
+        }
+
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             const salesId = localStorage.getItem('salesId');
