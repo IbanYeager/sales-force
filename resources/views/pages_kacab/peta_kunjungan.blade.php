@@ -950,7 +950,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_peta.js?v=20260905_online_tracking_v5"></script>
+  <script src="../js/kacab_peta.js?v=20260909_live_v10"></script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>

@@ -60,22 +60,30 @@
 
     // Mengirim pembaruan posisi secara senyap ke server MySQL (sales_last_locations)
     async function sendPing(pos) {
-        if (!isSalesRole() || !pos) return;
+        if (!isSalesRole()) return;
 
-        const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || '1';
-        const namaSales = localStorage.getItem('namaSales') || 'Sales Consultant';
-        const spvSales = localStorage.getItem('spvSales') || 'Supervisor';
+        const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || localStorage.getItem('sales_id') || localStorage.getItem('id_sales') || '';
+        const namaSales = localStorage.getItem('namaSales') || localStorage.getItem('userSales') || localStorage.getItem('nama') || '';
+        const spvSales = localStorage.getItem('spvSales') || localStorage.getItem('nama_spv') || 'Supervisor';
 
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const acc = pos.coords.accuracy ? Math.round(pos.coords.accuracy * 10) / 10 : 10;
+        if (!salesId && !namaSales) return;
 
-        const distToOffice = calcDistanceKm(lat, lng, DEALERSHIP_LAT, DEALERSHIP_LNG);
-        const statusAktif = (distToOffice <= GEOFENCE_OFFICE_KM) ? 'Di Kantor Cabang' : 'On-Duty';
+        let lat = DEALERSHIP_LAT;
+        let lng = DEALERSHIP_LNG;
+        let acc = 10;
+        let statusAktif = 'Di Kantor Cabang';
+
+        if (pos && pos.coords) {
+            lat = pos.coords.latitude;
+            lng = pos.coords.longitude;
+            acc = pos.coords.accuracy ? Math.round(pos.coords.accuracy * 10) / 10 : 10;
+            const distToOffice = calcDistanceKm(lat, lng, DEALERSHIP_LAT, DEALERSHIP_LNG);
+            statusAktif = (distToOffice <= GEOFENCE_OFFICE_KM) ? 'Di Kantor Cabang' : 'On-Duty';
+        }
 
         const payload = {
             action: 'auto_ping',
-            sales_id: String(salesId),
+            sales_id: String(salesId || '0'),
             nama_sales: namaSales,
             nama_spv: spvSales,
             latitude: lat,
@@ -129,41 +137,45 @@
     }
 
     function onPositionError(err) {
-        // Silent fail tanpa alert
+        // Walau gagal lock GPS (indoor / timeout), tetap kirim ping awal dengan lokasi kantor cabang
+        sendPing(null);
     }
 
     // Memulai pemantauan GPS live berkelanjutan di latar belakang secara senyap
     function startLiveWatch() {
-        if (!navigator.geolocation || !isSalesRole()) return;
+        if (!isSalesRole()) return;
 
-        if (watchId !== null) {
-            navigator.geolocation.clearWatch(watchId);
+        // Kirim ping awal segera
+        sendPing(lastKnownPos || null);
+
+        if (navigator.geolocation) {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+
+            const geoOptions = {
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 5000
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                onPositionSuccess,
+                onPositionError,
+                geoOptions
+            );
+
+            watchId = navigator.geolocation.watchPosition(
+                onPositionSuccess,
+                onPositionError,
+                geoOptions
+            );
         }
-
-        const geoOptions = {
-            enableHighAccuracy: true,
-            timeout: 20000,
-            maximumAge: 5000
-        };
-
-        navigator.geolocation.getCurrentPosition(
-            onPositionSuccess,
-            onPositionError,
-            geoOptions
-        );
-
-        watchId = navigator.geolocation.watchPosition(
-            onPositionSuccess,
-            onPositionError,
-            geoOptions
-        );
 
         if (heartbeatTimer) clearInterval(heartbeatTimer);
         heartbeatTimer = setInterval(() => {
-            if (lastKnownPos && Date.now() - lastSentTime >= 10000) {
-                sendPing(lastKnownPos);
-            }
-        }, 12000);
+            sendPing(lastKnownPos);
+        }, 15000);
     }
 
     // Modal UI untuk meminta izin lokasi sekali saja
