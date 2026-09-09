@@ -275,7 +275,7 @@ function populateSpvDropdown(spvNames, salesList) {
     selectSpv.value = currentVal || 'Semua';
 }
 
-// Deteksi apakah lokasi masih real-time (aktif dalam 3 menit terakhir)
+// Deteksi apakah lokasi masih real-time (aktif dalam 15 menit terakhir)
 function isLocationLive(dateStr) {
     if (!dateStr) return false;
     const locDate = new Date(String(dateStr).replace(/-/g, '/'));
@@ -283,7 +283,7 @@ function isLocationLive(dateStr) {
     const diffMs = now - locDate;
     const diffMins = Math.floor(diffMs / 60000);
     const isToday = locDate.toDateString() === now.toDateString();
-    return isToday && diffMins <= 3;
+    return isToday && diffMins <= 15;
 }
 
 // Hitung jarak dalam KM ke Kantor Cabang Kiara Condong

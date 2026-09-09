@@ -51,9 +51,10 @@
 
     function isSalesRole() {
         const loggedIn = localStorage.getItem('loggedIn') === 'true';
-        const peran = (localStorage.getItem('peranSales') || '').trim();
-        if (!loggedIn) return false;
-        if (peran === 'Supervisor' || peran === 'Kepala Cabang') return false;
+        const hasId = !!(localStorage.getItem('idSales') || localStorage.getItem('salesId') || localStorage.getItem('namaSales'));
+        const peran = (localStorage.getItem('peranSales') || '').trim().toLowerCase();
+        if (!loggedIn && !hasId) return false;
+        if (peran === 'supervisor' || peran === 'kepala cabang' || peran.includes('spv') || peran.includes('kacab')) return false;
         return true;
     }
 

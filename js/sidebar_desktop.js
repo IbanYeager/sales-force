@@ -465,12 +465,10 @@
             // Kirim heartbeat saat halaman dimuat
             sendHeartbeat('ping');
 
-            // Kirim heartbeat berkala setiap 35 detik selama tab aktif
+            // Kirim heartbeat berkala setiap 30 detik untuk memastikan status online stabil
             setInterval(() => {
-                if (!document.hidden) {
-                    sendHeartbeat('ping');
-                }
-            }, 35000);
+                sendHeartbeat('ping');
+            }, 30000);
 
             // Kirim heartbeat saat tab kembali aktif
             document.addEventListener('visibilitychange', () => {

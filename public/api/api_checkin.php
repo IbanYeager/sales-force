@@ -69,7 +69,7 @@ try {
             $stmt->bind_param("sssddds", $sales_id, $nama_sales, $nama_spv, $latitude, $longitude, $accuracy, $status_aktif);
 
             if ($stmt->execute()) {
-                @$conn->query("UPDATE sales_accounts SET last_active = NOW(), is_online = 1 WHERE id = CAST('$sales_id' AS UNSIGNED) OR nama_lengkap = '$nama_sales' COLLATE utf8mb4_general_ci");
+                @$conn->query("UPDATE sales_accounts SET last_active = NOW(), is_online = 1 WHERE id = CAST('$sales_id' AS UNSIGNED) OR nama_lengkap = '$nama_sales' OR nama_lengkap LIKE '%$nama_sales%'");
                 echo json_encode(["ok" => true, "message" => "Auto ping lokasi berhasil diperbarui"]);
             } else {
                 echo json_encode(["ok" => false, "message" => "Gagal auto ping: " . $conn->error]);
