@@ -105,8 +105,8 @@ try {
         $salesMap[(int)$s['id']] = $s['name'];
     }
 
-    // 1. Fetch Followup Customers (All nearby database leads for public GPS radar)
-    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id FROM followup_customers ORDER BY id DESC LIMIT 500", []);
+    // 1. Fetch Followup Customers (Prioritizing PKB dataset > 2.5 years vehicle age)
+    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id FROM followup_customers ORDER BY CASE WHEN sync_source = 'pkb_excel_radar' THEN 0 ELSE 1 END, id DESC LIMIT 1000", []);
     
     $results = [];
 
