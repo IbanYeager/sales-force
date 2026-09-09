@@ -149,17 +149,17 @@ try {
         if ($type === 'last_locations') {
             $onlyOnline = isset($_GET['only_online']) ? ($_GET['only_online'] === '1' || $_GET['only_online'] === 'true') : false;
 
-            @$conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
-            @$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
+            @$conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
+            @$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
 
             $sql = "SELECT s.sales_id, s.nama_sales, s.nama_spv, s.latitude, s.longitude, s.accuracy, s.status_aktif, s.updated_at,
                            CASE 
-                               WHEN (a.last_active >= DATE_SUB(NOW(), INTERVAL 3 MINUTE) OR s.updated_at >= DATE_SUB(NOW(), INTERVAL 3 MINUTE)) THEN 1 
+                               WHEN (a.last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR s.updated_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)) THEN 1 
                                ELSE 0 
                            END as is_online,
                            a.last_active
                     FROM sales_last_locations s
-                    LEFT JOIN sales_accounts a ON (a.id = CAST(s.sales_id AS UNSIGNED) OR a.nama_lengkap = s.nama_sales COLLATE utf8mb4_general_ci)
+                    LEFT JOIN sales_accounts a ON (a.id = CAST(s.sales_id AS UNSIGNED) OR a.nama_lengkap = s.nama_sales OR a.nama_lengkap LIKE CONCAT('%', s.nama_sales, '%'))
                     ORDER BY s.updated_at DESC";
 
             $result = $conn->query($sql);

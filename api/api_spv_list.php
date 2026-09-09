@@ -8,16 +8,16 @@ function formatRelSpvTime($datetimeStr) {
     if (!$datetimeStr) return "Belum pernah aktif";
     $time = strtotime($datetimeStr);
     $diff = time() - $time;
-    if ($diff < 90) return "Online Sekarang";
+    if ($diff < 900) return "Online Sekarang";
     if ($diff < 3600) return floor($diff / 60) . " mnt lalu";
     if ($diff < 86400) return "Hari ini " . date('H:i', $time);
     if ($diff < 172800) return "Kemarin " . date('H:i', $time);
     return date('d M Y H:i', $time);
 }
 
-// Update online threshold (2 minutes)
-$conn->query("UPDATE spv_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
-$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
+// Update online threshold (15 minutes)
+$conn->query("UPDATE spv_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
+$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
 
 $spv_names = [];
 $spv_details = [];

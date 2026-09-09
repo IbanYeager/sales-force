@@ -341,7 +341,9 @@ function applyMapFilter(shouldFitBounds = false) {
         const lastCheck = checkinBySalesId[String(s.id)] || checkinByName[sName.toLowerCase()];
 
         // Periksa apakah sales ini sedang ONLINE di website
-        const isOnline = onlineSalesIds.has(String(s.id)) || onlineSalesNames.has(sName.toLowerCase());
+        const isOnline = (s.is_online === 1 || s.is_online === true || s.status_online === 'Online') || 
+                         onlineSalesIds.has(String(s.id)) || 
+                         onlineSalesNames.has(sName.toLowerCase());
 
         let lat = null, lng = null, acc = null, jenis = 'Belum Check-in', lokasi = 'Menunggu Sinyal GPS', time = '';
         let hasGps = false;
@@ -383,6 +385,15 @@ function applyMapFilter(shouldFitBounds = false) {
             jenis = lastCheck.jenis_kunjungan;
             lokasi = lastCheck.nama_lokasi;
             time = lastCheck.created_at;
+            hasGps = true;
+        } else if (isOnline) {
+            // Fallback lokasi ke Kantor Cabang untuk sales online yang belum mengizinkan/mengirimkan GPS
+            lat = OFFICE_LAT;
+            lng = OFFICE_LNG;
+            acc = 10;
+            jenis = 'Di Kantor Cabang';
+            lokasi = 'Tunas Toyota Kiara Condong (Aktif Web)';
+            time = s.last_active || 'Online Sekarang';
             hasGps = true;
         } else {
             lat = null;

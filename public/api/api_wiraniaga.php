@@ -49,12 +49,12 @@ if ($method === 'GET') {
 
     $spv = isset($_GET['spv']) ? $conn->real_escape_string(trim($_GET['spv'])) : '';
     
-    // Update online status threshold (2 minutes)
-    $conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)");
-    $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 2 MINUTE) OR last_active IS NULL");
+    // Update online status threshold (15 minutes)
+    $conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
+    $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
 
     $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, last_active, no_hp, email, instagram_url, tiktok_url, facebook_url, website_url,
-                     CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 2 MINUTE) THEN 1 ELSE 0 END as is_online,
+                     CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) THEN 1 ELSE 0 END as is_online,
                      DATE_FORMAT(created_at, '%d %b %Y') as created_at, 
                      DATE_FORMAT(created_at, '%Y-%m-%d') as created_at_raw 
               FROM sales_accounts";
@@ -63,7 +63,7 @@ if ($method === 'GET') {
         if (!$datetimeStr) return "Belum pernah aktif";
         $time = strtotime($datetimeStr);
         $diff = time() - $time;
-        if ($diff < 90) return "Online Sekarang";
+        if ($diff < 900) return "Online Sekarang";
         if ($diff < 3600) return floor($diff / 60) . " mnt lalu";
         if ($diff < 86400) return "Hari ini " . date('H:i', $time);
         if ($diff < 172800) return "Kemarin " . date('H:i', $time);
