@@ -83,7 +83,7 @@ $subQuery = "
         a.tipe_aktivitas COLLATE utf8mb4_general_ci AS tipe_aktivitas, 
         a.keterangan COLLATE utf8mb4_general_ci AS keterangan, 
         a.lokasi COLLATE utf8mb4_general_ci AS lokasi, 
-        a.foto COLLATE utf8mb4_general_ci AS foto, 
+        COALESCE(NULLIF(a.foto, ''), a.foto_laporan, '') COLLATE utf8mb4_general_ci AS foto, 
         a.status COLLATE utf8mb4_general_ci AS status, 
         a.sesi_waktu COLLATE utf8mb4_general_ci AS sesi_waktu, 
         a.waktu_pelaksanaan, 

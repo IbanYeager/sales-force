@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Aktivitas Tim</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_spv.css">
-  <link rel="stylesheet" href="../css/spv_aktivitas.css">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260909_master_v5">
+  <link rel="stylesheet" href="../css/spv_aktivitas.css?v=20260909_master_v5">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
@@ -154,11 +154,13 @@
           <div id="detThumbs" class="detail-thumbs"></div>
         </div>
 
-        <div id="detNoPhotoBanner" class="detail-no-photo-banner" style="display:none;">
-          <i class="fa-solid fa-phone-volume"></i>
-          <div>
-            <strong>Aktivitas Telepon / WhatsApp CRM</strong>
-            <span>Perekaman aktivitas sistem tanpa lampiran foto fisik.</span>
+        <div id="detNoPhotoBanner" class="detail-no-photo-banner" style="display:none; align-items:center; gap:12px; padding:12px 16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:16px; color:#475569; font-size:13px;">
+          <div style="width:38px; height:38px; border-radius:8px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;">
+            <i class="fa-solid fa-phone-volume"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:600; color:#1e293b; font-size:13px; margin-bottom:2px;">Aktivitas Telepon / WhatsApp CRM</div>
+            <div style="color:#64748b; font-size:12px; line-height:1.4;">Perekaman aktivitas sistem otomatis tanpa lampiran foto fisik.</div>
           </div>
         </div>
 
@@ -206,7 +208,7 @@
   </div>
 
   <script src="../custom_alert.js"></script>
-  <script src="../js/spv_aktivitas.js?v=20260909_master_v4"></script>
+  <script src="../js/spv_aktivitas.js?v=20260909_master_v5"></script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
   <script src="../js/spv_global.js"></script>
