@@ -168,17 +168,35 @@ if (!in_array($session, ['pagi', 'siang', 'sore'])) {
     }
 }
 
+if (!function_exists('normalizeSentinelTimeInput')) {
+    function normalizeSentinelTimeInput($time_str, $default = '12:00') {
+        $time_str = trim((string)$time_str);
+        if (empty($time_str)) return $default;
+        
+        if (stripos($time_str, 'AM') !== false || stripos($time_str, 'PM') !== false) {
+            $timestamp = strtotime($time_str);
+            if ($timestamp !== false) {
+                return date('H:i', $timestamp);
+            }
+        }
+        
+        if (preg_match('/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/', $time_str, $matches)) {
+            $h = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+            $m = $matches[2];
+            return "{$h}:{$m}";
+        }
+        
+        return $default;
+    }
+}
+
 // 1. Tangani Simpan Pengaturan jika dipanggil via POST action=save_settings
 if ($action === 'save_settings') {
     $kacab_wa = $conn ? $conn->real_escape_string(trim($data['kacab_wa'] ?? $_POST['kacab_wa'] ?? '081234567890')) : '081234567890';
     
-    $schedule_time_pagi = trim($data['schedule_time_pagi'] ?? $_POST['schedule_time_pagi'] ?? '07:00');
-    $schedule_time_siang = trim($data['schedule_time_siang'] ?? $_POST['schedule_time_siang'] ?? '12:00');
-    $schedule_time_sore = trim($data['schedule_time_sore'] ?? $_POST['schedule_time_sore'] ?? '17:00');
-
-    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time_pagi)) $schedule_time_pagi = '07:00';
-    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time_siang)) $schedule_time_siang = '12:00';
-    if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $schedule_time_sore)) $schedule_time_sore = '17:00';
+    $schedule_time_pagi = normalizeSentinelTimeInput($data['schedule_time_pagi'] ?? $_POST['schedule_time_pagi'] ?? '07:00', '07:00');
+    $schedule_time_siang = normalizeSentinelTimeInput($data['schedule_time_siang'] ?? $_POST['schedule_time_siang'] ?? '12:00', '12:00');
+    $schedule_time_sore = normalizeSentinelTimeInput($data['schedule_time_sore'] ?? $_POST['schedule_time_sore'] ?? '17:00', '17:00');
 
     $auto_send = intval($data['auto_send_enabled'] ?? $_POST['auto_send_enabled'] ?? 1);
     $gateway_provider = $conn ? $conn->real_escape_string(trim($data['gateway_provider'] ?? $_POST['gateway_provider'] ?? 'fonnte')) : 'fonnte';

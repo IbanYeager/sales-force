@@ -239,6 +239,28 @@ unset($s_list);
 $total_sales_count = count($underperforming) + count($on_track);
 $needs_alert = (count($underperforming) > 0);
 
+if (!function_exists('normalizeSentinelTimeInput')) {
+    function normalizeSentinelTimeInput($time_str, $default = '12:00') {
+        $time_str = trim((string)$time_str);
+        if (empty($time_str)) return $default;
+        
+        if (stripos($time_str, 'AM') !== false || stripos($time_str, 'PM') !== false) {
+            $timestamp = strtotime($time_str);
+            if ($timestamp !== false) {
+                return date('H:i', $timestamp);
+            }
+        }
+        
+        if (preg_match('/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/', $time_str, $matches)) {
+            $h = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+            $m = $matches[2];
+            return "{$h}:{$m}";
+        }
+        
+        return $default;
+    }
+}
+
 // Fetch dynamic schedule times from settings DB
 $time_pagi = '07:00';
 $time_siang = '12:00';
@@ -247,9 +269,9 @@ $time_sore = '17:00';
 if ($conn) {
     $q_set = $conn->query("SELECT schedule_time_pagi, schedule_time_siang, schedule_time_sore FROM tabel_sentinel_settings WHERE id = 1 LIMIT 1");
     if ($q_set && $s_row = $q_set->fetch_assoc()) {
-        if (!empty($s_row['schedule_time_pagi'])) $time_pagi = $s_row['schedule_time_pagi'];
-        if (!empty($s_row['schedule_time_siang'])) $time_siang = $s_row['schedule_time_siang'];
-        if (!empty($s_row['schedule_time_sore'])) $time_sore = $s_row['schedule_time_sore'];
+        if (!empty($s_row['schedule_time_pagi'])) $time_pagi = normalizeSentinelTimeInput($s_row['schedule_time_pagi'], '07:00');
+        if (!empty($s_row['schedule_time_siang'])) $time_siang = normalizeSentinelTimeInput($s_row['schedule_time_siang'], '12:00');
+        if (!empty($s_row['schedule_time_sore'])) $time_sore = normalizeSentinelTimeInput($s_row['schedule_time_sore'], '17:00');
     }
 }
 
