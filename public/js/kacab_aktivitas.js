@@ -172,7 +172,7 @@ function applyTimelineFilters() {
         const imgUrl = getImageUrl(act.foto);
         if (imgUrl) {
           photoHtml = `<img src="${imgUrl}" class="tl-photo" alt="Foto aktivitas"
-            loading="lazy" onclick="zoomImage(event, '${imgUrl}')">`;
+            loading="lazy" onerror="this.style.display='none'" onclick="zoomImage(event, '${imgUrl}')">`;
         }
       }
 

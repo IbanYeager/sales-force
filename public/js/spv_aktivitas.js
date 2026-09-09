@@ -152,7 +152,7 @@ function applyActivityFilters() {
     if (act.foto && String(act.foto).trim() !== '') {
       const imgUrl = getImageUrl(act.foto);
       if (imgUrl) {
-        photoHtml = `<img src="${imgUrl}" class="activity-photo" alt="Foto aktivitas" onclick="zoomImage(event, '${imgUrl}')">`;
+        photoHtml = `<img src="${imgUrl}" class="activity-photo" alt="Foto aktivitas" onerror="this.style.display='none'" onclick="zoomImage(event, '${imgUrl}')">`;
       }
     }
 
