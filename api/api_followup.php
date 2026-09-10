@@ -1247,6 +1247,32 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $sales_fu_status = trim($input['sales_fu_status']);
     }
 
+    // Handle Visit Photo upload if sent as file or base64
+    $visitPhotoUrl = '';
+    if (isset($_FILES['visit_photo']) && $_FILES['visit_photo']['error'] === UPLOAD_ERR_OK) {
+        $uDir = __DIR__ . '/../uploads/visit_photos/';
+        if (!is_dir($uDir)) @mkdir($uDir, 0777, true);
+        $ext = strtolower(pathinfo($_FILES['visit_photo']['name'], PATHINFO_EXTENSION)) ?: 'jpg';
+        $fName = 'visit_' . $id . '_' . time() . '_' . rand(100, 999) . '.' . $ext;
+        if (@move_uploaded_file($_FILES['visit_photo']['tmp_name'], $uDir . $fName)) {
+            $visitPhotoUrl = 'uploads/visit_photos/' . $fName;
+        }
+    } elseif (!empty($input['visit_photo_base64'])) {
+        $uDir = __DIR__ . '/../uploads/visit_photos/';
+        if (!is_dir($uDir)) @mkdir($uDir, 0777, true);
+        $b64 = $input['visit_photo_base64'];
+        if (preg_match('/^data:image\/(\w+);base64,/', $b64, $type)) {
+            $b64Data = substr($b64, strpos($b64, ',') + 1);
+            $ext = strtolower($type[1]);
+            $b64Dec = base64_decode($b64Data);
+            if ($b64Dec !== false) {
+                $fName = 'visit_' . $id . '_' . time() . '_' . rand(100, 999) . '.' . $ext;
+                @file_put_contents($uDir . $fName, $b64Dec);
+                $visitPhotoUrl = 'uploads/visit_photos/' . $fName;
+            }
+        }
+    }
+
     $now = date('Y-m-d H:i:s');
     $current = followup_query("SELECT followup_status, notes, assigned_sales_id FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
     $oldStatus = !empty($current) ? $current[0]['followup_status'] : '';
@@ -1265,7 +1291,8 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
             notes = CASE WHEN ? != '' THEN ? ELSE notes END,
             last_contacted_at = ?,
             last_template_used = CASE WHEN ? != '' THEN ? ELSE last_template_used END,
-            assigned_sales_id = CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) AND ? > 0 THEN ? ELSE assigned_sales_id END
+            assigned_sales_id = CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) AND ? > 0 THEN ? ELSE assigned_sales_id END,
+            visit_photo = CASE WHEN ? != '' THEN ? ELSE visit_photo END
         WHERE id = ?
     ", [
         $connected, $contacted, $prospect, $spk, $remarks,
@@ -1275,18 +1302,20 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $now,
         $template_used, $template_used,
         $sales_id, $sales_id,
+        $visitPhotoUrl, $visitPhotoUrl,
         $id
     ]);
 
     followup_execute("
-        INSERT INTO followup_logs (customer_id, sales_id, action_type, old_status, new_status, note)
-        VALUES (?, ?, 'sales_fu_submission', ?, ?, ?)
+        INSERT INTO followup_logs (customer_id, sales_id, action_type, old_status, new_status, note, photo_url)
+        VALUES (?, ?, 'sales_fu_submission', ?, ?, ?, ?)
     ", [
         $id,
         $sales_id ?: ($current[0]['assigned_sales_id'] ?? null),
         $oldStatus,
         $status,
-        "Follow-Up TAM: Connected=$connected, Contacted=$contacted, Prospect=$prospect, SPK=$spk, Remarks=$remarks, Status=$sales_fu_status. Alasan: $reason_followup"
+        "Follow-Up TAM: Connected=$connected, Contacted=$contacted, Prospect=$prospect, SPK=$spk, Remarks=$remarks, Status=$sales_fu_status. Alasan: $reason_followup",
+        $visitPhotoUrl
     ]);
 
     // Push to Google Apps Script Webhook if configured (2-Way Realtime Sync)

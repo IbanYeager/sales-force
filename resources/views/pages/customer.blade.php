@@ -20,7 +20,7 @@
   <div class="mobile-app" style="max-width: 1200px;"> <!-- Expanded for kanban -->
     <header class="header-page">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
-      <h2>Customer CRM &amp; Radar</h2>
+      <h2>Customer CRM Pipeline</h2>
     </header>
 
     <div class="container" style="margin-top:18px;">
@@ -46,15 +46,15 @@
         </div>
       </div>
 
-      <!-- ================= LEAD STAGNANT & LOST DEAL RADAR ================= -->
+      <!-- ================= LEAD STAGNANT & LOST DEAL ================= -->
       <div class="card" style="padding:16px; margin-bottom:16px; background:linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%); border:1px solid #fecaca;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:36px; height:36px; border-radius:10px; background:#ef4444; color:white; display:flex; align-items:center; justify-content:center; font-size:16px; animation: radar-pulse 2s infinite;">
+            <div style="width:36px; height:36px; border-radius:10px; background:#ef4444; color:white; display:flex; align-items:center; justify-content:center; font-size:16px;">
               <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
-              <h4 style="font-size:14px; font-weight:800; color:#991b1b; margin:0;">Lead Stagnant Radar (Early Warning)</h4>
+              <h4 style="font-size:14px; font-weight:800; color:#991b1b; margin:0;">Lead Stagnant (Early Warning)</h4>
               <p style="font-size:11.5px; color:#b91c1c; margin:0;" id="stagnantSummaryText">Memeriksa prospek yang tidak di-follow up > 48 jam...</p>
             </div>
           </div>

@@ -129,11 +129,6 @@ function initFollowupTabs() {
             <span>Pool Rebutan Prospek</span>
             <span id="badgeOrphanPoolCount" class="badge-pulse-fire">0 Siap Rebut</span>
           </button>
-          <button type="button" class="sub-nav-fu-btn radar-tab" id="subBtnRadar" onclick="switchFollowupSubTab('radar')">
-            <i class="fa-solid fa-location-crosshairs" style="color:#3b82f6;"></i>
-            <span>Radar GPS Terdekat</span>
-            <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:rgba(215,18,58,0.12); color:#dc2626; border:1px solid rgba(215,18,58,0.25);">Live GPS</span>
-          </button>
         </div>
 
         <!-- 2. SEARCH, FILTER & VIEW TOGGLE BAR -->

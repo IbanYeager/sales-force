@@ -173,7 +173,7 @@ try {
     $lngDelta = ($maxRadius + 0.1) / 110.2;
 
     // Fetch ALL Followup Customers (PKB Radar + SPV/Kacab dataset)
-    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source FROM followup_customers ORDER BY id DESC", []);
+    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source, visit_photo FROM followup_customers ORDER BY id DESC", []);
     
     $results = [];
 
@@ -212,6 +212,7 @@ try {
                     'priority' => $row['priority'] ?: 'Warm',
                     'status' => $row['followup_status'] ?: 'Belum Dihubungi',
                     'sales_name' => $salesName,
+                    'visit_photo' => $row['visit_photo'] ?: '',
                     'lat' => round($coords[0], 6),
                     'lng' => round($coords[1], 6),
                     'distance_km' => round($dist, 2),

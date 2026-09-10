@@ -125,7 +125,7 @@
 
                 <p class="sidebar-nav-label">Customer &amp; Dokumen</p>
                 <a href="pages/customer.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-users"></i> Customer CRM &amp; Radar
+                    <i class="fa-solid fa-users"></i> Customer CRM
                 </a>
                 <a href="pages/retention.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-heart-pulse"></i> After-Sales &amp; Retention
