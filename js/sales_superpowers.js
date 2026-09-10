@@ -58,13 +58,13 @@ const SalesSuperpowers = {
   leafletMarkers: [],
   selectedPhotoFile: null,
 
-  async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 50) {
-    this.currentRadius = radiusKm;
+  async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 5) {
+    this.currentRadius = parseFloat(radiusKm) || 5;
     this.currentDistrict = district;
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Render Cockpit Shell with Interactive Leaflet Map & District Selector
+    // Render Cockpit Shell with Interactive Leaflet Map & District / Ring Radius Selectors
     container.innerHTML = `
       <div class="radar-cockpit-hero" style="background: linear-gradient(135deg, #0d1b3e 0%, #162a52 100%); padding: 18px; border-radius: 18px; color: #fff; margin-bottom: 18px;">
         <div class="radar-top-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
@@ -78,30 +78,46 @@ const SalesSuperpowers = {
                 <span class="radar-gps-badge" id="radarGpsStatus"><i class="fa-solid fa-satellite-dish"></i> Mendeteksi GPS...</span>
               </div>
               <p style="font-size:12px; color:rgba(255,255,255,0.75); margin:3px 0 0 0;" id="radarSubtitleText">
-                Memetakan lokasi titik customer di peta per wilayah/kecamatan untuk agenda kunjungan sales.
+                Memetakan titik lokasi customer se-akurat mungkin di dalam ring radius pilihan agenda kunjungan sales.
               </p>
             </div>
           </div>
 
-          <!-- District Filter Dropdown -->
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <label style="font-size:12px; font-weight:800; color:#94a3b8;"><i class="fa-solid fa-filter" style="color:#f43f5e;"></i> Wilayah / Kecamatan:</label>
-            <select id="radarDistrictSelect" onchange="SalesSuperpowers.handleDistrictChange(this.value, '${containerId}')" style="padding:7px 14px; border-radius:10px; font-size:12px; font-weight:800; border:1px solid rgba(255,255,255,0.2); background:#1e293b; color:#ffffff; cursor:pointer;">
-              <option value="all" ${district === 'all' ? 'selected' : ''}>🌐 Semua Wilayah / Kecamatan</option>
-              <option value="buahbatu" ${district === 'buahbatu' ? 'selected' : ''}>📍 Buahbatu / Buah Batu</option>
-              <option value="kiara" ${district === 'kiara' ? 'selected' : ''}>📍 Kiara Condong</option>
-              <option value="batununggal" ${district === 'batununggal' ? 'selected' : ''}>📍 Batununggal</option>
-              <option value="lengkong" ${district === 'lengkong' ? 'selected' : ''}>📍 Lengkong</option>
-              <option value="antapani" ${district === 'antapani' ? 'selected' : ''}>📍 Antapani</option>
-              <option value="arcamanik" ${district === 'arcamanik' ? 'selected' : ''}>📍 Arcamanik</option>
-              <option value="rancasari" ${district === 'rancasari' ? 'selected' : ''}>📍 Rancasari</option>
-              <option value="gedebage" ${district === 'gedebage' ? 'selected' : ''}>📍 Gedebage</option>
-              <option value="cibeunying" ${district === 'cibeunying' ? 'selected' : ''}>📍 Cibeunying</option>
-              <option value="sukajadi" ${district === 'sukajadi' ? 'selected' : ''}>📍 Sukajadi</option>
-              <option value="dago" ${district === 'dago' ? 'selected' : ''}>📍 Dago / Coblong</option>
-              <option value="cimahi" ${district === 'cimahi' ? 'selected' : ''}>📍 Cimahi</option>
-              <option value="sumedang" ${district === 'sumedang' ? 'selected' : ''}>📍 Sumedang / Jatinangor</option>
-            </select>
+          <!-- Controls: Ring Radius & District Selector -->
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <!-- Ring Radius Dropdown Selector -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label style="font-size:12px; font-weight:800; color:#94a3b8;"><i class="fa-solid fa-bullseye" style="color:#38bdf8;"></i> Ring Radius:</label>
+              <select id="radarRadiusSelect" onchange="SalesSuperpowers.handleRadiusChange(this.value, '${containerId}')" style="padding:7px 12px; border-radius:10px; font-size:12px; font-weight:800; border:1px solid rgba(255,255,255,0.2); background:#1e293b; color:#ffffff; cursor:pointer;">
+                <option value="1" ${this.currentRadius == 1 ? 'selected' : ''}>⭕ Ring 1 km</option>
+                <option value="3" ${this.currentRadius == 3 ? 'selected' : ''}>⭕ Ring 3 km</option>
+                <option value="5" ${this.currentRadius == 5 ? 'selected' : ''}>⭕ Ring 5 km</option>
+                <option value="10" ${this.currentRadius == 10 ? 'selected' : ''}>⭕ Ring 10 km</option>
+                <option value="25" ${this.currentRadius == 25 ? 'selected' : ''}>⭕ Ring 25 km</option>
+                <option value="999" ${this.currentRadius >= 999 ? 'selected' : ''}>🌐 Semua (> 25 km)</option>
+              </select>
+            </div>
+
+            <!-- District Filter Dropdown -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label style="font-size:12px; font-weight:800; color:#94a3b8;"><i class="fa-solid fa-filter" style="color:#f43f5e;"></i> Wilayah:</label>
+              <select id="radarDistrictSelect" onchange="SalesSuperpowers.handleDistrictChange(this.value, '${containerId}')" style="padding:7px 12px; border-radius:10px; font-size:12px; font-weight:800; border:1px solid rgba(255,255,255,0.2); background:#1e293b; color:#ffffff; cursor:pointer;">
+                <option value="all" ${district === 'all' ? 'selected' : ''}>🌐 Semua Wilayah / Kecamatan</option>
+                <option value="buahbatu" ${district === 'buahbatu' ? 'selected' : ''}>📍 Buahbatu / Buah Batu</option>
+                <option value="kiara" ${district === 'kiara' ? 'selected' : ''}>📍 Kiara Condong</option>
+                <option value="batununggal" ${district === 'batununggal' ? 'selected' : ''}>📍 Batununggal</option>
+                <option value="lengkong" ${district === 'lengkong' ? 'selected' : ''}>📍 Lengkong</option>
+                <option value="antapani" ${district === 'antapani' ? 'selected' : ''}>📍 Antapani</option>
+                <option value="arcamanik" ${district === 'arcamanik' ? 'selected' : ''}>📍 Arcamanik</option>
+                <option value="rancasari" ${district === 'rancasari' ? 'selected' : ''}>📍 Rancasari</option>
+                <option value="gedebage" ${district === 'gedebage' ? 'selected' : ''}>📍 Gedebage</option>
+                <option value="cibeunying" ${district === 'cibeunying' ? 'selected' : ''}>📍 Cibeunying</option>
+                <option value="sukajadi" ${district === 'sukajadi' ? 'selected' : ''}>📍 Sukajadi</option>
+                <option value="dago" ${district === 'dago' ? 'selected' : ''}>📍 Dago / Coblong</option>
+                <option value="cimahi" ${district === 'cimahi' ? 'selected' : ''}>📍 Cimahi</option>
+                <option value="sumedang" ${district === 'sumedang' ? 'selected' : ''}>📍 Sumedang / Jatinangor</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -125,7 +141,7 @@ const SalesSuperpowers = {
 
     // Fetch GPS coordinates & data
     if (!navigator.geolocation) {
-      this.fetchRadarData(-6.9248, 107.6472, radiusKm, district);
+      this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
       return;
     }
 
@@ -134,15 +150,25 @@ const SalesSuperpowers = {
         this.salesCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         const badge = document.getElementById('radarGpsStatus');
         if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> GPS Terkunci (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
-        this.fetchRadarData(pos.coords.latitude, pos.coords.longitude, radiusKm, district);
+        this.fetchRadarData(pos.coords.latitude, pos.coords.longitude, this.currentRadius, district);
       },
       (err) => {
         console.warn('GPS error, using fallback', err);
         const badge = document.getElementById('radarGpsStatus');
         if (badge) badge.innerHTML = `<i class="fa-solid fa-building"></i> Posisi: Kiara Condong`;
-        this.fetchRadarData(-6.9248, 107.6472, radiusKm, district);
+        this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
       },
       { timeout: 8000, enableHighAccuracy: true }
+    );
+  },
+
+  handleRadiusChange(radiusVal, containerId) {
+    this.currentRadius = parseFloat(radiusVal) || 5;
+    this.fetchRadarData(
+      this.salesCoords ? this.salesCoords.lat : -6.9248,
+      this.salesCoords ? this.salesCoords.lng : 107.6472,
+      this.currentRadius,
+      this.currentDistrict
     );
   },
 
@@ -182,8 +208,8 @@ const SalesSuperpowers = {
             <div style="width:60px; height:60px; border-radius:50%; background:#f1f5f9; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:24px;">
               <i class="fa-solid fa-location-crosshairs"></i>
             </div>
-            <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Customer di Wilayah ini</h4>
-            <p style="font-size:12.5px; color:#64748b; margin:0;">Coba ganti ke wilayah / kecamatan lain pada filter dropdown di atas.</p>
+            <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Customer di Ring Radius ${radiusKm < 999 ? radiusKm + ' km' : ''}</h4>
+            <p style="font-size:12.5px; color:#64748b; margin:0;">Coba perbesar Ring Radius atau pilih wilayah lain di atas.</p>
           </div>
         `;
         this.radarData = [];
@@ -210,10 +236,10 @@ const SalesSuperpowers = {
       this.leafletMap = null;
     }
 
-    const defaultLat = (leads && leads.length > 0) ? leads[0].lat : centerLat;
-    const defaultLng = (leads && leads.length > 0) ? leads[0].lng : centerLng;
+    const salesLat = this.salesCoords ? this.salesCoords.lat : centerLat;
+    const salesLng = this.salesCoords ? this.salesCoords.lng : centerLng;
 
-    const map = L.map('radarLeafletMapContainer').setView([defaultLat, defaultLng], 13);
+    const map = L.map('radarLeafletMapContainer').setView([salesLat, salesLng], 14);
     this.leafletMap = map;
 
     // Google Maps Tile Layers
@@ -238,15 +264,44 @@ const SalesSuperpowers = {
       "🛰️ Google Maps (Satelit)": gmapsHybrid
     }).addTo(map);
 
-    // Sales Location Pin
-    if (this.salesCoords) {
-      L.marker([this.salesCoords.lat, this.salesCoords.lng], {
-        title: 'Posisi Sales'
-      }).addTo(map).bindPopup('<b>📍 Lokasi Saya (Sales)</b>');
+    // Sales Location Pin (Center of Radar)
+    const salesIcon = L.divIcon({
+      className: 'sales-gps-pin',
+      html: `<div style="background:#d7123a; width:22px; height:22px; border-radius:50%; border:3px solid #ffffff; box-shadow:0 0 12px rgba(215,18,58,0.8); display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px;"><i class="fa-solid fa-user-large"></i></div>`,
+      iconSize: [26, 26],
+      iconAnchor: [13, 13]
+    });
+
+    L.marker([salesLat, salesLng], { icon: salesIcon, title: 'Posisi Sales' })
+      .addTo(map)
+      .bindPopup('<b style="color:#d7123a;">📍 Lokasi Saya (Sales)</b><br><span style="font-size:11px;">Pusat Ring Radius GPS</span>');
+
+    // DRAW VISUAL RADIUS CIRCLE (RING RADIUS)
+    const currentRadiusKm = this.currentRadius || 5;
+    if (currentRadiusKm < 500) {
+      const radiusMeters = currentRadiusKm * 1000;
+      const radiusCircle = L.circle([salesLat, salesLng], {
+        color: '#d7123a',
+        fillColor: '#f43f5e',
+        fillOpacity: 0.08,
+        weight: 2.5,
+        dashArray: '8, 8',
+        radius: radiusMeters
+      }).addTo(map);
+
+      // Fit bounds to circle ring radius so user clearly sees the ring and all customer points inside
+      map.fitBounds(radiusCircle.getBounds(), { padding: [25, 25] });
     }
 
+    // STRICT CUSTOMER FILTER INSIDE RING RADIUS ONLY
+    const filteredLeads = (leads || []).filter(c => {
+      if (c.distance_km === undefined || c.distance_km === null) return true;
+      if (currentRadiusKm >= 999) return true;
+      return c.distance_km <= currentRadiusKm;
+    });
+
     // Customer Pins
-    (leads || []).forEach(c => {
+    filteredLeads.forEach(c => {
       let pinColor = '#3b82f6';
       if (c.status === 'Belum Dihubungi') pinColor = '#d7123a';
       else if (c.status === 'Menunggu Respon') pinColor = '#f59e0b';
@@ -265,7 +320,7 @@ const SalesSuperpowers = {
       const popupHtml = `
         <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size:12px; line-height:1.4; padding:4px;">
           <b style="font-size:13.5px; color:#0f172a;">${escapeHtml(c.name)}</b>
-          <div style="color:#64748b; font-size:11px; margin-top:2px;"><i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)}</div>
+          <div style="color:#64748b; font-size:11px; margin-top:2px;"><i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)} (${c.formatted_distance || (c.distance_km + ' km')})</div>
           <div style="margin-top:4px;">🚗 <b>${escapeHtml(c.car_model)}</b></div>
           <div style="margin-top:4px;">Status: <b style="color:${pinColor};">${escapeHtml(c.status)}</b></div>
           ${c.visit_photo ? `<div style="margin-top:6px;"><img src="${c.visit_photo}" style="width:100%; max-height:100px; object-fit:cover; border-radius:8px;"></div>` : ''}
@@ -284,11 +339,21 @@ const SalesSuperpowers = {
     const listContainer = document.getElementById('radarLeadsContainer');
     if (!listContainer) return;
 
-    if (!leads || leads.length === 0) {
+    const currentRadiusKm = this.currentRadius || 5;
+    const filteredLeads = (leads || []).filter(c => {
+      if (c.distance_km === undefined || c.distance_km === null) return true;
+      if (currentRadiusKm >= 999) return true;
+      return c.distance_km <= currentRadiusKm;
+    });
+
+    if (!filteredLeads || filteredLeads.length === 0) {
       listContainer.innerHTML = `
-        <div style="text-align:center; padding:30px; background:#fff; border-radius:16px; color:#64748b;">
-          <i class="fa-solid fa-magnifying-glass" style="font-size:24px; margin-bottom:8px; opacity:0.5;"></i>
-          <p style="margin:0; font-weight:700;">Tidak ada customer yang cocok dengan pencarian.</p>
+        <div style="text-align:center; padding:35px 20px; background:#fff; border-radius:18px; border:1.5px dashed #cbd5e1; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+          <div style="width:54px; height:54px; border-radius:50%; background:#fef2f2; color:#ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:22px;">
+            <i class="fa-solid fa-bullseye"></i>
+          </div>
+          <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Customer di Ring Radius ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : ''}</h4>
+          <p style="font-size:12.5px; color:#64748b; margin:0;">Coba perbesar Ring Radius (misal 3km, 5km, 10km) atau ubah pilihan wilayah di atas.</p>
         </div>
       `;
       return;
@@ -297,13 +362,13 @@ const SalesSuperpowers = {
     let html = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <span style="font-size:13px; font-weight:800; color:#334155;">
-          🎯 Ditemukan <b style="color:#d7123a;">${leads.length} Customer Radar</b> di Wilayah ini
+          🎯 Ditemukan <b style="color:#d7123a;">${filteredLeads.length} Customer Radar</b> dalam Ring Radius ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : ''}
         </span>
       </div>
       <div class="radar-leads-grid">
     `;
 
-    leads.forEach((item) => {
+    filteredLeads.forEach((item) => {
       const initials = (item.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
 
       html += `

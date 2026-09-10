@@ -15,6 +15,52 @@ require_once __DIR__ . '/api_followup_db.php';
 
 // Known Coordinates Dictionary for Bandung & Greater Area & Indonesian Cities
 $cityDistrictCoords = [
+    // --- SPECIFIC BANDUNG STREETS & KELURAHAN / LANDMARKS ---
+    'terusan buahbatu' => [-6.9635, 107.6398],
+    'terusan buah batu'=> [-6.9635, 107.6398],
+    'soekarno hatta'   => [-6.9450, 107.6500],
+    'soekarno-hatta'   => [-6.9450, 107.6500],
+    'gatot subroto'    => [-6.9275, 107.6325],
+    'gatsu'            => [-6.9275, 107.6325],
+    'turangga'         => [-6.9388, 107.6294],
+    'ciganitri'        => [-6.9733, 107.6455],
+    'logam'            => [-6.9612, 107.6512],
+    'pasirluyu'        => [-6.9485, 107.6195],
+    'pasir luyu'       => [-6.9485, 107.6195],
+    'cijagra'          => [-6.9515, 107.6288],
+    'sekejati'         => [-6.9490, 107.6580],
+    'mengger'          => [-6.9620, 107.6260],
+    'ibrahim adjie'    => [-6.9290, 107.6440],
+    'kopo'             => [-6.9550, 107.5920],
+    'moch toha'        => [-6.9530, 107.6080],
+    'mohammad toha'    => [-6.9530, 107.6080],
+    'singgasana'       => [-6.9600, 107.5950],
+    'taman holis'      => [-6.9450, 107.5600],
+    'cibaduyut'        => [-6.9620, 107.5900],
+    'metro indah'      => [-6.9470, 107.6590],
+    'margacinta'       => [-6.9580, 107.6520],
+    'margahayu'        => [-6.9620, 107.6590],
+    'riung bandung'    => [-6.9520, 107.6710],
+    'derwati'          => [-6.9650, 107.6820],
+    'ciwastra'         => [-6.9620, 107.6650],
+    'summarecon'       => [-6.9680, 107.6980],
+    'cikutra'          => [-6.8986, 107.6358],
+    'pahlawan'         => [-6.8970, 107.6280],
+    'dipatiukur'       => [-6.8900, 107.6160],
+    'setiabudhi'       => [-6.8600, 107.5950],
+    'pasteur'          => [-6.8944, 107.5889],
+    'cibeureum'        => [-6.9080, 107.5680],
+    'sudirman'         => [-6.9180, 107.5850],
+    'jamika'           => [-6.9210, 107.5880],
+    'otista'           => [-6.9280, 107.6040],
+    'pasirkaliki'      => [-6.9080, 107.6000],
+    'asia afrika'      => [-6.9210, 107.6100],
+    'burangrang'       => [-6.9280, 107.6200],
+    'karapitan'        => [-6.9310, 107.6150],
+    'supratman'        => [-6.9070, 107.6300],
+    'riau'             => [-6.9080, 107.6180],
+    'trunojoyo'        => [-6.9040, 107.6130],
+
     // --- BANDUNG CITY KECAMATAN (Inner Bandung) ---
     'kiaracondong'     => [-6.9248, 107.6472],
     'kiara condong'    => [-6.9248, 107.6472],
@@ -33,7 +79,6 @@ $cityDistrictCoords = [
     'bedebage'         => [-6.9589, 107.6953],
     'cibeunying kidul' => [-6.9069, 107.6394],
     'cibeunying kaler' => [-6.8925, 107.6322],
-    'cikutra'          => [-6.8986, 107.6358],
     'sumur bandung'    => [-6.9167, 107.6111],
     'bandung wetan'    => [-6.9039, 107.6186],
     'bdh wetan'        => [-6.9039, 107.6186],
@@ -41,7 +86,6 @@ $cityDistrictCoords = [
     'dago'             => [-6.8653, 107.6183],
     'sukajadi'         => [-6.8856, 107.5925],
     'sukasari'         => [-6.8689, 107.5878],
-    'pasteur'          => [-6.8944, 107.5889],
     'andir'            => [-6.9078, 107.5819],
     'cicendo'          => [-6.9025, 107.5936],
     'astana anyar'     => [-6.9367, 107.6011],
@@ -59,7 +103,6 @@ $cityDistrictCoords = [
     'cibiru'           => [-6.9244, 107.7214],
     'ujung berung'     => [-6.9114, 107.7011],
     'ujungberung'      => [-6.9114, 107.7011],
-    'soekarno hatta'   => [-6.9450, 107.6500],
 
     // --- KABUPATEN BANDUNG & CIMAHI & KBB ---
     'bojongsoang'      => [-6.9833, 107.6333],
@@ -69,7 +112,6 @@ $cityDistrictCoords = [
     'bale endah'       => [-7.0069, 107.6319],
     'cileunyi'         => [-6.9442, 107.7478],
     'cimenyan'         => [-6.8711, 107.6489],
-    'margahayu'        => [-6.9722, 107.5667],
     'margaasih'        => [-6.9600, 107.5450],
     'katapang'         => [-6.9950, 107.5600],
     'soreang'          => [-7.0250, 107.5194],
@@ -130,20 +172,40 @@ $cityDistrictCoords = [
 
 function getAccurateCoords($id, $text, $cityDistrictCoords) {
     $clean = strtolower((string)$text);
-    foreach ($cityDistrictCoords as $key => $coords) {
+    $matchedKey = null;
+    $coords = null;
+
+    foreach ($cityDistrictCoords as $key => $c) {
         if (strpos($clean, $key) !== false) {
-            $hash = abs(crc32($id . $key));
-            $jLat = (($hash % 120) - 60) / 10000;
-            $jLng = ((($hash >> 3) % 120) - 60) / 10000;
-            return [$coords[0] + $jLat, $coords[1] + $jLng, ucwords($key)];
+            $matchedKey = $key;
+            $coords = $c;
+            break;
         }
     }
     
-    // Default fallback for generic 'Bandung Area': Tunas Kircon / Kiara Condong hub (-6.9248, 107.6472)
-    $hash = abs(crc32($id . 'kircon'));
-    $jLat = (($hash % 140) - 70) / 10000;
-    $jLng = ((($hash >> 3) % 140) - 70) / 10000;
-    return [-6.9248 + $jLat, 107.6472 + $jLng, 'Bandung Area'];
+    if (!$coords) {
+        $matchedKey = 'bandung area';
+        $coords = [-6.9248, 107.6472];
+    }
+
+    // Polar 2D dispersion to scatter points organically around neighborhood center
+    $hash1 = abs(crc32($id . '_' . $matchedKey));
+    $hash2 = abs(crc32($matchedKey . '_' . $id));
+    
+    // Angle in radians (0 to 2*PI)
+    $angle = (($hash1 % 360) / 180.0) * M_PI;
+    
+    // Radial distance offset between 40 meters (0.04 km) and 450 meters (0.45 km)
+    $distanceKm = 0.04 + (($hash2 % 410) / 1000.0);
+    
+    // Convert polar offset to Lat/Lng deltas
+    $deltaLat = ($distanceKm / 111.0) * cos($angle);
+    $deltaLng = ($distanceKm / (111.0 * cos(deg2rad($coords[0])))) * sin($angle);
+    
+    $finalLat = $coords[0] + $deltaLat;
+    $finalLng = $coords[1] + $deltaLng;
+
+    return [$finalLat, $finalLng, ucwords($matchedKey)];
 }
 
 function calculateDistance($lat1, $lon1, $lat2, $lon2) {
