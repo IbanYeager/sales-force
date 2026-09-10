@@ -1,6 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const namaKecamatan = decodeURIComponent(urlParams.get('kecamatan') || "Coblong");
-const tahunPilihDefault = urlParams.get('tahun') || sessionStorage.getItem('polreg_active_year') || "2026";
+let rawYear = urlParams.get('tahun') || sessionStorage.getItem('polreg_active_year') || "2025";
+const tahunPilihDefault = (rawYear === '2026') ? '2025' : rawYear;
 
 let currentKategori = 'Teratas';
 let activeCarsData = [];

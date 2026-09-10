@@ -129,10 +129,10 @@
         <div class="year-dropdown-wrapper">
           <i class="fa-solid fa-calendar-days dropdown-icon"></i>
           <select id="yearSelect" class="year-dropdown" onchange="setYear(this.value)">
-            <option value="2026" selected>Data Tahun 2026</option>
-            <option value="2025">Data Tahun 2025</option>
+            <option value="2025" selected>Data Tahun 2025</option>
             <option value="2024">Data Tahun 2024</option>
             <option value="2023">Data Tahun 2023</option>
+            <option value="2022">Data Tahun 2022</option>
           </select>
           <i class="fa-solid fa-chevron-down chevron-icon"></i>
         </div>

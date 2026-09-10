@@ -6,14 +6,20 @@
 
 let currentKeyword = '';
 let dbDataPolreg = [];
-let activeYear = sessionStorage.getItem('polreg_active_year') || '2026';
+let savedYear = sessionStorage.getItem('polreg_active_year');
+if (savedYear === '2026') {
+  savedYear = '2025';
+  sessionStorage.setItem('polreg_active_year', '2025');
+}
+let activeYear = savedYear || '2025';
 let currentKecamatan = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const yearFromUrl = urlParams.get('tahun') || sessionStorage.getItem('polreg_active_year') || '2026';
-  const tabFromUrl = urlParams.get('tab') || 'analisis';
-
+  let yearFromUrl = urlParams.get('tahun') || sessionStorage.getItem('polreg_active_year') || '2025';
+  if (yearFromUrl === '2026') {
+    yearFromUrl = '2025';
+  }
   activeYear = yearFromUrl;
   sessionStorage.setItem('polreg_active_year', activeYear);
 
