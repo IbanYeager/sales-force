@@ -6,7 +6,7 @@ header('Access-Control-Allow-Origin: *');
 require 'koneksi.php';
 
 $kecamatan = isset($_GET['kecamatan']) ? $_GET['kecamatan'] : '';
-$tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '2025';
+$tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '2026';
 
 // Menggunakan Prepared Statements untuk keamanan (Mencegah SQL Injection)
 $query = "SELECT merk, type, COUNT(*) AS unit 

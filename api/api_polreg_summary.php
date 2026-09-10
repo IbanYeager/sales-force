@@ -5,7 +5,7 @@ header('Access-Control-Allow-Origin: *');
 // Panggil koneksi database
 require 'koneksi.php';
 
-$tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '2025';
+$tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '2026';
 
 // Menggunakan Prepared Statements untuk keamanan
 $query = "SELECT TRIM(kecamatan) AS kecamatan, COUNT(*) AS total_unit

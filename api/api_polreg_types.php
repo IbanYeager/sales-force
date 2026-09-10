@@ -5,7 +5,7 @@ header('Access-Control-Allow-Origin: *');
 require 'koneksi.php';
 
 $kecamatan = isset($_GET['kecamatan']) ? $_GET['kecamatan'] : '';
-$tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '2025';
+$tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '2026';
 $merk = isset($_GET['merk']) ? $_GET['merk'] : '';
 
 $query = "SELECT DISTINCT type FROM tabel_polreg WHERE kecamatan = ? AND tahun = ? AND type IS NOT NULL AND type <> ''";

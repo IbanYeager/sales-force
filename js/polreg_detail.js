@@ -1,12 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const namaKecamatan = decodeURIComponent(urlParams.get('kecamatan') || "Coblong");
-let rawYear = urlParams.get('tahun') || sessionStorage.getItem('polreg_active_year') || "2025";
-const tahunPilihDefault = (rawYear === '2026') ? '2025' : rawYear;
-
-let currentKategori = 'Teratas';
-let activeCarsData = [];
-let currentSearchKeyword = '';
-let filterTahun = tahunPilihDefault;
+const filterTahun = urlParams.get('tahun') || '2026';
 let currentSortOrder = 'desc';
 
 // Save active year to sessionStorage & update back button link
