@@ -2777,7 +2777,7 @@ function switchFollowupSubTab(tab) {
     if (radarContainer) {
       radarContainer.style.display = 'block';
       if (window.SalesSuperpowers) {
-        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 5);
+        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 1);
       }
     }
   } else {
@@ -3906,7 +3906,7 @@ function switchFollowupSubTab(subTab) {
     if (containerRadar) {
       containerRadar.style.display = 'block';
       if (window.SalesSuperpowers && typeof SalesSuperpowers.renderRadarCockpit === 'function') {
-        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 50);
+        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 1);
       }
     }
   } else {

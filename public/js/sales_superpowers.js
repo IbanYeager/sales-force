@@ -413,20 +413,23 @@ const SalesSuperpowers = {
     });
 
     // DRAW VISUAL RADIUS CIRCLE (RING RADIUS)
-    const currentRadiusKm = this.currentRadius || 5;
+    const radiusSelect = document.getElementById('radarRadiusSelect');
+    const currentRadiusKm = radiusSelect ? parseFloat(radiusSelect.value) : (this.currentRadius || 1);
+    this.currentRadius = currentRadiusKm;
+
     if (currentRadiusKm < 500) {
       const radiusMeters = currentRadiusKm * 1000;
       const radiusCircle = L.circle([salesLat, salesLng], {
         color: '#d7123a',
         fillColor: '#f43f5e',
-        fillOpacity: 0.08,
+        fillOpacity: 0.12,
         weight: 2.5,
         dashArray: '8, 8',
         radius: radiusMeters
       }).addTo(map);
 
       // Fit bounds to circle ring radius so user clearly sees the ring and all customer points inside
-      map.fitBounds(radiusCircle.getBounds(), { padding: [25, 25] });
+      map.fitBounds(radiusCircle.getBounds(), { padding: [30, 30], maxZoom: 16 });
     }
 
     // STRICT CUSTOMER FILTER INSIDE RING RADIUS ONLY
