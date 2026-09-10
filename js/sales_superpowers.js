@@ -61,10 +61,18 @@ const SalesSuperpowers = {
   async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 5) {
     this.currentRadius = parseFloat(radiusKm) || 5;
     this.currentDistrict = district;
+
+    // Restore saved sales coords if available
+    const savedLat = localStorage.getItem('savedSalesLat');
+    const savedLng = localStorage.getItem('savedSalesLng');
+    if (savedLat && savedLng) {
+      this.salesCoords = { lat: parseFloat(savedLat), lng: parseFloat(savedLng) };
+    }
+
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Render Cockpit Shell with Interactive Leaflet Map & District / Ring Radius Selectors
+    // Render Cockpit Shell with Interactive Leaflet Map, District & Ring Radius Selectors, and Location Search Bar
     container.innerHTML = `
       <div class="radar-cockpit-hero" style="background: linear-gradient(135deg, #0d1b3e 0%, #162a52 100%); padding: 18px; border-radius: 18px; color: #fff; margin-bottom: 18px;">
         <div class="radar-top-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
@@ -121,6 +129,19 @@ const SalesSuperpowers = {
           </div>
         </div>
 
+        <!-- Sales GPS Address Search & Precision Controls Bar -->
+        <div style="display:flex; align-items:center; gap:8px; margin-top:12px; background:rgba(255,255,255,0.08); padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); flex-wrap:wrap;">
+          <i class="fa-solid fa-location-crosshairs" style="color:#38bdf8; font-size:14px;"></i>
+          <input type="text" id="salesLocationSearchInput" placeholder="Ketik lokasi Anda (misal: PSM Pindad, Buahbatu, Terusan Buahbatu)..." style="flex:1; min-width:200px; background:transparent; border:none; color:#ffffff; font-size:12px; font-weight:700; outline:none;" onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
+          <button onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)" style="background:#38bdf8; color:#0f172a; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+            <i class="fa-solid fa-magnifying-glass"></i> Set Lokasi
+          </button>
+          <button onclick="SalesSuperpowers.requestHighAccuracyGPS()" style="background:#10b981; color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Lacak ulang GPS Akurat HP">
+            <i class="fa-solid fa-location-arrow"></i> GPS Akurat
+          </button>
+          <span style="font-size:11px; color:#cbd5e1; font-weight:600;"><i class="fa-solid fa-hand-pointer" style="color:#f59e0b;"></i> Tip: Geser pin 📍 merah di peta ke posisi Anda</span>
+        </div>
+
         <!-- Interactive Leaflet Map Container -->
         <div style="margin-top: 14px; border-radius: 14px; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); position: relative; background: #0f172a; height: 380px;">
           <div id="radarLeafletMapContainer" style="width: 100%; height: 100%;"></div>
@@ -139,7 +160,15 @@ const SalesSuperpowers = {
     // Ensure Leaflet JS is loaded
     await this.ensureLeafletLoaded();
 
-    // Fetch GPS coordinates & data
+    // If salesCoords already set manually or from localStorage, fetch data directly
+    if (this.salesCoords) {
+      const badge = document.getElementById('radarGpsStatus');
+      if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Set (${this.salesCoords.lat.toFixed(3)}, ${this.salesCoords.lng.toFixed(3)})`;
+      this.fetchRadarData(this.salesCoords.lat, this.salesCoords.lng, this.currentRadius, district);
+      return;
+    }
+
+    // Otherwise fetch via browser Geolocation
     if (!navigator.geolocation) {
       this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
       return;
@@ -158,8 +187,97 @@ const SalesSuperpowers = {
         if (badge) badge.innerHTML = `<i class="fa-solid fa-building"></i> Posisi: Kiara Condong`;
         this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
       },
-      { timeout: 8000, enableHighAccuracy: true }
+      { timeout: 12000, enableHighAccuracy: true, maximumAge: 0 }
     );
+  },
+
+  setManualSalesCoords(lat, lng, label = null) {
+    this.salesCoords = { lat: parseFloat(lat), lng: parseFloat(lng) };
+    localStorage.setItem('savedSalesLat', lat);
+    localStorage.setItem('savedSalesLng', lng);
+    if (label) localStorage.setItem('savedSalesLocLabel', label);
+
+    const badge = document.getElementById('radarGpsStatus');
+    if (badge) {
+      badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Set (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})`;
+    }
+
+    this.fetchRadarData(lat, lng, this.currentRadius, this.currentDistrict);
+
+    if (typeof showCustomAlert === 'function') {
+      showCustomAlert('Lokasi Diperbarui', `Posisi GPS Sales diset ke (${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})`, 'success');
+    }
+  },
+
+  requestHighAccuracyGPS() {
+    if (!navigator.geolocation) {
+      alert('Browser tidak mendukung Geolocation.');
+      return;
+    }
+    const badge = document.getElementById('radarGpsStatus');
+    if (badge) badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Melacak GPS Presisi...`;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.setManualSalesCoords(pos.coords.latitude, pos.coords.longitude, 'GPS HP Presisi');
+      },
+      (err) => {
+        alert('Gagal mendapatkan GPS HP: ' + err.message + '. Silakan geser pin di peta atau ketik nama lokasi.');
+        if (badge) badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Gunakan Pin Geser`;
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  },
+
+  async searchAndSetLocation(query) {
+    if (!query || query.trim() === '') return;
+    const cleanQ = query.trim().toLowerCase();
+    
+    // Quick local dictionary check
+    const localDict = {
+      'pindad': [-6.9295, 107.6465],
+      'psm': [-6.9295, 107.6465],
+      'kpad pindad': [-6.9295, 107.6465],
+      'buahbatu': [-6.9554, 107.6468],
+      'buah batu': [-6.9554, 107.6468],
+      'kiaracondong': [-6.9248, 107.6472],
+      'kircon': [-6.9248, 107.6472],
+      'batununggal': [-6.9531, 107.6256],
+      'lengkong': [-6.9312, 107.6189],
+      'antapani': [-6.9147, 107.6625],
+      'arcamanik': [-6.9189, 107.6811],
+      'rancasari': [-6.9625, 107.6722],
+      'gedebage': [-6.9589, 107.6953],
+      'soekarno hatta': [-6.9450, 107.6500],
+      'margacinta': [-6.9580, 107.6520],
+      'ciganitri': [-6.9733, 107.6455],
+      'dayeuhkolot': [-6.9889, 107.6222],
+      'bojongsoang': [-6.9833, 107.6333],
+      'dago': [-6.8653, 107.6183],
+      'cimahi': [-6.8722, 107.5417]
+    };
+
+    for (let key in localDict) {
+      if (cleanQ.includes(key)) {
+        this.setManualSalesCoords(localDict[key][0], localDict[key][1], query);
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ' Bandung')}`);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        this.setManualSalesCoords(lat, lng, data[0].display_name);
+      } else {
+        alert('Lokasi "' + query + '" tidak ditemukan. Silakan klik atau geser pin langsung di peta.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Gagal mencari lokasi. Silakan geser pin merah di peta.');
+    }
   },
 
   handleRadiusChange(radiusVal, containerId) {
@@ -264,17 +382,34 @@ const SalesSuperpowers = {
       "🛰️ Google Maps (Satelit)": gmapsHybrid
     }).addTo(map);
 
-    // Sales Location Pin (Center of Radar)
+    // Sales Location Pin (Center of Radar, Draggable!)
     const salesIcon = L.divIcon({
       className: 'sales-gps-pin',
-      html: `<div style="background:#d7123a; width:22px; height:22px; border-radius:50%; border:3px solid #ffffff; box-shadow:0 0 12px rgba(215,18,58,0.8); display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px;"><i class="fa-solid fa-user-large"></i></div>`,
-      iconSize: [26, 26],
-      iconAnchor: [13, 13]
+      html: `<div style="background:#d7123a; width:24px; height:24px; border-radius:50%; border:3px solid #ffffff; box-shadow:0 0 14px rgba(215,18,58,0.9); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; cursor:grab;"><i class="fa-solid fa-location-dot"></i></div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
     });
 
-    L.marker([salesLat, salesLng], { icon: salesIcon, title: 'Posisi Sales' })
-      .addTo(map)
-      .bindPopup('<b style="color:#d7123a;">📍 Lokasi Saya (Sales)</b><br><span style="font-size:11px;">Pusat Ring Radius GPS</span>');
+    const salesMarker = L.marker([salesLat, salesLng], {
+      icon: salesIcon,
+      title: '📍 Lokasi Saya (Geser Pin Ini ke posisi Anda)',
+      draggable: true
+    }).addTo(map);
+
+    salesMarker.bindPopup(`
+      <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:12px; text-align:center; padding:4px;">
+        <b style="color:#d7123a; font-size:13px;">📍 Lokasi Saya (Sales)</b><br>
+        <span style="color:#64748b; font-size:11px;">Pusat Ring Radar GPS</span><br>
+        <div style="margin-top:6px; background:#f0fdf4; border:1px solid #bbf7d0; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700; color:#15803d;">
+          💡 Geser (drag) pin ini jika posisi Anda kurang pas!
+        </div>
+      </div>
+    `);
+
+    salesMarker.on('dragend', (e) => {
+      const newPos = e.target.getLatLng();
+      SalesSuperpowers.setManualSalesCoords(newPos.lat, newPos.lng, 'Pin Geser');
+    });
 
     // DRAW VISUAL RADIUS CIRCLE (RING RADIUS)
     const currentRadiusKm = this.currentRadius || 5;
