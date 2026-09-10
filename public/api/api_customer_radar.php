@@ -1,5 +1,5 @@
 <?php
-// api_customer_radar.php - Calculate distance to nearest prospects based on Sales GPS location
+// api_customer_radar.php - Calculate distance to nearest prospects based on Sales GPS location & uploaded Database Radar GPS
 date_default_timezone_set('Asia/Jakarta');
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -54,66 +54,97 @@ $districtCoords = [
     'bojongsoang'     => [-6.9833, 107.6333],
     'dayeuhkolot'     => [-6.9889, 107.6222],
     'baleendah'       => [-7.0069, 107.6319],
+    'cileunyi'        => [-6.9442, 107.7478],
     'margahayu'       => [-6.9722, 107.5667],
     'cimahi'          => [-6.8722, 107.5417],
     'padalarang'      => [-6.8389, 107.4778],
     'lembang'         => [-6.8167, 107.6167],
-    'soreang'         => [-7.0250, 107.5194]
+    'soreang'         => [-7.0250, 107.5194],
+    'ciparay'         => [-7.0383, 107.7125],
+    'majalaya'        => [-7.0506, 107.7375],
+    'mampang'         => [-6.2465, 106.8248]
 ];
 
-// Haversine formula to calculate distance in KM
+$bandungCenters = [
+    [-6.9248, 107.6472, 'Kiara Condong'],
+    [-6.9554, 107.6468, 'Buah Batu'],
+    [-6.9531, 107.6256, 'Batununggal'],
+    [-6.9147, 107.6625, 'Antapani'],
+    [-6.9189, 107.6811, 'Arcamanik'],
+    [-6.9625, 107.6722, 'Rancasari'],
+    [-6.9312, 107.6189, 'Lengkong'],
+    [-6.9611, 107.6339, 'Bandung Kidul'],
+    [-6.9833, 107.6333, 'Bojongsoang'],
+    [-6.9589, 107.6953, 'Gedebage'],
+    [-6.9069, 107.6394, 'Cibeunying Kidul'],
+    [-6.9392, 107.6084, 'Regol'],
+    [-6.9244, 107.7214, 'Cibiru'],
+    [-6.9114, 107.7011, 'Ujung Berung'],
+    [-6.9025, 107.5936, 'Cicendo'],
+    [-6.8837, 107.6139, 'Coblong'],
+];
+
+function getCoordinatesForLocationFast($id, $text, $districtMap, $bandungCenters) {
+    $clean = strtolower((string)$text);
+    foreach ($districtMap as $key => $coords) {
+        if (strpos($clean, $key) !== false) {
+            $hash = abs(crc32($id . $key));
+            $jLat = (($hash % 200) - 100) / 10000;
+            $jLng = ((($hash >> 3) % 200) - 100) / 10000;
+            return [$coords[0] + $jLat, $coords[1] + $jLng, ucwords($key)];
+        }
+    }
+    
+    // Fallback: Deterministic distribution across Bandung district hubs for generic 'Bandung Area' or unmapped text
+    $idx = abs(crc32($id . 'center')) % count($bandungCenters);
+    $c = $bandungCenters[$idx];
+    $hash = abs(crc32($id . 'gen'));
+    $jLat = (($hash % 240) - 120) / 10000;
+    $jLng = ((($hash >> 4) % 240) - 120) / 10000;
+    $distName = (!empty($text) && strtolower(trim($text)) !== 'bandung area') ? trim($text) : $c[2];
+    return [$c[0] + $jLat, $c[1] + $jLng, $distName];
+}
+
 function calculateDistance($lat1, $lon1, $lat2, $lon2) {
-    $earthRadius = 6371; // km
     $dLat = deg2rad($lat2 - $lat1);
     $dLon = deg2rad($lon2 - $lon1);
     $a = sin($dLat / 2) * sin($dLat / 2) +
          cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
          sin($dLon / 2) * sin($dLon / 2);
-    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-    return $earthRadius * $c;
-}
-
-// Function to estimate coordinates from text
-function getCoordinatesForLocation($text, $districtMap) {
-    if (empty($text)) {
-        return [-6.9248 + (mt_rand(-15, 15) / 1000), 107.6472 + (mt_rand(-15, 15) / 1000)];
-    }
-    
-    $clean = strtolower($text);
-    foreach ($districtMap as $key => $coords) {
-        if (strpos($clean, $key) !== false) {
-            $jitterLat = (crc32($text . 'lat') % 100 - 50) / 10000;
-            $jitterLng = (crc32($text . 'lng') % 100 - 50) / 10000;
-            return [$coords[0] + $jitterLat, $coords[1] + $jitterLng];
-        }
-    }
-    
-    return [-6.9248, 107.6472];
+    return 6371 * 2 * atan2(sqrt($a), sqrt(1 - $a));
 }
 
 $salesLat = isset($_GET['lat']) ? floatval($_GET['lat']) : -6.9248; // default Tunas Kircon
 $salesLng = isset($_GET['lng']) ? floatval($_GET['lng']) : 107.6472;
 $maxRadius = isset($_GET['radius']) ? floatval($_GET['radius']) : 15.0; // km
 $salesId = isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0;
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 50;
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 100;
 
 try {
-    // Helper sales map
     $salesList = get_sales_list();
     $salesMap = [];
     foreach ($salesList as $s) {
         $salesMap[(int)$s['id']] = $s['name'];
     }
 
-    // 1. Fetch Followup Customers (Prioritizing PKB dataset > 2.5 years vehicle age)
-    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id FROM followup_customers ORDER BY CASE WHEN sync_source = 'pkb_excel_radar' THEN 0 ELSE 1 END, id DESC LIMIT 1000", []);
+    // Bounding Box Deltas for ultra-fast filtering
+    $latDelta = ($maxRadius + 0.5) / 111.0;
+    $lngDelta = ($maxRadius + 0.5) / 110.2;
+
+    // Fetch ALL Followup Customers (PKB Radar + SPV/Kacab assigned dataset)
+    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source FROM followup_customers ORDER BY id DESC", []);
     
     $results = [];
 
     if (!empty($fuRows) && is_array($fuRows)) {
         foreach ($fuRows as $row) {
             $locText = ($row['district'] ?: '') . ' ' . ($row['cluster_name'] ?: '') . ' ' . ($row['notes'] ?: '');
-            $coords = getCoordinatesForLocation($locText, $districtCoords);
+            $coords = getCoordinatesForLocationFast($row['id'], $locText, $districtCoords, $bandungCenters);
+            
+            // Fast bounding box check
+            if (abs($coords[0] - $salesLat) > $latDelta) continue;
+            if (abs($coords[1] - $salesLng) > $lngDelta) continue;
+
             $dist = calculateDistance($salesLat, $salesLng, $coords[0], $coords[1]);
 
             if ($dist <= $maxRadius) {
@@ -122,13 +153,20 @@ try {
                 $sid = (int)($row['assigned_sales_id'] ?? 0);
                 $salesName = isset($salesMap[$sid]) ? $salesMap[$sid] : 'Terbuka (Siapa Saja)';
                 
+                $waUrl = '';
+                if (!empty($phoneClean) && $phoneClean !== '-') {
+                    $waUrl = "https://wa.me/" . $phoneClean . "?text=" . urlencode("Halo Bapak/Ibu " . $row['name'] . ", saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda di sekitar area " . ($coords[2] ?: 'tempat Bapak/Ibu') . ". Apakah ada waktu luang sebentar jika saya mampir untuk update info promo/unit?");
+                }
+
                 $results[] = [
                     'id' => (int)$row['id'],
-                    'source' => 'followup_db',
+                    'source' => $row['sync_source'] ?: 'followup_db',
                     'name' => $row['name'],
                     'phone' => $phoneClean,
                     'car_model' => $car,
-                    'district' => $row['district'] ?: 'Bandung Area',
+                    'last_car_model' => $row['last_car_model'] ?: '',
+                    'car_age' => $row['car_age'] ?: '',
+                    'district' => $coords[2] ?: ($row['district'] ?: 'Bandung Area'),
                     'priority' => $row['priority'] ?: 'Warm',
                     'status' => $row['followup_status'] ?: 'Belum Dihubungi',
                     'sales_name' => $salesName,
@@ -136,41 +174,9 @@ try {
                     'lng' => round($coords[1], 6),
                     'distance_km' => round($dist, 2),
                     'formatted_distance' => $dist < 1 ? round($dist * 1000) . ' m' : round($dist, 1) . ' km',
-                    'maps_url' => "https://www.google.com/maps/dir/?api=1&destination=" . $coords[0] . "," . $coords[1],
-                    'wa_url' => "https://wa.me/" . $phoneClean . "?text=" . urlencode("Halo Bapak/Ibu " . $row['name'] . ", saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda di sekitar area " . ($row['district'] ?: 'tempat Bapak/Ibu') . ". Apakah ada waktu luang sebentar jika saya mampir untuk update info promo/unit?")
+                    'maps_url' => "https://www.google.com/maps/dir/?api=1&destination=" . round($coords[0], 6) . "," . round($coords[1], 6),
+                    'wa_url' => $waUrl
                 ];
-            }
-        }
-    }
-
-    // 2. Also Fetch from tabel_customer (Kanban CRM) if available
-    if ($conn) {
-        $custRes = $conn->query("SELECT id, nama, no_telp, alamat, status FROM tabel_customer ORDER BY id DESC LIMIT 200");
-        if ($custRes && $custRes->num_rows > 0) {
-            while ($c = $custRes->fetch_assoc()) {
-                $coords = getCoordinatesForLocation($c['alamat'] ?: '', $districtCoords);
-                $dist = calculateDistance($salesLat, $salesLng, $coords[0], $coords[1]);
-
-                if ($dist <= $maxRadius) {
-                    $phoneClean = clean_phone_number($c['no_telp'] ?? '');
-                    $results[] = [
-                        'id' => (int)$c['id'],
-                        'source' => 'pipeline_crm',
-                        'name' => $c['nama'],
-                        'phone' => $phoneClean,
-                        'car_model' => 'Prospek CRM',
-                        'district' => $c['alamat'] ?: 'Bandung',
-                        'priority' => 'Hot Lead',
-                        'status' => $c['status'] ?: 'Follow Up',
-                        'sales_name' => 'Pipeline Sales',
-                        'lat' => round($coords[0], 6),
-                        'lng' => round($coords[1], 6),
-                        'distance_km' => round($dist, 2),
-                        'formatted_distance' => $dist < 1 ? round($dist * 1000) . ' m' : round($dist, 1) . ' km',
-                        'maps_url' => "https://www.google.com/maps/dir/?api=1&destination=" . $coords[0] . "," . $coords[1],
-                        'wa_url' => "https://wa.me/" . $phoneClean . "?text=" . urlencode("Halo Bapak/Ibu " . $c['nama'] . ", saya dari Tunas Toyota. Kebetulan saya sedang berada di dekat area " . ($c['alamat'] ?: 'lokasi Anda') . ". Apakah bisa saya mampir sebentar untuk diskusi penawaran?")
-                    ];
-                }
             }
         }
     }
@@ -180,7 +186,6 @@ try {
         return $a['distance_km'] <=> $b['distance_km'];
     });
 
-    // Slice to limit
     $sliced = array_slice($results, 0, $limit);
 
     echo json_encode([

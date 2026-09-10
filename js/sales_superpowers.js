@@ -195,6 +195,7 @@ const SalesSuperpowers = {
       const initials = (item.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
       const isNear = item.distance_km < 1;
       const etaMins = Math.max(2, Math.round(item.distance_km * 2.5));
+      const hasPhone = item.phone && item.phone.trim() !== '' && item.phone !== '-';
 
       html += `
         <div class="radar-lead-card-deluxe">
@@ -222,14 +223,15 @@ const SalesSuperpowers = {
             <div class="radar-vehicle-box">
               <div class="radar-vehicle-row">
                 <i class="fa-solid fa-car-side" style="color:#d7123a;"></i>
-                <span><b>Unit Minat:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model)}</span></span>
+                <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model)}</span> ${item.last_car_model ? `(Saat ini: ${escapeHtml(item.last_car_model)})` : ''}</span>
               </div>
-              <div style="margin-top:4px; font-size:11.5px; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
-                <span>Prioritas: <b>${escapeHtml(item.priority || 'Warm')}</b></span>
-                <span>Status: <b style="color:#2563eb;">${escapeHtml(item.status || 'Follow Up')}</b></span>
+              ${item.car_age ? `<div style="font-size:11px; color:#64748b; margin-top:3px;"><i class="fa-solid fa-clock"></i> Usia: <b>${escapeHtml(item.car_age)}</b></div>` : ''}
+              <div style="margin-top:4px; font-size:11.5px; color:#64748b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                <span>Prioritas: <b style="color:#d7123a;">${escapeHtml(item.priority || 'Prioritas Trade-in')}</b></span>
+                <span>Status: <b style="color:#2563eb;">${escapeHtml(item.status || 'Belum Dihubungi')}</b></span>
               </div>
               <div style="margin-top:4px; font-size:11px; color:#475569;">
-                <span><i class="fa-solid fa-user-check" style="color:#059669;"></i> PIC Sales: <b>${escapeHtml(item.sales_name || 'Terbuka Untuk Semua Sales')}</b></span>
+                <span><i class="fa-solid fa-user-check" style="color:#059669;"></i> PIC Sales: <b>${escapeHtml(item.sales_name || 'Terbuka (Siapa Saja)')}</b></span>
               </div>
             </div>
           </div>
@@ -238,9 +240,15 @@ const SalesSuperpowers = {
             <a href="${item.maps_url}" target="_blank" class="btn-radar-map" title="Buka Navigasi Rute Google Maps">
               <i class="fa-solid fa-map-location-dot"></i> Rute Maps
             </a>
-            <a href="${item.wa_url}" target="_blank" class="btn-radar-wa" title="Chat WhatsApp & Rencana Kunjungan">
-              <i class="fa-brands fa-whatsapp"></i> Chat &amp; Kunjungi
-            </a>
+            ${hasPhone ? `
+              <a href="${item.wa_url}" target="_blank" class="btn-radar-wa" title="Chat WhatsApp & Rencana Kunjungan">
+                <i class="fa-brands fa-whatsapp"></i> Chat &amp; Kunjungi
+              </a>
+            ` : `
+              <button type="button" class="btn-radar-wa" style="background:#f8fafc; color:#94a3b8; border:1px solid #cbd5e1; cursor:not-allowed;" title="Tanpa Nomor Telepon (Gunakan Rute Maps)">
+                <i class="fa-solid fa-phone-slash"></i> Tanpa WA
+              </button>
+            `}
           </div>
         </div>
       `;
