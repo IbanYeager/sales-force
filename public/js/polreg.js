@@ -267,9 +267,30 @@ async function renderKecamatanAnalysis(kecNama, year) {
         }
       }
 
+      // Helper to avoid duplicate brand names (e.g. "TOYOTA TOYOTA KIJANG")
+      function formatCarLabel(merk, type) {
+        const m = (merk || '').trim();
+        const t = (type || '').trim();
+        if (!t) return m;
+        if (t.toLowerCase().startsWith(m.toLowerCase())) {
+          return t;
+        }
+        return `${m} ${t}`;
+      }
+
+      function getCleanTypeOnly(merk, type) {
+        const m = (merk || '').trim();
+        const t = (type || '').trim();
+        if (t.toLowerCase().startsWith(m.toLowerCase())) {
+          const stripped = t.substring(m.length).trim();
+          return stripped || t;
+        }
+        return t;
+      }
+
       // Dominant Car Recommendation (Top 2 models)
-      const topModel1 = cars[0] ? `${cars[0].merk} ${cars[0].type}` : 'Toyota Avanza';
-      const topModel2 = cars[1] ? `${cars[1].merk} ${cars[1].type}` : 'Toyota Rush';
+      const topModel1 = cars[0] ? formatCarLabel(cars[0].merk, cars[0].type) : 'Toyota Avanza';
+      const topModel2 = cars[1] ? formatCarLabel(cars[1].merk, cars[1].type) : 'Toyota Rush';
 
       if (mobilRekom) mobilRekom.textContent = `${topModel1} & ${topModel2}`;
 
@@ -343,7 +364,7 @@ async function renderKecamatanAnalysis(kecNama, year) {
               <div style="flex: 1; min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
                   <span style="font-size: 9.5px; font-weight: 800; background: ${brandBg}; color: ${brandText}; padding: 1px 6px; border-radius: 4px; text-transform: uppercase;">${car.merk}</span>
-                  <span style="font-size: 12px; font-weight: 800; color: #0d1b3e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${car.type}</span>
+                  <span style="font-size: 12px; font-weight: 800; color: #0d1b3e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${getCleanTypeOnly(car.merk, car.type)}</span>
                 </div>
                 <div style="height: 6px; background: #f1f5f9; border-radius: 10px; overflow: hidden;">
                   <div style="height: 100%; width: ${pct}%; background: ${brandBg}; border-radius: 10px;"></div>
