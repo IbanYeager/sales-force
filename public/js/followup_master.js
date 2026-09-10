@@ -41,6 +41,9 @@ async function initMasterDashboard() {
     loadMasterStats(),
     loadMasterCustomers()
   ]);
+  if (typeof switchMasterDbSource === 'function') {
+    switchMasterDbSource(masterState.filters.db_source || 'sales');
+  }
 }
 
 // -------------------------------------------------------------
@@ -750,6 +753,7 @@ function switchMasterDbSource(source = 'sales') {
   loadMasterStats();
   loadMasterCustomers(true);
 }
+window.switchMasterDbSource = switchMasterDbSource;
 
 async function loadMasterStats() {
   try {
