@@ -1118,44 +1118,56 @@ function renderCustomerTable() {
           </select>
         </td>
 
-        <!-- 7. Respon & Catatan FU -->
-        <td style="min-width:210px; font-size:11.5px; color:#64748b;">
-          ${c.remarks ? `
-            <div style="margin-bottom:3px; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+        <!-- 7. Respon & Catatan FU / Bukti Kunjungan -->
+        <td style="min-width:240px; font-size:11.5px; color:#64748b;">
+          <div style="margin-bottom:4px; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+            ${c.remarks ? `
               <span class="badge-cluster-pill" style="font-size:10.5px; font-weight:800; background:#f0fdf4; color:#15803d; border-color:#bbf7d0;">
                 ${escapeHtml(c.remarks)}
               </span>
-              <span style="font-size:9.5px; font-weight:800; padding:1px 5px; border-radius:4px; background:${c.sales_fu_status === 'Closed' ? '#fee2e2; color:#991b1b;' : '#e0f2fe; color:#0369a1;'}">
-                ${escapeHtml(c.sales_fu_status || 'Open')}
-              </span>
-            </div>
-            <div style="font-size:10px; color:#475569; display:flex; gap:4px; flex-wrap:wrap; margin-bottom:2px;">
-              <span style="color:${(c.connected === 'TRUE' || c.connected === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Conn: ${(c.connected === 'TRUE' || c.connected === 'IYA') ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}</span>
-              <span style="color:${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Cont: ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}</span>
-              <span style="color:${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Prosp: ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '<i class="fa-solid fa-fire"></i>' : 'Belum'}</span>
-              <span style="color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">SPK: ${(c.spk === 'TRUE' || c.spk === 'IYA') ? '<i class="fa-solid fa-award"></i>' : 'Belum'}</span>
-            </div>
-            ${c.reason_followup ? `<div style="font-size:10.5px; color:#334155; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.reason_followup)}">"${escapeHtml(c.reason_followup)}"</div>` : ''}
-            ${c.visit_photo ? `
-              <div style="margin-top:4px;">
-                <a href="${escapeHtml(c.visit_photo)}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; color:#0284c7; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 7px; border-radius:6px; text-decoration:none;">
-                  <i class="fa-solid fa-camera"></i> Bukti Kunjungan
-                </a>
-              </div>
             ` : ''}
-            ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace; margin-top:2px;">${escapeHtml(c.followup_date.substring(0, 16))}</div>` : ''}
+            <span style="font-size:9.5px; font-weight:800; padding:1px 5px; border-radius:4px; background:${c.sales_fu_status === 'Closed' ? '#fee2e2; color:#991b1b;' : '#e0f2fe; color:#0369a1;'}">
+              ${escapeHtml(c.sales_fu_status || 'Open')}
+            </span>
+          </div>
+
+          <div style="font-size:10px; color:#475569; display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+            <span style="color:${(c.connected === 'TRUE' || c.connected === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Conn: ${(c.connected === 'TRUE' || c.connected === 'IYA') ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}</span>
+            <span style="color:${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Cont: ${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}</span>
+            <span style="color:${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">Prosp: ${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '<i class="fa-solid fa-fire"></i>' : 'Belum'}</span>
+            <span style="color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">SPK: ${(c.spk === 'TRUE' || c.spk === 'IYA') ? '<i class="fa-solid fa-award"></i>' : 'Belum'}</span>
+          </div>
+
+          ${(c.reason_followup || c.notes) ? `
+            <div style="font-size:11px; color:#0f172a; font-weight:700; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 8px; margin-bottom:4px; line-height:1.3;" title="${escapeHtml(c.reason_followup || c.notes)}">
+              <i class="fa-solid fa-comment-dots" style="color:#8b5cf6; font-size:10px; margin-right:3px;"></i> "${escapeHtml(c.reason_followup || c.notes)}"
+            </div>
+          ` : ''}
+
+          ${c.visit_photo ? `
+            <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+              <div style="position:relative; display:inline-block; cursor:pointer;" onclick="openVisitPhotoModal('${escapeJs(c.visit_photo)}', '${escapeJs(c.name)}', '${escapeJs(c.sales_name || c.sales_fu || 'Sales')}', '${escapeJs(c.followup_date || '')}')">
+                <img src="${escapeHtml(c.visit_photo)}" style="width:70px; height:46px; object-fit:cover; border-radius:8px; border:1.5px solid #cbd5e1; box-shadow:0 3px 8px rgba(0,0,0,0.12); transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+                <span style="position:absolute; bottom:2px; right:2px; background:rgba(15,23,42,0.8); color:#fff; font-size:8.5px; font-weight:800; padding:1px 4px; border-radius:4px; backdrop-filter:blur(2px);">
+                  <i class="fa-solid fa-expand"></i> Foto
+                </span>
+              </div>
+              <div>
+                <span style="font-size:10px; font-weight:800; color:#059669; display:block;">
+                  <i class="fa-solid fa-camera"></i> Bukti Kunjungan
+                </span>
+                <button type="button" onclick="openVisitPhotoModal('${escapeJs(c.visit_photo)}', '${escapeJs(c.name)}', '${escapeJs(c.sales_name || c.sales_fu || 'Sales')}', '${escapeJs(c.followup_date || '')}')" style="background:none; border:none; padding:0; color:#2563eb; font-size:10px; font-weight:700; cursor:pointer; text-decoration:underline;">
+                  Lihat Foto Besar
+                </button>
+              </div>
+            </div>
           ` : `
-            <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.notes || '-')}">
-              ${escapeHtml(c.notes || '-')}
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">
+              <i class="fa-solid fa-camera" style="color:#cbd5e1;"></i> Belum ada foto kunjungan
             </div>
-            ${c.visit_photo ? `
-              <div style="margin-top:4px;">
-                <a href="${escapeHtml(c.visit_photo)}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; color:#0284c7; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 7px; border-radius:6px; text-decoration:none;">
-                  <i class="fa-solid fa-camera"></i> Bukti Kunjungan
-                </a>
-              </div>
-            ` : ''}
           `}
+
+          ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace; margin-top:3px;">${escapeHtml(c.followup_date.substring(0, 16))}</div>` : ''}
         </td>
 
         <!-- 8. Aksi -->
@@ -1412,42 +1424,58 @@ function openCustomerDetailModal(customerId) {
       </div>
     </div>
 
-    <!-- TAM Sales Follow-Up Outcome Box -->
+    <!-- TAM Sales Follow-Up Outcome & Bukti Kunjungan Box -->
     <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:12px; padding:14px; margin-bottom:16px;">
-      <div style="font-size:12px; font-weight:800; color:#166534; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-        <i class="fa-solid fa-clipboard-check"></i> Hasil Respon Follow-Up Standar TAM
+      <div style="font-size:12px; font-weight:800; color:#166534; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
+        <span><i class="fa-solid fa-clipboard-check"></i> Hasil Respon Follow-Up Standar TAM</span>
+        ${c.visit_photo ? `<span style="font-size:10.5px; font-weight:800; color:#059669; background:#dcfce7; padding:2px 8px; border-radius:6px; border:1px solid #86efac;"><i class="fa-solid fa-camera"></i> Ada Foto Kunjungan</span>` : ''}
       </div>
-      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px;">
-        <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
-          <div style="font-size:10px; color:#64748b; font-weight:700;">Connected</div>
-          <strong style="font-size:12px; color:${(c.connected === 'TRUE' || c.connected === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.connected === 'TRUE' || c.connected === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
-        </div>
-        <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
-          <div style="font-size:10px; color:#64748b; font-weight:700;">Contacted</div>
-          <strong style="font-size:12px; color:${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
-        </div>
-        <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
-          <div style="font-size:10px; color:#64748b; font-weight:700;">Prospect</div>
-          <strong style="font-size:12px; color:${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
-        </div>
-        <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
-          <div style="font-size:10px; color:#64748b; font-weight:700;">SPK</div>
-          <strong style="font-size:12px; color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.spk === 'TRUE' || c.spk === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
-        </div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:11.5px; color:#334155;">
+
+      <div style="display:grid; grid-template-columns:${c.visit_photo ? '1fr 160px' : '1fr'}; gap:12px; align-items:start;">
         <div>
-          <span>Remarks:</span> <strong style="color:#0f172a;">${c.remarks || '-'}</strong>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px;">
+            <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
+              <div style="font-size:10px; color:#64748b; font-weight:700;">Connected</div>
+              <strong style="font-size:12px; color:${(c.connected === 'TRUE' || c.connected === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.connected === 'TRUE' || c.connected === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
+            </div>
+            <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
+              <div style="font-size:10px; color:#64748b; font-weight:700;">Contacted</div>
+              <strong style="font-size:12px; color:${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.contacted === 'TRUE' || c.contacted === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
+            </div>
+            <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
+              <div style="font-size:10px; color:#64748b; font-weight:700;">Prospect</div>
+              <strong style="font-size:12px; color:${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.prospect === 'TRUE' || c.prospect === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
+            </div>
+            <div style="background:#ffffff; border:1px solid #dcfce7; border-radius:8px; padding:6px 8px; text-align:center;">
+              <div style="font-size:10px; color:#64748b; font-weight:700;">SPK</div>
+              <strong style="font-size:12px; color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#16a34a' : '#dc2626'};">${(c.spk === 'TRUE' || c.spk === 'IYA') ? '✅ Iya' : '❌ Tidak'}</strong>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:11.5px; color:#334155;">
+            <div>
+              <span>Remarks:</span> <strong style="color:#0f172a;">${c.remarks || '-'}</strong>
+            </div>
+            <div>
+              <span>Status FU:</span> <strong style="color:${c.sales_fu_status === 'Closed' ? '#dc2626' : '#2563eb'};">${c.sales_fu_status || 'Open'}</strong>
+            </div>
+            <div style="grid-column: span 2;">
+              <span>Catatan / Progress Sales:</span> <strong style="color:#0f172a;">"${escapeHtml(c.reason_followup || c.notes || '-')}"</strong>
+            </div>
+            <div style="grid-column: span 2; font-size:10.5px; color:#64748b; font-family:monospace;">
+              📅 Waktu FU: <strong>${c.followup_date || 'Belum di-FU'}</strong>
+            </div>
+          </div>
         </div>
-        <div>
-          <span>Status FU:</span> <strong style="color:${c.sales_fu_status === 'Closed' ? '#dc2626' : '#2563eb'};">${c.sales_fu_status || 'Open'}</strong>
-        </div>
-        <div style="grid-column: span 2;">
-          <span>Alasan / Catatan:</span> <strong style="color:#0f172a;">${c.reason_followup || c.notes || '-'}</strong>
-        </div>
-        <div style="grid-column: span 2; font-size:10.5px; color:#64748b; font-family:monospace;">
-          📅 Waktu FU Otomatis: <strong>${c.followup_date || 'Belum di-FU'}</strong>
-        </div>
+
+        ${c.visit_photo ? `
+          <div style="text-align:center; background:#ffffff; border:1px solid #bbf7d0; border-radius:10px; padding:8px;">
+            <div style="font-size:10.5px; font-weight:800; color:#059669; margin-bottom:4px;"><i class="fa-solid fa-camera"></i> Foto Lokasi:</div>
+            <img src="${escapeHtml(c.visit_photo)}" onclick="openVisitPhotoModal('${escapeJs(c.visit_photo)}', '${escapeJs(c.name)}', '${escapeJs(c.sales_name || c.sales_fu || 'Sales')}', '${escapeJs(c.followup_date || '')}')" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px; border:1px solid #a7f3d0; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.12);" title="Klik untuk memperbesar foto">
+            <button type="button" onclick="openVisitPhotoModal('${escapeJs(c.visit_photo)}', '${escapeJs(c.name)}', '${escapeJs(c.sales_name || c.sales_fu || 'Sales')}', '${escapeJs(c.followup_date || '')}')" style="background:#059669; color:#fff; border:none; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; margin-top:6px; cursor:pointer; width:100%;">
+              <i class="fa-solid fa-expand"></i> Perbesar
+            </button>
+          </div>
+        ` : ''}
       </div>
     </div>
 
@@ -4378,5 +4406,56 @@ function showDistSuccessModal(result) {
 
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
+
+// -------------------------------------------------------------
+// VISIT PHOTO PREVIEW MODAL FOR SPV & KACAB
+// -------------------------------------------------------------
+function openVisitPhotoModal(photoUrl, custName, salesName, dateStr) {
+  let modal = document.getElementById('visitPhotoPreviewModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'visitPhotoPreviewModal';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:16px;';
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div style="background:#ffffff; border-radius:20px; max-width:640px; width:100%; overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,0.4); border:1px solid #e2e8f0;">
+      <div style="background:linear-gradient(135deg, #0d1b3e 0%, #1e293b 100%); color:#ffffff; padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.2); color:#34d399; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:2px;">
+            <i class="fa-solid fa-camera"></i> Bukti Kunjungan Sales
+          </div>
+          <h3 style="font-size:16px; font-weight:900; margin:0; color:#ffffff;">${escapeHtml(custName || 'Customer')}</h3>
+        </div>
+        <button onclick="document.getElementById('visitPhotoPreviewModal').style.display='none'" style="background:rgba(255,255,255,0.15); border:none; color:#ffffff; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div style="padding:20px; text-align:center; background:#0f172a;">
+        <img src="${escapeHtml(photoUrl)}" style="max-width:100%; max-height:68vh; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.5); border:2px solid #334155; object-fit:contain;">
+      </div>
+      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="font-size:12px; color:#475569; font-weight:700;">
+          <span>👤 Sales PIC: <strong style="color:#0f172a;">${escapeHtml(salesName || 'Sales')}</strong></span>
+          ${dateStr ? `<span style="margin-left:12px; color:#64748b;"><i class="fa-solid fa-clock"></i> ${escapeHtml(dateStr)}</span>` : ''}
+        </div>
+        <div style="display:flex; gap:8px;">
+          <a href="${escapeHtml(photoUrl)}" target="_blank" class="btn-fu btn-fu-secondary" style="padding:6px 14px; font-size:11.5px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+            <i class="fa-solid fa-up-right-from-square"></i> Buka Foto Asli
+          </a>
+          <button onclick="document.getElementById('visitPhotoPreviewModal').style.display='none'" class="btn-fu btn-fu-crimson" style="padding:6px 16px; font-size:11.5px;">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'flex';
+}
+window.openVisitPhotoModal = openVisitPhotoModal;
+
+
 
 
