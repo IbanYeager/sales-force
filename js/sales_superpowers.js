@@ -74,7 +74,7 @@ const SalesSuperpowers = {
             </div>
             <div>
               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <h3 style="font-size:16px; font-weight:900; margin:0; color:#ffffff;">Peta Radar GPS Prospek (Live Map)</h3>
+                <h3 style="font-size:16px; font-weight:900; margin:0; color:#ffffff;">Peta Radar GPS Prospek (Google Maps)</h3>
                 <span class="radar-gps-badge" id="radarGpsStatus"><i class="fa-solid fa-satellite-dish"></i> Mendeteksi GPS...</span>
               </div>
               <p style="font-size:12px; color:rgba(255,255,255,0.75); margin:3px 0 0 0;" id="radarSubtitleText">
@@ -216,9 +216,26 @@ const SalesSuperpowers = {
     const map = L.map('radarLeafletMapContainer').setView([defaultLat, defaultLng], 13);
     this.leafletMap = map;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap & Tunas Toyota Kircon'
+    // Google Maps Tile Layers
+    const gmapsRoadmap = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: '&copy; Google Maps & Tunas Toyota Kircon'
+    });
+
+    const gmapsHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: '&copy; Google Maps & Tunas Toyota Kircon'
+    });
+
+    // Add Google Maps Roadmap Layer as Default
+    gmapsRoadmap.addTo(map);
+
+    // Layer Switcher for Google Maps View
+    L.control.layers({
+      "🗺️ Google Maps (Jalan)": gmapsRoadmap,
+      "🛰️ Google Maps (Satelit)": gmapsHybrid
     }).addTo(map);
 
     // Sales Location Pin
@@ -243,6 +260,8 @@ const SalesSuperpowers = {
         iconAnchor: [10, 10]
       });
 
+      const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
+
       const popupHtml = `
         <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size:12px; line-height:1.4; padding:4px;">
           <b style="font-size:13.5px; color:#0f172a;">${escapeHtml(c.name)}</b>
@@ -252,7 +271,7 @@ const SalesSuperpowers = {
           ${c.visit_photo ? `<div style="margin-top:6px;"><img src="${c.visit_photo}" style="width:100%; max-height:100px; object-fit:cover; border-radius:8px;"></div>` : ''}
           <div style="margin-top:8px; display:flex; gap:6px;">
             <button onclick="SalesSuperpowers.openRadarFollowupModal(${c.id})" style="background:#10b981; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11px; cursor:pointer;"><i class="fa-solid fa-clipboard-check"></i> Follow Up</button>
-            <a href="${c.maps_url}" target="_blank" style="background:#2563eb; color:#fff; text-decoration:none; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11px;"><i class="fa-solid fa-route"></i> Maps</a>
+            <a href="${navUrl}" target="_blank" style="background:#ea4335; color:#fff; text-decoration:none; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-map-location-dot"></i> G-Maps Navigasi</a>
           </div>
         </div>
       `;
