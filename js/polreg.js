@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Handle Tab Switch from URL
+  const tabFromUrl = urlParams.get('tab') || 'analisis';
   switchPolregTab(tabFromUrl);
 
   // Auto-close dropdown menu when clicking outside

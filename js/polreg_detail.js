@@ -1,7 +1,11 @@
 const urlParams = new URLSearchParams(window.location.search);
 const namaKecamatan = decodeURIComponent(urlParams.get('kecamatan') || "Coblong");
 const filterTahun = urlParams.get('tahun') || '2026';
+const tahunPilihDefault = filterTahun;
 let currentSortOrder = 'desc';
+let currentKategori = 'Teratas';
+let currentSearchKeyword = '';
+let activeCarsData = [];
 
 // Save active year to sessionStorage & update back button link
 sessionStorage.setItem('polreg_active_year', filterTahun);
@@ -393,28 +397,26 @@ document.addEventListener('DOMContentLoaded', () => {
           if (cachedGeo[kel]) {
               k.geojson = cachedGeo[kel];
           } else {
-              document.getElementById('loadingMapText').textContent = `Mencari batas wilayah Kel. ${kel}...`;
-              // Menghapus kata "Kelurahan" dan "Kecamatan" karena sistem OSM Nominatim seringkali lebih presisi jika hanya menggunakan nama aslinya
-              let query1 = `${kel}, ${k.kecamatan}, Jawa Barat, Indonesia`;
+              // Pastikan ada fallback Point koordinat langsung dari data mobil agar peta selalu muncul
+              if (k.lats.length > 0 && k.lngs.length > 0) {
+                  let avgLat = k.lats.reduce((a, b) => a + b, 0) / k.lats.length;
+                  let avgLng = k.lngs.reduce((a, b) => a + b, 0) / k.lngs.length;
+                  k.geojson = { "type": "Point", "coordinates": [avgLng, avgLat] };
+                  newGeoCache.push({ kecamatan: k.kecamatan, kelurahan: kel, geojson: k.geojson });
+              }
+
+              // Upayakan batas wilayah Polygon dari Nominatim secara non-blocking
               try {
+                  let query1 = `${kel}, ${k.kecamatan}, Jawa Barat, Indonesia`;
                   let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=${encodeURIComponent(query1)}`);
                   let geoJsonData = await res.json();
-                  
-                  // Filter HANYA batas administratif asli (bukan gedung atau jalan yang kebetulan bernama sama)
                   let adminBoundary = geoJsonData.find(d => d.class === 'boundary' || d.osm_type === 'relation');
                   
                   if (adminBoundary && adminBoundary.geojson && (adminBoundary.geojson.type === 'Polygon' || adminBoundary.geojson.type === 'MultiPolygon')) {
                       k.geojson = adminBoundary.geojson;
                       newGeoCache.push({ kecamatan: k.kecamatan, kelurahan: kel, geojson: k.geojson });
-                  } else if (k.lats.length > 0 && k.lngs.length > 0) {
-                      // Jika batas wilayah tidak ada, hitung TITIK TENGAH (rata-rata) dari letak mobil-mobil yang sesungguhnya di jalanan!
-                      let avgLat = k.lats.reduce((a, b) => a + b, 0) / k.lats.length;
-                      let avgLng = k.lngs.reduce((a, b) => a + b, 0) / k.lngs.length;
-                      k.geojson = { "type": "Point", "coordinates": [avgLng, avgLat] };
-                      newGeoCache.push({ kecamatan: k.kecamatan, kelurahan: kel, geojson: k.geojson });
                   }
               } catch(e) {}
-              await new Promise(r => setTimeout(r, 1000));
           }
           
           groupedData.push({
@@ -573,16 +575,22 @@ document.addEventListener('DOMContentLoaded', () => {
                       };
                   },
                   pointToLayer: function (feature, latlng) {
-                      // Ini secara otomatis akan dipanggil jika datanya adalah Point
+                      // Radius proporsional dengan jumlah unit terdaftar
+                      let r = Math.min(22, Math.max(9, Math.round(8 + Math.log10(item.unit_count + 1) * 6)));
                       return L.circleMarker(latlng, {
-                          radius: 8,
+                          radius: r,
                           fillColor: circleColor,
                           color: "#ffffff",
                           weight: 2,
                           opacity: 1,
-                          fillOpacity: 1
+                          fillOpacity: 0.85
                       });
                   }
+              });
+              layer.bindTooltip(`<b>Kel. ${item.kelurahan}</b><br><span style="color:${circleColor}; font-weight:700;">${item.unit_count} Unit Terdaftar</span>`, {
+                  permanent: false,
+                  direction: 'top',
+                  opacity: 0.95
               });
               layer.bindPopup(popupContent);
               layer.addTo(layerGroup);
