@@ -2207,10 +2207,202 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
       s.onerror = reject;
       document.head.appendChild(s);
     });
+  },
+
+  // =========================================================================
+  // RADAR FOLLOW-UP MODAL & FOTO BUKTI KUNJUNGAN ENGINE
+  // =========================================================================
+  openRadarFollowupModal(customerId) {
+    const cust = (this.radarData || []).find(c => String(c.id) === String(customerId));
+    const custName = cust ? cust.name : 'Customer';
+    const custCar = cust ? cust.car_model : '';
+    const currentStatus = cust ? (cust.status || 'Belum Dihubungi') : 'Belum Dihubungi';
+
+    // Remove existing modal if any
+    const existingModal = document.getElementById('radarFollowupModalOverlay');
+    if (existingModal) existingModal.remove();
+
+    this.selectedPhotoFile = null;
+
+    const modalHtml = `
+      <div id="radarFollowupModalOverlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.75); backdrop-filter:blur(5px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+        <div style="background:#ffffff; width:100%; max-width:540px; max-height:90vh; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.3); overflow-y:auto; font-family:'Plus Jakarta Sans', sans-serif;">
+          <!-- Modal Header -->
+          <div style="background:linear-gradient(135deg, #0d1b3e 0%, #162a52 100%); color:#ffffff; padding:18px 20px; border-radius:20px 20px 0 0; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h3 style="font-size:16px; font-weight:900; margin:0; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-clipboard-check" style="color:#4ade80;"></i> Update Progres &amp; Foto Kunjungan
+              </h3>
+              <p style="font-size:12px; color:rgba(255,255,255,0.75); margin:3px 0 0 0;">
+                ${escapeHtml(custName)} &middot; <span style="color:#f43f5e; font-weight:700;">${escapeHtml(custCar)}</span>
+              </p>
+            </div>
+            <button onclick="document.getElementById('radarFollowupModalOverlay').remove()" style="background:rgba(255,255,255,0.15); border:none; color:#ffffff; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Modal Body Form -->
+          <form id="radarFollowupForm" onsubmit="SalesSuperpowers.submitRadarFollowup(event, ${customerId})" style="padding:20px;">
+            <input type="hidden" name="customer_id" value="${customerId}">
+            
+            <!-- 1. Status Progres -->
+            <div style="margin-bottom:16px;">
+              <label style="display:block; font-size:12px; font-weight:800; color:#334155; margin-bottom:6px;">
+                <i class="fa-solid fa-flag" style="color:#3b82f6;"></i> Status Progres Follow-Up:
+              </label>
+              <select name="status" class="fu-select" style="width:100%; padding:10px; border-radius:10px; border:1.5px solid #cbd5e1; font-weight:700; font-size:13px; color:#0f172a;">
+                <option value="Belum Dihubungi" ${currentStatus === 'Belum Dihubungi' ? 'selected' : ''}>⚪ Belum Dihubungi</option>
+                <option value="Menunggu Respon" ${currentStatus === 'Menunggu Respon' ? 'selected' : ''}>🟡 Menunggu Respon</option>
+                <option value="Tertarik / Jadwal Servis" ${currentStatus === 'Tertarik / Jadwal Servis' ? 'selected' : ''}>🟣 Tertarik / Jadwal Servis</option>
+                <option value="Deal / Selesai" ${currentStatus === 'Deal / Selesai' ? 'selected' : ''}>🟢 Deal / Selesai</option>
+                <option value="Tidak Tertarik" ${currentStatus === 'Tidak Tertarik' ? 'selected' : ''}>🔴 Tidak Tertarik</option>
+              </select>
+            </div>
+
+            <!-- 2. Catatan & Respon Follow-Up (Speech Dictation) -->
+            <div style="margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label style="font-size:12px; font-weight:800; color:#334155;">
+                  <i class="fa-solid fa-comment-dots" style="color:#8b5cf6;"></i> Catatan Hasil Kunjungan / Follow-Up:
+                </label>
+                <button type="button" onclick="SalesSuperpowers.toggleVoiceDictation('radarNotesInput')" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-microphone"></i> Dikte Suara
+                </button>
+              </div>
+              <textarea id="radarNotesInput" name="reason_followup" rows="3" placeholder="Tuliskan hasil pembicaraan/kunjungan dengan customer..." style="width:100%; padding:10px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:12.5px; font-family:inherit; box-sizing:border-box; outline:none;">${cust && cust.reason_followup ? escapeHtml(cust.reason_followup) : ''}</textarea>
+            </div>
+
+            <!-- 3. Upload Foto Bukti Kunjungan / Lokasi -->
+            <div style="margin-bottom:20px;">
+              <label style="display:block; font-size:12px; font-weight:800; color:#334155; margin-bottom:6px;">
+                <i class="fa-solid fa-camera" style="color:#e11d48;"></i> Upload Foto Bukti Kunjungan / Lokasi:
+              </label>
+              <div style="border:2px dashed #cbd5e1; border-radius:12px; padding:16px; text-align:center; background:#f8fafc; cursor:pointer;" onclick="document.getElementById('radarVisitPhotoInput').click()">
+                <input type="file" id="radarVisitPhotoInput" name="visit_photo" accept="image/*" capture="environment" style="display:none;" onchange="SalesSuperpowers.handleRadarPhotoSelect(event)">
+                <div id="radarPhotoPreviewContainer">
+                  ${cust && cust.visit_photo ? `
+                    <img src="${cust.visit_photo}" style="max-height:140px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.15); margin-bottom:8px;">
+                    <div style="font-size:11px; color:#059669; font-weight:800;"><i class="fa-solid fa-check-circle"></i> Foto Terpasang (Klik untuk Ganti)</div>
+                  ` : `
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size:28px; color:#94a3b8; margin-bottom:6px;"></i>
+                    <div style="font-size:12.5px; font-weight:800; color:#334155;">Ambil Foto Kamera / Unggah Berkas</div>
+                    <div style="font-size:11px; color:#64748b; margin-top:2px;">Bukti bahwa Anda sudah berada di lokasi customer</div>
+                  `}
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #e2e8f0; padding-top:16px;">
+              <button type="button" onclick="document.getElementById('radarFollowupModalOverlay').remove()" style="padding:9px 18px; border-radius:10px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; font-weight:800; font-size:12.5px; cursor:pointer;">
+                Batal
+              </button>
+              <button type="submit" id="btnSubmitRadarFu" style="padding:9px 22px; border-radius:10px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; font-weight:800; font-size:12.5px; cursor:pointer; box-shadow:0 4px 14px rgba(16,185,129,0.35); display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Progres
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  },
+
+  handleRadarPhotoSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    this.selectedPhotoFile = file;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const container = document.getElementById('radarPhotoPreviewContainer');
+      if (container) {
+        container.innerHTML = `
+          <div style="position:relative; display:inline-block;">
+            <img src="${e.target.result}" style="max-height:140px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <button type="button" onclick="event.stopPropagation(); SalesSuperpowers.removeRadarPhoto();" style="position:absolute; top:-8px; right:-8px; background:#ef4444; color:#fff; border:none; width:24px; height:24px; border-radius:50%; cursor:pointer; font-size:12px;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div style="font-size:11px; color:#059669; font-weight:800; margin-top:6px;"><i class="fa-solid fa-circle-check"></i> Foto Siap Diunggah</div>
+        `;
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+
+  removeRadarPhoto() {
+    this.selectedPhotoFile = null;
+    const input = document.getElementById('radarVisitPhotoInput');
+    if (input) input.value = '';
+    const container = document.getElementById('radarPhotoPreviewContainer');
+    if (container) {
+      container.innerHTML = `
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size:28px; color:#94a3b8; margin-bottom:6px;"></i>
+        <div style="font-size:12.5px; font-weight:800; color:#334155;">Ambil Foto Kamera / Unggah Berkas</div>
+        <div style="font-size:11px; color:#64748b; margin-top:2px;">Bukti bahwa Anda sudah berada di lokasi customer</div>
+      `;
+    }
+  },
+
+  async submitRadarFollowup(event, customerId) {
+    event.preventDefault();
+    const btn = document.getElementById('btnSubmitRadarFu');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+    }
+
+    try {
+      const form = document.getElementById('radarFollowupForm');
+      const formData = new FormData(form);
+
+      const res = await fetch(`${this.getApiPrefix()}api_followup.php?action=update_status`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        const modal = document.getElementById('radarFollowupModalOverlay');
+        if (modal) modal.remove();
+
+        if (typeof showCustomAlert === 'function') {
+          showCustomAlert('Berhasil!', 'Progres & Foto Bukti Kunjungan berhasil disimpan.', 'success');
+        } else {
+          alert('Progres follow up berhasil disimpan.');
+        }
+
+        // Refresh Radar Data
+        this.fetchRadarData(
+          this.salesCoords ? this.salesCoords.lat : -6.9248,
+          this.salesCoords ? this.salesCoords.lng : 107.6472,
+          this.currentRadius,
+          this.currentDistrict
+        );
+      } else {
+        alert(data.message || 'Gagal menyimpan progres.');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Progres`;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Terjadi kesalahan koneksi.');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Progres`;
+      }
+    }
   }
 };
 
-// Global shorthand
+// Global shorthands
 window.SalesSuperpowers = SalesSuperpowers;
 window.openRadarFollowupModal = (id) => SalesSuperpowers.openRadarFollowupModal(id);
-window.submitRadarFollowup = (id) => SalesSuperpowers.submitRadarFollowup(id);
+window.submitRadarFollowup = (e, id) => SalesSuperpowers.submitRadarFollowup(e, id);
+window.handleRadarPhotoSelect = (e) => SalesSuperpowers.handleRadarPhotoSelect(e);
+window.removeRadarPhoto = () => SalesSuperpowers.removeRadarPhoto();
