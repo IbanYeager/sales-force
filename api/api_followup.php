@@ -147,9 +147,16 @@ if ($action === 'customers') {
     $status = isset($_GET['status']) ? trim($_GET['status']) : '';
     $category = isset($_GET['category']) ? trim($_GET['category']) : '';
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
+    $db_source = isset($_GET['db_source']) ? trim($_GET['db_source']) : 'all';
 
     $where = [];
     $params = [];
+
+    if ($db_source === 'sales') {
+        $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
+    } elseif ($db_source === 'radar') {
+        $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
+    }
 
     if ($search !== '') {
         $where[] = "(name LIKE ? OR phone LIKE ? OR plate_number LIKE ? OR car_model LIKE ? OR vin LIKE ? OR last_car_model LIKE ? OR district LIKE ?)";
@@ -204,11 +211,16 @@ if ($action === 'customers') {
         $salesMap[$s['id']] = $s;
     }
 
-    // Attach sales name
+    // Attach sales name & db_source label
     foreach ($customers as &$c) {
         $sid = (int)($c['assigned_sales_id'] ?? 0);
         $c['sales_name'] = isset($salesMap[$sid]) ? $salesMap[$sid]['name'] : 'Belum Ditugaskan';
         $c['sales_phone'] = isset($salesMap[$sid]) ? $salesMap[$sid]['phone'] : '';
+        $src = $c['sync_source'] ?? '';
+        $cat = $c['followup_category'] ?? '';
+        $isRadar = ($src === 'pkb_excel_radar' || strpos($src, 'radar') !== false || strpos(strtolower($cat), 'radar') !== false);
+        $c['db_source'] = $isRadar ? 'radar' : 'sales';
+        $c['db_source_label'] = $isRadar ? 'Radar GPS' : 'Khusus Sales';
     }
 
     echo json_encode([
@@ -509,12 +521,18 @@ if ($action === 'dashboard_analytics') {
 // -------------------------------------------------------------
 if ($action === 'stats') {
     $sales_id = isset($_GET['sales_id']) ? trim($_GET['sales_id']) : '';
+    $db_source = isset($_GET['db_source']) ? trim($_GET['db_source']) : 'all';
 
-    $whereSql = "";
+    $where = [];
     $params = [];
     if ($sales_id !== '' && $sales_id !== 'all') {
-        $whereSql = "WHERE assigned_sales_id = ?";
+        $where[] = "assigned_sales_id = ?";
         $params[] = (int)$sales_id;
+    }
+    if ($db_source === 'sales') {
+        $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
+    } elseif ($db_source === 'radar') {
+        $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
     }
 
     // Clean up phantom/blank records from previous syncs if any
@@ -522,7 +540,8 @@ if ($action === 'stats') {
         followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR phone = '-' OR phone = '' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
     } catch (Exception $e) {}
 
-    $allCust = followup_query("SELECT id, followup_status, followup_category, assigned_sales_id FROM followup_customers $whereSql", $params);
+    $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+    $allCust = followup_query("SELECT id, followup_status, followup_category, assigned_sales_id, sync_source FROM followup_customers $whereSql", $params);
 
     $total = count($allCust);
     $unassigned = 0;
@@ -1811,6 +1830,13 @@ if ($action === 'distribute_quota') {
     // Build query for available leads (Prioritize Unassigned and Uncontacted Leads)
     $where = [];
     $params = [];
+
+    $db_source = trim($input['db_source'] ?? 'all');
+    if ($db_source === 'sales') {
+        $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
+    } elseif ($db_source === 'radar') {
+        $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
+    }
 
     if ($only_unassigned) {
         $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";

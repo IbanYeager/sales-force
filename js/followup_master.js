@@ -13,7 +13,8 @@ let masterState = {
     search: '',
     sales_id: 'all',
     status: 'all',
-    category: 'all'
+    category: 'all',
+    db_source: 'sales'
   },
   pagination: {
     currentPage: 1,
@@ -704,9 +705,56 @@ async function loadTemplates() {
   }
 }
 
+function switchMasterDbSource(source = 'sales') {
+  masterState.filters.db_source = source;
+
+  const btnSales = document.getElementById('tabDbSourceSales');
+  const btnRadar = document.getElementById('tabDbSourceRadar');
+  const btnAll = document.getElementById('tabDbSourceAll');
+  const subtitleText = document.getElementById('dbSourceSubtitleText');
+  const selectFilter = document.getElementById('filterDbSourceSelect');
+
+  if (selectFilter && selectFilter.value !== source) {
+    selectFilter.value = source;
+  }
+
+  if (btnSales) {
+    const isAct = source === 'sales';
+    btnSales.style.background = isAct ? '#d7123a' : '#f1f5f9';
+    btnSales.style.color = isAct ? '#ffffff' : '#475569';
+    btnSales.style.boxShadow = isAct ? '0 4px 12px rgba(215,18,58,0.25)' : 'none';
+  }
+  if (btnRadar) {
+    const isAct = source === 'radar';
+    btnRadar.style.background = isAct ? '#0284c7' : '#f1f5f9';
+    btnRadar.style.color = isAct ? '#ffffff' : '#475569';
+    btnRadar.style.boxShadow = isAct ? '0 4px 12px rgba(2,132,199,0.25)' : 'none';
+  }
+  if (btnAll) {
+    const isAct = source === 'all';
+    btnAll.style.background = isAct ? '#475569' : '#f1f5f9';
+    btnAll.style.color = isAct ? '#ffffff' : '#475569';
+    btnAll.style.boxShadow = isAct ? '0 4px 12px rgba(71,85,105,0.25)' : 'none';
+  }
+
+  if (subtitleText) {
+    if (source === 'sales') {
+      subtitleText.innerHTML = '<i class="fa-solid fa-circle-info" style="color:#d7123a;"></i> Menampilkan database yang <strong>khusus ditugaskan ke sales</strong> (Regular CRM)';
+    } else if (source === 'radar') {
+      subtitleText.innerHTML = '<i class="fa-solid fa-circle-info" style="color:#0284c7;"></i> Menampilkan database dari <strong>Radar GPS & PKB Radar</strong>';
+    } else {
+      subtitleText.innerHTML = '<i class="fa-solid fa-circle-info" style="color:#475569;"></i> Menampilkan <strong>seluruh database gabungan</strong> (Sales + Radar GPS)';
+    }
+  }
+
+  loadMasterStats();
+  loadMasterCustomers(true);
+}
+
 async function loadMasterStats() {
   try {
-    const res = await fetch('/api/api_followup.php?action=stats');
+    const { sales_id, db_source } = masterState.filters;
+    const res = await fetch(`/api/api_followup.php?action=stats&sales_id=${sales_id}&db_source=${db_source || 'sales'}`);
     const data = await res.json();
     if (data.success) {
       masterState.stats = data.stats || {};
@@ -890,9 +938,9 @@ async function loadMasterCustomers(resetPage = true) {
   }
 
   try {
-    const { search, sales_id, status, category } = masterState.filters;
+    const { search, sales_id, status, category, db_source } = masterState.filters;
     const spv = getLoggedInSpvName();
-    const url = `/api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&spv=${encodeURIComponent(spv)}`;
+    const url = `/api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&db_source=${db_source || 'sales'}&spv=${encodeURIComponent(spv)}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -1024,6 +1072,12 @@ function renderCustomerTable() {
 
         <!-- 4. Kategori & Klaster -->
         <td style="min-width:190px;">
+          <div style="margin-bottom:4px;">
+            ${c.db_source === 'radar'
+              ? `<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-size:10px; font-weight:800;"><i class="fa-solid fa-satellite-dish"></i> Radar GPS</span>`
+              : `<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800;"><i class="fa-solid fa-user-tag"></i> Khusus Sales</span>`
+            }
+          </div>
           ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="background:#f8fafc; color:#334155; border-color:#e2e8f0; font-size:10.5px; margin-bottom:3px;"><i class="fa-solid fa-tag"></i> ${escapeHtml(c.cluster_name)}</span></div>` : ''}
           ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:10px; margin-bottom:3px;"><i class="fa-solid fa-bolt"></i> ${escapeHtml(c.priority)}</span></div>` : ''}
           <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
@@ -4208,7 +4262,8 @@ async function executeSmartDistribution() {
         quota_per_sales: smartDistState.quota,
         category: smartDistState.category,
         only_unassigned: smartDistState.onlyUnassigned !== false,
-        exclude_keywords: (smartDistState.excludeKeywords || '').trim()
+        exclude_keywords: (smartDistState.excludeKeywords || '').trim(),
+        db_source: masterState.filters.db_source || 'sales'
       })
     });
     const data = await res.json();
