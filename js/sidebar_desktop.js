@@ -65,7 +65,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage) ? ' active' : '';
+            const isActive = (curPage === hrefPage || (hrefPage === 'polreg' && curPage === 'polreg_detail')) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -111,6 +111,7 @@
                 ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
+                ${navLinkKacab('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
                 ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
 
@@ -143,7 +144,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv')) ? ' active' : '';
+            const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv') || (hrefPage === 'polreg' && curPage === 'polreg_detail')) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -188,6 +189,7 @@
                 ${navLinkSPV('pages_spv/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas <span class="sidebar-notif-badge" id="sidebarAktivitasBadge" style="display:none; margin-left:auto; background:#2563eb;">0</span>')}
                 ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-wand-magic-sparkles', 'Briefing Auto-Gen')}
                 ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
+                ${navLinkSPV('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
                 ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
                 ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
                 ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
@@ -223,7 +225,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage || (curPage === '' && (hrefPage === 'index' || hrefPage === ''))) ? ' active' : '';
+            const isActive = (curPage === hrefPage || (curPage === '' && (hrefPage === 'index' || hrefPage === '')) || (hrefPage === 'polreg' && curPage === 'polreg_detail')) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}" data-tags="${tags}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -262,6 +264,7 @@
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
                 ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Jadwal Aktivitas', 'kalender jadwal agenda aktivitas')}
+                ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Polreg Wilayah', 'polreg registrasi wilayah peta daerah kuota mobil kota bandung market share')}
 
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
                 ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR', 'harga pricelist otr brosur daftar')}
@@ -290,7 +293,6 @@
                 ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°', 'komparasi lawan rival competitor banding')}
                 ${navLink('pages/elibrary.html', 'fa-solid fa-book-open', 'E-Catalog', 'catalog ecatalog e-catalog library brosur pdf spesifikasi mobil')}
                 ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Analisis Pasar & Kanvasing', 'pasar market analisis wilayah pangsa bbn plat kodepos kecamatan komplek')}
-                ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Polreg Wilayah', 'polreg registrasi wilayah peta daerah kuota mobil')}
                 ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong', 'penjualan kircon kiara condong rekap cabang')}
 
                 <p class="sidebar-nav-label">Tier 4: Trade-In, Aksesoris & Merch</p>

@@ -72,6 +72,12 @@
                 <a href="pages/target.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-bullseye"></i> Target &amp; Pencapaian
                 </a>
+                <a href="pages/jadwal_input.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-calendar-days"></i> Jadwal Aktivitas
+                </a>
+                <a href="pages/polreg.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-map-location-dot"></i> Peta Polreg Wilayah
+                </a>
 
                 <p class="sidebar-nav-label">Tools &amp; AI Superpowers</p>
                 <a href="pages/digital_card.html" class="sidebar-nav-link">
@@ -118,9 +124,6 @@
                 </a>
                 <a href="pages/market_analysis.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-chart-pie"></i> Analisis Pasar
-                </a>
-                <a href="pages/polreg.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-map-location-dot"></i> Peta Polreg Wilayah
                 </a>
                 <a href="pages/velg.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-compact-disc"></i> Velg &amp; Ban

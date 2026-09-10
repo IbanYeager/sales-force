@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=5.0" />
   <link rel="stylesheet" href="../css/polreg.css?v=5.0">
-  <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+  <script src="../js/sidebar_desktop.js?v=20260910_polreg"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 
