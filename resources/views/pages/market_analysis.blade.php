@@ -35,9 +35,9 @@
                 <button type="button" class="market-nav-btn" id="btnTabHousing" onclick="switchMarketTab('housing')" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:transparent; color:#64748b;">
                     <i class="fa-solid fa-city"></i> Komplek Perumahan (Kanvasing)
                 </button>
-                <button type="button" class="market-nav-btn" id="btnTabPolreg" onclick="switchMarketTab('polreg')" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:transparent; color:#64748b;">
-                    <i class="fa-solid fa-map-location-dot"></i> Registrasi Polreg Detail
-                </button>
+                <a href="polreg.html" class="market-nav-btn" id="btnTabPolreg" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:transparent; color:#64748b; text-decoration:none;">
+                    <i class="fa-solid fa-map-location-dot"></i> Peta Polreg Wilayah
+                </a>
             </div>
             <!-- Executive Hero Banner Header -->
             <div class="district-hero-card">
@@ -329,13 +329,8 @@
                 const sec = document.getElementById('housingSection');
                 if (sec) sec.scrollIntoView({ behavior: 'smooth' });
             } else if (tabName === 'polreg') {
-                const btn = document.getElementById('btnTabPolreg');
-                if (btn) {
-                    btn.style.background = 'linear-gradient(135deg, #0d1b3e, #1e3a8a)';
-                    btn.style.color = 'white';
-                }
-                if (typeof switchMode === 'function') switchMode('market_share');
-                window.scrollTo({ top: 400, behavior: 'smooth' });
+                window.location.href = 'polreg.html';
+                return;
             } else {
                 const btn = document.getElementById('btnTabMarket');
                 if (btn) {

@@ -289,7 +289,8 @@
                 ${navLink('pages/eco_calculator.html', 'fa-solid fa-leaf', 'Toyota Eco Calc (Hybrid)', 'eco hybrid bbm hemat emisi')}
                 ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°', 'komparasi lawan rival competitor banding')}
                 ${navLink('pages/elibrary.html', 'fa-solid fa-book-open', 'E-Catalog', 'catalog ecatalog e-catalog library brosur pdf spesifikasi mobil')}
-                ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Intelijen Pasar & Polreg', 'pasar market analisis wilayah pangsa polreg bbn plat kodepos kecamatan komplek')}
+                ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Analisis Pasar & Kanvasing', 'pasar market analisis wilayah pangsa bbn plat kodepos kecamatan komplek')}
+                ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Polreg Wilayah', 'polreg registrasi wilayah peta daerah kuota mobil')}
                 ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong', 'penjualan kircon kiara condong rekap cabang')}
 
                 <p class="sidebar-nav-label">Tier 4: Trade-In, Aksesoris & Merch</p>

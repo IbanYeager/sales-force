@@ -45,7 +45,7 @@ $salesPages = [
     'elibrary', 'game', 'hybrid_flow', 'inspeksi', 'inventory', 'jadwal_input',
     'kalkulator', 'kecamatan', 'komparasi', 'leasing_matrix', 'market_analysis',
     'merchandise', 'notifikasi', 'olx', 'order_tracker', 'penjualan_kircon', 'pitstop',
-    'polreg', 'pricelist', 'promo', 'quotation', 'rental_testdrive', 'retention',
+    'polreg', 'polreg_detail', 'pricelist', 'promo', 'quotation', 'rental_testdrive', 'retention',
     'riwayat_foto_aktivitas', 'snake', 'target', 'tco', 'tebak', 'testdrive',
     'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'wa_studio'
 ];
@@ -65,6 +65,9 @@ Route::get('/e-brosur', function () {
 
 foreach ($salesPages as $page) {
     Route::get("/{$page}", function () use ($page) {
+        return app(PageController::class)->showSalesPage($page);
+    });
+    Route::get("/{$page}.html", function () use ($page) {
         return app(PageController::class)->showSalesPage($page);
     });
 }

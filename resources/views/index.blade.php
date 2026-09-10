@@ -117,7 +117,10 @@
                     <i class="fa-solid fa-chart-line"></i> Penjualan Kiara Condong
                 </a>
                 <a href="pages/market_analysis.html" class="sidebar-nav-link">
-                    <i class="fa-solid fa-chart-pie"></i> Intelijen Pasar &amp; Polreg
+                    <i class="fa-solid fa-chart-pie"></i> Analisis Pasar
+                </a>
+                <a href="pages/polreg.html" class="sidebar-nav-link">
+                    <i class="fa-solid fa-map-location-dot"></i> Peta Polreg Wilayah
                 </a>
                 <a href="pages/velg.html" class="sidebar-nav-link">
                     <i class="fa-solid fa-compact-disc"></i> Velg &amp; Ban
@@ -854,7 +857,11 @@
                             </a>
                             <a href="pages/market_analysis.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chart-pie"></i></div>
-                                <span class="category-text">Intelijen Pasar &amp; Polreg</span>
+                                <span class="category-text">Analisis Pasar</span>
+                            </a>
+                            <a href="pages/polreg.html" class="category-item">
+                                <div class="category-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                                <span class="category-text">Peta Polreg</span>
                             </a>
                             <a href="pages/penjualan_kircon.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chart-line"></i></div>
