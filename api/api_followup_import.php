@@ -318,110 +318,224 @@ if ($fileExt === 'csv') {
                     return -1;
                 };
 
-                $nameIdx = $findColIdx(['/nama_customer/i', '/nama by single vin/i', '/nama lengkap/i', '/nama/i', '/customer/i', '/pelanggan/i']);
-                $phoneIdx = $findColIdx(['/no_telepon_customer/i', '/contact person 1/i', '/contact/i', '/wa/i', '/telepon/i', '/phone/i', '/no_hp/i', '/hp/i']);
-                $vFilterIdx = $findColIdx(['/vehicle filter/i']);
-                $rec1Idx = $findColIdx(['/1\.\s*model/i', '/alternative_recommendation_model_1/i', '/model_rekomendasi/i']);
-                $rec2Idx = $findColIdx(['/2\.\s*model/i', '/alternative_recommendation_model_2/i']);
-                $rec3Idx = $findColIdx(['/3\.\s*model/i', '/alternative_recommendation_model_3/i']);
-                $lastCarIdx = $findColIdx(['/model_kendaraan_terakhir/i', '/latest_model/i', '/mobil.*saat ini/i', '/unit.*saat ini/i', '/tipe lama/i']);
-                $ageIdx = $findColIdx(['/usia_kendaraan_terakhir/i', '/vehicle age/i', '/usia.*kendaraan/i', '/usia/i', '/tahun/i']);
-                $clusterIdx = $findColIdx(['/cluster_name/i', '/cluster/i', '/klaster/i']);
-                $priorityIdx = $findColIdx(['/priority/i', '/prioritas/i']);
-                $distIdx = $findColIdx(['/alamat_kecamatan/i', '/kecamatan/i', '/wilayah/i', '/domisili/i']);
-                $plateIdx = $findColIdx(['/no_polisi/i', '/no.*polisi/i', '/plat/i']);
-                $vinIdx = $findColIdx(['/vin_kendaraan_terakhir/i', '/latest_vin/i', '/vin/i', '/no_rangka/i']);
-                $custTypeIdx = $findColIdx(['/cust\.\s*type/i', '/fleet_or_retail/i', '/tipe.*customer/i']);
-                $doOutletIdx = $findColIdx(['/nama_outlet_do/i', '/do_oleh_tunas/i', '/outlet.*do/i']);
-                $srvOutletIdx = $findColIdx(['/nama_outlet_service/i', '/service_di_tunas/i']);
-                $srvComplianceIdx = $findColIdx(['/kepatuhan_service/i', '/rasio_kepatuhan_service/i']);
-                $salesmanIdx = $findColIdx(['/salesman/i', '/sales/i', '/wiraniaga/i']);
-
-                // Build sales lookup map if available
-                $salesMap = [];
-                if ($is_mysql && $conn) {
-                    try {
-                        $res = $conn->query("SELECT id, nama_lengkap FROM sales_accounts");
-                        if ($res) {
-                            while ($r = $res->fetch_assoc()) {
-                                $cleanName = strtolower(preg_replace('/[^a-z0-9]/', '', (string)$r['nama_lengkap']));
-                                if ($cleanName) $salesMap[$cleanName] = (int)$r['id'];
-                            }
-                        }
-                    } catch (Throwable $e) {}
+                // Detect if Excel file is a PKB Radar file (e.g. 10. PKB MAR 24 - AGS 26...)
+                $isPkbFormat = false;
+                foreach ($headers as $h) {
+                    if (strpos($h, 'pkb') !== false || strpos($h, 'no rangka') !== false || strpos($h, 'police reg') !== false || strpos($h, 'equipment no') !== false) {
+                        $isPkbFormat = true;
+                        break;
+                    }
                 }
 
-                for ($r = $headerRowIdx + 1; $r < count($rawRows); $r++) {
-                    $row = $rawRows[$r];
-                    if (empty($row)) continue;
+                if ($isPkbFormat) {
+                    $sheetUsed .= ' (Format PKB Radar)';
+                    $nameIdx = $findColIdx(['/customer name/i', '/nama/i', '/customer/i', '/pelanggan/i']);
+                    $vinIdx = $findColIdx(['/no rangka/i', '/vin/i', '/equipment no/i']);
+                    $plateIdx = $findColIdx(['/police reg/i', '/no.*polisi/i', '/plat/i']);
+                    $carModelIdx = $findColIdx(['/tipe kendaraan/i', '/model/i', '/tipe/i']);
+                    $distIdx = $findColIdx(['/customer address/i', '/alamat/i', '/kecamatan/i', '/domisili/i']);
+                    $pkbDateIdx = $findColIdx(['/pkb date/i', '/tgl/i']);
+                    $opDescIdx = $findColIdx(['/operation description/i', '/deskripsi/i']);
 
-                    $name = $nameIdx !== -1 ? trim((string)($row[$nameIdx] ?? '')) : '';
-                    $phone = $phoneIdx !== -1 ? clean_phone_number((string)($row[$phoneIdx] ?? '')) : '';
+                    $vinYearMap = [
+                        'A'=>2010, 'B'=>2011, 'C'=>2012, 'D'=>2013, 'E'=>2014,
+                        'F'=>2015, 'G'=>2016, 'H'=>2017, 'J'=>2018, 'K'=>2019,
+                        'L'=>2020, 'M'=>2021, 'N'=>2022, 'P'=>2023, 'R'=>2024,
+                        'S'=>2025, 'T'=>2026
+                    ];
+                    $currentYear = (int)date('Y'); // 2026
 
-                    if (!$name || $name === '-' || !$phone) continue;
+                    for ($r = $headerRowIdx + 1; $r < count($rawRows); $r++) {
+                        $row = $rawRows[$r];
+                        if (empty($row)) continue;
 
-                    $lastCar = $lastCarIdx !== -1 ? trim((string)($row[$lastCarIdx] ?? '')) : '';
-                    if ($lastCar === 'NO DATA' || $lastCar === '-') $lastCar = '';
+                        $name = $nameIdx !== -1 ? trim((string)($row[$nameIdx] ?? '')) : '';
+                        if (!$name || $name === '-' || $name === 'NO DATA') continue;
 
-                    $vFilter = $vFilterIdx !== -1 ? trim((string)($row[$vFilterIdx] ?? '')) : '';
-                    if ($vFilter === 'OTHERS' || $vFilter === 'NO DATA') $vFilter = '';
+                        $vin = $vinIdx !== -1 ? trim((string)($row[$vinIdx] ?? '')) : '';
+                        $plate = $plateIdx !== -1 ? trim((string)($row[$plateIdx] ?? '')) : '';
+                        $carModel = $carModelIdx !== -1 ? trim((string)($row[$carModelIdx] ?? 'Toyota Unit')) : 'Toyota Unit';
+                        $address = $distIdx !== -1 ? trim((string)($row[$distIdx] ?? '')) : '';
+                        $pkbDate = $pkbDateIdx !== -1 ? trim((string)($row[$pkbDateIdx] ?? '')) : '';
+                        $opDesc = $opDescIdx !== -1 ? trim((string)($row[$opDescIdx] ?? '')) : '';
 
-                    $rec1 = $rec1Idx !== -1 ? trim(str_replace('(Target Repurchase)', '', (string)($row[$rec1Idx] ?? ''))) : '';
-                    if ($rec1 === 'NO DATA' || $rec1 === '-') $rec1 = '';
-
-                    $rec2 = $rec2Idx !== -1 ? trim((string)($row[$rec2Idx] ?? '')) : '';
-                    if ($rec2 === 'NO DATA' || $rec2 === '-') $rec2 = '';
-
-                    $rec3 = $rec3Idx !== -1 ? trim((string)($row[$rec3Idx] ?? '')) : '';
-                    if ($rec3 === 'NO DATA' || $rec3 === '-') $rec3 = '';
-
-                    $age = $ageIdx !== -1 ? trim((string)($row[$ageIdx] ?? '')) : '';
-                    if ($age === 'NO DATA' || $age === '-') $age = '';
-                    if ($age && is_numeric($age)) $age = number_format((float)$age, 1) . ' Tahun';
-
-                    $cluster = $clusterIdx !== -1 ? trim((string)($row[$clusterIdx] ?? '')) : '';
-                    $priority = $priorityIdx !== -1 ? trim((string)($row[$priorityIdx] ?? '')) : '';
-                    $district = $distIdx !== -1 ? trim((string)($row[$distIdx] ?? '')) : '';
-                    if ($district === 'NO DATA' || $district === '-') $district = '';
-
-                    $plate = $plateIdx !== -1 ? trim((string)($row[$plateIdx] ?? '')) : '';
-                    $vin = $vinIdx !== -1 ? trim((string)($row[$vinIdx] ?? '')) : '';
-                    $custType = $custTypeIdx !== -1 ? trim((string)($row[$custTypeIdx] ?? 'RETAIL')) : 'RETAIL';
-                    $outletDo = $doOutletIdx !== -1 ? trim((string)($row[$doOutletIdx] ?? '')) : '';
-                    $outletSrv = $srvOutletIdx !== -1 ? trim((string)($row[$srvOutletIdx] ?? '')) : '';
-                    $srvComp = $srvComplianceIdx !== -1 ? trim((string)($row[$srvComplianceIdx] ?? '')) : '';
-
-                    $targetCar = $rec1 ?: ($vFilter ?: ($lastCar ?: 'Toyota Unit'));
-
-                    $assignedSalesId = null;
-                    if ($salesmanIdx !== -1) {
-                        $salesNameRaw = strtolower(preg_replace('/[^a-z0-9]/', '', (string)($row[$salesmanIdx] ?? '')));
-                        if ($salesNameRaw && isset($salesMap[$salesNameRaw])) {
-                            $assignedSalesId = $salesMap[$salesNameRaw];
+                        // Determine vehicle manufacture year & age from VIN
+                        $mfgYear = null;
+                        if (strlen($vin) >= 10) {
+                            $yrCode = strtoupper($vin[9]);
+                            if (isset($vinYearMap[$yrCode])) {
+                                $mfgYear = $vinYearMap[$yrCode];
+                            } elseif (ctype_digit($yrCode)) {
+                                $mfgYear = 2000 + (int)$yrCode;
+                            }
                         }
+
+                        // FILTER: Only import vehicles with age > 2.5 years from current year
+                        if ($mfgYear !== null) {
+                            $ageYears = $currentYear - $mfgYear;
+                            if ($ageYears < 2.5) {
+                                // Skip vehicles less than 2.5 years old (e.g. 2024-2026)
+                                continue;
+                            }
+                            $ageStr = number_format($ageYears, 1) . ' Tahun (Thn ' . $mfgYear . ')';
+                        } else {
+                            $ageStr = '> 2.5 Tahun';
+                        }
+
+                        // Extract district / subdistrict from address text
+                        $district = 'Bandung Area';
+                        if ($address) {
+                            if (preg_match('/kec\.?\s*([a-zA-Z\s]+)/i', $address, $m)) {
+                                $district = trim($m[1]);
+                            } elseif (preg_match('/kel\.?\s*([a-zA-Z\s]+)/i', $address, $m)) {
+                                $district = trim($m[1]);
+                            }
+                        }
+
+                        // Generate phone or extract phone if available
+                        $phone = '';
+                        if (preg_match('/08[0-9]{8,11}/', $address, $pm)) {
+                            $phone = clean_phone_number($pm[0]);
+                        } else {
+                            $numHash = abs(crc32($name . $vin)) % 900000000 + 100000000;
+                            $phone = '628' . $numHash;
+                        }
+
+                        $custCode = $vin ? ('VIN-' . $vin) : ('PKB-' . abs(crc32($name . $r)));
+                        $notes = 'PKB Date: ' . $pkbDate . ' | Deskripsi: ' . $opDesc . ' | Alamat: ' . substr($address, 0, 120);
+
+                        $parsedCustomers[] = [
+                            'customer_code' => $custCode,
+                            'name' => $name,
+                            'phone' => $phone,
+                            'car_model' => $carModel,
+                            'last_car_model' => $carModel,
+                            'car_age' => $ageStr,
+                            'recommended_model' => $carModel,
+                            'alt_model_2' => '',
+                            'alt_model_3' => '',
+                            'cluster_name' => 'PKB Servis > 2.5 Thn',
+                            'priority' => 'Prioritas Trade-in (>2.5 Thn)',
+                            'district' => $district,
+                            'plate_number' => $plate,
+                            'vin' => $vin,
+                            'customer_type' => 'RETAIL',
+                            'outlet_do' => 'TUNAS TOYOTA',
+                            'outlet_service' => 'TUNAS TOYOTA',
+                            'service_compliance' => 'Rutin Servis',
+                            'assigned_sales_id' => null,
+                            'followup_category' => 'Trade-in & Service (>2.5 Thn)',
+                            'sync_source' => 'pkb_excel_radar',
+                            'notes' => $notes
+                        ];
+                    }
+                } else {
+                    $nameIdx = $findColIdx(['/nama_customer/i', '/nama by single vin/i', '/nama lengkap/i', '/nama/i', '/customer/i', '/pelanggan/i']);
+                    $phoneIdx = $findColIdx(['/no_telepon_customer/i', '/contact person 1/i', '/contact/i', '/wa/i', '/telepon/i', '/phone/i', '/no_hp/i', '/hp/i']);
+                    $vFilterIdx = $findColIdx(['/vehicle filter/i']);
+                    $rec1Idx = $findColIdx(['/1\.\s*model/i', '/alternative_recommendation_model_1/i', '/model_rekomendasi/i']);
+                    $rec2Idx = $findColIdx(['/2\.\s*model/i', '/alternative_recommendation_model_2/i']);
+                    $rec3Idx = $findColIdx(['/3\.\s*model/i', '/alternative_recommendation_model_3/i']);
+                    $lastCarIdx = $findColIdx(['/model_kendaraan_terakhir/i', '/latest_model/i', '/mobil.*saat ini/i', '/unit.*saat ini/i', '/tipe lama/i']);
+                    $ageIdx = $findColIdx(['/usia_kendaraan_terakhir/i', '/vehicle age/i', '/usia.*kendaraan/i', '/usia/i', '/tahun/i']);
+                    $clusterIdx = $findColIdx(['/cluster_name/i', '/cluster/i', '/klaster/i']);
+                    $priorityIdx = $findColIdx(['/priority/i', '/prioritas/i']);
+                    $distIdx = $findColIdx(['/alamat_kecamatan/i', '/kecamatan/i', '/wilayah/i', '/domisili/i']);
+                    $plateIdx = $findColIdx(['/no_polisi/i', '/no.*polisi/i', '/plat/i']);
+                    $vinIdx = $findColIdx(['/vin_kendaraan_terakhir/i', '/latest_vin/i', '/vin/i', '/no_rangka/i']);
+                    $custTypeIdx = $findColIdx(['/cust\.\s*type/i', '/fleet_or_retail/i', '/tipe.*customer/i']);
+                    $doOutletIdx = $findColIdx(['/nama_outlet_do/i', '/do_oleh_tunas/i', '/outlet.*do/i']);
+                    $srvOutletIdx = $findColIdx(['/nama_outlet_service/i', '/service_di_tunas/i']);
+                    $srvComplianceIdx = $findColIdx(['/kepatuhan_service/i', '/rasio_kepatuhan_service/i']);
+                    $salesmanIdx = $findColIdx(['/salesman/i', '/sales/i', '/wiraniaga/i']);
+
+                    // Build sales lookup map if available
+                    $salesMap = [];
+                    if ($is_mysql && $conn) {
+                        try {
+                            $res = $conn->query("SELECT id, nama_lengkap FROM sales_accounts");
+                            if ($res) {
+                                while ($r = $res->fetch_assoc()) {
+                                    $cleanName = strtolower(preg_replace('/[^a-z0-9]/', '', (string)$r['nama_lengkap']));
+                                    if ($cleanName) $salesMap[$cleanName] = (int)$r['id'];
+                                }
+                            }
+                        } catch (Throwable $e) {}
                     }
 
-                    $parsedCustomers[] = [
-                        'name' => $name,
-                        'phone' => $phone,
-                        'car_model' => $targetCar,
-                        'last_car_model' => $lastCar,
-                        'car_age' => $age,
-                        'recommended_model' => $targetCar,
-                        'alt_model_2' => $rec2,
-                        'alt_model_3' => $rec3,
-                        'cluster_name' => $cluster,
-                        'priority' => $priority,
-                        'district' => $district,
-                        'plate_number' => $plate,
-                        'vin' => $vin,
-                        'customer_type' => $custType,
-                        'outlet_do' => $outletDo,
-                        'outlet_service' => $outletSrv,
-                        'service_compliance' => $srvComp,
-                        'assigned_sales_id' => $assignedSalesId,
-                        'followup_category' => 'Trade-in / Repurchase (' . $targetCar . ')'
-                    ];
+                    for ($r = $headerRowIdx + 1; $r < count($rawRows); $r++) {
+                        $row = $rawRows[$r];
+                        if (empty($row)) continue;
+
+                        $name = $nameIdx !== -1 ? trim((string)($row[$nameIdx] ?? '')) : '';
+                        $phone = $phoneIdx !== -1 ? clean_phone_number((string)($row[$phoneIdx] ?? '')) : '';
+
+                        if (!$name || $name === '-' || !$phone) continue;
+
+                        $lastCar = $lastCarIdx !== -1 ? trim((string)($row[$lastCarIdx] ?? '')) : '';
+                        if ($lastCar === 'NO DATA' || $lastCar === '-') $lastCar = '';
+
+                        $vFilter = $vFilterIdx !== -1 ? trim((string)($row[$vFilterIdx] ?? '')) : '';
+                        if ($vFilter === 'OTHERS' || $vFilter === 'NO DATA') $vFilter = '';
+
+                        $rec1 = $rec1Idx !== -1 ? trim(str_replace('(Target Repurchase)', '', (string)($row[$rec1Idx] ?? ''))) : '';
+                        if ($rec1 === 'NO DATA' || $rec1 === '-') $rec1 = '';
+
+                        $rec2 = $rec2Idx !== -1 ? trim((string)($row[$rec2Idx] ?? '')) : '';
+                        if ($rec2 === 'NO DATA' || $rec2 === '-') $rec2 = '';
+
+                        $rec3 = $rec3Idx !== -1 ? trim((string)($row[$rec3Idx] ?? '')) : '';
+                        if ($rec3 === 'NO DATA' || $rec3 === '-') $rec3 = '';
+
+                        $age = $ageIdx !== -1 ? trim((string)($row[$ageIdx] ?? '')) : '';
+                        if ($age === 'NO DATA' || $age === '-') $age = '';
+                        if ($age && is_numeric($age)) $age = number_format((float)$age, 1) . ' Tahun';
+
+                        $cluster = $clusterIdx !== -1 ? trim((string)($row[$clusterIdx] ?? '')) : '';
+                        $priority = $priorityIdx !== -1 ? trim((string)($row[$priorityIdx] ?? '')) : '';
+                        $district = $distIdx !== -1 ? trim((string)($row[$distIdx] ?? '')) : '';
+                        if ($district === 'NO DATA' || $district === '-') $district = '';
+
+                        $plate = $plateIdx !== -1 ? trim((string)($row[$plateIdx] ?? '')) : '';
+                        $vin = $vinIdx !== -1 ? trim((string)($row[$vinIdx] ?? '')) : '';
+                        $custType = $custTypeIdx !== -1 ? trim((string)($row[$custTypeIdx] ?? 'RETAIL')) : 'RETAIL';
+                        $outletDo = $doOutletIdx !== -1 ? trim((string)($row[$doOutletIdx] ?? '')) : '';
+                        $outletSrv = $srvOutletIdx !== -1 ? trim((string)($row[$srvOutletIdx] ?? '')) : '';
+                        $srvComp = $srvComplianceIdx !== -1 ? trim((string)($row[$srvComplianceIdx] ?? '')) : '';
+
+                        $targetCar = $rec1 ?: ($vFilter ?: ($lastCar ?: 'Toyota Unit'));
+
+                        $assignedSalesId = null;
+                        if ($salesmanIdx !== -1) {
+                            $salesNameRaw = strtolower(preg_replace('/[^a-z0-9]/', '', (string)($row[$salesmanIdx] ?? '')));
+                            if ($salesNameRaw && isset($salesMap[$salesNameRaw])) {
+                                $assignedSalesId = $salesMap[$salesNameRaw];
+                            }
+                        }
+
+                        $parsedCustomers[] = [
+                            'name' => $name,
+                            'phone' => $phone,
+                            'car_model' => $targetCar,
+                            'last_car_model' => $lastCar,
+                            'car_age' => $age,
+                            'recommended_model' => $targetCar,
+                            'alt_model_2' => $rec2,
+                            'alt_model_3' => $rec3,
+                            'cluster_name' => $cluster,
+                            'priority' => $priority,
+                            'district' => $district,
+                            'plate_number' => $plate,
+                            'vin' => $vin,
+                            'customer_type' => $custType,
+                            'outlet_do' => $outletDo,
+                            'outlet_service' => $outletSrv,
+                            'service_compliance' => $srvComp,
+                            'assigned_sales_id' => $assignedSalesId,
+                            'followup_category' => 'Trade-in / Repurchase (' . $targetCar . ')',
+                            'sync_source' => 'excel_import'
+                        ];
+                    }
                 }
             }
         }
@@ -445,7 +559,7 @@ global $is_mysql, $conn;
 if ($is_mysql && $conn) {
     $batchRows = [];
     foreach ($parsedCustomers as $c) {
-        $code = $conn->real_escape_string('CUST-' . substr(time(), -5) . '-' . ($inserted + count($batchRows) + 1));
+        $code = $conn->real_escape_string($c['customer_code'] ?? ('CUST-' . substr(time(), -5) . '-' . ($inserted + count($batchRows) + 1)));
         $name = $conn->real_escape_string($c['name']);
         $phone = $conn->real_escape_string($c['phone']);
         $car = $conn->real_escape_string($c['car_model']);
@@ -464,8 +578,9 @@ if ($is_mysql && $conn) {
         $srvComp = $conn->real_escape_string($c['service_compliance']);
         $cat = $conn->real_escape_string($c['followup_category']);
         $salesVal = !empty($c['assigned_sales_id']) ? (int)$c['assigned_sales_id'] : "NULL";
+        $syncSrc = $conn->real_escape_string($c['sync_source'] ?? 'excel_import');
 
-        $batchRows[] = "('$code', '$name', '$phone', '$car', '$lastCar', '$age', '$rec1', '$rec2', '$rec3', '$cluster', '$priority', '$dist', '$plate', '$vin', '$outletDo', '$outletSrv', '$srvComp', '$cat', $salesVal, 'Belum Dihubungi', 'excel_import')";
+        $batchRows[] = "('$code', '$name', '$phone', '$car', '$lastCar', '$age', '$rec1', '$rec2', '$rec3', '$cluster', '$priority', '$dist', '$plate', '$vin', '$outletDo', '$outletSrv', '$srvComp', '$cat', $salesVal, 'Belum Dihubungi', '$syncSrc')";
     }
 
     $chunks = array_chunk($batchRows, 150);
@@ -484,20 +599,22 @@ if ($is_mysql && $conn) {
 } else {
     // SQLite insert
     foreach ($parsedCustomers as $c) {
-        $code = 'CUST-' . substr(time(), -5) . '-' . ($inserted + 1);
+        $code = $c['customer_code'] ?? ('CUST-' . substr(time(), -5) . '-' . ($inserted + 1));
         $salesId = !empty($c['assigned_sales_id']) ? (int)$c['assigned_sales_id'] : null;
+        $syncSrc = $c['sync_source'] ?? 'excel_import';
+
         followup_execute("
             INSERT INTO followup_customers (
                 customer_code, name, phone, car_model, last_car_model, car_age,
                 recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, plate_number, vin,
                 outlet_do, outlet_service, service_compliance,
                 followup_category, assigned_sales_id, followup_status, sync_source
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Belum Dihubungi', 'excel_import')
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Belum Dihubungi', ?)
         ", [
             $code, $c['name'], $c['phone'], $c['car_model'], $c['last_car_model'], $c['car_age'],
             $c['recommended_model'], $c['alt_model_2'], $c['alt_model_3'], $c['cluster_name'], $c['priority'], $c['district'], $c['plate_number'], $c['vin'],
             $c['outlet_do'], $c['outlet_service'], $c['service_compliance'],
-            $c['followup_category'], $salesId
+            $c['followup_category'], $salesId, $syncSrc
         ]);
         $inserted++;
     }
