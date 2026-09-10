@@ -354,7 +354,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../custom_alert.js?v=25"></script>
   <script src="/js/spv_global.js"></script>
-  <script src="/js/followup_master.js?v=20260910_dbsource_v3"></script>
+  <script src="/js/followup_master.js?v=20260910_nophone"></script>
   <script src="/js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 </html>

@@ -506,14 +506,20 @@ function renderOrphanPoolCards() {
                   <span class="fu-card-num-badge orphan-badge">#${idx + 1}</span>
                   <span>${escapeHtml(c.name || 'Customer')}</span>
                 </div>
-                <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
-                  <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link">
-                    <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${escapeHtml(c.phone || '-')}
-                  </a>
-                  <button type="button" onclick="navigator.clipboard.writeText('${c.phone}'); showToastCopy('${c.phone}');" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; padding:2px 4px; font-size:11px;" title="Salin No. WA">
-                    <i class="fa-regular fa-copy"></i>
-                  </button>
-                </div>
+                ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? `
+                  <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
+                    <a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" class="cust-phone-link">
+                      <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${escapeHtml(c.phone)}
+                    </a>
+                    <button type="button" onclick="navigator.clipboard.writeText('${c.phone}'); showToastCopy('${c.phone}');" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; padding:2px 4px; font-size:11px;" title="Salin No. WA">
+                      <i class="fa-regular fa-copy"></i>
+                    </button>
+                  </div>
+                ` : `
+                  <div style="margin-top:3px; font-size:11.5px; color:#94a3b8; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                    <i class="fa-solid fa-phone-slash" style="font-size:10px;"></i> Tanpa No. WA
+                  </div>
+                `}
               </div>
             </div>
 
@@ -949,14 +955,20 @@ function renderSingleCustomerCardHtml(c, num) {
                 ${num ? `<span class="fu-card-num-badge">#${num}</span>` : ''}
                 <span>${c.name}</span>
               </div>
-              <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
-                <a href="https://wa.me/${c.phone}" target="_blank" class="cust-phone-link" onclick="sessionStorage.setItem('last_active_fu_customer_id', ${c.id})">
-                  <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${c.phone}
-                </a>
-                <button type="button" onclick="navigator.clipboard.writeText('${c.phone}'); showToastCopy('${c.phone}');" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; padding:2px 4px; font-size:11px;" title="Salin No. WA">
-                  <i class="fa-regular fa-copy"></i>
-                </button>
-              </div>
+              ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? `
+                <div style="margin-top:3px; display:flex; align-items:center; gap:6px;">
+                  <a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" class="cust-phone-link" onclick="sessionStorage.setItem('last_active_fu_customer_id', ${c.id})">
+                    <i class="fa-brands fa-whatsapp" style="color:#10b981; font-size:14px;"></i> +${escapeHtml(c.phone)}
+                  </a>
+                  <button type="button" onclick="navigator.clipboard.writeText('${c.phone}'); showToastCopy('${c.phone}');" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; padding:2px 4px; font-size:11px;" title="Salin No. WA">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              ` : `
+                <div style="margin-top:3px; font-size:11.5px; color:#94a3b8; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-phone-slash" style="font-size:10px;"></i> Tanpa No. WA
+                </div>
+              `}
             </div>
           </div>
 
@@ -1147,17 +1159,24 @@ function renderSingleCustomerCardHtml(c, num) {
 
       <!-- Bottom Action Bar (WhatsApp & Detail) -->
       <div style="margin-top:4px; display:flex; gap:8px; align-items:center;">
-        <!-- Big WhatsApp Button -->
-        <button class="btn-wa-action" style="flex:1; padding:12px 14px;" onclick="openWhatsAppModal(${c.id})">
-          <i class="fa-brands fa-whatsapp" style="font-size:18px;"></i> Follow Up via WhatsApp
-        </button>
-
-        <button class="btn-sub" style="padding:12px 14px; font-size:12px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; cursor:pointer;" onclick="openSalesCustomerDetailModal(${c.id})" title="Lihat Informasi Lengkap Customer">
-          <i class="fa-solid fa-circle-info"></i> Detail
-        </button>
-        <a href="tel:${c.phone}" class="btn-sub" style="padding:12px 14px; font-size:13px; border-radius:12px; background:#f1f5f9; color:#0f172a; text-decoration:none; border:1.5px solid #e2e8f0; display:flex; align-items:center; justify-content:center;" title="Telepon Langsung">
-          <i class="fa-solid fa-phone" style="color:#10b981;"></i>
-        </a>
+        ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? `
+          <button class="btn-wa-action" style="flex:1; padding:12px 14px;" onclick="openWhatsAppModal(${c.id})">
+            <i class="fa-brands fa-whatsapp" style="font-size:18px;"></i> Follow Up via WhatsApp
+          </button>
+          <button class="btn-sub" style="padding:12px 14px; font-size:12px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; cursor:pointer;" onclick="openSalesCustomerDetailModal(${c.id})" title="Lihat Informasi Lengkap Customer">
+            <i class="fa-solid fa-circle-info"></i> Detail
+          </button>
+          <a href="tel:${c.phone}" class="btn-sub" style="padding:12px 14px; font-size:13px; border-radius:12px; background:#f1f5f9; color:#0f172a; text-decoration:none; border:1.5px solid #e2e8f0; display:flex; align-items:center; justify-content:center;" title="Telepon Langsung">
+            <i class="fa-solid fa-phone" style="color:#10b981;"></i>
+          </a>
+        ` : `
+          <button class="btn-sub" style="flex:1; padding:12px 14px; font-size:12px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="openSalesCustomerDetailModal(${c.id})" title="Lihat Informasi Lengkap Customer">
+            <i class="fa-solid fa-circle-info"></i> Detail Customer
+          </button>
+          <button class="btn-sub" style="padding:12px 14px; font-size:12px; border-radius:12px; background:#f8fafc; color:#94a3b8; border:1.5px solid #e2e8f0; cursor:not-allowed;" title="Tanpa Nomor Telepon">
+            <i class="fa-solid fa-phone-slash"></i> Tanpa WA
+          </button>
+        `}
       </div>
     </div>
   `;

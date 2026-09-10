@@ -1044,11 +1044,17 @@ function renderCustomerTable() {
             <div class="cust-avatar-circle">${initials}</div>
             <div>
               <div style="font-weight:800; color:#0f172a; font-size:13.5px; line-height:1.25;">${escapeHtml(c.name || '')}</div>
-              <div style="font-family:monospace; font-size:11.5px; color:#059669; font-weight:700; margin-top:3px;">
-                <a href="https://wa.me/${c.phone}" target="_blank" style="color:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-                  <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> +${c.phone}
-                </a>
-              </div>
+              ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? `
+                <div style="font-family:monospace; font-size:11.5px; color:#059669; font-weight:700; margin-top:3px;">
+                  <a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" style="color:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                    <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> +${escapeHtml(c.phone)}
+                  </a>
+                </div>
+              ` : `
+                <div style="font-size:11px; color:#94a3b8; font-weight:600; margin-top:3px; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-phone-slash" style="font-size:10px;"></i> Tanpa No. WA
+                </div>
+              `}
               <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
                 ${c.district ? `<span style="font-size:10.5px; color:#64748b;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; font-size:9.5px;"></i> Kec. ${escapeHtml(c.district)}</span>` : ''}
                 ${c.customer_type ? `<span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:#f1f5f9; color:#475569;">${escapeHtml(c.customer_type)}</span>` : ''}
@@ -1333,8 +1339,8 @@ function openCustomerDetailModal(customerId) {
         <span style="display:inline-block; font-size:11px; font-weight:800; padding:4px 10px; border-radius:9999px; background:#d7123a; color:#ffffff;">
           ${c.priority || '4th Priority'}
         </span>
-        <div style="font-size:11px; color:#6ee7b7; font-weight:700; margin-top:4px; font-family:monospace;">
-          +${c.phone}
+        <div style="font-size:11px; color:${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? '#6ee7b7' : '#94a3b8'}; font-weight:700; margin-top:4px; font-family:monospace;">
+          ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? '+' + escapeHtml(c.phone) : 'Tanpa No. Telp'}
         </div>
       </div>
     </div>
@@ -1462,9 +1468,11 @@ function openCustomerDetailModal(customerId) {
           <i class="fa-solid fa-user-xmark"></i> Batal Penugasan
         </button>
       ` : ''}
-      <a href="tel:${c.phone}" class="btn-fu btn-fu-secondary" style="padding:12px 16px; text-decoration:none;">
-        <i class="fa-solid fa-phone"></i> Telepon
-      </a>
+      ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? `
+        <a href="tel:${c.phone}" class="btn-fu btn-fu-secondary" style="padding:12px 16px; text-decoration:none;">
+          <i class="fa-solid fa-phone"></i> Telepon
+        </a>
+      ` : ''}
       <button class="btn-fu btn-fu-secondary" style="padding:12px 16px;" onclick="closeCustomerDetailModal()">
         Tutup
       </button>
@@ -2036,7 +2044,7 @@ function openEditSingleCustomerModal(customerId) {
               <i class="fa-solid fa-pen-to-square"></i> Edit Data & Status TAM
             </div>
             <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0;">${escapeHtml(c.name)}</h3>
-            <span style="font-size:11.5px; color:#64748b;">${escapeHtml(c.recommended_model || c.car_model || '-')} &bull; +${c.phone}</span>
+            <span style="font-size:11.5px; color:#64748b;">${escapeHtml(c.recommended_model || c.car_model || '-')} ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? '&bull; +' + escapeHtml(c.phone) : '&bull; Tanpa No. WA'}</span>
           </div>
           <button class="btn-close-modal" onclick="closeEditSingleCustomerModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>

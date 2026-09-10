@@ -242,7 +242,7 @@ if ($action === 'dashboard_analytics') {
 
     // Clean up phantom/blank records from previous syncs if any
     try {
-        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR phone = '-' OR phone = '' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
+        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
     } catch (Exception $e) {}
 
     // Fetch all synchronized customers
@@ -537,7 +537,7 @@ if ($action === 'stats') {
 
     // Clean up phantom/blank records from previous syncs if any
     try {
-        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR phone = '-' OR phone = '' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
+        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
     } catch (Exception $e) {}
 
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";

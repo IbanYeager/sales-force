@@ -396,9 +396,6 @@ if ($fileExt === 'csv') {
                         $phone = '';
                         if (preg_match('/08[0-9]{8,11}/', $address, $pm)) {
                             $phone = clean_phone_number($pm[0]);
-                        } else {
-                            $numHash = abs(crc32($name . $vin)) % 900000000 + 100000000;
-                            $phone = '628' . $numHash;
                         }
 
                         $custCode = $vin ? ('VIN-' . $vin) : ('PKB-' . abs(crc32($name . $r)));
