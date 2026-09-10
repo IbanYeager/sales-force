@@ -590,10 +590,21 @@ if ($is_mysql && $conn) {
             recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, plate_number, vin,
             outlet_do, outlet_service, service_compliance,
             followup_category, assigned_sales_id, followup_status, sync_source
-        ) VALUES " . implode(',', $chunk);
+        ) VALUES " . implode(',', $chunk) . "
+        ON DUPLICATE KEY UPDATE
+            name = VALUES(name),
+            phone = VALUES(phone),
+            car_model = VALUES(car_model),
+            car_age = VALUES(car_age),
+            district = VALUES(district),
+            sync_source = VALUES(sync_source),
+            followup_category = VALUES(followup_category)";
         
         if ($conn->query($sql)) {
-            $inserted += count($chunk);
+            $aff = $conn->affected_rows;
+            if ($aff === 1) $inserted++;
+            elseif ($aff >= 2) $updated += (int)($aff / 2);
+            else $inserted += count($chunk);
         }
     }
 } else {
@@ -604,7 +615,7 @@ if ($is_mysql && $conn) {
         $syncSrc = $c['sync_source'] ?? 'excel_import';
 
         followup_execute("
-            INSERT INTO followup_customers (
+            INSERT OR REPLACE INTO followup_customers (
                 customer_code, name, phone, car_model, last_car_model, car_age,
                 recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, plate_number, vin,
                 outlet_do, outlet_service, service_compliance,
