@@ -1264,7 +1264,8 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
             followup_status = ?,
             notes = CASE WHEN ? != '' THEN ? ELSE notes END,
             last_contacted_at = ?,
-            last_template_used = CASE WHEN ? != '' THEN ? ELSE last_template_used END
+            last_template_used = CASE WHEN ? != '' THEN ? ELSE last_template_used END,
+            assigned_sales_id = CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) AND ? > 0 THEN ? ELSE assigned_sales_id END
         WHERE id = ?
     ", [
         $connected, $contacted, $prospect, $spk, $remarks,
@@ -1273,6 +1274,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $reason_followup, $reason_followup,
         $now,
         $template_used, $template_used,
+        $sales_id, $sales_id,
         $id
     ]);
 
