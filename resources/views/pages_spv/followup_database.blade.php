@@ -238,6 +238,9 @@
           <button type="button" class="db-source-tab-btn active" id="tabDbSourceSales" onclick="switchMasterDbSource('sales')" style="padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; background:#d7123a; color:#ffffff; box-shadow:0 4px 12px rgba(215,18,58,0.25);">
             <i class="fa-solid fa-user-tag"></i> Database Khusus Sales
           </button>
+          <button type="button" class="db-source-tab-btn" id="tabDbSourceRadar" onclick="switchMasterDbSource('radar')" style="padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; background:#f1f5f9; color:#475569;">
+            <i class="fa-solid fa-satellite-dish"></i> Database Radar GPS
+          </button>
           <button type="button" class="db-source-tab-btn" id="tabDbSourceAll" onclick="switchMasterDbSource('all')" style="padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; background:#f1f5f9; color:#475569;">
             <i class="fa-solid fa-layer-group"></i> Semua Database (Gabungan)
           </button>
@@ -257,6 +260,7 @@
         <div>
           <select id="filterDbSourceSelect" class="fu-select" onchange="switchMasterDbSource(this.value);" style="font-weight:800; border-color:#cbd5e1;">
             <option value="sales">🎯 Database Khusus Sales</option>
+            <option value="radar">🛰️ Database Radar GPS</option>
             <option value="all">🌐 Semua Database (Gabungan)</option>
           </select>
         </div>

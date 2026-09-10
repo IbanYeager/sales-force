@@ -129,6 +129,11 @@ function initFollowupTabs() {
             <span>Pool Rebutan Prospek</span>
             <span id="badgeOrphanPoolCount" class="badge-pulse-fire">0 Siap Rebut</span>
           </button>
+          <button type="button" class="sub-nav-fu-btn radar-tab" id="subBtnRadar" onclick="switchFollowupSubTab('radar')">
+            <i class="fa-solid fa-map-location-dot" style="color:#3b82f6;"></i>
+            <span>Peta Radar GPS</span>
+            <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:rgba(215,18,58,0.12); color:#dc2626; border:1px solid rgba(215,18,58,0.25);">Live Map</span>
+          </button>
         </div>
 
         <!-- 2. SEARCH, FILTER & VIEW TOGGLE BAR -->
@@ -3880,3 +3885,41 @@ function copyAllBlastLinks() {
     alert('Gagal menyalin ke clipboard.');
   });
 }
+
+function switchFollowupSubTab(subTab) {
+  followupState.subTab = subTab;
+  const btnMyTasks = document.getElementById('subBtnMyTasks');
+  const btnOrphanPool = document.getElementById('subBtnOrphanPool');
+  const btnRadar = document.getElementById('subBtnRadar');
+
+  const containerData = document.getElementById('followupDataContainer');
+  const containerRadar = document.getElementById('followupRadarContainer');
+  const filterCard = document.getElementById('fuFilterCard');
+
+  if (btnMyTasks) btnMyTasks.classList.toggle('active', subTab === 'my_tasks');
+  if (btnOrphanPool) btnOrphanPool.classList.toggle('active', subTab === 'orphan_pool');
+  if (btnRadar) btnRadar.classList.toggle('active', subTab === 'radar');
+
+  if (subTab === 'radar') {
+    if (containerData) containerData.style.display = 'none';
+    if (filterCard) filterCard.style.display = 'none';
+    if (containerRadar) {
+      containerRadar.style.display = 'block';
+      if (window.SalesSuperpowers && typeof SalesSuperpowers.renderRadarCockpit === 'function') {
+        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 50);
+      }
+    }
+  } else {
+    if (containerRadar) containerRadar.style.display = 'none';
+    if (containerData) containerData.style.display = 'block';
+    if (filterCard) filterCard.style.display = 'block';
+
+    if (subTab === 'orphan_pool') {
+      loadOrphanLeads();
+    } else {
+      renderCustomerCards();
+    }
+  }
+}
+window.switchFollowupSubTab = switchFollowupSubTab;
+

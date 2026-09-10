@@ -157,9 +157,11 @@ function calculateDistance($lat1, $lon1, $lat2, $lon2) {
 
 $salesLat = isset($_GET['lat']) ? floatval($_GET['lat']) : -6.9248; // default Tunas Kircon
 $salesLng = isset($_GET['lng']) ? floatval($_GET['lng']) : 107.6472;
-$maxRadius = isset($_GET['radius']) ? floatval($_GET['radius']) : 5.0; // km
+$maxRadius = isset($_GET['radius']) ? floatval($_GET['radius']) : 50.0; // km (allow wide range for map)
 $salesId = isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0;
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 500;
+$targetDistrict = isset($_GET['district']) ? strtolower(trim($_GET['district'])) : 'all';
+$dbSource = isset($_GET['db_source']) ? strtolower(trim($_GET['db_source'])) : 'all';
 
 try {
     $salesList = get_sales_list();
@@ -172,8 +174,18 @@ try {
     $latDelta = ($maxRadius + 0.1) / 111.0;
     $lngDelta = ($maxRadius + 0.1) / 110.2;
 
-    // Fetch ALL Followup Customers (PKB Radar + SPV/Kacab dataset)
-    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source, visit_photo FROM followup_customers ORDER BY id DESC", []);
+    $where = [];
+    $params = [];
+    if ($dbSource === 'radar') {
+        $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
+    } elseif ($dbSource === 'sales') {
+        $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%'))";
+    }
+
+    $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+    // Fetch Followup Customers
+    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source, visit_photo, reason_followup FROM followup_customers $whereSql ORDER BY id DESC", $params);
     
     $results = [];
 
@@ -182,6 +194,15 @@ try {
             $locText = ($row['district'] ?: '') . ' ' . ($row['cluster_name'] ?: '') . ' ' . ($row['notes'] ?: '');
             $coords = getAccurateCoords($row['id'], $locText, $cityDistrictCoords);
             
+            // District Filter check
+            if ($targetDistrict !== 'all' && $targetDistrict !== '') {
+                $distNameClean = strtolower($coords[2] ?: '');
+                $locClean = strtolower($locText);
+                if (strpos($distNameClean, $targetDistrict) === false && strpos($locClean, $targetDistrict) === false) {
+                    continue;
+                }
+            }
+
             // Fast bounding box check
             if (abs($coords[0] - $salesLat) > $latDelta) continue;
             if (abs($coords[1] - $salesLng) > $lngDelta) continue;
@@ -213,6 +234,7 @@ try {
                     'status' => $row['followup_status'] ?: 'Belum Dihubungi',
                     'sales_name' => $salesName,
                     'visit_photo' => $row['visit_photo'] ?: '',
+                    'reason_followup' => $row['reason_followup'] ?: '',
                     'lat' => round($coords[0], 6),
                     'lng' => round($coords[1], 6),
                     'distance_km' => round($dist, 2),

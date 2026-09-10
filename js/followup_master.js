@@ -1136,11 +1136,25 @@ function renderCustomerTable() {
               <span style="color:${(c.spk === 'TRUE' || c.spk === 'IYA') ? '#10b981' : '#94a3b8'}; font-weight:700;">SPK: ${(c.spk === 'TRUE' || c.spk === 'IYA') ? '<i class="fa-solid fa-award"></i>' : 'Belum'}</span>
             </div>
             ${c.reason_followup ? `<div style="font-size:10.5px; color:#334155; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.reason_followup)}">"${escapeHtml(c.reason_followup)}"</div>` : ''}
-            ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace;">${escapeHtml(c.followup_date.substring(0, 16))}</div>` : ''}
+            ${c.visit_photo ? `
+              <div style="margin-top:4px;">
+                <a href="${escapeHtml(c.visit_photo)}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; color:#0284c7; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 7px; border-radius:6px; text-decoration:none;">
+                  <i class="fa-solid fa-camera"></i> Bukti Kunjungan
+                </a>
+              </div>
+            ` : ''}
+            ${c.followup_date ? `<div style="font-size:9.5px; color:#94a3b8; font-family:monospace; margin-top:2px;">${escapeHtml(c.followup_date.substring(0, 16))}</div>` : ''}
           ` : `
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(c.notes || '-')}">
               ${escapeHtml(c.notes || '-')}
             </div>
+            ${c.visit_photo ? `
+              <div style="margin-top:4px;">
+                <a href="${escapeHtml(c.visit_photo)}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; color:#0284c7; background:#e0f2fe; border:1px solid #bae6fd; padding:2px 7px; border-radius:6px; text-decoration:none;">
+                  <i class="fa-solid fa-camera"></i> Bukti Kunjungan
+                </a>
+              </div>
+            ` : ''}
           `}
         </td>
 

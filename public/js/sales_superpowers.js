@@ -52,50 +52,63 @@ const SalesSuperpowers = {
   // 1. RADAR PROSPEK TERDEKAT (EXECUTIVE RADAR COCKPIT)
   // =========================================================================
   radarData: [],
-  currentRadius: 5,
+  radarData: [],
+  currentRadius: 50,
+  currentDistrict: 'all',
+  leafletMap: null,
+  leafletMarkers: [],
+  selectedPhotoFile: null,
 
-  async renderRadarCockpit(containerId = 'followupDataContainer', radiusKm = 5) {
+  async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 50) {
     this.currentRadius = radiusKm;
+    this.currentDistrict = district;
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Render Cockpit Shell
+    // Render Cockpit Shell with Interactive Leaflet Map & District Selector
     container.innerHTML = `
-      <div class="radar-cockpit-hero">
-        <div class="radar-top-row">
-          <div class="radar-title-wrap">
+      <div class="radar-cockpit-hero" style="background: linear-gradient(135deg, #0d1b3e 0%, #162a52 100%); padding: 18px; border-radius: 18px; color: #fff; margin-bottom: 18px;">
+        <div class="radar-top-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div class="radar-title-wrap" style="display:flex; align-items:center; gap:12px;">
             <div class="radar-sonar-mini">
               <div class="center-blip"></div>
             </div>
             <div>
               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <h3 style="font-size:16px; font-weight:900; margin:0; color:#ffffff;">Radar Prospek Terdekat (Live GPS)</h3>
+                <h3 style="font-size:16px; font-weight:900; margin:0; color:#ffffff;">Peta Radar GPS Prospek (Live Map)</h3>
                 <span class="radar-gps-badge" id="radarGpsStatus"><i class="fa-solid fa-satellite-dish"></i> Mendeteksi GPS...</span>
               </div>
               <p style="font-size:12px; color:rgba(255,255,255,0.75); margin:3px 0 0 0;" id="radarSubtitleText">
-                Mencari database prospek di sekitar lokasi Anda saat ini untuk rute kunjungan lapangan.
+                Memetakan lokasi titik customer di peta per wilayah/kecamatan untuk agenda kunjungan sales.
               </p>
             </div>
           </div>
 
-          <!-- Radius Selector Pills -->
-          <div class="radar-radius-pills">
-            <span style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-right:2px;">Radius:</span>
-            <button type="button" class="radar-radius-btn ${radiusKm === 1 ? 'active' : ''}" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 1)">1 KM</button>
-            <button type="button" class="radar-radius-btn ${radiusKm === 3 ? 'active' : ''}" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 3)">3 KM</button>
-            <button type="button" class="radar-radius-btn ${radiusKm === 5 ? 'active' : ''}" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 5)">5 KM</button>
-            <button type="button" class="radar-radius-btn ${radiusKm === 10 ? 'active' : ''}" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 10)">10 KM</button>
-            <button type="button" class="radar-radius-btn ${radiusKm === 25 ? 'active' : ''}" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 25)">25 KM (Bandung)</button>
+          <!-- District Filter Dropdown -->
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <label style="font-size:12px; font-weight:800; color:#94a3b8;"><i class="fa-solid fa-filter" style="color:#f43f5e;"></i> Wilayah / Kecamatan:</label>
+            <select id="radarDistrictSelect" onchange="SalesSuperpowers.handleDistrictChange(this.value, '${containerId}')" style="padding:7px 14px; border-radius:10px; font-size:12px; font-weight:800; border:1px solid rgba(255,255,255,0.2); background:#1e293b; color:#ffffff; cursor:pointer;">
+              <option value="all" ${district === 'all' ? 'selected' : ''}>🌐 Semua Wilayah / Kecamatan</option>
+              <option value="buahbatu" ${district === 'buahbatu' ? 'selected' : ''}>📍 Buahbatu / Buah Batu</option>
+              <option value="kiara" ${district === 'kiara' ? 'selected' : ''}>📍 Kiara Condong</option>
+              <option value="batununggal" ${district === 'batununggal' ? 'selected' : ''}>📍 Batununggal</option>
+              <option value="lengkong" ${district === 'lengkong' ? 'selected' : ''}>📍 Lengkong</option>
+              <option value="antapani" ${district === 'antapani' ? 'selected' : ''}>📍 Antapani</option>
+              <option value="arcamanik" ${district === 'arcamanik' ? 'selected' : ''}>📍 Arcamanik</option>
+              <option value="rancasari" ${district === 'rancasari' ? 'selected' : ''}>📍 Rancasari</option>
+              <option value="gedebage" ${district === 'gedebage' ? 'selected' : ''}>📍 Gedebage</option>
+              <option value="cibeunying" ${district === 'cibeunying' ? 'selected' : ''}>📍 Cibeunying</option>
+              <option value="sukajadi" ${district === 'sukajadi' ? 'selected' : ''}>📍 Sukajadi</option>
+              <option value="dago" ${district === 'dago' ? 'selected' : ''}>📍 Dago / Coblong</option>
+              <option value="cimahi" ${district === 'cimahi' ? 'selected' : ''}>📍 Cimahi</option>
+              <option value="sumedang" ${district === 'sumedang' ? 'selected' : ''}>📍 Sumedang / Jatinangor</option>
+            </select>
           </div>
         </div>
 
-        <!-- Radar Quick Search Bar -->
-        <div class="radar-search-box-wrap">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="radarSearchInput" placeholder="Cari nama prospek, unit mobil, atau kecamatan di radar..." oninput="SalesSuperpowers.filterRadarLeads(this.value)">
-          <button type="button" class="btn-fu" style="background:rgba(255,255,255,0.15); color:#fff; border:none; padding:4px 10px; font-size:11px; border-radius:8px; white-space:nowrap;" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', ${radiusKm})">
-            <i class="fa-solid fa-rotate-right"></i> Refresh GPS
-          </button>
+        <!-- Interactive Leaflet Map Container -->
+        <div style="margin-top: 14px; border-radius: 14px; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); position: relative; background: #0f172a; height: 380px;">
+          <div id="radarLeafletMapContainer" style="width: 100%; height: 100%;"></div>
         </div>
       </div>
 
@@ -103,14 +116,17 @@ const SalesSuperpowers = {
       <div id="radarLeadsContainer">
         <div style="text-align:center; padding:40px 20px; background:#fff; border-radius:18px; border:1px solid #e2e8f0;">
           <div style="width:50px; height:50px; border-radius:50%; border:3px solid #d7123a; border-top-color:transparent; animation:radar-spin 1s linear infinite; margin:0 auto 12px;"></div>
-          <p style="font-size:13px; font-weight:700; color:#334155; margin:0;">Memindai titik koordinat &amp; database terdekat...</p>
+          <p style="font-size:13px; font-weight:700; color:#334155; margin:0;">Memuat titik koordinat peta &amp; database customer...</p>
         </div>
       </div>
     `;
 
+    // Ensure Leaflet JS is loaded
+    await this.ensureLeafletLoaded();
+
     // Fetch GPS coordinates & data
     if (!navigator.geolocation) {
-      this.fetchRadarData(-6.9248, 107.6472, radiusKm);
+      this.fetchRadarData(-6.9248, 107.6472, radiusKm, district);
       return;
     }
 
@@ -119,25 +135,46 @@ const SalesSuperpowers = {
         this.salesCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         const badge = document.getElementById('radarGpsStatus');
         if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> GPS Terkunci (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
-        this.fetchRadarData(pos.coords.latitude, pos.coords.longitude, radiusKm);
+        this.fetchRadarData(pos.coords.latitude, pos.coords.longitude, radiusKm, district);
       },
       (err) => {
         console.warn('GPS error, using fallback', err);
         const badge = document.getElementById('radarGpsStatus');
         if (badge) badge.innerHTML = `<i class="fa-solid fa-building"></i> Posisi: Kiara Condong`;
-        this.fetchRadarData(-6.9248, 107.6472, radiusKm);
+        this.fetchRadarData(-6.9248, 107.6472, radiusKm, district);
       },
       { timeout: 8000, enableHighAccuracy: true }
     );
   },
 
-  async fetchRadarData(lat, lng, radiusKm) {
+  handleDistrictChange(districtVal, containerId) {
+    this.currentDistrict = districtVal;
+    this.fetchRadarData(
+      this.salesCoords ? this.salesCoords.lat : -6.9248,
+      this.salesCoords ? this.salesCoords.lng : 107.6472,
+      this.currentRadius,
+      districtVal
+    );
+  },
+
+  async ensureLeafletLoaded() {
+    if (window.L) return;
+    if (!document.querySelector('link[href*="leaflet.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
+    await this.loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+  },
+
+  async fetchRadarData(lat, lng, radiusKm, district = 'all') {
     const listContainer = document.getElementById('radarLeadsContainer');
     if (!listContainer) return;
 
     try {
       const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
-      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&sales_id=${salesId}`);
+      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&district=${encodeURIComponent(district)}&db_source=radar&sales_id=${salesId}`);
       const result = await res.json();
 
       if (result.status !== 'success' || !result.data || result.data.length === 0) {
@@ -146,25 +183,83 @@ const SalesSuperpowers = {
             <div style="width:60px; height:60px; border-radius:50%; background:#f1f5f9; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:24px;">
               <i class="fa-solid fa-location-crosshairs"></i>
             </div>
-            <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Prospek dalam Radius ${radiusKm} KM</h4>
-            <p style="font-size:12.5px; color:#64748b; margin:0 0 16px; max-width:400px; margin-inline:auto;">Coba perbesar radius radar untuk mendeteksi database di kecamatan sekitar.</p>
-            <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
-              <button class="btn-fu btn-fu-navy" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 10)">Perluas Radius 10 KM</button>
-              <button class="btn-fu btn-fu-crimson" onclick="SalesSuperpowers.renderRadarCockpit('${containerId}', 25)">Perluas Radius 25 KM</button>
-            </div>
+            <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Customer di Wilayah ini</h4>
+            <p style="font-size:12.5px; color:#64748b; margin:0;">Coba ganti ke wilayah / kecamatan lain pada filter dropdown di atas.</p>
           </div>
         `;
         this.radarData = [];
+        this.renderRadarLeafletMap([], lat, lng);
         return;
       }
 
       this.radarData = result.data;
+      this.renderRadarLeafletMap(this.radarData, lat, lng);
       this.renderRadarLeadCards(this.radarData);
 
     } catch (e) {
       console.error(e);
       listContainer.innerHTML = `<div class="alert-box-error">Gagal memuat data radar: ${e.message}</div>`;
     }
+  },
+
+  renderRadarLeafletMap(leads, centerLat, centerLng) {
+    const mapEl = document.getElementById('radarLeafletMapContainer');
+    if (!mapEl || !window.L) return;
+
+    if (this.leafletMap) {
+      this.leafletMap.remove();
+      this.leafletMap = null;
+    }
+
+    const defaultLat = (leads && leads.length > 0) ? leads[0].lat : centerLat;
+    const defaultLng = (leads && leads.length > 0) ? leads[0].lng : centerLng;
+
+    const map = L.map('radarLeafletMapContainer').setView([defaultLat, defaultLng], 13);
+    this.leafletMap = map;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap & Tunas Toyota Kircon'
+    }).addTo(map);
+
+    // Sales Location Pin
+    if (this.salesCoords) {
+      L.marker([this.salesCoords.lat, this.salesCoords.lng], {
+        title: 'Posisi Sales'
+      }).addTo(map).bindPopup('<b>📍 Lokasi Saya (Sales)</b>');
+    }
+
+    // Customer Pins
+    (leads || []).forEach(c => {
+      let pinColor = '#3b82f6';
+      if (c.status === 'Belum Dihubungi') pinColor = '#d7123a';
+      else if (c.status === 'Menunggu Respon') pinColor = '#f59e0b';
+      else if (c.status === 'Tertarik / Jadwal Servis') pinColor = '#8b5cf6';
+      else if (c.status === 'Deal / Selesai') pinColor = '#10b981';
+
+      const customIcon = L.divIcon({
+        className: 'custom-leaflet-pin',
+        html: `<div style="background:${pinColor}; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 3px 8px rgba(0,0,0,0.4);"></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+
+      const popupHtml = `
+        <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size:12px; line-height:1.4; padding:4px;">
+          <b style="font-size:13.5px; color:#0f172a;">${escapeHtml(c.name)}</b>
+          <div style="color:#64748b; font-size:11px; margin-top:2px;"><i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)}</div>
+          <div style="margin-top:4px;">🚗 <b>${escapeHtml(c.car_model)}</b></div>
+          <div style="margin-top:4px;">Status: <b style="color:${pinColor};">${escapeHtml(c.status)}</b></div>
+          ${c.visit_photo ? `<div style="margin-top:6px;"><img src="${c.visit_photo}" style="width:100%; max-height:100px; object-fit:cover; border-radius:8px;"></div>` : ''}
+          <div style="margin-top:8px; display:flex; gap:6px;">
+            <button onclick="SalesSuperpowers.openRadarFollowupModal(${c.id})" style="background:#10b981; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11px; cursor:pointer;"><i class="fa-solid fa-clipboard-check"></i> Follow Up</button>
+            <a href="${c.maps_url}" target="_blank" style="background:#2563eb; color:#fff; text-decoration:none; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11px;"><i class="fa-solid fa-route"></i> Maps</a>
+          </div>
+        </div>
+      `;
+
+      L.marker([c.lat, c.lng], { icon: customIcon }).addTo(map).bindPopup(popupHtml);
+    });
   },
 
   renderRadarLeadCards(leads) {
@@ -175,7 +270,7 @@ const SalesSuperpowers = {
       listContainer.innerHTML = `
         <div style="text-align:center; padding:30px; background:#fff; border-radius:16px; color:#64748b;">
           <i class="fa-solid fa-magnifying-glass" style="font-size:24px; margin-bottom:8px; opacity:0.5;"></i>
-          <p style="margin:0; font-weight:700;">Tidak ada prospek yang cocok dengan pencarian.</p>
+          <p style="margin:0; font-weight:700;">Tidak ada customer yang cocok dengan pencarian.</p>
         </div>
       `;
       return;
@@ -184,64 +279,60 @@ const SalesSuperpowers = {
     let html = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <span style="font-size:13px; font-weight:800; color:#334155;">
-          🎯 Ditemukan <b style="color:#d7123a;">${leads.length} Prospek</b> dalam radius ${this.currentRadius} KM
+          🎯 Ditemukan <b style="color:#d7123a;">${leads.length} Customer Radar</b> di Wilayah ini
         </span>
-        <span style="font-size:11.5px; color:#64748b;">Urutan: Terdekat dari posisi Anda</span>
       </div>
       <div class="radar-leads-grid">
     `;
 
-    leads.forEach((item, idx) => {
+    leads.forEach((item) => {
       const initials = (item.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-      const isNear = item.distance_km < 1;
       const etaMins = Math.max(2, Math.round(item.distance_km * 2.5));
-      const hasPhone = item.phone && item.phone.trim() !== '' && item.phone !== '-';
 
       html += `
-        <div class="radar-lead-card-deluxe">
+        <div class="radar-lead-card-deluxe" style="background:#fff; border-radius:16px; border:1px solid #e2e8f0; padding:16px; margin-bottom:14px; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
           <div>
-            <div class="radar-card-header">
-              <div class="radar-customer-profile">
-                <div class="radar-avatar-circle">${initials}</div>
+            <div class="radar-card-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+              <div class="radar-customer-profile" style="display:flex; align-items:center; gap:10px;">
+                <div class="radar-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#0d1b3e; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px;">${initials}</div>
                 <div>
-                  <h4 class="radar-customer-name">${escapeHtml(item.name)}</h4>
-                  <div class="radar-district-tag">
+                  <h4 class="radar-customer-name" style="font-size:14.5px; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(item.name)}</h4>
+                  <div class="radar-district-tag" style="font-size:11.5px; color:#64748b; margin-top:2px;">
                     <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(item.district)}
                   </div>
                 </div>
               </div>
               <div style="text-align:right;">
-                <span class="radar-dist-chip">
+                <span class="radar-dist-chip" style="background:#eff6ff; color:#2563eb; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px;">
                   <i class="fa-solid fa-route"></i> ${item.formatted_distance}
                 </span>
-                <div style="font-size:10.5px; font-weight:700; color:#64748b; margin-top:3px;">
-                  🚗 ~${etaMins} mnt
-                </div>
               </div>
             </div>
 
-            <div class="radar-vehicle-box">
+            <div class="radar-vehicle-box" style="background:#f8fafc; padding:10px 12px; border-radius:10px; font-size:12px; margin-bottom:12px;">
               <div class="radar-vehicle-row">
-                <i class="fa-solid fa-car-side" style="color:#d7123a;"></i>
-                <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model)}</span> ${item.last_car_model ? `(Saat ini: ${escapeHtml(item.last_car_model)})` : ''}</span>
+                <i class="fa-solid fa-car-side" style="color:#d7123a; margin-right:6px;"></i>
+                <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model)}</span></span>
               </div>
-              ${item.car_age ? `<div style="font-size:11px; color:#64748b; margin-top:3px;"><i class="fa-solid fa-clock"></i> Usia: <b>${escapeHtml(item.car_age)}</b></div>` : ''}
               <div style="margin-top:4px; font-size:11.5px; color:#64748b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
                 <span>Prioritas: <b style="color:#d7123a;">${escapeHtml(item.priority || 'Prioritas Trade-in')}</b></span>
                 <span>Status: <b style="color:#2563eb;">${escapeHtml(item.status || 'Belum Dihubungi')}</b></span>
               </div>
-              <div style="margin-top:4px; font-size:11px; color:#475569;">
-                <span><i class="fa-solid fa-user-check" style="color:#059669;"></i> PIC Sales: <b>${escapeHtml(item.sales_name || 'Terbuka (Siapa Saja)')}</b></span>
-              </div>
+              ${item.visit_photo ? `
+                <div style="margin-top:8px;">
+                  <span style="font-size:11px; font-weight:800; color:#059669; display:block; margin-bottom:3px;"><i class="fa-solid fa-camera"></i> Bukti Kunjungan:</span>
+                  <img src="${item.visit_photo}" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px;">
+                </div>
+              ` : ''}
             </div>
           </div>
 
-          <div class="radar-action-grid">
-            <a href="${item.maps_url}" target="_blank" class="btn-radar-map" title="Buka Navigasi Rute Google Maps">
+          <div class="radar-action-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <a href="${item.maps_url}" target="_blank" class="btn-radar-map" style="background:#2563eb; color:#fff; text-align:center; padding:8px; border-radius:8px; text-decoration:none; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; justify-content:center; gap:4px;">
               <i class="fa-solid fa-map-location-dot"></i> Rute Maps
             </a>
-            <button type="button" class="btn-radar-wa" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;" onclick="SalesSuperpowers.openRadarFollowupModal(${item.id})" title="Input Progress Follow-Up / Hasil Kunjungan">
-              <i class="fa-solid fa-clipboard-check"></i> Follow Up &amp; Progress
+            <button type="button" class="btn-radar-wa" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border:none; padding:8px; border-radius:8px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; justify-content:center; gap:4px; cursor:pointer;" onclick="SalesSuperpowers.openRadarFollowupModal(${item.id})">
+              <i class="fa-solid fa-clipboard-check"></i> Follow Up &amp; Foto
             </button>
           </div>
         </div>
@@ -250,6 +341,188 @@ const SalesSuperpowers = {
 
     html += `</div>`;
     listContainer.innerHTML = html;
+  },
+
+  openRadarFollowupModal(customerId) {
+    const item = (this.radarData || []).find(x => x.id == customerId) || { id: customerId, name: 'Customer', district: '' };
+    this.selectedPhotoFile = null;
+
+    let modal = document.getElementById('radarFollowupModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'radarFollowupModal';
+      modal.className = 'modal-overlay';
+      modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,0.75); backdrop-filter:blur(6px); z-index:99999; display:flex; align-items:center; justify-content:center; padding:16px;';
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div class="modal-content" style="background:#ffffff; border-radius:20px; max-width:480px; width:100%; max-height:90vh; overflow-y:auto; padding:20px; box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #f1f5f9; padding-bottom:12px; margin-bottom:16px;">
+          <div>
+            <h3 style="font-size:16px; font-weight:900; color:#0f172a; margin:0;">Follow Up &amp; Progress Kunjungan</h3>
+            <p style="font-size:11.5px; color:#64748b; margin:2px 0 0 0;">${escapeHtml(item.name)} • <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(item.district)}</p>
+          </div>
+          <button onclick="SalesSuperpowers.closeRadarFollowupModal()" style="background:none; border:none; font-size:20px; color:#64748b; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form id="formRadarFollowup" onsubmit="event.preventDefault(); SalesSuperpowers.submitRadarFollowup(${item.id});">
+          <div style="margin-bottom:14px;">
+            <label style="font-weight:800; font-size:12px; color:#334155; margin-bottom:4px; display:block;">Status Follow Up Baru <span style="color:red;">*</span></label>
+            <select id="radarFuStatusSelect" class="form-control" style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1; font-weight:700;">
+              <option value="Belum Dihubungi" ${item.status === 'Belum Dihubungi' ? 'selected' : ''}>Belum Dihubungi</option>
+              <option value="Menunggu Respon" ${item.status === 'Menunggu Respon' ? 'selected' : ''}>Menunggu Respon / Janjian</option>
+              <option value="Tertarik / Jadwal Servis" ${item.status === 'Tertarik / Jadwal Servis' ? 'selected' : ''}>Tertarik / Servis</option>
+              <option value="Deal / Selesai" ${item.status === 'Deal / Selesai' ? 'selected' : ''}>Deal / SPK</option>
+              <option value="Tidak Tertarik" ${item.status === 'Tidak Tertarik' ? 'selected' : ''}>Tidak Tertarik / Batal</option>
+            </select>
+          </div>
+
+          <!-- TAM Checklist Checkboxes -->
+          <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:14px;">
+            <div style="font-size:11.5px; font-weight:800; color:#475569; margin-bottom:8px;"><i class="fa-solid fa-list-check" style="color:#2563eb;"></i> Verifikasi Respon Customer:</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px; font-weight:700; color:#334155;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="radarFuConn" checked> 1. No. Aktif</label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="radarFuCont" checked> 2. Ada Respon</label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="radarFuProsp"> 3. Minat Beli</label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="radarFuSpk"> 4. Closing SPK</label>
+            </div>
+          </div>
+
+          <!-- Notes Textarea with Voice Dictation -->
+          <div style="margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="font-weight:800; font-size:12px; color:#334155; margin:0;">Catatan / Alasan Progress</label>
+              <button type="button" class="btn-voice-pill" id="btnRadarVoiceMic" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:4px 8px; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer;">
+                <i class="fa-solid fa-microphone"></i> Dikte Suara
+              </button>
+            </div>
+            <textarea id="radarFuNotesText" rows="3" class="form-control" placeholder="Tuliskan hasil pembicaraan/kunjungan dengan customer..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1;">${escapeHtml(item.reason_followup || '')}</textarea>
+            <div id="radarVoiceStatusPill" style="display:none; font-size:11px; color:#2563eb; margin-top:4px;"></div>
+          </div>
+
+          <!-- Photo Proof Input & Preview -->
+          <div style="margin-bottom:18px;">
+            <label style="font-weight:800; font-size:12px; color:#334155; margin-bottom:6px; display:block;">📷 Foto Bukti Kunjungan / Lokasi Customer</label>
+            <input type="file" id="radarVisitPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="SalesSuperpowers.handleRadarPhotoSelect(this)">
+            
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <button type="button" onclick="document.getElementById('radarVisitPhotoInput').click()" style="background:#f1f5f9; color:#334155; border:1.5px dashed #cbd5e1; padding:10px 16px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-camera" style="color:#d7123a; font-size:16px;"></i> Ambil / Upload Foto Lokasi
+              </button>
+            </div>
+
+            <div id="radarPhotoPreviewWrap" style="margin-top:10px; ${item.visit_photo ? '' : 'display:none;'}">
+              <div style="position:relative; display:inline-block; width:100%;">
+                <img id="radarPhotoPreviewImg" src="${item.visit_photo || ''}" style="width:100%; max-height:160px; object-fit:cover; border-radius:12px; border:2px solid #e2e8f0; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <button type="button" onclick="SalesSuperpowers.removeRadarPhoto()" style="position:absolute; top:6px; right:6px; background:#ef4444; color:#fff; border:none; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid #f1f5f9; padding-top:14px;">
+            <button type="button" onclick="SalesSuperpowers.closeRadarFollowupModal()" class="btn-fu btn-fu-secondary" style="padding:8px 16px; font-size:12px;">Batal</button>
+            <button type="submit" id="btnSubmitRadarFu" class="btn-fu btn-fu-crimson" style="padding:8px 18px; font-size:12px; font-weight:800;"><i class="fa-solid fa-floppy-disk"></i> Simpan Progress &amp; Foto</button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    modal.style.display = 'flex';
+    this.initVoiceRecorder('radarFuNotesText', 'btnRadarVoiceMic', 'radarVoiceStatusPill');
+  },
+
+  closeRadarFollowupModal() {
+    const modal = document.getElementById('radarFollowupModal');
+    if (modal) modal.style.display = 'none';
+  },
+
+  handleRadarPhotoSelect(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    this.selectedPhotoFile = file;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const wrap = document.getElementById('radarPhotoPreviewWrap');
+      const img = document.getElementById('radarPhotoPreviewImg');
+      if (img) img.src = e.target.result;
+      if (wrap) wrap.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  },
+
+  removeRadarPhoto() {
+    this.selectedPhotoFile = null;
+    const input = document.getElementById('radarVisitPhotoInput');
+    if (input) input.value = '';
+    const wrap = document.getElementById('radarPhotoPreviewWrap');
+    if (wrap) wrap.style.display = 'none';
+  },
+
+  async submitRadarFollowup(customerId) {
+    const btn = document.getElementById('btnSubmitRadarFu');
+    const origHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+    }
+
+    try {
+      const statusVal = document.getElementById('radarFuStatusSelect').value;
+      const connVal = document.getElementById('radarFuConn').checked ? 'TRUE' : 'FALSE';
+      const contVal = document.getElementById('radarFuCont').checked ? 'TRUE' : 'FALSE';
+      const prospVal = document.getElementById('radarFuProsp').checked ? 'TRUE' : 'FALSE';
+      const spkVal = document.getElementById('radarFuSpk').checked ? 'TRUE' : 'FALSE';
+      const notesVal = document.getElementById('radarFuNotesText').value.trim();
+      const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
+
+      const formData = new FormData();
+      formData.append('id', customerId);
+      formData.append('sales_id', salesId);
+      formData.append('status', statusVal);
+      formData.append('connected', connVal);
+      formData.append('contacted', contVal);
+      formData.append('prospect', prospVal);
+      formData.append('spk', spkVal);
+      formData.append('reason_followup', notesVal);
+
+      if (this.selectedPhotoFile) {
+        formData.append('visit_photo', this.selectedPhotoFile);
+      }
+
+      const res = await fetch(`${this.getApiPrefix()}api_followup.php?action=update_status`, {
+        method: 'POST',
+        body: formData
+      });
+      const json = await res.json();
+
+      if (json.success) {
+        this.closeRadarFollowupModal();
+        if (window.showCustomAlert) {
+          window.showCustomAlert('Progress Berhasil Disimpan', 'Status follow-up dan foto bukti kunjungan berhasil disimpan.', 'success');
+        } else {
+          alert('Progress follow-up berhasil disimpan!');
+        }
+        this.fetchRadarData(
+          this.salesCoords ? this.salesCoords.lat : -6.9248,
+          this.salesCoords ? this.salesCoords.lng : 107.6472,
+          this.currentRadius,
+          this.currentDistrict
+        );
+      } else {
+        alert(json.message || 'Gagal menyimpan progress');
+      }
+
+    } catch (e) {
+      console.error(e);
+      alert('Terjadi kesalahan koneksi saat menyimpan.');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+    }
   },
 
   filterRadarLeads(query) {
@@ -1697,3 +1970,5 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
 
 // Global shorthand
 window.SalesSuperpowers = SalesSuperpowers;
+window.openRadarFollowupModal = (id) => SalesSuperpowers.openRadarFollowupModal(id);
+window.submitRadarFollowup = (id) => SalesSuperpowers.submitRadarFollowup(id);
