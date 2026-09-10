@@ -43,7 +43,7 @@ if ($conn && !$conn->connect_error) {
                       VALUES (1, '$SPREADSHEET_ID', '$DEFAULT_SPREADSHEET_URL', '$APPS_SCRIPT_URL', 1)");
     } else {
         $cur_row = $c_check->fetch_assoc();
-        if (empty($cur_row['spreadsheet_id']) || $cur_row['spreadsheet_id'] === '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc') {
+        if (empty($cur_row['spreadsheet_id']) || $cur_row['spreadsheet_id'] === '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc' || $cur_row['spreadsheet_id'] === '1P7_QcL88DFg7v3arU8m_keOtUNLoiE_4i74t65f6HFQ') {
             $conn->query("UPDATE tabel_sheets_sync_config SET 
                             spreadsheet_id = '$SPREADSHEET_ID', 
                             spreadsheet_url = '$DEFAULT_SPREADSHEET_URL' 
@@ -86,32 +86,65 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     if (empty($custom_id) && $conn) {
         $res_cfg = $conn->query("SELECT spreadsheet_id FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
         if ($res_cfg && $c_row = $res_cfg->fetch_assoc()) {
-            if (!empty($c_row['spreadsheet_id']) && $c_row['spreadsheet_id'] !== '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc') {
-                $active_sheet_id = trim($c_row['spreadsheet_id']);
+            $db_sheet_id = trim($c_row['spreadsheet_id']);
+            if (!empty($db_sheet_id) && $db_sheet_id !== '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc' && $db_sheet_id !== '1P7_QcL88DFg7v3arU8m_keOtUNLoiE_4i74t65f6HFQ') {
+                $active_sheet_id = $db_sheet_id;
             }
         }
     }
 
-    $fetch_url = "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/gviz/tq?tqx=out:csv";
+    if (empty($active_sheet_id) || $active_sheet_id === '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc' || $active_sheet_id === '1P7_QcL88DFg7v3arU8m_keOtUNLoiE_4i74t65f6HFQ') {
+        $active_sheet_id = $SPREADSHEET_ID;
+    }
 
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $fetch_url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_TIMEOUT => 25
-    ]);
-    $csvData = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlErr = curl_error($ch);
-    curl_close($ch);
+    $cache_file = __DIR__ . '/../storage/sheets_target_cache.csv';
+    $candidate_urls = [
+        "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/gviz/tq?tqx=out:csv",
+        "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/export?format=csv"
+    ];
 
-    if (!$csvData || $httpCode !== 200) {
+    $csvData = false;
+    $lastErr = '';
+
+    foreach ($candidate_urls as $fetch_url) {
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $fetch_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_IPRESOLVE => defined('CURL_IPRESOLVE_V4') ? CURL_IPRESOLVE_V4 : 1,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            CURLOPT_CONNECTTIMEOUT => 3,
+            CURLOPT_TIMEOUT => 4
+        ]);
+        $res = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+
+        if ($httpCode === 200 && !empty($res) && strlen($res) > 200 && stripos($res, 'Tim Pak') !== false) {
+            $csvData = $res;
+            if (!is_dir(dirname($cache_file))) {
+                @mkdir(dirname($cache_file), 0777, true);
+            }
+            @file_put_contents($cache_file, $res);
+            break;
+        } else {
+            $lastErr = $curlErr ?: "HTTP $httpCode";
+        }
+    }
+
+    // Fallback ke cache lokal jika remote fetch gagal / rate-limited
+    if (!$csvData && file_exists($cache_file)) {
+        $csvData = @file_get_contents($cache_file);
+    }
+
+    if (!$csvData) {
         return [
             'status' => 'error',
-            'message' => 'Gagal mengambil data dari Google Spreadsheet: ' . ($curlErr ?: "HTTP $httpCode")
+            'message' => 'Gagal mengambil data dari Google Spreadsheet: ' . ($lastErr ?: 'Koneksi timeout')
         ];
     }
 
@@ -475,8 +508,8 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         }
     }
 
-    // Update status aktif sales
-    if (!empty($active_sheet_ids)) {
+    // Update status aktif sales (dengan threshold proteksi minimal 10 orang agar tidak ter-deaktivasi massal jika sheet bermasalah)
+    if (!empty($active_sheet_ids) && count($active_sheet_ids) >= 10) {
         $id_list_str = implode(',', $active_sheet_ids);
         $conn->query("UPDATE sales_accounts SET is_active = 0 WHERE id NOT IN ($id_list_str)");
     }

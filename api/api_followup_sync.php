@@ -76,30 +76,6 @@ if ($action === 'save_settings') {
         ", [$key, $val, $val]);
     }
 
-    // Sync to MySQL tabel_sheets_sync_config if active
-    if ($is_mysql && $conn) {
-        try {
-            $sheetUrl = trim($input['google_sheet_url'] ?? '');
-            $scriptUrl = trim($input['google_apps_script_url'] ?? '');
-            if ($sheetUrl) {
-                $sheetId = '';
-                if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sheetUrl, $matches)) {
-                    $sheetId = $matches[1];
-                }
-                $conn->query("
-                    INSERT INTO tabel_sheets_sync_config (id, spreadsheet_url, spreadsheet_id, apps_script_webhook_url, auto_sync_enabled)
-                    VALUES (1, '" . $conn->real_escape_string($sheetUrl) . "', '" . $conn->real_escape_string($sheetId) . "', '" . $conn->real_escape_string($scriptUrl) . "', 1)
-                    ON DUPLICATE KEY UPDATE
-                        spreadsheet_url = '" . $conn->real_escape_string($sheetUrl) . "',
-                        spreadsheet_id = '" . $conn->real_escape_string($sheetId) . "',
-                        apps_script_webhook_url = '" . $conn->real_escape_string($scriptUrl) . "'
-                ");
-            }
-        } catch (Exception $e) {
-            // Ignore error
-        }
-    }
-
     echo json_encode(['success' => true, 'message' => 'Pengaturan sinkronisasi berhasil disimpan']);
     exit;
 }

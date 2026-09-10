@@ -116,7 +116,7 @@ if ($method === 'GET') {
             $should_sync = true;
             if ($q_chk && $c_row = $q_chk->fetch_assoc()) {
                 $last_time = strtotime($c_row['last_sync_at'] ?? '2000-01-01');
-                if (time() - $last_time < 15) {
+                if (time() - $last_time < 300) {
                     $should_sync = false;
                 }
             }
@@ -227,7 +227,7 @@ if ($method === 'GET') {
                                       SUM(t.realisasi_spk) as realisasi_spk, SUM(t.realisasi_do) as realisasi_do 
                                       FROM target_do_bulanan t 
                                       JOIN sales_accounts s ON t.sales_account_id = s.id 
-                                      WHERE (s.nama_spv = '$spv' OR s.nama_spv LIKE '%$spv_clean%') 
+                                      WHERE (s.nama_spv = '$spv' OR s.nama_spv LIKE '%$spv_clean%') AND s.is_active = 1 
                                       GROUP BY t.periode_bulan");
         } elseif (!isset($_GET['id_sales'])) {
             // Master Aggregate for All Branch Teams
@@ -235,6 +235,7 @@ if ($method === 'GET') {
                                       SUM(t.realisasi_spk) as realisasi_spk, SUM(t.realisasi_do) as realisasi_do 
                                       FROM target_do_bulanan t 
                                       JOIN sales_accounts s ON t.sales_account_id = s.id 
+                                      WHERE s.is_active = 1 
                                       GROUP BY t.periode_bulan");
         } else {
             foreach ($active_cycle as $idx => $m) {

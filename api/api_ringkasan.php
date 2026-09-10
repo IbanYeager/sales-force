@@ -33,7 +33,7 @@ if (function_exists('syncGoogleSheetsToDb') || file_exists(__DIR__ . '/api_sheet
         $should_sync = true;
         if ($q_chk && $c_row = $q_chk->fetch_assoc()) {
             $last_time = strtotime($c_row['last_sync_at'] ?? '2000-01-01');
-            if (time() - $last_time < 15) {
+            if (time() - $last_time < 300) {
                 $should_sync = false;
             }
         }
