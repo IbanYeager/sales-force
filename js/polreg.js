@@ -11,8 +11,13 @@ sessionStorage.setItem('polreg_active_year', '2026');
 let currentKecamatan = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    localStorage.setItem('sft_last_visited_page', window.location.href);
+    sessionStorage.setItem('sft_last_visited_page', window.location.href);
+  } catch(e) {}
+
   const urlParams = new URLSearchParams(window.location.search);
-  activeYear = urlParams.get('tahun') || '2026';
+  activeYear = urlParams.get('tahun') || sessionStorage.getItem('polreg_active_year') || '2026';
   sessionStorage.setItem('polreg_active_year', activeYear);
 
   const yearSelect = document.getElementById('yearSelect');
@@ -20,8 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     yearSelect.value = activeYear;
   }
 
-  // Handle Tab Switch from URL
-  const tabFromUrl = urlParams.get('tab') || 'analisis';
+  // Handle Tab Switch from URL or sessionStorage
+  const tabFromUrl = urlParams.get('tab') || sessionStorage.getItem('polreg_active_tab') || 'analisis';
   switchPolregTab(tabFromUrl);
 
   // Auto-close dropdown menu when clicking outside
@@ -50,6 +55,13 @@ function switchPolregTab(tabName) {
   const tabAnalisis = document.getElementById('tabAnalisis');
   const tabDaftar = document.getElementById('tabDaftar');
 
+  sessionStorage.setItem('polreg_active_tab', tabName);
+  try {
+    const u = new URL(window.location.href);
+    u.searchParams.set('tab', tabName);
+    window.history.replaceState({}, '', u.toString());
+  } catch (e) {}
+
   if (tabName === 'daftar') {
     if (viewAnalisis) viewAnalisis.style.display = 'none';
     if (viewDaftar) viewDaftar.style.display = 'block';
@@ -66,6 +78,11 @@ function switchPolregTab(tabName) {
 function setYear(year) {
   activeYear = year;
   sessionStorage.setItem('polreg_active_year', year);
+  try {
+    const u = new URL(window.location.href);
+    u.searchParams.set('tahun', year);
+    window.history.replaceState({}, '', u.toString());
+  } catch (e) {}
   fetchDataDariDatabase();
 }
 

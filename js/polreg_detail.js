@@ -53,6 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function changeSortOrder(val) {
         currentSortOrder = val;
+        sessionStorage.setItem('polreg_detail_sort', val);
+        try {
+            const u = new URL(window.location.href);
+            u.searchParams.set('sort', val);
+            window.history.replaceState({}, '', u.toString());
+        } catch (e) {}
+
         const elSelect = document.getElementById('sortSelect');
         if (elSelect) elSelect.value = val;
         
@@ -214,6 +221,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectKategori(kategori) {
       currentKategori = kategori;
+      sessionStorage.setItem('polreg_detail_merk', kategori);
+      try {
+          const u = new URL(window.location.href);
+          if (kategori === 'Teratas') {
+              u.searchParams.delete('merk');
+          } else {
+              u.searchParams.set('merk', kategori);
+          }
+          window.history.replaceState({}, '', u.toString());
+      } catch (e) {}
       renderTabs();
       renderCarList();
       if (document.getElementById('viewMap').style.display === 'block') {
@@ -235,6 +252,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function initPage() {
+      // Simpan riwayat halaman terakhir yang dibuka di aplikasi
+      try {
+        localStorage.setItem('sft_last_visited_page', window.location.href);
+        sessionStorage.setItem('sft_last_visited_page', window.location.href);
+      } catch(e) {}
+
       const elTitle = document.getElementById('pageTitle');
       if (elTitle) elTitle.textContent = `Detail Wilayah ${tahunPilihDefault}`;
       
@@ -243,6 +266,18 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const elThn = document.getElementById('displayTahun');
       if (elThn) elThn.textContent = filterTahun;
+
+      // Pulihkan filter sort & merk jika ada dari URL atau sessionStorage
+      const savedSort = urlParams.get('sort') || sessionStorage.getItem('polreg_detail_sort');
+      if (savedSort) {
+          currentSortOrder = savedSort;
+          const elSelect = document.getElementById('sortSelect');
+          if (elSelect) elSelect.value = savedSort;
+      }
+      const savedMerk = urlParams.get('merk') || sessionStorage.getItem('polreg_detail_merk');
+      if (savedMerk) {
+          currentKategori = savedMerk;
+      }
 
       try {
         const elSearch = document.getElementById('searchType');
@@ -255,6 +290,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await fetchAndRender();
         setLoading(false);
+
+        // Pulihkan tab tampilan terakhir (Peta Lokasi vs Data List) saat halaman di-refresh
+        const savedView = urlParams.get('view') || sessionStorage.getItem('polreg_detail_view');
+        if (savedView === 'map') {
+            switchView('map');
+        }
       } catch (e) {
         console.error(e);
         const elLoading = document.getElementById('loadingIndicator');
@@ -289,6 +330,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const viewList = document.getElementById('viewList');
       const viewMap = document.getElementById('viewMap');
       const headerList = document.getElementById('headerList');
+
+      // Simpan tab tampilan terakhir agar saat refresh tidak kembali ke halaman/tab awal
+      sessionStorage.setItem('polreg_detail_view', view);
+      try {
+          const u = new URL(window.location.href);
+          u.searchParams.set('view', view);
+          window.history.replaceState({}, '', u.toString());
+      } catch (e) {}
 
       if (view === 'list') {
         btnList.style.background = 'var(--primary-red)';

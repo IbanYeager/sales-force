@@ -38,6 +38,14 @@
     // ── Determine path prefix ───────────────────────────────
     const path = window.location.pathname;
     const isRoot = !path.includes('/pages/') && !path.includes('/pages_spv/') && !path.includes('/pages_kacab/');
+
+    // Simpan riwayat halaman aktif agar jika refresh / re-open aplikasi, user tidak terlempar ke halaman pertama
+    try {
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('sft_last_visited_page', window.location.href);
+            localStorage.setItem('sft_last_visited_page', window.location.href);
+        }
+    } catch (e) {}
     const prefix = isRoot ? '' : '../';
 
     // ── Build sidebar HTML based on Role ────────────────────
