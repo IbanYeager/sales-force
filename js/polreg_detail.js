@@ -668,6 +668,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
       });
 
+      // Pastikan garis batas luar kecamatan tetap terlihat jelas di atas polygon kelurahan
+      if (kecLayer && kecLayer.bringToFront) {
+          kecLayer.bringToFront();
+      }
+
       // Peta otomatis fokus (zoom) rapi ke batas kecamatan dan titik-titik kelurahan
       if (kecLayer) {
           let fullBounds = kecLayer.getBounds();
