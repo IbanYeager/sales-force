@@ -3,7 +3,7 @@
 // Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20260908-pdf-viewer-mobile-fix-v24';
+const CACHE_VERSION = 'sft-pwa-v20260911-sidebar-polreg-sync-v25';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',

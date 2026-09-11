@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../css/style.css?v=5.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../js/script.js"></script>
-    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+    <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
 
     <style>
         :root {

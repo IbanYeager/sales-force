@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
-  <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+  <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
 
   <style>
     .game-wrapper {

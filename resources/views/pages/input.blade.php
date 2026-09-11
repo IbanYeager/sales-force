@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/input.css">
     <link rel="stylesheet" href="../css/sales_tools.css?v=1.0">
-    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+    <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#CC0000">
 </head>

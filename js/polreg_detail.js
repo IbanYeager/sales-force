@@ -394,23 +394,25 @@ document.addEventListener('DOMContentLoaded', () => {
           let k = kelurahanMap[kel];
           k.geojson = null;
 
-          if (cachedGeo[kel]) {
+          // Prioritaskan polygon asli jika sudah ada di cache
+          if (cachedGeo[kel] && (cachedGeo[kel].type === 'Polygon' || cachedGeo[kel].type === 'MultiPolygon')) {
               k.geojson = cachedGeo[kel];
           } else {
-              // Pastikan ada fallback Point koordinat langsung dari data mobil agar peta selalu muncul
-              if (k.lats.length > 0 && k.lngs.length > 0) {
+              // Jika di cache belum ada atau masih bertipe Point, set Point sebagai fallback sementara
+              if (cachedGeo[kel]) {
+                  k.geojson = cachedGeo[kel];
+              } else if (k.lats.length > 0 && k.lngs.length > 0) {
                   let avgLat = k.lats.reduce((a, b) => a + b, 0) / k.lats.length;
                   let avgLng = k.lngs.reduce((a, b) => a + b, 0) / k.lngs.length;
                   k.geojson = { "type": "Point", "coordinates": [avgLng, avgLat] };
-                  newGeoCache.push({ kecamatan: k.kecamatan, kelurahan: kel, geojson: k.geojson });
               }
 
-              // Upayakan batas wilayah Polygon dari Nominatim secara non-blocking
+              // Upayakan batas wilayah Polygon administratif asli dari Nominatim
               try {
-                  let query1 = `${kel}, ${k.kecamatan}, Jawa Barat, Indonesia`;
+                  let query1 = `${kel}, ${k.kecamatan}, Kota Bandung, Jawa Barat, Indonesia`;
                   let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=${encodeURIComponent(query1)}`);
                   let geoJsonData = await res.json();
-                  let adminBoundary = geoJsonData.find(d => d.class === 'boundary' || d.osm_type === 'relation');
+                  let adminBoundary = geoJsonData.find(d => d.class === 'boundary' || d.osm_type === 'relation' || d.type === 'administrative');
                   
                   if (adminBoundary && adminBoundary.geojson && (adminBoundary.geojson.type === 'Polygon' || adminBoundary.geojson.type === 'MultiPolygon')) {
                       k.geojson = adminBoundary.geojson;
@@ -563,19 +565,21 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
 
           if (item.geojson) {
+              let isPolygon = (item.geojson.type === 'Polygon' || item.geojson.type === 'MultiPolygon');
+              
               // Menggambar bentuk wilayah (Polygon) atau Titik Elegan (Point)
               let layer = L.geoJSON(item.geojson, {
                   style: function (feature) {
                       return {
                           fillColor: circleColor,
-                          color: circleColor,
-                          weight: 2,
-                          opacity: 0.8,
-                          fillOpacity: 0.4
+                          color: isPolygon ? '#ffffff' : circleColor,
+                          weight: isPolygon ? 2.5 : 2,
+                          opacity: 1,
+                          fillOpacity: isPolygon ? 0.45 : 0.85
                       };
                   },
                   pointToLayer: function (feature, latlng) {
-                      // Radius proporsional dengan jumlah unit terdaftar
+                      // Radius proporsional dengan jumlah unit terdaftar (jika fallback ke Point)
                       let r = Math.min(22, Math.max(9, Math.round(8 + Math.log10(item.unit_count + 1) * 6)));
                       return L.circleMarker(latlng, {
                           radius: r,
@@ -587,8 +591,33 @@ document.addEventListener('DOMContentLoaded', () => {
                       });
                   }
               });
+
+              if (isPolygon) {
+                  layer.on('mouseover', function (e) {
+                      const l = e.target;
+                      if (l.setStyle) {
+                          l.setStyle({
+                              weight: 3.5,
+                              color: '#0f172a',
+                              fillOpacity: 0.65
+                          });
+                      }
+                  });
+                  layer.on('mouseout', function (e) {
+                      const l = e.target;
+                      if (l.setStyle) {
+                          l.setStyle({
+                              weight: 2.5,
+                              color: '#ffffff',
+                              fillOpacity: 0.45
+                          });
+                      }
+                  });
+              }
+
               layer.bindTooltip(`<b>Kel. ${item.kelurahan}</b><br><span style="color:${circleColor}; font-weight:700;">${item.unit_count} Unit Terdaftar</span>`, {
                   permanent: false,
+                  sticky: isPolygon,
                   direction: 'top',
                   opacity: 0.95
               });

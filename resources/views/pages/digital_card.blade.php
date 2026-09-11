@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="../css/style.css?v=5.0">
-    <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+    <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
 
     <style>
         :root {

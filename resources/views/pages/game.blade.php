@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -13,7 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
-  <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+  <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
 
   <style>
     .game-hero {
@@ -246,8 +246,7 @@
 <body>
   <div class="mobile-app" style="max-width: 1200px;">
 
-    <!-- Executive Top Navbar Upgraded by sidebar_desktop.js?v=20260907_layout_fix -->
-    <header class="header-page">
+    <!-- Executive Top Navbar Upgraded by sidebar_desktop.js?v=20260911_polreg_sync"header-page">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
       <h2>Toyota Arcade Center</h2>
     </header>

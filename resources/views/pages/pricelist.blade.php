@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=20260907_layout_fix" />
   <link rel="stylesheet" href="../css/pricelist.css?v=20260907_layout_fix">
-  <script src="../js/sidebar_desktop.js?v=20260907_layout_fix"></script>
+  <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 </head>
