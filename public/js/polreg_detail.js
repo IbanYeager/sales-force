@@ -388,6 +388,41 @@ document.addEventListener('DOMContentLoaded', () => {
       let newGeoCache = [];
       let kelurahanList = Object.keys(kelurahanMap);
       
+      const KAB_KOTA_MAP = {
+          // Kota Bandung
+          "ANDIR": "Kota Bandung", "ANTAPANI": "Kota Bandung", "ARCAMANIK": "Kota Bandung", "ASTANA ANYAR": "Kota Bandung",
+          "BABAKAN CIPARAY": "Kota Bandung", "BANDUNG KIDUL": "Kota Bandung", "BANDUNG KULON": "Kota Bandung",
+          "BANDUNG WETAN": "Kota Bandung", "BATUNUNGGAL": "Kota Bandung", "BOJONGLOA KALER": "Kota Bandung",
+          "BOJONGLOA KIDUL": "Kota Bandung", "BUAHBATU": "Kota Bandung", "CIBEUNYING KALER": "Kota Bandung",
+          "CIBEUNYING KIDUL": "Kota Bandung", "CIBIRU": "Kota Bandung", "CICENDO": "Kota Bandung",
+          "CIDADAP": "Kota Bandung", "CINAMBO": "Kota Bandung", "COBLONG": "Kota Bandung", "GEDEBAGE": "Kota Bandung",
+          "KIARACONDONG": "Kota Bandung", "LENGKONG": "Kota Bandung", "MANDALAJATI": "Kota Bandung",
+          "PANYILEUKAN": "Kota Bandung", "RANCASARI": "Kota Bandung", "REGOL": "Kota Bandung",
+          "SUKAJADI": "Kota Bandung", "SUKASARI": "Kota Bandung", "SUMUR BANDUNG": "Kota Bandung",
+          "UJUNGBERUNG": "Kota Bandung",
+          // Kota Cimahi
+          "CIMAHI SELATAN": "Kota Cimahi", "CIMAHI TENGAH": "Kota Cimahi", "CIMAHI UTARA": "Kota Cimahi",
+          // Kab Bandung Barat
+          "PADALARANG": "Kabupaten Bandung Barat", "NGAMPRAH": "Kabupaten Bandung Barat", "LEMBANG": "Kabupaten Bandung Barat",
+          "PARONGPONG": "Kabupaten Bandung Barat", "BATUJAJAR": "Kabupaten Bandung Barat", "CIPATAT": "Kabupaten Bandung Barat",
+          "CIHAMPELAS": "Kabupaten Bandung Barat", "CIKALONGWETAN": "Kabupaten Bandung Barat", "CILILIN": "Kabupaten Bandung Barat",
+          "CISARUA": "Kabupaten Bandung Barat", "CIPEUNDEUY": "Kabupaten Bandung Barat", "SAGULING": "Kabupaten Bandung Barat",
+          "SINDANGKERTA": "Kabupaten Bandung Barat", "GUNUNGHALU": "Kabupaten Bandung Barat", "RONGGA": "Kabupaten Bandung Barat",
+          // Kab Bandung
+          "SOREANG": "Kabupaten Bandung", "BALEENDAH": "Kabupaten Bandung", "DAYEUHKOLOT": "Kabupaten Bandung",
+          "BOJONGSOANG": "Kabupaten Bandung", "MARGAASIH": "Kabupaten Bandung", "MARGAHAYU": "Kabupaten Bandung",
+          "KATAPANG": "Kabupaten Bandung", "BANJARAN": "Kabupaten Bandung", "RANCAEKEK": "Kabupaten Bandung",
+          "CILEUNYI": "Kabupaten Bandung", "CIMENYAN": "Kabupaten Bandung", "CILENGKRANG": "Kabupaten Bandung",
+          "CANGKUANG": "Kabupaten Bandung", "CIPARAY": "Kabupaten Bandung", "MAJALAYA": "Kabupaten Bandung",
+          "SOLOKANJERUK": "Kabupaten Bandung", "PASEH": "Kabupaten Bandung", "PANGALENGAN": "Kabupaten Bandung",
+          "KUTAWARINGIN": "Kabupaten Bandung", "ARJASARI": "Kabupaten Bandung", "PAMEUNGPEUK": "Kabupaten Bandung",
+          "CICALENGKA": "Kabupaten Bandung", "CIWIDEY": "Kabupaten Bandung", "PASIRJAMBU": "Kabupaten Bandung",
+          "RANCABALI": "Kabupaten Bandung", "PACET": "Kabupaten Bandung", "IBUN": "Kabupaten Bandung",
+          "NAGREG": "Kabupaten Bandung", "KERTASARI": "Kabupaten Bandung", "CIMAUNG": "Kabupaten Bandung",
+          "CIKANCUNG": "Kabupaten Bandung"
+      };
+      const kabKotaName = KAB_KOTA_MAP[namaKecamatan.toUpperCase()] || 'Jawa Barat';
+      
       // 3. Tarik polygon wilayah untuk tiap kelurahan
       for (let i = 0; i < kelurahanList.length; i++) {
           let kel = kelurahanList[i];
@@ -409,10 +444,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
               // Upayakan batas wilayah Polygon administratif asli dari Nominatim
               try {
-                  let query1 = `${kel}, ${k.kecamatan}, Kota Bandung, Jawa Barat, Indonesia`;
-                  let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=${encodeURIComponent(query1)}`);
+                  let query1 = `${kel}, ${k.kecamatan}, ${kabKotaName}, Jawa Barat, Indonesia`;
+                  let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&countrycodes=id&q=${encodeURIComponent(query1)}`);
                   let geoJsonData = await res.json();
-                  let adminBoundary = geoJsonData.find(d => d.class === 'boundary' || d.osm_type === 'relation' || d.type === 'administrative');
+                  let adminBoundary = geoJsonData.find(d => 
+                      (d.class === 'boundary' || d.osm_type === 'relation' || d.type === 'administrative') &&
+                      d.class !== 'building' && d.type !== 'building'
+                  );
                   
                   if (adminBoundary && adminBoundary.geojson && (adminBoundary.geojson.type === 'Polygon' || adminBoundary.geojson.type === 'MultiPolygon')) {
                       k.geojson = adminBoundary.geojson;
@@ -436,19 +474,21 @@ document.addEventListener('DOMContentLoaded', () => {
           kecamatanGeojson = cachedGeo["KECAMATAN_BOUNDARY"];
       } else {
           document.getElementById('loadingMapText').textContent = `Mencari batas luar Kecamatan ${namaKecamatan}...`;
-          // Mengembalikan kata "Kecamatan" agar Nominatim tidak bingung dan memunculkan batas level Kabupaten/Kota secara keliru
-          let queryKec = `Kecamatan ${namaKecamatan}, Jawa Barat, Indonesia`;
           try {
-              let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=${encodeURIComponent(queryKec)}`);
+              let queryKec = `${namaKecamatan}, ${kabKotaName}, Jawa Barat, Indonesia`;
+              let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&countrycodes=id&q=${encodeURIComponent(queryKec)}`);
               let geoJsonData = await res.json();
               
-              let adminBoundary = geoJsonData.find(d => d.class === 'boundary' || d.osm_type === 'relation');
-              if (adminBoundary && adminBoundary.geojson && (adminBoundary.geojson.type === 'Polygon' || adminBoundary.geojson.type === 'MultiPolygon')) {
+              let adminBoundary = geoJsonData.find(d => 
+                  (d.class === 'boundary' || d.type === 'administrative') &&
+                  d.class !== 'building' && d.type !== 'building' &&
+                  (d.geojson && (d.geojson.type === 'Polygon' || d.geojson.type === 'MultiPolygon'))
+              );
+              if (adminBoundary && adminBoundary.geojson) {
                   kecamatanGeojson = adminBoundary.geojson;
                   newGeoCache.push({ kecamatan: namaKecamatan, kelurahan: "KECAMATAN_BOUNDARY", geojson: kecamatanGeojson });
               }
           } catch(e) {}
-          await new Promise(r => setTimeout(r, 1000));
       }
 
       if (newGeoCache.length > 0) {
@@ -462,23 +502,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderMarkers(dataToRender, kecamatanGeojson) {
       if(!layerGroup) return;
       
-      // BERSIIHKAN layer lama agar lingkaran tidak menumpuk berkali-kali!
+      // BERSIHKAN layer lama agar lingkaran tidak menumpuk berkali-kali!
       layerGroup.clearLayers();
 
       // Ambil daftar kelurahan yang unik dari total mapData
       let uniqueKelurahan = [...new Set(mapData.map(item => item.kelurahan))].filter(Boolean);
 
-      // Buat penampung khusus untuk titik data kelurahan agar zoom map hanya fokus ke data, bukan ke bingkai raksasa
+      // Buat penampung khusus untuk titik data kelurahan agar zoom map hanya fokus ke data
       let dataBounds = [];
+      let kecLayer = null;
 
       // 1. Gambar batas luar Kecamatan terlebih dahulu agar posisinya ada di bawah layer kelurahan
       if (kecamatanGeojson) {
-          let kecLayer = L.geoJSON(kecamatanGeojson, {
+          kecLayer = L.geoJSON(kecamatanGeojson, {
               style: function (feature) {
                   return {
                       fillColor: 'transparent',
                       color: '#0f172a', // Garis pinggir gelap/tegas
-                      weight: 4, // Garis lebih tebal untuk membedakan dengan kelurahan
+                      weight: 3.5, // Garis lebih tebal untuk membedakan dengan kelurahan
                       opacity: 0.9,
                       fillOpacity: 0
                   };
@@ -627,10 +668,17 @@ document.addEventListener('DOMContentLoaded', () => {
           }
       });
 
-      // Auto-zoom kembali diaktifkan karena koordinat yang nyasar sudah di-reset.
-      // Peta akan otomatis fokus (zoom) HANYA ke wilayah data KELURAHAN yang ada (titik-titiknya saja),
-      // sehingga tidak ikut melebarkan zoom ke seluruh batas kecamatan raksasa.
-      if (dataBounds.length > 0) {
+      // Peta otomatis fokus (zoom) rapi ke batas kecamatan dan titik-titik kelurahan
+      if (kecLayer) {
+          let fullBounds = kecLayer.getBounds();
+          if (dataBounds.length > 0) {
+              dataBounds.forEach(l => {
+                  if (l.getBounds) fullBounds.extend(l.getBounds());
+                  else if (l.getLatLng) fullBounds.extend(l.getLatLng());
+              });
+          }
+          map.fitBounds(fullBounds, {padding: [30, 30], maxZoom: 15});
+      } else if (dataBounds.length > 0) {
           const group = new L.featureGroup(dataBounds);
           map.fitBounds(group.getBounds(), {padding: [30, 30], maxZoom: 15});
       }
