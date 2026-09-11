@@ -349,9 +349,84 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('loadingMap').style.display = 'none';
     }
 
+    function clipPolygonHalfplane(poly, M, N) {
+        if (!poly || poly.length === 0) return [];
+        let clipped = [];
+        let count = poly.length;
+        let ring = [...poly];
+        if (ring[0][0] === ring[count - 1][0] && ring[0][1] === ring[count - 1][1] && count > 1) {
+            ring.pop();
+            count--;
+        }
+        for (let i = 0; i < count; i++) {
+            let curr = ring[i];
+            let next = ring[(i + 1) % count];
+            let currDot = (curr[0] - M[0]) * N[0] + (curr[1] - M[1]) * N[1];
+            let nextDot = (next[0] - M[0]) * N[0] + (next[1] - M[1]) * N[1];
+            let currIn = (currDot <= 1e-9);
+            let nextIn = (nextDot <= 1e-9);
+            if (currIn) clipped.push(curr);
+            if (currIn !== nextIn) {
+                let t = currDot / (currDot - nextDot);
+                clipped.push([curr[0] + t * (next[0] - curr[0]), curr[1] + t * (next[1] - curr[1])]);
+            }
+        }
+        if (clipped.length > 0) clipped.push(clipped[0]);
+        return clipped;
+    }
+
+    function generateClientVoronoi(seeds, boundary) {
+        let cells = {};
+        let keys = Object.keys(seeds);
+        if (keys.length === 1) {
+            cells[keys[0]] = boundary;
+            return cells;
+        }
+        keys.forEach(k1 => {
+            let s1 = seeds[k1];
+            let cell = boundary;
+            keys.forEach(k2 => {
+                if (k1 === k2) return;
+                let s2 = seeds[k2];
+                let M = [(s1[0] + s2[0]) / 2, (s1[1] + s2[1]) / 2];
+                let N = [s2[0] - s1[0], s2[1] - s1[1]];
+                let lenSq = N[0] * N[0] + N[1] * N[1];
+                if (lenSq < 1e-12) return;
+                cell = clipPolygonHalfplane(cell, M, N);
+            });
+            if (cell && cell.length >= 4) cells[k1] = cell;
+        });
+        return cells;
+    }
+
     async function processAndRenderMapMarkers() {
       document.getElementById('loadingMap').style.display = 'block';
       document.getElementById('loadingMapText').textContent = 'Memuat batas wilayah kelurahan...';
+
+      // 0. Sanitasi koordinat outlier agar tidak pernah ada titik yang terpental ke luar wilayah kecamatan
+      if (mapData && mapData.length > 0) {
+          let validLats = mapData.map(i => parseFloat(i.lat)).filter(v => !isNaN(v) && v !== 0);
+          let validLngs = mapData.map(i => parseFloat(i.lng)).filter(v => !isNaN(v) && v !== 0);
+          if (validLats.length > 0) {
+              let medianLat = validLats.sort((a, b) => a - b)[Math.floor(validLats.length / 2)];
+              let medianLng = validLngs.sort((a, b) => a - b)[Math.floor(validLngs.length / 2)];
+              
+              mapData.forEach(item => {
+                  let lat = parseFloat(item.lat);
+                  let lng = parseFloat(item.lng);
+                  if (!isNaN(lat) && !isNaN(lng)) {
+                      let dLat = lat - medianLat;
+                      let dLng = (lng - medianLng) * Math.cos(medianLat * Math.PI / 180);
+                      let distKm = Math.sqrt(dLat * dLat + dLng * dLng) * 111.32;
+                      if (distKm > 6.0) {
+                          let factor = 3.0 / distKm;
+                          item.lat = (medianLat + dLat * factor).toFixed(8);
+                          item.lng = (medianLng + (lng - medianLng) * factor).toFixed(8);
+                      }
+                  }
+              });
+          }
+      }
 
       // 1. Gabungkan data mentah berdasarkan kelurahan untuk mendapatkan total unit
       let kelurahanMap = {};
@@ -442,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   k.geojson = { "type": "Point", "coordinates": [avgLng, avgLat] };
               }
 
-              // Upayakan batas wilayah Polygon administratif asli dari Nominatim
+              // Upayakan batas wilayah Polygon administratif asli dari Nominatim jika belum ada
               try {
                   let query1 = `${kel}, ${k.kecamatan}, ${kabKotaName}, Jawa Barat, Indonesia`;
                   let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&countrycodes=id&q=${encodeURIComponent(query1)}`);
@@ -489,6 +564,34 @@ document.addEventListener('DOMContentLoaded', () => {
                   newGeoCache.push({ kecamatan: namaKecamatan, kelurahan: "KECAMATAN_BOUNDARY", geojson: kecamatanGeojson });
               }
           } catch(e) {}
+      }
+
+      // 5. Dynamic Voronoi fallback jika ada kelurahan yang belum memiliki Polygon
+      let missingPoly = groupedData.filter(g => !g.geojson || (g.geojson.type !== 'Polygon' && g.geojson.type !== 'MultiPolygon'));
+      if (missingPoly.length > 0 && kecamatanGeojson && kecamatanGeojson.coordinates && kecamatanGeojson.coordinates[0]) {
+          let baseBoundary = kecamatanGeojson.coordinates[0];
+          let seeds = {};
+          groupedData.forEach(g => {
+              let lat = 0, lng = 0;
+              if (g.geojson && g.geojson.type === 'Point') {
+                  lng = g.geojson.coordinates[0];
+                  lat = g.geojson.coordinates[1];
+              } else {
+                  let km = kelurahanMap[g.kelurahan];
+                  if (km && km.lats.length > 0) {
+                      lat = km.lats.reduce((a, b) => a + b, 0) / km.lats.length;
+                      lng = km.lngs.reduce((a, b) => a + b, 0) / km.lngs.length;
+                  }
+              }
+              if (lat && lng) seeds[g.kelurahan] = [lng, lat];
+          });
+          
+          let generatedCells = generateClientVoronoi(seeds, baseBoundary);
+          groupedData.forEach(g => {
+              if ((!g.geojson || g.geojson.type === 'Point') && generatedCells[g.kelurahan]) {
+                  g.geojson = { "type": "Polygon", "coordinates": [generatedCells[g.kelurahan]] };
+              }
+          });
       }
 
       if (newGeoCache.length > 0) {
