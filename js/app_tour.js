@@ -1,56 +1,55 @@
 /**
  * app_tour.js - Interactive Guided Onboarding Tour for Sales App
- * Designed for maximum accessibility (senior sales-friendly):
- * Large fonts, high-contrast spotlight overlay, clear buttons,
- * and persistent storage (appears once on install, skippable, replayable anytime).
+ * Alur Kerja Penjualan Lengkap: Dari Mencari Customer sampai Pengiriman Mobil (DO).
+ * Dirancang ramah untuk seluruh sales (termasuk sales senior/tua):
+ * Tulisan besar, spotlight sorotan jelas, dan tombol navigasi praktis.
  */
 
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'sft_app_tour_completed_v1';
+  const STORAGE_KEY = 'sft_app_tour_completed_v2';
 
-  // Tour steps definition targeting main dashboard elements
+  // 5 Tahapan Alur Penjualan: Dari Prospek hingga DO
   const TOUR_STEPS = [
     {
       target: '.btn-input-aktivitas',
-      title: '1. Absen & Laporan Harian',
-      desc: 'Setiap pagi atau setelah bertemu customer di lapangan, pencet tombol ini untuk absen lokasi GPS dan unggah foto kegiatan Anda.',
-      icon: 'fa-camera',
-      badge: 'Langkah 1 dari 5'
+      title: '1. Cari & Catat Calon Pembeli',
+      desc: 'Alur dimulai dari sini! Saat Anda bertemu orang yang tertarik mobil Toyota di showroom, pameran, atau canvassing lapangan, catat nama dan nomor WhatsApp-nya agar tersimpan rapi di database CRM.',
+      icon: 'fa-user-plus',
+      badge: 'Tahap 1: Prospek Customer'
     },
     {
-      target: '.target-link, .target-card',
-      title: '2. Pantau Target SPK & DO',
-      desc: 'Di kartu ini, Anda bisa melihat berapa sisa target SPK dan unit DO yang harus Anda capai bulan ini secara otomatis tanpa perlu hitung manual.',
-      icon: 'fa-bullseye',
-      badge: 'Langkah 2 dari 5'
+      target: '.main-feature-grid a[href*="pricelist.html"], .category-item[href*="pricelist.html"]',
+      title: '2. Cek Harga & Hitung Cicilan',
+      desc: 'Customer tertarik mobil tertentu? Klik menu Pricelist OTR untuk cek harga resmi, lalu gunakan Kalkulator Kredit untuk menentukan DP serta angsuran bulanan yang pas di kantong pembeli.',
+      icon: 'fa-calculator',
+      badge: 'Tahap 2: Harga & Simulasi Kredit'
     },
     {
-      target: '.category-card, .main-feature-grid',
-      title: '3. Senjata Jualan (Fitur Utama)',
-      desc: 'Gunakan Pricelist untuk cek harga OTR, E-Catalog untuk brosur mobil, dan Live Inventory untuk cek stok unit yang ready di gudang.',
-      icon: 'fa-clipboard-list',
-      badge: 'Langkah 3 dari 5'
+      target: '.main-feature-grid a[href*="inventory.html"], .category-item[href*="inventory.html"]',
+      title: '3. Cek Ketersediaan Mobil di Gudang',
+      desc: 'Sebelum customer bayar tanda jadi, klik Live Inventory untuk memastikan tipe dan warna mobil yang diinginkan ready stock di gudang cabang kita.',
+      icon: 'fa-warehouse',
+      badge: 'Tahap 3: Cek Stok Gudang'
     },
     {
       target: '.btn-input-spk',
-      title: '4. Bikin SPK & Input DO',
-      desc: 'Kalau customer sudah deal, langsung pencet tombol ini untuk membuat surat pesanan resmi (SPK) atau mengajukan jadwal pengiriman mobil (DO).',
+      title: '4. Customer Deal: Bikin SPK Resmi!',
+      desc: 'Customer sudah setuju harga dan unit? Klik tombol ini lalu pilih "Buat Pengajuan SPK". Cukup foto KTP customer, upload bukti transfer tanda jadi (booking fee), dan minta customer tanda tangan di layar HP.',
       icon: 'fa-file-signature',
-      badge: 'Langkah 4 dari 5'
+      badge: 'Tahap 4: Pemesanan Resmi (SPK)'
     },
     {
-      target: '.btn-sop-guide',
-      title: '5. Panduan Bergambar (SOP)',
-      desc: 'Kapan saja Anda lupa urutan pemesanan mobil, cukup pencet tombol ini untuk membaca panduan bergambar yang sangat mudah dipahami.',
-      icon: 'fa-book-bookmark',
-      badge: 'Langkah 5 dari 5'
+      target: '.tgt-metric.is-green, .btn-input-spk',
+      title: '5. Mobil Siap Kirim (Penerbitan DO)',
+      desc: 'Tahap terakhir: Begitu leasing acc atau pembayaran tunai lunas, klik tombol ini lalu pilih "Input DO Langsung". Masukkan alamat kirim, lalu foto serah terima mobil bersama customer. Target DO Anda langsung tercapai!',
+      icon: 'fa-truck-ramp-box',
+      badge: 'Tahap 5: Kirim Mobil (DO)'
     }
   ];
 
   let currentStepIndex = 0;
-  let activeOverlay = null;
   let activeSpotlight = null;
   let activeTooltip = null;
 
@@ -64,7 +63,7 @@
       .tour-welcome-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(15, 23, 42, 0.82);
+        background: rgba(15, 23, 42, 0.84);
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
         z-index: 999990;
@@ -83,11 +82,11 @@
       .tour-welcome-card {
         background: #ffffff;
         border-radius: 24px;
-        max-width: 440px;
+        max-width: 460px;
         width: 100%;
         padding: 30px 24px;
         text-align: center;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
         border: 2px solid #e2e8f0;
         transform: scale(0.92);
         transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -119,8 +118,8 @@
       .tour-welcome-desc {
         font-size: 15px;
         color: #475569;
-        line-height: 1.5;
-        margin-bottom: 24px;
+        line-height: 1.55;
+        margin-bottom: 22px;
       }
       .tour-welcome-actions {
         display: flex;
@@ -191,7 +190,7 @@
         background: #ffffff;
         border-radius: 20px;
         padding: 22px 20px;
-        width: min(360px, 92vw);
+        width: min(370px, 92vw);
         box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
         border: 2px solid #e2e8f0;
         z-index: 999998;
@@ -208,7 +207,7 @@
         font-weight: 800;
         background: #fee2e2;
         color: #d71920;
-        padding: 3px 10px;
+        padding: 4px 11px;
         border-radius: 20px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -217,7 +216,7 @@
         background: transparent;
         border: none;
         color: #94a3b8;
-        font-size: 18px;
+        font-size: 20px;
         cursor: pointer;
         padding: 4px;
       }
@@ -240,7 +239,7 @@
       .tour-tooltip-desc {
         font-size: 14.5px;
         color: #334155;
-        line-height: 1.55;
+        line-height: 1.6;
         margin-bottom: 18px;
       }
       .tour-tooltip-footer {
@@ -257,7 +256,7 @@
       }
       .btn-tour-nav {
         border: none;
-        padding: 9px 15px;
+        padding: 9px 16px;
         border-radius: 10px;
         font-size: 13px;
         font-weight: 800;
@@ -309,15 +308,15 @@
       overlay.innerHTML = `
         <div class="tour-welcome-card">
           <div class="tour-welcome-badge">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <i class="fa-solid fa-car-side"></i>
           </div>
-          <h2 class="tour-welcome-title">Selamat Datang di Sales App!</h2>
+          <h2 class="tour-welcome-title">Alur Penjualan: Dari Prospek ke DO</h2>
           <p class="tour-welcome-desc">
-            Mau kami perlihatkan panduan singkat cara pakai aplikasi ini? Anda cukup ikuti petunjuk panah di layar (hanya 1 menit).
+            Mau kami perlihatkan panduan singkat (1 menit): Bagaimana alur kerja dari <strong>pertama kali mencari customer</strong> sampai <strong>mobil dikirim (DO)</strong> ke rumah pembeli?
           </p>
           <div class="tour-welcome-actions">
             <button type="button" class="btn-tour-start" id="btnStartTourAction">
-              <i class="fa-solid fa-play"></i> Mulai Tutorial Singkat
+              <i class="fa-solid fa-play"></i> Mulai Tutorial (Dari Prospek ke DO)
             </button>
             <button type="button" class="btn-tour-skip" id="btnSkipTourAction">
               ✕ Lewati (Jangan Tampilkan Lagi)
@@ -365,7 +364,6 @@
   }
 
   function renderCurrentStep() {
-    // Find matching step element that exists in current DOM
     let step = TOUR_STEPS[currentStepIndex];
     let el = null;
 
@@ -447,7 +445,7 @@
 
     // Check if place below
     let top = rect.bottom + margin;
-    if (top + 220 > winH) {
+    if (top + 230 > winH) {
       // Place above
       top = Math.max(16, rect.top - 240);
     }
@@ -480,16 +478,23 @@
     const celOverlay = document.createElement('div');
     celOverlay.className = 'tour-welcome-overlay show';
     celOverlay.innerHTML = `
-      <div class="tour-welcome-card">
+      <div class="tour-welcome-card" style="max-width:480px;">
         <div class="tour-welcome-badge" style="background:linear-gradient(135deg, #10b981, #059669); box-shadow:0 10px 20px rgba(16,185,129,0.3);">
           <i class="fa-solid fa-circle-check"></i>
         </div>
-        <h2 class="tour-welcome-title">Tutorial Selesai! 🎉</h2>
-        <p class="tour-welcome-desc">
-          Keren, sekarang Anda sudah tahu tombol-tombol utamanya. Anda bisa membuka kembali tutorial ini kapan saja lewat menu Panduan.
+        <h2 class="tour-welcome-title">Alur Penjualan Selesai! 🎉</h2>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:14px 16px; margin:14px 0; text-align:left; font-size:13.5px; line-height:1.75; color:#334155;">
+          <div>📍 <strong>1. Prospek:</strong> Catat calon pembeli di Aktivitas / CRM</div>
+          <div>🧮 <strong>2. Simulasi:</strong> Cek harga di Pricelist & Kalkulator Kredit</div>
+          <div>🏢 <strong>3. Cek Stok:</strong> Pastikan mobil ready di Live Inventory</div>
+          <div>📝 <strong>4. Closing SPK:</strong> Foto KTP & minta tanda tangan di layar HP</div>
+          <div>🚚 <strong>5. Pengiriman DO:</strong> Input surat jalan & foto serah terima mobil</div>
+        </div>
+        <p class="tour-welcome-desc" style="font-size:13.5px; margin-bottom:16px;">
+          Keren! Anda sekarang sudah paham urutan cara jualan mobil dari awal mencari pembeli sampai mobil dikirim ke rumah customer.
         </p>
         <button type="button" class="btn-tour-start" style="background:#10b981; width:100%;" onclick="this.closest('.tour-welcome-overlay').remove()">
-          <i class="fa-solid fa-thumbs-up"></i> Mulai Gunakan Aplikasi Sekarang
+          <i class="fa-solid fa-thumbs-up"></i> Siap Berjualan Sekarang!
         </button>
       </div>
     `;
