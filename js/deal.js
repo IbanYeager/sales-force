@@ -1,4 +1,4 @@
-﻿let selectedCar = '';
+let selectedCar = '';
         let selectedPromo = '';
         let selectedScheme = '';
         let selectedTenor = '';
@@ -350,4 +350,16 @@
 
         function goToPromoPage() {
             window.location.href = 'promo.html';
+        }
+
+        function goToSpkFromDeal() {
+            const nama = document.getElementById('namaPemohon')?.value.trim() || '';
+            const car = selectedCar !== '-' ? selectedCar : '';
+            const scheme = selectedScheme !== '-' ? selectedScheme : '';
+            const dp = selectedTdp || '';
+            const angsuran = selectedAngsuran || '';
+            const tenor = selectedTenor || '';
+
+            const url = `spk.html?customer=${encodeURIComponent(nama)}&model=${encodeURIComponent(car)}&tipe=${encodeURIComponent(scheme)}&dp=${encodeURIComponent(dp)}&cicilan=${encodeURIComponent(angsuran)}&tenor=${encodeURIComponent(tenor)}`;
+            window.location.href = url;
         }

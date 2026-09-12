@@ -200,6 +200,21 @@ if ($method === 'GET') {
                     $n_stmt->close();
                 }
 
+                // SINKRONISASI CRM PIPELINE (tabel_customer)
+                $cust_esc = $conn->real_escape_string($nama);
+                $hp_esc = $conn->real_escape_string($hp);
+                $alamat_esc = $conn->real_escape_string($alamat);
+                $new_crm_status = ($jenis_input === 'DO') ? 'DO' : 'SPK';
+
+                $q_cust = $conn->query("SELECT id FROM tabel_customer WHERE (nama = '$cust_esc' OR (no_telp = '$hp_esc' AND no_telp != '')) LIMIT 1");
+                if ($q_cust && $q_cust->num_rows > 0) {
+                    $row_c = $q_cust->fetch_assoc();
+                    $c_id = intval($row_c['id']);
+                    $conn->query("UPDATE tabel_customer SET status = '$new_crm_status', updated_at = NOW() WHERE id = $c_id");
+                } else {
+                    $conn->query("INSERT INTO tabel_customer (nama, no_telp, alamat, status, created_at, updated_at) VALUES ('$cust_esc', '$hp_esc', '$alamat_esc', '$new_crm_status', NOW(), NOW())");
+                }
+
                 // Auto Push ke Google Spreadsheet jika Webhook terhubung
                 $tambah_spk = ($jenis_input === 'SPK') ? 1 : 0;
                 $tambah_do = ($jenis_input === 'DO') ? 1 : 0;
@@ -260,6 +275,9 @@ if ($method === 'GET') {
                         $n_stmt->close();
                     }
 
+                    // Update status customer di CRM ke 'DO'
+                    $conn->query("UPDATE tabel_customer SET status = 'DO', updated_at = NOW() WHERE (nama = '$cust' OR (no_telp = '$cust' AND no_telp != ''))");
+
                     // Auto Push DO ke Google Spreadsheet
                     triggerSheetsPush($conn, $s_id, 0, 1);
                 }
@@ -295,6 +313,10 @@ if ($method === 'GET') {
                         $model = $conn->real_escape_string($spk_row['model']);
                         $hp_sales = $spk_row['hp_sales']; // get sales phone number
                         $tgl = date('Y-m-d');
+
+                        // Sinkronisasi status CRM ke 'SPK'
+                        $conn->query("UPDATE tabel_customer SET status = 'SPK', updated_at = NOW() WHERE nama = '$cust'");
+
                         // Masukkan ke transaksi_do jika belum ada
                         $check_do = $conn->query("SELECT id_transaksi FROM transaksi_do WHERE sales_account_id = $s_id AND nama_customer = '$cust' AND tipe_mobil = '$model'");
                         if ($check_do && $check_do->num_rows === 0) {

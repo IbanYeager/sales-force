@@ -300,7 +300,7 @@
           html += `
               </div>
               <div class="deal-btn-wrapper" onclick="event.stopPropagation()" style="padding: 12px 14px; border-top: 1px dashed #e2e8f0; background: #fafcff; display: flex; flex-direction: column; gap: 10px;">
-                  <div style="display:flex; gap:10px;">
+                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     <button id="btn-share-${cardId}" class="btn-share-pricelist" style="
                         flex: 1;
                         padding: 12px;
@@ -309,35 +309,54 @@
                         border: none;
                         border-radius: 10px;
                         font-weight: 700;
-                        font-size: 13px;
+                        font-size: 12.5px;
                         cursor: not-allowed;
                         transition: all 0.2s ease;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        gap: 8px;
+                        gap: 6px;
                         outline: none;
                     " disabled onclick="executePricelistShare(event, '${cardId}')">
                         <i class="fa-brands fa-whatsapp"></i> Share
                     </button>
-                    <button id="btn-deal-${cardId}" class="btn-deal-pricelist" style="
-                        flex: 1;
+                    <button id="btn-sim-${cardId}" class="btn-sim-pricelist" style="
+                        flex: 1.1;
                         padding: 12px;
                         background: #e2e8f0;
                         color: #94a3b8;
                         border: none;
                         border-radius: 10px;
                         font-weight: 700;
-                        font-size: 13px;
+                        font-size: 12.5px;
                         cursor: not-allowed;
                         transition: all 0.2s ease;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        gap: 8px;
+                        gap: 6px;
+                        outline: none;
+                    " disabled onclick="executePricelistSimulasi(event, '${cardId}')">
+                        <i class="fa-solid fa-calculator"></i> Simulasi Kredit
+                    </button>
+                    <button id="btn-deal-${cardId}" class="btn-deal-pricelist" style="
+                        flex: 1.2;
+                        padding: 12px;
+                        background: #e2e8f0;
+                        color: #94a3b8;
+                        border: none;
+                        border-radius: 10px;
+                        font-weight: 700;
+                        font-size: 12.5px;
+                        cursor: not-allowed;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 6px;
                         outline: none;
                     " disabled onclick="executePricelistDeal(event, '${cardId}')">
-                        <i class="fa-solid fa-handshake"></i> Pilih Varian Terlebih Dahulu
+                        <i class="fa-solid fa-handshake"></i> Pilih Varian
                     </button>
                   </div>
                   <button type="button" class="btn-share-all-model" onclick="shareEntireModel('${cleanModelName}', '${cardId}')" title="Share seluruh tipe ${modelName} sekaligus ke WhatsApp">
@@ -843,7 +862,17 @@
 
       const transLabel = formatTransmisiLabel(transmisi);
 
-      // Enable Deal & Share button
+      // Enable Deal, Sim & Share button
+      const simBtn = document.getElementById(`btn-sim-${cardId}`);
+      if (simBtn) {
+        simBtn.disabled = false;
+        simBtn.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+        simBtn.style.color = '#ffffff';
+        simBtn.style.cursor = 'pointer';
+        simBtn.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.15)';
+        simBtn.innerHTML = `<i class="fa-solid fa-calculator"></i> Simulasi Kredit`;
+      }
+
       const dealBtn = document.getElementById(`btn-deal-${cardId}`);
       if (dealBtn) {
         dealBtn.disabled = false;
@@ -863,6 +892,19 @@
         shareBtn.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.15)';
         shareBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> Share ${variantName}`;
       }
+    };
+
+    // Simulasi ke kalkulator.html
+    window.executePricelistSimulasi = function(event, cardId) {
+      if (event && event.stopPropagation) event.stopPropagation();
+      const selection = selectedPricelistMap[cardId];
+      if (!selection) return;
+
+      const transLabel = formatTransmisiLabel(selection.transmisi);
+      const fullUnitName = `${selection.model} ${selection.varian} (${transLabel})`;
+      
+      const targetUrl = `kalkulator.html?mobil=${encodeURIComponent(fullUnitName)}&harga=${encodeURIComponent(selection.harga)}`;
+      window.location.href = targetUrl;
     };
 
     // Deal ke deal.html

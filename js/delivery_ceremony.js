@@ -2,6 +2,35 @@ let sigCanvas, sigCtx, isDrawingSig = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     initSignatureCanvas();
+
+    // Parse URL query parameters from DO / CRM
+    const urlParams = new URLSearchParams(window.location.search);
+    const pCustomer = urlParams.get('customer');
+    const pPhone = urlParams.get('phone');
+    const pModel = urlParams.get('model');
+    const pRangka = urlParams.get('rangka') || urlParams.get('chassis');
+    const pMesin = urlParams.get('mesin');
+
+    if (pCustomer) {
+        const el = document.getElementById('delNamaCustomer');
+        if (el) el.value = pCustomer;
+    }
+    if (pPhone) {
+        const el = document.getElementById('delNoHp');
+        if (el) el.value = pPhone;
+    }
+    if (pModel) {
+        const el = document.getElementById('delModelUnit');
+        if (el) el.value = pModel;
+    }
+    if (pRangka) {
+        const el = document.getElementById('delNoRangka');
+        if (el) el.value = pRangka;
+    }
+    if (pMesin) {
+        const el = document.getElementById('delNoMesin');
+        if (el) el.value = pMesin;
+    }
 });
 
 function initSignatureCanvas() {
@@ -119,7 +148,12 @@ function submitDeliveryCeremony() {
                     <strong>No. Rangka / Mesin:</strong> ${noRangka || '-'} / ${noMesin || '-'}<br>
                     <strong>Tanggal Serah Terima:</strong> ${nowStr}<br>
                     <strong>PDI Status:</strong> 100% Lulus Inspeksi (${pdiChecklist.length} Poin Checked)<br>
-                    <strong>Garansi Aktif:</strong> T-Care (Free Service & Sparepart 3 Thn / 60.000 KM)
+                    <strong>Garansi Aktif:</strong> T-Care (Free Service & Sparepart 3 Thn / 60.000 KM)<br>
+                    <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #a7f3d0;">
+                        <a href="retention.html?search=${encodeURIComponent(nama)}" style="display:inline-flex; align-items:center; gap:6px; background:#047857; color:white; font-size:11.5px; font-weight:800; padding:7px 12px; border-radius:8px; text-decoration:none;">
+                            <i class="fa-solid fa-calendar-check"></i> Buka Jadwal Servis &amp; Retention Konsumen (T-Care)
+                        </a>
+                    </div>
                 `;
             }
         } else {

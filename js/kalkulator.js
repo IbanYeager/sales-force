@@ -247,6 +247,54 @@ let currentTenor = 3;
                     });
 
                     updateBunga();
+
+                    // Parse URL parameters from CRM / PriceList
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const pCustomer = urlParams.get('customer');
+                    const pMobil = urlParams.get('mobil') || urlParams.get('model');
+                    const pHarga = urlParams.get('harga');
+                    const pDp = urlParams.get('dp') || urlParams.get('tdp');
+
+                    if (pCustomer) {
+                        window.currentSimCustomer = pCustomer;
+                        const container = document.getElementById('sectionKalkulator');
+                        if (container && !document.getElementById('simCustBanner')) {
+                            const banner = document.createElement('div');
+                            banner.id = 'simCustBanner';
+                            banner.style.cssText = 'background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:#1e40af; display:flex; align-items:center; gap:8px; font-weight:700;';
+                            banner.innerHTML = `<i class="fa-solid fa-user-check"></i> Customer Prospek: <u>${escapeHtml(pCustomer)}</u> (Simulasi ini dapat langsung ditransfer ke Form SPK)`;
+                            container.insertBefore(banner, container.firstChild);
+                        }
+                    }
+
+                    if (pHarga) {
+                        const h = parseInt(pHarga, 10);
+                        if (!isNaN(h) && h > 0) {
+                            document.getElementById('inputHarga').value = numToFormatted(h);
+                            syncHarga(h);
+                        }
+                    }
+                    if (pDp) {
+                        const d = parseInt(pDp, 10);
+                        if (!isNaN(d) && d > 0) {
+                            document.getElementById('inputTdp').value = numToFormatted(d);
+                            syncTdp(d);
+                        }
+                    }
+                    if (pMobil) {
+                        const sel = document.getElementById('selectModel');
+                        if (sel) {
+                            for (let i = 0; i < sel.options.length; i++) {
+                                if (sel.options[i].text.toLowerCase().includes(pMobil.toLowerCase())) {
+                                    sel.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (pHarga || pMobil || pDp) {
+                        setTimeout(hitung, 300);
+                    }
                 }
             } catch (e) {
                 console.error('Error fetching kalkulator data:', e);
@@ -254,6 +302,29 @@ let currentTenor = 3;
         }
 
         document.addEventListener('DOMContentLoaded', loadKalkulatorData);
+
+        window.proceedSimulationToSpk = function() {
+            const amountText = document.getElementById('resultAmount').innerText;
+            if (amountText === 'Rp 0') {
+                alert('Silakan lakukan simulasi terlebih dahulu.');
+                return;
+            }
+
+            const modelSelect = document.getElementById('selectModel');
+            let mobilName = modelSelect && modelSelect.selectedIndex > 0 ? modelSelect.options[modelSelect.selectedIndex].text : '';
+            if (!mobilName) {
+                mobilName = document.getElementById('inputMobil') ? document.getElementById('inputMobil').value : '';
+            }
+            const hargaVal = getHarga();
+            const tdpVal = getTdp();
+            const cicilan = amountText.replace(/\D/g, '');
+            const leasingSelect = document.getElementById('selectLeasing');
+            const leasingName = leasingSelect ? (leasingSelect.options[leasingSelect.selectedIndex]?.text || '') : '';
+            const custName = window.currentSimCustomer || '';
+
+            const url = `spk.html?customer=${encodeURIComponent(custName)}&model=${encodeURIComponent(mobilName)}&harga=${hargaVal}&dp=${tdpVal}&cicilan=${cicilan}&tenor=${currentTenor}&leasing=${encodeURIComponent(leasingName)}`;
+            window.location.href = url;
+        };
 
         // ================= COMPARISON LOGIC =================
         let compareData = [];

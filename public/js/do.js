@@ -124,11 +124,23 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
           btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:10px;"></i> Submit DO';
 
           if (res.status === 'success') {
-            alert('DO berhasil diinput!');
+            const spk = spkDataList.find(s => s.id == spkId);
+            const custName = spk ? spk.nama_customer : '';
+            const custPhone = spk ? (spk.no_hp || '') : '';
+            const modelName = spk ? (spk.model || '') : '';
+
             document.getElementById('spkSelect').value = '';
             autoFillSpkData();
             fetchDo();
             loadSpkList();
+
+            if (confirm(`🎉 SELAMAT! DO untuk customer "${custName}" berhasil disubmit!\n\nApakah Anda ingin langsung membuka "Digital Delivery Ceremony & Handover Checklist" untuk serah terima unit ini?`)) {
+              window.location.href = `delivery_ceremony.html?customer=${encodeURIComponent(custName)}&phone=${encodeURIComponent(custPhone)}&model=${encodeURIComponent(modelName)}&spk_id=${spkId}`;
+            } else if (window.showCustomAlert) {
+              window.showCustomAlert('DO Berhasil Diinput', 'Data DO telah tercatat dan target cabang terupdate.', 'success');
+            } else {
+              alert('DO berhasil diinput!');
+            }
           } else {
             alert('Gagal: ' + res.message);
           }

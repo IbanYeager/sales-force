@@ -56,9 +56,21 @@ if ($method === 'POST') {
 
     if ($conn->query($sql)) {
         $insert_id = $conn->insert_id;
+
+        // Auto-Enroll Customer ke Siklus Servis Berkala (Retention Hub)
+        $today = date('Y-m-d');
+        $check_ret = $conn->query("SELECT id FROM tabel_customer_retention WHERE (nama_customer = '$nama_customer' OR (no_hp = '$no_hp' AND no_hp != '')) LIMIT 1");
+        if ($check_ret && $check_ret->num_rows === 0) {
+            $conn->query("INSERT INTO tabel_customer_retention (sales_account_id, nama_customer, no_hp, model_unit, tanggal_do, tipe_reminder, status_reminder, catatan_sales) 
+                          VALUES ('$sales_account_id', '$nama_customer', '$no_hp', '$model_unit', '$today', '1000KM', 'Belum Dihubungi', 'Otomatis terdaftar dari Serah Terima Unit (Digital Delivery Ceremony).')");
+        }
+
+        // Update status di CRM tabel_customer
+        $conn->query("UPDATE tabel_customer SET status = 'DO (Delivered)', updated_at = NOW() WHERE (nama = '$nama_customer' OR (no_telp = '$no_hp' AND no_telp != ''))");
+
         echo json_encode([
             "status" => "success",
-            "message" => "Sertifikat Serah Terima & PDI berhasil disimpan ke database!",
+            "message" => "Sertifikat Serah Terima & PDI berhasil diterbitkan! Customer otomatis terdaftar dalam jadwal servis berkala T-Care.",
             "id" => $insert_id
         ]);
     } else {

@@ -5,6 +5,19 @@ const salesName = localStorage.getItem('namaSales') || 'Sales';
         document.addEventListener('DOMContentLoaded', () => {
             fetchUnits();
             loadHistory();
+
+            // Parse URL query parameters from CRM
+            const urlParams = new URLSearchParams(window.location.search);
+            const customerName = urlParams.get('customer');
+            if (customerName) {
+                setTimeout(() => {
+                    const inputCust = document.getElementById('inputCustomer');
+                    if (inputCust) inputCust.value = customerName;
+                    if (typeof window.showCustomAlert === 'function') {
+                        window.showCustomAlert('Customer Dipilih', `Memproses pengajuan test drive untuk ${customerName}. Silakan pilih unit mobil yang diinginkan.`, 'info');
+                    }
+                }, 400);
+            }
         });
 
         async function switchTab(tab) {
@@ -176,9 +189,12 @@ const salesName = localStorage.getItem('namaSales') || 'Sales';
                 let printBtn = '';
                 if (item.status === 'Disetujui') {
                     printBtn = `
-                        <div style="margin-top:12px; border-top:1px dashed var(--border-color); padding-top:12px;">
-                            <button class="btn-main" style="width:100%; margin:0; font-size:12px; padding:10px;" onclick="window.location.href='cetak_testdrive.html?id=${item.id}'">
-                                <i class="fa-solid fa-print"></i> Cetak Dokumen PDF
+                        <div style="margin-top:12px; border-top:1px dashed var(--border-color); padding-top:12px; display:flex; gap:8px;">
+                            <button class="btn-main" style="flex:1; margin:0; font-size:11.5px; padding:9px 12px; background-color:var(--primary-blue);" onclick="window.location.href='cetak_testdrive.html?id=${item.id}'">
+                                <i class="fa-solid fa-print"></i> Cetak PDF
+                            </button>
+                            <button class="btn-main" style="flex:1.2; margin:0; font-size:11.5px; padding:9px 12px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border:none; border-radius:10px; cursor:pointer;" onclick="window.location.href='spk.html?customer=${encodeURIComponent(item.nama_customer)}&model=${encodeURIComponent(item.model || '')}&tipe=${encodeURIComponent(item.type || '')}'" title="Lanjut buat SPK untuk customer ini">
+                                <i class="fa-solid fa-file-signature"></i> Lanjut Buat SPK
                             </button>
                         </div>
                     `;

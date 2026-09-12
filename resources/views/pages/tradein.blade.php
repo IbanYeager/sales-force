@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -336,7 +336,11 @@
               </p>
             </div>
 
-            <div style="margin-top:16px;">
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:16px;">
+              <button type="button" class="btn" style="width:100%; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:white; font-weight:800; font-size:13.5px; padding:14px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(16,185,129,0.25); display:flex; align-items:center; justify-content:center; gap:8px;" onclick="proceedTradeInToSpk()">
+                <i class="fa-solid fa-file-signature" style="font-size:16px;"></i>
+                <span>Gunakan untuk SPK (Terapkan Nilai Mobil Lama ke DP)</span>
+              </button>
               <button class="btn" style="width:100%; background:#25D366; color:white; font-weight:800; font-size:13.5px; padding:14px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(37,211,102,0.3);" onclick="shareTradeInWA()">
                 <i class="fa-brands fa-whatsapp" style="font-size:17px; margin-right:6px;"></i> Kirim Simulasi Trade-In ke WA Konsumen
               </button>

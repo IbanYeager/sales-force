@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -354,7 +354,14 @@
 
                     <!-- Action Buttons -->
                     <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
-                        <!-- ACTION TERPADU: TRANSFER KE QUOTATION PDF -->
+                        <!-- ACTION TERPADU 1: TRANSFER KE FORM SPK -->
+                        <button type="button" onclick="proceedSimulationToSpk()" style="width:100%; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color:white; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 13.5px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow: 0 4px 15px rgba(16,185,129,0.25);">
+                            <i class="fa-solid fa-file-signature" style="font-size:16px;"></i>
+                            <span>Ajukan SPK dengan Simulasi Ini (Ke Form SPK)</span>
+                            <i class="fa-solid fa-arrow-right" style="font-size:12px; opacity:0.8;"></i>
+                        </button>
+
+                        <!-- ACTION TERPADU 2: TRANSFER KE QUOTATION PDF -->
                         <button type="button" onclick="transferToQuotation()" style="width:100%; background: linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 100%); color:white; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 13.5px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow: 0 4px 15px rgba(13,27,62,0.25);">
                             <i class="fa-solid fa-file-invoice-dollar" style="color:#fbbf24; font-size:16px;"></i>
                             <span>Terbitkan Surat Penawaran Resmi (Quotation PDF)</span>

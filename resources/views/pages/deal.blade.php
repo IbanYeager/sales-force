@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -119,9 +119,14 @@
             </div>
             <h3>Deal Berhasil Dibuat!</h3>
             <p>File PDF berhasil digenerate dan diunduh ke perangkat Anda dengan nama file sesuai nama Pemohon dan STNK.</p>
-            <button onclick="goToPromoPage()" class="btn-main" style="background: var(--primary-blue); justify-content: center;">
-                Kembali ke Promo
-            </button>
+            <div style="display:flex; flex-direction:column; gap:10px; width:100%; margin-top:16px;">
+                <button type="button" onclick="goToSpkFromDeal()" class="btn-main" style="background: linear-gradient(135deg, #10b981, #059669); justify-content: center; width:100%; margin:0;">
+                    <i class="fa-solid fa-file-signature"></i> Lanjut ke Form SPK
+                </button>
+                <button type="button" onclick="goToPromoPage()" class="btn-main" style="background: var(--primary-blue); justify-content: center; width:100%; margin:0;">
+                    Kembali ke Promo
+                </button>
+            </div>
         </div>
     </div>
 

@@ -89,8 +89,15 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
       const custPhone = urlParams.get('phone');
       const tipeBeli = urlParams.get('tipe');
       const warna = urlParams.get('warna');
+      const alamatParam = urlParams.get('alamat');
+      const dpParam = urlParams.get('dp');
+      const cicilanParam = urlParams.get('cicilan');
+      const tenorParam = urlParams.get('tenor');
+      const leasingParam = urlParams.get('leasing');
+      const tradeinUnit = urlParams.get('tradein_unit');
+      const tradeinVal = urlParams.get('tradein_val');
 
-      if (!chassis && !modelParam && !custName) return;
+      if (!chassis && !modelParam && !custName && !tradeinUnit && !dpParam) return;
 
       if (custName) {
         const nameEl = document.getElementById('namaCustomer');
@@ -100,9 +107,16 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
         const phoneEl = document.getElementById('noHp');
         if (phoneEl) phoneEl.value = custPhone;
       }
+      if (alamatParam) {
+        const alamatEl = document.getElementById('spkAlamat');
+        if (alamatEl) alamatEl.value = alamatParam;
+      }
       if (tipeBeli) {
         const tipeEl = document.getElementById('tipePembelian');
         if (tipeEl) tipeEl.value = tipeBeli;
+      } else if (dpParam || cicilanParam) {
+        const tipeEl = document.getElementById('tipePembelian');
+        if (tipeEl) tipeEl.value = 'Kredit';
       }
 
       if (modelParam) {
@@ -126,7 +140,7 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
           } else {
             const opt = document.createElement('option');
             opt.value = modelParam + (warna ? ` (${warna})` : '');
-            opt.textContent = `[Inventory Hold] ${opt.value}`;
+            opt.textContent = `[Unit Terpilih] ${opt.value}`;
             opt.dataset.harga = 0;
             select.appendChild(opt);
             if (window.jQuery && $.fn.select2) {
@@ -139,9 +153,11 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
         }
       }
 
-      // Tampilkan banner notifikasi bahwa data unit inventory terhubung
       const bannerContainer = document.getElementById('inputBiasaContainer');
-      if (bannerContainer && !document.getElementById('inventoryHoldLinkedBanner')) {
+      if (!bannerContainer) return;
+
+      // Banner Unit Inventory Hold
+      if (chassis && !document.getElementById('inventoryHoldLinkedBanner')) {
         const banner = document.createElement('div');
         banner.id = 'inventoryHoldLinkedBanner';
         banner.style.cssText = 'background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1.5px solid #3b82f6; border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 4px 12px rgba(59,130,246,0.15);';
@@ -158,6 +174,53 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
             </div>
           </div>
           <span style="background:#2563eb; color:white; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:20px; white-space:nowrap;">HOLD ➔ SPK</span>
+        `;
+        bannerContainer.insertBefore(banner, bannerContainer.children[2]);
+      }
+
+      // Banner Trade-In
+      if (tradeinUnit && !document.getElementById('tradeinLinkedBanner')) {
+        const tVal = tradeinVal ? parseInt(tradeinVal, 10) : 0;
+        const banner = document.createElement('div');
+        banner.id = 'tradeinLinkedBanner';
+        banner.style.cssText = 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1.5px solid #d97706; border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 4px 12px rgba(217,119,6,0.15);';
+        banner.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:#d97706; color:white; display:flex; align-items:center; justify-content:center; font-size:16px;">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </div>
+            <div>
+              <h5 style="margin:0 0 2px; font-size:13px; font-weight:800; color:#92400e;">Subsidi &amp; Potongan Trade-In Terhubung!</h5>
+              <p style="margin:0; font-size:11.5px; color:#b45309;">
+                Unit Mobil Bekas: <strong>${tradeinUnit}</strong> • Taksiran DP: <strong>Rp ${tVal.toLocaleString('id-ID')}</strong>
+              </p>
+            </div>
+          </div>
+          <span style="background:#b45309; color:white; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:20px; white-space:nowrap;">TRADE-IN ➔ SPK</span>
+        `;
+        bannerContainer.insertBefore(banner, bannerContainer.children[2]);
+      }
+
+      // Banner Simulasi Kredit
+      if ((dpParam || cicilanParam) && !document.getElementById('simulationLinkedBanner')) {
+        const dpVal = dpParam ? parseInt(dpParam, 10) : 0;
+        const cicilanVal = cicilanParam ? parseInt(cicilanParam, 10) : 0;
+        const banner = document.createElement('div');
+        banner.id = 'simulationLinkedBanner';
+        banner.style.cssText = 'background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1.5px solid #059669; border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 4px 12px rgba(5,150,105,0.15);';
+        banner.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:#059669; color:white; display:flex; align-items:center; justify-content:center; font-size:16px;">
+              <i class="fa-solid fa-calculator"></i>
+            </div>
+            <div>
+              <h5 style="margin:0 0 2px; font-size:13px; font-weight:800; color:#065f46;">Simulasi Kredit Kalkulator Terhubung!</h5>
+              <p style="margin:0; font-size:11.5px; color:#047857;">
+                Leasing: <strong>${leasingParam || 'TAF / ACC'}</strong> • DP: <strong>Rp ${dpVal.toLocaleString('id-ID')}</strong> • Cicilan: <strong>Rp ${cicilanVal.toLocaleString('id-ID')}/bln</strong> (${tenorParam || 3} Thn)
+              </p>
+            </div>
+          </div>
+          <span style="background:#047857; color:white; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:20px; white-space:nowrap;">KREDIT ➔ SPK</span>
         `;
         bannerContainer.insertBefore(banner, bannerContainer.children[2]);
       }

@@ -74,6 +74,11 @@ async function renderKanban() {
                     <div style="margin-top:8px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:4px 8px; font-size:10px; color:#b91c1c; font-weight:700; display:flex; align-items:center; gap:5px;">
                         <i class="fa-solid fa-circle-exclamation" style="animation: radar-pulse 1.5s infinite;"></i> Stagnan > 48 Jam (Perlu Follow-up)
                     </div>` : ''}
+                    <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;" onclick="event.stopPropagation()">
+                        <button onclick="window.location.href='testdrive.html?customer=${encodeURIComponent(c.nama)}&phone=${encodeURIComponent(c.no_telp || '')}'" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; padding:3px 8px; border-radius:6px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Jadwalkan Test Drive"><i class="fa-solid fa-car-side"></i> Test Drive</button>
+                        <button onclick="window.location.href='kalkulator.html?customer=${encodeURIComponent(c.nama)}'" style="background:#fefce8; border:1px solid #fef08a; color:#854d0e; padding:3px 8px; border-radius:6px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Hitung Simulasi Kredit"><i class="fa-solid fa-calculator"></i> Simulasi</button>
+                        <button onclick="window.location.href='spk.html?customer=${encodeURIComponent(c.nama)}&phone=${encodeURIComponent(c.no_telp || '')}&alamat=${encodeURIComponent(c.alamat || '')}'" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; padding:3px 8px; border-radius:6px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Buat Formulir SPK"><i class="fa-solid fa-file-signature"></i> Buat SPK</button>
+                    </div>
                 `;
 
                 card.addEventListener('click', () => {
@@ -152,6 +157,21 @@ async function updateCustomerStatus(id, newStatus) {
 
             // Re-render counters
             renderKanban();
+
+            // Seamless workflow prompts
+            if (newStatus === 'SPK' && c) {
+                setTimeout(() => {
+                    if (confirm(`Status customer "${c.nama}" diperbarui ke SPK. Lanjut buat Formulir SPK sekarang?`)) {
+                        window.location.href = `spk.html?customer=${encodeURIComponent(c.nama)}&phone=${encodeURIComponent(c.no_telp || '')}&alamat=${encodeURIComponent(c.alamat || '')}`;
+                    }
+                }, 300);
+            } else if (newStatus === 'Test Drive' && c) {
+                setTimeout(() => {
+                    if (confirm(`Status customer "${c.nama}" dipindahkan ke Test Drive. Atur unit Test Drive sekarang?`)) {
+                        window.location.href = `testdrive.html?customer=${encodeURIComponent(c.nama)}&phone=${encodeURIComponent(c.no_telp || '')}`;
+                    }
+                }, 300);
+            }
         }
     } catch (err) {
         if (typeof window.showCustomAlert === 'function') {

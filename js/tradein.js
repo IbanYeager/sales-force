@@ -163,5 +163,22 @@ function shareTradeInWA() {
   window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
 }
 
+window.proceedTradeInToSpk = function() {
+  calcTradeInValuation();
+
+  const merk = document.getElementById('trMerk').value;
+  const modelText = document.getElementById('trModel').value.trim() || 'Mobil Bekas';
+  const tahun = document.getElementById('trTahun').value || '2018';
+  const targetVal = document.getElementById('trTargetModel').value;
+  const targetModelName = targetVal.split('|')[1] || 'Toyota Unit';
+
+  const cleanOldCar = `${merk.toUpperCase()} ${modelText} (${tahun})`;
+  const valText = document.getElementById('lblTotalValuationWithSubsidi').textContent;
+  const rawVal = valText.replace(/\D/g, '');
+
+  const url = `spk.html?model=${encodeURIComponent(targetModelName)}&tradein_unit=${encodeURIComponent(cleanOldCar)}&tradein_val=${rawVal}`;
+  window.location.href = url;
+};
+
 // Initial calculation
 calcTradeInValuation();
