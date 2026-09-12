@@ -282,6 +282,110 @@
       font-style: italic;
     }
 
+    /* Order Flow SOP Styles */
+    .order-flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .order-step-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 5px solid var(--primary-red);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+    .order-step-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+      transform: translateY(-2px);
+    }
+    .order-step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .order-step-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .order-step-badge {
+      background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .order-step-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin: 0;
+    }
+    .menu-route-pill {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .menu-route-pill i {
+      color: var(--primary-red);
+    }
+    .order-step-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+    @media (max-width: 768px) {
+      .order-step-details { grid-template-columns: 1fr; }
+    }
+    .step-sub-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .step-sub-box h5 {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .step-sub-box ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12.5px;
+      color: #475569;
+      line-height: 1.6;
+    }
+    .step-sub-box.auto-box {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+    .step-sub-box.auto-box h5 {
+      color: #166534;
+    }
+    .step-sub-box.auto-box ul {
+      color: #15803d;
+    }
+
     /* Print Stylesheet */
     @media print {
       body { background: white; padding: 0; color: black; }
@@ -377,7 +481,252 @@ flowchart TD
         </div>
       </section>
 
-      <!-- SECTION 3: HIRARKI AKSES PORTAL -->
+      <!-- SECTION KHUSUS: ALUR KERJA KETIKA CUSTOMER MAU PESAN MOBIL -->
+      <section class="section-block" id="alur-pesan-mobil">
+        <h2 class="section-title"><i class="fa-solid fa-car-side" style="color:var(--primary-red);"></i> SOP Alur Kerja Sales: Ketika Customer Mau Pesan Mobil</h2>
+        <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:20px;">
+          Panduan komprehensif bagi <strong>Sales Consultant</strong> ketika mendampingi calon pembeli dari tahap awal prospek hingga serah terima unit mobil dan retensi purna jual. Sistem telah terintegrasi secara otomatis, meminimalkan ketik ulang data.
+        </p>
+
+        <!-- Diagram Flowchart Khusus Pesan Mobil -->
+        <div class="mermaid-box" style="margin-bottom: 28px;">
+          <pre class="mermaid">
+flowchart TD
+    %% 1. TAHAP PROSPEK
+    A["1. PROSPECTING & CRM<br/>(Input Prospek / customer.html)"] --> B{"Kebutuhan Konsumen?"}
+    
+    %% 2. TAHAP EKSPLORASI & SIMULASI
+    B -- Ingin Coba Mobil --> C["2A. TEST DRIVE<br/>(testdrive.html)<br/><i>Klik [Lanjut Buat SPK]</i>"]
+    B -- Tukar Mobil Bekas --> D["2B. TRADE-IN APPRAISAL<br/>(tradein.html)<br/><i>Klik [Terapkan Nilai ke DP]</i>"]
+    B -- Simulasi Angsuran --> E["2C. KALKULATOR LEASING<br/>(kalkulator.html)<br/><i>Klik [Ajukan SPK dg Simulasi]</i>"]
+    
+    C --> F["3. FORM SPK DIGITAL<br/>(spk.html)"]
+    D --> F
+    E --> F
+    B -- Langsung Pesan --> F
+
+    %% 3. TAHAP SPK & TANDA JADI
+    F --> G["Input Bukti Transfer Booking Fee<br/>+ Scan KTP + TTD Digital"]
+    G --> H["Submit SPK<br/><i>Auto-sync status CRM ke 'SPK'</i>"]
+
+    %% 4. TAHAP OTORISASI
+    H --> I["4. APPROVAL SUPERVISOR & KACAB<br/>(pages_spv/approval.html)"]
+    I --> J{"Plafond & Stok Approved?"}
+    J -- Ditolak --> F
+    J -- Disetujui --> K["Hold Unit Inventory<br/>+ Terbit Nomor SPK Resmi"]
+
+    %% 5. TAHAP DO & PELUNASAN
+    K --> L["PO Leasing Cair / Pelunasan Cash Masuk"]
+    L --> M["5. SUBMIT DELIVERY ORDER / DO<br/>(do.html)<br/><i>Auto-prompt: Buka Delivery Ceremony</i>"]
+
+    %% 6. TAHAP HANDOVER & RETENSI
+    M --> N["6. DIGITAL DELIVERY CEREMONY<br/>(delivery_ceremony.html)<br/>Checklist PDI + Foto BASTK"]
+    N --> O["7. RETENTION HUB & T-CARE<br/>(retention.html)<br/><i>Auto-reminder Servis 1.000 KM & 1 Bulan</i>"]
+          </pre>
+        </div>
+
+        <!-- Detail Tahapan Operasional Kartu demi Kartu -->
+        <div class="order-flow-container">
+          
+          <!-- TAHAP 1 -->
+          <div class="order-step-card">
+            <div class="order-step-header">
+              <div class="order-step-title-group">
+                <span class="order-step-badge">Tahap 1</span>
+                <h3 class="order-step-title">Pendataan Prospek & Kualifikasi Kebutuhan</h3>
+              </div>
+              <span class="menu-route-pill"><i class="fa-solid fa-address-book"></i> Menu: <strong>CRM Pipeline (customer.html)</strong></span>
+            </div>
+            <p style="font-size:13.5px; color:#334155; margin-bottom:12px;">
+              Saat pertama kali bertemu konsumen di showroom, pameran, atau via digital leads, sales memasukkan identitas calon pembeli ke sistem.
+            </p>
+            <div class="order-step-details">
+              <div class="step-sub-box">
+                <h5><i class="fa-solid fa-hand-pointer" style="color:var(--primary-red);"></i> Aksi yang Dilakukan Sales:</h5>
+                <ul>
+                  <li>Buka menu <strong>Input Prospek</strong> (<code>input.html</code>) atau klik <strong>[+ Tambah Prospek]</strong> di CRM.</li>
+                  <li>Masukkan Nama, Nomor WhatsApp, Domisili, dan Model mobil yang diminati (contoh: <em>Innova Zenix Hybrid, Veloz, Calya</em>).</li>
+                  <li>Pantau prospek di papan Kanban CRM pada kolom <strong>Cold / Warm</strong>.</li>
+                </ul>
+              </div>
+              <div class="step-sub-box auto-box">
+                <h5><i class="fa-solid fa-bolt"></i> Otomasi Sistem di Belakang Layar:</h5>
+                <ul>
+                  <li>Data langsung tersimpan di database CRM (<code>tabel_customer</code>).</li>
+                  <li>Setiap kartu prospek memiliki tombol aksi cepat: <strong>[🚗 Test Drive]</strong>, <strong>[🧮 Simulasi]</strong>, dan <strong>[📝 Buat SPK]</strong> yang otomatis membawa data prospek ke tahapan berikutnya.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAHAP 2 -->
+          <div class="order-step-card">
+            <div class="order-step-header">
+              <div class="order-step-title-group">
+                <span class="order-step-badge">Tahap 2</span>
+                <h3 class="order-step-title">Edukasi Unit, Simulasi Kredit, & Trade-In</h3>
+              </div>
+              <span class="menu-route-pill"><i class="fa-solid fa-calculator"></i> Menu: <strong>Pricelist / Kalkulator / Trade-In / Test Drive</strong></span>
+            </div>
+            <p style="font-size:13.5px; color:#334155; margin-bottom:12px;">
+              Sales memberikan opsi penawaran terbaik sesuai kebutuhan anggaran dan metode pembayaran yang diinginkan calon pembeli:
+            </p>
+            <div class="order-step-details">
+              <div class="step-sub-box">
+                <h5><i class="fa-solid fa-hand-pointer" style="color:var(--primary-red);"></i> Aksi yang Dilakukan Sales:</h5>
+                <ul>
+                  <li><strong>Opsi Cek Harga:</strong> Buka <strong>PriceList OTR</strong> (<code>pricelist.html</code>), pilih tipe varian, lalu klik <strong>[🧮 Simulasi Kredit]</strong>.</li>
+                  <li><strong>Opsi Simulasi Pembiayaan:</strong> Di <strong>Kalkulator Multi-Leasing</strong> (<code>kalkulator.html</code>), atur DP, tenor (1–5 tahun), dan leasing (TAF, ACC, MTF, dll.). Setelah deal, klik <strong>[📄 Ajukan SPK dengan Simulasi Ini]</strong>.</li>
+                  <li><strong>Opsi Tukar Tambah:</strong> Jika customer punya mobil lama, buka <strong>Trade-In</strong> (<code>tradein.html</code>), isi data taksiran, lalu klik <strong>[🚗 Gunakan untuk SPK (Terapkan Nilai ke DP)]</strong>.</li>
+                  <li><strong>Opsi Test Drive:</strong> Jika customer ingin uji jalan, buka <strong>Test Drive</strong> (<code>testdrive.html</code>). Setelah selesai, klik <strong>[📝 Lanjut Buat SPK Unit Ini]</strong> pada riwayat.</li>
+                </ul>
+              </div>
+              <div class="step-sub-box auto-box">
+                <h5><i class="fa-solid fa-bolt"></i> Otomasi Sistem di Belakang Layar:</h5>
+                <ul>
+                  <li>Semua data dari Kalkulator (DP, cicilan, tenor, leasing) atau dari Trade-In (taksiran mobil lama) langsung diteruskan ke Form SPK via parameter aman.</li>
+                  <li>Sales tidak perlu lagi menghitung ulang atau mencatat manual nilai DP dan angsuran.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAHAP 3 -->
+          <div class="order-step-card">
+            <div class="order-step-header">
+              <div class="order-step-title-group">
+                <span class="order-step-badge">Tahap 3</span>
+                <h3 class="order-step-title">Penerbitan Surat Pesanan Kendaraan (SPK Digital)</h3>
+              </div>
+              <span class="menu-route-pill"><i class="fa-solid fa-file-contract"></i> Menu: <strong>Form SPK Digital (spk.html)</strong></span>
+            </div>
+            <p style="font-size:13.5px; color:#334155; margin-bottom:12px;">
+              Formulir pemesanan resmi yang mengikat komitmen pembelian antara konsumen dan Tunas Toyota Kiaracondong.
+            </p>
+            <div class="order-step-details">
+              <div class="step-sub-box">
+                <h5><i class="fa-solid fa-hand-pointer" style="color:var(--primary-red);"></i> Aksi yang Dilakukan Sales:</h5>
+                <ul>
+                  <li>Data customer, leasing, dan potongan DP trade-in telah terisi otomatis (dengan banner visual konfirmasi).</li>
+                  <li>Gunakan fitur <strong>Scan KTP (OCR)</strong> untuk mengisi NIK & Alamat tanpa ketik manual.</li>
+                  <li>Pilih warna unit dan aksesoris resmi (TCO - Toyota Customization Option).</li>
+                  <li>Unggah bukti transfer tanda jadi / booking fee (misal: Rp 5.000.000).</li>
+                  <li>Minta tanda tangan digital konsumen langsung di layar HP/tablet.</li>
+                  <li>Klik tombol <strong>[Submit SPK]</strong>.</li>
+                </ul>
+              </div>
+              <div class="step-sub-box auto-box">
+                <h5><i class="fa-solid fa-bolt"></i> Otomasi Sistem di Belakang Layar:</h5>
+                <ul>
+                  <li>Nomor SPK resmi diterbitkan secara otomatis oleh sistem.</li>
+                  <li>Status customer di papan Kanban CRM (<code>tabel_customer</code>) otomatis naik kelas menjadi <strong>'SPK'</strong>.</li>
+                  <li>Notifikasi real-time terkirim ke Supervisor untuk proses otorisasi (<em>approval</em>).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAHAP 4 -->
+          <div class="order-step-card">
+            <div class="order-step-header">
+              <div class="order-step-title-group">
+                <span class="order-step-badge">Tahap 4</span>
+                <h3 class="order-step-title">Verifikasi & Approval Supervisor / KaCab</h3>
+              </div>
+              <span class="menu-route-pill"><i class="fa-solid fa-user-check"></i> Menu: <strong>Portal SPV (pages_spv/approval.html)</strong></span>
+            </div>
+            <p style="font-size:13.5px; color:#334155; margin-bottom:12px;">
+              Pemeriksaan dokumen, keabsahan tanda jadi, kelayakan diskon, dan alokasi unit stok cabang oleh pimpinan.
+            </p>
+            <div class="order-step-details">
+              <div class="step-sub-box">
+                <h5><i class="fa-solid fa-hand-pointer" style="color:var(--primary-red);"></i> Aksi yang Dilakukan Sales:</h5>
+                <ul>
+                  <li>Sales dapat memantau status persetujuan di riwayat SPK aplikasi sales.</li>
+                  <li>Jika ada catatan atau sanggahan diskon/plafon dari SPV, sales segera melengkapi berkas yang diminta.</li>
+                  <li>SPV / KaCab melakukan validasi dan mengklik tombol <strong>[Approve]</strong>.</li>
+                </ul>
+              </div>
+              <div class="step-sub-box auto-box">
+                <h5><i class="fa-solid fa-bolt"></i> Otomasi Sistem di Belakang Layar:</h5>
+                <ul>
+                  <li>SPK berstatus <strong>'Approved'</strong> dan unit di modul Inventory terkunci (<em>hold</em>) agar tidak diambil sales lain.</li>
+                  <li>Target pencapaian SPK Sales, SPV, dan Cabang langsung bertambah di dashboard real-time.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAHAP 5 -->
+          <div class="order-step-card">
+            <div class="order-step-header">
+              <div class="order-step-title-group">
+                <span class="order-step-badge">Tahap 5</span>
+                <h3 class="order-step-title">Pelunasan & Penerbitan Delivery Order (DO)</h3>
+              </div>
+              <span class="menu-route-pill"><i class="fa-solid fa-truck-ramp-box"></i> Menu: <strong>Delivery Order (do.html)</strong></span>
+            </div>
+            <p style="font-size:13.5px; color:#334155; margin-bottom:12px;">
+              Tahap di mana berkas PO leasing telah terbit (kredit) atau pembayaran unit telah lunas 100% (cash), dan mobil siap dijadwalkan untuk dikirim.
+            </p>
+            <div class="order-step-details">
+              <div class="step-sub-box">
+                <h5><i class="fa-solid fa-hand-pointer" style="color:var(--primary-red);"></i> Aksi yang Dilakukan Sales:</h5>
+                <ul>
+                  <li>Buka menu <strong>Delivery Order (DO)</strong> (<code>do.html</code>).</li>
+                  <li>Pilih SPK customer yang telah berstatus <em>Approved</em>.</li>
+                  <li>Masukkan Nomor Rangka, Nomor Mesin, Alamat Pengiriman, dan Tanggal Janji Kirim.</li>
+                  <li>Klik tombol <strong>[Submit DO]</strong>.</li>
+                </ul>
+              </div>
+              <div class="step-sub-box auto-box">
+                <h5><i class="fa-solid fa-bolt"></i> Otomasi Sistem di Belakang Layar:</h5>
+                <ul>
+                  <li>Status customer di CRM berubah menjadi <strong>'DO'</strong>.</li>
+                  <li>Muncul dialog selebrasi sukses yang langsung menawarkan tombol: <strong>[📸 Buka Digital Delivery Ceremony Sekarang]</strong>.</li>
+                  <li>Angka penjualan DO sales & cabang langsung terhitung real-time.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAHAP 6 -->
+          <div class="order-step-card">
+            <div class="order-step-header">
+              <div class="order-step-title-group">
+                <span class="order-step-badge">Tahap 6</span>
+                <h3 class="order-step-title">Serah Terima Kendaraan & Retensi Purna Jual (T-Care)</h3>
+              </div>
+              <span class="menu-route-pill"><i class="fa-solid fa-gift"></i> Menu: <strong>Delivery Ceremony & Retensi Konsumen</strong></span>
+            </div>
+            <p style="font-size:13.5px; color:#334155; margin-bottom:12px;">
+              Momen puncak penyerahan unit mobil baru kepada konsumen, pengecekan fisik kendaraan, dan pendampingan perawatan berkala jangka panjang.
+            </p>
+            <div class="order-step-details">
+              <div class="step-sub-box">
+                <h5><i class="fa-solid fa-hand-pointer" style="color:var(--primary-red);"></i> Aksi yang Dilakukan Sales:</h5>
+                <ul>
+                  <li>Buka <strong>Digital Delivery Ceremony</strong> (<code>delivery_ceremony.html</code>) — data nama, unit, dan nomor rangka terisi otomatis dari data DO.</li>
+                  <li>Lakukan checklist PDI bersama customer (kondisi bodi, kelengkapan toolkit, buku servis/garansi, STCK/STNK, kaca film).</li>
+                  <li>Ambil foto penyerahan bersama konsumen di depan unit baru.</li>
+                  <li>Minta tanda tangan digital serah terima BASTK dan terbitkan <strong>Sertifikat Serah Terima Resmi</strong>.</li>
+                </ul>
+              </div>
+              <div class="step-sub-box auto-box">
+                <h5><i class="fa-solid fa-bolt"></i> Otomasi Sistem di Belakang Layar:</h5>
+                <ul>
+                  <li>Status customer di CRM diperbarui menjadi <strong>'DO (Delivered)'</strong>.</li>
+                  <li>Sistem otomatis mendaftarkan customer ke modul <strong>Retensi Konsumen (<code>retention.html</code>)</strong> dengan reminder servis berkala perdana (<strong>1.000 KM / 1 Bulan pasca DO</strong>).</li>
+                  <li>Sales dapat mengirim reminder WhatsApp otomatis saat waktu servis berkala tiba untuk menjaga kepuasan konsumen dan membangun peluang <em>repeat order</em> atau <em>referral</em>.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 4: HIRARKI AKSES PORTAL -->
       <section class="section-block">
         <h2 class="section-title"><i class="fa-solid fa-users-gear"></i> Hirarki Portal Akses User</h2>
         <div class="grid-3">
@@ -399,9 +748,9 @@ flowchart TD
         </div>
       </section>
 
-      <!-- SECTION 4: STEP BY STEP OPERASIONAL -->
+      <!-- SECTION 5: STEP BY STEP OPERASIONAL HARIAN -->
       <section class="section-block">
-        <h2 class="section-title"><i class="fa-solid fa-list-check"></i> Langkah-Langkah Proses Operasional</h2>
+        <h2 class="section-title"><i class="fa-solid fa-list-check"></i> Langkah-Langkah Operasional Harian</h2>
         <div class="timeline-list">
           <div class="timeline-item">
             <div class="timeline-step-num">1</div>
@@ -434,7 +783,7 @@ flowchart TD
         </div>
       </section>
 
-      <!-- SECTION 4.5: 7 SUPERPOWERS SALES LAPANGAN -->
+      <!-- SECTION 6: 7 SUPERPOWERS SALES LAPANGAN -->
       <section class="section-block">
         <h2 class="section-title"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> 7 Fitur Superpowers Sales Lapangan</h2>
         <div class="grid-3">
@@ -471,7 +820,7 @@ flowchart TD
         </div>
       </section>
 
-      <!-- SECTION 5: NASKAH PRESENTASI -->
+      <!-- SECTION 7: NASKAH PRESENTASI -->
       <section class="section-block">
         <div class="script-box">
           <h3><i class="fa-solid fa-bullhorn"></i> Naskah Penjelasan Singkat (Script Presentasi 3 Menit)</h3>
