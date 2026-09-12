@@ -809,6 +809,26 @@
 
                 const rightGroup = header.querySelector('.header-right-group');
                 otherNodes.forEach(node => rightGroup.appendChild(node));
+
+                // Append Cara Pakai Header Button if not already added
+                if (!rightGroup.querySelector('#btnHeaderCaraPakai') && !path.toLowerCase().includes('login')) {
+                    const headerTutBtn = document.createElement('button');
+                    headerTutBtn.id = 'btnHeaderCaraPakai';
+                    headerTutBtn.className = 'btn-feature-guide-header';
+                    headerTutBtn.type = 'button';
+                    headerTutBtn.setAttribute('title', 'Buka panduan cara pakai fitur di halaman ini');
+                    headerTutBtn.innerHTML = `
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>Cara Pakai</span>
+                    `;
+                    headerTutBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        if (typeof window.sftOpenFeatureTutorial === 'function') {
+                            window.sftOpenFeatureTutorial();
+                        }
+                    });
+                    rightGroup.prepend(headerTutBtn);
+                }
             });
         })();
 
@@ -821,6 +841,20 @@
     } else {
         injectSidebar();
     }
+
+    // Automatically load Universal Feature Tutorial Script for ALL pages (Sales, SPV, Kacab)
+    (function loadFeatureTutorialScript() {
+        const pathLower = path.toLowerCase();
+        if (pathLower.includes('login')) {
+            return;
+        }
+        if (window.sftFeatureTutorialLoaded || document.querySelector('script[src*="feature_tutorial.js"]')) {
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = prefix + 'js/feature_tutorial.js?v=20260912_universal';
+        (document.head || document.documentElement).appendChild(script);
+    })();
 
     // Automatically load AI Copilot Assistant Script for Sales pages only
     (function loadAiCopilotScript() {
