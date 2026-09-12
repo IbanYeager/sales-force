@@ -373,22 +373,28 @@
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
 
-                    <!-- ═══ BANNER PANDUAN & SOP ALUR KERJA ═══ -->
-                    <a href="panduan_alur_kerja_sales_app.html" class="btn-sop-guide" style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #1e293b, #0f172a); color:white; padding:12px 16px; border-radius:14px; text-decoration:none; margin-bottom:16px; border:1px solid rgba(245,158,11,0.3); box-shadow:0 4px 15px rgba(0,0,0,0.06); transition:transform 0.2s ease;">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; flex-shrink:0;">
-                                <i class="fa-solid fa-book-bookmark"></i>
-                            </div>
-                            <div>
-                                <div style="font-size:13px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:6px;">
-                                    Panduan &amp; SOP Alur Kerja Sales
-                                    <span style="font-size:9px; background:#f59e0b; color:#fff; padding:1px 5px; border-radius:4px; font-weight:800;">SOP</span>
+                    <!-- ═══ BANNER PANDUAN & SOP ALUR KERJA + TOMBOL TUTORIAL ═══ -->
+                    <div style="display:flex; gap:10px; margin-bottom:16px;">
+                        <a href="panduan_alur_kerja_sales_app.html" class="btn-sop-guide" style="flex:1; display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #1e293b, #0f172a); color:white; padding:12px 14px; border-radius:14px; text-decoration:none; border:1px solid rgba(245,158,11,0.3); box-shadow:0 4px 15px rgba(0,0,0,0.06); transition:transform 0.2s ease;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; flex-shrink:0;">
+                                    <i class="fa-solid fa-book-bookmark"></i>
                                 </div>
-                                <div style="font-size:11px; color:#94a3b8;">Flow tahapan ketika customer mau pesan mobil</div>
+                                <div>
+                                    <div style="font-size:13px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:6px;">
+                                        Panduan &amp; SOP Sales
+                                        <span style="font-size:9px; background:#f59e0b; color:#fff; padding:1px 5px; border-radius:4px; font-weight:800;">SOP</span>
+                                    </div>
+                                    <div style="font-size:11px; color:#94a3b8;">Flow praktis cara pesan mobil</div>
+                                </div>
                             </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="color:#64748b; font-size:12px;"></i>
-                    </a>
+                            <i class="fa-solid fa-chevron-right" style="color:#64748b; font-size:12px;"></i>
+                        </a>
+                        <button type="button" onclick="if(window.startAppTour) window.startAppTour(true);" style="background:linear-gradient(135deg, #d71920, #a81016); color:white; border:none; border-radius:14px; padding:0 14px; font-size:12px; font-weight:800; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; box-shadow:0 4px 12px rgba(215,25,32,0.3); flex-shrink:0;" title="Mulai Tutorial Interaktif di Layar">
+                            <i class="fa-solid fa-play" style="font-size:14px;"></i>
+                            <span>Tutorial</span>
+                        </button>
+                    </div>
 
                     <!-- ═══ FITUR UTAMA (PERMANEN: 4 Fitur Paling Kritis & Penting untuk Sales Consultant) ═══ -->
                     <div class="section-header-row">
@@ -1369,6 +1375,7 @@
 
     <script src="js/auto_location_tracker.js?v=20260908_v8"></script>
     <script src="./js/pwa-app.js?v=20260908_no_toast"></script>
+    <script src="js/app_tour.js?v=20260912_tour_v1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {

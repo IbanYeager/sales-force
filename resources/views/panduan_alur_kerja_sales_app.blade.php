@@ -498,6 +498,9 @@
           <img src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png" alt="Tunas Toyota">
         </div>
         <div class="header-tools">
+          <button type="button" class="btn-tool" onclick="startAppTourFromGuide()" style="background:rgba(255,255,255,0.92); color:#d71920; font-weight:800; border-color:#ffffff;" title="Putar Tutorial Interaktif di Layar HP">
+            <i class="fa-solid fa-play"></i> <span>Mulai Tutorial di Layar</span>
+          </button>
           <button type="button" class="btn-tool" onclick="toggleFontSize()" id="btnFontToggle" title="Perbesar Tulisan">
             <i class="fa-solid fa-text-height"></i> <span id="lblFontToggle">Tulisan Besar</span>
           </button>
@@ -733,9 +736,14 @@
           <h4>Butuh Bantuan Lebih Lanjut?</h4>
           <p>Jika ada tahapan yang kurang jelas, tanyakan langsung ke Supervisor Anda atau Admin Cabang.</p>
         </div>
-        <a href="index.html" class="btn-back-home">
-          <i class="fa-solid fa-house"></i> Kembali ke Dashboard
-        </a>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn-back-home" onclick="startAppTourFromGuide()" style="background:#0d2d5e;">
+            <i class="fa-solid fa-play"></i> Putar Tutorial di Layar
+          </button>
+          <a href="index.html" class="btn-back-home">
+            <i class="fa-solid fa-house"></i> Kembali ke Dashboard
+          </a>
+        </div>
       </div>
 
     </main>
@@ -743,6 +751,13 @@
   </div>
 
   <script>
+    function startAppTourFromGuide() {
+      try {
+        localStorage.removeItem('sft_app_tour_completed_v1');
+      } catch(e) {}
+      window.location.href = 'index.html?tour=1';
+    }
+
     function toggleFontSize() {
       const body = document.body;
       const isLarge = body.classList.toggle('large-text');
