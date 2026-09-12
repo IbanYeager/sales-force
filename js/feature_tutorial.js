@@ -413,54 +413,6 @@
                 50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 4px #eab308); }
             }
 
-            /* ── FLOATING CORNER BUTTON ── */
-            .sft-floating-feature-btn {
-                position: fixed;
-                bottom: 84px;
-                left: 18px;
-                z-index: 99990;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                background: linear-gradient(135deg, #0d1b3e, #1e293b);
-                color: #ffffff;
-                border: 2px solid #facc15;
-                padding: 9px 15px;
-                border-radius: 30px;
-                font-size: 12.5px;
-                font-weight: 800;
-                box-shadow: 0 8px 24px rgba(13, 27, 62, 0.45);
-                cursor: pointer;
-                transition: all 0.25s ease;
-                backdrop-filter: blur(10px);
-                user-select: none;
-            }
-            .sft-floating-feature-btn:hover {
-                transform: translateY(-3px) scale(1.05);
-                box-shadow: 0 12px 30px rgba(13, 27, 62, 0.6);
-            }
-            .sft-floating-feature-btn .btn-badge-icon {
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                background: #facc15;
-                color: #854d0e;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                font-weight: 900;
-            }
-
-            @media (max-width: 640px) {
-                .sft-floating-feature-btn {
-                    bottom: 80px;
-                    left: 14px;
-                    padding: 8px 12px;
-                    font-size: 11.5px;
-                }
-            }
-
             /* ── INTERACTIVE SPOTLIGHT (PERSIS FOTO 2) ── */
             .sft-page-spotlight {
                 position: fixed;
@@ -856,19 +808,10 @@
             }
         }
 
-        // 2. Tombol melayang di sudut kiri bawah layar (Selalu mudah ditekan)
-        if (!document.getElementById('sftFloatingFeatureBtn')) {
-            const floatBtn = document.createElement('div');
-            floatBtn.id = 'sftFloatingFeatureBtn';
-            floatBtn.className = 'sft-floating-feature-btn';
-            floatBtn.setAttribute('role', 'button');
-            floatBtn.setAttribute('title', 'Mulai tutorial sorotan tombol cara pakai fitur ini');
-            floatBtn.innerHTML = `
-                <span class="btn-badge-icon"><i class="fa-solid fa-lightbulb"></i></span>
-                <span>Cara Pakai Fitur</span>
-            `;
-            floatBtn.addEventListener('click', () => startSpotlightTour(currentSlug));
-            document.body.appendChild(floatBtn);
+        // 2. Pastikan tombol floating di area sidebar tidak muncul
+        const floatBtn = document.getElementById('sftFloatingFeatureBtn');
+        if (floatBtn) {
+            floatBtn.remove();
         }
     }
 
