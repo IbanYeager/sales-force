@@ -838,11 +838,11 @@ function openReferralModalForCustomer(customerId) {
     // Generate referral link based on sales public digital card
     const origin = window.location.origin;
     const refCode = encodeURIComponent(cust.nama_customer.replace(/[^a-zA-Z0-9]/g, '_'));
-    const refUrl = `${origin}/pages/digital_card.html?ref=${refCode}`;
+    const salesName = localStorage.getItem('namaSales') || 'Indra Gunawan';
+    const salesPhone = (localStorage.getItem('noHp') || '08122334455').replace(/[^\d]/g, '');
+    const refUrl = `${origin}/pages/public_card.html?ref=${refCode}&sales=${encodeURIComponent(salesName)}&wa=${encodeURIComponent(salesPhone)}`;
 
     if (elLink) elLink.value = refUrl;
-
-    const salesName = localStorage.getItem('namaSales') || 'Wiraniaga Tunas Toyota';
     const draftText = `Halo Bapak/Ibu *${cust.nama_customer}*,\n\nSemoga unit *${cust.model_unit}* senantiasa nyaman digunakan beraktivitas bersama keluarga tercinta! 🙏🚗\n\nSebagai bentuk apresiasi kami kepada Bapak/Ibu, kami mengundang Bapak/Ibu bergabung dalam *Program Referral Teman Beli Mobil Tunas Toyota*.\n\nJika ada keluarga, rekan kerja, atau sahabat yang berencana membeli mobil Toyota baru, silakan bagikan tautan rekomendasi spesial Bapak/Ibu berikut:\n🔗 *${refUrl}*\n\n🎁 Setiap rekomendasi yang berhasil closing SPK, Bapak/Ibu berhak mendapatkan *Voucher Servis Gratis & Hadiah Merchandise Eksklusif* dari Tunas Toyota!\n\nSalam hangat,\n*${salesName}*\nTunas Toyota Kiara Condong`;
 
     if (elDraft) elDraft.value = draftText;

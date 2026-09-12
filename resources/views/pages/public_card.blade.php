@@ -870,13 +870,31 @@
         let cleanWa = salesConfig.wa.replace(/[^0-9]/g, '');
         if (cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.substring(1);
 
+        // Check VIP Referral parameter
+        const refParam = params.get('ref');
+        let refDisplayName = '';
+        if (refParam) {
+            refDisplayName = decodeURIComponent(refParam).replace(/_/g, ' ');
+            const heroBanner = document.querySelector('.hero-banner');
+            if (heroBanner) {
+                const refBanner = document.createElement('div');
+                refBanner.style.cssText = 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; border: 1.5px solid #f59e0b; border-radius: 14px; padding: 10px 14px; margin-top: 14px; font-size: 11.5px; font-weight: 700; text-align: center; box-shadow: 0 4px 12px rgba(245,158,11,0.25); display: flex; align-items: center; justify-content: center; gap: 8px;';
+                refBanner.innerHTML = `<i class="fa-solid fa-gift" style="font-size:16px; color:#d97706;"></i> <span>Rekomendasi Spesial dari <strong>${refDisplayName}</strong>! Dapatkan diskon &amp; voucher servis spesial.</span>`;
+                heroBanner.appendChild(refBanner);
+            }
+        }
+
         // Populate DOM
         document.getElementById('pubName').innerText = salesConfig.name;
         document.getElementById('pubTitle').innerText = `${salesConfig.title} • NPK: ${salesConfig.npk}`;
         document.getElementById('pubAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(salesConfig.name)}&background=c8102e&color=fff&bold=true&size=200`;
         document.getElementById('btnActionCall').href = `tel:${salesConfig.telp}`;
         
-        const defaultWaLink = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Halo ' + salesConfig.name + ', saya melihat kartu nama digital Anda dan tertarik info mobil Toyota.')}`;
+        let waGreeting = 'Halo ' + salesConfig.name + ', saya melihat kartu nama digital Anda dan tertarik info mobil Toyota.';
+        if (refDisplayName) {
+            waGreeting = 'Halo ' + salesConfig.name + ', saya direkomendasikan oleh ' + refDisplayName + ' melalui kartu nama digital Anda untuk konsultasi promo mobil Toyota.';
+        }
+        const defaultWaLink = `https://wa.me/${cleanWa}?text=${encodeURIComponent(waGreeting)}`;
         document.getElementById('btnActionWa').href = defaultWaLink;
         document.getElementById('floatWaBtn').href = defaultWaLink;
 
@@ -932,7 +950,11 @@
 
         // Direct Chat for specific car model
         function chatPromoModel(modelName) {
-            const msg = `Halo ${salesConfig.name},\nSaya tertarik dengan promo unit *Toyota ${modelName}* di Tunas Toyota Kiara Condong.\nBoleh minta rincian diskon, promo DP, dan bonus aksesorisnya? Terima kasih.`;
+            let refIntro = '';
+            if (refDisplayName) {
+                refIntro = ` (Rekomendasi dari Bpk/Ibu *${refDisplayName}*)`;
+            }
+            const msg = `Halo ${salesConfig.name},\nSaya tertarik dengan promo unit *Toyota ${modelName}* di Tunas Toyota Kiara Condong${refIntro}.\nBoleh minta rincian diskon, promo DP, dan bonus aksesorisnya? Terima kasih.`;
             window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -969,8 +991,9 @@
             const angsuranText = document.getElementById('hasilAngsuran').innerText;
             const dpText = document.getElementById('hasilDp').innerText;
             const tenorText = document.getElementById('kreditTenor').value;
+            const refNote = refDisplayName ? `\n(Rekomendasi Konsumen: *${refDisplayName}*)` : '';
 
-            const msg = `Halo ${salesConfig.name},\nSaya membuat simulasi kredit di kartu digital Anda:\n\n🚗 Unit: *${modelText}*\n💰 ${dpText}\n📅 Cicilan: *${angsuranText}/bulan* (${tenorText} Bulan)\n\nApakah ada diskon tambahan dan unitnya ready stock?`;
+            const msg = `Halo ${salesConfig.name},\nSaya membuat simulasi kredit di kartu digital Anda:${refNote}\n\n🚗 Unit: *${modelText}*\n💰 ${dpText}\n📅 Cicilan: *${angsuranText}/bulan* (${tenorText} Bulan)\n\nApakah ada promo diskon spesial referral dan unitnya ready stock?`;
             window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 

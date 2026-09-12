@@ -307,6 +307,9 @@
                 <i class="fa-brands fa-whatsapp"></i> Kirim ke Grup Sales
               </button>
             </div>
+            <button type="button" class="btn" style="width:100%; background:linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color:white; font-weight:800; padding:13px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.35); margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="publishBriefingToSalesApp()">
+              <i class="fa-solid fa-cloud-arrow-up"></i> 📢 Terbitkan ke Seluruh Sales App (Podcast &amp; Teks)
+            </button>
 
             <!-- AI VOICE PODCAST PLAYER CARD -->
             <div style="background: linear-gradient(135deg, #0d1b3e 0%, #1e293b 100%); border-radius: 16px; padding: 18px 20px; color: white; margin-top: 16px; box-shadow: 0 8px 24px rgba(13,27,62,0.18);">
@@ -454,6 +457,71 @@ _Terima kasih atas perjuangan hari ini. Selamat beristirahat bersama keluarga te
     function sendToWaGroup() {
       const text = document.getElementById('waMessagePreview').innerText;
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    async function publishBriefingToSalesApp() {
+      const text = document.getElementById('waMessagePreview').innerText;
+      if (!text || text.trim().length === 0) {
+        Swal.fire('Peringatan', 'Teks briefing belum dibuat.', 'warning');
+        return;
+      }
+
+      const spvName = localStorage.getItem('spv_name') || localStorage.getItem('namaSales') || 'Supervisor Tunas Toyota';
+      const targetSpk = document.getElementById('inTargetSpk').value;
+      const realSpk = document.getElementById('inRealisasiSpk').value;
+      const targetDo = document.getElementById('inTargetDo').value;
+      const realDo = document.getElementById('inRealisasiDo').value;
+      const title = currentMode === 'morning' ? 'Morning Huddle & Kickoff' : 'Evening Closing & Recap';
+
+      Swal.fire({
+        title: 'Terbitkan Briefing?',
+        text: 'Briefing ini akan langsung tampil di Dashboard seluruh Wiraniaga lengkap dengan fitur Voice Podcast Audio!',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        confirmButtonText: '<i class="fa-solid fa-cloud-arrow-up"></i> Ya, Terbitkan Sekarang',
+        cancelButtonText: 'Batal'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            Swal.fire({
+              title: 'Menerbitkan Briefing...',
+              allowOutsideClick: false,
+              didOpen: () => Swal.showLoading()
+            });
+
+            const res = await fetch('../api/api_briefing.php?action=publish_briefing', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                spv_name: spvName,
+                briefing_type: currentMode,
+                title: title,
+                content_text: text,
+                target_spk: targetSpk,
+                realisasi_spk: realSpk,
+                target_do: targetDo,
+                realisasi_do: realDo
+              })
+            });
+
+            const json = await res.json();
+            if (json.status === 'success') {
+              Swal.fire({
+                icon: 'success',
+                title: '🎉 Briefing Berhasil Diterbitkan!',
+                text: 'Seluruh tim sales kini dapat membaca dan mendengarkan podcast suara briefing ini langsung di dashboard mereka.',
+                confirmButtonColor: '#2563eb'
+              });
+            } else {
+              Swal.fire('Gagal', json.message || 'Gagal menerbitkan briefing.', 'error');
+            }
+          } catch (err) {
+            console.error(err);
+            Swal.fire('Error', 'Terjadi kesalahan koneksi saat menerbitkan briefing.', 'error');
+          }
+        }
+      });
     }
 
     // Auto fetch live SPK & DO stats from database

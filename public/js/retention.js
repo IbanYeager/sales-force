@@ -396,6 +396,9 @@ function renderRetentionCards() {
 
                     <!-- Right: Action Buttons -->
                     <div class="action-btn-group" style="align-self:center;">
+                        <button type="button" class="btn-booking-action" style="border-color:#059669; color:#059669; font-weight:700;" onclick="openReferralModalForCustomer(${item.id})" title="Ajak Konsumen Jadi Referral Teman Beli Mobil">
+                            <i class="fa-solid fa-gift"></i> Referral Link
+                        </button>
                         <button type="button" class="btn-booking-action" onclick="openBookingServiceModal(${item.id})">
                             <i class="fa-solid fa-wrench"></i> Booking Servis
                         </button>
@@ -811,4 +814,101 @@ function syncDataFromDO() {
             alert('Data DO sudah tersinkronisasi penuh!');
         }
     });
+}
+
+// ==============================================================
+// MODAL 4: PROGRAM REFERRAL KONSUMEN TOYOTA LOGIC
+// ==============================================================
+let activeReferralCust = null;
+
+function openReferralModalForCustomer(customerId) {
+    const cust = allRetentionData.find(c => c.id === customerId);
+    if (!cust) return;
+
+    activeReferralCust = cust;
+
+    const elName = document.getElementById('referralCustName');
+    const elDetail = document.getElementById('referralCustDetail');
+    const elLink = document.getElementById('referralGeneratedLink');
+    const elDraft = document.getElementById('referralWaDraft');
+
+    if (elName) elName.textContent = cust.nama_customer;
+    if (elDetail) elDetail.textContent = `${cust.model_unit} • ${cust.no_hp}`;
+
+    // Generate referral link based on sales public digital card
+    const origin = window.location.origin;
+    const refCode = encodeURIComponent(cust.nama_customer.replace(/[^a-zA-Z0-9]/g, '_'));
+    const salesName = localStorage.getItem('namaSales') || 'Indra Gunawan';
+    const salesPhone = (localStorage.getItem('noHp') || '08122334455').replace(/[^\d]/g, '');
+    const refUrl = `${origin}/pages/public_card.html?ref=${refCode}&sales=${encodeURIComponent(salesName)}&wa=${encodeURIComponent(salesPhone)}`;
+
+    if (elLink) elLink.value = refUrl;
+    const draftText = `Halo Bapak/Ibu *${cust.nama_customer}*,\n\nSemoga unit *${cust.model_unit}* senantiasa nyaman digunakan beraktivitas bersama keluarga tercinta! 🙏🚗\n\nSebagai bentuk apresiasi kami kepada Bapak/Ibu, kami mengundang Bapak/Ibu bergabung dalam *Program Referral Teman Beli Mobil Tunas Toyota*.\n\nJika ada keluarga, rekan kerja, atau sahabat yang berencana membeli mobil Toyota baru, silakan bagikan tautan rekomendasi spesial Bapak/Ibu berikut:\n🔗 *${refUrl}*\n\n🎁 Setiap rekomendasi yang berhasil closing SPK, Bapak/Ibu berhak mendapatkan *Voucher Servis Gratis & Hadiah Merchandise Eksklusif* dari Tunas Toyota!\n\nSalam hangat,\n*${salesName}*\nTunas Toyota Kiara Condong`;
+
+    if (elDraft) elDraft.value = draftText;
+
+    const modal = document.getElementById('referralModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function openGeneralReferralModal(btn) {
+    if (btn) {
+        document.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Pick first customer or fallback
+    const first = allRetentionData.length > 0 ? allRetentionData[0] : {
+        id: 0,
+        nama_customer: "Konsumen Setia Tunas Toyota",
+        model_unit: "Toyota Unit",
+        no_hp: "08123456789"
+    };
+
+    openReferralModalForCustomer(first.id || 101);
+}
+
+function closeReferralModal(e) {
+    if (e && e.target && e.target.closest && e.target.closest('.retention-modal-box') && !e.target.closest('button')) {
+        return;
+    }
+    const modal = document.getElementById('referralModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function copyReferralLink() {
+    const el = document.getElementById('referralGeneratedLink');
+    if (!el || !el.value) return;
+
+    navigator.clipboard.writeText(el.value).then(() => {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Tautan Disalin!',
+                text: 'Link referral kartu digital siap dibagikan ke media sosial / chat.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            alert('Tautan referral berhasil disalin!');
+        }
+    });
+}
+
+function dispatchReferralWhatsApp() {
+    const text = document.getElementById('referralWaDraft')?.value || '';
+    if (!text) return;
+
+    const cust = activeReferralCust;
+    const phone = cust ? (cust.no_hp || '').replace(/[^\d]/g, '') : '';
+    let formattedPhone = phone;
+    if (formattedPhone.startsWith('0')) {
+        formattedPhone = '62' + formattedPhone.substring(1);
+    }
+
+    const url = formattedPhone 
+        ? `https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`
+        : `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+    window.open(url, '_blank');
 }

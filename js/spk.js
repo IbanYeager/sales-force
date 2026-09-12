@@ -73,9 +73,94 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
                     updateNominal();
                 });
             }
+
+            // Auto-check URL parameters from Inventory Hold / Booking
+            setTimeout(checkInventoryPreFillParams, 150);
           }
         })
         .catch(err => console.error("Error loading inventory:", err));
+    }
+
+    function checkInventoryPreFillParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const chassis = urlParams.get('chassis');
+      const modelParam = urlParams.get('model');
+      const custName = urlParams.get('customer');
+      const custPhone = urlParams.get('phone');
+      const tipeBeli = urlParams.get('tipe');
+      const warna = urlParams.get('warna');
+
+      if (!chassis && !modelParam && !custName) return;
+
+      if (custName) {
+        const nameEl = document.getElementById('namaCustomer');
+        if (nameEl) nameEl.value = custName;
+      }
+      if (custPhone) {
+        const phoneEl = document.getElementById('noHp');
+        if (phoneEl) phoneEl.value = custPhone;
+      }
+      if (tipeBeli) {
+        const tipeEl = document.getElementById('tipePembelian');
+        if (tipeEl) tipeEl.value = tipeBeli;
+      }
+
+      if (modelParam) {
+        const select = document.getElementById('modelSelect');
+        if (select) {
+          let foundVal = '';
+          for (let i = 0; i < select.options.length; i++) {
+            const opt = select.options[i];
+            if (opt.value && opt.value.toLowerCase().includes(modelParam.toLowerCase())) {
+              foundVal = opt.value;
+              break;
+            }
+          }
+          if (foundVal) {
+            if (window.jQuery && $.fn.select2) {
+              $(select).val(foundVal).trigger('change');
+            } else {
+              select.value = foundVal;
+              updateNominal();
+            }
+          } else {
+            const opt = document.createElement('option');
+            opt.value = modelParam + (warna ? ` (${warna})` : '');
+            opt.textContent = `[Inventory Hold] ${opt.value}`;
+            opt.dataset.harga = 0;
+            select.appendChild(opt);
+            if (window.jQuery && $.fn.select2) {
+              $(select).val(opt.value).trigger('change');
+            } else {
+              select.value = opt.value;
+              updateNominal();
+            }
+          }
+        }
+      }
+
+      // Tampilkan banner notifikasi bahwa data unit inventory terhubung
+      const bannerContainer = document.getElementById('inputBiasaContainer');
+      if (bannerContainer && !document.getElementById('inventoryHoldLinkedBanner')) {
+        const banner = document.createElement('div');
+        banner.id = 'inventoryHoldLinkedBanner';
+        banner.style.cssText = 'background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1.5px solid #3b82f6; border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 4px 12px rgba(59,130,246,0.15);';
+        banner.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center; font-size:16px;">
+              <i class="fa-solid fa-car"></i>
+            </div>
+            <div>
+              <h5 style="margin:0 0 2px; font-size:13px; font-weight:800; color:#1e3a8a;">Unit Inventory Terhubung!</h5>
+              <p style="margin:0; font-size:11.5px; color:#1e40af;">
+                Rangka: <strong>${chassis || '-'}</strong> • ${modelParam || 'Toyota'} ${warna ? `(${warna})` : ''}
+              </p>
+            </div>
+          </div>
+          <span style="background:#2563eb; color:white; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:20px; white-space:nowrap;">HOLD ➔ SPK</span>
+        `;
+        bannerContainer.insertBefore(banner, bannerContainer.children[2]);
+      }
     }
 
     function updateNominal() {
@@ -280,6 +365,35 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
 
             if (window.clearSignature) window.clearSignature();
             fetchSpk();
+
+            // Otomatis buka Dokumen Lembar SPK Resmi untuk dicetak atau dishare ke WA Customer
+            setTimeout(() => {
+              const createdSpk = {
+                id: (res.data && res.data.id) ? res.data.id : (allSPKData[0] ? allSPKData[0].id + 1 : 1),
+                spk_number: (res.data && res.data.spk_number) ? res.data.spk_number : `SPK/TKC/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(Math.floor(Math.random() * 9000) + 1000)}`,
+                created_at: new Date().toISOString(),
+                status: 'Menunggu',
+                nama_customer: nama,
+                no_hp: hp,
+                nik: nik,
+                no_kk: no_kk,
+                alamat: alamat,
+                rt_rw: rt_rw,
+                kelurahan: kelurahan,
+                kecamatan: kecamatan,
+                kota: kota,
+                provinsi: provinsi,
+                model: model,
+                nominal: nominal,
+                nominal_jt: Math.round(Number(nominal) / 1000000),
+                tipe_pembelian: tipePembelian,
+                signature: signatureData
+              };
+              allSPKData.unshift(createdSpk);
+              if (window.openSpkDocumentModal) {
+                window.openSpkDocumentModal(createdSpk.id);
+              }
+            }, 600);
           } else {
             alert('Gagal: ' + res.message);
           }

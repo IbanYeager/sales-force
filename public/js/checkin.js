@@ -307,11 +307,19 @@ async function reverseGeocode(lat, lng) {
     }
 }
 
-function setQuickLocation(name, lat, lng) {
+function setQuickLocation(name, lat, lng, activity = '') {
     const inputAddress = document.getElementById('inputAddress');
     if (inputAddress) {
         inputAddress.value = name;
         inputAddress.dataset.manualEdited = 'true';
+    }
+
+    if (activity) {
+        const selectJenis = document.getElementById('selectJenis');
+        if (selectJenis) {
+            selectJenis.value = activity;
+            if (typeof handleJenisChange === 'function') handleJenisChange();
+        }
     }
 
     updateCoordinates(lat, lng, 10, true);
@@ -319,7 +327,7 @@ function setQuickLocation(name, lat, lng) {
     const statusEl = document.getElementById('geoStatus');
     if (statusEl) {
         statusEl.className = 'geo-badge geo-success';
-        statusEl.innerHTML = `<i class="fa-solid fa-thumbtack"></i> Preset: ${name}`;
+        statusEl.innerHTML = `<i class="fa-solid fa-thumbtack"></i> Titik Target: ${name}`;
     }
 
     if (mapInstance && markerInstance) {
@@ -644,5 +652,18 @@ document.addEventListener('DOMContentLoaded', () => {
         inputAddress.addEventListener('input', () => {
             inputAddress.dataset.manualEdited = 'true';
         });
+    }
+
+    // Check URL parameters for canvassing / polreg deep-linking
+    const urlParams = new URLSearchParams(window.location.search);
+    const locParam = urlParams.get('location');
+    const latParam = parseFloat(urlParams.get('lat'));
+    const lngParam = parseFloat(urlParams.get('lng'));
+    const actParam = urlParams.get('activity') || urlParams.get('jenis');
+
+    if (locParam) {
+        setTimeout(() => {
+            setQuickLocation(locParam, !isNaN(latParam) ? latParam : -6.9387, !isNaN(lngParam) ? lngParam : 107.6433, actParam || 'Canvassing Wilayah');
+        }, 500);
     }
 });

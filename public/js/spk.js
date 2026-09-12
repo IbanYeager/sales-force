@@ -73,9 +73,94 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
                     updateNominal();
                 });
             }
+
+            // Auto-check URL parameters from Inventory Hold / Booking
+            setTimeout(checkInventoryPreFillParams, 150);
           }
         })
         .catch(err => console.error("Error loading inventory:", err));
+    }
+
+    function checkInventoryPreFillParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const chassis = urlParams.get('chassis');
+      const modelParam = urlParams.get('model');
+      const custName = urlParams.get('customer');
+      const custPhone = urlParams.get('phone');
+      const tipeBeli = urlParams.get('tipe');
+      const warna = urlParams.get('warna');
+
+      if (!chassis && !modelParam && !custName) return;
+
+      if (custName) {
+        const nameEl = document.getElementById('namaCustomer');
+        if (nameEl) nameEl.value = custName;
+      }
+      if (custPhone) {
+        const phoneEl = document.getElementById('noHp');
+        if (phoneEl) phoneEl.value = custPhone;
+      }
+      if (tipeBeli) {
+        const tipeEl = document.getElementById('tipePembelian');
+        if (tipeEl) tipeEl.value = tipeBeli;
+      }
+
+      if (modelParam) {
+        const select = document.getElementById('modelSelect');
+        if (select) {
+          let foundVal = '';
+          for (let i = 0; i < select.options.length; i++) {
+            const opt = select.options[i];
+            if (opt.value && opt.value.toLowerCase().includes(modelParam.toLowerCase())) {
+              foundVal = opt.value;
+              break;
+            }
+          }
+          if (foundVal) {
+            if (window.jQuery && $.fn.select2) {
+              $(select).val(foundVal).trigger('change');
+            } else {
+              select.value = foundVal;
+              updateNominal();
+            }
+          } else {
+            const opt = document.createElement('option');
+            opt.value = modelParam + (warna ? ` (${warna})` : '');
+            opt.textContent = `[Inventory Hold] ${opt.value}`;
+            opt.dataset.harga = 0;
+            select.appendChild(opt);
+            if (window.jQuery && $.fn.select2) {
+              $(select).val(opt.value).trigger('change');
+            } else {
+              select.value = opt.value;
+              updateNominal();
+            }
+          }
+        }
+      }
+
+      // Tampilkan banner notifikasi bahwa data unit inventory terhubung
+      const bannerContainer = document.getElementById('inputBiasaContainer');
+      if (bannerContainer && !document.getElementById('inventoryHoldLinkedBanner')) {
+        const banner = document.createElement('div');
+        banner.id = 'inventoryHoldLinkedBanner';
+        banner.style.cssText = 'background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1.5px solid #3b82f6; border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 4px 12px rgba(59,130,246,0.15);';
+        banner.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center; font-size:16px;">
+              <i class="fa-solid fa-car"></i>
+            </div>
+            <div>
+              <h5 style="margin:0 0 2px; font-size:13px; font-weight:800; color:#1e3a8a;">Unit Inventory Terhubung!</h5>
+              <p style="margin:0; font-size:11.5px; color:#1e40af;">
+                Rangka: <strong>${chassis || '-'}</strong> • ${modelParam || 'Toyota'} ${warna ? `(${warna})` : ''}
+              </p>
+            </div>
+          </div>
+          <span style="background:#2563eb; color:white; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:20px; white-space:nowrap;">HOLD ➔ SPK</span>
+        `;
+        bannerContainer.insertBefore(banner, bannerContainer.children[2]);
+      }
     }
 
     function updateNominal() {
@@ -111,17 +196,23 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
 
         const nikBadge = s.nik ? `<span style="font-size:10px; color:#1e40af; background:#eff6ff; border:1px solid #bfdbfe; padding:2px 6px; border-radius:6px; margin-left:6px; font-weight:700;"><i class="fa-solid fa-id-card"></i> NIK: ${s.nik}</span>` : '';
         const kotaStr = s.kota ? ` • 📍 ${s.kota}` : '';
+        const spkKey = (s.id || s.nama_customer || '').replace(/'/g, "\\'");
 
         return `
-          <div style="border-bottom: 1px solid var(--border-color); padding-bottom:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <h4 style="font-size:13px; margin:0 0 4px 0; display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
-                <span>${s.nama_customer}</span>
+          <div style="border-bottom: 1px solid var(--border-color); padding:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="flex:1; min-width:200px;">
+              <h4 style="font-size:13.5px; margin:0 0 4px 0; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                <span style="font-weight:800; color:#0f172a;">${s.nama_customer}</span>
                 ${nikBadge}
               </h4>
-              <p style="font-size:11px; color:var(--text-muted); margin:0;">${s.model} • Rp ${s.nominal_jt} Jt • ${s.tipe_pembelian}${kotaStr}</p>
+              <p style="font-size:11.5px; color:var(--text-muted); margin:0;">${s.model} • Rp ${s.nominal_jt} Jt • ${s.tipe_pembelian}${kotaStr}</p>
             </div>
-            <span class="chip ${badgeClass}" style="font-size:10px; font-weight:800; padding:4px 8px;">${s.status}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="chip ${badgeClass}" style="font-size:10px; font-weight:800; padding:4px 8px;">${s.status}</span>
+              <button type="button" class="btn-outline" style="padding:5px 12px; font-size:11px; border-color:#0284c7; color:#0284c7; border-radius:8px; display:inline-flex; align-items:center; gap:5px; font-weight:700; cursor:pointer;" onclick="openSpkDocumentModal('${spkKey}')" title="Lihat & Cetak Lembar SPK">
+                <i class="fa-solid fa-file-contract"></i> Dokumen SPK
+              </button>
+            </div>
           </div>
         `;
       }).join('');
@@ -274,6 +365,35 @@ const sales_account_id = localStorage.getItem('idSales') || 1;
 
             if (window.clearSignature) window.clearSignature();
             fetchSpk();
+
+            // Otomatis buka Dokumen Lembar SPK Resmi untuk dicetak atau dishare ke WA Customer
+            setTimeout(() => {
+              const createdSpk = {
+                id: (res.data && res.data.id) ? res.data.id : (allSPKData[0] ? allSPKData[0].id + 1 : 1),
+                spk_number: (res.data && res.data.spk_number) ? res.data.spk_number : `SPK/TKC/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(Math.floor(Math.random() * 9000) + 1000)}`,
+                created_at: new Date().toISOString(),
+                status: 'Menunggu',
+                nama_customer: nama,
+                no_hp: hp,
+                nik: nik,
+                no_kk: no_kk,
+                alamat: alamat,
+                rt_rw: rt_rw,
+                kelurahan: kelurahan,
+                kecamatan: kecamatan,
+                kota: kota,
+                provinsi: provinsi,
+                model: model,
+                nominal: nominal,
+                nominal_jt: Math.round(Number(nominal) / 1000000),
+                tipe_pembelian: tipePembelian,
+                signature: signatureData
+              };
+              allSPKData.unshift(createdSpk);
+              if (window.openSpkDocumentModal) {
+                window.openSpkDocumentModal(createdSpk.id);
+              }
+            }, 600);
           } else {
             alert('Gagal: ' + res.message);
           }
@@ -695,4 +815,105 @@ window.resetGameSpkForm = function() {
   document.getElementById('gameNominal').value = '';
   clearGameSignature();
   setGameStage(1);
+};
+
+// ── DIGITAL SPK OFFICIAL DOCUMENT HANDLERS ──────────────────
+let currentActiveDocSpk = null;
+
+window.openSpkDocumentModal = function(identifier) {
+  const s = allSPKData.find(item => String(item.id) === String(identifier) || item.nama_customer === identifier);
+  if (!s) {
+    if (window.showCustomAlert) showCustomAlert('Info', 'Data SPK tidak ditemukan.', 'info');
+    else alert('Data SPK tidak ditemukan.');
+    return;
+  }
+
+  currentActiveDocSpk = s;
+
+  // Populate data
+  const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  const spkNum = s.spk_number || `SPK/TKC/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(s.id || 1).padStart(4, '0')}`;
+
+  const elSpkNum = document.getElementById('docSpkNumber');
+  const elSpkDate = document.getElementById('docSpkDate');
+  const elBadge = document.getElementById('docBadgeStatus');
+  if (elSpkNum) elSpkNum.textContent = spkNum;
+  if (elSpkDate) elSpkDate.textContent = dateStr;
+  
+  if (elBadge) {
+    elBadge.textContent = s.status || 'PENDING';
+    elBadge.className = 'chip ' + ((s.status === 'Disetujui' || s.status === 'DO') ? 'chip-green' : (s.status === 'Ditolak' ? 'chip-red' : 'chip-yellow'));
+  }
+
+  const elNama = document.getElementById('docNamaCust');
+  const elNik = document.getElementById('docNikKk');
+  const elHp = document.getElementById('docHpCust');
+  const elAlamat = document.getElementById('docAlamatCust');
+  const elWilayah = document.getElementById('docWilayahCust');
+
+  if (elNama) elNama.textContent = s.nama_customer || '-';
+  if (elNik) elNik.textContent = (s.nik ? `NIK: ${s.nik}` : '') + (s.no_kk ? ` / KK: ${s.no_kk}` : (s.nik ? '' : '-'));
+  if (elHp) elHp.textContent = s.no_hp || '-';
+  if (elAlamat) elAlamat.textContent = s.alamat || '-';
+  
+  const wilayahParts = [s.rt_rw ? `RT/RW ${s.rt_rw}` : '', s.kelurahan, s.kecamatan, s.kota, s.provinsi].filter(Boolean);
+  if (elWilayah) elWilayah.textContent = wilayahParts.length > 0 ? wilayahParts.join(', ') : '-';
+
+  const elModel = document.getElementById('docModelUnit');
+  const elHarga = document.getElementById('docHargaOtr');
+  const elTipe = document.getElementById('docTipeBeli');
+  const elSales = document.getElementById('docNamaSales');
+  const elSigner = document.getElementById('docSignerName');
+
+  if (elModel) elModel.textContent = s.model || '-';
+  if (elHarga) elHarga.textContent = s.nominal_jt ? `Rp ${s.nominal_jt} Juta` : (s.nominal ? `Rp ${formatRupiahInput(s.nominal.toString())}` : '-');
+  if (elTipe) elTipe.textContent = s.tipe_pembelian || 'Kredit';
+  if (elSales) elSales.textContent = s.nama_sales || localStorage.getItem('namaSales') || 'Wiraniaga Tunas Toyota';
+  if (elSigner) elSigner.textContent = s.nama_customer || 'Customer Toyota';
+
+  // Signature Image
+  const sigImg = document.getElementById('docSignatureImg');
+  const noSign = document.getElementById('docNoSignPlaceholder');
+  if (sigImg && noSign) {
+    if (s.signature && s.signature.length > 100) {
+      sigImg.src = s.signature;
+      sigImg.style.display = 'block';
+      noSign.style.display = 'none';
+    } else {
+      sigImg.style.display = 'none';
+      noSign.style.display = 'block';
+    }
+  }
+
+  const modal = document.getElementById('spkDocumentModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeSpkDocumentModal = function(e) {
+  if (e && e.target && e.target.closest && e.target.closest('.spk-doc-sheet') && !e.target.closest('.ocr-modal-close-btn') && !e.target.closest('.btn-outline')) {
+    return;
+  }
+  const modal = document.getElementById('spkDocumentModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.printSpkDocument = function() {
+  window.print();
+};
+
+window.shareSpkDocumentWa = function() {
+  if (!currentActiveDocSpk) return;
+  const s = currentActiveDocSpk;
+  const spkNum = document.getElementById('docSpkNumber')?.textContent || 'SPK/TKC/2026';
+  const salesName = document.getElementById('docNamaSales')?.textContent || 'Wiraniaga Tunas Toyota';
+  const text = `Halo Bapak/Ibu *${s.nama_customer}*,\n\nTerima kasih telah melakukan pemesanan kendaraan resmi di *Tunas Toyota Kiara Condong Bandung*.\n\nBerikut adalah rincian *Surat Pemesanan Kendaraan (SPK)* Anda:\n📄 *No. Registrasi SPK:* ${spkNum}\n🚗 *Unit Kendaraan:* ${s.model}\n💰 *Sistem Pembelian:* ${s.tipe_pembelian || 'Kredit'}\n✅ *Status Dokumen:* Terverifikasi & Ditandatangani Digital\n\nSales Consultant Anda:\n👤 *${salesName}*\n📞 Kantor Tunas Toyota Kiara Condong: (022) 731-2000\n\n_Toyota Let's Go Beyond!_ 🚀🚗`;
+
+  const phone = (s.no_hp || '').replace(/[^\d]/g, '');
+  let phoneFormatted = phone;
+  if (phoneFormatted.startsWith('0')) {
+    phoneFormatted = '62' + phoneFormatted.substring(1);
+  }
+  
+  const waUrl = phoneFormatted ? `https://wa.me/${phoneFormatted}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(waUrl, '_blank');
 };

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -420,11 +420,29 @@
                             <button type="button" class="btn-quick-loc" onclick="setQuickLocation('Festival Citylink Mall', -6.9329, 107.5855)">
                                 🏬 Festival Citylink
                             </button>
-                            <button type="button" class="btn-quick-loc" onclick="setQuickLocation('Paris Van Java Mall', -6.8893, 107.5960)">
-                                🏬 PVJ Bandung
-                            </button>
                             <button type="button" class="btn-quick-loc" onclick="setQuickLocation('Summarecon Mall Bandung', -6.9667, 107.6972)">
                                 🏬 Summarecon Mall
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Polreg Canvassing Strategic Hotspots -->
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 11px; color: #c8102e; font-weight: 800; display:flex; align-items:center; gap:5px;">
+                            <i class="fa-solid fa-crosshairs"></i> Hotspot Canvassing Polreg Wilayah:
+                        </span>
+                        <div class="quick-location-grid" style="margin-top:6px;">
+                            <button type="button" class="btn-quick-loc" style="border-color:#fca5a5; background:#fff5f5; color:#991b1b; font-weight:700;" onclick="setQuickLocation('Sentra Bisnis Buah Batu', -6.9450, 107.6350, 'Canvassing Wilayah')">
+                                🎯 Buah Batu (Trade-In Rush)
+                            </button>
+                            <button type="button" class="btn-quick-loc" style="border-color:#fca5a5; background:#fff5f5; color:#991b1b; font-weight:700;" onclick="setQuickLocation('Area Komersial Batununggal', -6.9580, 107.6250, 'Canvassing Wilayah')">
+                                🎯 Batununggal (Conquesting)
+                            </button>
+                            <button type="button" class="btn-quick-loc" style="border-color:#fca5a5; background:#fff5f5; color:#991b1b; font-weight:700;" onclick="setQuickLocation('Sentra Otomotif Soekarno Hatta', -6.9420, 107.6520, 'Canvassing Wilayah')">
+                                🎯 Soekarno Hatta (Penetrasi)
+                            </button>
+                            <button type="button" class="btn-quick-loc" style="border-color:#fca5a5; background:#fff5f5; color:#991b1b; font-weight:700;" onclick="setQuickLocation('Kawasan Industri Kiara Condong', -6.9380, 107.6430, 'Canvassing Wilayah')">
+                                🎯 Kircon Industri (Fleet/Rangga)
                             </button>
                         </div>
                     </div>

@@ -280,6 +280,7 @@
 
                     <!-- ═══ WIDGET MORNING BRIEFING AGENDA FOLLOW-UP ═══ -->
                     <div id="dailyFollowupBriefingContainer"></div>
+                    <div id="spvAiVoiceBriefingContainer"></div>
 
                     <!-- ═══ KARTU TARGET SPK & DO ═══ -->
                     <a href="pages/target.html" class="target-link">
@@ -1338,6 +1339,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {
                 SalesSuperpowers.checkDailyFollowupReminders();
+                SalesSuperpowers.loadTodayBriefingPodcast();
             }
         });
     </script>

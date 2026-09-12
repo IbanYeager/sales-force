@@ -215,19 +215,26 @@ function renderSpkList() {
     let footerHtml = '';
     if (s.status === 'Menunggu') {
       footerHtml = `
-                <div class="card-footer" style="justify-content: flex-end;">
-                  <button class="btn-action btn-reject" onclick="updateSpkStatus(${s.id}, 'Ditolak', this)">
-                    <i class="fa-solid fa-xmark"></i> Tolak
+                <div class="card-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                  <button class="btn-action" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:700;" onclick="viewSpkDocumentFromSpv(${s.id})" title="Periksa Dokumen Lengkap SPK & Tanda Tangan">
+                    <i class="fa-solid fa-file-contract"></i> Lembar SPK &amp; KTP
                   </button>
-                  <button class="btn-action btn-approve" onclick="updateSpkStatus(${s.id}, 'Disetujui', this)">
-                    <i class="fa-solid fa-check"></i> Setujui
-                  </button>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn-action btn-reject" onclick="updateSpkStatus(${s.id}, 'Ditolak', this)">
+                      <i class="fa-solid fa-xmark"></i> Tolak
+                    </button>
+                    <button class="btn-action btn-approve" onclick="updateSpkStatus(${s.id}, 'Disetujui', this)">
+                      <i class="fa-solid fa-check"></i> Setujui
+                    </button>
+                  </div>
                 </div>
               `;
     } else {
       footerHtml = `
-                <div class="card-footer" style="justify-content: space-between; align-items: center;">
-                  <span style="font-size:11px; font-weight:700; color:var(--muted);"><i class="fa-solid fa-clock-rotate-left"></i> Histori</span>
+                <div class="card-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                  <button class="btn-action" style="background:#f8fafc; color:#334155; border:1px solid #cbd5e1; font-weight:700;" onclick="viewSpkDocumentFromSpv(${s.id})" title="Lihat Salinan Dokumen SPK">
+                    <i class="fa-solid fa-file-contract"></i> Lihat Dokumen SPK
+                  </button>
                   <button class="btn-action" style="background:#fee2e2; color:#ef4444;" onclick="deleteSpk(${s.id}, this)">
                     <i class="fa-solid fa-trash"></i> Hapus
                   </button>
@@ -659,6 +666,99 @@ async function deleteTestDrive(id, btn) {
     btn.innerHTML = '<i class="fa-solid fa-trash"></i> Hapus';
   }
 }
+
+// ── SPV SPK OFFICIAL DOCUMENT MODAL LOGIC ───────────────────
+let currentActiveDocSpk = null;
+
+window.viewSpkDocumentFromSpv = function(spkId) {
+  const s = spkData.find(item => String(item.id) === String(spkId));
+  if (!s) {
+    alert('Data SPK tidak ditemukan.');
+    return;
+  }
+
+  currentActiveDocSpk = s;
+
+  const dateStr = s.created_at ? new Date(s.created_at.replace(/-/g, '/')).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  const spkNum = s.spk_number || `SPK/TKC/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(s.id || 1).padStart(4, '0')}`;
+
+  const elSpkNum = document.getElementById('docSpkNumber');
+  const elSpkDate = document.getElementById('docSpkDate');
+  const elBadge = document.getElementById('docBadgeStatus');
+  if (elSpkNum) elSpkNum.textContent = spkNum;
+  if (elSpkDate) elSpkDate.textContent = dateStr;
+  
+  if (elBadge) {
+    elBadge.textContent = s.status || 'Menunggu';
+    elBadge.className = 'chip ' + ((s.status === 'Disetujui' || s.status === 'DO') ? 'chip-green' : (s.status === 'Ditolak' ? 'chip-red' : 'chip-yellow'));
+  }
+
+  const elNama = document.getElementById('docNamaCust');
+  const elNik = document.getElementById('docNikKk');
+  const elHp = document.getElementById('docHpCust');
+  const elAlamat = document.getElementById('docAlamatCust');
+  const elWilayah = document.getElementById('docWilayahCust');
+
+  if (elNama) elNama.textContent = s.nama_customer || '-';
+  if (elNik) elNik.textContent = (s.nik ? `NIK: ${s.nik}` : '') + (s.no_kk ? ` / KK: ${s.no_kk}` : (s.nik ? '' : '-'));
+  if (elHp) elHp.textContent = s.no_hp || '-';
+  if (elAlamat) elAlamat.textContent = s.alamat || '-';
+  
+  const wilayahParts = [s.rt_rw ? `RT/RW ${s.rt_rw}` : '', s.kelurahan, s.kecamatan, s.kota, s.provinsi].filter(Boolean);
+  if (elWilayah) elWilayah.textContent = wilayahParts.length > 0 ? wilayahParts.join(', ') : '-';
+
+  const elModel = document.getElementById('docModelUnit');
+  const elHarga = document.getElementById('docHargaOtr');
+  const elTipe = document.getElementById('docTipeBeli');
+  const elSales = document.getElementById('docNamaSales');
+  const elSigner = document.getElementById('docSignerName');
+
+  if (elModel) elModel.textContent = s.model || '-';
+  if (elHarga) elHarga.textContent = s.nominal_jt ? `Rp ${s.nominal_jt} Juta` : (s.nominal ? `Rp ${Number(s.nominal).toLocaleString('id-ID')}` : '-');
+  if (elTipe) elTipe.textContent = s.tipe_pembelian || 'Kredit';
+  if (elSales) elSales.textContent = s.nama_sales || 'Wiraniaga Tunas Toyota';
+  if (elSigner) elSigner.textContent = s.nama_customer || 'Customer Toyota';
+
+  const sigImg = document.getElementById('docSignatureImg');
+  const noSign = document.getElementById('docNoSignPlaceholder');
+  if (sigImg && noSign) {
+    if (s.signature && s.signature.length > 100) {
+      sigImg.src = s.signature;
+      sigImg.style.display = 'block';
+      noSign.style.display = 'none';
+    } else {
+      sigImg.style.display = 'none';
+      noSign.style.display = 'block';
+    }
+  }
+
+  const modal = document.getElementById('spkDocumentModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeSpkDocumentModal = function(e) {
+  if (e && e.target && e.target.closest && e.target.closest('.spk-doc-sheet') && !e.target.closest('.ocr-modal-close-btn') && !e.target.closest('.btn-outline')) {
+    return;
+  }
+  const modal = document.getElementById('spkDocumentModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.printSpkDocument = function() {
+  window.print();
+};
+
+window.shareSpkDocumentWa = function() {
+  if (!currentActiveDocSpk) return;
+  const s = currentActiveDocSpk;
+  const spkNum = document.getElementById('docSpkNumber')?.textContent || 'SPK/TKC/2026';
+  const text = `Halo Bapak/Ibu *${s.nama_customer}*,\n\nBerikut adalah konfirmasi *Surat Pemesanan Kendaraan (SPK)* resmi dari *Tunas Toyota Kiara Condong*:\n📄 *No. Registrasi SPK:* ${spkNum}\n🚗 *Unit Kendaraan:* ${s.model}\n💰 *Sistem Pembelian:* ${s.tipe_pembelian || 'Kredit'}\n✅ *Status Dokumen:* Terverifikasi & Disetujui\n\nTunas Toyota Kiara Condong Bandung\n📞 (022) 731-2000`;
+  const phone = (s.no_hp || '').replace(/[^\d]/g, '');
+  let phoneFormatted = phone;
+  if (phoneFormatted.startsWith('0')) phoneFormatted = '62' + phoneFormatted.substring(1);
+  const waUrl = phoneFormatted ? `https://wa.me/${phoneFormatted}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(waUrl, '_blank');
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   guardSPV();

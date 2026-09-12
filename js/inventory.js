@@ -522,6 +522,9 @@ function renderTableView(data, container) {
             statusText = `<i class="fa-solid fa-lock"></i> LOCKED<br><span class="hold-timer-pill" data-seconds="${rem}"><i class="fa-solid fa-stopwatch"></i> ${formatRemainingSeconds(rem)}</span>`;
             actionBtnHtml = `
                 <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                    <button class="btn-table-ambil" style="background:#10b981; color:white; font-size:10.5px; padding:3px 8px;" onclick="convertHoldToSpk('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Lanjut ke Form SPK untuk Unit Hold Ini">
+                        <i class="fa-solid fa-file-signature"></i> Jadi SPK
+                    </button>
                     <button class="btn-table-release" onclick="releaseUnitHold('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Lepas Kunci Hold">
                         <i class="fa-solid fa-lock-open"></i> Release
                     </button>
@@ -696,6 +699,9 @@ function renderAccordionView(data, container) {
                     statusText = `<i class="fa-solid fa-lock"></i> LOCKED<br><span class="hold-timer-pill" data-seconds="${rem}"><i class="fa-solid fa-stopwatch"></i> ${formatRemainingSeconds(rem)}</span>`;
                     actionBtnHtml = `
                         <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                            <button class="btn-table-ambil" style="background:#10b981; color:white; font-size:10.5px; padding:3px 8px;" onclick="convertHoldToSpk('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Lanjut ke Form SPK untuk Unit Hold Ini">
+                                <i class="fa-solid fa-file-signature"></i> Jadi SPK
+                            </button>
                             <button class="btn-table-release" onclick="releaseUnitHold('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Lepas Kunci Hold">
                                 <i class="fa-solid fa-lock-open"></i> Release
                             </button>
@@ -837,6 +843,9 @@ function renderGridView(data, container) {
             statusText = `<i class="fa-solid fa-lock"></i> LOCKED / DITAHAN <span class="hold-timer-pill" data-seconds="${rem}"><i class="fa-solid fa-stopwatch"></i> ${formatRemainingSeconds(rem)}</span>`;
             actionBtnHtml = `
                 <div style="margin-top: 10px; display:flex; flex-direction:column; gap:6px;">
+                    <button class="card-action-btn" style="background:#10b981; color:white; border:none;" onclick="convertHoldToSpk('${(item.chassis_no || '').replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-file-signature"></i> Lanjut Form SPK
+                    </button>
                     <button class="card-action-btn" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;" onclick="releaseUnitHold('${(item.chassis_no || '').replace(/'/g, "\\'")}')">
                         <i class="fa-solid fa-lock-open"></i> Release Hold
                     </button>
@@ -1045,12 +1054,24 @@ async function submitSpkForm(e) {
         closeSpkModal();
 
         if (json.status === 'success') {
-            showCustomAlert(
-                currentSpkMode === 'hold' ? '🔒 Unit Berhasil Dikunci (Hold)!' : '🎉 Pengajuan SPK Unit Berhasil!',
-                `Unit ${selectedSpkUnit.product_description} (${selectedSpkUnit.chassis_no}) berhasil dikunci selama 2 jam untuk ${name}. Data stok langsung tersinkronisasi.`,
-                'success'
-            );
-            loadInventory();
+            if (currentSpkMode === 'spk') {
+                showCustomAlert(
+                    '🎉 Unit Berhasil Dialokasikan!',
+                    `Unit ${selectedSpkUnit.product_description} dialokasikan untuk ${name}. Mengalihkan ke Formulir SPK...`,
+                    'success'
+                );
+                setTimeout(() => {
+                    const spkUrl = `../pages/spk.html?chassis=${encodeURIComponent(selectedSpkUnit.chassis_no)}&model=${encodeURIComponent(selectedSpkUnit.product_description)}&warna=${encodeURIComponent(selectedSpkUnit.color_description || '')}&customer=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&tipe=${encodeURIComponent(tipe)}`;
+                    window.location.href = spkUrl;
+                }, 800);
+            } else {
+                showCustomAlert(
+                    '🔒 Unit Berhasil Dikunci (Hold)!',
+                    `Unit ${selectedSpkUnit.product_description} (${selectedSpkUnit.chassis_no}) berhasil dikunci selama 2 jam untuk ${name}. Data stok langsung tersinkronisasi.`,
+                    'success'
+                );
+                loadInventory();
+            }
         } else {
             showCustomAlert('Gagal', json.message || 'Tidak dapat memproses unit.', 'error');
         }
@@ -1062,6 +1083,37 @@ async function submitSpkForm(e) {
             submitBtn.disabled = false;
         }
     }
+}
+
+async function convertHoldToSpk(chassisNo) {
+    const item = inventoryData.find(u => u.chassis_no === chassisNo);
+    if (!item) {
+        showCustomAlert('Error', 'Data unit tidak ditemukan.', 'error');
+        return;
+    }
+
+    const holder = item.hold_info ? item.hold_info.customer_name : 'Customer';
+    const desc = item.product_description || 'Toyota';
+    const phone = item.hold_info ? item.hold_info.customer_phone : '';
+    const tipe = item.hold_info ? item.hold_info.tipe_pembelian : 'Kredit';
+    const warna = item.color_description || '';
+
+    if (!confirm(`Konfirmasi alokasi SPK untuk unit ${desc} (${chassisNo}) atas nama ${holder}?\nData customer dan unit akan otomatis terisi di formulir SPK.`)) {
+        return;
+    }
+
+    try {
+        await fetch('../api/api_inventory.php?action=confirm_spk_hold', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chassis_no: chassisNo })
+        });
+    } catch (e) {
+        console.warn('confirm_spk_hold warn:', e);
+    }
+
+    const spkUrl = `../pages/spk.html?chassis=${encodeURIComponent(chassisNo)}&model=${encodeURIComponent(desc)}&warna=${encodeURIComponent(warna)}&customer=${encodeURIComponent(holder)}&phone=${encodeURIComponent(phone)}&tipe=${encodeURIComponent(tipe)}`;
+    window.location.href = spkUrl;
 }
 
 async function releaseUnitHold(chassisNo) {

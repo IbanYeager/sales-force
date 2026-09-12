@@ -860,6 +860,210 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
   },
 
   // =========================================================================
+  // 3B. PODCAST VOICE MORNING BRIEFING SPV
+  // =========================================================================
+  briefingSpeech: null,
+  briefingSpeaking: false,
+  briefingPaused: false,
+  briefingSpeed: 1.0,
+  activeBriefingData: null,
+
+  async loadTodayBriefingPodcast() {
+    const container = document.getElementById('spvAiVoiceBriefingContainer');
+    if (!container) return;
+
+    try {
+      const res = await fetch('api/api_briefing.php?action=get_today_briefing');
+      const json = await res.json();
+      if (json.status !== 'success' || !json.data) {
+        return;
+      }
+
+      const b = json.data;
+      this.activeBriefingData = b;
+
+      const title = b.title || (b.briefing_type === 'morning' ? 'Morning Huddle & Kickoff' : 'Evening Closing Recap');
+      const dateStr = b.briefing_date ? new Date(b.briefing_date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }) : 'Hari Ini';
+      const isMorning = b.briefing_type === 'morning';
+      const iconType = isMorning ? 'fa-sun' : 'fa-moon';
+      const gradientBg = isMorning 
+        ? 'linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 60%, #c8102e 100%)' 
+        : 'linear-gradient(135deg, #090d16 0%, #1e293b 60%, #334155 100%)';
+
+      container.innerHTML = `
+        <div style="background:${gradientBg}; border-radius:20px; padding:18px 20px; color:white; margin-bottom:18px; box-shadow:0 10px 28px rgba(13,27,62,0.25); position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.12);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="background:rgba(239,68,68,0.25); color:#fca5a5; font-size:10.5px; font-weight:900; padding:3px 10px; border-radius:20px; text-transform:uppercase; border:1px solid rgba(239,68,68,0.4); display:inline-flex; align-items:center; gap:5px;">
+                  <i class="fa-solid fa-microphone-lines"></i> PODCAST BRIEFING SPV
+                </span>
+                <span style="font-size:11px; color:#cbd5e1;"><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
+              </div>
+              <h3 style="font-size:15.5px; font-weight:800; margin:0 0 4px; color:#ffffff; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid ${iconType}" style="color:#fbbf24;"></i> ${title}
+              </h3>
+              <p style="font-size:11.5px; color:#e2e8f0; margin:0; line-height:1.5;">
+                Arahan resmi dari <strong>${b.spv_name || 'Supervisor'}</strong> untuk seluruh wiraniaga.
+              </p>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <span style="font-size:10.5px; color:#94a3b8; font-weight:700;">Speed:</span>
+              <button type="button" class="btn-briefing-speed" onclick="SalesSuperpowers.setBriefingSpeed(1.0, this)" style="background:#38bdf8; border:1px solid #38bdf8; color:#0f172a; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px; cursor:pointer;">1.0x</button>
+              <button type="button" class="btn-briefing-speed" onclick="SalesSuperpowers.setBriefingSpeed(1.2, this)" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; cursor:pointer;">1.2x</button>
+              <button type="button" class="btn-briefing-speed" onclick="SalesSuperpowers.setBriefingSpeed(1.4, this)" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; cursor:pointer;">1.4x</button>
+            </div>
+          </div>
+
+          <!-- Controls Bar -->
+          <div style="display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap;">
+            <button type="button" id="btnDashPlayBriefing" onclick="SalesSuperpowers.toggleBriefingVoice()" style="background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color:white; border:none; padding:9px 18px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(34,197,94,0.35);">
+              <i class="fa-solid fa-play" id="dashPlayIcon"></i> <span id="dashPlayText">Putar Audio Podcast</span>
+            </button>
+            <button type="button" onclick="SalesSuperpowers.stopBriefingVoice()" style="background:rgba(255,255,255,0.12); color:#cbd5e1; border:1px solid rgba(255,255,255,0.25); padding:9px 14px; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-stop"></i> Stop
+            </button>
+            <button type="button" onclick="SalesSuperpowers.openBriefingTextModal()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.25); padding:9px 14px; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-left:auto;">
+              <i class="fa-solid fa-book-open"></i> Baca Teks
+            </button>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      console.warn('Load today briefing error:', err);
+    }
+  },
+
+  setBriefingSpeed(speed, btn) {
+    this.briefingSpeed = speed;
+    document.querySelectorAll('.btn-briefing-speed').forEach(b => {
+      b.style.background = 'rgba(255,255,255,0.15)';
+      b.style.color = 'white';
+      b.style.borderColor = 'rgba(255,255,255,0.3)';
+    });
+    if (btn) {
+      btn.style.background = '#38bdf8';
+      btn.style.color = '#0f172a';
+      btn.style.borderColor = '#38bdf8';
+    }
+    if (this.briefingSpeaking && !this.briefingPaused) {
+      this.stopBriefingVoice();
+      this.playBriefingVoice();
+    }
+  },
+
+  toggleBriefingVoice() {
+    if (!this.activeBriefingData) return;
+
+    if (this.briefingPaused) {
+      window.speechSynthesis.resume();
+      this.briefingPaused = false;
+      this.briefingSpeaking = true;
+      this.updateBriefingUi('playing');
+      return;
+    }
+
+    if (this.briefingSpeaking) {
+      window.speechSynthesis.pause();
+      this.briefingPaused = true;
+      this.updateBriefingUi('paused');
+      return;
+    }
+
+    this.playBriefingVoice();
+  },
+
+  playBriefingVoice() {
+    if (!this.activeBriefingData || !window.speechSynthesis) return;
+
+    const rawText = this.activeBriefingData.content_text || '';
+    const cleanText = rawText
+      .replace(/[\*\_~`]/g, '')
+      .replace(/[\u{1F600}-\u{1F64F}|\u{1F300}-\u{1F5FF}|\u{1F680}-\u{1F6FF}|\u{2600}-\u{26FF}|\u{2700}-\u{27BF}]/gu, '')
+      .replace(/•/g, 'Poin: ')
+      .replace(/\n\n+/g, '. ')
+      .replace(/\n/g, ', ');
+
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(cleanText);
+    utt.lang = 'id-ID';
+    utt.rate = this.briefingSpeed;
+    utt.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    const idVoice = voices.find(v => v.lang === 'id-ID' || v.lang.includes('id') || v.name.toLowerCase().includes('indonesia'));
+    if (idVoice) utt.voice = idVoice;
+
+    utt.onstart = () => {
+      this.briefingSpeaking = true;
+      this.briefingPaused = false;
+      this.updateBriefingUi('playing');
+    };
+
+    utt.onend = () => {
+      this.briefingSpeaking = false;
+      this.briefingPaused = false;
+      this.updateBriefingUi('idle');
+    };
+
+    utt.onerror = () => {
+      this.briefingSpeaking = false;
+      this.briefingPaused = false;
+      this.updateBriefingUi('idle');
+    };
+
+    this.briefingSpeech = utt;
+    window.speechSynthesis.speak(utt);
+  },
+
+  stopBriefingVoice() {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    this.briefingSpeaking = false;
+    this.briefingPaused = false;
+    this.updateBriefingUi('idle');
+  },
+
+  updateBriefingUi(state) {
+    const icon = document.getElementById('dashPlayIcon');
+    const text = document.getElementById('dashPlayText');
+    const btn = document.getElementById('btnDashPlayBriefing');
+    if (!icon || !text || !btn) return;
+
+    if (state === 'playing') {
+      icon.className = 'fa-solid fa-pause';
+      text.textContent = 'Jeda Podcast';
+      btn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+    } else if (state === 'paused') {
+      icon.className = 'fa-solid fa-play';
+      text.textContent = 'Lanjut Putar';
+      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    } else {
+      icon.className = 'fa-solid fa-play';
+      text.textContent = 'Putar Audio Podcast';
+      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    }
+  },
+
+  openBriefingTextModal() {
+    if (!this.activeBriefingData) return;
+    const b = this.activeBriefingData;
+    const dateStr = b.briefing_date ? new Date(b.briefing_date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : 'Hari Ini';
+
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        title: `<div style="font-size:16px; font-weight:800; color:#0f172a;">${b.title}</div><div style="font-size:12px; color:#64748b; font-weight:500;">Oleh: ${b.spv_name} • ${dateStr}</div>`,
+        html: `<div style="text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; font-size:12px; line-height:1.7; color:#1e293b; max-height:350px; overflow-y:auto; white-space:pre-wrap;">${b.content_text}</div>`,
+        confirmButtonText: 'Tutup',
+        confirmButtonColor: '#0d1b3e'
+      });
+    } else {
+      alert(b.content_text);
+    }
+  },
+
+  // =========================================================================
   // 4. SCAN KTP & STNK OTOMATIS (OCR)
   // =========================================================================
   // 4. SMART AI OCR SCANNER (KAMERA LIVE & DOKUMEN KTP / KK)

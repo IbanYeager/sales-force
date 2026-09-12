@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -29,6 +29,11 @@
         <h3 id="displayKecamatan" style="margin: 0 0 4px 0; font-size: 17px;">Kecamatan...</h3>
         <p style="margin: 0; font-size: 11px; opacity: 0.9;">Analisis data registrasi mobil tahun <b
             id="displayTahun">...</b></p>
+        <div style="margin-top: 12px; display:flex; gap:8px;">
+          <button type="button" onclick="goToCanvassingCheckin()" style="flex:1; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); color:white; font-size:11.5px; font-weight:800; padding:8px 12px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; backdrop-filter:blur(4px);">
+            <i class="fa-solid fa-location-crosshairs"></i> Rute &amp; Check-in Canvassing Wilayah Ini
+          </button>
+        </div>
       </div>
 
       <div class="section-header-row" style="margin-bottom: 10px;">
@@ -99,6 +104,13 @@
 
   <script src="../js/script.js"></script>
   <script src="../js/polreg_detail.js"></script>
+  <script>
+    function goToCanvassingCheckin() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const kec = urlParams.get('kecamatan') || document.getElementById('displayKecamatan')?.textContent || 'Bandung';
+      window.location.href = `checkin.html?location=Kecamatan+${encodeURIComponent(kec)}&activity=Canvassing Wilayah`;
+    }
+  </script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
