@@ -70,275 +70,675 @@
         // ── SPK (Surat Pesanan Kendaraan) ────────────────────────────────────
         'spk': [
             {
-                target: '#btnScanKtp, #btnModeBiasa, .input-mode-switcher-card, #inputBiasaContainer',
+                target: '.ocr-scanner-banner, #btnScanKtp, #btnModeBiasa, #spkNik, #namaCustomer',
                 badge: 'Langkah 1 dari 3: Identitas Pembeli',
                 icon: 'fa-camera',
-                title: '1. Foto KTP Customer (Scan Otomatis)',
-                desc: 'Arahkan kamera HP ke KTP calon pembeli. Sistem otomatis mengisi NIK, Nama, dan Alamat tanpa perlu Anda ketik satu per satu.'
+                title: '1. Scan KTP / Input Data Pembeli',
+                desc: 'Gunakan fitur Smart AI OCR Scanner untuk foto KTP customer agar nama, NIK, dan alamat otomatis terisi seketika.'
             },
             {
-                target: '#modelMobil, select[name="model"], #tandaJadiInput, #formPengajuanSpk .form-group:nth-child(2), input[name="nama"]',
-                badge: 'Langkah 2 dari 3: Unit & Booking Fee',
+                target: '#modelSelect, select#modelSelect, #nominal, #tipePembelian',
+                badge: 'Langkah 2 dari 3: Unit & Pembelian',
                 icon: 'fa-car-side',
-                title: '2. Pilih Tipe Mobil & Uang Tanda Jadi',
-                desc: 'Pilih tipe mobil Toyota yang dipesan customer, tentukan warna idaman, dan masukkan nominal booking fee (minimal Rp 5 Juta) beserta foto bukti transfer.'
+                title: '2. Pilih Tipe Mobil Toyota',
+                desc: 'Pilih model kendaraan yang dipesan customer, sistem otomatis menampilkan harga OTR resmi dan opsi Cash / Kredit.'
             },
             {
-                target: '#signaturePad, .signature-wrapper, button[type="submit"], .btn-submit-spk, button.btn-main, .container',
-                badge: 'Langkah 3 dari 3: Otorisasi SPV',
-                icon: 'fa-file-signature',
+                target: '#signatureCanvas, canvas#signatureCanvas, button[onclick*="submitSpk"], button.btn-main',
+                badge: 'Langkah 3 dari 3: Tanda Tangan & Submit',
+                icon: 'fa-signature',
                 title: '3. Tanda Tangan & Kirim ke SPV',
-                desc: 'Minta tanda tangan customer langsung di layar HP Anda, lalu tekan tombol Kirim Pengajuan SPK agar berkas langsung masuk ke meja SPV untuk di-ACC!'
+                desc: 'Minta tanda tangan customer langsung di layar, lalu tekan tombol Submit SPK Lengkap agar berkas masuk ke meja SPV untuk di-ACC.'
             }
         ],
 
         // ── KALKULATOR MULTI-LEASING ─────────────────────────────────────────
         'kalkulator': [
             {
-                target: '.finance-tab-wrapper, #modelSelect, select[name="model"], .model-picker, .card:first-child',
-                badge: 'Langkah 1 dari 3: Pilih Mobil & OTR',
+                target: '#selectModel, select#selectModel, .finance-tab-wrapper',
+                badge: 'Langkah 1 dari 3: Pilih Model Mobil',
                 icon: 'fa-car',
-                title: '1. Pilih Model Mobil & Harga OTR',
-                desc: 'Pilih tipe mobil Toyota yang diinginkan pembeli. Harga resmi OTR Jawa Barat terbaru beserta program diskon cabang akan otomatis terisi.'
+                title: '1. Pilih Model Toyota & Harga OTR',
+                desc: 'Pilih tipe mobil Toyota yang diinginkan pembeli untuk memuat harga OTR resmi dan paket angsuran.'
             },
             {
-                target: '#dpRange, #dpPercent, #tenorSelect, .dp-slider-wrap, .finance-calc-body, .calc-body',
-                badge: 'Langkah 2 dari 3: Atur Angsuran',
+                target: '#rangeTdp, .dp-chips, .tenor-tabs, #inputTdp',
+                badge: 'Langkah 2 dari 3: Atur DP & Tenor',
                 icon: 'fa-sliders',
-                title: '2. Geser DP & Pilih Tenor Cicilan',
-                desc: 'Geser persentase DP (misal 20% atau 30%) dan tentukan lama cicilan (1 s/d 5 tahun) untuk melihat besaran angsuran yang pas di kantong pembeli.'
+                title: '2. Sesuaikan DP & Tenor Cicilan',
+                desc: 'Geser slider DP atau pilih tombol persentase (20%, 25%, 30%) dan pilih tenor 1 s/d 6 tahun sesuai kesanggupan customer.'
             },
             {
-                target: '#btnAjukanSpk, #btnShareWa, .btn-export-pdf, .calc-action-group, .btn-main',
-                badge: 'Langkah 3 dari 3: Deal & Tindak Lanjut',
+                target: '#resultCard, button[onclick*="proceedSimulationToSpk"], .result-amount',
+                badge: 'Langkah 3 dari 3: Hasil & Aksi Cepat',
                 icon: 'fa-file-invoice-dollar',
-                title: '3. Ajukan SPK atau Kirim ke WhatsApp',
-                desc: 'Customer setuju hitungan angsuran? Tekan [Ajukan SPK dengan Simulasi Ini] untuk langsung memesan mobil, atau kirim PDF penawaran ke WhatsApp pembeli.'
+                title: '3. Hasil Simulasi & Teruskan ke SPK',
+                desc: 'Lihat nominal cicilan bulanan. Jika pembeli setuju, langsung tekan [Ajukan SPK dengan Simulasi Ini] tanpa perlu hitung ulang!'
             }
         ],
 
         // ── CUSTOMER CRM PIPELINE ────────────────────────────────────────────
         'customer': [
             {
-                target: 'button[onclick*="openAddCustomerModal"], #searchCustomer, .btn-main',
+                target: 'button[onclick*="openAddCustomerModal"], #searchCustomer, .card:first-child .form-group',
                 badge: 'Langkah 1 dari 3: Tambah Prospek',
                 icon: 'fa-user-plus',
-                title: '1. Catat Calon Pembeli Baru',
-                desc: 'Ketuk tombol tambah ini setiap kali berkenalan dengan orang yang tertarik mobil Toyota untuk menyimpan nama, nomor WhatsApp, dan mobil incarannya.'
+                title: '1. Tambah Calon Pembeli Baru',
+                desc: 'Tekan tombol plus (+) untuk mencatat data prospek baru (nama, no. WhatsApp, dan tipe mobil incaran) ke database CRM.'
             },
             {
-                target: '#followupList, .kanban-col, .card-customer, #kanbanBoard, .card:nth-child(2)',
-                badge: 'Langkah 2 dari 3: Update Status',
+                target: '#followupList, button[onclick*="openFollowupModal"], .card:nth-child(2)',
+                badge: 'Langkah 2 dari 3: Jadwal Follow-Up',
+                icon: 'fa-calendar-check',
+                title: '2. Pengingat Follow-Up & Dikte Suara',
+                desc: 'Lihat daftar prospek yang harus dihubungi hari ini dan tambahkan pengingat follow-up dengan fitur rekam suara.'
+            },
+            {
+                target: '#kanbanBoard, .kanban-board',
+                badge: 'Langkah 3 dari 3: Pipeline Penjualan',
                 icon: 'fa-arrows-left-right',
-                title: '2. Geser Status (Cold ➔ Warm ➔ Hot)',
-                desc: 'Tarik dan geser kartu customer antar kolom setelah Anda selesai follow-up telepon/chat agar proses pendekatan selalu terpantau rapi.'
-            },
-            {
-                target: '.customer-action-btn, .btn-action-group, .card:first-child',
-                badge: 'Langkah 3 dari 3: Aksi Cepat',
-                icon: 'fa-bolt',
-                title: '3. Tombol Aksi Pintas',
-                desc: 'Gunakan tombol aksi di kartu customer untuk langsung menjadwalkan Test Drive, membuat Simulasi Kredit, atau langsung menerbitkan Form SPK.'
+                title: '3. Geser Status di Papan Pipeline',
+                desc: 'Geser kartu customer antar tahapan (Cold ➔ Warm ➔ Hot ➔ SPK ➔ DO) untuk memantau progres closing penjualan Anda.'
             }
         ],
 
         // ── PRICELIST OTR ───────────────────────────────────────────────────
         'pricelist': [
             {
-                target: '#searchPricelist, input[type="search"], .search-box, .filter-category, input[type="text"]',
-                badge: 'Langkah 1 dari 3: Cari Mobil',
+                target: '#searchInput, .search-wrap',
+                badge: 'Langkah 1 dari 3: Cari Tipe Mobil',
                 icon: 'fa-magnifying-glass',
-                title: '1. Cari Model Kendaraan',
-                desc: 'Ketik tipe mobil yang ditanyakan calon pembeli (contoh: Zenix, Avanza, Veloz, Calya) untuk menemukan baris harga OTR seketika.'
+                title: '1. Cari Varian Mobil',
+                desc: 'Ketik nama tipe mobil (misal: Zenix, Avanza, Veloz, Calya, Hilux) untuk melihat baris harga OTR seketika.'
             },
             {
-                target: '.table-pricelist tbody tr:first-child, .pricelist-row, .price-col, table',
-                badge: 'Langkah 2 dari 3: Cek Harga & Diskon',
-                icon: 'fa-tags',
-                title: '2. Periksa OTR & Plafon Diskon',
-                desc: 'Lihat harga on-the-road tunai dan diskon resmi wiraniaga. Jika customer menawar lebih, ajukan otorisasi diskon khusus ke Supervisor.'
+                target: '#btnToggleMultiSelect, button[onclick*="openFilterModal"], #btnExportPricelist',
+                badge: 'Langkah 2 dari 3: Filter & Multi-Share',
+                icon: 'fa-list-check',
+                title: '2. Fitur Pilih Banyak & Download',
+                desc: 'Gunakan tombol [Pilih Banyak] untuk membagikan beberapa varian sekaligus ke WhatsApp pembeli, atau unduh daftar harga.'
             },
             {
-                target: '.btn-simulasi, a[href*="kalkulator"], .btn-action-pricelist, a.btn-main',
-                badge: 'Langkah 3 dari 3: Hitung Angsuran',
+                target: '#pricelistContainer, .section-header-row',
+                badge: 'Langkah 3 dari 3: Simulasi Cepat',
                 icon: 'fa-calculator',
-                title: '3. Ketuk [Simulasi Kredit]',
-                desc: 'Tekan tombol ini di samping mobil yang dipilih untuk langsung membawa nominal harga OTR ke kalkulator kredit tanpa perlu catat manual.'
+                title: '3. Bawa Langsung ke Simulasi Kredit',
+                desc: 'Setiap baris mobil memiliki tombol aksi untuk langsung membawa harga OTR ke kalkulator kredit atau kirim brosur.'
             }
         ],
 
         // ── LIVE INVENTORY (STOK GUDANG) ────────────────────────────────────
         'inventory': [
             {
-                target: '#searchStock, select[name="filter_model"], #filterWarna, .stock-filters, input[type="text"]',
-                badge: 'Langkah 1 dari 3: Filter Unit',
+                target: '.quick-chips-wrapper, #searchInput',
+                badge: 'Langkah 1 dari 3: Kategori & Filter Unit',
                 icon: 'fa-filter',
-                title: '1. Filter Model & Warna',
-                desc: 'Pilih tipe mobil dan warna yang dicari customer untuk memeriksa ketersediaan unit di gudang cabang dan depo pusat.'
+                title: '1. Filter Model & Kategori',
+                desc: 'Pilih kategori mobil (Ready Stock, MPV, SUV, Commercial) atau ketik warna dan tipe mobil yang dicari customer.'
             },
             {
-                target: '.badge-stock, .badge-free, .table-inventory tbody tr:first-child, .stock-row, table',
-                badge: 'Langkah 2 dari 3: Status Siap Jual',
+                target: '.inv-stats-grid, .stat-ready',
+                badge: 'Langkah 2 dari 3: Pantau Unit Siap Jual',
                 icon: 'fa-circle-check',
-                title: '2. Cek Status Hijau (Free Stock)',
-                desc: 'Pastikan status unit berwarna HIJAU (Free Stock) yang berarti siap dijual dan langsung bisa diproses untuk pengiriman cepat.'
+                title: '2. Cek Total Unit Ready Stock',
+                desc: 'Pantau jumlah unit siap jual (Free Stock). Unit berstatus hijau siap langsung diproses untuk pengiriman kilat.'
             },
             {
-                target: '.btn-lock-unit, a[href*="spk"], .btn-copy-vin, .inventory-action, table',
-                badge: 'Langkah 3 dari 3: Kunci Unit',
-                icon: 'fa-lock',
-                title: '3. Kunci Nomor Rangka ke SPK',
-                desc: 'Salin Nomor Rangka mobil yang ready stock, lalu pasangkan pada form SPK customer Anda agar unit tersebut resmi terkunci atas nama Anda!'
+                target: '.btn-filter-square, .btn-refresh-pill, .inv-toolbar-card',
+                badge: 'Langkah 3 dari 3: Refresh & Kunci Unit',
+                icon: 'fa-rotate-right',
+                title: '3. Segarkan Data & Kunci Rangka',
+                desc: 'Segarkan data stok gudang kapan saja dan salin Nomor Rangka unit yang ready untuk langsung dipasangkan ke form SPK.'
             }
         ],
 
         // ── TEST DRIVE ──────────────────────────────────────────────────────
         'testdrive': [
             {
-                target: '#btnTambahTestDrive, .btn-booking-testdrive, .btn-add-schedule, .btn-primary, .btn-main',
-                badge: 'Langkah 1 dari 3: Daftar Jadwal',
+                target: '.td-tabs-nav, #tabBtnCabang',
+                badge: 'Langkah 1 dari 3: Pilihan Armada',
+                icon: 'fa-building-flag',
+                title: '1. Unit Dealer atau Mitra Rental',
+                desc: 'Pilih antara armada resmi showroom cabang atau armada kemitraan rental (TRAC) jika mobil tertentu sedang dipakai.'
+            },
+            {
+                target: '#selectedBanner, #unitList, #viewUnits',
+                badge: 'Langkah 2 dari 3: Pilih Mobil',
+                icon: 'fa-car',
+                title: '2. Pilih Mobil yang Ingin Dicoba',
+                desc: 'Ketuk mobil Toyota yang diminati pembeli untuk melihat ketersediaan jam dan status unit.'
+            },
+            {
+                target: '.btn-banner-ajukan, button[onclick*="openModal"]',
+                badge: 'Langkah 3 dari 3: Jadwalkan Test Drive',
                 icon: 'fa-calendar-plus',
-                title: '1. Jadwalkan Uji Coba Mobil',
-                desc: 'Tekan tombol ini untuk memilih calon pembeli dan tipe mobil test drive yang siap dikendarai bersama customer.'
-            },
-            {
-                target: '#lokasiSelect, input[name="jadwal"], .schedule-card, .testdrive-form, .card:first-child',
-                badge: 'Langkah 2 dari 3: Waktu & Lokasi',
-                icon: 'fa-location-dot',
-                title: '2. Tentukan Tanggal & Tempat',
-                desc: 'Pilih apakah customer ingin mencoba di showroom dealer atau Anda mengantarkan unit uji coba langsung ke rumah/kantor pembeli.'
-            },
-            {
-                target: '.btn-spk-testdrive, .btn-closing-action, .testdrive-card:first-child, .card:last-child',
-                badge: 'Langkah 3 dari 3: Deal Penjualan',
-                icon: 'fa-file-signature',
-                title: '3. Lanjut Buat SPK Setelah Puas',
-                desc: 'Setelah pembeli merasakan kenyamanan dan tarikan mesin Toyota, segera tekan [Lanjut Buat SPK Unit Ini] selagi antusiasme pembeli memuncak!'
+                title: '3. Ajukan Jadwal Uji Coba',
+                desc: 'Tekan Ajukan Jadwal untuk menentukan jam temu bersama calon pembeli (di showroom dealer atau diantar ke rumah).'
             }
         ],
 
         // ── TRADE-IN (TUKAR TAMBAH) ─────────────────────────────────────────
         'tradein': [
             {
-                target: '#formTradeIn, input[name="merk_mobil"], select[name="tahun"], .tradein-input-grid, .card:first-child',
+                target: '#trMerk, #trModel, .trade-container .card:first-child',
                 badge: 'Langkah 1 dari 3: Data Mobil Lama',
-                icon: 'fa-car-burst',
-                title: '1. Masukkan Data Mobil Lama',
-                desc: 'Ketik merk mobil bekas pembeli (apapun merknya), tahun pembuatan, tipe transmisi, dan jarak kilometer yang tertera di speedometer.'
+                icon: 'fa-car-side',
+                title: '1. Masukkan Spesifikasi Mobil Lama',
+                desc: 'Pilih merek, ketik tipe model, tahun pembuatan, dan kondisi mobil bekas milik konsumen yang ingin ditukar tambah.'
             },
             {
-                target: '#uploadFotoMobil, .upload-area, input[type="file"], .photo-guide, .card:nth-child(2)',
-                badge: 'Langkah 2 dari 3: Foto Kendaraan',
-                icon: 'fa-images',
-                title: '2. Upload Foto Kondisi Fisik Mobil',
-                desc: 'Lampirkan 4 foto (tampak depan, belakang, interior dashboard, dan speedometer) agar tim penilai memberikan harga taksiran terbaik.'
+                target: '#trTargetModel, #trDpTargetPct, #trSubsidiTradeIn',
+                badge: 'Langkah 2 dari 3: Mobil Toyota Baru',
+                icon: 'fa-cart-shopping',
+                title: '2. Tentukan Mobil Toyota Baru & Subsidi',
+                desc: 'Pilih mobil Toyota baru incaran pembeli. Sistem otomatis menambahkan subsidi trade-in resmi dari Tunas Toyota.'
             },
             {
-                target: '#btnApplyTradeIn, .btn-apply-spk, button[type="submit"], .btn-submit-tradein, .btn-main',
-                badge: 'Langkah 3 dari 3: Potong DP SPK',
+                target: '.val-card, button[onclick*="proceedTradeInToSpk"], button[onclick*="shareTradeInWA"]',
+                badge: 'Langkah 3 dari 3: Appraisal & Potong DP',
                 icon: 'fa-circle-dollar-to-slot',
-                title: '3. Gunakan Taksiran untuk Potong DP',
-                desc: 'Tekan tombol terapkan taksiran agar uang mobil lama langsung otomatis menjadi pengurang DP mobil Toyota baru di form SPK!'
+                title: '3. Terapkan Nilai Mobil Lama ke DP SPK',
+                desc: 'Nilai bersih mobil lama otomatis menutup uang muka (DP). Tekan tombol gunakan untuk SPK agar otomatis terpotong!'
             }
         ],
 
         // ── DELIVERY ORDER (DO) ─────────────────────────────────────────────
         'do': [
             {
-                target: '#selectSpk, select[name="spk_id"], .spk-dropdown, .form-do, .card:first-child',
-                badge: 'Langkah 1 dari 3: Pilih SPK',
-                icon: 'fa-file-check',
-                title: '1. Pilih SPK Lunas / ACC Leasing',
-                desc: 'Pilih customer yang SPK-nya sudah lunas uang mukanya atau sudah terbit PO dari pihak leasing rekanan.'
+                target: '#spkSelect, select#spkSelect',
+                badge: 'Langkah 1 dari 3: Pilih Berkas SPK',
+                icon: 'fa-file-circle-check',
+                title: '1. Pilih Customer yang Siap DO',
+                desc: 'Pilih berkas SPK customer yang sudah lunas atau sudah terbit PO leasing dari menu pilihan ini.'
             },
             {
-                target: '#tanggalKirim, textarea[name="alamat_kirim"], input[name="alamat"], .card:nth-child(2)',
-                badge: 'Langkah 2 dari 3: Jadwal Pengiriman',
-                icon: 'fa-calendar-days',
-                title: '2. Atur Tanggal Janji Kirim',
-                desc: 'Tentukan tanggal dan alamat pengantaran mobil ke rumah pembeli sesuai kesepakatan bersama keluarga customer.'
+                target: '#namaCustomer, #model, #nominal',
+                badge: 'Langkah 2 dari 3: Data Otomatis Terisi',
+                icon: 'fa-address-card',
+                title: '2. Periksa Detail Pemesanan',
+                desc: 'Nama pembeli, no handphone, tipe kendaraan Toyota, dan nominal harga akan otomatis terisi rapi oleh sistem.'
             },
             {
-                target: '#btnSubmitDo, button[type="submit"], .btn-submit-do, .btn-main',
+                target: 'button[onclick*="submitDo"], .btn-main, #spkList',
                 badge: 'Langkah 3 dari 3: Penerbitan DO',
-                icon: 'fa-truck-ramp-box',
-                title: '3. Ajukan DO ke Tim Logistik',
-                desc: 'Tekan [Ajukan Delivery Order] agar tim salon PDI dan supir pengiriman cabang segera menyiapkan mobil baru untuk diantarkan!'
+                icon: 'fa-paper-plane',
+                title: '3. Terbitkan Delivery Order (DO)',
+                desc: 'Tekan tombol Submit DO agar tim logistik cabang langsung mempersiapkan pengantaran unit ke rumah customer.'
             }
         ],
 
         // ── DELIVERY CEREMONY ───────────────────────────────────────────────
         'delivery_ceremony': [
             {
-                target: '#pdiChecklist, .checklist-container, .pdi-item:first-child, .card:first-child',
-                badge: 'Langkah 1 dari 3: Cek Kelengkapan',
-                icon: 'fa-clipboard-check',
-                title: '1. Checklist Fisik & Dokumen',
-                desc: 'Periksa bersama customer: buku servis resmi, kunci serep, dongkrak, karpet bludru, dan kartu garansi kaca film.'
+                target: '#delNamaCustomer, #delModelUnit, .card-custom:first-of-type',
+                badge: 'Langkah 1 dari 3: Identitas Customer',
+                icon: 'fa-user-check',
+                title: '1. Isi Data Serah Terima',
+                desc: 'Ketik nama customer, nomor telepon, tipe mobil, serta nomor rangka dan nomor mesin mobil yang diserahkan.'
             },
             {
-                target: '#btnAmbilFoto, .camera-trigger, input[type="file"], .photo-ceremony, .card:nth-child(2)',
-                badge: 'Langkah 2 dari 3: Foto Selebrasi',
-                icon: 'fa-camera',
-                title: '2. Foto Penyerahan Kunci Mobil',
-                desc: 'Abadikan momen bahagia penyerahan replika kunci bersama customer di depan mobil barunya. Foto ini akan otomatis masuk ke Piagam Digital!'
+                target: '#pdiChecklistContainer, .card-custom:nth-of-type(2)',
+                badge: 'Langkah 2 dari 3: PDI Checklist',
+                icon: 'fa-list-check',
+                title: '2. Periksa Kelengkapan Mobil Bersama Customer',
+                desc: 'Centang checklist fisik bersama customer: STNK, buku garansi T-Care, kunci cadangan, APAR, karpet, dan kelistrikan.'
             },
             {
-                target: '#btnGenerateCertificate, #btnShareCertificate, .btn-publish-ceremony, .btn-main',
-                badge: 'Langkah 3 dari 3: Piagam Digital',
-                icon: 'fa-award',
-                title: '3. Cetak & Kirim Piagam ke WhatsApp',
-                desc: 'Minta customer tanda tangan di layar HP Anda, lalu kirimkan Piagam Penyerahan Berbingkai Emas langsung ke WhatsApp customer!'
+                target: '#delSigCanvas, button[onclick*="submitDeliveryCeremony"]',
+                badge: 'Langkah 3 dari 3: Sertifikat Digital',
+                icon: 'fa-certificate',
+                title: '3. Tanda Tangan & Terbitkan Sertifikat',
+                desc: 'Minta tanda tangan customer di layar, lalu terbitkan Sertifikat Digital resmi bertanda tangan dan bagikan ke WA pembeli!'
             }
         ],
 
         // ── INPUT AKTIVITAS ─────────────────────────────────────────────────
         'input': [
             {
-                target: '#jenisAktivitas, select[name="jenis_aktivitas"], .activity-type-picker, .card:first-child',
+                target: '#jenisAktivitas, select#jenisAktivitas, #durasiAktivitas',
                 badge: 'Langkah 1 dari 3: Jenis Kegiatan',
                 icon: 'fa-list-check',
-                title: '1. Pilih Jenis Aktivitas Sales',
-                desc: 'Pilih kegiatan yang baru saja Anda laksanakan: Canvassing Lapangan, Jaga Pameran Mall, Kunjungan Prospek, atau Follow-up Telepon.'
+                title: '1. Pilih Kategori Aktivitas',
+                desc: 'Pilih jenis kegiatan yang baru saja Anda lakukan (Digital Marketing, Walk-in, Pameran, Canvassing, Follow-up Database, dll).'
             },
             {
-                target: '#btnKamera, .camera-box, input[type="file"], .gps-box, .card:nth-child(2)',
+                target: '#uploadButtonBox, #photoGrid, .photo-grid, .lokasi-box',
                 badge: 'Langkah 2 dari 3: Foto & GPS',
-                icon: 'fa-location-crosshairs',
+                icon: 'fa-camera',
                 title: '2. Ambil Foto di Lokasi (GPS Otomatis)',
-                desc: 'Tekan tombol kamera dan ambil foto di lokasi kegiatan. Titik koordinat GPS dan jam kehadiran akan terkunci secara otomatis.'
+                desc: 'Ketuk tombol kamera untuk mengambil foto dokumentasi di lapangan. Titik GPS dan jam kehadiran otomatis terkunci.'
             },
             {
-                target: '#btnSimpan, button[type="submit"], .btn-save-activity, .btn-main',
+                target: '#btnSubmit, button#btnSubmit, button[onclick*="simpanAktivitasBaru"]',
                 badge: 'Langkah 3 dari 3: Lapor ke SPV',
-                icon: 'fa-floppy-disk',
+                icon: 'fa-paper-plane',
                 title: '3. Simpan & Laporkan ke Supervisor',
-                desc: 'Tulis catatan singkat hasil obrolan dengan prospek, lalu tekan Simpan. Supervisor (SPV) Anda akan langsung melihat laporan aktif Anda!'
+                desc: 'Tuliskan catatan hasil obrolan atau gunakan tombol Dikte Suara, lalu tekan Simpan Aktivitas agar langsung terlaporkan ke SPV!'
             }
         ],
 
         // ── AO REPORT ───────────────────────────────────────────────────────
         'ao_report': [
             {
-                target: '#searchAo, .filter-leasing, .search-bar, input[type="text"]',
-                badge: 'Langkah 1 dari 3: Cari Customer',
+                target: '.ao-closing-hero, .ao-closing-grid, #aoBoardMainContainer .ao-closing-hero',
+                badge: 'Langkah 1 dari 3: Estimasi Closing',
+                icon: 'fa-flag-checkered',
+                title: '1. Pantau Estimasi Closing Cabang',
+                desc: 'Lihat target DO cabang bulan ini, alokasi matching OS, proyeksi SPK baru, dan rasio efisiensi penyerahan unit.'
+            },
+            {
+                target: '.ao-quad-card:first-child, .ao-stock-bars-row, #aoBoardMainContainer .ao-quad-card',
+                badge: 'Langkah 2 dari 3: Stock Matching & Ritme',
+                icon: 'fa-boxes-stacked',
+                title: '2. Periksa Free Stock & Ritme 5-Harian',
+                desc: 'Cek perbandingan Free Stock vs Matched Stock serta grafik tangga ritme target pengiriman 5-harian MTD.'
+            },
+            {
+                target: '.ao-quad-card:nth-child(2), #btnAoSendWA, .ao-actions-toolbar',
+                badge: 'Langkah 3 dari 3: SPK Plan & Broadcast',
+                icon: 'fa-file-signature',
+                title: '3. Evaluasi SPK Plan & Broadcast WA',
+                desc: 'Pantau pencapaian SPK per periode dan gunakan tombol Broadcast WA di atas untuk membagikan ringkasan AO Report ini.'
+            }
+        ],
+
+        // ── TARGET & PENCAPAIAN ─────────────────────────────────────────────
+        'target': [
+            {
+                target: '.btn-input-achievement, button[onclick*="openInputModal"]',
+                badge: 'Langkah 1 dari 3: Input Pencapaian',
+                icon: 'fa-circle-plus',
+                title: '1. Laporkan SPK & DO Baru',
+                desc: 'Tekan tombol ini setiap kali Anda berhasil closing untuk menambahkan realisasi angka SPK atau mobil DO Anda.'
+            },
+            {
+                target: '#circleProgressSpk, .target-card:first-of-type',
+                badge: 'Langkah 2 dari 3: Pantau Target SPK',
+                icon: 'fa-file-invoice',
+                title: '2. Pantau Target SPK Bulan Ini',
+                desc: 'Lihat persentase pencapaian, sisa unit yang harus dikejar, serta input rencana unit (plan SPK) bulan ini.'
+            },
+            {
+                target: '#circleProgressDoBulan, .target-card:nth-of-type(2)',
+                badge: 'Langkah 3 dari 3: Target Penyerahan DO',
+                icon: 'fa-boxes-packing',
+                title: '3. Pantau Target DO & Evaluasi',
+                desc: 'Pastikan seluruh SPK yang sudah closing segera terkirim (DO) sebelum akhir bulan untuk memaksimalkan insentif.'
+            }
+        ],
+
+        // ── DIGITAL SMART CARD ──────────────────────────────────────────────
+        'digital_card': [
+            {
+                target: '.card-preview-box, .profile-section',
+                badge: 'Langkah 1 dari 3: Kartu Nama Pintar',
+                icon: 'fa-id-badge',
+                title: '1. Desain Kartu Nama Digital Resmi',
+                desc: 'Kartu nama digital resmi berlogo Toyota lengkap dengan foto profil, nomor kontak, dan badge verifikasi cabang.'
+            },
+            {
+                target: '.action-btn-grid, .action-card-btn.btn-green',
+                badge: 'Langkah 2 dari 3: Kontak 1-Klik',
+                icon: 'fa-bolt',
+                title: '2. Tombol Hubungi Cepat',
+                desc: 'Konsumen yang membuka link kartu nama Anda dapat langsung chat WhatsApp, telepon, atau simpan kontak dalam 1-klik.'
+            },
+            {
+                target: '.studio-right-card, .studio-tabs',
+                badge: 'Langkah 3 dari 3: Pengaturan & Bagikan',
+                icon: 'fa-share-nodes',
+                title: '3. Sesuaikan Konten & Bagikan',
+                desc: 'Atur tautan brosur, katalog mobil, dan bagikan link kartu nama Anda ke status WhatsApp atau media sosial.'
+            }
+        ],
+
+        // ── E-CATALOG & BROSUR ──────────────────────────────────────────────
+        'elibrary': [
+            {
+                target: '#searchInput, .form-group',
+                badge: 'Langkah 1 dari 3: Cari Mobil',
                 icon: 'fa-magnifying-glass',
-                title: '1. Cari Berkas Pengajuan Kredit',
-                desc: 'Ketik nama customer atau pilih leasing (TAF, ACC, MTF, BCA) untuk memantau berkas siapa yang sedang diproses analis leasing.'
+                title: '1. Cari Brosur & Spesifikasi',
+                desc: 'Ketik nama mobil Toyota yang ingin dilihat spesifikasinya atau yang ditanyakan oleh calon pembeli.'
             },
             {
-                target: '.badge-ao-status, .ao-card:first-child, .table-ao tbody tr:first-child, table',
-                badge: 'Langkah 2 dari 3: Pantau Warna Status',
-                icon: 'fa-traffic-light',
-                title: '2. Perhatikan Warna Status',
-                desc: 'Kuning (Sedang Survey), Merah (Kurang Dokumen), dan Hijau (PO Approved / Kredit Disetujui Siap Kirim Mobil).'
+                target: '#categoryFilters, .cat-btn',
+                badge: 'Langkah 2 dari 3: Kategori Mobil',
+                icon: 'fa-layer-group',
+                title: '2. Filter Tipe Kendaraan',
+                desc: 'Pilih kategori MPV, SUV, Hatchback, Sedan, atau Commercial untuk menyaring daftar brosur dengan cepat.'
             },
             {
-                target: '.btn-contact-ao, .btn-action-followup, a[href*="do"], .btn-main',
-                badge: 'Langkah 3 dari 3: Tindak Lanjut',
-                icon: 'fa-phone-volume',
-                title: '3. Tindak Lanjuti Segera',
-                desc: 'Jika status hijau (PO Terbit), segera buka menu Pengajuan DO untuk menjadwalkan pengantaran mobil baru!'
+                target: '#libGrid, .elib-unified-grid',
+                badge: 'Langkah 3 dari 3: Bagikan ke Customer',
+                icon: 'fa-share-nodes',
+                title: '3. Kirim Brosur PDF Resmi ke Konsumen',
+                desc: 'Ketuk tombol bagikan pada kartu mobil untuk langsung mengirimkan file PDF brosur resmi Toyota ke WhatsApp customer.'
+            }
+        ],
+
+        // ── BATTLE CARD & OBJECTION HANDLING ────────────────────────────────
+        'battle_card': [
+            {
+                target: '.battle-tab-nav, #tabBtnObjection',
+                badge: 'Langkah 1 dari 3: Pilihan Topik',
+                icon: 'fa-shield-halved',
+                title: '1. Menjawab Keberatan vs Battle Card',
+                desc: 'Pilih antara skrip menjawab keberatan customer (diskon, inden, hybrid) atau tabel adu spek vs mobil kompetitor.'
+            },
+            {
+                target: '#searchBattleInput, .card:has(#searchBattleInput)',
+                badge: 'Langkah 2 dari 3: Cari Skrip Kilat',
+                icon: 'fa-magnifying-glass',
+                title: '2. Cari Contekan Jawaban',
+                desc: 'Ketik kata kunci keberatan customer (contoh: "diskon sebelah lebih besar", "baterai hybrid", "inden lama").'
+            },
+            {
+                target: '.objection-accordion:first-child, .btn-copy-script',
+                badge: 'Langkah 3 dari 3: Salin Teks Bicara',
+                icon: 'fa-copy',
+                title: '3. Pola Pikir & Salin Skrip Bicara',
+                desc: 'Pelajari cara membalikkan keberatan pembeli dan tekan [Salin Skrip Bicara] untuk dikirim ke chat customer.'
+            }
+        ],
+
+        // ── CHECK-IN KUNJUNGAN ──────────────────────────────────────────────
+        'checkin': [
+            {
+                target: '.geo-card:first-child, .geo-header-flex, #liveGpsCoordinates',
+                badge: 'Langkah 1 dari 3: Akurasi GPS',
+                icon: 'fa-location-dot',
+                title: '1. Kunci Koordinat Lokasi',
+                desc: 'Sistem mendeteksi titik koordinat satelit GPS secara akurat untuk memverifikasi kehadiran Anda di lokasi prospek.'
+            },
+            {
+                target: '.photo-uploader-box, #lokasiInput, .geo-card:nth-child(2)',
+                badge: 'Langkah 2 dari 3: Foto Kunjungan',
+                icon: 'fa-camera',
+                title: '2. Ambil Foto di Lapangan',
+                desc: 'Ambil foto suasana saat bertemu customer, kanvasing, atau pameran sebagai bukti laporan resmi.'
+            },
+            {
+                target: '.btn-submit-action, button#btnSubmitCheckin',
+                badge: 'Langkah 3 dari 3: Kirim Check-In',
+                icon: 'fa-paper-plane',
+                title: '3. Kirim Check-In ke Dashboard SPV',
+                desc: 'Tekan tombol Kirim Check-In agar data kunjungan Anda langsung tercatat rapi di peta monitoring Supervisor.'
+            }
+        ],
+
+        // ── RETENTION & AFTER-SALES ─────────────────────────────────────────
+        'retention': [
+            {
+                target: '.kpi-grid, .kpi-card:first-child',
+                badge: 'Langkah 1 dari 3: KPI Retensi',
+                icon: 'fa-chart-pie',
+                title: '1. Pantau Konsumen Jatuh Tempo',
+                desc: 'Lihat ringkasan customer yang masuk jadwal servis berkala T-Care, perpanjangan STNK, asuransi, dan potensi trade-in.'
+            },
+            {
+                target: '.retention-tabs, #tabTcare, .card:first-child',
+                badge: 'Langkah 2 dari 3: Filter Kategori',
+                icon: 'fa-filter',
+                title: '2. Pilih Kategori Pengingat',
+                desc: 'Pilih jenis layanan purna jual yang ingin Anda tindak lanjuti untuk menjaga hubungan baik dengan customer lama.'
+            },
+            {
+                target: '#retentionListContainer, .btn-action-wa, .retention-card',
+                badge: 'Langkah 3 dari 3: Sapa Konsumen',
+                icon: 'fa-brands fa-whatsapp',
+                title: '3. Sapa Konsumen Lewat WhatsApp',
+                desc: 'Gunakan tombol WhatsApp di samping nama customer untuk mengirim pesan ramah pengingat servis yang sudah disiapkan sistem.'
+            }
+        ],
+
+        // ── POLISI REGIONAL (POLREG) ────────────────────────────────────────
+        'polreg': [
+            {
+                target: '.polreg-tab-bar, .district-hero',
+                badge: 'Langkah 1 dari 3: Wilayah Polreg',
+                icon: 'fa-map',
+                title: '1. Peta Penugasan Wilayah',
+                desc: 'Pantau pembagian area dan batas wilayah regional operasional penjualan cabang Tunas Toyota Kiara Condong.'
+            },
+            {
+                target: '.stat-grid-3, .stat-card-sm:first-child',
+                badge: 'Langkah 2 dari 3: Potensi Pasar',
+                icon: 'fa-chart-simple',
+                title: '2. Analisis Potensi Pasar per Kecamatan',
+                desc: 'Lihat data jumlah populasi kendaraan dan potensi prospek penjualan mobil baru di masing-masing kecamatan.'
+            },
+            {
+                target: '#polregMap, #districtList, .card:has(#polregMap)',
+                badge: 'Langkah 3 dari 3: Peta Wilayah',
+                icon: 'fa-location-dot',
+                title: '3. Eksplorasi Peta & Target Penetrasi',
+                desc: 'Gunakan peta interaktif ini untuk memetakan rute kanvasing dan fokus penyerangan pasar kompetitor.'
+            }
+        ],
+
+        // ── WA SALES STUDIO ─────────────────────────────────────────────────
+        'wa_studio': [
+            {
+                target: '.template-card:first-child, .wa-container > div:first-child',
+                badge: 'Langkah 1 dari 3: Pilih Template Skrip',
+                icon: 'fa-comments',
+                title: '1. Pilih Skrip Sesuai Kebutuhan',
+                desc: 'Pilih template siap pakai: Ucapan Perkenalan, Follow-up Promo Baru, Undangan Test Drive, atau Reminder SPK.'
+            },
+            {
+                target: '.styled-input, #inCustomerName, #inModelName',
+                badge: 'Langkah 2 dari 3: Personalisasi Data',
+                icon: 'fa-user-pen',
+                title: '2. Isi Nama & Mobil Incaran Customer',
+                desc: 'Ketik nama customer dan tipe mobil, pesan WhatsApp akan otomatis tersusun rapi dengan bahasa yang sopan dan persuasif.'
+            },
+            {
+                target: '.wa-preview-box, button.btn-send-wa, button[onclick*="sendWhatsApp"]',
+                badge: 'Langkah 3 dari 3: Preview & Kirim',
+                icon: 'fa-paper-plane',
+                title: '3. Pratinjau & Kirim Langsung ke WA',
+                desc: 'Periksa pratinjau pesan di gelembung hijau, lalu tekan Kirim ke WhatsApp untuk langsung membuka aplikasi WA!'
+            }
+        ],
+
+        // ── PUSAT NOTIFIKASI ────────────────────────────────────────────────
+        'notifikasi': [
+            {
+                target: '.notif-summary-card, .stat-pill-group',
+                badge: 'Langkah 1 dari 3: Status Notifikasi',
+                icon: 'fa-bell',
+                title: '1. Ringkasan Pemberitahuan Baru',
+                desc: 'Pantau jumlah pesan baru yang belum dibaca dari Supervisor, persetujuan SPK, maupun pengingat sistem.'
+            },
+            {
+                target: '.notif-actions, .btn-notif-action.read-all',
+                badge: 'Langkah 2 dari 3: Kelola Notifikasi',
+                icon: 'fa-envelope-open',
+                title: '2. Tandai Dibaca & Bersihkan',
+                desc: 'Gunakan tombol aksi cepat untuk menandai semua notifikasi sudah dibaca atau membersihkan riwayat pesan.'
+            },
+            {
+                target: '#notifList, .notif-card-item:first-child',
+                badge: 'Langkah 3 dari 3: Detail Pesan',
+                icon: 'fa-list',
+                title: '3. Ketuk Pesan untuk Membuka Detail',
+                desc: 'Ketuk salah satu notifikasi untuk langsung diarahkan ke halaman SPK, Approval, atau data customer terkait.'
+            }
+        ],
+
+        // ── PROFIL WIRANIAGA ────────────────────────────────────────────────
+        'profil': [
+            {
+                target: '.card:first-of-type, #namaSalesEl',
+                badge: 'Langkah 1 dari 3: Identitas Wiraniaga',
+                icon: 'fa-user',
+                title: '1. Data Akun Sales Consultant',
+                desc: 'Profil nama lengkap, peran/jabatan, cabang resmi, dan supervisor yang membawahi Anda di Tunas Toyota.'
+            },
+            {
+                target: '#socialLinksContainer, .card:has(#socialLinksContainer)',
+                badge: 'Langkah 2 dari 3: Akun Media Sosial',
+                icon: 'fa-share-nodes',
+                title: '2. Integrasi Akun Sosmed Sales',
+                desc: 'Akun Instagram, TikTok, dan Facebook Anda otomatis tercantum saat Anda membagikan promo dan simulasi kredit ke konsumen.'
+            },
+            {
+                target: 'button[onclick*="openEditProfilModal"], #btnPwaInstallProfil',
+                badge: 'Langkah 3 dari 3: Edit Profil & PWA',
+                icon: 'fa-user-pen',
+                title: '3. Edit Profil & Pasang Aplikasi',
+                desc: 'Perbarui nomor kontak dan link sosmed Anda di sini, serta instal aplikasi SFT ke layar utama HP Anda.'
+            }
+        ],
+
+        // ── APPROVAL PENGAJUAN ──────────────────────────────────────────────
+        'approval': [
+            {
+                target: '.approval-stats, .stat-chip:first-child',
+                badge: 'Langkah 1 dari 3: Status Pengajuan',
+                icon: 'fa-clipboard-check',
+                title: '1. Pantau Status Berkas SPK',
+                desc: 'Lihat rekapitulasi jumlah berkas pengajuan SPK Anda yang masih Pending, sudah Disetujui, atau Ditolak oleh SPV.'
+            },
+            {
+                target: '.filter-tabs, .filter-tab:first-child',
+                badge: 'Langkah 2 dari 3: Filter Berkas',
+                icon: 'fa-filter',
+                title: '2. Saring Berkas Pengajuan',
+                desc: 'Pilih tab Menunggu, Disetujui, atau Ditolak untuk memeriksa catatan alasan revisi dari Supervisor.'
+            },
+            {
+                target: '#approvalList, .card:first-child',
+                badge: 'Langkah 3 dari 3: Riwayat Berkas',
+                icon: 'fa-folder-open',
+                title: '3. Cek Riwayat & Keputusan SPV',
+                desc: 'Buka kartu customer untuk melihat nomor SPK resmi yang telah disetujui atau melengkapi berkas yang diminta SPV.'
+            }
+        ],
+
+        // ── TOYOTA SAFETY SENSE (TSS SIMULATOR) ─────────────────────────────
+        'tss-simulator': [
+            {
+                target: '.tss-tabs-row, .tss-tab-btn:first-child',
+                badge: 'Langkah 1 dari 3: Fitur Keselamatan',
+                icon: 'fa-shield-halved',
+                title: '1. Pilih Fitur TSS (Toyota Safety Sense)',
+                desc: 'Pilih teknologi radar canggih: PCS (Pre-Collision System), DRCC (Radar Cruise Control), LDA (Lane Departure), dll.'
+            },
+            {
+                target: '.tss-hero-section, #tssRadarCanvas, .tss-display-box',
+                badge: 'Langkah 2 dari 3: Visual Radar Interaktif',
+                icon: 'fa-radar',
+                title: '2. Demonstrasi Radar Mobil ke Customer',
+                desc: 'Tunjukkan kepada calon pembeli bagaimana sensor monokular kamera & radar gelombang milimeter Toyota bekerja mencegah benturan.'
+            },
+            {
+                target: '.btn-trigger-tss, .tss-action-btn, button.btn-main',
+                badge: 'Langkah 3 dari 3: Simulasi Nyata',
+                icon: 'fa-play',
+                title: '3. Jalankan Skenario Bahaya',
+                desc: 'Tekan tombol simulasi untuk memicu animasi pengereman otomatis saat ada rintangan mendadak di jalan raya.'
+            }
+        ],
+
+        // ── SPV: MONITORING WIRANIAGA ───────────────────────────────────────
+        'spv_wiraniaga': [
+            {
+                target: '#searchSales, input[type="text"]',
+                badge: 'Langkah 1 dari 3: Cari Sales',
+                icon: 'fa-magnifying-glass',
+                title: '1. Cari Wiraniaga Binaan',
+                desc: 'Ketik nama wiraniaga untuk memeriksa status kehadiran, aktivitas harian, dan pencapaian target SPK/DO.'
+            },
+            {
+                target: '.stat-container, .card:first-child',
+                badge: 'Langkah 2 dari 3: Rekap Performa',
+                icon: 'fa-chart-line',
+                title: '2. Rekapitulasi Tim Supervisor',
+                desc: 'Pantau total realisasi SPK tim, rasio konversi prospek, dan tingkat keaktifan wiraniaga di lapangan.'
+            },
+            {
+                target: '.table-wiraniaga, table, .table-container',
+                badge: 'Langkah 3 dari 3: Evaluasi & Coaching',
+                icon: 'fa-user-check',
+                title: '3. Detail & Tindakan Pembinaan',
+                desc: 'Ketuk baris wiraniaga untuk memberikan catatan evaluasi coaching, peringatan aktivitas, atau reward closing.'
+            }
+        ],
+
+        // ── SPV: MONITORING AKTIVITAS ───────────────────────────────────────
+        'spv_aktivitas': [
+            {
+                target: '#filterTanggal, .filter-bar, input[type="date"]',
+                badge: 'Langkah 1 dari 3: Filter Waktu',
+                icon: 'fa-calendar-day',
+                title: '1. Saring Tanggal Aktivitas',
+                desc: 'Pilih tanggal untuk melihat rekap riwayat kunjungan lapangan, canvassing, dan pameran seluruh sales.'
+            },
+            {
+                target: '.activity-table, table, .table-container',
+                badge: 'Langkah 2 dari 3: Log Laporan Sales',
+                icon: 'fa-list-check',
+                title: '2. Periksa Foto & Titik GPS',
+                desc: 'Lihat foto kegiatan lapangan dan verifikasi koordinat lokasi geotagging setiap wiraniaga secara real-time.'
+            },
+            {
+                target: '.stat-box, .card:first-child',
+                badge: 'Langkah 3 dari 3: Rekap Kepatuhan',
+                icon: 'fa-circle-check',
+                title: '3. Evaluasi Kepatuhan Laporan',
+                desc: 'Pastikan seluruh wiraniaga memenuhi batas minimal input aktivitas harian sebelum jam kerja berakhir.'
+            }
+        ],
+
+        // ── KACAB: MONITORING SPV ───────────────────────────────────────────
+        'kacab_monitoring_spv': [
+            {
+                target: '#filterBulan, select',
+                badge: 'Langkah 1 dari 3: Filter Periode',
+                icon: 'fa-calendar-days',
+                title: '1. Pilih Periode Kerja Cabang',
+                desc: 'Saring evaluasi performa bulanan antar tim Supervisor (SPV) di cabang Tunas Toyota Kiara Condong.'
+            },
+            {
+                target: '.spv-card, .card:first-child',
+                badge: 'Langkah 2 dari 3: Kartu Performa SPV',
+                icon: 'fa-users-gear',
+                title: '2. Perbandingan Realisasi Antar Tim',
+                desc: 'Lihat perbandingan kontribusi SPK, rasio pengiriman DO, dan kecepatan approval berkas per grup supervisor.'
+            },
+            {
+                target: '.table-spv, table, .table-container',
+                badge: 'Langkah 3 dari 3: Tabel Evaluasi Eksekutif',
+                icon: 'fa-table-list',
+                title: '3. Analisis Produktivitas Cabang',
+                desc: 'Evaluasi produktivitas rata-rata per wiraniaga dalam tim untuk bahan rapat koordinasi mingguan.'
+            }
+        ],
+
+        // ── KACAB: TARGET CABANG ────────────────────────────────────────────
+        'kacab_target_kacab': [
+            {
+                target: '.kacab-hero, .card:first-child',
+                badge: 'Langkah 1 dari 3: Target Bulanan Cabang',
+                icon: 'fa-bullseye',
+                title: '1. Pantau Target Penjualan Cabang',
+                desc: 'Lihat target penjualan unit mobil Toyota cabang Kiara Condong dari TAM (Toyota Astra Motor) dan Tunas Pusat.'
+            },
+            {
+                target: '.target-grid, .stat-grid',
+                badge: 'Langkah 2 dari 3: Breakdown SPK & DO',
+                icon: 'fa-chart-pie',
+                title: '2. Rincian SPK vs DO Terkirim',
+                desc: 'Pantau sisa target unit yang harus ditutup dan gap antara SPK masuk dengan ketersediaan alokasi DO.'
+            },
+            {
+                target: '#btnSetTarget, .btn-main, button',
+                badge: 'Langkah 3 dari 3: Distribusi Target',
+                icon: 'fa-sliders',
+                title: '3. Distribusi Target ke Tim SPV',
+                desc: 'Gunakan panel ini untuk mendistribusikan kuota target SPK dan DO secara adil ke masing-masing Supervisor.'
             }
         ]
     };
@@ -347,25 +747,25 @@
     function getFallbackSteps() {
         return [
             {
-                target: 'input[type="text"], input[type="search"], select, .search-box, .form-control',
-                badge: 'Langkah 1 dari 3: Filter / Cari',
+                target: 'input:not([type="hidden"]), select, .search-box, .filter-bar, .card:first-child',
+                badge: 'Langkah 1 dari 3: Filter / Input',
                 icon: 'fa-magnifying-glass',
-                title: '1. Gunakan Kolom Filter / Pencarian',
-                desc: 'Ketik kata kunci atau pilih kategori filter di bagian atas untuk menyaring data yang Anda perlukan di halaman ini.'
+                title: '1. Masukkan Parameter / Filter',
+                desc: 'Gunakan kolom pencarian, filter, atau input formulir di bagian atas untuk menyaring data yang Anda perlukan.'
             },
             {
-                target: 'table tbody tr:first-child, .card:first-child, .container, .card',
-                badge: 'Langkah 2 dari 3: Tinjau Data',
+                target: 'table, .table-container, .card:nth-child(2), .card, .grid-container',
+                badge: 'Langkah 2 dari 3: Tinjau Informasi',
                 icon: 'fa-table-list',
-                title: '2. Tinjau Informasi Lengkap',
-                desc: 'Periksa informasi dan angka yang tercantum pada kartu atau baris tabel secara seksama.'
+                title: '2. Tinjau Ringkasan Informasi',
+                desc: 'Periksa baris data, grafik, atau kartu status yang tersaji di layar secara seksama.'
             },
             {
-                target: 'button[type="submit"], .btn-main, .btn-primary, .btn-success, button',
-                badge: 'Langkah 3 dari 3: Proses Data',
+                target: 'button.btn-main, button.btn-primary, button[type="submit"], .btn-action, button:last-of-type',
+                badge: 'Langkah 3 dari 3: Tombol Aksi Utama',
                 icon: 'fa-circle-check',
-                title: '3. Tekan Tombol Aksi Utama',
-                desc: 'Tekan tombol aksi berwarna (Simpan / Proses / Tambah) untuk menyelesaikan tindakan Anda di halaman ini.'
+                title: '3. Tekan Tombol Aksi',
+                desc: 'Tekan tombol aksi untuk memproses data, menyimpan perubahan formulir, atau membagikan laporan.'
             }
         ];
     }
@@ -663,33 +1063,49 @@
         }
     }
 
+    function isExcludedTourElement(el) {
+        if (!el) return true;
+        return !!el.closest('.desktop-sidebar, .sidebar, .sidebar-bottom, .sidebar-nav-link, .spv-sidebar, .kcb-sidebar, .bottom-nav, .sft-page-tooltip-box, .sft-page-spotlight, #sftScrollToTopBtn');
+    }
+
     function findVisibleTarget(selectorString) {
         if (!selectorString) return null;
         const selectors = selectorString.split(',').map(s => s.trim());
+
+        const contentRoots = [
+            document.querySelector('.desktop-content'),
+            document.querySelector('.spv-main'),
+            document.querySelector('.kcb-main'),
+            document.querySelector('.mobile-app'),
+            document.querySelector('main'),
+            document.body
+        ].filter(Boolean);
+
         for (let sel of selectors) {
-            try {
-                const els = document.querySelectorAll(sel);
-                for (let el of els) {
-                    if (el && el.offsetParent !== null) {
-                        const rect = el.getBoundingClientRect();
-                        if (rect.width > 10 && rect.height > 10) {
-                            return el;
+            for (let root of contentRoots) {
+                try {
+                    const els = root.querySelectorAll(sel);
+                    for (let el of els) {
+                        if (el && !isExcludedTourElement(el)) {
+                            const style = window.getComputedStyle(el);
+                            if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+                                const rect = el.getBoundingClientRect();
+                                if (rect.width > 12 && rect.height > 12) {
+                                    return el;
+                                }
+                            }
                         }
                     }
-                }
-            } catch (e) {}
+                } catch (e) {}
+            }
         }
-        // Fallback to first matching even if hidden
-        try {
-            return document.querySelector(selectors[0]) || document.querySelector('.container, .card, main');
-        } catch (e) {
-            return document.body;
-        }
+
+        return null;
     }
 
-    function getScrollParent(node) {
-        if (!node) return null;
-        let parent = node.parentElement;
+    function getActiveScrollContainer(el) {
+        if (!el) return null;
+        let parent = el.parentElement;
         while (parent && parent !== document.body && parent !== document.documentElement) {
             const style = window.getComputedStyle(parent);
             if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && parent.scrollHeight > parent.clientHeight) {
@@ -697,37 +1113,51 @@
             }
             parent = parent.parentElement;
         }
-        return null;
+        const desktopContent = document.querySelector('.desktop-content');
+        if (desktopContent && desktopContent.scrollHeight > desktopContent.clientHeight) {
+            return desktopContent;
+        }
+        return window;
     }
 
     function scrollTargetIntoComfortView(el) {
         if (!el) return;
-        const rect = el.getBoundingClientRect();
+        const scrollContainer = getActiveScrollContainer(el);
         const winH = window.innerHeight;
-        // Posisikan target di 10% - 15% bagian atas layar agar ruang di bawahnya sangat lega untuk tooltip
-        const desiredTop = Math.max(65, Math.min(110, Math.round(winH * 0.13)));
-        const diff = rect.top - desiredTop;
+        const desiredTop = Math.max(70, Math.min(130, Math.round(winH * 0.14)));
+        const elRect = el.getBoundingClientRect();
+        const diff = elRect.top - desiredTop;
 
-        if (Math.abs(diff) > 10) {
-            const scrollParent = getScrollParent(el);
-            if (scrollParent) {
-                scrollParent.scrollBy({
-                    top: diff,
+        if (Math.abs(diff) > 20) {
+            if (scrollContainer && scrollContainer !== window) {
+                scrollContainer.scrollTo({
+                    top: Math.max(0, scrollContainer.scrollTop + diff),
                     behavior: 'smooth'
                 });
             } else {
-                window.scrollBy({
-                    top: diff,
+                const currentY = window.pageYOffset || document.documentElement.scrollTop || 0;
+                window.scrollTo({
+                    top: Math.max(0, currentY + diff),
                     behavior: 'smooth'
                 });
-                if (document.scrollingElement) {
-                    document.scrollingElement.scrollBy({
-                        top: diff,
-                        behavior: 'smooth'
-                    });
-                }
             }
         }
+    }
+
+    let tourAnimationFrameId = null;
+    function animateReposition(duration = 550) {
+        if (tourAnimationFrameId) cancelAnimationFrame(tourAnimationFrameId);
+        const start = performance.now();
+        function tick(now) {
+            handleReposition();
+            if (now - start < duration) {
+                tourAnimationFrameId = requestAnimationFrame(tick);
+            } else {
+                handleReposition();
+                lockPageScroll();
+            }
+        }
+        tourAnimationFrameId = requestAnimationFrame(tick);
     }
 
     function startSpotlightTour(slug) {
@@ -766,13 +1196,11 @@
         unlockPageScroll();
         scrollTargetIntoComfortView(el);
 
-        // Immediate rendering
+        // Immediate initial rendering
         updateSpotlightAndTooltip(el, step);
 
-        setTimeout(() => {
-            handleReposition();
-            lockPageScroll();
-        }, 450);
+        // Continuous silky-smooth repositioning during smooth scroll transition
+        animateReposition(550);
     }
 
     function updateSpotlightAndTooltip(el, step) {
@@ -894,6 +1322,7 @@
 
     window.addEventListener('resize', handleReposition);
     window.addEventListener('scroll', handleReposition, { passive: true, capture: true });
+    document.addEventListener('scroll', handleReposition, { passive: true, capture: true });
 
     function nextStep() {
         currentStepIndex++;
@@ -915,6 +1344,7 @@
     }
 
     function exitTour() {
+        if (tourAnimationFrameId) cancelAnimationFrame(tourAnimationFrameId);
         unlockPageScroll();
         if (activeSpotlight) {
             activeSpotlight.remove();
