@@ -458,29 +458,42 @@
                 transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
                 font-family: inherit;
             }
+            .sft-page-tooltip-box {
+                position: fixed;
+                background: #ffffff;
+                border-radius: 18px;
+                padding: 14px 18px;
+                width: min(380px, 92vw);
+                max-height: calc(100vh - 24px);
+                box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+                border: 2px solid #e2e8f0;
+                z-index: 999998;
+                box-sizing: border-box;
+                transition: top 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            }
             .sft-page-tooltip-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 12px;
+                margin-bottom: 6px;
             }
             .sft-page-tooltip-badge {
-                font-size: 11px;
+                font-size: 10.5px;
                 font-weight: 800;
                 background: #fee2e2;
                 color: #d71920;
-                padding: 4px 12px;
+                padding: 3px 9px;
                 border-radius: 20px;
                 text-transform: uppercase;
-                letter-spacing: 0.5px;
+                letter-spacing: 0.4px;
             }
             .sft-page-tooltip-close {
                 background: transparent;
                 border: none;
                 color: #94a3b8;
-                font-size: 22px;
+                font-size: 20px;
                 cursor: pointer;
-                padding: 2px 6px;
+                padding: 0 4px;
                 line-height: 1;
                 border-radius: 8px;
                 transition: all 0.15s;
@@ -490,42 +503,42 @@
                 background: #f1f5f9;
             }
             .sft-page-tooltip-title {
-                font-size: 17.5px;
+                font-size: 15.5px;
                 font-weight: 800;
                 color: #0f172a;
-                margin: 0 0 8px;
+                margin: 0 0 5px;
                 display: flex;
                 align-items: center;
-                gap: 8px;
-                line-height: 1.35;
+                gap: 7px;
+                line-height: 1.25;
             }
             .sft-page-tooltip-title i {
                 color: #d71920;
-                font-size: 17px;
+                font-size: 16px;
             }
             .sft-page-tooltip-desc {
-                font-size: 14px;
+                font-size: 13px;
                 color: #334155;
-                line-height: 1.6;
-                margin: 0 0 18px;
+                line-height: 1.45;
+                margin: 0 0 10px;
             }
             .sft-page-tooltip-footer {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 gap: 8px;
-                padding-top: 14px;
+                padding-top: 8px;
                 border-top: 1px solid #f1f5f9;
             }
             .sft-btn-tour-exit-link {
                 background: transparent;
                 border: none;
                 color: #94a3b8;
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: 700;
                 cursor: pointer;
                 text-decoration: underline;
-                padding: 6px 2px;
+                padding: 4px 6px;
             }
             .sft-btn-tour-exit-link:hover {
                 color: #ef4444;
@@ -536,9 +549,9 @@
             }
             .sft-btn-tour-nav {
                 border: none;
-                padding: 9px 16px;
-                border-radius: 11px;
-                font-size: 13px;
+                padding: 8px 15px;
+                border-radius: 9px;
+                font-size: 12.5px;
                 font-weight: 800;
                 cursor: pointer;
                 display: inline-flex;
@@ -674,6 +687,49 @@
         }
     }
 
+    function getScrollParent(node) {
+        if (!node) return null;
+        let parent = node.parentElement;
+        while (parent && parent !== document.body && parent !== document.documentElement) {
+            const style = window.getComputedStyle(parent);
+            if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && parent.scrollHeight > parent.clientHeight) {
+                return parent;
+            }
+            parent = parent.parentElement;
+        }
+        return null;
+    }
+
+    function scrollTargetIntoComfortView(el) {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const winH = window.innerHeight;
+        // Posisikan target di 10% - 15% bagian atas layar agar ruang di bawahnya sangat lega untuk tooltip
+        const desiredTop = Math.max(65, Math.min(110, Math.round(winH * 0.13)));
+        const diff = rect.top - desiredTop;
+
+        if (Math.abs(diff) > 10) {
+            const scrollParent = getScrollParent(el);
+            if (scrollParent) {
+                scrollParent.scrollBy({
+                    top: diff,
+                    behavior: 'smooth'
+                });
+            } else {
+                window.scrollBy({
+                    top: diff,
+                    behavior: 'smooth'
+                });
+                if (document.scrollingElement) {
+                    document.scrollingElement.scrollBy({
+                        top: diff,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+    }
+
     function startSpotlightTour(slug) {
         injectSpotlightStyles();
 
@@ -706,14 +762,17 @@
 
         currentTargetEl = el;
 
-        // Temporarily allow scroll so browser smoothly centers target
+        // Temporarily allow scroll so browser smoothly centers target comfortably
         unlockPageScroll();
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollTargetIntoComfortView(el);
+
+        // Immediate rendering
+        updateSpotlightAndTooltip(el, step);
 
         setTimeout(() => {
-            updateSpotlightAndTooltip(el, step);
+            handleReposition();
             lockPageScroll();
-        }, 380);
+        }, 450);
     }
 
     function updateSpotlightAndTooltip(el, step) {
@@ -766,32 +825,59 @@
             </div>
         `;
 
-        // Atur posisi kartu secara pintar (di bawah elemen jika muat, atau di atas elemen jika terlalu mepet bawah)
+        // Atur posisi kartu secara pintar
         positionTooltipSmart(rect);
+
+        // Re-verify after layout paint to ensure accurate height clamping
+        requestAnimationFrame(() => {
+            if (currentTargetEl && activeTooltip) {
+                positionTooltipSmart(currentTargetEl.getBoundingClientRect());
+            }
+        });
     }
 
     function positionTooltipSmart(rect) {
         if (!activeTooltip) return;
-        const pad = 12;
+        const ttHeight = activeTooltip.offsetHeight || activeTooltip.getBoundingClientRect().height || 190;
+        const ttWidth = activeTooltip.offsetWidth || Math.min(380, window.innerWidth * 0.92);
+        const margin = 10;
         const winH = window.innerHeight;
         const winW = window.innerWidth;
-        const ttWidth = Math.min(390, winW * 0.92);
 
-        // Hitung posisi horizontal (tengah terhadap target, atau tengah layar)
+        const spaceBelow = winH - rect.bottom - margin;
+        const spaceAbove = rect.top - margin;
+
+        let top;
+        // Cek apakah ada ruang cukup di bawah elemen (+16px buffer)
+        if (spaceBelow >= ttHeight + 16) {
+            top = rect.bottom + margin;
+        } else if (spaceAbove >= ttHeight + 16) {
+            top = rect.top - ttHeight - margin;
+        } else {
+            if (spaceBelow >= spaceAbove) {
+                top = rect.bottom + margin;
+            } else {
+                top = rect.top - ttHeight - margin;
+            }
+        }
+
+        // STRICT VIEWPORT CLAMPING:
+        // Pastikan tombol di bagian footer tooltip TIDAK PERNAH terpotong di bawah layar!
+        if (top + ttHeight > winH - 14) {
+            top = winH - ttHeight - 14;
+        }
+        if (top < 14) {
+            top = 14;
+        }
+
+        // Posisikan horizontal di tengah target
         let left = rect.left + (rect.width / 2) - (ttWidth / 2);
         if (left < 14) left = 14;
         if (left + ttWidth > winW - 14) left = winW - ttWidth - 14;
 
-        // Cek posisi vertikal: apakah muat di bawah elemen?
-        let top = rect.bottom + pad + 6;
-        if (top + 240 > winH) {
-            // Taruh di atas elemen
-            top = Math.max(14, rect.top - 240 - pad);
-        }
-
-        activeTooltip.style.top = `${top}px`;
-        activeTooltip.style.left = `${left}px`;
-        activeTooltip.style.width = `${ttWidth}px`;
+        activeTooltip.style.top = `${Math.round(top)}px`;
+        activeTooltip.style.left = `${Math.round(left)}px`;
+        activeTooltip.style.width = `${Math.round(ttWidth)}px`;
     }
 
     function handleReposition() {
@@ -807,7 +893,7 @@
     }
 
     window.addEventListener('resize', handleReposition);
-    window.addEventListener('scroll', handleReposition, { passive: true });
+    window.addEventListener('scroll', handleReposition, { passive: true, capture: true });
 
     function nextStep() {
         currentStepIndex++;

@@ -1375,7 +1375,7 @@
 
     <script src="js/auto_location_tracker.js?v=20260908_v8"></script>
     <script src="./js/pwa-app.js?v=20260908_no_toast"></script>
-    <script src="js/app_tour.js?v=20260912_tour_v1"></script>
+    <script src="js/app_tour.js?v=20260912_tour_v2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {

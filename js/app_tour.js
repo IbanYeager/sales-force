@@ -188,29 +188,31 @@
       .tour-tooltip-box {
         position: fixed;
         background: #ffffff;
-        border-radius: 20px;
-        padding: 22px 20px;
-        width: min(370px, 92vw);
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+        border-radius: 18px;
+        padding: 14px 18px;
+        width: min(380px, 92vw);
+        max-height: calc(100vh - 24px);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
         border: 2px solid #e2e8f0;
         z-index: 999998;
-        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-sizing: border-box;
+        transition: top 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .tour-tooltip-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
       }
       .tour-tooltip-badge {
-        font-size: 11px;
+        font-size: 10.5px;
         font-weight: 800;
         background: #fee2e2;
         color: #d71920;
-        padding: 4px 11px;
+        padding: 3px 9px;
         border-radius: 20px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
       }
       .tour-tooltip-close {
         background: transparent;
@@ -218,36 +220,38 @@
         color: #94a3b8;
         font-size: 20px;
         cursor: pointer;
-        padding: 4px;
+        padding: 0 4px;
+        line-height: 1;
       }
       .tour-tooltip-close:hover {
         color: #ef4444;
       }
       .tour-tooltip-title {
         font-family: 'Outfit', sans-serif;
-        font-size: 18px;
+        font-size: 15.5px;
         font-weight: 800;
         color: #0f172a;
-        margin-bottom: 8px;
+        margin-bottom: 5px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 7px;
+        line-height: 1.25;
       }
       .tour-tooltip-title i {
         color: #d71920;
       }
       .tour-tooltip-desc {
-        font-size: 14.5px;
+        font-size: 13px;
         color: #334155;
-        line-height: 1.6;
-        margin-bottom: 18px;
+        line-height: 1.45;
+        margin-bottom: 10px;
       }
       .tour-tooltip-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 8px;
-        padding-top: 14px;
+        padding-top: 8px;
         border-top: 1px solid #f1f5f9;
       }
       .tour-btn-group {
@@ -256,9 +260,9 @@
       }
       .btn-tour-nav {
         border: none;
-        padding: 9px 16px;
-        border-radius: 10px;
-        font-size: 13px;
+        padding: 8px 15px;
+        border-radius: 9px;
+        font-size: 12.5px;
         font-weight: 800;
         cursor: pointer;
         display: inline-flex;
@@ -284,10 +288,11 @@
         background: transparent;
         border: none;
         color: #94a3b8;
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 700;
         cursor: pointer;
         text-decoration: underline;
+        padding: 4px 6px;
       }
       .btn-tour-exit-link:hover {
         color: #ef4444;
@@ -374,11 +379,13 @@
       activeSpotlight.style.left = `${Math.max(0, rect.left - pad)}px`;
       activeSpotlight.style.width = `${rect.width + pad * 2}px`;
       activeSpotlight.style.height = `${rect.height + pad * 2}px`;
-      positionTooltipSmart(rect);
+      if (activeTooltip) {
+        positionTooltipSmart(rect);
+      }
     }
   }
 
-  window.addEventListener('scroll', syncSpotlightPosition, { passive: true });
+  window.addEventListener('scroll', syncSpotlightPosition, { passive: true, capture: true });
   window.addEventListener('resize', syncSpotlightPosition, { passive: true });
 
   // Show Welcome Dialog
@@ -448,6 +455,49 @@
     renderCurrentStep();
   }
 
+  function getScrollParent(node) {
+    if (!node) return null;
+    let parent = node.parentElement;
+    while (parent && parent !== document.body && parent !== document.documentElement) {
+      const style = window.getComputedStyle(parent);
+      if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && parent.scrollHeight > parent.clientHeight) {
+        return parent;
+      }
+      parent = parent.parentElement;
+    }
+    return null;
+  }
+
+  function scrollTargetIntoComfortView(el) {
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const winH = window.innerHeight;
+    // Posisikan target di 10% - 15% bagian atas layar agar ruang di bawahnya sangat lega untuk tooltip
+    const desiredTop = Math.max(65, Math.min(110, Math.round(winH * 0.13)));
+    const diff = rect.top - desiredTop;
+
+    if (Math.abs(diff) > 10) {
+      const scrollParent = getScrollParent(el);
+      if (scrollParent) {
+        scrollParent.scrollBy({
+          top: diff,
+          behavior: 'smooth'
+        });
+      } else {
+        window.scrollBy({
+          top: diff,
+          behavior: 'smooth'
+        });
+        if (document.scrollingElement) {
+          document.scrollingElement.scrollBy({
+            top: diff,
+            behavior: 'smooth'
+          });
+        }
+      }
+    }
+  }
+
   function renderCurrentStep() {
     let step = TOUR_STEPS[currentStepIndex];
     let el = null;
@@ -467,14 +517,18 @@
 
     currentTargetEl = el;
 
-    // Temporarily allow scrolling so browser can smoothly center target
+    // Temporarily allow scrolling so browser can smoothly position target comfortably
     unlockPageScroll();
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    scrollTargetIntoComfortView(el);
 
+    // Render spotlight and tooltip immediately
+    updateSpotlightAndTooltip(el, step);
+
+    // After smooth scroll finishes, lock scroll and do final sync
     setTimeout(() => {
-      updateSpotlightAndTooltip(el, step);
+      syncSpotlightPosition();
       lockPageScroll();
-    }, 380);
+    }, 450);
   }
 
   function updateSpotlightAndTooltip(el, step) {
@@ -523,29 +577,57 @@
 
     // Position tooltip smart (below if space, above otherwise)
     positionTooltipSmart(rect);
+
+    // Re-verify after layout paint to ensure accurate height clamping
+    requestAnimationFrame(() => {
+      if (currentTargetEl && activeTooltip) {
+        positionTooltipSmart(currentTargetEl.getBoundingClientRect());
+      }
+    });
   }
 
   function positionTooltipSmart(rect) {
     if (!activeTooltip) return;
-    const ttRect = activeTooltip.getBoundingClientRect();
-    const margin = 14;
+    const ttHeight = activeTooltip.offsetHeight || activeTooltip.getBoundingClientRect().height || 190;
+    const ttWidth = activeTooltip.offsetWidth || Math.min(380, window.innerWidth * 0.92);
+    const margin = 10;
     const winH = window.innerHeight;
     const winW = window.innerWidth;
 
-    // Check if place below
-    let top = rect.bottom + margin;
-    if (top + 230 > winH) {
-      // Place above
-      top = Math.max(16, rect.top - 240);
+    const spaceBelow = winH - rect.bottom - margin;
+    const spaceAbove = rect.top - margin;
+
+    let top;
+    // Cek apakah ada ruang cukup di bawah elemen (+16px buffer)
+    if (spaceBelow >= ttHeight + 16) {
+      top = rect.bottom + margin;
+    } else if (spaceAbove >= ttHeight + 16) {
+      top = rect.top - ttHeight - margin;
+    } else {
+      if (spaceBelow >= spaceAbove) {
+        top = rect.bottom + margin;
+      } else {
+        top = rect.top - ttHeight - margin;
+      }
     }
 
-    // Horizontal centering
-    let left = rect.left + (rect.width / 2) - (ttRect.width / 2);
-    if (left < 16) left = 16;
-    if (left + ttRect.width > winW - 16) left = winW - ttWidth - 16;
+    // STRICT VIEWPORT CLAMPING:
+    // Pastikan tombol di bagian footer tooltip TIDAK PERNAH terpotong di bawah layar!
+    if (top + ttHeight > winH - 14) {
+      top = winH - ttHeight - 14;
+    }
+    if (top < 14) {
+      top = 14;
+    }
 
-    activeTooltip.style.top = `${top}px`;
-    activeTooltip.style.left = `${left}px`;
+    // Posisikan horizontal di tengah target
+    let left = rect.left + (rect.width / 2) - (ttWidth / 2);
+    if (left < 14) left = 14;
+    if (left + ttWidth > winW - 14) left = winW - ttWidth - 14;
+
+    activeTooltip.style.top = `${Math.round(top)}px`;
+    activeTooltip.style.left = `${Math.round(left)}px`;
+    activeTooltip.style.width = `${Math.round(ttWidth)}px`;
   }
 
   function cleanTourElements() {
