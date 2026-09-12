@@ -852,7 +852,7 @@
             return;
         }
         const script = document.createElement('script');
-        script.src = prefix + 'js/feature_tutorial.js?v=20260912_universal_v3';
+        script.src = prefix + 'js/feature_tutorial.js?v=20260912_comprehensive_v4';
         (document.head || document.documentElement).appendChild(script);
     })();
 
