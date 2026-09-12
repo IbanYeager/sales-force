@@ -413,6 +413,15 @@
                 50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 4px #eab308); }
             }
 
+            /* Lock Scrolling during Tour */
+            html.tour-scroll-locked,
+            body.tour-scroll-locked,
+            .tour-scroll-locked {
+                overflow: hidden !important;
+                overscroll-behavior: none !important;
+                touch-action: none !important;
+            }
+
             /* ── INTERACTIVE SPOTLIGHT (PERSIS FOTO 2) ── */
             .sft-page-spotlight {
                 position: fixed;
@@ -582,6 +591,64 @@
     let activeTooltip = null;
     let activeSteps = [];
     let currentTargetEl = null;
+    let isScrollLocked = false;
+
+    function lockPageScroll() {
+        if (isScrollLocked) return;
+        isScrollLocked = true;
+        document.documentElement.classList.add('tour-scroll-locked');
+        document.body.classList.add('tour-scroll-locked');
+        document.querySelectorAll('.desktop-content, .mobile-app, .container').forEach(el => {
+            el.classList.add('tour-scroll-locked');
+        });
+
+        window.addEventListener('wheel', preventWheelScroll, { passive: false, capture: true });
+        window.addEventListener('touchmove', preventTouchScroll, { passive: false, capture: true });
+        window.addEventListener('keydown', preventKeyScroll, { passive: false, capture: true });
+    }
+
+    function unlockPageScroll() {
+        if (!isScrollLocked) return;
+        isScrollLocked = false;
+        document.documentElement.classList.remove('tour-scroll-locked');
+        document.body.classList.remove('tour-scroll-locked');
+        document.querySelectorAll('.desktop-content, .mobile-app, .container').forEach(el => {
+            el.classList.remove('tour-scroll-locked');
+        });
+
+        window.removeEventListener('wheel', preventWheelScroll, { capture: true });
+        window.removeEventListener('touchmove', preventTouchScroll, { capture: true });
+        window.removeEventListener('keydown', preventKeyScroll, { capture: true });
+    }
+
+    function preventWheelScroll(e) {
+        if (activeTooltip && activeTooltip.contains(e.target)) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    function preventTouchScroll(e) {
+        if (activeTooltip && activeTooltip.contains(e.target)) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    function preventKeyScroll(e) {
+        const keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+        if (keys.includes(e.key)) {
+            if (activeTooltip && activeTooltip.contains(document.activeElement)) {
+                return;
+            }
+            e.preventDefault();
+            return false;
+        }
+    }
 
     function findVisibleTarget(selectorString) {
         if (!selectorString) return null;
@@ -639,12 +706,14 @@
 
         currentTargetEl = el;
 
-        // Scroll elemen ke tengah layar secara halus
+        // Temporarily allow scroll so browser smoothly centers target
+        unlockPageScroll();
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         setTimeout(() => {
             updateSpotlightAndTooltip(el, step);
-        }, 320);
+            lockPageScroll();
+        }, 380);
     }
 
     function updateSpotlightAndTooltip(el, step) {
@@ -760,6 +829,7 @@
     }
 
     function exitTour() {
+        unlockPageScroll();
         if (activeSpotlight) {
             activeSpotlight.remove();
             activeSpotlight = null;

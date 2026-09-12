@@ -292,9 +292,94 @@
       .btn-tour-exit-link:hover {
         color: #ef4444;
       }
+
+      /* Lock Scrolling during Tour */
+      html.tour-scroll-locked,
+      body.tour-scroll-locked,
+      .tour-scroll-locked {
+        overflow: hidden !important;
+        overscroll-behavior: none !important;
+        touch-action: none !important;
+      }
     `;
     document.head.appendChild(style);
   }
+
+  // ── Robust Scroll Locking Engine ──
+  let isScrollLocked = false;
+  let currentTargetEl = null;
+
+  function lockPageScroll() {
+    if (isScrollLocked) return;
+    isScrollLocked = true;
+    document.documentElement.classList.add('tour-scroll-locked');
+    document.body.classList.add('tour-scroll-locked');
+    document.querySelectorAll('.desktop-content, .mobile-app, .container').forEach(el => {
+      el.classList.add('tour-scroll-locked');
+    });
+
+    window.addEventListener('wheel', preventWheelScroll, { passive: false, capture: true });
+    window.addEventListener('touchmove', preventTouchScroll, { passive: false, capture: true });
+    window.addEventListener('keydown', preventKeyScroll, { passive: false, capture: true });
+  }
+
+  function unlockPageScroll() {
+    if (!isScrollLocked) return;
+    isScrollLocked = false;
+    document.documentElement.classList.remove('tour-scroll-locked');
+    document.body.classList.remove('tour-scroll-locked');
+    document.querySelectorAll('.desktop-content, .mobile-app, .container').forEach(el => {
+      el.classList.remove('tour-scroll-locked');
+    });
+
+    window.removeEventListener('wheel', preventWheelScroll, { capture: true });
+    window.removeEventListener('touchmove', preventTouchScroll, { capture: true });
+    window.removeEventListener('keydown', preventKeyScroll, { capture: true });
+  }
+
+  function preventWheelScroll(e) {
+    if (activeTooltip && activeTooltip.contains(e.target)) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+
+  function preventTouchScroll(e) {
+    if (activeTooltip && activeTooltip.contains(e.target)) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+
+  function preventKeyScroll(e) {
+    const keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+    if (keys.includes(e.key)) {
+      if (activeTooltip && activeTooltip.contains(document.activeElement)) {
+        return;
+      }
+      e.preventDefault();
+      return false;
+    }
+  }
+
+  function syncSpotlightPosition() {
+    if (activeSpotlight && currentTargetEl) {
+      const rect = currentTargetEl.getBoundingClientRect();
+      const pad = 6;
+      activeSpotlight.style.top = `${Math.max(0, rect.top - pad)}px`;
+      activeSpotlight.style.left = `${Math.max(0, rect.left - pad)}px`;
+      activeSpotlight.style.width = `${rect.width + pad * 2}px`;
+      activeSpotlight.style.height = `${rect.height + pad * 2}px`;
+      positionTooltipSmart(rect);
+    }
+  }
+
+  window.addEventListener('scroll', syncSpotlightPosition, { passive: true });
+  window.addEventListener('resize', syncSpotlightPosition, { passive: true });
 
   // Show Welcome Dialog
   function showWelcomeModal() {
@@ -380,12 +465,16 @@
       return;
     }
 
-    // Scroll element into view centered
+    currentTargetEl = el;
+
+    // Temporarily allow scrolling so browser can smoothly center target
+    unlockPageScroll();
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     setTimeout(() => {
       updateSpotlightAndTooltip(el, step);
-    }, 350);
+      lockPageScroll();
+    }, 380);
   }
 
   function updateSpotlightAndTooltip(el, step) {
@@ -453,13 +542,15 @@
     // Horizontal centering
     let left = rect.left + (rect.width / 2) - (ttRect.width / 2);
     if (left < 16) left = 16;
-    if (left + ttRect.width > winW - 16) left = winW - ttRect.width - 16;
+    if (left + ttRect.width > winW - 16) left = winW - ttWidth - 16;
 
     activeTooltip.style.top = `${top}px`;
     activeTooltip.style.left = `${left}px`;
   }
 
   function cleanTourElements() {
+    unlockPageScroll();
+    currentTargetEl = null;
     if (activeSpotlight) {
       activeSpotlight.remove();
       activeSpotlight = null;
