@@ -38,6 +38,7 @@
 
       <nav class="kcb-nav">
         <a href="index_kacab.html" id="navDash" class="active"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
+        <a href="../panduan_alur_kerja_sales_app.html" id="navPanduan"><i class="fa-solid fa-book-bookmark"></i>Panduan &amp; SOP Sistem</a>
         <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
         <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>

@@ -110,6 +110,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
+                ${navLinkKacab('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
@@ -189,6 +190,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
+                ${navLinkSPV('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem')}
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
                 ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
@@ -267,6 +269,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Utama</p>
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
+                ${navLink('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-notif-badge" style="background:#f59e0b; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">SOP</span>', 'panduan alur kerja sop pesan mobil order tahapan flow tutorial cara pakai')}
                 ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}

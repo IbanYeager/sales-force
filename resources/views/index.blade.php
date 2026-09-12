@@ -60,6 +60,10 @@
                 <a href="index.html" class="sidebar-nav-link active" data-tags="home beranda ringkasan">
                     <i class="fa-solid fa-house"></i> Dashboard
                 </a>
+                <a href="panduan_alur_kerja_sales_app.html" class="sidebar-nav-link" data-tags="panduan alur kerja sop pesan mobil order tahapan flow tutorial cara pakai" style="border-left: 3px solid #f59e0b;">
+                    <i class="fa-solid fa-book-bookmark" style="color: #f59e0b;"></i> Panduan &amp; SOP Sistem
+                    <span style="font-size: 9px; font-weight: 800; background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 2px 6px; border-radius: 6px; margin-left: auto; text-transform: uppercase;">SOP</span>
+                </a>
                 <a href="pages/ao_report.html" class="sidebar-nav-link" data-tags="ao report leasing finance">
                     <i class="fa-solid fa-chalkboard-user"></i> Papan AO Report
                 </a>
@@ -367,6 +371,23 @@
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <!-- ═══ BANNER PANDUAN & SOP ALUR KERJA ═══ -->
+                    <a href="panduan_alur_kerja_sales_app.html" class="btn-sop-guide" style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #1e293b, #0f172a); color:white; padding:12px 16px; border-radius:14px; text-decoration:none; margin-bottom:16px; border:1px solid rgba(245,158,11,0.3); box-shadow:0 4px 15px rgba(0,0,0,0.06); transition:transform 0.2s ease;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; flex-shrink:0;">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:13px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:6px;">
+                                    Panduan &amp; SOP Alur Kerja Sales
+                                    <span style="font-size:9px; background:#f59e0b; color:#fff; padding:1px 5px; border-radius:4px; font-weight:800;">SOP</span>
+                                </div>
+                                <div style="font-size:11px; color:#94a3b8;">Flow tahapan ketika customer mau pesan mobil</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#64748b; font-size:12px;"></i>
                     </a>
 
                     <!-- ═══ FITUR UTAMA (PERMANEN: 4 Fitur Paling Kritis & Penting untuk Sales Consultant) ═══ -->
@@ -803,6 +824,19 @@
                         </div>
 
                         <div class="category-grid feature-modal-grid">
+                            <!-- Panduan & SOP Alur Kerja -->
+                            <a href="panduan_alur_kerja_sales_app.html" class="category-item" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(200,16,46,0.06)); border: 1.5px solid rgba(245,158,11,0.4); border-radius: 14px; padding: 12px; display: flex; flex-direction: row; align-items: center; gap: 12px; text-decoration: none;">
+                                <div class="category-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin: 0; flex-shrink: 0;"><i class="fa-solid fa-book-bookmark"></i></div>
+                                <div style="text-align: left;">
+                                    <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+                                        Panduan &amp; SOP Alur Kerja Sales
+                                        <span style="font-size: 9px; background: #f59e0b; color: white; padding: 1px 5px; border-radius: 4px; font-weight: 800;">SOP</span>
+                                    </div>
+                                    <div style="font-size: 11px; color: #64748b;">Tahapan saat customer pesan mobil dari awal hingga DO</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right" style="margin-left: auto; color: #94a3b8; font-size: 12px;"></i>
+                            </a>
+
                             <!-- Tier 1: Operasional Harian & Closing Transaksi (Paling Kritis) -->
                             <a href="pages/ao_report.html" class="category-item">
                                 <div class="category-icon"><i class="fa-solid fa-chalkboard-user"></i></div>

@@ -19,6 +19,11 @@ Route::get('/dashboard', [PageController::class, 'index']);
 // Panduan Alur Kerja
 Route::get('/panduan', [PageController::class, 'panduan'])->name('panduan');
 Route::get('/panduan_alur_kerja_sales_app.html', [PageController::class, 'panduan']);
+Route::get('/panduan_alur_kerja_sales_app', [PageController::class, 'panduan']);
+Route::get('/pages/panduan_alur_kerja_sales_app.html', [PageController::class, 'panduan']);
+Route::get('/pages/panduan_alur_kerja_sales_app', [PageController::class, 'panduan']);
+Route::get('/pages_spv/panduan_alur_kerja_sales_app.html', [PageController::class, 'panduan']);
+Route::get('/pages_kacab/panduan_alur_kerja_sales_app.html', [PageController::class, 'panduan']);
 
 // Portal SPV (Supervisor)
 Route::prefix('spv')->group(function () {
