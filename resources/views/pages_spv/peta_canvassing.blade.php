@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -193,18 +193,35 @@
             </div>
           </div>
 
-          <div style="margin-bottom:16px;">
-            <strong style="font-size:12.5px; color:#0f172a; display:block; margin-bottom:6px;">
-              <i class="fa-solid fa-location-crosshairs" style="color:#2563eb;"></i> Rekomendasi Titik Canvassing &amp; Pameran:
-            </strong>
-            <ul style="font-size:12px; color:#475569; padding-left:16px; line-height:1.6; margin:0;" id="zoneRecommendations">
-              <li>Pameran Mini Weekend di Summarecon Mall Bandung (Lobby Timur).</li>
-              <li>Canvassing door-to-door di Cluster Flora &amp; Emily Summarecon.</li>
-              <li>Flyering pagi hari di sekitar stasiun Kereta Cepat Whoosh Tegalluar.</li>
-            </ul>
+          <!-- CONQUESTING & TRADE-IN STRATEGY -->
+          <div style="background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%); border: 1.5px solid #fecdd3; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
+            <div style="font-size:11.5px; font-weight:800; color:#9f1239; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-shield-halved"></i> Strategi Conquesting &amp; Trade-In
+            </div>
+            <p style="font-size:11px; color:#4c0519; margin:0 0 6px; line-height:1.5;" id="zoneConquestText">
+              Sasaran utama tukar tambah (trade-in): Mengonversi pengguna Brio, Sigra, dan Xpander ke line-up Toyota.
+            </p>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;" id="zoneCompetitorChips">
+              <span style="font-size:10px; background:#ffffff; color:#be123c; border:1px solid #fecdd3; font-weight:700; padding:2px 8px; border-radius:6px;">Target: Pemilik Mobil 3-5 Thn</span>
+              <span style="font-size:10px; background:#ffffff; color:#be123c; border:1px solid #fecdd3; font-weight:700; padding:2px 8px; border-radius:6px;">Paket: DP Ringan T-Care</span>
+            </div>
           </div>
 
-          <button class="btn" style="width:100%; background:#25D366; color:white; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;" onclick="shareCanvassStrategyWa()">
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <strong style="font-size:12.5px; color:#0f172a; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-location-crosshairs" style="color:#2563eb;"></i> Titik Sasaran &amp; Rute GPS:
+              </strong>
+              <button type="button" id="btnNavCenterGps" onclick="navigateZoneGps()" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                <i class="fa-solid fa-diamond-turn-right"></i> Rute Pusat Zona
+              </button>
+            </div>
+            <div id="zoneRecommendations" style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Populated dynamically with direct Google Maps route buttons -->
+            </div>
+          </div>
+
+          <button class="btn" style="width:100%; background:#25D366; color:white; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 12px rgba(37,211,102,0.25);" onclick="shareCanvassStrategyWa()">
             <i class="fa-brands fa-whatsapp"></i> Bagikan Tugas Canvassing ke Tim Sales
           </button>
         </div>
@@ -303,9 +320,30 @@
       }
 
       document.getElementById('zoneModels').innerHTML = (z.models || []).map(m => `<span style="font-size:11.5px; background:#eff6ff; color:#1e40af; font-weight:700; padding:4px 8px; border-radius:6px;">${m}</span>`).join('');
-      document.getElementById('zoneRecommendations').innerHTML = (z.spots || []).map(s => `<li>${s}</li>`).join('');
+      
+      // Dynamic spots with direct Google Maps Turn-by-Turn Navigation links
+      document.getElementById('zoneRecommendations').innerHTML = (z.spots || []).map((s, idx) => {
+        const query = encodeURIComponent(`${s}, ${z.name}, Bandung`);
+        const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
+        return `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div style="font-size:11.5px; color:#334155; font-weight:600; flex:1;">
+              <i class="fa-solid fa-map-pin" style="color:#ef4444; margin-right:4px;"></i> ${s}
+            </div>
+            <a href="${gmapsUrl}" target="_blank" rel="noopener noreferrer" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;">
+              <i class="fa-solid fa-diamond-turn-right"></i> Rute Maps
+            </a>
+          </div>
+        `;
+      }).join('');
 
       map.panTo([z.lat, z.lng]);
+    }
+
+    function navigateZoneGps() {
+      if (!currentSelectedZone) return;
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${currentSelectedZone.lat},${currentSelectedZone.lng}`;
+      window.open(url, '_blank');
     }
 
     function filterMapZone(type) {
@@ -315,7 +353,7 @@
     function shareCanvassStrategyWa() {
       const z = currentSelectedZone;
       if (!z) return;
-      const text = `🗺️ *STRATEGI PENUGASAN CANVASSING TIM SALES* 🗺️\nDealer: Tunas Toyota Kiara Condong\n\n📍 *Wilayah Target:* ${z.name} (${z.sub})\n📊 *Market Share Toyota:* ${z.share}\n🚗 *Fokus Unit Jualan:* ${(z.models || []).join(', ')}\n\n📌 *Rekomendasi Titik Lapangan:* \n${(z.spots || []).map((s, idx) => `${idx+1}. ${s}`).join('\n')}\n\nSemua wiraniaga yang ditugaskan wajib check-in GPS dan upload foto di Sales App saat tiba di lokasi. Semangat closing! 🔥`;
+      const text = `🗺️ *STRATEGI PENUGASAN CANVASSING TIM SALES* 🗺️\nDealer: Tunas Toyota Kiara Condong\n\n📍 *Wilayah Target:* ${z.name} (${z.sub})\n📊 *Market Share Toyota:* ${z.share}\n🚗 *Fokus Unit Jualan:* ${(z.models || []).join(', ')}\n\n📌 *Rekomendasi Titik Lapangan & Rute Maps:* \n${(z.spots || []).map((s, idx) => `${idx+1}. ${s} (https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s + ', ' + z.name + ', Bandung')})`).join('\n')}\n\nSemua wiraniaga yang ditugaskan wajib check-in GPS dan upload foto di Sales App saat tiba di lokasi. Semangat closing! 🔥`;
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
 

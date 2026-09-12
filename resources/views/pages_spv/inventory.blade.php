@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -263,7 +263,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/elibrary_data.js"></script>
-  <script src="../js/inventory.js?v=20260819_spv"></script>
+  <script src="../js/inventory.js?v=20260912_hold_lock_realtime"></script>
   <script src="../js/spv_global.js"></script>
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>

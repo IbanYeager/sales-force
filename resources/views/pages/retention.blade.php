@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -482,6 +482,9 @@
                     <button class="filter-tab-btn" onclick="filterRetentionCategory('BOOKED', this)">
                         <i class="fa-solid fa-calendar-check"></i> Terjadwal Servis
                     </button>
+                    <button class="filter-tab-btn" onclick="openGeneralReferralModal(this)">
+                        <i class="fa-solid fa-gift" style="color:#059669;"></i> Program Referral
+                    </button>
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#64748b; padding-top:4px;">
@@ -731,10 +734,60 @@
         </div>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MODAL 4: PROGRAM REFERRAL KONSUMEN TOYOTA                      -->
+    <!-- ============================================================== -->
+    <div id="referralModal" class="retention-modal-overlay" style="display:none;" onclick="closeReferralModal(event)">
+        <div class="retention-modal-box" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+                <div>
+                    <span style="font-size:11px; font-weight:800; color:#059669; text-transform:uppercase; letter-spacing:0.5px;">
+                        <i class="fa-solid fa-gift"></i> Program Referral Konsumen
+                    </span>
+                    <h3 style="font-family:'Outfit',sans-serif; margin:2px 0 0 0; font-size:18px; font-weight:800; color:#0f172a;">
+                        Tautan Referral Teman Beli Mobil
+                    </h3>
+                </div>
+                <button type="button" onclick="closeReferralModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:14px; margin-bottom:14px;">
+                <div style="font-weight:800; font-size:13.5px; color:#065f46;" id="referralCustName">Bpk. Hendra Gunawan</div>
+                <div style="font-size:12px; color:#047857;" id="referralCustDetail">All New Kijang Innova Zenix V Hybrid • 08123456789</div>
+            </div>
+
+            <div class="form-group-retention">
+                <label>Tautan Khusus Kartu Digital Rekomendasi:</label>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="referralGeneratedLink" readonly style="font-size:12px; background:#f8fafc; font-weight:700; color:#0d1b3e;">
+                    <button type="button" onclick="copyReferralLink()" style="background:#0d1b3e; color:#fff; border:none; padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">
+                        <i class="fa-solid fa-copy"></i> Salin
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group-retention">
+                <label>Draft Pesan WhatsApp Undangan Referral (Bisa Diedit):</label>
+                <textarea id="referralWaDraft" rows="6" style="font-size:12.5px; line-height:1.5;"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+                <button type="button" onclick="closeReferralModal()" style="padding:10px 16px; border:1px solid #cbd5e1; background:#f8fafc; border-radius:10px; font-size:12.5px; font-weight:700; cursor:pointer; color:#475569;">
+                    Tutup
+                </button>
+                <button type="button" onclick="dispatchReferralWhatsApp()" class="btn-wa-action" style="padding:10px 18px; font-size:13px;">
+                    <i class="fa-brands fa-whatsapp"></i> Kirim ke WA Konsumen
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../custom_alert.js"></script>
-    <script src="../js/retention.js"></script>
+    <script src="../js/retention.js?v=20260912_referral_rewards"></script>
 </body>
 
 </html>

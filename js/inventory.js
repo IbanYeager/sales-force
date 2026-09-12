@@ -460,6 +460,40 @@ function renderData(data) {
     } else {
         renderGridView(data, container);
     }
+    startHoldCountdown();
+}
+
+// ── Helper: Format detik ke Jam:Menit:Detik ─────────────────
+function formatRemainingSeconds(sec) {
+    if (sec <= 0) return '00:00:00';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+let holdTimerInterval = null;
+function startHoldCountdown() {
+    if (holdTimerInterval) clearInterval(holdTimerInterval);
+    holdTimerInterval = setInterval(() => {
+        const timerPills = document.querySelectorAll('.hold-timer-pill');
+        let needsRefresh = false;
+        timerPills.forEach(pill => {
+            let sec = parseInt(pill.getAttribute('data-seconds') || '0', 10);
+            if (sec > 0) {
+                sec--;
+                pill.setAttribute('data-seconds', sec);
+                pill.innerHTML = `<i class="fa-solid fa-stopwatch"></i> ${formatRemainingSeconds(sec)}`;
+            } else {
+                pill.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> EXPIRED`;
+                needsRefresh = true;
+            }
+        });
+        if (needsRefresh) {
+            clearInterval(holdTimerInterval);
+            loadInventory();
+        }
+    }, 1000);
 }
 
 // ── Helper: Check if user is Kepala Cabang ──────────────────
@@ -475,19 +509,37 @@ function renderTableView(data, container) {
     data.forEach((item, idx) => {
         const stokVal = parseInt(item.stok !== undefined ? item.stok : (item.stock !== undefined ? item.stock : 1), 10);
         const statusLower = (item.availability_status || '').toLowerCase().trim();
-        const isAvailable = (statusLower.includes('available') || statusLower === 'tersedia') && stokVal > 0;
+        const isAvailable = (statusLower.includes('available') || statusLower === 'tersedia') && stokVal > 0 && !item.is_held;
         
         let statusBadgeClass = 'status-ready';
         let statusText = 'Ready Stock';
         let actionBtnHtml = '';
 
-        if (isAvailable) {
+        if (item.is_held) {
+            statusBadgeClass = 'status-locked';
+            const rem = item.hold_info ? item.hold_info.remaining_seconds : 0;
+            const holderName = item.hold_info ? (item.hold_info.sales_name + ' (' + item.hold_info.customer_name + ')') : 'Sales';
+            statusText = `<i class="fa-solid fa-lock"></i> LOCKED<br><span class="hold-timer-pill" data-seconds="${rem}"><i class="fa-solid fa-stopwatch"></i> ${formatRemainingSeconds(rem)}</span>`;
+            actionBtnHtml = `
+                <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                    <button class="btn-table-release" onclick="releaseUnitHold('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Lepas Kunci Hold">
+                        <i class="fa-solid fa-lock-open"></i> Release
+                    </button>
+                    <span style="font-size:9.5px; color:#b45309; font-weight:700; max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${holderName}">Hold: ${holderName}</span>
+                </div>
+            `;
+        } else if (isAvailable) {
             statusBadgeClass = 'status-ready';
             statusText = '<i class="fa-solid fa-circle-check"></i> Ready';
             actionBtnHtml = `
-                <button class="btn-table-ambil" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Ambil Unit (SPK)">
-                    <i class="fa-solid fa-check"></i> Ambil SPK
-                </button>
+                <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn-table-ambil" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}', 'spk')" title="Ambil Unit (SPK)">
+                        <i class="fa-solid fa-check"></i> SPK
+                    </button>
+                    <button class="btn-table-hold" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}', 'hold')" title="Kunci / Hold Unit 2 Jam">
+                        <i class="fa-solid fa-lock"></i> Hold
+                    </button>
+                </div>
             `;
         } else if (statusLower === 'matched') {
             statusBadgeClass = 'status-matched';
@@ -631,19 +683,37 @@ function renderAccordionView(data, container) {
             groupUnits.forEach(item => {
                 const stokVal = parseInt(item.stok !== undefined ? item.stok : (item.stock !== undefined ? item.stock : 1), 10);
                 const statusLower = (item.availability_status || '').toLowerCase().trim();
-                const isAvailable = (statusLower.includes('available') || statusLower === 'tersedia') && stokVal > 0;
+                const isAvailable = (statusLower.includes('available') || statusLower === 'tersedia') && stokVal > 0 && !item.is_held;
                 
                 let statusBadgeClass = 'status-ready';
                 let statusText = 'Ready Stock';
                 let actionBtnHtml = '';
 
-                if (isAvailable) {
+                if (item.is_held) {
+                    statusBadgeClass = 'status-locked';
+                    const rem = item.hold_info ? item.hold_info.remaining_seconds : 0;
+                    const holderName = item.hold_info ? (item.hold_info.sales_name + ' (' + item.hold_info.customer_name + ')') : 'Sales';
+                    statusText = `<i class="fa-solid fa-lock"></i> LOCKED<br><span class="hold-timer-pill" data-seconds="${rem}"><i class="fa-solid fa-stopwatch"></i> ${formatRemainingSeconds(rem)}</span>`;
+                    actionBtnHtml = `
+                        <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                            <button class="btn-table-release" onclick="releaseUnitHold('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Lepas Kunci Hold">
+                                <i class="fa-solid fa-lock-open"></i> Release
+                            </button>
+                            <span style="font-size:9.5px; color:#b45309; font-weight:700;" title="${holderName}">Hold: ${holderName}</span>
+                        </div>
+                    `;
+                } else if (isAvailable) {
                     statusBadgeClass = 'status-ready';
                     statusText = '<i class="fa-solid fa-circle-check"></i> Ready';
                     actionBtnHtml = `
-                        <button class="btn-table-ambil" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}')" title="Ambil Unit (SPK)">
-                            <i class="fa-solid fa-check"></i> Ambil SPK
-                        </button>
+                        <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                            <button class="btn-table-ambil" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}', 'spk')" title="Ambil Unit (SPK)">
+                                <i class="fa-solid fa-check"></i> SPK
+                            </button>
+                            <button class="btn-table-hold" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}', 'hold')" title="Kunci / Hold Unit 2 Jam">
+                                <i class="fa-solid fa-lock"></i> Hold
+                            </button>
+                        </div>
                     `;
                 } else if (statusLower === 'matched') {
                     statusBadgeClass = 'status-matched';
@@ -754,19 +824,37 @@ function renderGridView(data, container) {
     data.forEach(item => {
         const stokVal = parseInt(item.stok !== undefined ? item.stok : (item.stock !== undefined ? item.stock : 1), 10);
         const statusLower = (item.availability_status || '').toLowerCase().trim();
-        const isAvailable = (statusLower.includes('available') || statusLower === 'tersedia') && stokVal > 0;
+        const isAvailable = (statusLower.includes('available') || statusLower === 'tersedia') && stokVal > 0 && !item.is_held;
         
         let statusBadgeClass = 'status-ready';
         let statusText = 'Ready Stock';
         let actionBtnHtml = '';
 
-        if (isAvailable) {
+        if (item.is_held) {
+            statusBadgeClass = 'status-locked';
+            const rem = item.hold_info ? item.hold_info.remaining_seconds : 0;
+            const holderName = item.hold_info ? (item.hold_info.sales_name + ' (' + item.hold_info.customer_name + ')') : 'Sales';
+            statusText = `<i class="fa-solid fa-lock"></i> LOCKED / DITAHAN <span class="hold-timer-pill" data-seconds="${rem}"><i class="fa-solid fa-stopwatch"></i> ${formatRemainingSeconds(rem)}</span>`;
+            actionBtnHtml = `
+                <div style="margin-top: 10px; display:flex; flex-direction:column; gap:6px;">
+                    <button class="card-action-btn" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;" onclick="releaseUnitHold('${(item.chassis_no || '').replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-lock-open"></i> Release Hold
+                    </button>
+                    <div style="font-size:10.5px; color:#b45309; font-weight:700;">Di-hold: ${holderName}</div>
+                </div>
+            `;
+        } else if (isAvailable) {
             statusBadgeClass = 'status-ready';
             statusText = '<i class="fa-solid fa-circle-check"></i> Ready Stock';
             actionBtnHtml = `
-                <button class="card-action-btn" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}')">
-                    <i class="fa-solid fa-check"></i> Ambil Unit (SPK)
-                </button>
+                <div style="margin-top: 10px; display:flex; gap:8px;">
+                    <button class="card-action-btn" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}', 'spk')">
+                        <i class="fa-solid fa-check"></i> Ambil SPK
+                    </button>
+                    <button class="card-action-btn" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white;" onclick="openSpkModal('${(item.chassis_no || '').replace(/'/g, "\\'")}', 'hold')">
+                        <i class="fa-solid fa-lock"></i> Hold 2 Jam
+                    </button>
+                </div>
             `;
         } else if (statusLower === 'matched') {
             statusBadgeClass = 'status-matched';
@@ -852,8 +940,10 @@ function closeImageModal() {
 
 // ── 11. SPK / Ambil Unit Modal Logic ───────────────────────
 let selectedSpkUnit = null;
+let currentSpkMode = 'spk'; // 'spk' atau 'hold'
 
-function openSpkModal(chassisNo) {
+function openSpkModal(chassisNo, mode = 'spk') {
+    currentSpkMode = mode;
     const item = inventoryData.find(u => u.chassis_no === chassisNo);
     if (!item) {
         showCustomAlert('Error', 'Data unit tidak ditemukan', 'error');
@@ -868,6 +958,23 @@ function openSpkModal(chassisNo) {
     if (titleEl) titleEl.textContent = item.product_description || 'UNIT TOYOTA';
     if (chassisEl) chassisEl.textContent = item.chassis_no || '-';
 
+    const modalTitle = document.querySelector('.spk-modal-header h3');
+    const submitBtn = document.querySelector('.btn-spk-submit');
+
+    if (mode === 'hold') {
+        if (modalTitle) modalTitle.innerHTML = `<i class="fa-solid fa-lock" style="color:#d97706; margin-right:6px;"></i> Kunci / Hold Unit (2 Jam)`;
+        if (submitBtn) {
+            submitBtn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            submitBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Kunci Unit (Hold 2 Jam)`;
+        }
+    } else {
+        if (modalTitle) modalTitle.innerHTML = `Buat SPK / Ambil Unit`;
+        if (submitBtn) {
+            submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Konfirmasi SPK`;
+        }
+    }
+
     const nameInp = document.getElementById('spkCustomerName');
     const phoneInp = document.getElementById('spkCustomerPhone');
     const tandaJadiInp = document.getElementById('spkTandaJadi');
@@ -875,8 +982,8 @@ function openSpkModal(chassisNo) {
     
     if (nameInp) nameInp.value = '';
     if (phoneInp) phoneInp.value = '';
-    if (tandaJadiInp) tandaJadiInp.value = '';
-    if (tipeInp) tipeInp.value = '';
+    if (tandaJadiInp) tandaJadiInp.value = mode === 'hold' ? 'Rp 5.000.000' : '';
+    if (tipeInp) tipeInp.value = 'Kredit';
 
     const modal = document.getElementById('spkModal');
     if (modal) modal.classList.add('active');
@@ -897,7 +1004,7 @@ function formatRupiahInput(el) {
     el.value = 'Rp ' + formatted;
 }
 
-function submitSpkForm(e) {
+async function submitSpkForm(e) {
     e.preventDefault();
     if (!selectedSpkUnit) return;
 
@@ -906,20 +1013,79 @@ function submitSpkForm(e) {
     const tandaJadi = document.getElementById('spkTandaJadi').value.trim();
     const tipe = document.getElementById('spkTipePembelian').value;
 
-    if (!name || !phone || !tandaJadi || !tipe) {
+    if (!name || !phone || !tipe) {
         showCustomAlert('Peringatan', 'Harap isi semua kolom wajib (*)', 'warning');
         return;
     }
 
-    closeSpkModal();
+    const currentSales = localStorage.getItem('namaSales') || localStorage.getItem('username') || 'Wiraniaga Tunas';
+    const submitBtn = document.querySelector('.btn-spk-submit');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+    }
 
-    setTimeout(() => {
-        showCustomAlert(
-            'Pengajuan SPK Berhasil!',
-            `Unit ${selectedSpkUnit.product_description} (${selectedSpkUnit.chassis_no}) telah berhasil diajukan atas nama ${name}. Silakan lanjutkan ke Form SPK untuk cetak dokumen.`,
-            'success'
-        );
-    }, 200);
+    try {
+        const actionType = (currentSpkMode === 'hold') ? 'hold_unit' : 'hold_unit';
+        const res = await fetch('../api/api_inventory.php?action=' + actionType, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chassis_no: selectedSpkUnit.chassis_no,
+                product_description: selectedSpkUnit.product_description,
+                sales_name: currentSales,
+                customer_name: name,
+                customer_phone: phone,
+                tanda_jadi: tandaJadi,
+                tipe_pembelian: tipe,
+                duration_minutes: 120
+            })
+        });
+        const json = await res.json();
+        closeSpkModal();
+
+        if (json.status === 'success') {
+            showCustomAlert(
+                currentSpkMode === 'hold' ? '🔒 Unit Berhasil Dikunci (Hold)!' : '🎉 Pengajuan SPK Unit Berhasil!',
+                `Unit ${selectedSpkUnit.product_description} (${selectedSpkUnit.chassis_no}) berhasil dikunci selama 2 jam untuk ${name}. Data stok langsung tersinkronisasi.`,
+                'success'
+            );
+            loadInventory();
+        } else {
+            showCustomAlert('Gagal', json.message || 'Tidak dapat memproses unit.', 'error');
+        }
+    } catch (err) {
+        console.error(err);
+        showCustomAlert('Error', 'Terjadi kesalahan jaringan saat menyimpan status unit.', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+async function releaseUnitHold(chassisNo) {
+    if (!confirm(`Lepas status HOLD untuk unit ${chassisNo}? Unit ini akan kembali menjadi Ready Stock untuk seluruh wiraniaga.`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch('../api/api_inventory.php?action=release_hold', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chassis_no: chassisNo })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+            showCustomAlert('Status Dilepas', json.message, 'success');
+            loadInventory();
+        } else {
+            showCustomAlert('Gagal', json.message || 'Gagal melepas status hold.', 'error');
+        }
+    } catch (err) {
+        console.error(err);
+        showCustomAlert('Error', 'Kesalahan koneksi saat melepas status hold.', 'error');
+    }
 }
 
 // ── 12. Filter Modal Open / Close / Reset ──────────────────

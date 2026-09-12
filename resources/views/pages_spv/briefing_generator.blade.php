@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -113,6 +113,60 @@
       font-family: inherit;
       white-space: pre-wrap;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* AI Voice Podcast Wave Styles */
+    .voice-speed-chip {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #cbd5e1;
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .voice-speed-chip.active {
+      background: #38bdf8;
+      color: #0f172a;
+      border-color: #38bdf8;
+      font-weight: 800;
+    }
+    .audio-wave-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 36px;
+      margin: 12px 0 6px;
+    }
+    .audio-bar {
+      width: 4.5px;
+      height: 6px;
+      background: #38bdf8;
+      border-radius: 3px;
+      transition: height 0.15s ease;
+    }
+    .audio-wave-container.playing .audio-bar {
+      animation: wavePulseAnim 0.75s infinite ease-in-out alternate;
+    }
+    .audio-wave-container.playing .bar-1 { animation-delay: 0.1s; }
+    .audio-wave-container.playing .bar-2 { animation-delay: 0.3s; }
+    .audio-wave-container.playing .bar-3 { animation-delay: 0.5s; }
+    .audio-wave-container.playing .bar-4 { animation-delay: 0.2s; }
+    .audio-wave-container.playing .bar-5 { animation-delay: 0.4s; }
+    .audio-wave-container.playing .bar-6 { animation-delay: 0.6s; }
+    .audio-wave-container.playing .bar-7 { animation-delay: 0.15s; }
+    .audio-wave-container.playing .bar-8 { animation-delay: 0.35s; }
+    .audio-wave-container.playing .bar-9 { animation-delay: 0.55s; }
+    .audio-wave-container.playing .bar-10 { animation-delay: 0.25s; }
+    .audio-wave-container.playing .bar-11 { animation-delay: 0.45s; }
+    .audio-wave-container.playing .bar-12 { animation-delay: 0.65s; }
+
+    @keyframes wavePulseAnim {
+      0% { height: 6px; }
+      100% { height: 32px; background: #22c55e; }
     }
   </style>
 </head>
@@ -253,6 +307,52 @@
                 <i class="fa-brands fa-whatsapp"></i> Kirim ke Grup Sales
               </button>
             </div>
+
+            <!-- AI VOICE PODCAST PLAYER CARD -->
+            <div style="background: linear-gradient(135deg, #0d1b3e 0%, #1e293b 100%); border-radius: 16px; padding: 18px 20px; color: white; margin-top: 16px; box-shadow: 0 8px 24px rgba(13,27,62,0.18);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="background:rgba(239,68,68,0.2); color:#fca5a5; font-size:10.5px; font-weight:900; padding:3px 10px; border-radius:20px; text-transform:uppercase; border:1px solid rgba(239,68,68,0.4); display:inline-flex; align-items:center; gap:5px;">
+                    <i class="fa-solid fa-microphone-lines"></i> AI Voice Podcast
+                  </span>
+                  <span id="voiceStatusText" style="font-size:11.5px; color:#cbd5e1; font-weight:600;">Siap diputar di speaker ruangan</span>
+                </div>
+                
+                <!-- Speed Selector -->
+                <div style="display:flex; align-items:center; gap:5px; font-size:11px;">
+                  <span style="color:#94a3b8; font-weight:700;">Kecepatan:</span>
+                  <button type="button" class="voice-speed-chip active" onclick="setVoiceSpeed(1.0, this)">1.0x</button>
+                  <button type="button" class="voice-speed-chip" onclick="setVoiceSpeed(1.2, this)">1.2x</button>
+                  <button type="button" class="voice-speed-chip" onclick="setVoiceSpeed(1.4, this)">1.4x</button>
+                </div>
+              </div>
+
+              <!-- Audio Wave Visualizer Bar -->
+              <div class="audio-wave-container" id="voiceWaveContainer">
+                <span class="audio-bar bar-1"></span>
+                <span class="audio-bar bar-2"></span>
+                <span class="audio-bar bar-3"></span>
+                <span class="audio-bar bar-4"></span>
+                <span class="audio-bar bar-5"></span>
+                <span class="audio-bar bar-6"></span>
+                <span class="audio-bar bar-7"></span>
+                <span class="audio-bar bar-8"></span>
+                <span class="audio-bar bar-9"></span>
+                <span class="audio-bar bar-10"></span>
+                <span class="audio-bar bar-11"></span>
+                <span class="audio-bar bar-12"></span>
+              </div>
+
+              <!-- Controls -->
+              <div style="display:flex; gap:10px; align-items:center; justify-content:center; margin-top:12px;">
+                <button type="button" id="btnPlayVoice" onclick="togglePlayVoice()" style="background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color:white; border:none; padding:10px 24px; border-radius:12px; font-size:13px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(34,197,94,0.35);">
+                  <i class="fa-solid fa-play" id="btnPlayVoiceIcon"></i> <span id="btnPlayVoiceText">Putar Audio Briefing</span>
+                </button>
+                <button type="button" onclick="stopBriefingVoice()" style="background:rgba(255,255,255,0.12); color:#cbd5e1; border:1px solid rgba(255,255,255,0.2); padding:10px 16px; border-radius:12px; font-size:12.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-stop"></i> Stop
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -383,6 +483,132 @@ _Terima kasih atas perjuangan hari ini. Selamat beristirahat bersama keluarga te
 
     // Initialize
     generateBriefingText();
+
+    // ── AI VOICE BRIEFING AUDIO ENGINE (TTS) ───────────────────
+    let currentSpeechUtterance = null;
+    let isSpeaking = false;
+    let isPaused = false;
+    let voiceSpeed = 1.0;
+
+    function setVoiceSpeed(speed, btn) {
+      voiceSpeed = speed;
+      document.querySelectorAll('.voice-speed-chip').forEach(c => c.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (isSpeaking && !isPaused) {
+        const rawText = document.getElementById('waMessagePreview').innerText;
+        stopBriefingVoice();
+        playVoiceFromText(rawText);
+      }
+    }
+
+    function cleanTextForSpeech(text) {
+      return text
+        .replace(/[\*\_~`]/g, '')
+        .replace(/[\u{1F600}-\u{1F64F}|\u{1F300}-\u{1F5FF}|\u{1F680}-\u{1F6FF}|\u{2600}-\u{26FF}|\u{2700}-\u{27BF}]/gu, '')
+        .replace(/•/g, 'Poin: ')
+        .replace(/\n\n+/g, '. ')
+        .replace(/\n/g, ', ');
+    }
+
+    function togglePlayVoice() {
+      if (isPaused) {
+        window.speechSynthesis.resume();
+        isPaused = false;
+        isSpeaking = true;
+        updateVoiceUiState('playing');
+        return;
+      }
+
+      if (isSpeaking) {
+        window.speechSynthesis.pause();
+        isPaused = true;
+        updateVoiceUiState('paused');
+        return;
+      }
+
+      const text = document.getElementById('waMessagePreview').innerText;
+      playVoiceFromText(text);
+    }
+
+    function playVoiceFromText(text) {
+      if (!('speechSynthesis' in window)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Peramban Tidak Mendukung Suara',
+          text: 'Browser Anda tidak mendukung fitur Speech Synthesis.',
+          confirmButtonColor: '#0d1b3e'
+        });
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const spokenText = cleanTextForSpeech(text);
+      currentSpeechUtterance = new SpeechSynthesisUtterance(spokenText);
+      currentSpeechUtterance.rate = voiceSpeed;
+      currentSpeechUtterance.pitch = 1.05;
+      currentSpeechUtterance.lang = 'id-ID';
+
+      const voices = window.speechSynthesis.getVoices();
+      const idVoice = voices.find(v => v.lang === 'id-ID' || v.lang.startsWith('id') || (v.name && v.name.toLowerCase().includes('indonesia')));
+      if (idVoice) {
+        currentSpeechUtterance.voice = idVoice;
+      }
+
+      currentSpeechUtterance.onstart = () => {
+        isSpeaking = true;
+        isPaused = false;
+        updateVoiceUiState('playing');
+      };
+
+      currentSpeechUtterance.onend = () => {
+        isSpeaking = false;
+        isPaused = false;
+        updateVoiceUiState('stopped');
+      };
+
+      currentSpeechUtterance.onerror = (e) => {
+        console.warn('Speech synthesis error:', e);
+        isSpeaking = false;
+        isPaused = false;
+        updateVoiceUiState('stopped');
+      };
+
+      window.speechSynthesis.speak(currentSpeechUtterance);
+    }
+
+    function stopBriefingVoice() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isSpeaking = false;
+      isPaused = false;
+      updateVoiceUiState('stopped');
+    }
+
+    function updateVoiceUiState(state) {
+      const wave = document.getElementById('voiceWaveContainer');
+      const btnIcon = document.getElementById('btnPlayVoiceIcon');
+      const btnText = document.getElementById('btnPlayVoiceText');
+      const statusText = document.getElementById('voiceStatusText');
+
+      if (state === 'playing') {
+        if (wave) wave.classList.add('playing');
+        if (btnIcon) btnIcon.className = 'fa-solid fa-pause';
+        if (btnText) btnText.innerText = 'Jeda Suara';
+        if (statusText) statusText.innerText = 'Sedang memutar naskah briefing...';
+      } else if (state === 'paused') {
+        if (wave) wave.classList.remove('playing');
+        if (btnIcon) btnIcon.className = 'fa-solid fa-play';
+        if (btnText) btnText.innerText = 'Lanjutkan Suara';
+        if (statusText) statusText.innerText = 'Suara dijeda';
+      } else {
+        if (wave) wave.classList.remove('playing');
+        if (btnIcon) btnIcon.className = 'fa-solid fa-play';
+        if (btnText) btnText.innerText = 'Putar Audio Briefing';
+        if (statusText) statusText.innerText = 'Siap diputar di speaker ruangan';
+      }
+    }
   </script>
   <script src="../js/spv_global.js"></script>
 </body>
