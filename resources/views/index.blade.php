@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sales App - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=20260907_layout_fix">
-    <link rel="stylesheet" href="css/index_dashboard.css?v=5.0">
+    <link rel="stylesheet" href="css/style.css?v=20260914_mobile_fluid">
+    <link rel="stylesheet" href="css/index_dashboard.css?v=5.1">
     <link rel="stylesheet" href="css/sales_tools.css?v=1.0">
 
     <link rel="icon" type="image/x-icon" href="favicon.ico">

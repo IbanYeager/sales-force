@@ -928,3 +928,63 @@ textarea.form-control {
   margin: 0;
   color: var(--text-dark);
 }
+
+/* Mobile Responsive Calendar Grid (iPhone XR, Samsung, etc.) */
+@media (max-width: 480px) {
+  .calendar-header {
+    padding: 14px 14px;
+    gap: 8px;
+  }
+  .calendar-month-title h2 {
+    font-size: 15px;
+  }
+  .calendar-grid-wrapper {
+    padding: 10px 8px;
+  }
+  .calendar-weekdays {
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+  .calendar-days {
+    gap: 4px;
+  }
+  .cal-day-cell {
+    min-height: 44px;
+    padding: 4px 2px;
+    border-radius: 9px;
+  }
+  .cal-day-number {
+    font-size: 12px;
+  }
+  .cal-dot-wrap {
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .cal-dot {
+    width: 4px;
+    height: 4px;
+  }
+  .form-buttons-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 380px) {
+  .calendar-header {
+    padding: 12px 10px;
+  }
+  .calendar-grid-wrapper {
+    padding: 8px 4px;
+  }
+  .calendar-days {
+    gap: 3px;
+  }
+  .cal-day-cell {
+    min-height: 38px;
+    padding: 2px 1px;
+    border-radius: 7px;
+  }
+  .cal-day-number {
+    font-size: 11px;
+  }
+}

@@ -136,6 +136,14 @@ th {
     -webkit-font-smoothing: antialiased;
 }
 
+html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    -webkit-text-size-adjust: 100% !important;
+}
+
 body {
     background:
         radial-gradient(1100px 640px at 92% -12%, rgba(53, 101, 224, 0.10), transparent 62%),
@@ -147,6 +155,11 @@ body {
     justify-content: center;
     color: var(--text-dark);
     min-height: 100vh;
+    min-height: 100dvh;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    position: relative !important;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
 }
@@ -161,6 +174,7 @@ body {
     overflow-x: hidden;
     overflow-y: visible;
     padding-bottom: 130px;
+    box-sizing: border-box;
 }
 
 a {
@@ -1772,8 +1786,8 @@ select.form-control {
     border-radius: var(--radius-2xl);
     padding: 26px 22px 34px;
     width: 100%;
-    max-width: 414px;
-    max-height: 86vh;
+    max-width: min(520px, 94vw);
+    max-height: 88vh;
     overflow-y: auto;
     transform: translateY(100%);
     transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
@@ -2636,17 +2650,25 @@ select.form-control {
 /* ── Mobile Responsive Header Page (Flush to Top on Mobile Only) ────────── */
 @media (max-width: 768px) {
     .header-page {
-        margin: 0 0 18px 0 !important;
-        padding: 16px 16px 14px 16px !important;
+        margin: 0 0 16px 0 !important;
+        padding-top: max(16px, calc(12px + env(safe-area-inset-top, 0px))) !important;
+        padding-bottom: 14px !important;
+        padding-left: max(14px, calc(10px + env(safe-area-inset-left, 0px))) !important;
+        padding-right: max(14px, calc(10px + env(safe-area-inset-right, 0px))) !important;
         border-radius: 0 0 20px 20px !important;
         border-top: none !important;
         border-left: none !important;
         border-right: none !important;
         box-shadow: 0 8px 24px rgba(9, 20, 46, 0.2) !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100vw !important;
     }
 
     .header-nav-group {
         gap: 10px !important;
+        min-width: 0 !important;
+        flex: 1 !important;
     }
 
     .header-back-btn,
@@ -2657,11 +2679,14 @@ select.form-control {
         height: 36px !important;
         border-radius: 10px !important;
         font-size: 13.5px !important;
+        flex-shrink: 0 !important;
     }
 
     .header-breadcrumb {
         font-size: 12.5px !important;
         gap: 4px !important;
+        min-width: 0 !important;
+        flex: 1 !important;
     }
 
     .header-breadcrumb a {
@@ -2676,19 +2701,37 @@ select.form-control {
 
     .header-breadcrumb .active-crumb {
         font-size: 13.5px !important;
+        font-weight: 800 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: min(220px, 48vw) !important;
+        display: block !important;
+    }
+
+    /* Subpage raw H2/H1 title mobile support */
+    .header-page h2,
+    .header-page h1,
+    .header-page .header-title {
+        font-size: 14.5px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: min(240px, 50vw) !important;
+        line-height: 1.25 !important;
+    }
+
+    .header-right-group {
+        gap: 6px !important;
+        flex-shrink: 0 !important;
     }
 }
 
-@media (max-width: 420px) {
-    .header-page {
-        margin: 0 0 14px 0 !important;
-        padding: 14px 14px 12px 14px !important;
-        border-radius: 0 0 18px 18px !important;
-        border-top: none !important;
-        border-left: none !important;
-        border-right: none !important;
-    }
-
+/* On smartphones (<= 640px: iPhone XR, Samsung, etc.), collapse breadcrumb prefix and make tutorial button compact */
+@media (max-width: 640px) {
     .header-breadcrumb a,
     .header-breadcrumb .header-breadcrumb-sep,
     .header-breadcrumb .divider {
@@ -2698,6 +2741,36 @@ select.form-control {
     .header-breadcrumb .active-crumb {
         font-size: 13.5px !important;
         font-weight: 800 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: min(220px, 46vw) !important;
+        display: block !important;
+    }
+
+    /* Cara Pakai button compact mode: hide label, show glowing bulb icon */
+    .btn-feature-guide-header {
+        padding: 7px 10px !important;
+        gap: 0 !important;
+        border-radius: 12px !important;
+    }
+    .btn-feature-guide-header span {
+        display: none !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .header-page {
+        margin: 0 0 12px 0 !important;
+        padding-left: max(10px, calc(6px + env(safe-area-inset-left, 0px))) !important;
+        padding-right: max(10px, calc(6px + env(safe-area-inset-right, 0px))) !important;
+        border-radius: 0 0 16px 16px !important;
+    }
+
+    .header-breadcrumb .active-crumb,
+    .header-page h2 {
+        font-size: 12.5px !important;
+        max-width: min(160px, 42vw) !important;
     }
 }
 
@@ -3284,7 +3357,8 @@ tbody tr:last-child td {
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 414px;
+    max-width: 600px;
+    box-sizing: border-box;
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(20px) saturate(1.3);
     -webkit-backdrop-filter: blur(20px) saturate(1.3);
@@ -3338,10 +3412,81 @@ tbody tr:last-child td {
 
 /* Tablet & Mobile Breakpoint (<= 768px) */
 @media (max-width: 768px) {
+    .desktop-shell,
+    .desktop-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+
     .mobile-app {
         max-width: 100% !important;
         width: 100% !important;
         overflow-x: hidden !important;
+        box-sizing: border-box !important;
+        padding-bottom: max(120px, calc(105px + env(safe-area-inset-bottom, 0px))) !important;
+    }
+
+    /* Fixed bottom bar full width on mobile */
+    .fixed-bottom {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding-bottom: max(20px, calc(14px + env(safe-area-inset-bottom, 0px))) !important;
+    }
+
+    /* Universal Fluid Media & Objects */
+    img:not(.bypass-responsive),
+    video,
+    iframe:not(.bypass-responsive),
+    canvas {
+        max-width: 100% !important;
+        height: auto;
+        box-sizing: border-box;
+    }
+
+    /* Universal Tables & Responsive Wrappers */
+    .table-responsive,
+    .table-wrapper,
+    .inv-table-responsive {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        box-sizing: border-box !important;
+        display: block !important;
+    }
+
+    table {
+        max-width: 100%;
+    }
+
+    /* Universal Inputs & Forms */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .container,
+    .edge-pad,
+    .card {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     /* Floating Action Buttons stacking */
@@ -3534,40 +3679,43 @@ tbody tr:last-child td {
     /* Bottom Floating Dock */
     .bottom-nav {
         width: calc(100% - 24px) !important;
-        padding: 7px 10px !important;
+        max-width: 380px !important;
+        padding: 7px 8px !important;
         border-radius: 26px !important;
+        bottom: max(14px, calc(10px + env(safe-area-inset-bottom, 0px))) !important;
     }
 
     .nav-item {
-        width: 50px;
+        width: 48px;
         height: 44px;
     }
 
     .nav-item i {
-        font-size: 17px;
+        font-size: 16.5px;
     }
 
     .nav-text {
-        font-size: 9.5px;
+        font-size: 9px;
+        letter-spacing: -0.1px;
     }
 
     .nav-item.center-btn {
-        width: 52px;
-        height: 52px;
+        width: 50px;
+        height: 50px;
     }
 
     .center-btn-inner {
-        width: 48px;
-        height: 48px;
+        width: 46px;
+        height: 46px;
     }
 
     .nav-item.center-btn i {
-        font-size: 20px;
+        font-size: 19px;
     }
 }
 
-/* Extra Small Phones (<= 360px: e.g. iPhone SE 1st, Galaxy Z Flip cover, compact phones) */
-@media (max-width: 360px) {
+/* Extra Small & Compact Phones (<= 380px: Samsung Galaxy 360px, iPhone SE, Galaxy Z Flip cover) */
+@media (max-width: 380px) {
     .header-home {
         padding: 30px 10px 72px !important;
         border-radius: 0 0 22px 22px !important;
@@ -3645,9 +3793,10 @@ tbody tr:last-child td {
     }
 
     .bottom-nav {
-        width: calc(100% - 14px) !important;
+        width: calc(100% - 16px) !important;
         padding: 5px 6px !important;
         border-radius: 22px !important;
+        bottom: max(12px, calc(8px + env(safe-area-inset-bottom, 0px))) !important;
     }
 
     .nav-item {
@@ -3661,15 +3810,21 @@ tbody tr:last-child td {
 
     .nav-text {
         font-size: 8.5px;
+        letter-spacing: -0.2px;
+    }
+
+    .nav-item.center-btn {
+        width: 46px;
+        height: 46px;
     }
 
     .center-btn-inner {
-        width: 44px;
-        height: 44px;
+        width: 42px;
+        height: 42px;
     }
 
     .nav-item.center-btn i {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     #btnToggleAiCopilot {
@@ -3683,6 +3838,23 @@ tbody tr:last-child td {
         height: 38px !important;
         right: 14px !important;
         font-size: 14px !important;
+    }
+}
+
+/* Ultra Compact Devices (<= 340px) */
+@media (max-width: 340px) {
+    .bottom-nav {
+        width: calc(100% - 10px) !important;
+        padding: 4px 4px !important;
+    }
+
+    .nav-item {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    .nav-text {
+        display: none !important;
     }
 }
 

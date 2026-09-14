@@ -1157,6 +1157,16 @@
                 color: #b45309 !important;
                 animation: sftBulbGlow 2s infinite ease-in-out !important;
             }
+            @media (max-width: 640px) {
+                .btn-feature-guide-header {
+                    padding: 6px 9px !important;
+                    gap: 0 !important;
+                    border-radius: 10px !important;
+                }
+                .btn-feature-guide-header span {
+                    display: none !important;
+                }
+            }
 
             @keyframes sftBulbGlow {
                 0%, 100% { transform: scale(1); opacity: 0.9; }
