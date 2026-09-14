@@ -2649,6 +2649,12 @@ select.form-control {
 
 /* ── Mobile Responsive Header Page (Flush to Top on Mobile Only) ────────── */
 @media (max-width: 768px) {
+    body {
+        display: block !important;
+        justify-content: flex-start !important;
+        align-items: stretch !important;
+    }
+
     .header-page {
         margin: 0 0 16px 0 !important;
         padding-top: max(16px, calc(12px + env(safe-area-inset-top, 0px))) !important;
