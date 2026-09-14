@@ -1,81 +1,74 @@
 /* ==========================================================================
    AREA OPERATION (AO) REPORT - TUNAS TOYOTA KIARACONDONG
    Executive Physical Whiteboard Replica & Operations Cockpit
-   Synchronized: 31 Agustus 2026 / Dynamic Live Engine
+   PANORAMIC HORIZONTAL SCROLL WHITEBOARD CANVAS (1 Screen Height)
    ========================================================================== */
 
 :root {
     --ao-bg: #f8fafc;
     --ao-surface: #ffffff;
-    --ao-border: #e2e8f0;
-    --ao-border-dark: #cbd5e1;
+    --ao-border: #cbd5e1;
     --ao-line-dark: #0f172a;
     --ao-text: #0f172a;
     --ao-text-muted: #64748b;
     --ao-text-faint: #94a3b8;
     
-    /* Whiteboard Marker Palette */
+    /* Marker Colors */
     --ao-pen-black: #0f172a;
     --ao-pen-red: #dc2626;
     --ao-pen-blue: #2563eb;
     --ao-pen-green: #16a34a;
     --ao-pen-amber: #d97706;
     
-    /* Soft Tonal Surfaces */
-    --ao-soft-blue: #e0f2fe;
-    --ao-soft-blue-border: #bae6fd;
-    --ao-soft-yellow: #fef08a;
-    --ao-soft-yellow-border: #fde047;
-    --ao-soft-green: #dcfce7;
-    --ao-soft-green-border: #86efac;
-    --ao-soft-peach: #ffedd5;
-    --ao-soft-peach-border: #fed7aa;
-    --ao-soft-red: #fee2e2;
-    --ao-soft-red-border: #fca5a5;
-    
     /* Font */
     --ao-font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
-/* Master Whiteboard Frame Container */
+/* Master Whiteboard Frame Container (Fits 1 Screen Viewport) */
 .ao-board-container {
     background: #ffffff;
     border: 3px solid #cbd5e1;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), inset 0 2px 4px rgba(255, 255, 255, 0.9);
-    padding: 20px 22px 28px 22px;
-    margin-bottom: 30px;
+    padding: 14px 18px 16px 18px;
+    margin-bottom: 20px;
     position: relative;
     font-family: var(--ao-font-main);
     color: var(--ao-pen-black);
     width: 100%;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    min-height: 560px;
     overflow: hidden;
 }
 
-/* Whiteboard Aluminium Header & Bottom Marker Tray */
+/* Aluminium Whiteboard Top & Bottom Details */
 .ao-board-container::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 5px;
+    height: 4px;
     background: linear-gradient(90deg, #94a3b8, #cbd5e1, #94a3b8);
     pointer-events: none;
+    z-index: 10;
 }
 
 .ao-board-container::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 15%;
-    right: 15%;
-    height: 5px;
+    left: 20%;
+    right: 20%;
+    height: 4px;
     background: linear-gradient(180deg, #94a3b8, #64748b);
     border-radius: 3px 3px 0 0;
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
     pointer-events: none;
+    z-index: 10;
 }
 
 /* Marker Circle Badge (①, ②, ③, ④, ⑤, ⑥, ⑧, ⑩) */
@@ -83,18 +76,32 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: 2px solid #dc2626;
     color: #dc2626;
     font-weight: 900;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1;
-    margin-left: 6px;
+    margin-left: 4px;
     vertical-align: middle;
     background: #fff5f5;
-    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.15);
+    box-shadow: 0 1px 2px rgba(220, 38, 38, 0.15);
+}
+
+.marker-circle-mini {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+    margin-right: 4px;
 }
 
 /* Whiteboard Top Title & Toolbar */
@@ -102,88 +109,129 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 14px;
-    margin-bottom: 18px;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
     border-bottom: 2.5px solid #0f172a;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
+    flex-shrink: 0;
 }
 
 .ao-board-main-title-box {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     border: 2px solid #0f172a;
-    padding: 6px 16px;
+    padding: 5px 14px;
     background: #ffffff;
-    box-shadow: 3px 3px 0px #0f172a;
+    box-shadow: 2px 2px 0px #0f172a;
     border-radius: 4px;
 }
 
 .ao-title-main {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 900;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     color: #0f172a;
     margin: 0;
     text-transform: uppercase;
 }
 
 .ao-board-date-hand {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 800;
     color: #0f172a;
-    padding-left: 12px;
+    padding-left: 10px;
     border-left: 2px solid #0f172a;
 }
 
 .ao-board-logo-area {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .ao-brand-badge-text {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     font-weight: 900;
-    font-size: 16px;
+    font-size: 14px;
     color: #1e3a8a;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 }
 
 .ao-brand-badge-text span.toyota {
     color: #dc2626;
 }
 
+/* Quick Navigation Jump Bar */
+.ao-nav-jump-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.ao-jump-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1.5px solid #cbd5e1;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.ao-jump-pill:hover, .ao-jump-pill.active {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+
 .ao-actions-toolbar {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
 .btn-ao {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-size: 12px;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.15s ease;
     border: 1.5px solid #cbd5e1;
     background: #ffffff;
     color: #334155;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .btn-ao:hover {
     background: #f1f5f9;
     border-color: #94a3b8;
-    transform: translateY(-1px);
+}
+
+.btn-ao-nav {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1.5px solid #0f172a;
+    padding: 6px 9px;
+    font-size: 12px;
+}
+.btn-ao-nav:hover {
+    background: #0f172a;
+    color: #ffffff;
 }
 
 .btn-ao-wa {
@@ -194,7 +242,6 @@
 .btn-ao-wa:hover {
     background: linear-gradient(135deg, #22c55e, #15803d);
     color: #ffffff;
-    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
 }
 
 .btn-ao-projector {
@@ -204,7 +251,6 @@
 }
 .btn-ao-projector:hover {
     background: #1e293b;
-    color: #ffffff;
 }
 
 .btn-ao-export {
@@ -214,82 +260,117 @@
 }
 .btn-ao-export:hover {
     background: #f0fdf4;
-    border-color: #86efac;
 }
 
 /* ==========================================================================
-   TWO BIG COLUMNS WHITEBOARD LAYOUT
+   PANORAMIC HORIZONTAL SCROLL TRACK
    ========================================================================== */
-.ao-whiteboard-grid {
-    display: grid;
-    grid-template-columns: 1.35fr 1fr;
-    gap: 18px;
-    align-items: start;
+.ao-whiteboard-horizontal-track {
+    display: flex;
+    flex-direction: row;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    flex: 1;
+    min-height: 0;
+    padding-bottom: 8px;
 }
 
-@media (max-width: 1200px) {
-    .ao-whiteboard-grid {
-        grid-template-columns: 1fr;
-    }
+/* Custom sleek horizontal scrollbar */
+.ao-whiteboard-horizontal-track::-webkit-scrollbar {
+    height: 9px;
+}
+.ao-whiteboard-horizontal-track::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+.ao-whiteboard-horizontal-track::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 6px;
+    border: 2px solid #f1f5f9;
+}
+.ao-whiteboard-horizontal-track::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
 }
 
-/* SECTION SHELL */
-.ao-section-panel {
+/* Panel Card Base */
+.ao-panel-card {
     border: 2px solid #0f172a;
     background: #ffffff;
-    padding: 12px 14px;
-    margin-bottom: 18px;
+    padding: 10px 12px;
     border-radius: 6px;
-    position: relative;
-    box-shadow: 2px 2px 0px rgba(15, 23, 42, 0.1);
+    box-shadow: 2px 2px 0px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Custom vertical scrollbar for panels if needed */
+.ao-panel-card::-webkit-scrollbar {
+    width: 6px;
+}
+.ao-panel-card::-webkit-scrollbar-track {
+    background: #f8fafc;
+}
+.ao-panel-card::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
 }
 
 .ao-section-heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 15px;
+    font-size: 13.5px;
     font-weight: 900;
     color: #0f172a;
-    margin-bottom: 12px;
-    padding-bottom: 4px;
+    margin-bottom: 8px;
+    padding-bottom: 3px;
     border-bottom: 1.5px dashed #cbd5e1;
+    flex-shrink: 0;
 }
 
-/* ==========================================================================
-   LEFT COLUMN - SECTION 1: Stock Matching with OS (②)
-   ========================================================================== */
+/* -------------------------------------------------------------
+   PANEL 1: Stock Matching with OS (②)
+   ------------------------------------------------------------- */
+.ao-panel-stock {
+    width: 490px;
+    min-width: 490px;
+}
+
 .ao-stock-flow-layout {
     display: grid;
-    grid-template-columns: repeat(4, minmax(75px, 1fr)) 1.4fr;
-    gap: 8px;
+    grid-template-columns: repeat(4, minmax(70px, 1fr)) 1.35fr;
+    gap: 6px;
     align-items: end;
+    flex: 1;
+    min-height: 0;
 }
 
-@media (max-width: 800px) {
-    .ao-stock-flow-layout {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Columns 1, 2, 3, 4: Pillars */
 .ao-pillar-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 2px solid #0f172a;
+    border: 1.5px solid #0f172a;
     background: #ffffff;
     text-align: center;
     border-radius: 4px;
     overflow: hidden;
+    height: 100%;
 }
 
 .ao-pillar-head-val {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 900;
     color: #0f172a;
-    padding: 4px 0;
-    border-bottom: 2px solid #0f172a;
+    padding: 3px 0;
+    border-bottom: 1.5px solid #0f172a;
     width: 100%;
     background: #f8fafc;
 }
@@ -298,7 +379,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 180px;
+    flex: 1;
 }
 
 .ao-block-free {
@@ -309,19 +390,18 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-bottom: 2px solid #0f172a;
-    padding: 6px 2px;
+    border-bottom: 1.5px solid #0f172a;
+    padding: 4px 1px;
 }
 
 .ao-block-free .label, .ao-block-match .label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
 }
 
 .ao-block-free .val, .ao-block-match .val {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 900;
 }
 
@@ -333,19 +413,18 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 6px 2px;
+    padding: 4px 1px;
 }
 
 .ao-pillar-footer-title {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 900;
-    padding: 5px 2px;
-    border-top: 2px solid #0f172a;
+    padding: 4px 1px;
+    border-top: 1.5px solid #0f172a;
     width: 100%;
     background: #f1f5f9;
     color: #0f172a;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
 }
 
 /* Column 3: OS Order (Multi-layer stack) */
@@ -353,158 +432,130 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 180px;
-    font-size: 9.5px;
+    flex: 1;
+    font-size: 9px;
     font-weight: 800;
 }
 
 .ao-os-layer {
-    padding: 3px 4px;
-    border-bottom: 1.5px solid #0f172a;
+    padding: 2px 3px;
+    border-bottom: 1px solid #0f172a;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
 }
 
-.ao-os-layer.layer-gt60 {
-    background: #fed7aa;
-}
-
-.ao-os-layer.layer-3060 {
-    background: #bbf7d0;
-}
-
-.ao-os-layer.layer-lt30-green {
-    background: #86efac;
-    flex: 2;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.ao-os-layer.layer-lt30-yellow {
-    background: #fef08a;
-    flex: 1.5;
-    flex-direction: column;
-    justify-content: center;
-    border-bottom: none;
-}
+.ao-os-layer.layer-gt60 { background: #fed7aa; }
+.ao-os-layer.layer-3060 { background: #bbf7d0; }
+.ao-os-layer.layer-lt30-green { background: #86efac; flex: 2; flex-direction: column; justify-content: center; }
+.ao-os-layer.layer-lt30-yellow { background: #fef08a; flex: 1.5; flex-direction: column; justify-content: center; border-bottom: none; }
 
 /* Column 4: Stock Matching */
 .ao-sm-stack-body {
     width: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 180px;
-    font-size: 9px;
+    flex: 1;
+    font-size: 8.5px;
     font-weight: 800;
 }
 
 .ao-sm-top-row {
     display: flex;
-    border-bottom: 2px solid #0f172a;
+    border-bottom: 1.5px solid #0f172a;
     background: #ffffff;
 }
 
 .ao-sm-top-cell {
     flex: 1;
-    padding: 4px 2px;
-    border-right: 1.5px solid #0f172a;
+    padding: 3px 1px;
+    border-right: 1px solid #0f172a;
     text-align: center;
     font-weight: 900;
 }
-.ao-sm-top-cell:last-child {
-    border-right: none;
-}
+.ao-sm-top-cell:last-child { border-right: none; }
 
 .ao-sm-unmatch-box {
     background: #ffffff;
-    border-bottom: 2px solid #0f172a;
-    padding: 5px 4px;
+    border-bottom: 1.5px solid #0f172a;
+    padding: 3px 2px;
     flex: 2;
 }
 
 .ao-sm-subrow {
     display: flex;
     justify-content: space-between;
-    padding: 1px 2px;
+    padding: 1px;
 }
 
 .ao-sm-match-box {
     background: #bfdbfe;
-    padding: 5px 4px;
+    padding: 3px 2px;
     flex: 1.8;
 }
 
-/* Right of Section 1: KPI & 6-step staircase */
+/* KPI & Staircase */
 .ao-stock-kpi-ladder-col {
     display: flex;
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
-    padding-left: 6px;
+    padding-left: 4px;
 }
 
 .ao-kpi-ratio-row {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 900;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #eff6ff;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border: 1.5px solid #0f172a;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .ao-kpi-potential-row {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #f0fdf4;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border: 1.5px solid #0f172a;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .ao-staircase-chart-row {
     display: flex;
     align-items: flex-end;
-    gap: 6px;
+    gap: 4px;
     margin-top: auto;
 }
 
 .ao-pillar-sub-od {
-    width: 48px;
-    border: 2px solid #0f172a;
+    width: 42px;
+    border: 1.5px solid #0f172a;
     text-align: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     border-radius: 3px;
     overflow: hidden;
 }
 
-.ao-sub-od-top {
-    background: #fed7aa;
-    padding: 4px 2px;
-    border-bottom: 1.5px solid #0f172a;
-}
-.ao-sub-od-bot {
-    background: #fef08a;
-    padding: 16px 2px;
-}
+.ao-sub-od-top { background: #fed7aa; padding: 3px 1px; border-bottom: 1px solid #0f172a; }
+.ao-sub-od-bot { background: #fef08a; padding: 12px 1px; }
 
-/* 6-step Green Staircase */
 .ao-stairs-wrap {
     display: flex;
     align-items: flex-end;
-    gap: 3px;
+    gap: 2px;
     flex: 1;
-    height: 115px;
+    height: 105px;
 }
 
 .ao-stair-step {
@@ -515,15 +566,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 900;
     color: #0f172a;
     border-radius: 2px 2px 0 0;
-    transition: transform 0.15s ease;
-}
-
-.ao-stair-step:hover {
-    transform: scaleY(1.04);
 }
 
 .ao-stair-step.step-1 { height: 20%; }
@@ -534,53 +580,46 @@
 .ao-stair-step.step-6 { height: 95%; }
 
 .ao-pillar-gap-target {
-    width: 62px;
-    border: 2px solid #0f172a;
+    width: 54px;
+    border: 1.5px solid #0f172a;
     text-align: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 900;
     border-radius: 3px;
     overflow: hidden;
 }
 
-.ao-pillar-gap-target .gap-top {
-    padding: 8px 2px;
-    background: #ffffff;
-    border-bottom: 2px solid #0f172a;
+.ao-pillar-gap-target .gap-top { padding: 6px 1px; background: #ffffff; border-bottom: 1.5px solid #0f172a; }
+.ao-pillar-gap-target .mtd-bot { padding: 10px 1px; background: #86efac; }
+
+/* -------------------------------------------------------------
+   PANEL 2: SPK Plan (⑩)
+   ------------------------------------------------------------- */
+.ao-panel-spk {
+    width: 540px;
+    min-width: 540px;
 }
 
-.ao-pillar-gap-target .mtd-bot {
-    padding: 14px 2px;
-    background: #86efac;
-}
-
-/* ==========================================================================
-   LEFT COLUMN - SECTION 2: Matching Stock from Order / SPK Plan (⑩)
-   ========================================================================== */
 .ao-spk-section-grid {
     display: grid;
-    grid-template-columns: 1.45fr 1fr;
-    gap: 12px;
-}
-
-@media (max-width: 900px) {
-    .ao-spk-section-grid {
-        grid-template-columns: 1fr;
-    }
+    grid-template-columns: 1.35fr 1fr;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
 }
 
 .ao-table-wb {
     width: 100%;
     border-collapse: collapse;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 800;
-    border: 2px solid #0f172a;
+    border: 1.5px solid #0f172a;
     text-align: center;
 }
 
 .ao-table-wb th, .ao-table-wb td {
-    border: 1.5px solid #0f172a;
-    padding: 4px 3px;
+    border: 1px solid #0f172a;
+    padding: 3px 2px;
 }
 
 .ao-table-wb th {
@@ -589,14 +628,8 @@
     color: #0f172a;
 }
 
-.ao-row-green-actual {
-    background: #dcfce7;
-    color: #0f172a;
-}
-
-.ao-row-nett-plan {
-    background: #fef9c3;
-}
+.ao-row-green-actual { background: #dcfce7; color: #0f172a; }
+.ao-row-nett-plan { background: #fef9c3; }
 
 .ao-spk-right-pane {
     display: flex;
@@ -605,112 +638,101 @@
 }
 
 .ao-cancel-ratio-box {
-    border: 2px solid #0f172a;
-    padding: 6px 10px;
-    font-size: 11px;
+    border: 1.5px solid #0f172a;
+    padding: 4px 8px;
+    font-size: 10px;
     font-weight: 800;
     background: #f8fafc;
     width: fit-content;
-    margin-bottom: 8px;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .ao-nett-visual-row {
     display: flex;
     align-items: flex-end;
-    gap: 8px;
+    gap: 6px;
 }
 
 .ao-arrow-avg-days {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 900;
     color: #0f172a;
-    padding: 4px 6px;
-    border: 1.5px solid #0f172a;
+    padding: 3px 4px;
+    border: 1px solid #0f172a;
     background: #e2e8f0;
     text-align: center;
-    margin: 4px 0;
-    border-radius: 4px;
+    margin: 3px 0;
+    border-radius: 3px;
 }
 
 .ao-pillar-become-os {
-    width: 65px;
-    border: 2px solid #0f172a;
+    width: 58px;
+    border: 1.5px solid #0f172a;
     text-align: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 900;
     border-radius: 3px;
     overflow: hidden;
 }
 
-.ao-pillar-become-os .top-os {
-    background: #cbd5e1;
-    padding: 10px 2px;
-    border-bottom: 2px solid #0f172a;
+.ao-pillar-become-os .top-os { background: #cbd5e1; padding: 8px 1px; border-bottom: 1.5px solid #0f172a; }
+.ao-pillar-become-os .bot-rs { background: #fed7aa; padding: 16px 1px; }
+
+/* -------------------------------------------------------------
+   PANEL 3: MDP Plan & FFS Selling Plan
+   ------------------------------------------------------------- */
+.ao-panel-mdp {
+    width: 510px;
+    min-width: 510px;
 }
 
-.ao-pillar-become-os .bot-rs {
-    background: #fed7aa;
-    padding: 20px 2px;
-}
-
-/* ==========================================================================
-   LEFT COLUMN - SECTION 3: MDP Plan & FFS Selling Plan
-   ========================================================================== */
 .ao-mdp-section-grid {
     display: flex;
     align-items: flex-end;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
 }
 
 .ao-pillar-mdp-split {
-    width: 44px;
-    border: 2px solid #0f172a;
+    width: 40px;
+    border: 1.5px solid #0f172a;
     text-align: center;
     font-weight: 900;
-    font-size: 11px;
+    font-size: 10px;
     border-radius: 3px;
     overflow: hidden;
 }
 
-.ao-mdp-top-slice {
-    background: #86efac;
-    padding: 4px 2px;
-    border-bottom: 1.5px solid #0f172a;
-}
-
-.ao-mdp-bot-slice {
-    background: #93c5fd;
-    padding: 24px 2px;
-}
+.ao-mdp-top-slice { background: #86efac; padding: 3px 1px; border-bottom: 1px solid #0f172a; }
+.ao-mdp-bot-slice { background: #93c5fd; padding: 20px 1px; }
 
 .ao-pillar-ffs-oh {
-    width: 44px;
-    border: 2px solid #0f172a;
+    width: 40px;
+    border: 1.5px solid #0f172a;
     text-align: center;
     font-weight: 900;
-    font-size: 11px;
+    font-size: 10px;
     background: #fed7aa;
-    padding: 26px 2px;
+    padding: 22px 1px;
     border-radius: 3px;
     overflow: hidden;
 }
 
 .ao-ffs-truck-ladder-wrap {
     flex: 1;
-    min-width: 250px;
+    min-width: 220px;
 }
 
 .ao-truck-stairs {
     display: flex;
     align-items: flex-end;
-    gap: 4px;
-    height: 95px;
-    border-bottom: 2px solid #0f172a;
+    gap: 3px;
+    height: 85px;
+    border-bottom: 1.5px solid #0f172a;
     padding-bottom: 2px;
 }
 
@@ -723,42 +745,42 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: 4px;
-    font-size: 11px;
+    padding-top: 3px;
+    font-size: 10px;
     color: #1e3a8a;
-    border-radius: 3px 3px 0 0;
+    border-radius: 2px 2px 0 0;
 }
 
 .ao-truck-accum-boxes {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     margin-top: 2px;
 }
 
 .ao-truck-accum-box {
     flex: 1;
     background: #fef08a;
-    border: 1.5px solid #0f172a;
-    font-size: 8.5px;
+    border: 1px solid #0f172a;
+    font-size: 8px;
     font-weight: 800;
     text-align: center;
-    padding: 2px 0;
+    padding: 1px 0;
     border-radius: 2px;
 }
 
 .ao-rs-steps-under {
     display: flex;
     align-items: flex-end;
-    gap: 4px;
-    height: 42px;
-    margin-top: 6px;
+    gap: 3px;
+    height: 38px;
+    margin-top: 4px;
 }
 
 .ao-rs-step-bar {
     flex: 1;
     background: #86efac;
     border: 1.5px solid #0f172a;
-    font-size: 9px;
+    font-size: 8.5px;
     font-weight: 900;
     text-align: center;
     display: flex;
@@ -770,92 +792,86 @@
 
 .ao-accum-rs-vals {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     margin-top: 2px;
-    font-size: 8.5px;
+    font-size: 8px;
     font-weight: 800;
     text-align: center;
 }
 .ao-accum-rs-vals span {
     flex: 1;
-    border: 1.5px solid #0f172a;
+    border: 1px solid #0f172a;
     padding: 1px 0;
     background: #ffffff;
     border-radius: 2px;
 }
 
 .ao-pillar-from-new-order {
-    width: 60px;
-    border: 2px solid #0f172a;
+    width: 52px;
+    border: 1.5px solid #0f172a;
     background: #86efac;
-    font-size: 10.5px;
+    font-size: 9.5px;
     font-weight: 900;
     text-align: center;
-    padding: 36px 2px;
+    padding: 28px 1px;
     border-radius: 3px;
     overflow: hidden;
 }
 
-/* ==========================================================================
-   RIGHT COLUMN - SECTION 4: Closing Estimation (①) & Table 1
-   ========================================================================== */
-.ao-right-col-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+/* -------------------------------------------------------------
+   PANEL 4: Closing Estimation (①) & Table 1 Model Gap
+   ------------------------------------------------------------- */
+.ao-panel-closing {
+    width: 560px;
+    min-width: 560px;
 }
 
 .ao-closing-estimation-card {
-    border: 2px solid #0f172a;
+    border: 1.5px solid #0f172a;
     background: #ffffff;
-    padding: 8px 10px;
-    margin-bottom: 12px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
     border-radius: 4px;
+    flex-shrink: 0;
 }
 
 .ao-closing-table-compact {
     width: 100%;
     border-collapse: collapse;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
-    border: 1.5px solid #0f172a;
+    border: 1px solid #0f172a;
 }
 
 .ao-closing-table-compact th, .ao-closing-table-compact td {
-    border: 1.5px solid #0f172a;
-    padding: 5px 7px;
+    border: 1px solid #0f172a;
+    padding: 3px 5px;
 }
 
-.ao-closing-table-compact .th-gold {
-    background: #fef08a;
-    font-weight: 900;
-}
+.ao-closing-table-compact .th-gold { background: #fef08a; font-weight: 900; }
+.ao-closing-table-compact .td-blue { background: #bfdbfe; font-weight: 900; }
 
-.ao-closing-table-compact .td-blue {
-    background: #bfdbfe;
-    font-weight: 900;
-}
-
-/* Table 1: Model Gap OS & Matching */
 .ao-model-table-wrap {
-    max-height: 380px;
+    flex: 1;
+    min-height: 0;
+    max-height: 280px;
     overflow-y: auto;
     overflow-x: auto;
-    border: 2px solid #0f172a;
+    border: 1.5px solid #0f172a;
     border-radius: 4px;
 }
 
 .ao-model-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 800;
     text-align: center;
 }
 
 .ao-model-table th, .ao-model-table td {
     border: 1px solid #0f172a;
-    padding: 4px 3px;
+    padding: 3px 2px;
     white-space: nowrap;
 }
 
@@ -874,7 +890,7 @@
 .ao-col-model-name {
     text-align: left;
     font-weight: 800;
-    padding-left: 6px !important;
+    padding-left: 5px !important;
     background: #ffffff;
     position: sticky;
     left: 0;
@@ -887,40 +903,41 @@
     position: sticky;
     bottom: 0;
     z-index: 3;
-    border-top: 2px solid #0f172a;
+    border-top: 1.5px solid #0f172a;
 }
 
-/* ==========================================================================
-   RIGHT COLUMN - SECTION 5: Table 2 Supply & FTS
-   ========================================================================== */
+/* -------------------------------------------------------------
+   PANEL 5: Table 2 Supply, Alokasi & FTS
+   ------------------------------------------------------------- */
+.ao-panel-supply {
+    width: 660px;
+    min-width: 660px;
+}
+
 .ao-table2-layout {
     display: grid;
-    grid-template-columns: 95px 1fr;
-    gap: 8px;
+    grid-template-columns: 85px 1fr;
+    gap: 6px;
     align-items: start;
-}
-
-@media (max-width: 600px) {
-    .ao-table2-layout {
-        grid-template-columns: 1fr;
-    }
+    flex: 1;
+    min-height: 0;
 }
 
 .ao-side-param-box {
-    border: 2px solid #0f172a;
-    padding: 8px;
-    font-size: 9.5px;
+    border: 1.5px solid #0f172a;
+    padding: 6px 4px;
+    font-size: 9px;
     font-weight: 800;
     background: #f8fafc;
-    line-height: 1.45;
+    line-height: 1.4;
     border-radius: 4px;
 }
 
 .ao-side-param-box .title {
     font-weight: 900;
-    border-bottom: 1.5px solid #0f172a;
-    padding-bottom: 4px;
-    margin-bottom: 6px;
+    border-bottom: 1px solid #0f172a;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
     text-align: center;
     color: #0f172a;
 }
@@ -935,9 +952,13 @@
     z-index: 999999;
     margin: 0;
     border-radius: 0;
-    border: 8px solid #0f172a;
-    overflow-y: auto;
+    border: 6px solid #0f172a;
+    overflow: hidden;
     background: #ffffff;
     box-shadow: none;
-    padding: 14px 20px;
+    padding: 12px 16px;
+}
+
+.ao-board-container.ao-fullscreen-active .ao-whiteboard-horizontal-track {
+    height: calc(100vh - 90px);
 }

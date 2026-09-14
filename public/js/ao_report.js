@@ -334,15 +334,41 @@
             });
         }
 
-        // ESC key exits fullscreen
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && boardContainer && boardContainer.classList.contains('ao-fullscreen-active')) {
-                boardContainer.classList.remove('ao-fullscreen-active');
-                if (btnProjector) btnProjector.innerHTML = '<i class="fa-solid fa-expand"></i> Mode Proyektor TV';
-            }
-        });
+        // Horizontal Track Mousewheel support
+        const track = document.getElementById('aoWhiteboardTrack');
+        if (track) {
+            track.addEventListener('wheel', (e) => {
+                const targetInTable = e.target.closest('.ao-model-table-wrap');
+                if (targetInTable && targetInTable.scrollHeight > targetInTable.clientHeight) {
+                    return; // let table scroll vertically
+                }
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                    e.preventDefault();
+                    track.scrollLeft += e.deltaY;
+                }
+            }, { passive: false });
+        }
     }
 
+    function aoScrollHorizontal(delta) {
+        const track = document.getElementById('aoWhiteboardTrack');
+        if (track) {
+            track.scrollBy({ left: delta, behavior: 'smooth' });
+        }
+    }
+
+    function aoScrollToSection(secId) {
+        const target = document.getElementById(secId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+        }
+        document.querySelectorAll('.ao-jump-pill').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.querySelector(`.ao-jump-pill[onclick*="${secId}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    window.aoScrollHorizontal = aoScrollHorizontal;
+    window.aoScrollToSection = aoScrollToSection;
     window.initAOReport = initAOReport;
     window.renderAllAOComponents = renderAllAOComponents;
 
