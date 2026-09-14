@@ -76,8 +76,8 @@
                 <a href="pages/target.html" class="sidebar-nav-link" data-tags="target spk do pencapaian kuota">
                     <i class="fa-solid fa-bullseye"></i> Target &amp; Pencapaian
                 </a>
-                <a href="pages/jadwal_input.html" class="sidebar-nav-link" data-tags="kalender jadwal agenda aktivitas">
-                    <i class="fa-solid fa-calendar-days"></i> Jadwal Aktivitas
+                <a href="pages/jadwal_input.html" class="sidebar-nav-link" data-tags="kalender jadwal agenda aktivitas reminder follow up">
+                    <i class="fa-solid fa-calendar-days"></i> Kalender &amp; Reminder Jadwal
                 </a>
                 <a href="pages/polreg.html" class="sidebar-nav-link" data-tags="polreg registrasi wilayah peta daerah kuota mobil kota bandung market share">
                     <i class="fa-solid fa-map-location-dot"></i> Peta Polreg Wilayah
@@ -844,19 +844,37 @@
                 </nav>
 
 
-                <!-- ═══ MODAL: SEMUA FITUR ═══ -->
+                <!-- ═══ MODAL: SEMUA FITUR (Lengkap & Terorganisir) ═══ -->
                 <div class="modal-overlay" id="featureModal" onclick="closeFeatureModal()">
-                    <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 88vh; display: flex; flex-direction: column;">
                         <div class="modal-drag-handle"></div>
-                        <div class="modal-header">
-                            <h3>Semua Fitur</h3>
-                            <button type="button" class="btn-close-modal" onclick="closeFeatureModal()"><i
-                                    class="fa-solid fa-xmark"></i></button>
+                        <div class="modal-header" style="flex-shrink: 0; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                            <div>
+                                <h3 style="margin:0; font-size: 17px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-grid-2" style="color: var(--primary-red);"></i> Semua Fitur Sales App
+                                </h3>
+                                <p style="margin: 2px 0 0 0; font-size: 11.5px; color: #64748b;">Katalog lengkap 49+ fitur operasional, closing, AI tools &amp; media hub</p>
+                            </div>
+                            <button type="button" class="btn-close-modal" onclick="closeFeatureModal()"><i class="fa-solid fa-xmark"></i></button>
                         </div>
 
-                        <div class="category-grid feature-modal-grid">
+                        <!-- In-Modal Quick Search -->
+                        <div style="padding: 12px 16px 8px; flex-shrink: 0; background: #ffffff;">
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: #94a3b8; font-size: 13px;"></i>
+                                <input type="text" id="featureModalSearchInput" placeholder="Cari nama fitur (contoh: STNK, Stok, Kalender, Media, SPK)..." 
+                                       style="width: 100%; box-sizing: border-box; padding: 10px 38px 10px 38px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: #f8fafc; font-size: 13px; outline: none; font-family: inherit; transition: all 0.2s;"
+                                       oninput="filterModalFeatures(this.value)">
+                                <button type="button" id="featureModalSearchClear" onclick="clearFeatureModalSearch()" 
+                                        style="display:none; position: absolute; right: 12px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 14px;">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="category-grid feature-modal-grid" style="overflow-y: auto; flex: 1; padding: 10px 14px 24px !important;">
                             <!-- Panduan & SOP Alur Kerja -->
-                            <a href="panduan_alur_kerja_sales_app.html" class="category-item" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(200,16,46,0.06)); border: 1.5px solid rgba(245,158,11,0.4); border-radius: 14px; padding: 12px; display: flex; flex-direction: row; align-items: center; gap: 12px; text-decoration: none;">
+                            <a href="panduan_alur_kerja_sales_app.html" class="category-item modal-feature-item" data-tags="sop panduan alur kerja flow pesan mobil" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(200,16,46,0.06)); border: 1.5px solid rgba(245,158,11,0.4); border-radius: 14px; padding: 12px; display: flex; flex-direction: row; align-items: center; gap: 12px; text-decoration: none;">
                                 <div class="category-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin: 0; flex-shrink: 0;"><i class="fa-solid fa-book-bookmark"></i></div>
                                 <div style="text-align: left;">
                                     <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
@@ -868,175 +886,246 @@
                                 <i class="fa-solid fa-chevron-right" style="margin-left: auto; color: #94a3b8; font-size: 12px;"></i>
                             </a>
 
-                            <!-- Tier 1: Operasional Harian & Closing Transaksi (Paling Kritis) -->
-                            <a href="pages/ao_report.html" class="category-item">
+                            <!-- SECTION: MENU UTAMA & OPERASIONAL HARIAN -->
+                            <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 10px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-compass" style="color: var(--primary-red);"></i> Menu Utama &amp; Operasional Harian
+                            </div>
+
+                            <a href="pages/input.html" class="category-item modal-feature-item" data-tags="input aktivitas checkin geotag spm gps suara mic laporan">
+                                <div class="category-icon"><i class="fa-solid fa-camera"></i></div>
+                                <span class="category-text">Check-in Aktivitas</span>
+                            </a>
+                            <a href="pages/riwayat_foto_aktivitas.html" class="category-item modal-feature-item" data-tags="galeri foto canvassing aktivitas riwayat lapangan">
+                                <div class="category-icon"><i class="fa-solid fa-images"></i></div>
+                                <span class="category-text">Riwayat Foto</span>
+                            </a>
+                            <a href="pages/target.html" class="category-item modal-feature-item" data-tags="target spk do pencapaian kuota bonus komisi">
+                                <div class="category-icon"><i class="fa-solid fa-bullseye"></i></div>
+                                <span class="category-text">Target &amp; Capaian</span>
+                            </a>
+                            <a href="pages/jadwal_input.html" class="category-item modal-feature-item" data-tags="kalender jadwal agenda aktivitas reminder follow up stnk servis">
+                                <div class="category-icon" style="position: relative;"><i class="fa-solid fa-calendar-days"></i><span style="position: absolute; top: -4px; right: -4px; width: 8px; height: 8px; background: #c8102e; border-radius: 50%;"></span></div>
+                                <span class="category-text">Kalender &amp; Jadwal</span>
+                            </a>
+                            <a href="pages/ao_report.html" class="category-item modal-feature-item" data-tags="ao report live leasing finance match">
                                 <div class="category-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
                                 <span class="category-text">AO Report Live</span>
                             </a>
-                            <a href="pages/pricelist.html" class="category-item">
+                            <a href="pages/polreg.html" class="category-item modal-feature-item" data-tags="polreg registrasi wilayah peta daerah kuota mobil kota bandung market share">
+                                <div class="category-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                                <span class="category-text">Peta Polreg</span>
+                            </a>
+
+                            <!-- SECTION: TIER 1 CLOSING, PRICING & STOCK -->
+                            <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-tags" style="color: #2563eb;"></i> Tier 1: Closing, Pricing &amp; Stock
+                            </div>
+
+                            <a href="pages/pricelist.html" class="category-item modal-feature-item" data-tags="harga pricelist otr brosur daftar">
                                 <div class="category-icon"><i class="fa-solid fa-clipboard-list"></i></div>
                                 <span class="category-text">Pricelist OTR</span>
                             </a>
-                            <a href="pages/kalkulator.html" class="category-item">
+                            <a href="pages/kalkulator.html" class="category-item modal-feature-item" data-tags="kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf">
                                 <div class="category-icon"><i class="fa-solid fa-calculator"></i></div>
                                 <span class="category-text">Kalkulator &amp; Quotation</span>
                             </a>
-                            <a href="pages/inventory.html" class="category-item">
+                            <a href="pages/inventory.html" class="category-item modal-feature-item" data-tags="stok stock live inventory unit mobil t-stock ready">
                                 <div class="category-icon"><i class="fa-solid fa-warehouse"></i></div>
                                 <span class="category-text">Live Inventory</span>
                             </a>
-                            <a href="pages/customer.html" class="category-item">
+                            <a href="pages/customer.html" class="category-item modal-feature-item" data-tags="customer crm radar prospek data database lead">
                                 <div class="category-icon"><i class="fa-solid fa-users"></i></div>
                                 <span class="category-text">Customer CRM</span>
                             </a>
-                            <a href="pages/battle_card.html" class="category-item">
+                            <a href="pages/battle_card.html" class="category-item modal-feature-item" data-tags="battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata">
                                 <div class="category-icon"><i class="fa-solid fa-shield-halved"></i></div>
                                 <span class="category-text">Battle Card</span>
                             </a>
-                            <a href="pages/spk.html" class="category-item">
+                            <a href="pages/spk.html" class="category-item modal-feature-item" data-tags="spk pesanan form surat tanda jadi">
                                 <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>
                                 <span class="category-text">Form SPK</span>
                             </a>
-                            <a href="pages/promo.html" class="category-item">
+                            <a href="pages/promo.html" class="category-item modal-feature-item" data-tags="promo diskon paket kredit tenor program bunga">
                                 <div class="category-icon"><i class="fa-solid fa-percent"></i></div>
                                 <span class="category-text">Promo &amp; Tenor</span>
                             </a>
-                            <a href="pages/order_tracker.html" class="category-item">
+                            <a href="pages/order_tracker.html" class="category-item modal-feature-item" data-tags="tracking status mobil tracker delivery progres">
                                 <div class="category-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
                                 <span class="category-text">Live Tracker</span>
                             </a>
-                            <a href="pages/tradein.html" class="category-item">
+                            <a href="pages/tradein.html" class="category-item modal-feature-item" data-tags="trade in tukar tambah over kredit mobil bekas inspeksi fisik jadwal appraisal olx riset pasar">
                                 <div class="category-icon"><i class="fa-solid fa-right-left"></i></div>
                                 <span class="category-text">Trade-In Center</span>
                             </a>
 
-                            <!-- Tier 2: Komunikasi, AI Superpowers, Purna Jual & Delivery -->
-                            <a href="pages/wa_studio.html" class="category-item">
+                            <!-- SECTION: TIER 2 AI TOOLS, MEDIA HUB & DELIVERY -->
+                            <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-wand-magic-sparkles" style="color: #8b5cf6;"></i> Tier 2: AI Tools, Media Hub &amp; Delivery
+                            </div>
+
+                            <a href="pages/video_viral.html" class="category-item modal-feature-item" data-tags="media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase viral">
+                                <div class="category-icon" style="background: linear-gradient(135deg, rgba(200,16,46,0.15), rgba(200,16,46,0.05)); color: #c8102e; border: 1px solid rgba(200,16,46,0.3);"><i class="fa-solid fa-photo-film"></i></div>
+                                <span class="category-text">Media Studio</span>
+                            </a>
+                            <a href="pages/wa_studio.html" class="category-item modal-feature-item" data-tags="wa whatsapp broadcast blast pesan template text closing">
                                 <div class="category-icon"><i class="fa-brands fa-whatsapp"></i></div>
                                 <span class="category-text">WA Studio</span>
                             </a>
-                            <a href="pages/ai_copilot.html" class="category-item">
+                            <a href="pages/ai_copilot.html" class="category-item modal-feature-item" data-tags="ai copilot asisten chatbot tanya script closing pertanyaan">
                                 <div class="category-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                                 <span class="category-text">AI Copilot</span>
                             </a>
-                            <a href="pages/digital_card.html" class="category-item">
+                            <a href="pages/digital_card.html" class="category-item modal-feature-item" data-tags="kartu nama digital vcard qr kontak profil sales">
                                 <div class="category-icon"><i class="fa-solid fa-address-card"></i></div>
                                 <span class="category-text">Kartu Digital</span>
                             </a>
-                            <a href="pages/retention.html" class="category-item">
+                            <a href="pages/retention.html" class="category-item modal-feature-item" data-tags="after sales servis stnk bpkb retention loyalitas purna jual">
                                 <div class="category-icon"><i class="fa-solid fa-heart-pulse"></i></div>
                                 <span class="category-text">After-Sales Hub</span>
                             </a>
-                            <a href="pages/delivery_ceremony.html" class="category-item">
+                            <a href="pages/delivery_ceremony.html" class="category-item modal-feature-item" data-tags="handover ceremony serah terima piagam sertifikat">
                                 <div class="category-icon"><i class="fa-solid fa-award"></i></div>
                                 <span class="category-text">Delivery Ceremony</span>
                             </a>
-                            <a href="pages/deal.html" class="category-item">
+                            <a href="pages/do.html" class="category-item modal-feature-item" data-tags="do delivery order surat jalan kirim serah terima cetak do">
+                                <div class="category-icon"><i class="fa-solid fa-truck"></i></div>
+                                <span class="category-text">Surat Jalan (DO)</span>
+                            </a>
+                            <a href="pages/deal.html" class="category-item modal-feature-item" data-tags="deal pipeline closing tahap prospek negosiasi">
                                 <div class="category-icon"><i class="fa-solid fa-handshake"></i></div>
                                 <span class="category-text">Deal Pipeline</span>
                             </a>
-                            <a href="pages/testdrive.html" class="category-item">
+                            <a href="pages/testdrive.html" class="category-item modal-feature-item" data-tags="test drive uji coba mobil showroom rental rekanan riwayat booking">
                                 <div class="category-icon"><i class="fa-solid fa-car-side"></i></div>
                                 <span class="category-text">Test Drive Center</span>
                             </a>
-                            <a href="pages/approval.html" class="category-item">
+                            <a href="pages/approval.html" class="category-item modal-feature-item" data-tags="approval diskon persetujuan spv otorisasi">
                                 <div class="category-icon"><i class="fa-solid fa-check-to-slot"></i></div>
-                                <span class="category-text">Approval</span>
+                                <span class="category-text">Approval Diskon</span>
                             </a>
-                            <a href="pages/dokumen.html" class="category-item">
+                            <a href="pages/dokumen.html" class="category-item modal-feature-item" data-tags="dokumen berkas ktp kk berkas leasing upload storage">
                                 <div class="category-icon"><i class="fa-solid fa-receipt"></i></div>
                                 <span class="category-text">Dokumen</span>
                             </a>
 
-                            <!-- Tier 3: Product Knowledge, Hybrid & Analisis Pasar -->
-                            <a href="pages/eco_calculator.html" class="category-item">
+                            <!-- SECTION: TIER 3 PRODUCT KNOWLEDGE & ANALISIS PASAR -->
+                            <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-chart-line" style="color: #10b981;"></i> Tier 3: Product Knowledge &amp; Analisis Pasar
+                            </div>
+
+                            <a href="pages/eco_calculator.html" class="category-item modal-feature-item" data-tags="eco hybrid bbm hemat emisi efisiensi ev">
                                 <div class="category-icon"><i class="fa-solid fa-leaf"></i></div>
                                 <span class="category-text">Eco Calc (Hybrid)</span>
                             </a>
-                            <a href="pages/komparasi.html" class="category-item">
+                            <a href="pages/komparasi.html" class="category-item modal-feature-item" data-tags="komparasi lawan rival competitor banding spesifikasi adu fitur">
                                 <div class="category-icon"><i class="fa-solid fa-scale-balanced"></i></div>
                                 <span class="category-text">Komparasi 360°</span>
                             </a>
-                            <a href="pages/elibrary.html" class="category-item">
+                            <a href="pages/elibrary.html" class="category-item modal-feature-item" data-tags="catalog ecatalog e-catalog library brosur pdf spesifikasi mobil">
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">E-Catalog</span>
                             </a>
-                            <a href="pages/market_analysis.html" class="category-item">
+                            <a href="pages/market_analysis.html" class="category-item modal-feature-item" data-tags="pasar market analisis wilayah pangsa bbn plat kodepos kecamatan komplek">
                                 <div class="category-icon"><i class="fa-solid fa-chart-pie"></i></div>
                                 <span class="category-text">Analisis Pasar</span>
                             </a>
-                            <a href="pages/polreg.html" class="category-item">
-                                <div class="category-icon"><i class="fa-solid fa-map-location-dot"></i></div>
-                                <span class="category-text">Peta Polreg</span>
-                            </a>
-                            <a href="pages/penjualan_kircon.html" class="category-item">
+                            <a href="pages/penjualan_kircon.html" class="category-item modal-feature-item" data-tags="penjualan kircon kiara condong rekap cabang ranking">
                                 <div class="category-icon"><i class="fa-solid fa-chart-line"></i></div>
                                 <span class="category-text">Penjualan Kircon</span>
                             </a>
 
-                            <!-- Tier 4: Trade-In, Aksesoris & Merchandise -->
-                            <a href="pages/tco.html" class="category-item">
+                            <!-- SECTION: TIER 4 AKSESORIS, CUSTOM & MERCHANDISE -->
+                            <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-car-tunnel" style="color: #f59e0b;"></i> Tier 4: Aksesoris, Custom &amp; Merchandise
+                            </div>
+
+                            <a href="pages/tco.html" class="category-item modal-feature-item" data-tags="tco aksesoris custom bodykit kaca film karpet">
                                 <div class="category-icon"><i class="fa-solid fa-car-tunnel"></i></div>
                                 <span class="category-text">Aksesoris TCO</span>
                             </a>
-                            <a href="pages/velg.html" class="category-item">
+                            <a href="pages/velg.html" class="category-item modal-feature-item" data-tags="velg ban wheel variasi ring velg ban">
                                 <div class="category-icon"><i class="fa-solid fa-compact-disc"></i></div>
                                 <span class="category-text">Velg &amp; Ban</span>
                             </a>
-                            <a href="pages/merchandise.html" class="category-item">
+                            <a href="pages/merchandise.html" class="category-item modal-feature-item" data-tags="merch baju kaos topi gantungan payung jaket souvenir">
                                 <div class="category-icon"><i class="fa-solid fa-shirt"></i></div>
                                 <span class="category-text">Merchandise</span>
                             </a>
 
-                            <!-- Tier 5: Refreshment & Arcade Games (11 Games) -->
-                            <a href="pages/game.html" class="category-item">
+                            <!-- SECTION: TIER 5 REFRESHMENT & ARCADE GAMES -->
+                            <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-gamepad" style="color: #ec4899;"></i> Tier 5: Refreshment &amp; Arcade Games (11 Games)
+                            </div>
+
+                            <a href="pages/game.html" class="category-item modal-feature-item" data-tags="game arcade main santai hub">
                                 <div class="category-icon"><i class="fa-solid fa-gamepad"></i></div>
                                 <span class="category-text">Arcade Center</span>
                             </a>
-                            <a href="pages/drag_race.html" class="category-item">
+                            <a href="pages/drag_race.html" class="category-item modal-feature-item" data-tags="drag race balap gr kecepatan">
                                 <div class="category-icon"><i class="fa-solid fa-gauge-high"></i></div>
                                 <span class="category-text">Toyota Drag Strip</span>
                             </a>
-                            <a href="pages/valet_park.html" class="category-item">
+                            <a href="pages/valet_park.html" class="category-item modal-feature-item" data-tags="valet parkir park tebak parkir">
                                 <div class="category-icon"><i class="fa-solid fa-square-parking"></i></div>
                                 <span class="category-text">Valet Parking VIP</span>
                             </a>
-                            <a href="pages/hybrid_flow.html" class="category-item">
+                            <a href="pages/hybrid_flow.html" class="category-item modal-feature-item" data-tags="hybrid flow baterai simulator motor listrik">
                                 <div class="category-icon"><i class="fa-solid fa-bolt"></i></div>
                                 <span class="category-text">Hybrid Flow</span>
                             </a>
-                            <a href="pages/pitstop.html" class="category-item">
+                            <a href="pages/pitstop.html" class="category-item modal-feature-item" data-tags="pit stop montir bengkel ban cepat">
                                 <div class="category-icon"><i class="fa-solid fa-wrench"></i></div>
                                 <span class="category-text">GR Pit Stop</span>
                             </a>
-                            <a href="pages/memory_match.html" class="category-item">
+                            <a href="pages/memory_match.html" class="category-item modal-feature-item" data-tags="memory tebak kartu match pasang">
                                 <div class="category-icon"><i class="fa-solid fa-clone"></i></div>
                                 <span class="category-text">Memory Match</span>
                             </a>
-                            <a href="pages/catur.html" class="category-item">
+                            <a href="pages/catur.html" class="category-item modal-feature-item" data-tags="catur chess strategi knight pion raja">
                                 <div class="category-icon"><i class="fa-solid fa-chess-knight"></i></div>
                                 <span class="category-text">Catur Master</span>
                             </a>
-                            <a href="pages/balap.html" class="category-item">
+                            <a href="pages/balap.html" class="category-item modal-feature-item" data-tags="balap mobil gr racing sirkuit">
                                 <div class="category-icon"><i class="fa-solid fa-flag-checkered"></i></div>
-                                <span class="category-text">Balap Mobil</span>
+                                <span class="category-text">Balap Mobil GR</span>
                             </a>
-                            <a href="pages/snake.html" class="category-item">
+                            <a href="pages/snake.html" class="category-item modal-feature-item" data-tags="snake ular drift pom bensin rush">
                                 <div class="category-icon"><i class="fa-solid fa-gas-pump"></i></div>
                                 <span class="category-text">Parkir Drift</span>
                             </a>
-                            <a href="pages/tebak.html" class="category-item">
+                            <a href="pages/tebak.html" class="category-item modal-feature-item" data-tags="tebak kuis trivia otomotif mobil">
                                 <div class="category-icon"><i class="fa-solid fa-brain"></i></div>
                                 <span class="category-text">Tebak Otomotif</span>
                             </a>
-                            <a href="pages/tts.html" class="category-item">
+                            <a href="pages/tts.html" class="category-item modal-feature-item" data-tags="tts teka teki silang puzzle kata">
                                 <div class="category-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
                                 <span class="category-text">TTS Otomotif</span>
                             </a>
-                            <a href="pages/tss-simulator.html" class="category-item">
+                            <a href="pages/tss-simulator.html" class="category-item modal-feature-item" data-tags="tss safety toyota safety sense radar pre-collision">
                                 <div class="category-icon"><i class="fa-solid fa-shield-halved"></i></div>
                                 <span class="category-text">Simulator TSS</span>
                             </a>
+
+                            <!-- SECTION: AKUN & NOTIFIKASI -->
+                            <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-user-gear" style="color: #0f172a;"></i> Akun &amp; Pengaturan
+                            </div>
+
+                            <a href="pages/notifikasi.html" class="category-item modal-feature-item" data-tags="notifikasi pemberitahuan pesan lonceng peringatan">
+                                <div class="category-icon"><i class="fa-regular fa-bell"></i></div>
+                                <span class="category-text">Notifikasi</span>
+                            </a>
+                            <a href="pages/profil.html" class="category-item modal-feature-item" data-tags="profil saya profil akun foto pengaturan logout">
+                                <div class="category-icon"><i class="fa-solid fa-user"></i></div>
+                                <span class="category-text">Profil Saya</span>
+                            </a>
+
+                            <!-- Empty Search Result State -->
+                            <div id="modalFeatureEmpty" style="display:none; grid-column: 1 / -1; text-align: center; padding: 36px 16px; color: #94a3b8;">
+                                <i class="fa-solid fa-magnifying-glass" style="font-size: 30px; margin-bottom: 8px; opacity: 0.5;"></i>
+                                <div style="font-weight: 700; color: #1e293b; font-size: 14px;">Fitur tidak ditemukan</div>
+                                <div style="font-size: 12px; margin-top: 2px;">Coba gunakan kata kunci lain (contoh: STNK, Stok, Promo, Do)</div>
+                            </div>
                         </div>
                     </div>
                 </div>

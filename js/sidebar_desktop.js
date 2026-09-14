@@ -121,8 +121,10 @@
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
                 ${navLinkKacab('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
+                ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
                 ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkKacab('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -200,9 +202,11 @@
                 ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-wand-magic-sparkles', 'Briefing Auto-Gen')}
                 ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
                 ${navLinkSPV('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
+                ${navLinkSPV('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
                 ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
                 ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkSPV('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
                 ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
@@ -274,7 +278,7 @@
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
-                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Jadwal Aktivitas', 'kalender jadwal agenda aktivitas')}
+                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal', 'kalender jadwal agenda aktivitas reminder follow up')}
                 ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Polreg Wilayah', 'polreg registrasi wilayah peta daerah kuota mobil kota bandung market share')}
 
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
@@ -293,6 +297,7 @@
                 ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)', 'kartu nama digital vcard qr kontak profil')}
                 ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub', 'after sales servis stnk bpkb retention loyalitas')}
                 ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony', 'handover ceremony serah terima piagam')}
+                ${navLink('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio <span class="sidebar-notif-badge" style="background:#c8102e; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>', 'media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
                 ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Pusat Test Drive & Booking', 'test drive uji coba mobil showroom rental rekanan riwayat booking')}

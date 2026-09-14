@@ -443,12 +443,69 @@ function toggleMenuUtama(e) {
 function openFeatureModal(event) {
     if (event) event.preventDefault();
     const modal = document.getElementById('featureModal');
-    if (modal) modal.classList.add('show');
+    if (modal) {
+        modal.classList.add('show');
+        const searchInput = document.getElementById('featureModalSearchInput');
+        if (searchInput) {
+            searchInput.value = '';
+            filterModalFeatures('');
+            setTimeout(() => searchInput.focus(), 150);
+        }
+    }
 }
 
 function closeFeatureModal() {
     const modal = document.getElementById('featureModal');
     if (modal) modal.classList.remove('show');
+}
+
+function filterModalFeatures(query) {
+    const q = (query || '').toLowerCase().trim();
+    const clearBtn = document.getElementById('featureModalSearchClear');
+    if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+    const modal = document.getElementById('featureModal');
+    if (!modal) return;
+    const items = modal.querySelectorAll('.category-item');
+    const sections = modal.querySelectorAll('.modal-section-header');
+    let visibleCount = 0;
+
+    items.forEach(item => {
+        const text = (item.innerText || '').toLowerCase();
+        const href = (item.getAttribute('href') || '').toLowerCase();
+        const tags = (item.getAttribute('data-tags') || '').toLowerCase();
+        const match = !q || text.includes(q) || href.includes(q) || tags.includes(q);
+        item.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+    });
+
+    sections.forEach(sec => {
+        if (!q) {
+            sec.style.display = '';
+            return;
+        }
+        let next = sec.nextElementSibling;
+        let hasItem = false;
+        while (next && !next.classList.contains('modal-section-header')) {
+            if (next.classList.contains('category-item') && next.style.display !== 'none') {
+                hasItem = true;
+                break;
+            }
+            next = next.nextElementSibling;
+        }
+        sec.style.display = hasItem ? '' : 'none';
+    });
+
+    const empty = document.getElementById('modalFeatureEmpty');
+    if (empty) empty.style.display = (visibleCount === 0 && q) ? 'block' : 'none';
+}
+
+function clearFeatureModalSearch() {
+    const inp = document.getElementById('featureModalSearchInput');
+    if (inp) {
+        inp.value = '';
+        filterModalFeatures('');
+        inp.focus();
+    }
 }
 
 function openModal(modalId, event) {

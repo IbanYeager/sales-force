@@ -121,6 +121,7 @@
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
                 ${navLinkKacab('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
+                ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
                 ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
                 ${navLinkKacab('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
@@ -201,6 +202,7 @@
                 ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-wand-magic-sparkles', 'Briefing Auto-Gen')}
                 ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
                 ${navLinkSPV('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
+                ${navLinkSPV('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
                 ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
                 ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
@@ -276,7 +278,7 @@
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
-                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Jadwal Aktivitas', 'kalender jadwal agenda aktivitas')}
+                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal', 'kalender jadwal agenda aktivitas reminder follow up')}
                 ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Polreg Wilayah', 'polreg registrasi wilayah peta daerah kuota mobil kota bandung market share')}
 
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
