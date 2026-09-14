@@ -7,7 +7,7 @@
   <meta name="description" content="Pusat Konten Digital, Video Showcase & Customer Stories Tunas Toyota Kiara Condong untuk Materi Promosi & Inspirasi Sales">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=5.0">
-  <script src="../js/sidebar_desktop.js?v=20260914_viral_v4"></script>
+  <script src="../js/sidebar_desktop.js?v=20260914_viral_v5"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#090d16">
 
@@ -194,7 +194,7 @@
       max-width: 860px;
     }
 
-    /* Hero Stats Deck (No Views/Likes) */
+    /* Hero Stats Deck (Clean, No Views / Likes) */
     .viral-stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -385,12 +385,19 @@
     }
 
     .video-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 38px rgba(15, 23, 42, 0.12), 0 8px 16px rgba(200, 16, 46, 0.08);
-      border-color: rgba(200, 16, 46, 0.35);
+      transform: translateY(-5px);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1), 0 6px 14px rgba(200, 16, 46, 0.06);
+      border-color: rgba(200, 16, 46, 0.3);
     }
 
-    /* Showroom Stage Thumbnail Container */
+    .video-card.card-playing {
+      border-color: var(--primary-red);
+      box-shadow: 0 20px 40px rgba(200, 16, 46, 0.2);
+    }
+
+    /* =========================================================
+       INLINE SHOWROOM STAGE & DIRECT IN-PLACE VIDEO PLAYER
+       ========================================================= */
     .video-thumb-container {
       position: relative;
       width: 100%;
@@ -398,6 +405,66 @@
       background: #090d16;
       overflow: hidden;
       cursor: pointer;
+      transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* When playing directly inside the card: expand height smoothly! */
+    .video-thumb-container.is-playing {
+      height: 380px;
+      background: #000000;
+      cursor: default;
+    }
+
+    .inline-player-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: inlinePlayerFadeIn 0.3s ease;
+    }
+
+    @keyframes inlinePlayerFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .inline-player-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* In-place close video floating button */
+    .btn-close-inline {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 30;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+    }
+
+    .btn-close-inline:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      transform: scale(1.05);
     }
 
     /* Stage Interior Backgrounds (Bespoke per Vehicle) */
@@ -563,7 +630,7 @@
       gap: 4px;
     }
 
-    /* Rank Badges (Gold, Silver, Bronze) */
+    /* Rank Badges (Curated Recommendations) */
     .rank-badge {
       position: absolute;
       top: 10px;
@@ -803,15 +870,13 @@
       color: #0f172a;
     }
 
-    /* =========================================================
-       2-COLUMN EXECUTIVE THEATER MODAL (CLEAN & NO METRICS)
-       ========================================================= */
+    /* Modal Form for Add Video */
     .video-modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(9, 13, 22, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -819,7 +884,7 @@
       padding: 20px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.25s ease;
     }
 
     .video-modal-overlay.active {
@@ -828,215 +893,19 @@
     }
 
     .video-modal-box {
-      background: #0f172a;
-      border-radius: 24px;
-      width: 100%;
-      max-width: 840px;
-      max-height: 88vh;
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.85), 0 0 45px rgba(200, 16, 46, 0.18);
-      overflow: hidden;
-      display: flex;
-      flex-direction: row;
-      position: relative;
-      animation: modalPop 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes modalPop {
-      0% { transform: scale(0.93) translateY(10px); opacity: 0; }
-      100% { transform: scale(1) translateY(0); opacity: 1; }
-    }
-
-    /* Modal Left: Video Player Stage */
-    .modal-player-column {
-      flex: 1.05;
-      max-width: 380px;
-      background: #000000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .video-embed-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-height: 480px;
-      background: #000000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .video-embed-wrapper iframe {
-      width: 100%;
-      height: 100%;
-      min-height: 480px;
-      border: none;
-      display: block;
-    }
-
-    /* Modal Right: Details, Sales Tips & WhatsApp Action */
-    .modal-details-column {
-      flex: 1.25;
-      padding: 24px 26px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow-y: auto;
-      max-height: 88vh;
-      background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
-    }
-
-    .modal-header-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 12px;
-    }
-
-    .modal-close-btn-new {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #94a3b8;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      flex-shrink: 0;
-    }
-
-    .modal-close-btn-new:hover {
-      background: #ef4444;
-      border-color: #ef4444;
-      color: #ffffff;
-      transform: rotate(90deg);
-    }
-
-    .modal-vehicle-pill {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: #38bdf8;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 10px;
+      background: #ffffff;
+      color: #0f172a;
       border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .modal-sales-pitch-card {
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.25);
-      border-radius: 12px;
-      padding: 10px 14px;
-      margin: 12px 0 16px 0;
-      font-size: 12px;
-      color: #fde68a;
-      line-height: 1.45;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-
-    .modal-sales-pitch-card i {
-      color: #f59e0b;
-      margin-top: 2px;
-      font-size: 14px;
-    }
-
-    .btn-copy-template {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #e2e8f0;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       width: 100%;
-      margin-bottom: 10px;
-      transition: all 0.2s;
-    }
-
-    .btn-copy-template:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.3);
-      color: #ffffff;
-    }
-
-    .modal-actions-bar {
+      max-width: 480px;
+      padding: 24px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
       display: flex;
-      gap: 10px;
-      margin-top: 14px;
+      flex-direction: column;
+      position: relative;
     }
 
-    .btn-wa-modal-cta {
-      flex: 2;
-      background: var(--wa-green);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      padding: 13px 18px;
-      font-size: 13.5px;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
-      transition: all 0.25s;
-    }
-
-    .btn-wa-modal-cta:hover {
-      background: var(--wa-green-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
-    }
-
-    .btn-origin-modal-cta {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      color: white;
-      border-radius: 14px;
-      padding: 13px 14px;
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .btn-origin-modal-cta:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    /* Modal Form for Add Video */
     .modal-form-input {
       width: 100%;
       box-sizing: border-box;
@@ -1056,32 +925,9 @@
       background: #ffffff;
     }
 
-    /* Mobile Responsive Rules for Pop-up */
     @media (max-width: 767px) {
-      .video-modal-box {
-        flex-direction: column;
-        max-height: 92vh;
-        overflow-y: auto;
-      }
-      .modal-player-column {
-        max-width: 100%;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      .video-embed-wrapper {
-        min-height: 320px;
+      .video-thumb-container.is-playing {
         height: 320px;
-      }
-      .video-embed-wrapper iframe {
-        min-height: 320px;
-        height: 320px;
-      }
-      .modal-details-column {
-        padding: 18px 16px;
-        max-height: none;
-      }
-      .modal-actions-bar {
-        flex-direction: column;
       }
     }
   </style>
@@ -1125,7 +971,7 @@
           Kircon Media Studio &amp; Showcase
         </h1>
         <p class="hero-desc">
-          Hub media resmi <strong>Tunas Toyota Kiara Condong</strong>. Menyajikan video momen serah terima (delivery ceremony), bedah fitur canggih kendaraan, serta tips edukasi otomotif untuk materi promosi instan sales ke WhatsApp konsumen.
+          Hub media resmi <strong>Tunas Toyota Kiara Condong</strong>. Putar video langsung di setiap kartu tanpa pop-up: momen serah terima unit, bedah fitur canggih kendaraan, serta materi promosi siap bagikan ke WhatsApp calon konsumen.
         </p>
 
         <!-- Stats Grid (Clean, No Views / Likes) -->
@@ -1207,86 +1053,9 @@
     </div>
   </div>
 
-  <!-- =========================================================
-       MODAL 1: 2-COLUMN SPLIT THEATER PLAYER (CLEAN, NO METRICS)
-       ========================================================= -->
-  <div class="video-modal-overlay" id="videoPlayerModal">
-    <div class="video-modal-box">
-      
-      <!-- Left Column: Video Embed Player -->
-      <div class="modal-player-column">
-        <div class="video-embed-wrapper" id="videoModalPlayerArea">
-          <!-- Injected Player via JS -->
-        </div>
-      </div>
-
-      <!-- Right Column: Details, Sales Tips & WhatsApp Action -->
-      <div class="modal-details-column">
-        <div>
-          <!-- Header Bar with Close Button -->
-          <div class="modal-header-nav">
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <span id="modalVideoCategory" style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"></span>
-              <span id="modalVideoPlatform" class="platform-badge tiktok"></span>
-              <span id="modalVideoModel" class="modal-vehicle-pill">
-                <i class="fa-solid fa-car"></i> <span id="modalVideoModelText">Toyota</span>
-              </span>
-            </div>
-            
-            <button class="modal-close-btn-new" onclick="closeVideoModal()" title="Tutup Player (Esc)">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-
-          <!-- Video Title -->
-          <h3 id="modalVideoTitle" style="font-size: 16px; font-weight: 800; margin: 0 0 8px 0; line-height: 1.4; color: #ffffff;"></h3>
-          
-          <!-- Creator Info (Clean, No Views / Likes) -->
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-            <span style="font-size: 12px; color: #94a3b8; font-weight: 700; display: flex; align-items: center; gap: 5px;">
-              <i class="fa-solid fa-circle-check" style="color: #38bdf8;"></i> <span id="modalVideoAuthor">@tunastoyotakircon</span>
-            </span>
-            <span style="background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
-              <i class="fa-solid fa-certificate" style="color: #d8a437;"></i> Konten Resmi Showroom
-            </span>
-          </div>
-
-          <!-- Video Description -->
-          <p id="modalVideoDesc" style="font-size: 12.5px; color: #cbd5e1; line-height: 1.55; margin: 0 0 12px 0;"></p>
-
-          <!-- Sales Pitch Tip Card -->
-          <div class="modal-sales-pitch-card">
-            <i class="fa-solid fa-lightbulb"></i>
-            <div>
-              <strong style="color: #ffffff; display: block; margin-bottom: 2px;">Rekomendasi Hook Sales:</strong>
-              <span id="modalVideoPitch">Konten ini sangat efektif untuk meyakinkan calon konsumen saat ragu menentukan pilihan tipe mobil.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div>
-          <button onclick="copyCurrentVideoTemplate()" class="btn-copy-template" id="btnCopyTemplate">
-            <i class="fa-solid fa-copy"></i> Salin Teks Chat Promosi Siap Kirim
-          </button>
-
-          <div class="modal-actions-bar">
-            <a id="modalWaShareBtn" href="#" target="_blank" class="btn-wa-modal-cta">
-              <i class="fa-brands fa-whatsapp" style="font-size: 17px;"></i> Kirim ke WhatsApp Konsumen
-            </a>
-            <a id="modalExternalLinkBtn" href="#" target="_blank" class="btn-origin-modal-cta">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Asli
-            </a>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL 2: TAMBAH VIDEO MEDIA BARU -->
+  <!-- MODAL: TAMBAH VIDEO MEDIA BARU -->
   <div class="video-modal-overlay" id="addVideoModal">
-    <div class="video-modal-box" style="background: #ffffff; color: #0f172a; max-width: 480px; padding: 24px; border: 1px solid #cbd5e1; display: flex; flex-direction: column;">
+    <div class="video-modal-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
         <h3 style="font-size: 16px; font-weight: 800; margin: 0; color: #0f172a; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-photo-film" style="color: var(--primary-red);"></i> Tambah Konten Video Sales
@@ -1298,8 +1067,8 @@
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <div>
-          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Link URL Video (TikTok / IG Reels / YouTube Shorts):</label>
-          <input type="url" id="newVideoUrl" class="modal-form-input" placeholder="Paste link video (contoh: https://www.youtube.com/shorts/... atau tiktok.com/...)" oninput="checkVideoUrlInput(this.value)">
+          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Link URL Video (YouTube Shorts / TikTok / IG Reels):</label>
+          <input type="url" id="newVideoUrl" class="modal-form-input" placeholder="Paste link video (contoh: https://www.youtube.com/shorts/...)" oninput="checkVideoUrlInput(this.value)">
           <div id="videoDetectBadge" style="display:none; font-size: 11.5px; font-weight: 700; color: #16a34a; margin-top: -6px; margin-bottom: 8px;">
             <i class="fa-solid fa-circle-check"></i> <span id="videoDetectText">ID Video Terdeteksi</span>
           </div>
@@ -1366,9 +1135,9 @@
     </div>
   </div>
 
-  <!-- SCRIPT DATA & LOGIC -->
+  <!-- SCRIPT DATA & INLINE DIRECT PLAYBACK LOGIC -->
   <script>
-    // Authentic Verified Tunas Toyota Kiara Condong Video Showcase with 100% Guaranteed Native Playback
+    // Authentic Verified Tunas Toyota Kiara Condong Video Showcase with 100% Direct In-Place Playback
     const DEFAULT_VIRAL_VIDEOS = [
       {
         id: 'v1',
@@ -1542,7 +1311,7 @@
 
     let currentCategory = 'all';
     let currentVideos = [];
-    let currentActiveVideo = null;
+    let currentlyPlayingId = null;
 
     // Extract TikTok Video ID
     function extractTikTokVideoId(url) {
@@ -1620,8 +1389,8 @@
     }
 
     function initViralVideos() {
-      // Use v6: Clean layout with views and likes removed per user instruction
-      const stored = localStorage.getItem('sft_viral_videos_v6');
+      // Use v7: Direct in-place video playback without pop-up modal
+      const stored = localStorage.getItem('sft_viral_videos_v7');
       if (stored) {
         try {
           currentVideos = JSON.parse(stored);
@@ -1630,7 +1399,7 @@
         }
       } else {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos_v6', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v7', JSON.stringify(currentVideos));
       }
       renderVideos();
       updateStats();
@@ -1641,7 +1410,6 @@
       const el = document.getElementById('statTotalVideos');
       if (el) el.innerHTML = `<i class="fa-solid fa-clapperboard" style="color: #ff334b;"></i> ${totalCount} Video`;
 
-      // Update category pill counters
       const categories = ['all', 'delivery', 'feature', 'tips', 'parodi', 'promo'];
       categories.forEach(cat => {
         const countEl = document.getElementById(`count-${cat}`);
@@ -1657,6 +1425,9 @@
     }
 
     function selectCategory(cat, btn) {
+      if (currentlyPlayingId) {
+        stopVideoInline(currentlyPlayingId);
+      }
       currentCategory = cat;
       document.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
       if (btn) {
@@ -1666,7 +1437,67 @@
     }
 
     function filterVideos() {
+      if (currentlyPlayingId) {
+        stopVideoInline(currentlyPlayingId);
+      }
       renderVideos();
+    }
+
+    // Helper: Build Showroom Stage Thumbnail Inner HTML
+    function getThumbnailInnerHtml(video, idx) {
+      const platformIcon = video.platform === 'tiktok' 
+        ? '<i class="fa-brands fa-tiktok"></i> TikTok' 
+        : (video.platform === 'instagram' 
+          ? '<i class="fa-brands fa-instagram"></i> Reels' 
+          : '<i class="fa-brands fa-youtube"></i> Shorts');
+
+      const platformClass = video.platform === 'tiktok' ? 'tiktok' : (video.platform === 'instagram' ? 'instagram' : 'youtube');
+      
+      let rankBadge = '';
+      if (idx === 0) {
+        rankBadge = `<div class="rank-badge rank-1"><i class="fa-solid fa-star"></i> REKOMENDASI UTAMA</div>`;
+      } else if (idx === 1) {
+        rankBadge = `<div class="rank-badge rank-2"><i class="fa-solid fa-thumbs-up"></i> PILIHAN SALES</div>`;
+      } else if (idx === 2) {
+        rankBadge = `<div class="rank-badge rank-3"><i class="fa-solid fa-award"></i> BEST CHOICE</div>`;
+      }
+
+      const stageTheme = video.stageTheme || 'stage-zenix';
+      const carImg = video.carImg || '../assets/img/mobil/zenix.webp';
+      const modelName = video.modelName || 'TOYOTA HYBRID';
+
+      return `
+        ${rankBadge}
+        
+        <div class="stage-bg ${stageTheme}">
+          <div class="stage-spotlight"></div>
+          <div class="stage-model-watermark">${modelName}</div>
+          <img src="${carImg}" alt="${video.title}" class="stage-car-img" loading="lazy">
+          <div class="stage-car-shadow"></div>
+        </div>
+
+        <!-- Overlay Badges (Clean, No Views / Likes) -->
+        <div class="video-thumb-overlay">
+          <div class="thumb-top-row">
+            <span class="platform-badge ${platformClass}">${platformIcon}</span>
+            <span class="author-badge">
+              <i class="fa-solid fa-circle-check" style="color: #38bdf8;"></i> ${video.author}
+            </span>
+          </div>
+
+          <!-- Frosted Glass Play Button -->
+          <div class="play-button-center" title="Klik untuk Putar Langsung di Sini">
+            <i class="fa-solid fa-play"></i>
+          </div>
+
+          <div class="thumb-bottom-row">
+            <span class="model-tag-pill"><i class="fa-solid fa-car-side"></i> ${modelName}</span>
+            <span style="font-size: 10.5px; background: rgba(9,13,22,0.75); color: #cbd5e1; padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-play" style="font-size: 9px; color: #ff334b;"></i> Putar Langsung
+            </span>
+          </div>
+        </div>
+      `;
     }
 
     function renderVideos() {
@@ -1685,7 +1516,7 @@
         return matchCategory && matchQuery;
       });
 
-      // SORTING LOGIC (Clean without views/likes)
+      // SORTING LOGIC
       if (sortVal === 'latest') {
         filtered = [...filtered].reverse();
       } else if (sortVal === 'model') {
@@ -1702,64 +1533,14 @@
 
       if (grid) {
         grid.innerHTML = filtered.map((video, idx) => {
-          const platformIcon = video.platform === 'tiktok' 
-            ? '<i class="fa-brands fa-tiktok"></i> TikTok' 
-            : (video.platform === 'instagram' 
-              ? '<i class="fa-brands fa-instagram"></i> Reels' 
-              : '<i class="fa-brands fa-youtube"></i> Shorts');
-
-          const platformClass = video.platform === 'tiktok' ? 'tiktok' : (video.platform === 'instagram' ? 'instagram' : 'youtube');
-          
-          // Recommendation Badges for Top 3
-          let rankBadge = '';
-          if (idx === 0) {
-            rankBadge = `<div class="rank-badge rank-1"><i class="fa-solid fa-star"></i> REKOMENDASI UTAMA</div>`;
-          } else if (idx === 1) {
-            rankBadge = `<div class="rank-badge rank-2"><i class="fa-solid fa-thumbs-up"></i> PILIHAN SALES</div>`;
-          } else if (idx === 2) {
-            rankBadge = `<div class="rank-badge rank-3"><i class="fa-solid fa-award"></i> BEST CHOICE</div>`;
-          }
-
-          const stageTheme = video.stageTheme || 'stage-zenix';
-          const carImg = video.carImg || '../assets/img/mobil/zenix.webp';
-          const modelName = video.modelName || 'TOYOTA HYBRID';
           const salesPitch = video.salesPitch || 'Materi promosi resmi untuk follow-up dan meningkatkan kepercayaan calon pembeli.';
           const catClass = `cat-${video.category || 'delivery'}`;
 
           return `
-            <div class="video-card">
-              <!-- Showroom Stage Thumbnail -->
-              <div class="video-thumb-container" onclick="openVideoPlayer('${video.id}')">
-                ${rankBadge}
-                
-                <div class="stage-bg ${stageTheme}">
-                  <div class="stage-spotlight"></div>
-                  <div class="stage-model-watermark">${modelName}</div>
-                  <img src="${carImg}" alt="${video.title}" class="stage-car-img" loading="lazy">
-                  <div class="stage-car-shadow"></div>
-                </div>
-
-                <!-- Overlay Badges (Clean, No Views / Likes) -->
-                <div class="video-thumb-overlay">
-                  <div class="thumb-top-row">
-                    <span class="platform-badge ${platformClass}">${platformIcon}</span>
-                    <span class="author-badge">
-                      <i class="fa-solid fa-circle-check" style="color: #38bdf8;"></i> ${video.author}
-                    </span>
-                  </div>
-
-                  <!-- Frosted Glass Play Button -->
-                  <div class="play-button-center" title="Putar Video Sekarang">
-                    <i class="fa-solid fa-play"></i>
-                  </div>
-
-                  <div class="thumb-bottom-row">
-                    <span class="model-tag-pill"><i class="fa-solid fa-car-side"></i> ${modelName}</span>
-                    <span style="font-size: 10.5px; background: rgba(9,13,22,0.75); color: #cbd5e1; padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 5px;">
-                      <i class="fa-solid fa-play" style="font-size: 9px; color: #ff334b;"></i> Putar Video
-                    </span>
-                  </div>
-                </div>
+            <div class="video-card" id="card-${video.id}">
+              <!-- Direct In-Place Stage / Player -->
+              <div class="video-thumb-container" id="thumb-${video.id}" onclick="toggleInlineVideo('${video.id}')">
+                ${getThumbnailInnerHtml(video, idx)}
               </div>
 
               <!-- Card Details -->
@@ -1778,9 +1559,9 @@
                   </div>
                 </div>
 
-                <!-- Actions for Sales -->
+                <!-- Actions for Sales (In-Place Play, WhatsApp Share, Copy Link) -->
                 <div class="video-actions">
-                  <button onclick="openVideoPlayer('${video.id}')" class="btn-watch">
+                  <button onclick="toggleInlineVideo('${video.id}')" class="btn-watch" id="play-btn-${video.id}">
                     <i class="fa-solid fa-play"></i> Putar Video
                   </button>
                   <button onclick="shareVideoToWa('${video.id}')" class="btn-wa-share">
@@ -1794,6 +1575,123 @@
             </div>
           `;
         }).join('');
+      }
+    }
+
+    // =========================================================
+    // INLINE DIRECT VIDEO PLAYBACK CONTROLS (NO POPUP!)
+    // =========================================================
+    function toggleInlineVideo(id) {
+      if (currentlyPlayingId === id) {
+        stopVideoInline(id);
+        return;
+      }
+
+      // Stop previous video if another one is playing
+      if (currentlyPlayingId) {
+        stopVideoInline(currentlyPlayingId);
+      }
+
+      const v = currentVideos.find(item => item.id === id);
+      if (!v) return;
+
+      const card = document.getElementById(`card-${id}`);
+      const thumbContainer = document.getElementById(`thumb-${id}`);
+      const actionBtn = document.getElementById(`play-btn-${id}`);
+
+      if (!thumbContainer) return;
+
+      currentlyPlayingId = id;
+      thumbContainer.classList.add('is-playing');
+      if (card) card.classList.add('card-playing');
+
+      const ytId = extractYouTubeId(v.videoUrl);
+      const tiktokId = extractTikTokVideoId(v.videoUrl);
+      const igCode = extractInstagramReelCode(v.videoUrl);
+
+      let embedHtml = '';
+
+      // 1. YouTube Shorts / Video Embed (Plays inline instantly!)
+      if (v.platform === 'youtube' || ytId) {
+        const idToUse = ytId || 'gdwtyyYBjZ8';
+        embedHtml = `
+          <div class="inline-player-wrapper">
+            <button class="btn-close-inline" onclick="event.stopPropagation(); stopVideoInline('${id}')" title="Tutup Video (Esc)">
+              <i class="fa-solid fa-xmark"></i> Tutup
+            </button>
+            <iframe 
+              src="https://www.youtube.com/embed/${idToUse}?autoplay=1&rel=0&modestbranding=1&playsinline=1" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        `;
+      } 
+      // 2. TikTok Direct Player
+      else if (v.platform === 'tiktok' && tiktokId) {
+        embedHtml = `
+          <div class="inline-player-wrapper">
+            <button class="btn-close-inline" onclick="event.stopPropagation(); stopVideoInline('${id}')" title="Tutup Video (Esc)">
+              <i class="fa-solid fa-xmark"></i> Tutup
+            </button>
+            <iframe 
+              src="https://www.tiktok.com/player/v1/${tiktokId}?music_info=1&description=1" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        `;
+      } 
+      // 3. Instagram Reels
+      else if (v.platform === 'instagram' && igCode) {
+        embedHtml = `
+          <div class="inline-player-wrapper">
+            <button class="btn-close-inline" onclick="event.stopPropagation(); stopVideoInline('${id}')" title="Tutup Video (Esc)">
+              <i class="fa-solid fa-xmark"></i> Tutup
+            </button>
+            <iframe 
+              src="https://www.instagram.com/reel/${igCode}/embed" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        `;
+      } 
+      // 4. Fallback: External link
+      else {
+        window.open(v.videoUrl, '_blank');
+        currentlyPlayingId = null;
+        return;
+      }
+
+      thumbContainer.innerHTML = embedHtml;
+
+      if (actionBtn) {
+        actionBtn.innerHTML = '<i class="fa-solid fa-stop"></i> Tutup Video';
+        actionBtn.style.background = '#c8102e';
+      }
+    }
+
+    function stopVideoInline(id) {
+      if (currentlyPlayingId === id) {
+        currentlyPlayingId = null;
+      }
+      const v = currentVideos.find(item => item.id === id);
+      if (!v) return;
+
+      const idx = currentVideos.indexOf(v);
+      const card = document.getElementById(`card-${id}`);
+      const thumbContainer = document.getElementById(`thumb-${id}`);
+      const actionBtn = document.getElementById(`play-btn-${id}`);
+
+      if (card) card.classList.remove('card-playing');
+      if (thumbContainer) {
+        thumbContainer.classList.remove('is-playing');
+        thumbContainer.innerHTML = getThumbnailInnerHtml(v, idx);
+      }
+
+      if (actionBtn) {
+        actionBtn.innerHTML = '<i class="fa-solid fa-play"></i> Putar Video';
+        actionBtn.style.background = '#0f172a';
       }
     }
 
@@ -1818,132 +1716,6 @@
       const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton Video: ${v.videoUrl}\n\n#TunasToyotaKircon #ToyotaBandung #SalesToyotaKircon`;
       navigator.clipboard.writeText(text);
       alert('✅ Link video & caption promosi berhasil disalin ke clipboard! Siap dipaste ke WhatsApp calon konsumen.');
-    }
-
-    // Copy Template in Modal
-    function copyCurrentVideoTemplate() {
-      if (!currentActiveVideo) return;
-      const v = currentActiveVideo;
-      const salesName = localStorage.getItem('namaSales') || 'Sales Consultant Tunas Toyota';
-      const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin berbagi video ulasan & momen serah terima resmi dari showroom kami:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton video selengkapnya:\n👉 ${v.videoUrl}\n\nJika Bapak/Ibu ingin info ketersediaan unit ready stock atau simulasi hitungan kredit DP ringan, saya siap bantu kapan saja ya Pak/Bu. Terima kasih! 🙏`;
-
-      navigator.clipboard.writeText(text);
-      const btn = document.getElementById('btnCopyTemplate');
-      if (btn) {
-        btn.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Teks Berhasil Disalin ke Clipboard!';
-        setTimeout(() => {
-          btn.innerHTML = '<i class="fa-solid fa-copy"></i> Salin Teks Chat Promosi Siap Kirim';
-        }, 3000);
-      }
-    }
-
-    // Open Modal Video Player (Clean, No Views / Likes)
-    function openVideoPlayer(id) {
-      const v = currentVideos.find(item => item.id === id);
-      if (!v) return;
-
-      currentActiveVideo = v;
-
-      // Populate right column details
-      document.getElementById('modalVideoTitle').textContent = v.title;
-      document.getElementById('modalVideoDesc').textContent = v.desc;
-      document.getElementById('modalVideoCategory').textContent = v.categoryName;
-      document.getElementById('modalVideoModelText').textContent = v.modelName || 'Toyota';
-      document.getElementById('modalVideoAuthor').textContent = v.author || '@tunastoyotakircon';
-      
-      const pitchEl = document.getElementById('modalVideoPitch');
-      if (pitchEl) {
-        pitchEl.textContent = v.salesPitch || 'Materi video showroom resmi untuk memperkuat kepercayaan dan mempercepat closing.';
-      }
-      
-      const modalPlatform = document.getElementById('modalVideoPlatform');
-      modalPlatform.className = `platform-badge ${v.platform === 'tiktok' ? 'tiktok' : (v.platform === 'instagram' ? 'instagram' : 'youtube')}`;
-      modalPlatform.innerHTML = v.platform === 'tiktok' 
-        ? '<i class="fa-brands fa-tiktok"></i> TikTok' 
-        : (v.platform === 'instagram' ? '<i class="fa-brands fa-instagram"></i> Reels' : '<i class="fa-brands fa-youtube"></i> Shorts');
-
-      const modalPlayerArea = document.getElementById('videoModalPlayerArea');
-      
-      const ytId = extractYouTubeId(v.videoUrl);
-      const tiktokId = extractTikTokVideoId(v.videoUrl);
-      const igCode = extractInstagramReelCode(v.videoUrl);
-
-      // 1. YOUTUBE SHORTS NATIVE PLAYER EMBED (100% Playable)
-      if (v.platform === 'youtube' || ytId) {
-        const idToUse = ytId || 'gdwtyyYBjZ8';
-        modalPlayerArea.innerHTML = `
-          <div style="width: 100%; height: 100%; position: relative; background: #000; display: flex; align-items: center; justify-content: center;">
-            <iframe 
-              src="https://www.youtube.com/embed/${idToUse}?autoplay=1&rel=0&modestbranding=1&playsinline=1" 
-              style="width: 100%; height: 100%; border: none; display: block;" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowfullscreen>
-            </iframe>
-          </div>
-        `;
-      } 
-      // 2. TIKTOK NATIVE PLAYER EMBED WITH FALLBACK SWITCHER
-      else if (v.platform === 'tiktok' && tiktokId) {
-        modalPlayerArea.innerHTML = `
-          <div style="width: 100%; height: 100%; position: relative; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <iframe 
-              src="https://www.tiktok.com/player/v1/${tiktokId}?music_info=1&description=1" 
-              style="width: 100%; height: 100%; border: none; display: block;" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
-              allowfullscreen>
-            </iframe>
-            <div style="position: absolute; bottom: 8px; left: 8px; right: 8px; background: rgba(9,13,22,0.85); backdrop-filter: blur(8px); padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between; z-index: 10;">
-              <span>Jika video terhalang akun TikTok:</span>
-              <a href="${v.videoUrl}" target="_blank" style="color: #fe2c55; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 4px;">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka TikTok
-              </a>
-            </div>
-          </div>
-        `;
-      } 
-      // 3. INSTAGRAM REELS EMBED
-      else if (v.platform === 'instagram' && igCode) {
-        modalPlayerArea.innerHTML = `
-          <div style="width: 100%; height: 100%; position: relative; background: #fff;">
-            <iframe 
-              src="https://www.instagram.com/reel/${igCode}/embed" 
-              style="width: 100%; height: 480px; border: none; display: block;" 
-              allowfullscreen>
-            </iframe>
-          </div>
-        `;
-      } 
-      // 4. ELEGANT SHOWROOM FALLBACK CARD
-      else {
-        modalPlayerArea.innerHTML = `
-          <div style="position: relative; width: 100%; height: 100%; min-height: 460px; display: flex; align-items: center; justify-content: center; background: #090d16;">
-            <img src="${v.carImg}" style="height: 140px; object-fit: contain; opacity: 0.6; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8));">
-            <div style="position: absolute; text-align: center; padding: 20px;">
-              <div style="width: 68px; height: 68px; border-radius: 50%; background: var(--red-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; box-shadow: 0 0 35px rgba(200,16,46,0.8); cursor: pointer;" onclick="window.open('${v.videoUrl}', '_blank')">
-                <i class="fa-solid fa-play" style="margin-left: 4px;"></i>
-              </div>
-              <div style="font-size: 15px; font-weight: 800; color: white; margin-bottom: 4px;">Tonton di Aplikasi ${v.platform.toUpperCase()}</div>
-              <div style="font-size: 12px; color: #94a3b8;">Tautan resmi akun Tunas Toyota Kiara Condong</div>
-            </div>
-          </div>
-        `;
-      }
-
-      // Setup actions
-      document.getElementById('modalExternalLinkBtn').href = v.videoUrl;
-      
-      const salesName = localStorage.getItem('namaSales') || 'Sales Consultant Tunas Toyota';
-      const waText = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin berbagi video ulasan & momen serah terima resmi dari cabang showroom kami:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton video lengkapnya di tautan berikut ya:\n👉 ${v.videoUrl}\n\nJika ingin info ketersediaan unit ready stock atau simulasi kredit, saya siap bantu kapan saja ya Pak/Bu. Terima kasih! 🙏`;
-      document.getElementById('modalWaShareBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
-
-      document.getElementById('videoPlayerModal').classList.add('active');
-    }
-
-    function closeVideoModal() {
-      document.getElementById('videoPlayerModal').classList.remove('active');
-      const modalPlayerArea = document.getElementById('videoModalPlayerArea');
-      if (modalPlayerArea) modalPlayerArea.innerHTML = '';
-      currentActiveVideo = null;
     }
 
     // Modal Add Video
@@ -2001,12 +1773,12 @@
       };
 
       currentVideos.unshift(newVideo);
-      localStorage.setItem('sft_viral_videos_v6', JSON.stringify(currentVideos));
+      localStorage.setItem('sft_viral_videos_v7', JSON.stringify(currentVideos));
       
       closeAddVideoModal();
       renderVideos();
       updateStats();
-      alert('🎉 Video berhasil disimpan! Konten langsung tampil di katalog tanpa kolom views.');
+      alert('🎉 Video berhasil disimpan! Konten langsung tampil dan siap diputar langsung di dalam kartu.');
 
       // Reset form
       document.getElementById('newVideoUrl').value = '';
@@ -2017,26 +1789,26 @@
     function resetVideosToDefault() {
       if (confirm('Kembalikan koleksi video ke daftar default resmi Tunas Toyota Kiara Condong?')) {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos_v6', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v7', JSON.stringify(currentVideos));
         renderVideos();
         updateStats();
         closeAddVideoModal();
       }
     }
 
-    // Keyboard support: Escape closes modal
+    // Keyboard support: Escape closes video or modal
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        closeVideoModal();
+        if (currentlyPlayingId) {
+          stopVideoInline(currentlyPlayingId);
+        }
         closeAddVideoModal();
       }
     });
 
     // Close modal on background click
     window.addEventListener('click', (e) => {
-      const modalPlayer = document.getElementById('videoPlayerModal');
       const modalAdd = document.getElementById('addVideoModal');
-      if (e.target === modalPlayer) closeVideoModal();
       if (e.target === modalAdd) closeAddVideoModal();
     });
 
