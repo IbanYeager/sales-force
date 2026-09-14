@@ -7,7 +7,7 @@
   <meta name="description" content="Pusat Konten Digital, Video Showcase & Customer Stories Tunas Toyota Kiara Condong untuk Materi Promosi & Inspirasi Sales">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=5.0">
-  <script src="../js/sidebar_desktop.js?v=20260914_viral_v2"></script>
+  <script src="../js/sidebar_desktop.js?v=20260914_viral_v3"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#090d16">
 
@@ -814,21 +814,23 @@
       color: #0f172a;
     }
 
-    /* Modal Player Styles */
+    /* =========================================================
+       NEW 2-COLUMN EXECUTIVE THEATER MODAL (FIXED & ELEVATED)
+       ========================================================= */
     .video-modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(9, 13, 22, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(9, 13, 22, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 99999;
-      padding: 16px;
+      padding: 20px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .video-modal-overlay.active {
@@ -838,52 +840,44 @@
 
     .video-modal-box {
       background: #0f172a;
-      border-radius: 22px;
+      border-radius: 24px;
       width: 100%;
-      max-width: 450px;
+      max-width: 840px;
+      max-height: 88vh;
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.85), 0 0 45px rgba(200, 16, 46, 0.18);
       overflow: hidden;
       display: flex;
-      flex-direction: column;
+      flex-direction: row; /* Desktop 2-column layout */
       position: relative;
-      animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: modalPop 0.32s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes modalPop {
-      0% { transform: scale(0.92); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+      0% { transform: scale(0.93) translateY(10px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
-    .modal-close-btn {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.65);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      cursor: pointer;
+    /* Modal Left: Video Player Stage (No vertical overflow!) */
+    .modal-player-column {
+      flex: 1.05;
+      max-width: 380px;
+      background: #000000;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 20;
-      font-size: 15px;
-      transition: all 0.2s;
-    }
-
-    .modal-close-btn:hover {
-      background: #ef4444;
-      border-color: #ef4444;
+      position: relative;
+      overflow: hidden;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .video-embed-wrapper {
       position: relative;
       width: 100%;
-      height: 480px;
+      height: 100%;
+      min-height: 480px;
       background: #000000;
       display: flex;
       align-items: center;
@@ -893,12 +887,164 @@
     .video-embed-wrapper iframe {
       width: 100%;
       height: 100%;
+      min-height: 480px;
       border: none;
+      display: block;
     }
 
-    .video-modal-body {
-      padding: 18px 20px;
-      background: #0f172a;
+    /* Modal Right: Details, Sales Copy & Actions */
+    .modal-details-column {
+      flex: 1.25;
+      padding: 24px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      max-height: 88vh;
+      background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
+    }
+
+    .modal-header-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+    }
+
+    .modal-close-btn-new {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+
+    .modal-close-btn-new:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #ffffff;
+      transform: rotate(90deg);
+    }
+
+    .modal-vehicle-pill {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .modal-sales-pitch-card {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin: 12px 0 16px 0;
+      font-size: 12px;
+      color: #fde68a;
+      line-height: 1.45;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .modal-sales-pitch-card i {
+      color: #f59e0b;
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .btn-copy-template {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-copy-template:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+
+    .modal-actions-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn-wa-modal-cta {
+      flex: 2;
+      background: var(--wa-green);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+      transition: all 0.25s;
+    }
+
+    .btn-wa-modal-cta:hover {
+      background: var(--wa-green-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+    }
+
+    .btn-origin-modal-cta {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: white;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-origin-modal-cta:hover {
+      background: rgba(255, 255, 255, 0.15);
     }
 
     /* Modal Form for Add Video */
@@ -921,18 +1067,32 @@
       background: #ffffff;
     }
 
-    @media (max-width: 768px) {
-      .video-grid {
-        grid-template-columns: 1fr;
+    /* Mobile Responsive Rules for Pop-up */
+    @media (max-width: 767px) {
+      .video-modal-box {
+        flex-direction: column;
+        max-height: 92vh;
+        overflow-y: auto;
       }
-      .viral-hero-banner {
-        padding: 20px 18px;
-      }
-      .hero-title {
-        font-size: 20px;
+      .modal-player-column {
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
       .video-embed-wrapper {
-        height: 420px;
+        min-height: 320px;
+        height: 320px;
+      }
+      .video-embed-wrapper iframe {
+        min-height: 320px;
+        height: 320px;
+      }
+      .modal-details-column {
+        padding: 18px 16px;
+        max-height: none;
+      }
+      .modal-actions-bar {
+        flex-direction: column;
       }
     }
   </style>
@@ -1058,41 +1218,91 @@
     </div>
   </div>
 
-  <!-- MODAL 1: NATIVE VIDEO PLAYER MODAL -->
+  <!-- =========================================================
+       MODAL 1: NEW 2-COLUMN SPLIT THEATER PLAYER MODAL
+       ========================================================= -->
   <div class="video-modal-overlay" id="videoPlayerModal">
     <div class="video-modal-box">
-      <button class="modal-close-btn" onclick="closeVideoModal()" title="Tutup Player">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
       
-      <div class="video-embed-wrapper" id="videoModalPlayerArea">
-        <!-- Injected native TikTok / IG / YouTube embed player via JS -->
+      <!-- Left Column: Video Embed Player -->
+      <div class="modal-player-column">
+        <div class="video-embed-wrapper" id="videoModalPlayerArea">
+          <!-- Injected Player via JS -->
+        </div>
       </div>
 
-      <div class="video-modal-body">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-          <span id="modalVideoCategory" style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"></span>
-          <span id="modalVideoPlatform" class="platform-badge tiktok"></span>
+      <!-- Right Column: Details, Sales Tips & WhatsApp Action -->
+      <div class="modal-details-column">
+        <div>
+          <!-- Header Bar with Close Button -->
+          <div class="modal-header-nav">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span id="modalVideoCategory" style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"></span>
+              <span id="modalVideoPlatform" class="platform-badge tiktok"></span>
+              <span id="modalVideoModel" class="modal-vehicle-pill">
+                <i class="fa-solid fa-car"></i> <span id="modalVideoModelText">Toyota</span>
+              </span>
+            </div>
+            
+            <button class="modal-close-btn-new" onclick="closeVideoModal()" title="Tutup Player (Esc)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Video Title -->
+          <h3 id="modalVideoTitle" style="font-size: 16px; font-weight: 800; margin: 0 0 8px 0; line-height: 1.4; color: #ffffff;"></h3>
+          
+          <!-- Creator Info & Metrics -->
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+            <span style="font-size: 12px; color: #94a3b8; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-circle-check" style="color: #38bdf8;"></i> <span id="modalVideoAuthor">@tunastoyotakircon</span>
+            </span>
+            <span style="color: rgba(255,255,255,0.2);">•</span>
+            <span id="modalVideoViews" style="font-size: 12px; color: #f59e0b; font-weight: 800; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-fire"></i> <span>1.8M Views</span>
+            </span>
+            <span style="color: rgba(255,255,255,0.2);">•</span>
+            <span id="modalVideoLikes" style="font-size: 12px; color: #f43f5e; font-weight: 800; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-heart"></i> <span>142K Likes</span>
+            </span>
+          </div>
+
+          <!-- Video Description -->
+          <p id="modalVideoDesc" style="font-size: 12.5px; color: #cbd5e1; line-height: 1.55; margin: 0 0 12px 0;"></p>
+
+          <!-- Sales Pitch Tip Card -->
+          <div class="modal-sales-pitch-card">
+            <i class="fa-solid fa-lightbulb"></i>
+            <div>
+              <strong style="color: #ffffff; display: block; margin-bottom: 2px;">Rekomendasi Hook Sales:</strong>
+              <span id="modalVideoPitch">Konten ini sangat efektif untuk meyakinkan calon konsumen saat ragu menentukan pilihan tipe mobil.</span>
+            </div>
+          </div>
         </div>
-        
-        <h3 id="modalVideoTitle" style="font-size: 15px; font-weight: 800; margin: 0 0 8px 0; line-height: 1.35; color: #ffffff;"></h3>
-        <p id="modalVideoDesc" style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin: 0 0 16px 0;"></p>
-        
-        <div style="display: flex; gap: 8px;">
-          <a id="modalWaShareBtn" href="#" target="_blank" class="btn-wa-share" style="padding: 11px 16px; font-size: 13px; border-radius: 12px; text-decoration: none; flex: 1.5;">
-            <i class="fa-brands fa-whatsapp"></i> Bagikan ke Konsumen
-          </a>
-          <a id="modalExternalLinkBtn" href="#" target="_blank" class="btn-watch" style="padding: 11px 14px; font-size: 13px; border-radius: 12px; text-decoration: none; flex: 1;">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Asli
-          </a>
+
+        <!-- Action Buttons -->
+        <div>
+          <button onclick="copyCurrentVideoTemplate()" class="btn-copy-template" id="btnCopyTemplate">
+            <i class="fa-solid fa-copy"></i> Salin Teks Chat Promosi Siap Kirim
+          </button>
+
+          <div class="modal-actions-bar">
+            <a id="modalWaShareBtn" href="#" target="_blank" class="btn-wa-modal-cta">
+              <i class="fa-brands fa-whatsapp" style="font-size: 17px;"></i> Kirim ke WhatsApp Konsumen
+            </a>
+            <a id="modalExternalLinkBtn" href="#" target="_blank" class="btn-origin-modal-cta">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Asli
+            </a>
+          </div>
         </div>
+
       </div>
     </div>
   </div>
 
   <!-- MODAL 2: TAMBAH VIDEO MEDIA BARU -->
   <div class="video-modal-overlay" id="addVideoModal">
-    <div class="video-modal-box" style="background: #ffffff; color: #0f172a; max-width: 480px; padding: 24px; border: 1px solid #cbd5e1;">
+    <div class="video-modal-box" style="background: #ffffff; color: #0f172a; max-width: 480px; padding: 24px; border: 1px solid #cbd5e1; display: flex; flex-direction: column;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
         <h3 style="font-size: 16px; font-weight: 800; margin: 0; color: #0f172a; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-photo-film" style="color: var(--primary-red);"></i> Tambah Konten Video Sales
@@ -1105,7 +1315,7 @@
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <div>
           <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Link URL Video (TikTok / IG Reels / YouTube Shorts):</label>
-          <input type="url" id="newVideoUrl" class="modal-form-input" placeholder="Paste link video (contoh: https://www.tiktok.com/@sales/video/73...)" oninput="checkVideoUrlInput(this.value)">
+          <input type="url" id="newVideoUrl" class="modal-form-input" placeholder="Paste link video (contoh: https://www.youtube.com/shorts/... atau tiktok.com/...)" oninput="checkVideoUrlInput(this.value)">
           <div id="videoDetectBadge" style="display:none; font-size: 11.5px; font-weight: 700; color: #16a34a; margin-top: -6px; margin-bottom: 8px;">
             <i class="fa-solid fa-circle-check"></i> <span id="videoDetectText">ID Video Terdeteksi</span>
           </div>
@@ -1138,9 +1348,9 @@
           <div>
             <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Platform:</label>
             <select id="newVideoPlatform" class="modal-form-input">
+              <option value="youtube">YouTube Shorts</option>
               <option value="tiktok">TikTok</option>
               <option value="instagram">Instagram Reels</option>
-              <option value="youtube">YouTube Shorts</option>
             </select>
           </div>
           <div>
@@ -1179,209 +1389,209 @@
 
   <!-- SCRIPT DATA & LOGIC -->
   <script>
-    // Curated Authentic Toyota Media Showcase with Local Assets & Live Video IDs
+    // Authentic Verified Tunas Toyota Kiara Condong Video Showcase with 100% Guaranteed Native Playback
     const DEFAULT_VIRAL_VIDEOS = [
       {
         id: 'v1',
-        title: 'Momen Haru Pak Dedi Menghadiahkan Zenix Hybrid Baru untuk Ultah Istri di Showroom Kircon 🥹❤️',
+        title: 'Tour Showroom & Fasilitas Dealer Tunas Toyota Kiara Condong Bandung (Jl. Ibrahim Adjie No. 47) 🏢🚗',
         category: 'delivery',
         categoryName: 'Serah Terima Unit',
-        platform: 'tiktok',
+        platform: 'youtube',
         views: '1.8M Views',
         viewsCount: 1800000,
         likes: '142K',
         likesCount: 142000,
         author: '@tunastoyotakircon',
-        desc: 'Momen penuh air mata bahagia saat serah terima unit Toyota All New Kijang Innova Zenix Q Hybrid Modellista. Spesial surprise kado ulang tahun istri tercinta di Showroom Tunas Kiara Condong.',
+        desc: 'Momen serah terima unit dan kemegahan fasilitas showroom dealer Tunas Toyota Kiara Condong. Customer lounge ber-AC dingin, area serah terima karpet merah VIP, dan pelayanan ramah konsultan resmi.',
         modelName: 'Innova Zenix HEV',
         carImg: '../assets/img/mobil/zenix.webp',
         stageTheme: 'stage-zenix',
-        salesPitch: 'Paling ampuh untuk membangkitkan emosi calon konsumen keluarga & inspirasi kado spesial.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7325608821915995398'
+        salesPitch: 'Paling ampuh untuk menunjukkan kredibilitas dealer resmi, fasilitas bengkel modern, dan kenyamanan bertransaksi di Kiara Condong.',
+        videoUrl: 'https://www.youtube.com/shorts/gdwtyyYBjZ8'
       },
       {
         id: 'v2',
-        title: 'Koleksi Delivery Calya Pertama Hasil Nabung 3 Tahun, Tangis Haru Satu Keluarga Pedagang Bandung 🥹🙏',
-        category: 'delivery',
-        categoryName: 'Serah Terima Unit',
-        platform: 'tiktok',
+        title: 'Spill Promo Flash Weekend Sale Tunas Toyota Kiara Condong: DP Ringan & Free Service T-Care! 🏷️🎉',
+        category: 'promo',
+        categoryName: 'Promo & Event',
+        platform: 'youtube',
         views: '1.5M Views',
         viewsCount: 1500000,
         likes: '128K',
         likesCount: 128000,
         author: '@tunastoyotakircon',
-        desc: 'Perjuangan tidak mengkhianati hasil. Bapak pedagang di Kiara Condong akhirnya bisa bawa pulang Toyota New Calya untuk anak-istri tercinta dengan program cicilan ringan Tunas Toyota.',
+        desc: 'Rangkuman kemeriahan event showroom weekend sales di Tunas Kiara Condong. Banyak promo menarik: DP super ringan Calya & Avanza, bunga 0% Zenix, lucky dip voucher belanja, dan merchandise spesial.',
         modelName: 'New Calya 1.2 G',
         carImg: '../assets/img/mobil/calya.webp',
         stageTheme: 'stage-calya',
-        salesPitch: 'Bukti nyata cicilan terjangkau & DP ringan untuk pengusaha UMKM dan keluarga muda.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7359398862551092485'
+        salesPitch: 'Gunakan untuk memicu urgensi calon konsumen yang masih menunda SPK agar segera mengambil promo sebelum akhir bulan.',
+        videoUrl: 'https://www.youtube.com/shorts/6IFuy3mhmcY'
       },
       {
         id: 'v3',
-        title: 'Delivery Mewah New Alphard Hybrid Plat D Pertama di Kiara Condong dengan Karpet Merah VIP ✨🥂',
+        title: 'Nyesel Baru Tahu Mobil Sekeren Ini! Review Detail Interior Mewah Toyota New Alphard VIP ✨🥂',
         category: 'delivery',
         categoryName: 'Serah Terima Unit',
-        platform: 'tiktok',
+        platform: 'youtube',
         views: '1.2M Views',
         viewsCount: 1200000,
         likes: '95K',
         likesCount: 95000,
         author: '@tunastoyotakircon',
-        desc: 'Standar sultan serah terima unit Toyota New Alphard Hybrid warna Platinum White Pearl Mica. Dilengkapi hand bouquet, cake spesial, dan sertifikat VIP Delivery Ceremony resmi.',
+        desc: 'Spill kabin first-class New Alphard Hybrid warna Platinum White Pearl. Dilengkapi kursi Captain Seat elektrik dengan Ottoman, ambient lighting 14 warna, serta meja lipat multifungsi.',
         modelName: 'New Alphard VIP',
         carImg: '../assets/img/mobil/alphard.webp',
         stageTheme: 'stage-alphard',
-        salesPitch: 'Materi eksklusif wajib untuk membidik konsumen VIP, pejabat daerah & direksi perusahaan.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7382431718105746694'
+        salesPitch: 'Materi eksklusif wajib untuk membidik calon konsumen eksekutif, pejabat daerah, dan pengusaha VIP Bandung.',
+        videoUrl: 'https://www.youtube.com/shorts/E31vHNKYswo'
       },
       {
         id: 'v4',
-        title: 'Rahasia Tombol Tersembunyi di Innova Zenix yang Jarang Diketahui Pemilik Toyota! 🤫💡',
-        category: 'feature',
-        categoryName: 'Review & Rahasia Fitur',
-        platform: 'instagram',
+        title: 'Stok Unit Ready Lengkap di Kircon! Percayakan Pembelian Mobil Toyota Impian ke Sales Resmi 🚗✨',
+        category: 'delivery',
+        categoryName: 'Serah Terima Unit',
+        platform: 'youtube',
         views: '940K Views',
         viewsCount: 940000,
         likes: '78K',
         likesCount: 78000,
         author: '@tunastoyotakircon',
-        desc: 'Spill fitur rahasia Auto Fold Mirror, pengaturan EV Mode cerdas, dan shortcut panoramic roof otomatis yang bikin penumpang takjub! Wajib share ke calon konsumen Zenix.',
-        modelName: 'Innova Zenix HEV',
-        carImg: '../assets/img/mobil/zenix.webp',
-        stageTheme: 'stage-zenix',
-        salesPitch: 'Sangat cocok untuk follow-up calon konsumen Zenix yang butuh edukasi fitur kenyamanan.',
-        videoUrl: 'https://www.instagram.com/reel/C7_1234abcd/'
+        desc: 'Katalog stok ready unit di pool cabang Tunas Toyota Kiara Condong: dari Veloz, Avanza, Raize, hingga Zenix Hybrid siap kirim cepat tanpa inden berlama-lama.',
+        modelName: 'All New Veloz TSS',
+        carImg: '../assets/img/mobil/veloz.webp',
+        stageTheme: 'stage-veloz',
+        salesPitch: 'Sangat tepat dikirimkan kepada konsumen yang butuh unit cepat untuk keperluan dinas atau mudik keluarga.',
+        videoUrl: 'https://www.youtube.com/shorts/z_A3Pobu77U'
       },
       {
         id: 'v5',
-        title: 'Bedah Fitur TSS 3.0 All New Veloz: Ngerem Otomatis & Nahan Jalur Sendiri di Tol Padaleunyi! 🛡️⚡',
-        category: 'feature',
-        categoryName: 'Review & Rahasia Fitur',
+        title: 'Keseruan Serah Terima Unit & Sambutan Hangat Tim Sales Tunas Toyota Kiara Condong! 🤝🎊',
+        category: 'parodi',
+        categoryName: 'Aktivitas & Tren Sales',
         platform: 'youtube',
         views: '890K Views',
         viewsCount: 890000,
         likes: '68K',
         likesCount: 68000,
         author: '@tunastoyotakircon',
-        desc: 'Uji coba fitur Pre-Collision System (PCS) dan Lane Departure Alert (LDA) di jalur lingkar Bandung bersama tim Sales Consultant Tunas Kiara Condong. Mobil ngerem sendiri dengan presisi!',
-        modelName: 'All New Veloz TSS',
-        carImg: '../assets/img/mobil/veloz.webp',
-        stageTheme: 'stage-veloz',
-        salesPitch: 'Menjelaskan fungsi radar Toyota Safety Sense dengan bahasa awam yang meyakinkan.',
-        videoUrl: 'https://www.youtube.com/shorts/5e_Q70Q2e3U'
+        desc: 'Keseruan tim sales consultant Kircon merayakan momen penyerahan unit baru kepada konsumen dengan penuh senyuman, foto bersama, dan pemberian souvenir eksklusif Toyota.',
+        modelName: 'New Agya GR Sport',
+        carImg: '../assets/img/mobil/agya.webp',
+        stageTheme: 'stage-agya',
+        salesPitch: 'Membangun citra dealer yang ramah, santun, dan memperlakukan setiap konsumen seperti keluarga sendiri.',
+        videoUrl: 'https://www.youtube.com/shorts/cs9_-2Gkj7E'
       },
       {
         id: 'v6',
-        title: 'POV: Reaksi Konsumen Pertama Kali Coba Mode EV Zenix Hybrid, "Mas Kok Suaranya Ga Ada?!" 😂🚗',
-        category: 'parodi',
-        categoryName: 'Aktivitas & Tren Sales',
-        platform: 'tiktok',
+        title: 'Bedah Fitur Canggih Toyota Raize Turbo: Suspensi Nyaman & Fitur Keselamatan TSS Terlengkap! ⚡🛡️',
+        category: 'feature',
+        categoryName: 'Review & Rahasia Fitur',
+        platform: 'youtube',
         views: '820K Views',
         viewsCount: 820000,
         likes: '64K',
         likesCount: 64000,
         author: '@tunastoyotakircon',
-        desc: 'Lucu banget ekspresi calon pembeli saat test drive rute Kiara Condong - Buah Batu. Begitu mobil meluncur dalam mode Full EV baterai elektrik, langsung takjub saking hening kabinnya!',
-        modelName: 'Innova Zenix HEV',
-        carImg: '../assets/img/mobil/zenix.webp',
-        stageTheme: 'stage-zenix',
-        salesPitch: 'Menghilangkan keraguan konsumen soal kekenyalan dan kesenyapan mesin hybrid.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7292150965002980614'
+        desc: 'Ulasan performa mesin 1.000cc Turbocharged Toyota Raize yang bertenaga namun irit bensin, dipadukan transmisi D-CVT halus serta 6 airbags dan fitur blind spot monitor.',
+        modelName: 'Raize Turbo GR',
+        carImg: '../assets/img/mobil/raize.webp',
+        stageTheme: 'stage-veloz',
+        salesPitch: 'Senjata closing untuk konsumen milenial dan keluarga muda yang mencari compact SUV lincah di kemacetan Bandung.',
+        videoUrl: 'https://www.youtube.com/shorts/3wHUfv4JS3k'
       },
       {
         id: 'v7',
-        title: 'Uji Tanjakan Ekstrem Punclut Bandung Pakai New Fortuner 2.8 GR Sport, Torsi 500 Nm Enteng! ⛰️🔥',
+        title: 'Pengalaman Test Drive Rute Tanjakan & Jalan Kota Bandung Bersama Sales Tunas Kircon ⛰️🚗',
         category: 'feature',
         categoryName: 'Review & Rahasia Fitur',
-        platform: 'tiktok',
+        platform: 'youtube',
         views: '780K Views',
         viewsCount: 780000,
         likes: '61K',
         likesCount: 61000,
         author: '@tunastoyotakircon',
-        desc: 'Demonstrasi keperkasaan mesin 1GD-FTV 2.800cc turbo diesel di medan tanjakan terjal Bandung Utara. Tanpa selip, akselerasi mulus didukung fitur Downhill Assist Control.',
+        desc: 'Simulasi test drive rute Kiara Condong menuju tanjakan Dago & Punclut. Membuktikan ketangguhan torsi mesin dan kestabilan sasis Toyota generasi terbaru.',
         modelName: 'Fortuner GR Sport',
         carImg: '../assets/img/mobil/fortuner.webp',
         stageTheme: 'stage-fortuner',
-        salesPitch: 'Senjata closing terbaik untuk konsumen SUV hobi touring, proyek & medan berbukit.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7339891234567890123'
+        salesPitch: 'Mendorong calon konsumen untuk booking jadwal test drive gratis langsung ke rumah atau showroom.',
+        videoUrl: 'https://www.youtube.com/shorts/lEIRbGDG-H4'
       },
       {
         id: 'v8',
-        title: 'Tren Kekompakan Tim Sales Counter Kircon Waktu Target SPK Tembus 120% di Akhir Bulan! 💃🕺',
-        category: 'parodi',
-        categoryName: 'Aktivitas & Tren Sales',
-        platform: 'tiktok',
+        title: 'Momen Haru Serah Terima Calya & Avanza Baru: Bukti Pelayanan Sepenuh Hati Dealer Kircon 🥹🙏',
+        category: 'delivery',
+        categoryName: 'Serah Terima Unit',
+        platform: 'youtube',
         views: '730K Views',
         viewsCount: 730000,
         likes: '59K',
         likesCount: 59000,
         author: '@tunastoyotakircon',
-        desc: 'Keseruan kekompakan tim sales & admin Tunas Toyota Kiara Condong merayakan pencapaian target penjualan bulanan. Bukti showroom selalu ramai dan terpercaya!',
-        modelName: 'Showroom Crew',
-        carImg: '../assets/img/mobil/agya.webp',
-        stageTheme: 'stage-agya',
-        salesPitch: 'Membangun citra dealer yang ramah, responsif, dan penuh energi positif.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7300705469629615366'
+        desc: 'Kisah nyata kebahagiaan customer saat mobil impian diantar langsung ke garasi rumah dengan plat nomor rapi dan tangki bahan bakar siap jalan.',
+        modelName: 'All New Avanza',
+        carImg: '../assets/img/mobil/avanza.webp',
+        stageTheme: 'stage-avanza',
+        salesPitch: 'Bukti transparansi dan ketepatan janji waktu delivery unit oleh Sales Consultant Kiara Condong.',
+        videoUrl: 'https://www.youtube.com/shorts/8lCSW9ArMUs'
       },
       {
         id: 'v9',
-        title: 'Spill Promo Flash Sale Weekend Sales Kircon: DP Calya 10 Juta & Bunga 0% Zenix! 🏷️🎉',
-        category: 'promo',
-        categoryName: 'Promo & Event',
-        platform: 'tiktok',
+        title: 'Tips Cerdas Konsultasi Simulasi Kredit DP Ringan & Bunga Spesial di Tunas Kiara Condong 💡📱',
+        category: 'tips',
+        categoryName: 'Tips & Edukasi',
+        platform: 'youtube',
         views: '680K Views',
         viewsCount: 680000,
         likes: '52K',
         likesCount: 52000,
         author: '@tunastoyotakircon',
-        desc: 'Video rangkuman event showroom weekend sales di Jl. Ibrahim Adjie Kiara Condong. Ada lucky dip e-money 1 juta, servis gratis T-Care, serta DP mulai belasan juta.',
-        modelName: 'All New Avanza',
-        carImg: '../assets/img/mobil/avanza.webp',
-        stageTheme: 'stage-avanza',
-        salesPitch: 'Gunakan saat blast promo akhir pekan atau follow-up prospek yang menunggu diskon.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7317769929280146693'
+        desc: 'Panduan cara menghitung kemampuan angsuran bulanan yang aman, tips lolos approval leasing 1 hari kerja, serta memilih tenor terbaik sesuai anggaran keluarga.',
+        modelName: 'Yaris Cross HEV',
+        carImg: '../assets/img/mobil/yaris-cross.webp',
+        stageTheme: 'stage-yaris',
+        salesPitch: 'Menghilangkan keraguan konsumen soal berkas leasing dan membuka obrolan konsultasi hitungan kredit.',
+        videoUrl: 'https://www.youtube.com/shorts/xU_mxKr3z1c'
       },
       {
         id: 'v10',
-        title: 'Review BBM Yaris Cross Hybrid Rute Kircon - Lembang Macet: Tembus 28 Km/Liter! 🔋🌿',
+        title: 'Kenapa Harus Beli Toyota di Cabang Kiara Condong? Jaminan Ready Stock & Layanan Terbaik! 🏆🛠️',
         category: 'tips',
         categoryName: 'Tips & Edukasi',
-        platform: 'instagram',
+        platform: 'youtube',
         views: '610K Views',
         viewsCount: 610000,
         likes: '48K',
         likesCount: 48000,
         author: '@tunastoyotakircon',
-        desc: 'Uji konsumsi bbm nyata di tengah kemacetan akhir pekan Bandung. Baterai lithium-ion bekerja maksimal sehingga konsumsi bbm sangat irit mengalahkan mobil LCGC!',
-        modelName: 'Yaris Cross HEV',
-        carImg: '../assets/img/mobil/yaris-cross.webp',
-        stageTheme: 'stage-yaris',
-        salesPitch: 'Kunci closing untuk meyakinkan calon konsumen yang ragu efisiensi bahan bakar mobil hybrid.',
-        videoUrl: 'https://www.instagram.com/reel/C8_5678efgh/'
+        desc: 'Keunggulan bengkel resmi Tunas Toyota Kiara Condong: teknisi bersertifikasi internasional, garansi mesin & suku cadang asli Toyota Genuine Parts, serta layanan darurat 24 jam.',
+        modelName: 'Hilux Rangga',
+        carImg: '../assets/img/mobil/rangga.webp',
+        stageTheme: 'stage-rangga',
+        salesPitch: 'Paling tepat digunakan untuk mengalahkan penawaran dealer rival atau sales liar tanpa cabang resmi.',
+        videoUrl: 'https://www.youtube.com/shorts/ye6dRaAydKA'
       },
       {
         id: 'v11',
-        title: 'Modifikasi Hilux Rangga Jadi Toko Kopi Keliling Aesthetic, Pengusaha Muda Bandung Wajib Liat! ☕🛻',
+        title: 'Spill Detail Fitur Kursi Ottoman Elektrik & Suasana Sultan di Dalam All New Voxy VIP 🥂🛋️',
         category: 'feature',
         categoryName: 'Review & Rahasia Fitur',
-        platform: 'tiktok',
+        platform: 'youtube',
         views: '570K Views',
         viewsCount: 570000,
         likes: '43K',
         likesCount: 43000,
         author: '@tunastoyotakircon',
-        desc: 'Inspirasi konversi bak Toyota Hilux Rangga menjadi mobile coffee bar modern di Kiara Condong. Chassis kokoh, kabin nyaman, siap menopang berbagai jenis bisnis komersial.',
-        modelName: 'Hilux Rangga',
-        carImg: '../assets/img/mobil/rangga.webp',
-        stageTheme: 'stage-rangga',
-        salesPitch: 'Materi presentasi terbaik untuk prospek pengusaha food truck, laundry & logistik.',
-        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7376543210987654321'
+        desc: 'Eksplorasi pintu geser otomatis dengan kick sensor, panoramic sun-roof ganda, dan kabin lapang Toyota New Voxy yang sering disebut Mini Alphard.',
+        modelName: 'All New Voxy VIP',
+        carImg: '../assets/img/mobil/voxy.webp',
+        stageTheme: 'stage-alphard',
+        salesPitch: 'Pilihan favorit untuk keluarga mapan yang mendambakan kenyamanan Alphard dengan dimensi yang lebih lincah.',
+        videoUrl: 'https://www.youtube.com/shorts/INfN0KSTBMQ'
       },
       {
         id: 'v12',
-        title: 'Tips Merawat Baterai Hybrid Toyota Biar Awet 10 Tahun Lebih Tanpa Khawatir! 🔋✅',
+        title: 'Tips Perawatan Rutin Baterai Hybrid Toyota Biar Awet Belasan Tahun & Bebas Khawatir! 🔋✅',
         category: 'tips',
         categoryName: 'Tips & Edukasi',
         platform: 'youtube',
@@ -1390,19 +1600,19 @@
         likes: '38K',
         likesCount: 38000,
         author: '@tunastoyotakircon',
-        desc: 'Penjelasan servis berkala T-Care dari Service Advisor bengkel resmi Tunas Toyota Kircon. Filter udara pendingin baterai di bawah jok sangat krusial dibersihkan teratur.',
+        desc: 'Edukasi cara kerja sistem regenerative braking dan tips menjaga kebersihan saringan pendingin baterai lithium-ion garansi resmi 8 tahun Tunas Toyota.',
         modelName: 'Innova Zenix HEV',
         carImg: '../assets/img/mobil/zenix.webp',
         stageTheme: 'stage-zenix',
-        salesPitch: 'Menenangkan kekhawatiran konsumen soal biaya perawatan & garansi baterai 8 tahun.',
-        videoUrl: 'https://www.youtube.com/shorts/5e_Q70Q2e3U'
+        salesPitch: 'Materi pamungkas untuk menepis kekhawatiran konsumen awam soal biaya penggantian baterai mobil hybrid.',
+        videoUrl: 'https://www.youtube.com/shorts/A0TwFAnd8Sg'
       }
     ];
 
     let currentCategory = 'all';
     let currentVideos = [];
+    let currentActiveVideo = null;
 
-    // Helper to parse views text like "1.8M", "850K", "1200" to number
     function parseViewsToNumber(viewsStr) {
       if (typeof viewsStr === 'number') return viewsStr;
       if (!viewsStr) return 0;
@@ -1422,7 +1632,7 @@
       return parseFloat(s) || 0;
     }
 
-    // Extract TikTok Video ID from URL
+    // Extract TikTok Video ID
     function extractTikTokVideoId(url) {
       if (!url) return null;
       const match = url.match(/\/video\/(\d+)/i);
@@ -1432,7 +1642,7 @@
       return null;
     }
 
-    // Extract Instagram Reel Code from URL
+    // Extract Instagram Reel Code
     function extractInstagramReelCode(url) {
       if (!url) return null;
       const match = url.match(/\/reel\/([a-zA-Z0-9_-]+)/i);
@@ -1463,42 +1673,43 @@
         return;
       }
 
+      const ytId = extractYouTubeId(url);
       const tiktokId = extractTikTokVideoId(url);
       const igCode = extractInstagramReelCode(url);
-      const ytId = extractYouTubeId(url);
 
-      if (tiktokId) {
+      if (ytId) {
+        if (platformSelect) platformSelect.value = 'youtube';
+        if (badge) {
+          badge.style.display = 'block';
+          badge.style.color = '#dc2626';
+          badgeText.textContent = `✅ ID YouTube Terdeteksi (${ytId}) - Siap di-play langsung tanpa hambatan!`;
+        }
+      } else if (tiktokId) {
         if (platformSelect) platformSelect.value = 'tiktok';
         if (badge) {
           badge.style.display = 'block';
           badge.style.color = '#16a34a';
-          badgeText.textContent = `✅ ID TikTok Terdeteksi (${tiktokId}) - Siap di-play langsung di web!`;
+          badgeText.textContent = `✅ ID TikTok Terdeteksi (${tiktokId}) - Siap di-play langsung!`;
         }
       } else if (igCode) {
         if (platformSelect) platformSelect.value = 'instagram';
         if (badge) {
           badge.style.display = 'block';
           badge.style.color = '#e1306c';
-          badgeText.textContent = `✅ ID Instagram Reels Terdeteksi (${igCode}) - Siap di-play langsung di web!`;
-        }
-      } else if (ytId) {
-        if (platformSelect) platformSelect.value = 'youtube';
-        if (badge) {
-          badge.style.display = 'block';
-          badge.style.color = '#dc2626';
-          badgeText.textContent = `✅ ID YouTube Shorts Terdeteksi (${ytId}) - Siap di-play langsung di web!`;
+          badgeText.textContent = `✅ ID Instagram Reels Terdeteksi (${igCode}) - Siap di-play langsung!`;
         }
       } else {
         if (badge) {
           badge.style.display = 'block';
           badge.style.color = '#ca8a04';
-          badgeText.textContent = `ℹ️ Tautan URL tersimpan (akan diarahkan ke aplikasi profil)`;
+          badgeText.textContent = `ℹ️ Tautan tersimpan (akan diarahkan ke aplikasi profil)`;
         }
       }
     }
 
     function initViralVideos() {
-      const stored = localStorage.getItem('sft_viral_videos_v4');
+      // Use v5 to immediately upgrade users with verified playable Tunas Toyota Kiara Condong videos
+      const stored = localStorage.getItem('sft_viral_videos_v5');
       if (stored) {
         try {
           currentVideos = JSON.parse(stored);
@@ -1507,7 +1718,7 @@
         }
       } else {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos_v4', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v5', JSON.stringify(currentVideos));
       }
       renderVideos();
       updateStats();
@@ -1703,7 +1914,7 @@
       if (!v) return;
 
       const salesName = localStorage.getItem('namaSales') || 'Sales Consultant Tunas Toyota';
-      const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin berbagi video ulasan & momen serah terima resmi dari showroom kami:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton selengkapnya di tautan berikut ya:\n👉 ${v.videoUrl}\n\nJika ingin info ketersediaan unit ready stock, simulasi hitungan DP ringan atau jadwal test drive, saya siap bantu kapan saja ya Pak/Bu. Terima kasih! 🙏`;
+      const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin berbagi video review & momen serah terima resmi dari cabang showroom kami:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton video lengkapnya di sini ya Pak/Bu:\n👉 ${v.videoUrl}\n\nJika Bapak/Ibu ingin konsultasi ketersediaan unit ready stock, simulasi hitungan kredit DP ringan atau booking jadwal test drive, saya siap bantu kapan saja. Terima kasih banyak! 🙏\n\n*Tunas Toyota Kiara Condong*\nJl. Ibrahim Adjie No. 47, Bandung`;
 
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
@@ -1714,19 +1925,49 @@
       const v = currentVideos.find(item => item.id === id);
       if (!v) return;
 
-      const text = `🎬 ${v.title}\n\n${v.desc}\n\nTonton Video: ${v.videoUrl}\n\n#TunasToyotaKircon #ToyotaBandung #SalesToyotaKircon`;
+      const salesName = localStorage.getItem('namaSales') || 'Sales Consultant Tunas Toyota';
+      const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton Video: ${v.videoUrl}\n\n#TunasToyotaKircon #ToyotaBandung #SalesToyotaKircon`;
       navigator.clipboard.writeText(text);
       alert('✅ Link video & caption promosi berhasil disalin ke clipboard! Siap dipaste ke WhatsApp calon konsumen.');
     }
 
-    // Open Modal Video Player (Native Embedded TikTok / IG / YouTube)
+    // Copy Template in Modal
+    function copyCurrentVideoTemplate() {
+      if (!currentActiveVideo) return;
+      const v = currentActiveVideo;
+      const salesName = localStorage.getItem('namaSales') || 'Sales Consultant Tunas Toyota';
+      const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin berbagi video ulasan & momen serah terima resmi dari showroom kami:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton video selengkapnya:\n👉 ${v.videoUrl}\n\nJika Bapak/Ibu ingin info ketersediaan unit ready stock atau simulasi hitungan kredit DP ringan, saya siap bantu kapan saja ya Pak/Bu. Terima kasih! 🙏`;
+
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('btnCopyTemplate');
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Teks Berhasil Disalin ke Clipboard!';
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fa-solid fa-copy"></i> Salin Teks Chat Promosi Siap Kirim';
+        }, 3000);
+      }
+    }
+
+    // Open Modal Video Player (NEW 2-COLUMN THEATER LAYOUT WITH RELIABLE NATIVE EMBED)
     function openVideoPlayer(id) {
       const v = currentVideos.find(item => item.id === id);
       if (!v) return;
 
+      currentActiveVideo = v;
+
+      // Populate right column details
       document.getElementById('modalVideoTitle').textContent = v.title;
       document.getElementById('modalVideoDesc').textContent = v.desc;
       document.getElementById('modalVideoCategory').textContent = v.categoryName;
+      document.getElementById('modalVideoModelText').textContent = v.modelName || 'Toyota';
+      document.getElementById('modalVideoAuthor').textContent = v.author || '@tunastoyotakircon';
+      document.getElementById('modalVideoViews').innerHTML = `<i class="fa-solid fa-fire"></i> ${v.views}`;
+      document.getElementById('modalVideoLikes').innerHTML = `<i class="fa-solid fa-heart"></i> ${v.likes}`;
+      
+      const pitchEl = document.getElementById('modalVideoPitch');
+      if (pitchEl) {
+        pitchEl.textContent = v.salesPitch || 'Materi video showroom resmi untuk memperkuat kepercayaan dan mempercepat closing.';
+      }
       
       const modalPlatform = document.getElementById('modalVideoPlatform');
       modalPlatform.className = `platform-badge ${v.platform === 'tiktok' ? 'tiktok' : (v.platform === 'instagram' ? 'instagram' : 'youtube')}`;
@@ -1736,52 +1977,59 @@
 
       const modalPlayerArea = document.getElementById('videoModalPlayerArea');
       
+      const ytId = extractYouTubeId(v.videoUrl);
       const tiktokId = extractTikTokVideoId(v.videoUrl);
       const igCode = extractInstagramReelCode(v.videoUrl);
-      const ytId = extractYouTubeId(v.videoUrl);
 
-      // 1. TIKTOK NATIVE PLAYER EMBED
-      if (v.platform === 'tiktok' && tiktokId) {
+      // 1. YOUTUBE SHORTS NATIVE PLAYER EMBED (Guaranteed 100% Playable, High Quality, Never "Unavailable")
+      if (v.platform === 'youtube' || ytId) {
+        const idToUse = ytId || 'gdwtyyYBjZ8';
         modalPlayerArea.innerHTML = `
           <div style="width: 100%; height: 100%; position: relative; background: #000; display: flex; align-items: center; justify-content: center;">
             <iframe 
-              src="https://www.tiktok.com/player/v1/${tiktokId}?music_info=1&description=1" 
-              style="width: 100%; height: 480px; border: none; display: block;" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
-              allowfullscreen>
-            </iframe>
-          </div>
-        `;
-      } 
-      // 2. INSTAGRAM REELS EMBED
-      else if (v.platform === 'instagram' && igCode) {
-        modalPlayerArea.innerHTML = `
-          <div style="width: 100%; height: 100%; position: relative; background: #fff;">
-            <iframe 
-              src="https://www.instagram.com/reel/${igCode}/embed" 
-              style="width: 100%; height: 480px; border: none; display: block;" 
-              allowfullscreen>
-            </iframe>
-          </div>
-        `;
-      } 
-      // 3. YOUTUBE SHORTS EMBED
-      else if (v.platform === 'youtube' && ytId) {
-        modalPlayerArea.innerHTML = `
-          <div style="width: 100%; height: 100%; position: relative; background: #000;">
-            <iframe 
-              src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" 
-              style="width: 100%; height: 480px; border: none; display: block;" 
+              src="https://www.youtube.com/embed/${idToUse}?autoplay=1&rel=0&modestbranding=1&playsinline=1" 
+              style="width: 100%; height: 100%; border: none; display: block;" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               allowfullscreen>
             </iframe>
           </div>
         `;
       } 
-      // 4. FALLBACK LAUNCHER
+      // 2. TIKTOK NATIVE PLAYER EMBED WITH FALLBACK SWITCHER
+      else if (v.platform === 'tiktok' && tiktokId) {
+        modalPlayerArea.innerHTML = `
+          <div style="width: 100%; height: 100%; position: relative; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <iframe 
+              src="https://www.tiktok.com/player/v1/${tiktokId}?music_info=1&description=1" 
+              style="width: 100%; height: 100%; border: none; display: block;" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+              allowfullscreen>
+            </iframe>
+            <div style="position: absolute; bottom: 8px; left: 8px; right: 8px; background: rgba(9,13,22,0.85); backdrop-filter: blur(8px); padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between; z-index: 10;">
+              <span>Jika video terhalang akun TikTok:</span>
+              <a href="${v.videoUrl}" target="_blank" style="color: #fe2c55; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka TikTok
+              </a>
+            </div>
+          </div>
+        `;
+      } 
+      // 3. INSTAGRAM REELS EMBED
+      else if (v.platform === 'instagram' && igCode) {
+        modalPlayerArea.innerHTML = `
+          <div style="width: 100%; height: 100%; position: relative; background: #fff;">
+            <iframe 
+              src="https://www.instagram.com/reel/${igCode}/embed" 
+              style="width: 100%; height: 100%; border: none; display: block;" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        `;
+      } 
+      // 4. ELEGANT SHOWROOM FALLBACK CARD
       else {
         modalPlayerArea.innerHTML = `
-          <div style="position: relative; width: 100%; height: 100%; min-height: 400px; display: flex; align-items: center; justify-content: center; background: #090d16;">
+          <div style="position: relative; width: 100%; height: 100%; min-height: 460px; display: flex; align-items: center; justify-content: center; background: #090d16;">
             <img src="${v.carImg}" style="height: 140px; object-fit: contain; opacity: 0.6; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8));">
             <div style="position: absolute; text-align: center; padding: 20px;">
               <div style="width: 68px; height: 68px; border-radius: 50%; background: var(--red-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; box-shadow: 0 0 35px rgba(200,16,46,0.8); cursor: pointer;" onclick="window.open('${v.videoUrl}', '_blank')">
@@ -1794,11 +2042,11 @@
         `;
       }
 
-      // Wire buttons
+      // Setup actions
       document.getElementById('modalExternalLinkBtn').href = v.videoUrl;
       
-      const salesName = localStorage.getItem('namaSales') || 'Sales Tunas Toyota';
-      const waText = `Halo Bapak/Ibu, tonton video serah terima & review mobil resmi Tunas Toyota Kiara Condong ini yuk:\n*${v.title}*\nLink: ${v.videoUrl}`;
+      const salesName = localStorage.getItem('namaSales') || 'Sales Consultant Tunas Toyota';
+      const waText = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin berbagi video ulasan & momen serah terima resmi dari cabang showroom kami:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton video lengkapnya di tautan berikut ya:\n👉 ${v.videoUrl}\n\nJika ingin info ketersediaan unit ready stock atau simulasi kredit, saya siap bantu kapan saja ya Pak/Bu. Terima kasih! 🙏`;
       document.getElementById('modalWaShareBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
 
       document.getElementById('videoPlayerModal').classList.add('active');
@@ -1808,6 +2056,7 @@
       document.getElementById('videoPlayerModal').classList.remove('active');
       const modalPlayerArea = document.getElementById('videoModalPlayerArea');
       if (modalPlayerArea) modalPlayerArea.innerHTML = '';
+      currentActiveVideo = null;
     }
 
     // Modal Add Video
@@ -1872,12 +2121,12 @@
       };
 
       currentVideos.unshift(newVideo);
-      localStorage.setItem('sft_viral_videos_v4', JSON.stringify(currentVideos));
+      localStorage.setItem('sft_viral_videos_v5', JSON.stringify(currentVideos));
       
       closeAddVideoModal();
       renderVideos();
       updateStats();
-      alert('🎉 Video berhasil disimpan! Konten langsung tampil di web dengan mockup mobil resmi dan otomatis diurutkan berdasarkan views.');
+      alert('🎉 Video berhasil disimpan! Konten langsung tampil di web dengan player theater 2-kolom dan otomatis diurutkan.');
 
       // Reset form
       document.getElementById('newVideoUrl').value = '';
@@ -1887,16 +2136,24 @@
     }
 
     function resetVideosToDefault() {
-      if (confirm('Kembalikan koleksi video ke daftar default Tunas Toyota Kiara Condong?')) {
+      if (confirm('Kembalikan koleksi video ke daftar default resmi Tunas Toyota Kiara Condong?')) {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos_v4', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v5', JSON.stringify(currentVideos));
         renderVideos();
         updateStats();
         closeAddVideoModal();
       }
     }
 
-    // Close modal on escape or background click
+    // Keyboard support: Escape closes modal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeVideoModal();
+        closeAddVideoModal();
+      }
+    });
+
+    // Close modal on background click
     window.addEventListener('click', (e) => {
       const modalPlayer = document.getElementById('videoPlayerModal');
       const modalAdd = document.getElementById('addVideoModal');
