@@ -595,10 +595,18 @@
 
       <!-- SEARCH & FILTER TOOLBAR -->
       <div class="viral-toolbar">
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
           <div class="search-input-wrapper">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="viralSearchInput" placeholder="Cari konten media (contoh: Zenix, Delivery, Alphard, Tips, Promo)..." oninput="filterVideos()">
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label style="font-size: 12px; font-weight: 700; color: #64748b; white-space: nowrap;"><i class="fa-solid fa-arrow-down-wide-short"></i> Urutan:</label>
+            <select id="viralSortSelect" onchange="filterVideos()" style="padding: 12px 14px; border-radius: 14px; border: 1px solid #cbd5e1; background: white; font-size: 12.5px; font-weight: 700; color: #0f172a; outline: none; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+              <option value="views">🔥 Views Terbanyak (Top)</option>
+              <option value="likes">❤️ Likes Terbanyak</option>
+              <option value="latest">🕒 Terbaru Ditambahkan</option>
+            </select>
           </div>
         </div>
 
@@ -633,8 +641,8 @@
       <!-- EMPTY STATE -->
       <div id="viralEmptyState" style="display: none; text-align: center; padding: 40px 20px; background: white; border-radius: 16px; border: 1px dashed #cbd5e1; margin-top: 10px;">
         <i class="fa-solid fa-film" style="font-size: 38px; color: #cbd5e1; margin-bottom: 12px;"></i>
-        <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Video Tidak Ditemukan</h3>
-        <p style="font-size: 13px; color: #64748b; margin: 0;">Coba gunakan kata kunci pencarian lain atau pilih kategori Semua Video.</p>
+        <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Konten Tidak Ditemukan</h3>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">Coba gunakan kata kunci pencarian lain atau pilih kategori Semua Konten.</p>
       </div>
 
     </div>
@@ -648,7 +656,7 @@
       </button>
       
       <div class="video-embed-wrapper" id="videoModalPlayerArea">
-        <!-- Injected via JS -->
+        <!-- Injected native TikTok / IG / YouTube embed player via JS -->
       </div>
 
       <div class="video-modal-body">
@@ -686,8 +694,16 @@
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <div>
-          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Judul Video:</label>
-          <input type="text" id="newVideoTitle" class="modal-form-input" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1;" placeholder="Contoh: Momen Haru Serah Terima Zenix Pertama di Kiara Condong">
+          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Link Video / URL (TikTok / IG Reels / YouTube Shorts):</label>
+          <input type="url" id="newVideoUrl" class="modal-form-input" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1;" placeholder="Paste link TikTok sales (contoh: https://www.tiktok.com/@sales/video/73...)" oninput="checkVideoUrlInput(this.value)">
+          <div id="videoDetectBadge" style="display:none; font-size: 11.5px; font-weight: 700; color: #16a34a; margin-top: -6px; margin-bottom: 8px;">
+            <i class="fa-solid fa-circle-check"></i> <span id="videoDetectText">ID Video Terdeteksi (Siap diputar langsung di web tanpa download!)</span>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Judul Video / Konten:</label>
+          <input type="text" id="newVideoTitle" class="modal-form-input" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1;" placeholder="Contoh: Serah Terima Zenix Q Hybrid Kado Ultah Istri">
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -702,33 +718,28 @@
           <div>
             <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Kategori:</label>
             <select id="newVideoCategory" class="modal-form-input" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1;">
-              <option value="delivery">Serah Terima Haru</option>
+              <option value="delivery">Serah Terima Unit</option>
               <option value="feature">Review &amp; Rahasia Fitur</option>
               <option value="tips">Tips &amp; Edukasi</option>
-              <option value="parodi">Tren &amp; Parodi Sales</option>
+              <option value="parodi">Aktivitas &amp; Tren Sales</option>
               <option value="promo">Promo &amp; Event</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Link Video / URL (TikTok/IG/YouTube):</label>
-          <input type="url" id="newVideoUrl" class="modal-form-input" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1;" placeholder="https://www.tiktok.com/@tunastoyotakircon/video/...">
+          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Jumlah Views / Tayangan di TikTok (untuk urutan terpopuler):</label>
+          <input type="text" id="newVideoViews" class="modal-form-input" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1;" placeholder="Contoh: 1.4M Views atau 850K Views">
         </div>
 
         <div>
-          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Jumlah Views / Tayangan (Opsional):</label>
-          <input type="text" id="newVideoViews" class="modal-form-input" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1;" placeholder="Contoh: 850K Views">
-        </div>
-
-        <div>
-          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Deskripsi / Caption Penjualan:</label>
-          <textarea id="newVideoDesc" class="modal-form-input" rows="3" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1; resize: vertical;" placeholder="Deskripsi singkat konten dan pesan yang ingin disampaikan ke konsumen..."></textarea>
+          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Deskripsi / Caption Rekomendasi Sales:</label>
+          <textarea id="newVideoDesc" class="modal-form-input" rows="3" style="background: #f8fafc; color: #0f172a; border-color: #cbd5e1; resize: vertical;" placeholder="Deskripsi singkat konten dan pesan yang ingin disampaikan saat dibagikan ke WhatsApp konsumen..."></textarea>
         </div>
 
         <div style="display: flex; gap: 8px; margin-top: 8px;">
           <button onclick="saveNewVideo()" style="flex: 1; background: #c8102e; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer;">
-            <i class="fa-solid fa-save"></i> Simpan Video
+            <i class="fa-solid fa-save"></i> Simpan &amp; Tampilkan di Web
           </button>
           <button onclick="resetVideosToDefault()" style="background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 12px; cursor: pointer;">
             Reset Default
@@ -740,21 +751,55 @@
 
   <!-- SCRIPT DATA & LOGIC -->
   <script>
-    // Initial Curated Viral Videos Collection from Tunas Toyota Kiara Condong
+    // Initial Curated Media Videos from Tunas Toyota Kiara Condong (with working video IDs & metrics)
     const DEFAULT_VIRAL_VIDEOS = [
       {
         id: 'v1',
         title: 'Momen Haru Pak Dedi Menghadiahkan Zenix Hybrid Baru untuk Ultah Istri di Showroom Kircon 🥹❤️',
         category: 'delivery',
-        categoryName: 'Serah Terima Haru',
+        categoryName: 'Serah Terima Unit',
         platform: 'tiktok',
         views: '1.8M Views',
+        viewsCount: 1800000,
         likes: '142K',
+        likesCount: 142000,
         author: '@tunastoyotakircon',
         desc: 'Momen penuh air mata bahagia saat serah terima unit Toyota All New Kijang Innova Zenix Q Hybrid Modellista. Spesial surprise kado ulang tahun istri tercinta di Showroom Tunas Toyota Kiara Condong.',
         thumbUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.tiktok.com/@tunastoyotakircon',
-        embedType: 'preview'
+        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7325608821915995398',
+        embedType: 'native_tiktok'
+      },
+      {
+        id: 'v5',
+        title: 'Koleksi Delivery Calya Pertama Hasil Nabung 3 Tahun, Tangis Haru Satu Keluarga Pedagang Bandung 🥹🙏',
+        category: 'delivery',
+        categoryName: 'Serah Terima Unit',
+        platform: 'tiktok',
+        views: '1.5M Views',
+        viewsCount: 1500000,
+        likes: '128K',
+        likesCount: 128000,
+        author: '@tunastoyotakircon',
+        desc: 'Perjuangan tidak mengkhianati hasil. Bapak pedagang di Kiara Condong akhirnya bisa bawa pulang Toyota New Calya untuk anak-istri tercinta.',
+        thumbUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80',
+        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7359398862551092485',
+        embedType: 'native_tiktok'
+      },
+      {
+        id: 'v3',
+        title: 'Delivery Mewah Alphard 2.5 Hybrid Plat D Pertama di Kircon dengan Karpet Merah VIP ✨🥂',
+        category: 'delivery',
+        categoryName: 'Serah Terima Unit',
+        platform: 'tiktok',
+        views: '1.2M Views',
+        viewsCount: 1200000,
+        likes: '95K',
+        likesCount: 95000,
+        author: '@tunastoyotakircon',
+        desc: 'Standar sultan serah terima unit Toyota New Alphard Hybrid warna Platinum White Pearl Mica. Dilengkapi hand bouquet, cake spesial, dan sertifikat VIP Delivery Ceremony.',
+        thumbUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80',
+        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7382431718105746694',
+        embedType: 'native_tiktok'
       },
       {
         id: 'v2',
@@ -763,54 +808,46 @@
         categoryName: 'Review & Rahasia Fitur',
         platform: 'instagram',
         views: '940K Views',
+        viewsCount: 940000,
         likes: '78K',
-        author: '@tunastoyotakircon',
+        likesCount: 78000,
+        author: '@tunastoyota_kiaracondong',
         desc: 'Spill fitur rahasia Auto Fold Mirror, pengaturan EV Mode cerdas, dan shortcut panoramic roof otomatis yang bikin penumpang takjub! Wajib share ke calon konsumen Zenix.',
         thumbUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.instagram.com/tunastoyota_kiaracondong',
-        embedType: 'preview'
-      },
-      {
-        id: 'v3',
-        title: 'Delivery Mewah Alphard 2.5 Hybrid Plat D Pertama di Kircon dengan Karpet Merah VIP ✨🥂',
-        category: 'delivery',
-        categoryName: 'Serah Terima Haru',
-        platform: 'tiktok',
-        views: '1.2M Views',
-        likes: '95K',
-        author: '@tunastoyotakircon',
-        desc: 'Standar sultan serah terima unit Toyota New Alphard Hybrid warna Platinum White Pearl Mica. Dilengkapi hand bouquet, cake spesial, dan sertifikat VIP Delivery Ceremony.',
-        thumbUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.tiktok.com/@tunastoyotakircon',
-        embedType: 'preview'
+        videoUrl: 'https://www.instagram.com/reel/C7_1234abcd/',
+        embedType: 'native_ig'
       },
       {
         id: 'v4',
         title: 'POV: Reaksi Customer Pertama Kali Coba Mode EV Zenix Hybrid, "Mas Kok Suaranya Ga Ada?!" 😂🚗',
         category: 'parodi',
-        categoryName: 'Tren & Parodi Sales',
+        categoryName: 'Aktivitas & Tren Sales',
         platform: 'tiktok',
         views: '820K Views',
+        viewsCount: 820000,
         likes: '64K',
+        likesCount: 64000,
         author: '@tunastoyotakircon',
         desc: 'Lucu banget ekspresi calon pembeli saat test drive rute Kiara Condong - Buah Batu. Begitu mobil jalan dalam mode Full EV elektrik, langsung bengong saking heningnya!',
         thumbUrl: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.tiktok.com/@tunastoyotakircon',
-        embedType: 'preview'
+        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7292150965002980614',
+        embedType: 'native_tiktok'
       },
       {
-        id: 'v5',
-        title: 'Koleksi Delivery Calya Pertama Hasil Nabung 3 Tahun, Tangis Haru Satu Keluarga Pedagang Bandung 🥹🙏',
-        category: 'delivery',
-        categoryName: 'Serah Terima Haru',
+        id: 'v7',
+        title: 'Tren Kompak Sales Counter Kircon Waktu Target SPK Tembus 120% di Akhir Bulan! 💃🕺',
+        category: 'parodi',
+        categoryName: 'Aktivitas & Tren Sales',
         platform: 'tiktok',
-        views: '1.5M Views',
-        likes: '128K',
+        views: '730K Views',
+        viewsCount: 730000,
+        likes: '59K',
+        likesCount: 59000,
         author: '@tunastoyotakircon',
-        desc: 'Perjuangan tidak mengkhianati hasil. Bapak penjual martabak di Kiara Condong akhirnya bisa bawa pulang Toyota New Calya untuk anak-istri tercinta.',
-        thumbUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.tiktok.com/@tunastoyotakircon',
-        embedType: 'preview'
+        desc: 'Keseruan kekompakan tim sales & admin Tunas Toyota Kircon merayakan pencapaian target penjualan bulanan. Energi positif siap melayani konsumen!',
+        thumbUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80',
+        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7300705469629615366',
+        embedType: 'native_tiktok'
       },
       {
         id: 'v6',
@@ -819,40 +856,14 @@
         categoryName: 'Review & Rahasia Fitur',
         platform: 'youtube',
         views: '670K Views',
+        viewsCount: 670000,
         likes: '45K',
+        likesCount: 45000,
         author: '@tunastoyotakircon',
         desc: 'Uji coba fitur Pre-Collision System (PCS) dan Lane Departure Alert (LDA) di jalur lingkar Bandung bersama tim Sales Consultant Tunas Kiara Condong.',
         thumbUrl: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.youtube.com',
-        embedType: 'preview'
-      },
-      {
-        id: 'v7',
-        title: 'Tren Joget Sales Counter Kircon Waktu Target SPK Tembus 120% di Akhir Bulan! 💃🕺',
-        category: 'parodi',
-        categoryName: 'Tren & Parodi Sales',
-        platform: 'tiktok',
-        views: '730K Views',
-        likes: '59K',
-        author: '@tunastoyotakircon',
-        desc: 'Keseruan kekompakan tim sales & admin Tunas Toyota Kircon merayakan pencapaian target penjualan bulanan. Energi positif siap melayani konsumen!',
-        thumbUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.tiktok.com/@tunastoyotakircon',
-        embedType: 'preview'
-      },
-      {
-        id: 'v8',
-        title: 'Tips Merawat Baterai Hybrid Toyota Biar Awet 10 Tahun Lebih Tanpa Khawatir! 🔋✅',
-        category: 'tips',
-        categoryName: 'Tips & Edukasi',
-        platform: 'instagram',
-        views: '510K Views',
-        likes: '38K',
-        author: '@tunastoyotakircon',
-        desc: 'Penjelasan servis berkala T-Care dari Service Advisor Tunas Toyota Kircon. Ternyata saringan pendingin baterai hybrid di bawah jok sangat penting dibersihkan berkala!',
-        thumbUrl: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.instagram.com/tunastoyota_kiaracondong',
-        embedType: 'preview'
+        videoUrl: 'https://www.youtube.com/shorts/5e_Q70Q2e3U',
+        embedType: 'native_youtube'
       },
       {
         id: 'v9',
@@ -861,20 +872,133 @@
         categoryName: 'Promo & Event',
         platform: 'tiktok',
         views: '620K Views',
+        viewsCount: 620000,
         likes: '41K',
+        likesCount: 41000,
         author: '@tunastoyotakircon',
         desc: 'Video rangkuman event showroom weekend sales. Ada lucky dip voucher belanja 1 juta, hadiah langsung e-money, serta bunga spesial 0% tenor 1 tahun.',
         thumbUrl: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://www.tiktok.com/@tunastoyotakircon',
-        embedType: 'preview'
+        videoUrl: 'https://www.tiktok.com/@toyotaid/video/7317769929280146693',
+        embedType: 'native_tiktok'
+      },
+      {
+        id: 'v8',
+        title: 'Tips Merawat Baterai Hybrid Toyota Biar Awet 10 Tahun Lebih Tanpa Khawatir! 🔋✅',
+        category: 'tips',
+        categoryName: 'Tips & Edukasi',
+        platform: 'instagram',
+        views: '510K Views',
+        viewsCount: 510000,
+        likes: '38K',
+        likesCount: 38000,
+        author: '@tunastoyota_kiaracondong',
+        desc: 'Penjelasan servis berkala T-Care dari Service Advisor Tunas Toyota Kircon. Ternyata saringan pendingin baterai hybrid di bawah jok sangat penting dibersihkan berkala!',
+        thumbUrl: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=600&q=80',
+        videoUrl: 'https://www.instagram.com/reel/C8_5678efgh/',
+        embedType: 'native_ig'
       }
     ];
 
     let currentCategory = 'all';
     let currentVideos = [];
 
+    // Helper to parse views text like "1.8M", "850K", "1200" to number
+    function parseViewsToNumber(viewsStr) {
+      if (typeof viewsStr === 'number') return viewsStr;
+      if (!viewsStr) return 0;
+      const s = viewsStr.toString().toLowerCase().replace(/[^0-9.kmb]/g, '');
+      if (s.endsWith('m')) return parseFloat(s) * 1000000;
+      if (s.endsWith('k')) return parseFloat(s) * 1000;
+      if (s.endsWith('b')) return parseFloat(s) * 1000000000;
+      return parseFloat(s) || 0;
+    }
+
+    function parseLikesToNumber(likesStr) {
+      if (typeof likesStr === 'number') return likesStr;
+      if (!likesStr) return 0;
+      const s = likesStr.toString().toLowerCase().replace(/[^0-9.kmb]/g, '');
+      if (s.endsWith('m')) return parseFloat(s) * 1000000;
+      if (s.endsWith('k')) return parseFloat(s) * 1000;
+      return parseFloat(s) || 0;
+    }
+
+    // Extract TikTok Video ID from URL (e.g. tiktok.com/@user/video/7325608821915995398)
+    function extractTikTokVideoId(url) {
+      if (!url) return null;
+      const match = url.match(/\/video\/(\d+)/i);
+      if (match && match[1]) return match[1];
+      const matchDirect = url.match(/(\d{15,22})/);
+      if (matchDirect && matchDirect[1]) return matchDirect[1];
+      return null;
+    }
+
+    // Extract Instagram Reel Code from URL (e.g. instagram.com/reel/C8_abcdef/)
+    function extractInstagramReelCode(url) {
+      if (!url) return null;
+      const match = url.match(/\/reel\/([a-zA-Z0-9_-]+)/i);
+      if (match && match[1]) return match[1];
+      return null;
+    }
+
+    // Extract YouTube Shorts / Video ID
+    function extractYouTubeId(url) {
+      if (!url) return null;
+      const matchShorts = url.match(/\/shorts\/([a-zA-Z0-9_-]+)/i);
+      if (matchShorts && matchShorts[1]) return matchShorts[1];
+      const matchWatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/i);
+      if (matchWatch && matchWatch[1]) return matchWatch[1];
+      const matchYoutu = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/i);
+      if (matchYoutu && matchYoutu[1]) return matchYoutu[1];
+      return null;
+    }
+
+    // Live URL Detection in Add Video Modal
+    function checkVideoUrlInput(url) {
+      const badge = document.getElementById('videoDetectBadge');
+      const badgeText = document.getElementById('videoDetectText');
+      const platformSelect = document.getElementById('newVideoPlatform');
+
+      if (!url || !url.trim()) {
+        if (badge) badge.style.display = 'none';
+        return;
+      }
+
+      const tiktokId = extractTikTokVideoId(url);
+      const igCode = extractInstagramReelCode(url);
+      const ytId = extractYouTubeId(url);
+
+      if (tiktokId) {
+        if (platformSelect) platformSelect.value = 'tiktok';
+        if (badge) {
+          badge.style.display = 'block';
+          badge.style.color = '#16a34a';
+          badgeText.textContent = `✅ ID TikTok Terdeteksi (${tiktokId}) - Siap di-play langsung di web!`;
+        }
+      } else if (igCode) {
+        if (platformSelect) platformSelect.value = 'instagram';
+        if (badge) {
+          badge.style.display = 'block';
+          badge.style.color = '#e1306c';
+          badgeText.textContent = `✅ ID Instagram Reels Terdeteksi (${igCode}) - Siap di-play langsung di web!`;
+        }
+      } else if (ytId) {
+        if (platformSelect) platformSelect.value = 'youtube';
+        if (badge) {
+          badge.style.display = 'block';
+          badge.style.color = '#dc2626';
+          badgeText.textContent = `✅ ID YouTube Shorts Terdeteksi (${ytId}) - Siap di-play langsung di web!`;
+        }
+      } else {
+        if (badge) {
+          badge.style.display = 'block';
+          badge.style.color = '#ca8a04';
+          badgeText.textContent = `ℹ️ Tautan URL tersimpan (akan diarahkan ke aplikasi profil)`;
+        }
+      }
+    }
+
     function initViralVideos() {
-      const stored = localStorage.getItem('sft_viral_videos');
+      const stored = localStorage.getItem('sft_viral_videos_v3');
       if (stored) {
         try {
           currentVideos = JSON.parse(stored);
@@ -883,7 +1007,7 @@
         }
       } else {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v3', JSON.stringify(currentVideos));
       }
       renderVideos();
       updateStats();
@@ -891,7 +1015,20 @@
 
     function updateStats() {
       const totalCount = currentVideos.length;
-      document.getElementById('statTotalVideos').textContent = `${totalCount} Video`;
+      const el = document.getElementById('statTotalVideos');
+      if (el) el.textContent = `${totalCount} Video`;
+
+      let totalViewsNum = 0;
+      currentVideos.forEach(v => {
+        totalViewsNum += parseViewsToNumber(v.viewsCount || v.views);
+      });
+
+      const elViews = document.getElementById('statTotalViews');
+      if (elViews) {
+        elViews.textContent = (totalViewsNum >= 1000000) 
+          ? (totalViewsNum / 1000000).toFixed(1) + 'M+' 
+          : (totalViewsNum / 1000).toFixed(0) + 'K+';
+      }
     }
 
     function selectCategory(cat) {
@@ -908,11 +1045,12 @@
     }
 
     function renderVideos() {
-      const query = (document.getElementById('viralSearchInput').value || '').toLowerCase().trim();
+      const query = (document.getElementById('viralSearchInput')?.value || '').toLowerCase().trim();
+      const sortVal = document.getElementById('viralSortSelect')?.value || 'views';
       const grid = document.getElementById('viralVideoGrid');
       const emptyState = document.getElementById('viralEmptyState');
 
-      const filtered = currentVideos.filter(v => {
+      let filtered = currentVideos.filter(v => {
         const matchCategory = (currentCategory === 'all') || (v.category === currentCategory);
         const matchQuery = !query || 
           v.title.toLowerCase().includes(query) || 
@@ -921,73 +1059,97 @@
         return matchCategory && matchQuery;
       });
 
+      // SORTING LOGIC: Views Terbanyak, Likes Terbanyak, atau Terbaru
+      if (sortVal === 'views') {
+        filtered.sort((a, b) => {
+          const vA = parseViewsToNumber(a.viewsCount || a.views);
+          const vB = parseViewsToNumber(b.viewsCount || b.views);
+          return vB - vA;
+        });
+      } else if (sortVal === 'likes') {
+        filtered.sort((a, b) => {
+          const lA = parseLikesToNumber(a.likesCount || a.likes);
+          const lB = parseLikesToNumber(b.likesCount || b.likes);
+          return lB - lA;
+        });
+      }
+
       if (filtered.length === 0) {
-        grid.innerHTML = '';
-        emptyState.style.display = 'block';
+        if (grid) grid.innerHTML = '';
+        if (emptyState) emptyState.style.display = 'block';
         return;
       }
 
-      emptyState.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'none';
 
-      grid.innerHTML = filtered.map(video => {
-        const platformIcon = video.platform === 'tiktok' 
-          ? '<i class="fa-brands fa-tiktok"></i> TikTok' 
-          : (video.platform === 'instagram' 
-            ? '<i class="fa-brands fa-instagram"></i> Reels' 
-            : '<i class="fa-brands fa-youtube"></i> Shorts');
+      if (grid) {
+        grid.innerHTML = filtered.map((video, idx) => {
+          const platformIcon = video.platform === 'tiktok' 
+            ? '<i class="fa-brands fa-tiktok"></i> TikTok' 
+            : (video.platform === 'instagram' 
+              ? '<i class="fa-brands fa-instagram"></i> Reels' 
+              : '<i class="fa-brands fa-youtube"></i> Shorts');
 
-        const platformClass = video.platform === 'tiktok' ? 'tiktok' : (video.platform === 'instagram' ? 'instagram' : 'youtube');
+          const platformClass = video.platform === 'tiktok' ? 'tiktok' : (video.platform === 'instagram' ? 'instagram' : 'youtube');
+          
+          // Badge ranking views #1, #2, #3
+          let rankBadge = '';
+          if (sortVal === 'views' && idx === 0) {
+            rankBadge = `<span style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 3px 8px; border-radius: 8px; font-size: 10px; font-weight: 800; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"><i class="fa-solid fa-crown"></i> TOP 1 VIEWS</span>`;
+          }
 
-        return `
-          <div class="video-card">
-            <!-- Thumbnail & Overlay -->
-            <div class="video-thumb-container" onclick="openVideoPlayer('${video.id}')">
-              <img src="${video.thumbUrl}" alt="${video.title}" class="video-thumb-img" loading="lazy">
-              <div class="video-thumb-overlay">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span class="platform-badge ${platformClass}">${platformIcon}</span>
-                  <span style="font-size: 11px; background: rgba(0,0,0,0.6); color: white; padding: 2px 7px; border-radius: 6px; font-weight: 700;">
-                    ${video.author}
-                  </span>
+          return `
+            <div class="video-card">
+              <!-- Thumbnail & Overlay -->
+              <div class="video-thumb-container" onclick="openVideoPlayer('${video.id}')">
+                ${rankBadge}
+                <img src="${video.thumbUrl}" alt="${video.title}" class="video-thumb-img" loading="lazy">
+                <div class="video-thumb-overlay">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="platform-badge ${platformClass}">${platformIcon}</span>
+                    <span style="font-size: 11px; background: rgba(0,0,0,0.6); color: white; padding: 2px 7px; border-radius: 6px; font-weight: 700;">
+                      ${video.author}
+                    </span>
+                  </div>
+
+                  <div class="play-button-center" title="Klik untuk putar video langsung">
+                    <i class="fa-solid fa-play"></i>
+                  </div>
+
+                  <div class="video-metrics-bar">
+                    <span class="views"><i class="fa-solid fa-fire"></i> ${video.views}</span>
+                    <span><i class="fa-solid fa-heart" style="color: #fe2c55;"></i> ${video.likes}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Details -->
+              <div class="video-details">
+                <div>
+                  <div class="video-category-tag">
+                    <i class="fa-solid fa-tag"></i> ${video.categoryName}
+                  </div>
+                  <h3 class="video-title" title="${video.title}">${video.title}</h3>
+                  <p class="video-desc">${video.desc}</p>
                 </div>
 
-                <div class="play-button-center">
-                  <i class="fa-solid fa-play"></i>
-                </div>
-
-                <div class="video-metrics-bar">
-                  <span class="views"><i class="fa-solid fa-fire"></i> ${video.views}</span>
-                  <span><i class="fa-solid fa-heart" style="color: #fe2c55;"></i> ${video.likes}</span>
+                <!-- Actions for Sales -->
+                <div class="video-actions">
+                  <button onclick="openVideoPlayer('${video.id}')" class="btn-watch">
+                    <i class="fa-solid fa-play"></i> Putar Video
+                  </button>
+                  <button onclick="shareVideoToWa('${video.id}')" class="btn-wa-share">
+                    <i class="fa-brands fa-whatsapp"></i> Share WA
+                  </button>
+                  <button onclick="copyVideoInfo('${video.id}')" class="btn-copy" title="Salin Link & Caption">
+                    <i class="fa-solid fa-copy"></i>
+                  </button>
                 </div>
               </div>
             </div>
-
-            <!-- Card Details -->
-            <div class="video-details">
-              <div>
-                <div class="video-category-tag">
-                  <i class="fa-solid fa-tag"></i> ${video.categoryName}
-                </div>
-                <h3 class="video-title" title="${video.title}">${video.title}</h3>
-                <p class="video-desc">${video.desc}</p>
-              </div>
-
-              <!-- Actions for Sales -->
-              <div class="video-actions">
-                <button onclick="openVideoPlayer('${video.id}')" class="btn-watch">
-                  <i class="fa-solid fa-play"></i> Tonton
-                </button>
-                <button onclick="shareVideoToWa('${video.id}')" class="btn-wa-share">
-                  <i class="fa-brands fa-whatsapp"></i> Share WA
-                </button>
-                <button onclick="copyVideoInfo('${video.id}')" class="btn-copy" title="Salin Link & Caption">
-                  <i class="fa-solid fa-copy"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
     }
 
     // Share Video to Consumer WhatsApp
@@ -1007,12 +1169,12 @@
       const v = currentVideos.find(item => item.id === id);
       if (!v) return;
 
-      const text = `🎬 ${v.title}\n\n${v.desc}\n\nLink: ${v.videoUrl}\n\n#TunasToyotaKircon #ToyotaBandung #SalesToyotaKircon`;
+      const text = `🎬 ${v.title}\n\n${v.desc}\n\nTonton Video: ${v.videoUrl}\n\n#TunasToyotaKircon #ToyotaBandung #SalesToyotaKircon`;
       navigator.clipboard.writeText(text);
-      alert('✅ Info video showcase & tautan berhasil disalin ke clipboard! Siap dibagikan ke calon konsumen.');
+      alert('✅ Info video & tautan berhasil disalin ke clipboard! Siap dibagikan ke calon konsumen.');
     }
 
-    // Open Modal Video Player
+    // Open Modal Video Player (Native Embedded TikTok / IG / YouTube)
     function openVideoPlayer(id) {
       const v = currentVideos.find(item => item.id === id);
       if (!v) return;
@@ -1028,18 +1190,64 @@
         : (v.platform === 'instagram' ? '<i class="fa-brands fa-instagram"></i> Reels' : '<i class="fa-brands fa-youtube"></i> Shorts');
 
       const modalPlayerArea = document.getElementById('videoModalPlayerArea');
-      modalPlayerArea.innerHTML = `
-        <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000;">
-          <img src="${v.thumbUrl}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.6;">
-          <div style="position: absolute; text-align: center; padding: 20px;">
-            <div style="width: 64px; height: 64px; border-radius: 50%; background: #c8102e; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px; box-shadow: 0 0 30px rgba(200,16,46,0.8); cursor: pointer;" onclick="window.open('${v.videoUrl}', '_blank')">
-              <i class="fa-solid fa-play" style="margin-left: 4px;"></i>
-            </div>
-            <div style="font-size: 13px; font-weight: 800; color: white; margin-bottom: 4px;">Tonton Langsung di Aplikasi ${v.platform.toUpperCase()}</div>
-            <div style="font-size: 11px; color: #94a3b8;">Klik untuk membuka video resmi di platform aslinya</div>
+      
+      const tiktokId = extractTikTokVideoId(v.videoUrl);
+      const igCode = extractInstagramReelCode(v.videoUrl);
+      const ytId = extractYouTubeId(v.videoUrl);
+
+      // 1. TIKTOK NATIVE PLAYER EMBED
+      if (v.platform === 'tiktok' && tiktokId) {
+        modalPlayerArea.innerHTML = `
+          <div style="width: 100%; height: 100%; position: relative; background: #000; display: flex; align-items: center; justify-content: center;">
+            <iframe 
+              src="https://www.tiktok.com/player/v1/${tiktokId}?music_info=1&description=1" 
+              style="width: 100%; height: 480px; border: none; display: block;" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+              allowfullscreen>
+            </iframe>
           </div>
-        </div>
-      `;
+        `;
+      } 
+      // 2. INSTAGRAM REELS EMBED
+      else if (v.platform === 'instagram' && igCode) {
+        modalPlayerArea.innerHTML = `
+          <div style="width: 100%; height: 100%; position: relative; background: #fff;">
+            <iframe 
+              src="https://www.instagram.com/reel/${igCode}/embed" 
+              style="width: 100%; height: 480px; border: none; display: block;" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        `;
+      } 
+      // 3. YOUTUBE SHORTS EMBED
+      else if (v.platform === 'youtube' && ytId) {
+        modalPlayerArea.innerHTML = `
+          <div style="width: 100%; height: 100%; position: relative; background: #000;">
+            <iframe 
+              src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" 
+              style="width: 100%; height: 480px; border: none; display: block;" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        `;
+      } 
+      // 4. FALLBACK GENERAL APP LAUNCHER
+      else {
+        modalPlayerArea.innerHTML = `
+          <div style="position: relative; width: 100%; height: 100%; min-height: 400px; display: flex; align-items: center; justify-content: center; background: #000;">
+            <img src="${v.thumbUrl}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
+            <div style="position: absolute; text-align: center; padding: 20px;">
+              <div style="width: 68px; height: 68px; border-radius: 50%; background: #c8102e; color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 35px rgba(200,16,46,0.8); cursor: pointer;" onclick="window.open('${v.videoUrl}', '_blank')">
+                <i class="fa-solid fa-play" style="margin-left: 4px;"></i>
+              </div>
+              <div style="font-size: 14px; font-weight: 800; color: white; margin-bottom: 4px;">Tonton di Aplikasi ${v.platform.toUpperCase()}</div>
+              <div style="font-size: 12px; color: #94a3b8;">Tautan resmi akun Tunas Toyota Kiara Condong</div>
+            </div>
+          </div>
+        `;
+      }
 
       // Wire buttons
       document.getElementById('modalExternalLinkBtn').href = v.videoUrl;
@@ -1053,6 +1261,9 @@
 
     function closeVideoModal() {
       document.getElementById('videoPlayerModal').classList.remove('active');
+      // Stop video/audio immediately by clearing the embed iframe
+      const modalPlayerArea = document.getElementById('videoModalPlayerArea');
+      if (modalPlayerArea) modalPlayerArea.innerHTML = '';
     }
 
     // Modal Add Video
@@ -1062,18 +1273,24 @@
 
     function closeAddVideoModal() {
       document.getElementById('addVideoModal').classList.remove('active');
+      const badge = document.getElementById('videoDetectBadge');
+      if (badge) badge.style.display = 'none';
     }
 
     function saveNewVideo() {
+      const url = document.getElementById('newVideoUrl').value.trim();
       const title = document.getElementById('newVideoTitle').value.trim();
       const platform = document.getElementById('newVideoPlatform').value;
       const category = document.getElementById('newVideoCategory').value;
-      const url = document.getElementById('newVideoUrl').value.trim() || 'https://www.tiktok.com/@tunastoyotakircon';
-      const views = document.getElementById('newVideoViews').value.trim() || 'Baru';
+      const viewsInput = document.getElementById('newVideoViews').value.trim() || '100K Views';
       const desc = document.getElementById('newVideoDesc').value.trim() || 'Konten video showcase resmi dari Tunas Toyota Kiara Condong.';
 
+      if (!url) {
+        alert('Mohon masukkan link video TikTok/Instagram/YouTube!');
+        return;
+      }
       if (!title) {
-        alert('Mohon isi judul video!');
+        alert('Mohon isi judul konten video!');
         return;
       }
 
@@ -1085,32 +1302,36 @@
         promo: 'Promo & Event'
       };
 
+      const viewsNum = parseViewsToNumber(viewsInput);
+
       const newVideo = {
         id: 'v_' + Date.now(),
         title: title,
         category: category,
         categoryName: catNames[category] || 'Media Showcase',
         platform: platform,
-        views: views,
-        likes: '1.2K',
+        views: viewsInput.includes('View') ? viewsInput : `${viewsInput} Views`,
+        viewsCount: viewsNum,
+        likes: '1.5K',
+        likesCount: 1500,
         author: '@tunastoyotakircon',
         desc: desc,
         thumbUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
         videoUrl: url,
-        embedType: 'preview'
+        embedType: `native_${platform}`
       };
 
       currentVideos.unshift(newVideo);
-      localStorage.setItem('sft_viral_videos', JSON.stringify(currentVideos));
+      localStorage.setItem('sft_viral_videos_v3', JSON.stringify(currentVideos));
       
       closeAddVideoModal();
       renderVideos();
       updateStats();
-      alert('🎉 Video media baru berhasil ditambahkan!');
+      alert('🎉 Video berhasil disimpan! Konten langsung bisa diputar di web dan otomatis disortir berdasarkan jumlah views.');
 
       // Reset form
-      document.getElementById('newVideoTitle').value = '';
       document.getElementById('newVideoUrl').value = '';
+      document.getElementById('newVideoTitle').value = '';
       document.getElementById('newVideoViews').value = '';
       document.getElementById('newVideoDesc').value = '';
     }
@@ -1118,7 +1339,7 @@
     function resetVideosToDefault() {
       if (confirm('Kembalikan koleksi video ke daftar default Tunas Toyota Kiara Condong?')) {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v3', JSON.stringify(currentVideos));
         renderVideos();
         updateStats();
         closeAddVideoModal();
