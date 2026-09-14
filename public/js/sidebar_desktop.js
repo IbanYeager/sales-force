@@ -278,7 +278,7 @@
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
-                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal', 'kalender jadwal agenda aktivitas reminder follow up')}
+                ${navLink('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender &amp; Reminder Jadwal <span class="sidebar-notif-badge" id="sidebarJadwalBadge" style="display:none; margin-left:auto; min-width:18px; height:18px; padding:0 5px; background:#c8102e; color:#fff; border-radius:10px; font-size:10px; font-weight:800; align-items:center; justify-content:center;">0</span>', 'kalender jadwal agenda aktivitas reminder follow up')}
                 ${navLink('pages/polreg.html', 'fa-solid fa-map-location-dot', 'Peta Polreg Wilayah', 'polreg registrasi wilayah peta daerah kuota mobil kota bandung market share')}
 
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
@@ -655,6 +655,32 @@
 
         checkNotifications();
         setInterval(checkNotifications, 10000); // Poll every 10 seconds
+
+        // Polling badge jumlah jadwal hari ini
+        function checkJadwalTodayBadge() {
+            const sId = localStorage.getItem('idSales') || 1;
+            fetch(`${apiBase}api_jadwal.php?sales_account_id=${sId}&view=today_pending`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        const count = res.pending_count !== undefined ? res.pending_count : (res.data ? res.data.length : 0);
+                        const displayVal = count > 99 ? '99+' : count;
+                        const sidebarBadge = document.getElementById('sidebarJadwalBadge');
+                        const modalBadge = document.getElementById('featureModalJadwalBadge');
+
+                        if (count > 0) {
+                            if (sidebarBadge) { sidebarBadge.textContent = displayVal; sidebarBadge.style.display = 'inline-flex'; }
+                            if (modalBadge) { modalBadge.textContent = displayVal; modalBadge.style.display = 'inline-flex'; }
+                        } else {
+                            if (sidebarBadge) sidebarBadge.style.display = 'none';
+                            if (modalBadge) modalBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+        checkJadwalTodayBadge();
+        setInterval(checkJadwalTodayBadge, 15000);
 
         // ── Sidebar Instant Search Feature Filter ──────────────
         (function initSidebarSearchFilter() {

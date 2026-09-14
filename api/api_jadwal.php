@@ -17,7 +17,7 @@ if ($method === 'OPTIONS') {
 }
 
 if ($method === 'GET') {
-    $sales_id = isset($_GET['sales_account_id']) ? intval($_GET['sales_account_id']) : 1;
+    $sales_id = (isset($_GET['sales_account_id']) && intval($_GET['sales_account_id']) > 0) ? intval($_GET['sales_account_id']) : 1;
     $dateParam = isset($_GET['date']) ? trim($_GET['date']) : '';
     $monthParam = isset($_GET['month']) ? intval($_GET['month']) : 0;
     $yearParam = isset($_GET['year']) ? intval($_GET['year']) : 0;
@@ -31,16 +31,26 @@ if ($method === 'GET') {
     $params = [$sales_id];
 
     if (!empty($dateParam)) {
-        // Query specific date: YYYY-MM-DD
-        $conditions[] = "DATE(waktu) = ?";
-        $types .= "s";
-        $params[] = $dateParam;
+        if ($dateParam === 'today') {
+            $conditions[] = "DATE(waktu) = CURDATE()";
+        } else {
+            // Query specific date: YYYY-MM-DD
+            $conditions[] = "DATE(waktu) = ?";
+            $types .= "s";
+            $params[] = $dateParam;
+        }
     } elseif ($monthParam > 0 && $yearParam > 0) {
         // Query whole month for calendar view
         $conditions[] = "MONTH(waktu) = ? AND YEAR(waktu) = ?";
         $types .= "ii";
         $params[] = $monthParam;
         $params[] = $yearParam;
+    } elseif ($viewParam === 'today_pending' || $viewParam === 'today_reminders') {
+        // Today's pending schedules + overdue reminders not yet marked Selesai
+        $conditions[] = "((DATE(waktu) = CURDATE()) OR (DATE(waktu) < CURDATE() AND status != 'Selesai'))";
+        if (empty($statusParam) || $statusParam === 'pending' || $statusParam === 'Terjadwal') {
+            $conditions[] = "status != 'Selesai'";
+        }
     } elseif ($viewParam === 'upcoming' || $viewParam === 'all') {
         // All upcoming reminders from today onwards
         $conditions[] = "DATE(waktu) >= CURDATE()";
@@ -55,7 +65,7 @@ if ($method === 'GET') {
         }
     }
 
-    if (!empty($statusParam) && $statusParam !== 'all') {
+    if (!empty($statusParam) && $statusParam !== 'all' && $statusParam !== 'pending') {
         $conditions[] = "status = ?";
         $types .= "s";
         $params[] = $statusParam;
@@ -73,11 +83,17 @@ if ($method === 'GET') {
         $result = $stmt->get_result();
         
         $data = [];
+        $pendingCount = 0;
         while ($row = $result->fetch_assoc()) {
+            $row['id'] = intval($row['id']);
             $rawWaktu = $row['waktu'] ?? '';
             $row['waktu_full'] = $rawWaktu;
             $row['tanggal'] = (strlen($rawWaktu) >= 10) ? substr($rawWaktu, 0, 10) : '';
             $row['jam'] = (strlen($rawWaktu) >= 16) ? substr($rawWaktu, 11, 5) : '';
+
+            if ($row['status'] !== 'Selesai') {
+                $pendingCount++;
+            }
 
             // For legacy caller (e.g. pages_index.js dashboard widget expecting hh:mm in waktu)
             if ($isLegacyCall) {
@@ -89,7 +105,12 @@ if ($method === 'GET') {
 
             $data[] = $row;
         }
-        echo json_encode(["status" => "success", "data" => $data]);
+        echo json_encode([
+            "status" => "success", 
+            "data" => $data, 
+            "total" => count($data),
+            "pending_count" => $pendingCount
+        ]);
         $stmt->close();
     } else {
         echo json_encode(["status" => "error", "message" => "Gagal mempersiapkan query: " . $conn->error]);

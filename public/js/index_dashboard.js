@@ -1042,4 +1042,244 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load data OLX achievement saat halaman dimuat
     loadOlxAchievementData();
+
+    // ══════════════════════════════════════════════════════════
+    // PENGINGAT JADWAL HARI INI & BADGE COUNTER KALENDER
+    // ══════════════════════════════════════════════════════════
+    const DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    function detectJadwalCategory(item) {
+        const text = ((item.judul || '') + ' ' + (item.deskripsi || '')).toLowerCase();
+        if (text.includes('stnk') || text.includes('plat') || text.includes('bpkb') || text.includes('nopol')) {
+            return { key: 'stnk', name: 'Follow Up STNK', icon: 'fa-file-lines', bg: '#eff6ff', color: '#1d4ed8', border: '#3b82f6' };
+        }
+        if (text.includes('servis') || text.includes('service') || text.includes('1000') || text.includes('1.000') || text.includes('bengkel')) {
+            return { key: 'servis', name: 'Reminder Servis', icon: 'fa-wrench', bg: '#fffbeb', color: '#b45309', border: '#f59e0b' };
+        }
+        if (text.includes('janji') || text.includes('temu') || text.includes('test drive') || text.includes('showroom')) {
+            return { key: 'janjitemu', name: 'Janji Temu / Test Drive', icon: 'fa-handshake', bg: '#ecfdf5', color: '#047857', border: '#10b981' };
+        }
+        if (text.includes('do') || text.includes('serah terima') || text.includes('delivery') || text.includes('kirim')) {
+            return { key: 'do', name: 'Serah Terima Unit (DO)', icon: 'fa-gift', bg: '#fff1f2', color: '#be123c', border: '#f43f5e' };
+        }
+        if (text.includes('prospek') || text.includes('spk') || text.includes('closing') || text.includes('follow up') || text.includes('si ')) {
+            return { key: 'prospek', name: 'Follow Up Prospek', icon: 'fa-car', bg: '#f5f3ff', color: '#6d28d9', border: '#8b5cf6' };
+        }
+        return { key: 'other', name: 'Agenda Sales', icon: 'fa-calendar-check', bg: '#f8fafc', color: '#334155', border: '#64748b' };
+    }
+
+    function extractPhoneNumber(text) {
+        if (!text) return '';
+        const match = text.match(/(?:(?:\+62|62|0)[0-9]{8,13})/);
+        if (match) {
+            let clean = match[0].replace(/[^0-9]/g, '');
+            if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+            return clean;
+        }
+        return '';
+    }
+
+    function escapeHtmlText(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, m => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        })[m]);
+    }
+
+    let todayJadwalItems = [];
+
+    function updateJadwalBadges(count) {
+        const modalBadge = document.getElementById('featureModalJadwalBadge');
+        if (modalBadge) {
+            if (count > 0) {
+                modalBadge.textContent = count;
+                modalBadge.style.display = 'inline-flex';
+            } else {
+                modalBadge.style.display = 'none';
+            }
+        }
+
+        const sidebarBadge = document.getElementById('sidebarJadwalBadge');
+        if (sidebarBadge) {
+            if (count > 0) {
+                sidebarBadge.textContent = count;
+                sidebarBadge.style.display = 'inline-flex';
+            } else {
+                sidebarBadge.style.display = 'none';
+            }
+        }
+
+        const popupCount = document.getElementById('popupJadwalCountBadge');
+        if (popupCount) {
+            popupCount.textContent = `${count} Agenda`;
+        }
+    }
+
+    function renderTodayJadwalModalList(items) {
+        const container = document.getElementById('todayJadwalModalBody');
+        if (!container) return;
+
+        if (!items || items.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 32px 16px; color: #166534;">
+                    <div style="width: 54px; height: 54px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; box-shadow: 0 4px 12px rgba(22,163,74,0.15);">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <h4 style="margin: 0 0 6px 0; font-size: 15px; font-weight: 800; color: #15803d;">Tidak Ada Agenda Tertunda</h4>
+                    <p style="margin: 0; font-size: 12px; color: #4b5563; line-height: 1.4;">Semua agenda &amp; jadwal untuk hari ini sudah selesai atau belum ada jadwal baru yang ditambahkan.</p>
+                </div>`;
+            return;
+        }
+
+        const salesConsultantName = localStorage.getItem('namaSales') || 'Sales Tunas Toyota';
+
+        container.innerHTML = items.map(item => {
+            const cat = detectJadwalCategory(item);
+            const phone = extractPhoneNumber((item.judul || '') + ' ' + (item.deskripsi || ''));
+            const timeFormatted = item.waktu || item.jam || 'Hari Ini';
+            
+            const waGreeting = `Halo Bapak/Ibu, saya ${salesConsultantName} dari Tunas Toyota Kiara Condong ingin follow-up terkait: ${item.judul || 'agenda sales'}. Terima kasih!`;
+
+            return `
+                <div class="today-jadwal-card" id="todayJadwalItem_${item.id}" style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4.5px solid ${cat.border}; border-radius: 12px; padding: 12px 14px; box-shadow: 0 2px 5px rgba(15,23,42,0.04); transition: all 0.25s ease;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; gap: 8px;">
+                        <span style="font-size: 10.5px; font-weight: 800; background: ${cat.bg}; color: ${cat.color}; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;">
+                            <i class="fa-solid ${cat.icon}"></i> ${cat.name}
+                        </span>
+                        <span style="font-size: 10.5px; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                            <i class="fa-regular fa-clock"></i> ${escapeHtmlText(timeFormatted)}
+                        </span>
+                    </div>
+
+                    <h4 style="margin: 0 0 6px 0; font-size: 13.5px; font-weight: 800; color: #0f172a; line-height: 1.35;">${escapeHtmlText(item.judul)}</h4>
+
+                    ${item.deskripsi ? `
+                    <div style="font-size: 12px; color: #475569; background: #f8fafc; border-radius: 8px; padding: 7px 10px; margin-bottom: 10px; line-height: 1.45; border: 1px dashed #e2e8f0;">
+                        ${escapeHtmlText(item.deskripsi)}
+                    </div>` : ''}
+
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                        ${phone ? `
+                        <a href="https://wa.me/${phone}?text=${encodeURIComponent(waGreeting)}" target="_blank" style="font-size: 11px; font-weight: 700; background: #22c55e; color: #fff; padding: 6px 12px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(34,197,94,0.3);">
+                            <i class="fa-brands fa-whatsapp"></i> Chat WA
+                        </a>` : ''}
+
+                        <button type="button" onclick="markJadwalDoneFromPopup(${item.id})" id="btnDoneJadwal_${item.id}" style="font-size: 11px; font-weight: 700; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s ease;">
+                            <i class="fa-solid fa-check"></i> Tandai Selesai
+                        </button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    window.openTodayJadwalModal = function () {
+        const modal = document.getElementById('todayJadwalReminderModal');
+        if (modal) {
+            modal.classList.add('show');
+        }
+    };
+
+    window.closeTodayJadwalModal = function () {
+        const modal = document.getElementById('todayJadwalReminderModal');
+        if (modal) {
+            modal.classList.remove('show');
+            const todayKey = new Date().toISOString().split('T')[0];
+            sessionStorage.setItem('sft_jadwal_popup_dismissed_' + todayKey, 'true');
+        }
+    };
+
+    window.markJadwalDoneFromPopup = function (id) {
+        const btn = document.getElementById(`btnDoneJadwal_${id}`);
+        const card = document.getElementById(`todayJadwalItem_${id}`);
+        if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            btn.style.pointerEvents = 'none';
+        }
+
+        fetch('api/api_jadwal.php', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, status: 'Selesai' })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.status === 'success') {
+                if (card) {
+                    card.style.background = '#f0fdf4';
+                    card.style.borderColor = '#86efac';
+                    card.style.transition = 'all 0.35s ease';
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 0; color: #16a34a; font-size: 13px; font-weight: 800;">
+                            <i class="fa-solid fa-circle-check" style="font-size: 16px;"></i> Agenda Berhasil Ditandai Selesai!
+                        </div>`;
+                    
+                    setTimeout(() => {
+                        card.remove();
+                        todayJadwalItems = todayJadwalItems.filter(x => x.id != id);
+                        const remainingCount = todayJadwalItems.length;
+                        updateJadwalBadges(remainingCount);
+
+                        if (remainingCount === 0) {
+                            renderTodayJadwalModalList([]);
+                        }
+                    }, 800);
+                }
+            } else {
+                alert(res.message || 'Gagal memperbarui status agenda');
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Tandai Selesai';
+                    btn.style.pointerEvents = 'auto';
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Error marking jadwal done:", err);
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Tandai Selesai';
+                btn.style.pointerEvents = 'auto';
+            }
+        });
+    };
+
+    function initTodayJadwalReminder() {
+        const todayDateEl = document.getElementById('popupTodayDateFormatted');
+        if (todayDateEl) {
+            const now = new Date();
+            const dayName = DAYS_ID[now.getDay()];
+            const dayNum = now.getDate();
+            const monthName = MONTHS_ID[now.getMonth()];
+            const yearNum = now.getFullYear();
+            todayDateEl.textContent = `${dayName}, ${dayNum} ${monthName} ${yearNum}`;
+        }
+
+        const salesId = localStorage.getItem('idSales') || 1;
+        fetch(`api/api_jadwal.php?sales_account_id=${salesId}&view=today_pending`)
+            .then(r => r.json())
+            .then(res => {
+                if (res.status === 'success' && res.data) {
+                    todayJadwalItems = res.data;
+                    const pendingCount = res.pending_count !== undefined ? res.pending_count : todayJadwalItems.length;
+                    
+                    updateJadwalBadges(pendingCount);
+                    renderTodayJadwalModalList(todayJadwalItems);
+
+                    // Auto-open modal popup on web load so sales consultant won't forget
+                    const todayKey = new Date().toISOString().split('T')[0];
+                    const isDismissed = sessionStorage.getItem('sft_jadwal_popup_dismissed_' + todayKey);
+                    if (pendingCount > 0 && !isDismissed) {
+                        setTimeout(() => {
+                            window.openTodayJadwalModal();
+                        }, 700);
+                    }
+                }
+            })
+            .catch(err => console.error("Error loading today jadwal:", err));
+    }
+
+    initTodayJadwalReminder();
 });

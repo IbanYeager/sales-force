@@ -78,6 +78,7 @@
                 </a>
                 <a href="pages/jadwal_input.html" class="sidebar-nav-link" data-tags="kalender jadwal agenda aktivitas reminder follow up">
                     <i class="fa-solid fa-calendar-days"></i> Kalender &amp; Reminder Jadwal
+                    <span id="sidebarJadwalBadge" class="sidebar-notif-badge" style="display:none; margin-left:auto; min-width:18px; height:18px; padding:0 5px; background:#c8102e; color:#fff; border-radius:10px; font-size:10px; font-weight:800; align-items:center; justify-content:center;">0</span>
                 </a>
                 <a href="pages/polreg.html" class="sidebar-nav-link" data-tags="polreg registrasi wilayah peta daerah kuota mobil kota bandung market share">
                     <i class="fa-solid fa-map-location-dot"></i> Peta Polreg Wilayah
@@ -904,7 +905,10 @@
                                 <span class="category-text">Target &amp; Capaian</span>
                             </a>
                             <a href="pages/jadwal_input.html" class="category-item modal-feature-item" data-tags="kalender jadwal agenda aktivitas reminder follow up stnk servis">
-                                <div class="category-icon" style="position: relative;"><i class="fa-solid fa-calendar-days"></i><span style="position: absolute; top: -4px; right: -4px; width: 8px; height: 8px; background: #c8102e; border-radius: 50%;"></span></div>
+                                <div class="category-icon" style="position: relative;">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <span id="featureModalJadwalBadge" class="feature-notif-badge" style="display: none; position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; background: #c8102e; color: #fff; border-radius: 999px; font-size: 10px; font-weight: 800; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(200,16,46,0.4); line-height: 1;">0</span>
+                                </div>
                                 <span class="category-text">Kalender &amp; Jadwal</span>
                             </a>
                             <a href="pages/ao_report.html" class="category-item modal-feature-item" data-tags="ao report live leasing finance match">
@@ -1473,6 +1477,64 @@
                         <button id="detBtnHubungiSales" class="btn-main olxdet-wa" style="display: none;">
                             <i class="fa-brands fa-whatsapp"></i> Hubungi Sales
                         </button>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL: PENGINGAT JADWAL & AGENDA HARI INI ═══ -->
+                <div class="modal-overlay" id="todayJadwalReminderModal" style="z-index: 10005;">
+                    <div class="modal-content jm-content premium-modal-aktivitas" style="max-width: 520px; width: 100%; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);">
+                        <div class="jm-drag-handle"></div>
+
+                        <!-- Premium Header Red-Navy Gradient -->
+                        <div class="pm-header pm-header-red" style="background: linear-gradient(135deg, #991b1b 0%, #c8102e 55%, #1e1b4b 100%); padding: 18px 20px; position: relative; overflow: hidden;">
+                            <div class="pm-header-deco" style="position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%); border-radius: 50%;"></div>
+                            <div class="pm-header-content" style="display: flex; align-items: flex-start; justify-content: space-between; position: relative; z-index: 2;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div class="pm-header-icon" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                    </div>
+                                    <div class="pm-header-text">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <h3 style="margin: 0; color: #fff; font-size: 16px; font-weight: 800; letter-spacing: -0.2px;">Pengingat Agenda Hari Ini</h3>
+                                            <span id="popupJadwalCountBadge" style="background: #fff; color: #c8102e; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">0</span>
+                                        </div>
+                                        <p style="margin: 2px 0 0; color: rgba(255,255,255,0.88); font-size: 12px; font-weight: 500;" id="popupJadwalSubtitle">Jangan lewatkan agenda &amp; follow-up Anda hari ini!</p>
+                                    </div>
+                                </div>
+                                <button class="pm-close-btn" onclick="closeTodayJadwalModal()" style="background: rgba(255,255,255,0.15); border: none; width: 32px; height: 32px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Quick Date Bar -->
+                            <div style="margin-top: 14px; padding: 8px 12px; background: rgba(0,0,0,0.22); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #fff; backdrop-filter: blur(4px);">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <i class="fa-regular fa-clock" style="color: #fca5a5;"></i>
+                                    <span id="popupTodayDateFormatted">Hari Ini</span>
+                                </div>
+                                <span style="font-weight: 700; color: #fecdd3; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 6px;">Live Reminder</span>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="pm-body" style="padding: 16px 18px; max-height: 52vh; overflow-y: auto; background: #f8fafc;">
+                            <div id="todayJadwalModalBody" style="display: flex; flex-direction: column; gap: 12px;">
+                                <div class="pm-loading-state" style="text-align:center; padding: 24px 0; color: #94a3b8;">
+                                    <div class="pm-loading-spinner" style="width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: #c8102e; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px;"></div>
+                                    <p style="font-size: 12px; font-weight: 600; margin: 0;">Memeriksa agenda hari ini...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div style="padding: 12px 18px; background: #ffffff; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: center; justify-content: space-between;">
+                            <a href="pages/jadwal_input.html" class="btn-main" style="flex: 1; text-align: center; text-decoration: none; padding: 10px 14px; font-size: 12.5px; font-weight: 700; border-radius: 10px; background: #0f172a; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                                <i class="fa-solid fa-calendar-plus"></i> Kelola Kalender &amp; Jadwal
+                            </a>
+                            <button type="button" onclick="closeTodayJadwalModal()" style="padding: 10px 16px; font-size: 12.5px; font-weight: 700; border-radius: 10px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; cursor: pointer; transition: background 0.2s ease;">
+                                Tutup
+                            </button>
+                        </div>
                     </div>
                 </div>
 
