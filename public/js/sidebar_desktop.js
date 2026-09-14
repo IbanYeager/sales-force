@@ -771,7 +771,10 @@
         (function upgradeHeaders() {
             const headers = document.querySelectorAll('.header-page');
             headers.forEach(header => {
-                if (header.classList.contains('header-upgraded')) return;
+                if (header.classList.contains('header-upgraded') || header.querySelector('.header-nav-group')) {
+                    header.classList.add('header-upgraded');
+                    return;
+                }
                 header.classList.add('header-upgraded');
 
                 // Find title element
@@ -791,9 +794,8 @@
                 }
 
                 // Collect non-title & non-backbtn nodes (e.g. right side buttons, badges)
-                const otherNodes = Array.from(header.childNodes).filter(node => {
-                    if (node === h2 || node === backBtn) return false;
-                    if (node.nodeType === 3 && !node.textContent.trim()) return false;
+                const otherNodes = Array.from(header.children).filter(node => {
+                    if (node === h2 || node === backBtn || node.classList.contains('header-nav-group') || node.classList.contains('header-right-group')) return false;
                     return true;
                 });
 

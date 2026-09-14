@@ -7,8 +7,8 @@
   <title>Kalender & Reminder Follow-Up - Tunas Toyota Kiara Condong</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=20260914_fix_mobile" />
-  <link rel="stylesheet" href="../css/jadwal_input.css?v=20260914_cal_v3">
-  <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
+  <link rel="stylesheet" href="../css/jadwal_input.css?v=20260914_cal_v4">
+  <script src="../js/sidebar_desktop.js?v=20260914_fix_hdr"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 </head>
@@ -17,14 +17,11 @@
   <div class="mobile-app" style="padding-bottom: 90px; width: 100%; max-width: 1200px; margin: 0 auto; box-sizing: border-box; overflow-x: hidden;">
     <!-- Header Mobile Navigation -->
     <header class="header-page">
-      <div class="header-nav-group">
-        <a href="../index.html" title="Kembali ke Dashboard" class="header-back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <h2>Kalender &amp; Reminder Jadwal</h2>
-      </div>
-      <div class="header-right-group"></div>
+      <a href="../index.html" title="Kembali ke Dashboard"><i class="fa-solid fa-arrow-left"></i></a>
+      <h2>Kalender &amp; Reminder</h2>
     </header>
 
-    <div class="container" style="padding: 0 12px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+    <div class="jadwal-container">
     <!-- Top Statistics & Hero Banner -->
     <div class="jadwal-hero">
       <div class="jadwal-hero-header">
