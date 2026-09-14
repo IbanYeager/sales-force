@@ -52,7 +52,7 @@ $salesPages = [
     'merchandise', 'notifikasi', 'olx', 'order_tracker', 'penjualan_kircon', 'pitstop',
     'polreg', 'polreg_detail', 'pricelist', 'promo', 'public_card', 'quotation', 'rental_testdrive', 'retention',
     'riwayat_foto_aktivitas', 'snake', 'target', 'tco', 'tebak', 'testdrive',
-    'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'wa_studio'
+    'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'video_viral', 'wa_studio'
 ];
 
 Route::get('/e-catalog', function () {

@@ -125,6 +125,9 @@
                 <a href="pages/delivery_ceremony.html" class="sidebar-nav-link" data-tags="handover ceremony serah terima piagam">
                     <i class="fa-solid fa-award"></i> Digital Delivery Ceremony
                 </a>
+                <a href="pages/video_viral.html" class="sidebar-nav-link" data-tags="video viral tiktok reels shorts kircon konten instagram serah terima review promo">
+                    <i class="fa-solid fa-video" style="color:#fe2c55;"></i> Video Viral Tunas Kircon <span class="sidebar-notif-badge" style="background:#fe2c55; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">HOT</span>
+                </a>
                 <a href="pages/do.html" class="sidebar-nav-link" data-tags="do delivery order surat jalan kirim">
                     <i class="fa-solid fa-truck"></i> Surat Jalan (DO)
                 </a>
@@ -433,6 +436,28 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- ═══ VIDEO VIRAL TUNAS TOYOTA KIRCON BANNER ═══ -->
+                    <a href="pages/video_viral.html" class="card" style="display:block; text-decoration:none; background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #31101e 100%); color: white; border: 1.5px solid rgba(254,44,85,0.4); border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(15,23,42,0.15); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #fe2c55, #c8102e); display:flex; align-items:center; justify-content:center; font-size:20px; color:#ffffff; box-shadow:0 0 15px rgba(254,44,85,0.5);">
+                                    <i class="fa-solid fa-play"></i>
+                                </div>
+                                <div>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <h4 style="margin:0; font-size:15px; font-weight:800; color:#ffffff;">Video Viral Tunas Kircon</h4>
+                                        <span style="font-size:10px; background:#fe2c55; color:white; padding:2px 7px; border-radius:10px; font-weight:800; letter-spacing:0.5px;">🔥 TRENDING</span>
+                                    </div>
+                                    <p style="margin:3px 0 0 0; font-size:12px; color:#cbd5e1;">Koleksi video viral TikTok &amp; Reels: serah terima haru, review fitur Zenix &amp; bahan promosi WA</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:10px; font-size:12px; font-weight:700; color:white;">
+                                <span>Buka Galeri</span>
+                                <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
+                            </div>
+                        </div>
+                    </a>
 
                     <!-- ═══ AREA OPERATION (AO) REPORT BANNER & METRICS ═══ -->
                     <div class="card ao-preview-card" style="background: linear-gradient(135deg, #0b132b 0%, #1c2541 100%); color: white; border: 1.5px solid #3a506b; border-radius: 16px; padding: 18px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(11,19,43,0.3);">

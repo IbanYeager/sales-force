@@ -123,6 +123,7 @@
                 ${navLinkKacab('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
                 ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkKacab('pages/video_viral.html', 'fa-solid fa-video', 'Video Viral Kircon')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -203,6 +204,7 @@
                 ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
                 ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
                 ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkSPV('pages/video_viral.html', 'fa-solid fa-video', 'Video Viral Kircon')}
                 ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
@@ -293,6 +295,7 @@
                 ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)', 'kartu nama digital vcard qr kontak profil')}
                 ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub', 'after sales servis stnk bpkb retention loyalitas')}
                 ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony', 'handover ceremony serah terima piagam')}
+                ${navLink('pages/video_viral.html', 'fa-solid fa-video', 'Video Viral Tunas Kircon <span class="sidebar-notif-badge" style="background:#fe2c55; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">HOT</span>', 'video viral tiktok reels shorts kircon konten instagram serah terima review promo')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
                 ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Pusat Test Drive & Booking', 'test drive uji coba mobil showroom rental rekanan riwayat booking')}
