@@ -1,65 +1,75 @@
 /**
- * AO (Area Operation) Report Data & Business Logic Engine
- * Tunas Toyota Kiara Condong - Standard Area Operation Whiteboard System
+ * AO (Area Operation) Report Data Engine - Tunas Toyota Kiaracondong
+ * Synchronized with the physical whiteboard (31 Agustus 2026)
  */
 
 (function(window) {
     'use strict';
 
-    // Master Initial Data mirroring the physical whiteboard photo (10 Agustus 2026)
     const DEFAULT_AO_DATA = {
         branch: 'TUNAS TOYOTA KIARACONDONG',
-        reportDate: '10 Agustus 2026',
+        reportDate: '31 Agustus 2026',
         periodMonth: 'Agustus 2026',
-        
-        // 1. Stock Matching with OS
+
+        // 1. Stock Matching with OS (Lingkaran 2)
         stock: {
-            fullStock: { total: 124, free: 82, match: 42 },
-            invoiceableStock: { total: 124, free: 82, match: 42 },
+            fullStock: { total: 46, free: 30, match: 16 },
+            invoiceableStock: { total: 46, free: 30, match: 16 },
             osOrder: {
-                gt60Days: { total: 1, match: 0, firmedMatch: 0 },
-                d30To60Days: { total: 0, match: 0, firmedMatch: 0 },
-                lt30Days: { total: 48, firmed: 18, match: 30, firmedMatch: 30 }
+                total: 29,
+                gt60Days: { total: 0, match: 0 },
+                d30To60Days: { total: 4, match: 2, firmedMatch: 0 },
+                firmedOSLt30: { total: 25, firmed: 6, plCpi: 19 }
             },
-            matchingStatus: {
-                unmatchStock: 7,
-                unmatchBreakdown: { unfirmedGt30: 0, unfirmedLt30: 0, firmedGt30: 0, firmedLt30: 7, firmed: 1 },
-                matchStock: 42,
-                weeklyUnfirmedMatch: {
-                    w1: 10,
-                    w2: 5,
-                    w3: 5,
-                    w4: 1
+            stockMatching: {
+                matchUnfirmedGt30: 2,
+                matchUnfirmedLt30: 2,
+                unmatchStock: 10,
+                unmatchBreakdown: {
+                    firmedGt30: 1,
+                    firmedLt30: 5,
+                    unfirmedLt30: 4,
+                    unfirmedGt30: 0
                 },
-                firmedMatch: 18
+                matchStock: 16,
+                matchBreakdown: {
+                    firmedGt30: 1,
+                    plCpi: 15
+                }
             },
             kpi: {
-                matchingRatio: 86, // in %
+                matchingRatio: 34, // %
                 targetDO: 92,
-                potentialDoFromOS: 52,
-                gapFromTarget: 40,
-                mtdActual: 18
+                potentialDoFromOS: 16,
+                gapTarget: 76,
+                mtdActual: 16,
+                mdpVal: 0,
+                onHandStock: 16
             },
             ritme5Harian: [
-                { period: '1-5', value: 3, accum: 3 },
-                { period: '6-10', value: 7, accum: 10 },
-                { period: '11-15', value: 9, accum: 19 },
-                { period: '16-20', value: 10, accum: 29 },
-                { period: '21-25', value: 11, accum: 40 },
-                { period: '26-31', value: 12, accum: 52 }
+                { period: '1-5', value: 2, accum: 2 },
+                { period: '6-10', value: 3, accum: 5 },
+                { period: '11-15', value: 3, accum: 8 },
+                { period: '16-20', value: 3, accum: 11 },
+                { period: '21-25', value: 3, accum: 14 },
+                { period: '26-31', value: 2, accum: 16 }
             ]
         },
 
-        // 2. Matching Stock from Order / SPK Plan
+        // 2. Matching Stock from Order / SPK Plan (Lingkaran 10)
         spkPlan: {
             periods: ['TTL', '1-5', '6-10', '11-15', '16-20', '21-25', '26-31'],
+            effectiveNRS: 76,
+            forNPlus1RS: 42,
+
             spkGrossPlan: [122, 20, 20, 20, 20, 20, 22],
             spkGrossActual: [54, 30, 24, null, null, null, null],
-            gapGross: [null, '+10', '+4', null, null, null, null],
-            
-            cancellationAssum: [8, 1, 1, 1, 2, 1, 1],
+            gapGross: ['-', 0, 1, 2, 3, 1, 1],
+
+            cancellationAssum: [8, 1, 1, 2, 2, 1, 1],
             cancellationActual: [0, 0, 0, null, null, null, null],
             cancellationRatio: ['0%', '0%', '0%', '0%', '0%', '0%', '0%'],
+
             cancelRatioStats: {
                 threeMonthsAvg: '4%',
                 loanRejection: '2%'
@@ -67,91 +77,119 @@
 
             spkNettPlan: [114, 19, 19, 19, 19, 19, 19],
             spkNettActual: [54, 30, 24, null, null, null, null],
-            gapNett: [null, '+11', '+5', '-19', '-19', '-19', '-19'],
+            gapNett: ['-', '+11', '+5', '-19', '-19', '-19', '-19'],
 
-            effectiveToN1RS: 48,
             nettSpkVisualize: [
-                { period: '1-5', step: 30, accum: 30 },
-                { period: '6-10', step: 24, accum: 54 },
-                { period: '11-15', step: 19, accum: 73 },
-                { period: '16-20', step: 19, accum: 92 },
-                { period: '21-25', step: 19, accum: 111 },
-                { period: '26-31', step: 19, accum: 130 }
+                { period: '1-5', val: 19 },
+                { period: '6-10', val: 19 },
+                { period: '11-15', val: 19 },
+                { period: '16-20', val: 19 },
+                { period: '21-25', val: 19 },
+                { period: '26-31', val: 19 }
             ],
-            rsMetrics: {
-                avg5DaysSpk: 19,
+
+            rsPillar: {
+                ttl: 114,
                 becomeOS: 38,
-                effectiveToMonthDO: 76
+                effectiveMonthRS: 76,
+                avgDays: 8
             }
         },
 
-        // 3. MDP Plan (Monthly Delivery Plan & FFS Selling Plan)
+        // 3. MDP Plan & FFS Selling Plan
         mdpPlan: {
+            leftPillar: {
+                total: 32,
+                green: 2,
+                blue: 30
+            },
+            ffsPillar: 46,
             ffsSellingPlan: [
-                { period: '1-5', value: 38, accum: 38, icon: 'truck' },
-                { period: '6-10', value: 6, accum: 44, icon: 'truck' },
-                { period: '11-15', value: 20, accum: 64, icon: 'truck-fast' },
-                { period: '16-20', value: 23, accum: 87, icon: 'truck-ramp-box' },
-                { period: '21-25', value: 22, accum: 109, icon: 'truck-plane' },
-                { period: '26-31', value: 8, accum: 117, icon: 'truck-front' },
-                { period: 'Reserve', value: 17, accum: 134, icon: 'boxes-packing' }
+                { period: '1-5', accum: 46 },
+                { period: '6-10', accum: 52 },
+                { period: '11-15', accum: 72 },
+                { period: '16-20', accum: 95 },
+                { period: '21-25', accum: 117 },
+                { period: '26-31', accum: 125 }
             ],
-            stepProgression: [
-                { period: '1-5', value: 0, accum: 0 },
-                { period: '6-10', value: 0, accum: 0 },
-                { period: '11-15', value: 8, accum: 8 },
-                { period: '16-20', value: 9, accum: 17 },
-                { period: '21-25', value: 10, accum: 27 },
-                { period: '26-31', value: 13, accum: 40 }
-            ],
-            accumMtdDoRs: 57,
-            totalSellingPlanAccum: 134
+            rsPlanSteps: [19, 19, 19, 19, 19, 19],
+            accumMtdDoRsValues: [0, 0, 8, 17, 27, 40],
+            fromNewOrder: 76
         },
 
-        // 4. Closing Estimation (Executive Metrics)
+        // 4. Closing Estimation (Lingkaran 1)
         closingEstimation: {
-            doRsTarget: 92,
-            matchingWithOS: 52,
-            newOrderSPK: 52,
-            totalEstClosingMonth: 104,
-            gapFromTarget: 12, // +12 Overachieve
-            efficiencyOS: 83, // %
-            nPlus1OpSPK: 85,
-            oldSPKMay21To31: 38,
-            constRatio: 45 // %
+            oapTarget: 92,
+            matchingOutstanding: 29,
+            newOrderSPK: 76,
+            totalEstClosing: 92,
+            totalInvoiceableStock: 46,
+            efficiencySTO: '24%'
         },
 
-        // 5. Vehicle Model Breakdown Matrix (24 Toyota Models + Grand Total)
-        modelsBreakdown: [
-            { model: 'Avanza New', gapOS: 5, w1: 15, w2: 2, w3: 2, w4: 1, totalMatch: 20, firmedPlan: 2, unmatch: 0, mdpStock: 7, adaCO1: 1, adaCO2: 0, estClosing: 22 },
-            { model: 'Veloz New', gapOS: 2, w1: 6, w2: 1, w3: 1, w4: 0, totalMatch: 8, firmedPlan: 1, unmatch: 0, mdpStock: 3, adaCO1: 1, adaCO2: 0, estClosing: 9 },
-            { model: 'Raize', gapOS: 3, w1: 4, w2: 1, w3: 1, w4: 0, totalMatch: 6, firmedPlan: 1, unmatch: 1, mdpStock: 2, adaCO1: 0, adaCO2: 0, estClosing: 7 },
-            { model: 'Agya', gapOS: 4, w1: 5, w2: 1, w3: 1, w4: 0, totalMatch: 7, firmedPlan: 2, unmatch: 0, mdpStock: 3, adaCO1: 1, adaCO2: 0, estClosing: 8 },
-            { model: 'Agya GR-S', gapOS: 1, w1: 2, w2: 0, w3: 0, w4: 0, totalMatch: 2, firmedPlan: 1, unmatch: 0, mdpStock: 1, adaCO1: 0, adaCO2: 0, estClosing: 3 },
-            { model: 'Calya', gapOS: 4, w1: 8, w2: 2, w3: 1, w4: 0, totalMatch: 11, firmedPlan: 3, unmatch: 0, mdpStock: 4, adaCO1: 1, adaCO2: 0, estClosing: 13 },
-            { model: 'Yaris', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 0 },
-            { model: 'Yaris Cross Gasoline', gapOS: 2, w1: 2, w2: 1, w3: 0, w4: 0, totalMatch: 3, firmedPlan: 1, unmatch: 0, mdpStock: 1, adaCO1: 0, adaCO2: 0, estClosing: 3 },
-            { model: 'Yaris Cross Hybrid', gapOS: 3, w1: 3, w2: 1, w3: 0, w4: 0, totalMatch: 4, firmedPlan: 1, unmatch: 1, mdpStock: 2, adaCO1: 0, adaCO2: 0, estClosing: 5 },
-            { model: 'Innova', gapOS: 1, w1: 1, w2: 0, w3: 0, w4: 0, totalMatch: 1, firmedPlan: 1, unmatch: 0, mdpStock: 1, adaCO1: 0, adaCO2: 0, estClosing: 2 },
-            { model: 'Innova Zenix Gasoline', gapOS: 4, w1: 4, w2: 1, w3: 1, w4: 0, totalMatch: 6, firmedPlan: 2, unmatch: 1, mdpStock: 3, adaCO1: 1, adaCO2: 0, estClosing: 8 },
-            { model: 'Innova Zenix Hybrid', gapOS: 7, w1: 9, w2: 3, w3: 2, w4: 0, totalMatch: 14, firmedPlan: 4, unmatch: 2, mdpStock: 5, adaCO1: 1, adaCO2: 0, estClosing: 16 },
-            { model: 'Fortuner 4x2', gapOS: 2, w1: 3, w2: 1, w3: 0, w4: 0, totalMatch: 4, firmedPlan: 1, unmatch: 0, mdpStock: 2, adaCO1: 0, adaCO2: 0, estClosing: 4 },
-            { model: 'Rush', gapOS: 3, w1: 5, w2: 1, w3: 1, w4: 0, totalMatch: 7, firmedPlan: 2, unmatch: 1, mdpStock: 2, adaCO1: 0, adaCO2: 0, estClosing: 7 },
-            { model: 'Alphard', gapOS: 1, w1: 1, w2: 0, w3: 0, w4: 0, totalMatch: 1, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 1 },
-            { model: 'Alphard Hybrid', gapOS: 1, w1: 1, w2: 0, w3: 0, w4: 0, totalMatch: 1, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 1 },
-            { model: 'Voxy', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 0 },
-            { model: 'Hilux D-Cab', gapOS: 1, w1: 1, w2: 0, w3: 0, w4: 0, totalMatch: 1, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 1 },
-            { model: 'Hilux S-Cab', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 0 },
-            { model: 'Hilux S-Cab 4x4', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 0 },
-            { model: 'Hilux Rangga', gapOS: 2, w1: 2, w2: 1, w3: 0, w4: 0, totalMatch: 3, firmedPlan: 1, unmatch: 1, mdpStock: 1, adaCO1: 0, adaCO2: 0, estClosing: 3 },
-            { model: 'Hiace', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 0 },
-            { model: 'Hiace Premio', gapOS: 1, w1: 1, w2: 0, w3: 0, w4: 0, totalMatch: 1, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 1 },
-            { model: 'Others', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmedPlan: 0, unmatch: 0, mdpStock: 0, adaCO1: 0, adaCO2: 0, estClosing: 0 }
+        // 5. Table 1: Model Breakdown for Gap OS & Matching (PL + CPI)
+        table1Models: [
+            { model: 'Avanza New', gapOS: 1, w1: 1, w2: 0, w3: 0, w4: 0, totalMatch: 1, firmed: 1, pLoan: 0, unmatch: 0 },
+            { model: 'Veloz New', gapOS: 1, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Raize', gapOS: 1, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Agya', gapOS: 3, w1: 1, w2: 1, w3: 0, w4: 0, totalMatch: 2, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Agya GR-S', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Calya', gapOS: 5, w1: 0, w2: 0, w3: 4, w4: 0, totalMatch: 4, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Yaris', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Yaris Cross Gasoline', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Yaris Cross Hybrid', gapOS: 3, w1: 1, w2: 0, w3: 2, w4: 0, totalMatch: 3, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Innova', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Innova Zenix Hybrid', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Innova Zenix', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Fortuner 4x2', gapOS: 1, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Rush', gapOS: 1, w1: 1, w2: 0, w3: 0, w4: 0, totalMatch: 1, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Alphard', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Alphard Hybrid', gapOS: 0, w1: 0, w2: 0, w3: 2, w4: 1, totalMatch: 3, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Voxy', gapOS: 0, w1: 0, w2: 0, w3: 2, w4: 2, totalMatch: 4, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Hilux D-Cab', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Hilux S-Cab', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Hilux S-Cab 4x4', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Hilux Rangga', gapOS: 0, w1: 0, w2: 0, w3: 2, w4: 2, totalMatch: 4, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Hiace', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Hiace Premio', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 },
+            { model: 'Others', gapOS: 0, w1: 0, w2: 0, w3: 0, w4: 0, totalMatch: 0, firmed: 0, pLoan: 0, unmatch: 0 }
+        ],
+
+        // 6. Table 2: Model Breakdown for Supply, Alokasi & FTS
+        table2BoxParams: {
+            nPlus1OpTgt: 114,
+            day21To30CkdSpk: 38,
+            comp: 76
+        },
+        table2Supply: [
+            { model: 'Avanza New', stock: 7, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 7, doActual: 0, stockMatching: 1, fts: 6, spk: 0, do: 0, netFts: 6 },
+            { model: 'Veloz New', stock: 5, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 5, doActual: 0, stockMatching: 0, fts: 5, spk: 0, do: 0, netFts: 5 },
+            { model: 'Raize', stock: 7, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 7, doActual: 0, stockMatching: 0, fts: 7, spk: 0, do: 0, netFts: 7 },
+            { model: 'Rush', stock: 4, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 4, doActual: 0, stockMatching: 1, fts: 3, spk: 0, do: 0, netFts: 3 },
+            { model: 'Agya', stock: 3, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 3, doActual: 0, stockMatching: 2, fts: 1, spk: 0, do: 0, netFts: 1 },
+            { model: 'Agya GR-S', stock: 2, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 2, doActual: 0, stockMatching: 0, fts: 2, spk: 0, do: 0, netFts: 2 },
+            { model: 'Calya', stock: 4, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 4, doActual: 0, stockMatching: 4, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Yaris', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Yaris Cross Gasoline', stock: 1, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 1, doActual: 0, stockMatching: 0, fts: 1, spk: 0, do: 0, netFts: 1 },
+            { model: 'Yaris Cross Hybrid', stock: 3, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 3, doActual: 0, stockMatching: 3, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Innova', stock: 2, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 2, doActual: 0, stockMatching: 0, fts: 2, spk: 0, do: 0, netFts: 2 },
+            { model: 'Innova Zenix Hybrid', stock: 3, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 3, doActual: 0, stockMatching: 0, fts: 3, spk: 0, do: 0, netFts: 3 },
+            { model: 'Innova Zenix', stock: 5, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 5, doActual: 0, stockMatching: 0, fts: 5, spk: 0, do: 0, netFts: 5 },
+            { model: 'Fortuner 4x2', stock: 2, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 2, doActual: 0, stockMatching: 0, fts: 2, spk: 0, do: 0, netFts: 2 },
+            { model: 'Alphard', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Alphard Hybrid', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Voxy', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Hilux D-Cab', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Hilux S-Cab', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Hilux S-Cab 4x4', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Hilux Rangga', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Hiace', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Hiace Premio', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 },
+            { model: 'Others', stock: 0, mdp: 0, secondAllo: 0, co: 0, ttlSupply: 0, doActual: 0, stockMatching: 0, fts: 0, spk: 0, do: 0, netFts: 0 }
         ]
     };
 
-    // Store in localStorage if not already saved
-    const STORAGE_KEY = 'ao_report_live_data_v2';
+    const STORAGE_KEY = 'ao_report_live_whiteboard_v3';
     let cachedLiveAOData = null;
 
     async function fetchAODataLive(forceFresh = false) {
@@ -162,13 +200,13 @@
         try {
             const res = await fetch('../api/api_ao_report.php');
             const json = await res.json();
-            if (json && json.status === 'success') {
+            if (json && json.status === 'success' && json.stock) {
                 cachedLiveAOData = json;
                 saveAOData(json);
                 return json;
             }
         } catch (err) {
-            console.warn('Gagal memuat live AO API, fallback ke cached/default:', err);
+            console.warn('Fallback ke preset whiteboard data:', err);
         }
 
         const fallback = getAOData();
@@ -181,7 +219,10 @@
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
-                return JSON.parse(saved);
+                const parsed = JSON.parse(saved);
+                if (parsed.table1Models && parsed.table2Supply) {
+                    return parsed;
+                }
             }
         } catch (e) {
             console.warn('Error reading localStorage AO data:', e);
@@ -204,119 +245,165 @@
         return fresh;
     }
 
-    // Calculation Helpers
-    function calculateTotals(models) {
+    function calculateTable1Totals(models) {
         const grand = {
-            model: 'GRAND TOTAL',
+            model: 'Grand Total',
             gapOS: 0,
             w1: 0,
             w2: 0,
             w3: 0,
             w4: 0,
             totalMatch: 0,
-            firmedPlan: 0,
-            unmatch: 0,
-            mdpStock: 0,
-            adaCO1: 0,
-            adaCO2: 0,
-            estClosing: 0
+            firmed: 0,
+            pLoan: 0,
+            unmatch: 0
         };
 
-        models.forEach(m => {
+        (models || []).forEach(m => {
             grand.gapOS += Number(m.gapOS || 0);
             grand.w1 += Number(m.w1 || 0);
             grand.w2 += Number(m.w2 || 0);
             grand.w3 += Number(m.w3 || 0);
             grand.w4 += Number(m.w4 || 0);
             grand.totalMatch += Number(m.totalMatch || (Number(m.w1||0) + Number(m.w2||0) + Number(m.w3||0) + Number(m.w4||0)) || 0);
-            grand.firmedPlan += Number(m.firmedPlan || 0);
+            grand.firmed += Number(m.firmed || 0);
+            grand.pLoan += Number(m.pLoan || 0);
             grand.unmatch += Number(m.unmatch || 0);
-            grand.mdpStock += Number(m.mdpStock || 0);
-            grand.adaCO1 += Number(m.adaCO1 || 0);
-            grand.adaCO2 += Number(m.adaCO2 || 0);
-            grand.estClosing += Number(m.estClosing || 0);
         });
 
         return grand;
     }
 
-    // Format WhatsApp Briefing Text
-    function generateWAContent(data, role) {
-        const d = data || getAOData();
-        const models = d.modelsBreakdown || [];
-        const grand = calculateTotals(models);
+    function calculateTable2Totals(models) {
+        const grand = {
+            model: 'Grand Total',
+            stock: 0,
+            mdp: 0,
+            secondAllo: 0,
+            co: 0,
+            ttlSupply: 0,
+            doActual: 0,
+            stockMatching: 0,
+            fts: 0,
+            spk: 0,
+            do: 0,
+            netFts: 0
+        };
 
-        let txt = `📊 *AREA OPERATION (AO) REPORT*\n`;
-        txt += `🏢 *${d.branch}*\n`;
-        txt += `📅 *Tanggal:* ${d.reportDate} | *Periode:* ${d.periodMonth}\n`;
-        txt += `─────────────────────────\n\n`;
-
-        txt += `🎯 *1. STOCK MATCHING WITH OS*\n`;
-        txt += `• Full Stock: *${d.stock.fullStock.total} unit* (Free: ${d.stock.fullStock.free} | Match: ${d.stock.fullStock.match})\n`;
-        txt += `• OS Order <30d: *${d.stock.osOrder.lt30Days.total} unit* (Firmed: ${d.stock.osOrder.lt30Days.firmed} | Match: ${d.stock.osOrder.lt30Days.match})\n`;
-        txt += `• Matching Ratio: *${d.stock.kpi.matchingRatio}%* 🟢\n`;
-        txt += `• Target DO Cabang: *${d.stock.kpi.targetDO} unit*\n`;
-        txt += `• Potensi DO dari OS: *${d.stock.kpi.potentialDoFromOS} unit* (Gap: ${d.stock.kpi.gapFromTarget} unit)\n`;
-        txt += `• Realisasi DO MTD: *${d.stock.kpi.mtdActual} unit*\n\n`;
-
-        txt += `📈 *2. SPK PACE & RITME 5-HARIAN*\n`;
-        txt += `• SPK Gross Plan: *${d.spkPlan.spkGrossPlan[0]} unit* | Aktual: *${d.spkPlan.spkGrossActual[0]} unit*\n`;
-        txt += `• Ritme 1-5: Plan ${d.spkPlan.spkGrossPlan[1]} ➔ Aktual *${d.spkPlan.spkGrossActual[1]} unit* (+10)\n`;
-        txt += `• Ritme 6-10: Plan ${d.spkPlan.spkGrossPlan[2]} ➔ Aktual *${d.spkPlan.spkGrossActual[2]} unit* (+4)\n`;
-        txt += `• Cancellation Ratio: *0%* (Aman)\n`;
-        txt += `• SPK Nett Aktual: *${d.spkPlan.spkNettActual[0]} unit*\n\n`;
-
-        txt += `🏆 *3. ESTIMASI CLOSING BULAN INI*\n`;
-        txt += `• DO/RS Target: *${d.closingEstimation.doRsTarget} unit*\n`;
-        txt += `• (+) Matching OS: *+${d.closingEstimation.matchingWithOS} unit*\n`;
-        txt += `• (+) New SPK Order: *+${d.closingEstimation.newOrderSPK} unit*\n`;
-        txt += `• 🏁 *TOTAL ESTIMASI CLOSING:* *${d.closingEstimation.totalEstClosingMonth} UNIT*\n`;
-        txt += `• Status vs Target: *+${d.closingEstimation.gapFromTarget} UNIT (OVERACHIEVE! 🎉)*\n`;
-        txt += `• Efisiensi OS: *${d.closingEstimation.efficiencyOS}%*\n\n`;
-
-        txt += `🚗 *4. TOP 5 KONTRIBUTOR MODEL*\n`;
-        const topModels = [...models].sort((a, b) => b.estClosing - a.estClosing).slice(0, 5);
-        topModels.forEach((m, idx) => {
-            txt += `${idx + 1}. *${m.model}*: Est. Closing ${m.estClosing} unit (Match: ${m.totalMatch} | MDP: ${m.mdpStock})\n`;
+        (models || []).forEach(m => {
+            grand.stock += Number(m.stock || 0);
+            grand.mdp += Number(m.mdp || 0);
+            grand.secondAllo += Number(m.secondAllo || 0);
+            grand.co += Number(m.co || 0);
+            grand.ttlSupply += Number(m.ttlSupply || (Number(m.stock||0) + Number(m.mdp||0) + Number(m.secondAllo||0) + Number(m.co||0)) || 0);
+            grand.doActual += Number(m.doActual || 0);
+            grand.stockMatching += Number(m.stockMatching || 0);
+            grand.fts += Number(m.fts || (Number(m.ttlSupply||0) - Number(m.stockMatching||0)) || 0);
+            grand.spk += Number(m.spk || 0);
+            grand.do += Number(m.do || 0);
+            grand.netFts += Number(m.netFts || (Number(m.fts||0) - Number(m.spk||0)) || 0);
         });
 
-        txt += `\n─────────────────────────\n`;
-        txt += `💪 *SEMANGAT JUARA & CLOSING TOYOTA!*`;
+        return grand;
+    }
+
+    function generateWAContent(data, role) {
+        const d = data || getAOData();
+        const t1 = d.table1Models || [];
+        const grand1 = calculateTable1Totals(t1);
+        const t2 = d.table2Supply || [];
+        const grand2 = calculateTable2Totals(t2);
+
+        let txt = `📋 *AREA OPERATION (AO) REPORT - PAPAN OPERASIONAL*\n`;
+        txt += `🏢 *${d.branch}*\n`;
+        txt += `📅 *Tanggal:* ${d.reportDate} | *Periode:* ${d.periodMonth}\n`;
+        txt += `═════════════════════════\n\n`;
+
+        txt += `🎯 *1. STOCK MATCHING WITH OS (②)*\n`;
+        txt += `• Full Stock: *${d.stock.fullStock.total}* (Free: ${d.stock.fullStock.free} | Match: ${d.stock.fullStock.match})\n`;
+        txt += `• Invoiceable Stk: *${d.stock.invoiceableStock.total}* (Free: ${d.stock.invoiceableStock.free} | Match: ${d.stock.invoiceableStock.match})\n`;
+        txt += `• OS Order: *${d.stock.osOrder.total}* (<30d: ${d.stock.osOrder.firmedOSLt30.total} | Firmed Match: ${d.stock.osOrder.firmedOSLt30.plCpi})\n`;
+        txt += `• Stock Matching: Match ${d.stock.stockMatching.matchStock} (PL+CPI 15) | Unmatch ${d.stock.stockMatching.unmatchStock}\n`;
+        txt += `• Matching Ratio: *${d.stock.kpi.matchingRatio}%* (③)\n`;
+        txt += `• Total Potensi DO fr OS: *${d.stock.kpi.potentialDoFromOS}* (⑤)\n`;
+        txt += `• Realisasi DO MTD: *${d.stock.kpi.mtdActual}* (④) | GAP Target: *${d.stock.kpi.gapTarget}* (⑥)\n\n`;
+
+        txt += `📈 *2. MATCHING STOCK FROM ORDER / SPK PLAN (⑩)*\n`;
+        txt += `• SPK Gross Plan: *${d.spkPlan.spkGrossPlan[0]}* | Aktual: *${d.spkPlan.spkGrossActual[0]}*\n`;
+        txt += `• SPK Nett Plan: *${d.spkPlan.spkNettPlan[0]}* (Ritme 19/periode)\n`;
+        txt += `• Eff to Month RS: *${d.spkPlan.rsPillar.effectiveMonthRS}* | Become OS: *${d.spkPlan.rsPillar.becomeOS}*\n`;
+        txt += `• Cancel Ratio 3M Avg: *${d.spkPlan.cancelRatioStats.threeMonthsAvg}* | Loan Rej: *${d.spkPlan.cancelRatioStats.loanRejection}*\n\n`;
+
+        txt += `🚚 *3. MDP PLAN & FFS SELLING PLAN*\n`;
+        txt += `• Pilar MDP: *${d.mdpPlan.leftPillar.total}* (Hijau: ${d.mdpPlan.leftPillar.green}, Biru: ${d.mdpPlan.leftPillar.blue})\n`;
+        txt += `• FFS Selling Plan: *${d.mdpPlan.ffsPillar}*\n`;
+        txt += `• From New Order: *${d.mdpPlan.fromNewOrder}*\n\n`;
+
+        txt += `🏁 *4. CLOSING ESTIMATION (①)*\n`;
+        txt += `• OAP Target: *${d.closingEstimation.oapTarget} unit*\n`;
+        txt += `• [A] Matching with OS: *${d.closingEstimation.matchingOutstanding}*\n`;
+        txt += `• [B] New Order (SPK): *${d.closingEstimation.newOrderSPK}*\n`;
+        txt += `• Total Estimasi Closing: *${d.closingEstimation.totalEstClosing} unit*\n`;
+        txt += `• Efficiency (STO): *${d.closingEstimation.efficiencySTO}*\n\n`;
+
+        txt += `🚗 *5. RINGKASAN STOK MODEL KUNCI (FTS)*\n`;
+        const topFts = [...t2].filter(m => m.stock > 0).slice(0, 6);
+        topFts.forEach(m => {
+            txt += `• *${m.model}*: Stock ${m.stock} | Match ${m.stockMatching} | Net FTS *${m.netFts}*\n`;
+        });
+        txt += `• *Total Stock Cabang: ${grand2.stock} unit*\n\n`;
+
+        txt += `═════════════════════════\n`;
+        txt += `💪 *TUNAS TOYOTA KIARACONDONG - SEMANGAT CLOSING!*`;
 
         return txt;
     }
 
-    // Export to CSV
     function exportToCSV(data) {
         const d = data || getAOData();
-        const models = d.modelsBreakdown || [];
-        const grand = calculateTotals(models);
+        const t1 = d.table1Models || [];
+        const grand1 = calculateTable1Totals(t1);
+        const t2 = d.table2Supply || [];
+        const grand2 = calculateTable2Totals(t2);
 
-        let csv = 'Model,Gap from OS,1 Minggu,2 Minggu,3 Minggu,4 Minggu,Total Match,Firmed Plan,Unmatch,MDP Stock,1st Ada C/O,2nd Ada C/O,Est Closing\n';
+        let csv = '=== AREA OPERATION REPORT - TUNAS TOYOTA KIARACONDONG ===\n';
+        csv += `Tanggal,${d.reportDate}\n`;
+        csv += `OAP Target,${d.closingEstimation.oapTarget}\n`;
+        csv += `Matching with OS,${d.closingEstimation.matchingOutstanding}\n`;
+        csv += `New Order SPK,${d.closingEstimation.newOrderSPK}\n`;
+        csv += `Total Est Closing,${d.closingEstimation.totalEstClosing}\n\n`;
 
-        models.forEach(m => {
-            csv += `"${m.model}",${m.gapOS},${m.w1},${m.w2},${m.w3},${m.w4},${m.totalMatch},${m.firmedPlan},${m.unmatch},${m.mdpStock},${m.adaCO1},${m.adaCO2},${m.estClosing}\n`;
+        csv += '--- TABEL 1: GAP FROM OS & MATCHING ---\n';
+        csv += 'Model,Gap from OS,1 Minggu,2 Minggu,3 Minggu,4 Minggu,Total Match,Firmed,P.Loan,UNMATCH\n';
+        t1.forEach(m => {
+            csv += `"${m.model}",${m.gapOS},${m.w1},${m.w2},${m.w3},${m.w4},${m.totalMatch},${m.firmed},${m.pLoan},${m.unmatch}\n`;
         });
+        csv += `"Grand Total",${grand1.gapOS},${grand1.w1},${grand1.w2},${grand1.w3},${grand1.w4},${grand1.totalMatch},${grand1.firmed},${grand1.pLoan},${grand1.unmatch}\n\n`;
 
-        csv += `"GRAND TOTAL",${grand.gapOS},${grand.w1},${grand.w2},${grand.w3},${grand.w4},${grand.totalMatch},${grand.firmedPlan},${grand.unmatch},${grand.mdpStock},${grand.adaCO1},${grand.adaCO2},${grand.estClosing}\n`;
+        csv += '--- TABEL 2: SUPPLY, ALOKASI & FTS ---\n';
+        csv += 'Model,Stock,MDP,2nd Allo,C/O,TTL Supply,DO Actual,Stock Matching,FTS,SPK,DO,Net FTS\n';
+        t2.forEach(m => {
+            csv += `"${m.model}",${m.stock},${m.mdp},${m.secondAllo},${m.co},${m.ttlSupply},${m.doActual},${m.stockMatching},${m.fts},${m.spk},${m.do},${m.netFts}\n`;
+        });
+        csv += `"Grand Total",${grand2.stock},${grand2.mdp},${grand2.secondAllo},${grand2.co},${grand2.ttlSupply},${grand2.doActual},${grand2.stockMatching},${grand2.fts},${grand2.spk},${grand2.do},${grand2.netFts}\n`;
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `AO_Report_Tunas_Toyota_${d.reportDate.replace(/\s+/g, '_')}.csv`;
+        a.download = `AO_Whiteboard_Report_${d.reportDate.replace(/\s+/g, '_')}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     }
 
-    // Global Export
     window.AOReportData = {
         DEFAULT_AO_DATA,
         getAOData,
         fetchAODataLive,
         saveAOData,
         resetAOData,
-        calculateTotals,
+        calculateTable1Totals,
+        calculateTable2Totals,
         generateWAContent,
         exportToCSV
     };

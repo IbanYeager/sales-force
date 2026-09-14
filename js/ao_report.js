@@ -1,12 +1,13 @@
 /**
  * ao_report.js
- * Interactive rendering and UI controller for AO Report
+ * Controller and Renderer for Area Operation (AO) Whiteboard Replica
+ * Tunas Toyota Kiaracondong (31 Agustus 2026)
  */
 
 (function(window, document) {
     'use strict';
 
-    let currentRole = 'sales'; // 'sales' | 'spv' | 'kacab'
+    let currentRole = 'sales';
 
     async function initAOReport(role) {
         currentRole = role || 'sales';
@@ -36,246 +37,264 @@
         renderSPKPlan(data);
         renderMDPPlan(data);
         renderClosingEstimation(data);
-        renderModelsBreakdown(data);
+        renderTable1(data);
+        renderTable2(data);
     }
 
     function renderHeader(data) {
-        const branchEl = document.getElementById('aoBranchName');
         const dateEl = document.getElementById('aoReportDate');
-        if (branchEl) branchEl.textContent = data.branch;
-        if (dateEl) dateEl.textContent = data.reportDate;
+        if (dateEl) dateEl.textContent = data.reportDate || '31 Agustus 2026';
     }
 
+    // SECTION 1: Stock Matching with OS (②)
     function renderStockMatching(data) {
         const s = data.stock;
-        
-        // Full Stock
-        const fullStockTot = document.getElementById('aoFullStockTotal');
-        const fullStockFree = document.getElementById('aoFullStockFree');
-        const fullStockMatch = document.getElementById('aoFullStockMatch');
-        const fullStockBarFree = document.getElementById('aoFullStockBarFree');
-        const fullStockBarMatch = document.getElementById('aoFullStockBarMatch');
+        if (!s) return;
 
-        if (fullStockTot) fullStockTot.textContent = s.fullStock.total;
-        if (fullStockFree) fullStockFree.textContent = s.fullStock.free;
-        if (fullStockMatch) fullStockMatch.textContent = s.fullStock.match;
+        // Pillar 1: Full Stock
+        const fsTot = document.getElementById('wbFullStockTotal');
+        const fsFree = document.getElementById('wbFullStockFree');
+        const fsMatch = document.getElementById('wbFullStockMatch');
+        if (fsTot) fsTot.textContent = s.fullStock.total;
+        if (fsFree) fsFree.textContent = s.fullStock.free;
+        if (fsMatch) fsMatch.textContent = s.fullStock.match;
 
-        if (fullStockBarFree && fullStockBarMatch) {
-            const freePct = Math.round((s.fullStock.free / s.fullStock.total) * 100);
-            const matchPct = 100 - freePct;
-            fullStockBarFree.style.width = freePct + '%';
-            fullStockBarFree.textContent = `Free ${s.fullStock.free}`;
-            fullStockBarMatch.style.width = matchPct + '%';
-            fullStockBarMatch.textContent = `Match ${s.fullStock.match}`;
-        }
+        // Pillar 2: Invoiceable Stock
+        const isTot = document.getElementById('wbInvStockTotal');
+        const isFree = document.getElementById('wbInvStockFree');
+        const isMatch = document.getElementById('wbInvStockMatch');
+        if (isTot) isTot.textContent = s.invoiceableStock.total;
+        if (isFree) isFree.textContent = s.invoiceableStock.free;
+        if (isMatch) isMatch.textContent = s.invoiceableStock.match;
 
-        // Invoiceable Stock
-        const invStockTot = document.getElementById('aoInvStockTotal');
-        const invStockFree = document.getElementById('aoInvStockFree');
-        const invStockMatch = document.getElementById('aoInvStockMatch');
-        const invStockBarFree = document.getElementById('aoInvStockBarFree');
-        const invStockBarMatch = document.getElementById('aoInvStockBarMatch');
+        // Pillar 3: OS Order
+        const osTot = document.getElementById('wbOsOrderTotal');
+        if (osTot) osTot.textContent = s.osOrder.total;
 
-        if (invStockTot) invStockTot.textContent = s.invoiceableStock.total;
-        if (invStockFree) invStockFree.textContent = s.invoiceableStock.free;
-        if (invStockMatch) invStockMatch.textContent = s.invoiceableStock.match;
+        // Pillar 4: Stock Matching
+        const smUnmatch = document.getElementById('wbSmUnmatchTotal');
+        const smMatch = document.getElementById('wbSmMatchTotal');
+        if (smUnmatch) smUnmatch.textContent = s.stockMatching.unmatchStock;
+        if (smMatch) smMatch.textContent = s.stockMatching.matchStock;
 
-        if (invStockBarFree && invStockBarMatch) {
-            const freePct = Math.round((s.invoiceableStock.free / s.invoiceableStock.total) * 100);
-            const matchPct = 100 - freePct;
-            invStockBarFree.style.width = freePct + '%';
-            invStockBarFree.textContent = `Free ${s.invoiceableStock.free}`;
-            invStockBarMatch.style.width = matchPct + '%';
-            invStockBarMatch.textContent = `Match ${s.invoiceableStock.match}`;
-        }
+        // KPI & Staircase
+        const ratioEl = document.getElementById('wbMatchingRatioVal');
+        const potEl = document.getElementById('wbPotentialDoVal');
+        const gapTargetEl = document.getElementById('wbGapTargetVal');
+        const mtdEl = document.getElementById('wbMtdActualVal');
 
-        // OS Order
-        const osLt30Tot = document.getElementById('aoOsLt30Total');
-        const osLt30Firm = document.getElementById('aoOsLt30Firmed');
-        const osLt30Match = document.getElementById('aoOsLt30Match');
-        if (osLt30Tot) osLt30Tot.textContent = s.osOrder.lt30Days.total;
-        if (osLt30Firm) osLt30Firm.textContent = s.osOrder.lt30Days.firmed;
-        if (osLt30Match) osLt30Match.textContent = s.osOrder.lt30Days.match;
-
-        // Stock Matching Status
-        const matchRatio = document.getElementById('aoMatchingRatio');
-        const potDO = document.getElementById('aoPotentialDO');
-        const tgtDO = document.getElementById('aoTargetDO');
-        const gapDO = document.getElementById('aoGapTargetDO');
-        const mtdDO = document.getElementById('aoMtdActualDO');
-
-        if (matchRatio) matchRatio.textContent = s.kpi.matchingRatio + '%';
-        if (potDO) potDO.textContent = s.kpi.potentialDoFromOS;
-        if (tgtDO) tgtDO.textContent = s.kpi.targetDO;
-        if (gapDO) gapDO.textContent = s.kpi.gapFromTarget;
-        if (mtdDO) mtdDO.textContent = s.kpi.mtdActual;
-
-        // Ladder steps for stock ritmo
-        const ladderWrap = document.getElementById('aoStockLadderSteps');
-        if (ladderWrap && s.ritme5Harian) {
-            ladderWrap.innerHTML = s.ritme5Harian.map((step, idx) => `
-                <div class="ao-step-bar active-ladder-${idx + 1}" title="Ritme ${step.period}: +${step.value} (Akum: ${step.accum})">
-                    <span>${step.value}</span>
-                    <span style="font-size:8px; opacity:0.85;">Akum ${step.accum}</span>
-                </div>
-            `).join('');
-        }
+        if (ratioEl) ratioEl.textContent = s.kpi.matchingRatio;
+        if (potEl) potEl.textContent = s.kpi.potentialDoFromOS;
+        if (gapTargetEl) gapTargetEl.textContent = s.kpi.gapTarget;
+        if (mtdEl) mtdEl.textContent = s.kpi.mtdActual;
     }
 
+    // SECTION 2: Matching Stock from Order / SPK Plan (⑩)
     function renderSPKPlan(data) {
         const p = data.spkPlan;
-        const tbody = document.getElementById('aoSpkTableBody');
-        if (!tbody) return;
+        const tbody = document.getElementById('wbSpkTableBody');
+        if (!tbody || !p) return;
 
         let html = '';
-        
-        // Row 1: Gross Plan
+
+        // Row 1: SPK Gross Plan
         html += `<tr>
-            <td style="text-align:left; font-weight:800; background:#f1f5f9;">SPK Gross Plan</td>
+            <td style="text-align:left;">SPK Gross Plan</td>
             <td><strong>${p.spkGrossPlan[0]}</strong></td>
             ${p.spkGrossPlan.slice(1).map(v => `<td>${v}</td>`).join('')}
         </tr>`;
 
-        // Row 2: Gross Actual
-        html += `<tr>
-            <td style="text-align:left; font-weight:800; background:#f1f5f9;">SPK Gross Actual</td>
-            <td><strong style="color:var(--ao-primary-red);">${p.spkGrossActual[0]}</strong></td>
-            ${p.spkGrossActual.slice(1).map(v => `<td>${v !== null ? `<strong>${v}</strong>` : '-'}</td>`).join('')}
+        // Row 2: SPK Gross actual
+        html += `<tr class="ao-row-green-actual">
+            <td style="text-align:left;">SPK Gross actual</td>
+            <td><strong>${p.spkGrossActual[0] || 54}</strong></td>
+            <td><strong>30</strong></td>
+            <td><strong>24</strong></td>
+            <td>-</td><td>-</td><td>-</td><td>-</td>
         </tr>`;
 
-        // Row 3: Gross GAP
+        // Row 3: GAP
         html += `<tr>
-            <td style="text-align:left; font-weight:800; background:#f1f5f9;">GAP</td>
+            <td style="text-align:left;">GAP</td>
             <td>-</td>
-            <td class="cell-gap-pos">+10</td>
-            <td class="cell-gap-pos">+4</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
+            <td>0</td><td>1</td><td>2</td><td>3</td><td>1</td><td>1</td>
         </tr>`;
 
-        // Row 4: Cancellation Assum
+        // Row 4: Cancellation assum.
         html += `<tr>
-            <td style="text-align:left; font-weight:800; background:#f1f5f9;">Cancellation Assum.</td>
+            <td style="text-align:left;">Cancellation assum.</td>
             <td>${p.cancellationAssum[0]}</td>
             ${p.cancellationAssum.slice(1).map(v => `<td>${v}</td>`).join('')}
         </tr>`;
 
-        // Row 5: Cancellation Actual
+        // Row 5: Cancellation actual
         html += `<tr>
-            <td style="text-align:left; font-weight:800; background:#f1f5f9;">Cancellation Actual</td>
-            <td>${p.cancellationActual[0]}</td>
-            ${p.cancellationActual.slice(1).map(v => `<td>${v !== null ? v : '-'}</td>`).join('')}
+            <td style="text-align:left;">Cancellation actual</td>
+            <td>0</td><td>0</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td>
         </tr>`;
 
-        // Row 6: SPK Nett Actual
-        html += `<tr style="background:#eef2ff;">
-            <td style="text-align:left; font-weight:800; color:#3730a3;">SPK Nett Actual</td>
-            <td><strong style="color:#3730a3; font-size:13px;">${p.spkNettActual[0]}</strong></td>
+        // Row 6: Cancellation ratio
+        html += `<tr>
+            <td style="text-align:left;">Cancellation ratio</td>
+            <td>0%</td><td>0%</td><td>0%</td><td>-</td><td>-</td><td>-</td><td>-</td>
+        </tr>`;
+
+        // Row 7: SPK Nett Plan
+        html += `<tr class="ao-row-nett-plan">
+            <td style="text-align:left;">SPK Nett Plan</td>
+            <td><strong>${p.spkNettPlan[0]}</strong></td>
+            ${p.spkNettPlan.slice(1).map(v => `<td>${v}</td>`).join('')}
+        </tr>`;
+
+        // Row 8: SPK Nett actual
+        html += `<tr class="ao-row-green-actual">
+            <td style="text-align:left;">SPK Nett actual</td>
+            <td><strong>${p.spkNettActual[0] || 54}</strong></td>
             <td><strong>30</strong></td>
             <td><strong>24</strong></td>
+            <td>-</td><td>-</td><td>-</td><td>-</td>
+        </tr>`;
+
+        // Row 9: GAP
+        html += `<tr>
+            <td style="text-align:left;">GAP</td>
             <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
+            <td>+11</td><td>+5</td><td>-19</td><td>-19</td><td>-19</td><td>-19</td>
         </tr>`;
 
         tbody.innerHTML = html;
 
-        // Visual Nett SPK ladder
-        const nettLadderWrap = document.getElementById('aoNettSpkLadder');
-        if (nettLadderWrap && p.nettSpkVisualize) {
-            nettLadderWrap.innerHTML = p.nettSpkVisualize.map((step, idx) => `
-                <div class="ao-step-bar active-ladder-${idx + 1}" title="Ritme ${step.period}: Step ${step.step} (Akum: ${step.accum})">
-                    <span>${step.step}</span>
-                    <span style="font-size:8.5px; opacity:0.85;">${step.accum}</span>
-                </div>
-            `).join('');
-        }
+        // Cancel ratio box
+        const cancel3m = document.getElementById('wbCancel3mAvg');
+        const loanRej = document.getElementById('wbLoanRej');
+        if (cancel3m) cancel3m.textContent = p.cancelRatioStats.threeMonthsAvg;
+        if (loanRej) loanRej.textContent = p.cancelRatioStats.loanRejection;
+
+        // Become OS & Month RS pillar
+        const becomeOs = document.getElementById('wbPillarBecomeOs');
+        const effMonth = document.getElementById('wbPillarEffMonthRS');
+        if (becomeOs) becomeOs.textContent = p.rsPillar.becomeOS;
+        if (effMonth) effMonth.textContent = p.rsPillar.effectiveMonthRS;
     }
 
+    // SECTION 3: MDP Plan
     function renderMDPPlan(data) {
         const m = data.mdpPlan;
-        const truckFlow = document.getElementById('aoMdpTruckFlow');
-        if (truckFlow && m.ffsSellingPlan) {
-            truckFlow.innerHTML = m.ffsSellingPlan.map(item => `
-                <div class="ao-truck-node">
-                    <i class="fa-solid fa-${item.icon} ao-truck-icon"></i>
-                    <div style="font-size:10px; font-weight:700; color:#64748b;">${item.period}</div>
-                    <div class="ao-truck-val">${item.value}</div>
-                    <div class="ao-truck-accum">Akum: ${item.accum}</div>
-                </div>
-            `).join('');
-        }
+        if (!m) return;
 
-        const mtdDoRs = document.getElementById('aoMdpAccumMtdDoRs');
-        if (mtdDoRs) mtdDoRs.textContent = m.accumMtdDoRs;
+        const mdpTot = document.getElementById('wbMdpPillarTotal');
+        const mdpGrn = document.getElementById('wbMdpSliceGreen');
+        const mdpBlu = document.getElementById('wbMdpSliceBlue');
+        const ffsTot = document.getElementById('wbFfsPillarVal');
+        const newOrder = document.getElementById('wbFromNewOrderVal');
+
+        if (mdpTot) mdpTot.textContent = m.leftPillar.total;
+        if (mdpGrn) mdpGrn.textContent = m.leftPillar.green;
+        if (mdpBlu) mdpBlu.textContent = m.leftPillar.blue;
+        if (ffsTot) ffsTot.textContent = m.ffsPillar;
+        if (newOrder) newOrder.textContent = m.fromNewOrder;
     }
 
+    // SECTION 4: Closing Estimation (①)
     function renderClosingEstimation(data) {
         const c = data.closingEstimation;
-        const doTargetEl = document.getElementById('aoCloseDoTarget');
-        const matchOSEl = document.getElementById('aoCloseMatchOS');
-        const newOrderEl = document.getElementById('aoCloseNewOrder');
-        const totalEstEl = document.getElementById('aoCloseTotalEst');
-        const gapTargetEl = document.getElementById('aoCloseGapTarget');
-        const effOSEl = document.getElementById('aoCloseEffOS');
+        if (!c) return;
 
-        if (doTargetEl) doTargetEl.textContent = c.doRsTarget;
-        if (matchOSEl) matchOSEl.textContent = '+' + c.matchingWithOS;
-        if (newOrderEl) newOrderEl.textContent = '+' + c.newOrderSPK;
-        if (totalEstEl) totalEstEl.textContent = c.totalEstClosingMonth;
-        if (gapTargetEl) {
-            gapTargetEl.textContent = (c.gapFromTarget >= 0 ? '+' : '') + c.gapFromTarget + ' Unit';
-        }
-        if (effOSEl) effOSEl.textContent = c.efficiencyOS + '%';
+        const oapTgt = document.getElementById('wbCloseOapTarget');
+        const matchOs = document.getElementById('wbCloseMatchOS');
+        const newSpk = document.getElementById('wbCloseNewSPK');
+        const totalEst = document.getElementById('wbCloseTotalEst');
+        const invStock = document.getElementById('wbCloseInvStock');
+        const effSto = document.getElementById('wbCloseEffSTO');
+
+        if (oapTgt) oapTgt.textContent = c.oapTarget;
+        if (matchOs) matchOs.textContent = c.matchingOutstanding;
+        if (newSpk) newSpk.textContent = c.newOrderSPK;
+        if (totalEst) totalEst.textContent = c.totalEstClosing;
+        if (invStock) invStock.textContent = c.totalInvoiceableStock;
+        if (effSto) effSto.textContent = c.efficiencySTO;
     }
 
-    function renderModelsBreakdown(data) {
-        const tbody = document.getElementById('aoModelsTableBody');
+    // TABLE 1: Gap from OS & Match Unfirmed
+    function renderTable1(data) {
+        const tbody = document.getElementById('wbTable1Body');
         if (!tbody) return;
 
-        const models = data.modelsBreakdown || [];
-        const grand = window.AOReportData.calculateTotals(models);
+        const models = data.table1Models || [];
+        const grand = window.AOReportData.calculateTable1Totals(models);
 
-        let rows = models.map((m, idx) => `
+        let rows = models.map(m => `
             <tr>
-                <td class="col-model">
-                    <span style="display:inline-block; width:18px; font-size:10.5px; color:#94a3b8; font-weight:700;">${idx + 1}.</span>
-                    <strong>${m.model}</strong>
-                </td>
-                <td style="color:#d97706; font-weight:800;">${m.gapOS}</td>
-                <td style="background:#fefce8; color:#854d0e;">${m.w1}</td>
-                <td style="background:#fefce8; color:#854d0e;">${m.w2}</td>
-                <td style="background:#fefce8; color:#854d0e;">${m.w3}</td>
-                <td style="background:#fefce8; color:#854d0e;">${m.w4}</td>
-                <td style="background:#fef08a; font-weight:900; color:#713f12;">${m.totalMatch}</td>
-                <td style="background:#dcfce7; color:#15803d; font-weight:800;">${m.firmedPlan}</td>
-                <td style="${m.unmatch > 0 ? 'background:#fee2e2; color:#991b1b; font-weight:800;' : 'color:#cbd5e1;'}">${m.unmatch}</td>
-                <td style="background:#e0f2fe; color:#0369a1; font-weight:800;">${m.mdpStock}</td>
-                <td>${m.adaCO1}</td>
-                <td>${m.adaCO2}</td>
-                <td style="background:#f1f5f9; font-size:13px; font-weight:900; color:#0f172a;">${m.estClosing}</td>
+                <td class="ao-col-model-name">${m.model}</td>
+                <td style="font-weight:900;">${m.gapOS || 0}</td>
+                <td>${m.w1 || ''}</td>
+                <td>${m.w2 || ''}</td>
+                <td>${m.w3 || ''}</td>
+                <td>${m.w4 || ''}</td>
+                <td style="font-weight:900; background:#fef08a;">${m.totalMatch || ''}</td>
+                <td style="background:#bbf7d0;">${m.firmed || ''}</td>
+                <td>${m.pLoan || ''}</td>
+                <td style="${m.unmatch > 0 ? 'background:#fecaca; color:#dc2626;' : ''}">${m.unmatch || ''}</td>
             </tr>
         `).join('');
 
-        // Grand Total Row
         rows += `
-            <tr class="row-grand-total">
-                <td class="col-model">🏆 ${grand.model}</td>
+            <tr class="ao-row-grand-total">
+                <td class="ao-col-model-name">Grand Total</td>
                 <td>${grand.gapOS}</td>
                 <td>${grand.w1}</td>
                 <td>${grand.w2}</td>
                 <td>${grand.w3}</td>
                 <td>${grand.w4}</td>
-                <td>${grand.totalMatch}</td>
-                <td>${grand.firmedPlan}</td>
+                <td style="background:#fef08a;">${grand.totalMatch}</td>
+                <td style="background:#bbf7d0;">${grand.firmed}</td>
+                <td>${grand.pLoan}</td>
                 <td>${grand.unmatch}</td>
-                <td>${grand.mdpStock}</td>
-                <td>${grand.adaCO1}</td>
-                <td>${grand.adaCO2}</td>
-                <td>${grand.estClosing}</td>
+            </tr>
+        `;
+
+        tbody.innerHTML = rows;
+    }
+
+    // TABLE 2: Supply, Alokasi & FTS
+    function renderTable2(data) {
+        const tbody = document.getElementById('wbTable2Body');
+        if (!tbody) return;
+
+        const models = data.table2Supply || [];
+        const grand = window.AOReportData.calculateTable2Totals(models);
+
+        let rows = models.map(m => `
+            <tr>
+                <td class="ao-col-model-name">${m.model}</td>
+                <td style="background:#fef08a; font-weight:900;">${m.stock || 0}</td>
+                <td style="background:#e0f2fe;">${m.mdp || ''}</td>
+                <td>${m.secondAllo || ''}</td>
+                <td>${m.co || ''}</td>
+                <td style="background:#fed7aa; font-weight:800;">${m.ttlSupply || m.stock || 0}</td>
+                <td>${m.doActual || ''}</td>
+                <td>${m.stockMatching || ''}</td>
+                <td style="background:#ffedd5; font-weight:900;">${m.fts !== undefined ? m.fts : (m.stock - m.stockMatching)}</td>
+                <td>${m.spk || ''}</td>
+                <td>${m.do || ''}</td>
+                <td style="background:#bbf7d0; font-weight:900;">${m.netFts !== undefined ? m.netFts : (m.stock - m.stockMatching)}</td>
+            </tr>
+        `).join('');
+
+        rows += `
+            <tr class="ao-row-grand-total">
+                <td class="ao-col-model-name">Grand Total</td>
+                <td style="background:#fef08a;">${grand.stock}</td>
+                <td style="background:#e0f2fe;">${grand.mdp}</td>
+                <td>${grand.secondAllo}</td>
+                <td>${grand.co}</td>
+                <td style="background:#fed7aa;">${grand.ttlSupply}</td>
+                <td>${grand.doActual}</td>
+                <td>${grand.stockMatching}</td>
+                <td style="background:#ffedd5;">${grand.fts}</td>
+                <td>${grand.spk}</td>
+                <td>${grand.do}</td>
+                <td style="background:#bbf7d0;">${grand.netFts}</td>
             </tr>
         `;
 
@@ -293,13 +312,35 @@
             });
         }
 
-        // Export CSV
+        // Export CSV button
         const btnCSV = document.getElementById('btnAoExportCSV');
         if (btnCSV) {
             btnCSV.addEventListener('click', () => {
                 window.AOReportData.exportToCSV();
             });
         }
+
+        // Fullscreen / Projector Mode Toggle
+        const btnProjector = document.getElementById('btnAoProjector');
+        const boardContainer = document.getElementById('aoBoardMainContainer');
+        if (btnProjector && boardContainer) {
+            btnProjector.addEventListener('click', () => {
+                boardContainer.classList.toggle('ao-fullscreen-active');
+                if (boardContainer.classList.contains('ao-fullscreen-active')) {
+                    btnProjector.innerHTML = '<i class="fa-solid fa-compress"></i> Tutup Layar Penuh';
+                } else {
+                    btnProjector.innerHTML = '<i class="fa-solid fa-expand"></i> Mode Proyektor TV';
+                }
+            });
+        }
+
+        // ESC key exits fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && boardContainer && boardContainer.classList.contains('ao-fullscreen-active')) {
+                boardContainer.classList.remove('ao-fullscreen-active');
+                if (btnProjector) btnProjector.innerHTML = '<i class="fa-solid fa-expand"></i> Mode Proyektor TV';
+            }
+        });
     }
 
     window.initAOReport = initAOReport;

@@ -1,7 +1,7 @@
 <?php
 // api/api_ao_report.php
 // Live Dynamic Backend API for Area Operation (AO) Report
-// Fetches real data from MySQL database & Google Spreadsheet sync tables
+// Synchronized with the physical whiteboard (31 Agustus 2026)
 
 error_reporting(0);
 mysqli_report(MYSQLI_REPORT_OFF);
@@ -31,159 +31,75 @@ $nama_bulan_list = [
     5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
-$report_date_str = $current_day . " " . $nama_bulan_list[$current_month] . " " . $current_year;
-$period_month_str = $nama_bulan_list[$current_month] . " " . $current_year;
+$report_date_str = "31 Agustus 2026";
+$period_month_str = "Agustus 2026";
 
-// 1. Ambil Target & Realisasi SPK/DO Cabang dari target_do_bulanan
-$tot_target_spk = 0;
-$tot_target_do = 0;
-$tot_actual_spk = 0;
-$tot_actual_do = 0;
+// Whiteboard Baseline Data (31 Agustus 2026)
+$full_stock_total = 46;
+$full_stock_match = 16;
+$full_stock_free = 30;
 
-if ($conn && !$conn->connect_error) {
-    $q_tgt = $conn->query("SELECT 
-        SUM(target_spk) as total_tgt_spk, 
-        SUM(target_do) as total_tgt_do, 
-        SUM(realisasi_spk) as total_act_spk, 
-        SUM(realisasi_do) as total_act_do 
-        FROM target_do_bulanan WHERE periode_bulan = $current_month");
-    
-    if ($q_tgt && $r = $q_tgt->fetch_assoc()) {
-        $tot_target_spk = intval($r['total_tgt_spk']);
-        $tot_target_do = intval($r['total_tgt_do']);
-        $tot_actual_spk = intval($r['total_act_spk']);
-        $tot_actual_do = intval($r['total_act_do']);
-    }
+$os_total = 29;
+$matching_ratio = 34;
+$target_do = 92;
+$potential_do_from_os = 16;
+$gap_target = 76;
+$mtd_actual = 16;
 
-    // Jika tabel_spk memiliki data transaksi live
-    $q_spk_live = $conn->query("SELECT 
-        SUM(CASE WHEN status != 'Ditolak' THEN 1 ELSE 0 END) as live_spk,
-        SUM(CASE WHEN status = 'DO' THEN 1 ELSE 0 END) as live_do
-        FROM tabel_spk WHERE MONTH(created_at) = $current_month OR created_at IS NULL");
-    if ($q_spk_live && $row_live = $q_spk_live->fetch_assoc()) {
-        $tot_actual_spk = max($tot_actual_spk, intval($row_live['live_spk']));
-        $tot_actual_do = max($tot_actual_do, intval($row_live['live_do']));
-    }
-}
-
-// Fallback baseline jika database baru pertama kali sinkron
-if ($tot_target_spk <= 0) $tot_target_spk = 122;
-if ($tot_target_do <= 0) $tot_target_do = 92;
-if ($tot_actual_spk <= 0) $tot_actual_spk = 57;
-if ($tot_actual_do <= 0) $tot_actual_do = 25;
-
-// 2. Data Stok Gudang (Live Stock)
-$full_stock_total = 124;
-$full_stock_match = 42;
-$full_stock_free = 82;
-
-if ($conn && !$conn->connect_error) {
-    $q_stk = $conn->query("SELECT SUM(stok) as tot_stok FROM tabel_inventory WHERE stok > 0");
-    if ($q_stk && $stk_row = $q_stk->fetch_assoc()) {
-        $val = intval($stk_row['tot_stok']);
-        if ($val > 0) {
-            $full_stock_total = $val;
-            $full_stock_match = min(intval($val * 0.34), $tot_actual_spk);
-            $full_stock_free = max(0, $full_stock_total - $full_stock_match);
-        }
-    }
-}
-
-// 3. Data Outstanding Order (OS) & Matching
-$os_total = max(18, $tot_actual_spk - $tot_actual_do + 16);
-$os_firmed = intval($os_total * 0.38);
-$os_match = min($os_total, $full_stock_match);
-
-$matching_ratio = $full_stock_total > 0 ? round(($full_stock_match / max(1, $os_total)) * 100) : 86;
-if ($matching_ratio > 100) $matching_ratio = 86;
-if ($matching_ratio < 60) $matching_ratio = 86;
-
-$potential_do_from_os = max($tot_actual_do, min($tot_target_do, $os_match + intval($tot_actual_spk * 0.4)));
-if ($potential_do_from_os < 45) $potential_do_from_os = 52;
-$gap_from_target = max(0, $tot_target_do - $potential_do_from_os);
-
-// 4. Hitung Ritme SPK 5-Harian Live
-$ritme_actual_1_5 = 0;
-$ritme_actual_6_10 = 0;
-$ritme_actual_11_15 = 0;
-$ritme_actual_16_20 = 0;
-$ritme_actual_21_25 = 0;
-$ritme_actual_26_31 = 0;
-
-if ($conn && !$conn->connect_error) {
-    $q_r = $conn->query("SELECT DAY(created_at) as tgl, COUNT(*) as cnt 
-        FROM tabel_spk 
-        WHERE status != 'Ditolak' AND MONTH(created_at) = $current_month 
-        GROUP BY DAY(created_at)");
-    if ($q_r && $q_r->num_rows > 0) {
-        while ($r_row = $q_r->fetch_assoc()) {
-            $t = intval($r_row['tgl']);
-            $c = intval($r_row['cnt']);
-            if ($t <= 5) $ritme_actual_1_5 += $c;
-            elseif ($t <= 10) $ritme_actual_6_10 += $c;
-            elseif ($t <= 15) $ritme_actual_11_15 += $c;
-            elseif ($t <= 20) $ritme_actual_16_20 += $c;
-            elseif ($t <= 25) $ritme_actual_21_25 += $c;
-            else $ritme_actual_26_31 += $c;
-        }
-    }
-}
-
-// Jika belum ada data per tanggal individu di tabel_spk, gunakan distribusi real-progresif dari total aktual
-if ($ritme_actual_1_5 + $ritme_actual_6_10 + $ritme_actual_11_15 + $ritme_actual_16_20 + $ritme_actual_21_25 + $ritme_actual_26_31 === 0) {
-    $rem = $tot_actual_spk;
-    $ritme_actual_1_5 = min(30, intval($rem * 0.52));
-    $rem -= $ritme_actual_1_5;
-    $ritme_actual_6_10 = min(24, intval($rem * 0.6));
-    $rem -= $ritme_actual_6_10;
-    $ritme_actual_11_15 = $current_day > 10 ? min(20, $rem) : null;
-    if ($ritme_actual_11_15 !== null) $rem -= $ritme_actual_11_15;
-    $ritme_actual_16_20 = $current_day > 15 ? min(20, $rem) : null;
-    if ($ritme_actual_16_20 !== null) $rem -= $ritme_actual_16_20;
-    $ritme_actual_21_25 = $current_day > 20 ? min(20, $rem) : null;
-    if ($ritme_actual_21_25 !== null) $rem -= $ritme_actual_21_25;
-    $ritme_actual_26_31 = $current_day > 25 ? min(22, $rem) : null;
-}
-
-// 5. Perhitungan Closing Estimation
-$matching_with_os = $potential_do_from_os;
-$new_order_spk = max(40, intval($tot_actual_spk * 0.9));
-$total_est_closing = $tot_actual_do + max(0, $matching_with_os - $tot_actual_do) + intval($new_order_spk * 0.5);
-if ($total_est_closing < $tot_target_do) {
-    $total_est_closing = $tot_target_do + 12; // Overachieve projection
-}
-$gap_closing = $total_est_closing - $tot_target_do;
-$efficiency_os = 83;
-
-// 6. Breakdown Model Kendaraan
-$models_breakdown = [
-    ['model' => 'Avanza New', 'gapOS' => 5, 'w1' => 15, 'w2' => 2, 'w3' => 2, 'w4' => 1, 'totalMatch' => 20, 'firmedPlan' => 2, 'unmatch' => 0, 'mdpStock' => 7, 'adaCO1' => 1, 'adaCO2' => 0, 'estClosing' => 22],
-    ['model' => 'Veloz New', 'gapOS' => 2, 'w1' => 6, 'w2' => 1, 'w3' => 1, 'w4' => 0, 'totalMatch' => 8, 'firmedPlan' => 1, 'unmatch' => 0, 'mdpStock' => 3, 'adaCO1' => 1, 'adaCO2' => 0, 'estClosing' => 9],
-    ['model' => 'Raize', 'gapOS' => 3, 'w1' => 4, 'w2' => 1, 'w3' => 1, 'w4' => 0, 'totalMatch' => 6, 'firmedPlan' => 1, 'unmatch' => 1, 'mdpStock' => 2, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 7],
-    ['model' => 'Agya', 'gapOS' => 4, 'w1' => 5, 'w2' => 1, 'w3' => 1, 'w4' => 0, 'totalMatch' => 7, 'firmedPlan' => 2, 'unmatch' => 0, 'mdpStock' => 3, 'adaCO1' => 1, 'adaCO2' => 0, 'estClosing' => 8],
-    ['model' => 'Agya GR-S', 'gapOS' => 1, 'w1' => 2, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 2, 'firmedPlan' => 1, 'unmatch' => 0, 'mdpStock' => 1, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 3],
-    ['model' => 'Calya', 'gapOS' => 4, 'w1' => 8, 'w2' => 2, 'w3' => 1, 'w4' => 0, 'totalMatch' => 11, 'firmedPlan' => 3, 'unmatch' => 0, 'mdpStock' => 4, 'adaCO1' => 1, 'adaCO2' => 0, 'estClosing' => 13],
-    ['model' => 'Yaris', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 0],
-    ['model' => 'Yaris Cross Gasoline', 'gapOS' => 2, 'w1' => 2, 'w2' => 1, 'w3' => 0, 'w4' => 0, 'totalMatch' => 3, 'firmedPlan' => 1, 'unmatch' => 0, 'mdpStock' => 1, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 3],
-    ['model' => 'Yaris Cross Hybrid', 'gapOS' => 3, 'w1' => 3, 'w2' => 1, 'w3' => 0, 'w4' => 0, 'totalMatch' => 4, 'firmedPlan' => 1, 'unmatch' => 1, 'mdpStock' => 2, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 5],
-    ['model' => 'Innova', 'gapOS' => 1, 'w1' => 1, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 1, 'firmedPlan' => 1, 'unmatch' => 0, 'mdpStock' => 1, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 2],
-    ['model' => 'Innova Zenix Gasoline', 'gapOS' => 4, 'w1' => 4, 'w2' => 1, 'w3' => 1, 'w4' => 0, 'totalMatch' => 6, 'firmedPlan' => 2, 'unmatch' => 1, 'mdpStock' => 3, 'adaCO1' => 1, 'adaCO2' => 0, 'estClosing' => 8],
-    ['model' => 'Innova Zenix Hybrid', 'gapOS' => 7, 'w1' => 9, 'w2' => 3, 'w3' => 2, 'w4' => 0, 'totalMatch' => 14, 'firmedPlan' => 4, 'unmatch' => 2, 'mdpStock' => 5, 'adaCO1' => 1, 'adaCO2' => 0, 'estClosing' => 16],
-    ['model' => 'Fortuner 4x2', 'gapOS' => 2, 'w1' => 3, 'w2' => 1, 'w3' => 0, 'w4' => 0, 'totalMatch' => 4, 'firmedPlan' => 1, 'unmatch' => 0, 'mdpStock' => 2, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 4],
-    ['model' => 'Rush', 'gapOS' => 3, 'w1' => 5, 'w2' => 1, 'w3' => 1, 'w4' => 0, 'totalMatch' => 7, 'firmedPlan' => 2, 'unmatch' => 1, 'mdpStock' => 2, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 7],
-    ['model' => 'Alphard', 'gapOS' => 1, 'w1' => 1, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 1, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 1],
-    ['model' => 'Alphard Hybrid', 'gapOS' => 1, 'w1' => 1, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 1, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 1],
-    ['model' => 'Voxy', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 0],
-    ['model' => 'Hilux D-Cab', 'gapOS' => 1, 'w1' => 1, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 1, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 1],
-    ['model' => 'Hilux S-Cab', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 0],
-    ['model' => 'Hilux S-Cab 4x4', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 0],
-    ['model' => 'Hilux Rangga', 'gapOS' => 2, 'w1' => 2, 'w2' => 1, 'w3' => 0, 'w4' => 0, 'totalMatch' => 3, 'firmedPlan' => 1, 'unmatch' => 1, 'mdpStock' => 1, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 3],
-    ['model' => 'Hiace', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 0],
-    ['model' => 'Hiace Premio', 'gapOS' => 1, 'w1' => 1, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 1, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 1],
-    ['model' => 'Others', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmedPlan' => 0, 'unmatch' => 0, 'mdpStock' => 0, 'adaCO1' => 0, 'adaCO2' => 0, 'estClosing' => 0]
+$table1_models = [
+    ['model' => 'Avanza New', 'gapOS' => 1, 'w1' => 1, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 1, 'firmed' => 1, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Veloz New', 'gapOS' => 1, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Raize', 'gapOS' => 1, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Agya', 'gapOS' => 3, 'w1' => 1, 'w2' => 1, 'w3' => 0, 'w4' => 0, 'totalMatch' => 2, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Agya GR-S', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Calya', 'gapOS' => 5, 'w1' => 0, 'w2' => 0, 'w3' => 4, 'w4' => 0, 'totalMatch' => 4, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Yaris', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Yaris Cross Gasoline', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Yaris Cross Hybrid', 'gapOS' => 3, 'w1' => 1, 'w2' => 0, 'w3' => 2, 'w4' => 0, 'totalMatch' => 3, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Innova', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Innova Zenix Hybrid', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Innova Zenix', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Fortuner 4x2', 'gapOS' => 1, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Rush', 'gapOS' => 1, 'w1' => 1, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 1, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Alphard', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Alphard Hybrid', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 2, 'w4' => 1, 'totalMatch' => 3, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Voxy', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 2, 'w4' => 2, 'totalMatch' => 4, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Hilux D-Cab', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Hilux S-Cab', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Hilux S-Cab 4x4', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Hilux Rangga', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 2, 'w4' => 2, 'totalMatch' => 4, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Hiace', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Hiace Premio', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0],
+    ['model' => 'Others', 'gapOS' => 0, 'w1' => 0, 'w2' => 0, 'w3' => 0, 'w4' => 0, 'totalMatch' => 0, 'firmed' => 0, 'pLoan' => 0, 'unmatch' => 0]
 ];
 
-// Susun respons JSON lengkap
+$table2_supply = [
+    ['model' => 'Avanza New', 'stock' => 7, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 7, 'doActual' => 0, 'stockMatching' => 1, 'fts' => 6, 'spk' => 0, 'do' => 0, 'netFts' => 6],
+    ['model' => 'Veloz New', 'stock' => 5, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 5, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 5, 'spk' => 0, 'do' => 0, 'netFts' => 5],
+    ['model' => 'Raize', 'stock' => 7, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 7, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 7, 'spk' => 0, 'do' => 0, 'netFts' => 7],
+    ['model' => 'Rush', 'stock' => 4, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 4, 'doActual' => 0, 'stockMatching' => 1, 'fts' => 3, 'spk' => 0, 'do' => 0, 'netFts' => 3],
+    ['model' => 'Agya', 'stock' => 3, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 3, 'doActual' => 0, 'stockMatching' => 2, 'fts' => 1, 'spk' => 0, 'do' => 0, 'netFts' => 1],
+    ['model' => 'Agya GR-S', 'stock' => 2, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 2, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 2, 'spk' => 0, 'do' => 0, 'netFts' => 2],
+    ['model' => 'Calya', 'stock' => 4, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 4, 'doActual' => 0, 'stockMatching' => 4, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Yaris', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Yaris Cross Gasoline', 'stock' => 1, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 1, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 1, 'spk' => 0, 'do' => 0, 'netFts' => 1],
+    ['model' => 'Yaris Cross Hybrid', 'stock' => 3, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 3, 'doActual' => 0, 'stockMatching' => 3, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Innova', 'stock' => 2, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 2, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 2, 'spk' => 0, 'do' => 0, 'netFts' => 2],
+    ['model' => 'Innova Zenix Hybrid', 'stock' => 3, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 3, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 3, 'spk' => 0, 'do' => 0, 'netFts' => 3],
+    ['model' => 'Innova Zenix', 'stock' => 5, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 5, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 5, 'spk' => 0, 'do' => 0, 'netFts' => 5],
+    ['model' => 'Fortuner 4x2', 'stock' => 2, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 2, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 2, 'spk' => 0, 'do' => 0, 'netFts' => 2],
+    ['model' => 'Alphard', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Alphard Hybrid', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Voxy', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Hilux D-Cab', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Hilux S-Cab', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Hilux S-Cab 4x4', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Hilux Rangga', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Hiace', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Hiace Premio', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0],
+    ['model' => 'Others', 'stock' => 0, 'mdp' => 0, 'secondAllo' => 0, 'co' => 0, 'ttlSupply' => 0, 'doActual' => 0, 'stockMatching' => 0, 'fts' => 0, 'spk' => 0, 'do' => 0, 'netFts' => 0]
+];
+
 $response_data = [
     "status" => "success",
     "branch" => "TUNAS TOYOTA KIARACONDONG",
@@ -193,96 +109,106 @@ $response_data = [
         "fullStock" => ["total" => $full_stock_total, "free" => $full_stock_free, "match" => $full_stock_match],
         "invoiceableStock" => ["total" => $full_stock_total, "free" => $full_stock_free, "match" => $full_stock_match],
         "osOrder" => [
-            "gt60Days" => ["total" => 1, "match" => 0, "firmedMatch" => 0],
-            "d30To60Days" => ["total" => 0, "match" => 0, "firmedMatch" => 0],
-            "lt30Days" => ["total" => $os_total, "firmed" => $os_firmed, "match" => $os_match, "firmedMatch" => $os_match]
+            "total" => $os_total,
+            "gt60Days" => ["total" => 0, "match" => 0],
+            "d30To60Days" => ["total" => 4, "match" => 2],
+            "firmedOSLt30" => ["total" => 25, "firmed" => 6, "plCpi" => 19]
         ],
-        "matchingStatus" => [
-            "unmatchStock" => max(0, $full_stock_total - $full_stock_match),
-            "unmatchBreakdown" => ["unfirmedGt30" => 0, "unfirmedLt30" => 0, "firmedGt30" => 0, "firmedLt30" => 7, "firmed" => 1],
-            "matchStock" => $full_stock_match,
-            "weeklyUnfirmedMatch" => ["w1" => 10, "w2" => 5, "w3" => 5, "w4" => 1],
-            "firmedMatch" => $os_firmed
+        "stockMatching" => [
+            "matchUnfirmedGt30" => 2,
+            "matchUnfirmedLt30" => 2,
+            "unmatchStock" => 10,
+            "unmatchBreakdown" => [
+                "firmedGt30" => 1,
+                "firmedLt30" => 5,
+                "unfirmedLt30" => 4,
+                "unfirmedGt30" => 0
+            ],
+            "matchStock" => 16,
+            "matchBreakdown" => [
+                "firmedGt30" => 1,
+                "plCpi" => 15
+            ]
         ],
         "kpi" => [
             "matchingRatio" => $matching_ratio,
-            "targetDO" => $tot_target_do,
+            "targetDO" => $target_do,
             "potentialDoFromOS" => $potential_do_from_os,
-            "gapFromTarget" => $gap_from_target,
-            "mtdActual" => $tot_actual_do
+            "gapTarget" => $gap_target,
+            "mtdActual" => $mtd_actual,
+            "mdpVal" => 0,
+            "onHandStock" => 16
         ],
         "ritme5Harian" => [
-            ["period" => "1-5", "value" => 3, "accum" => 3],
-            ["period" => "6-10", "value" => 7, "accum" => 10],
-            ["period" => "11-15", "value" => 9, "accum" => 19],
-            ["period" => "16-20", "value" => 10, "accum" => 29],
-            ["period" => "21-25", "value" => 11, "accum" => 40],
-            ["period" => "26-31", "value" => 12, "accum" => 52]
+            ["period" => "1-5", "value" => 2, "accum" => 2],
+            ["period" => "6-10", "value" => 3, "accum" => 5],
+            ["period" => "11-15", "value" => 3, "accum" => 8],
+            ["period" => "16-20", "value" => 3, "accum" => 11],
+            ["period" => "21-25", "value" => 3, "accum" => 14],
+            ["period" => "26-31", "value" => 2, "accum" => 16]
         ]
     ],
     "spkPlan" => [
         "periods" => ['TTL', '1-5', '6-10', '11-15', '16-20', '21-25', '26-31'],
-        "spkGrossPlan" => [$tot_target_spk, 20, 20, 20, 20, 20, 22],
-        "spkGrossActual" => [$tot_actual_spk, $ritme_actual_1_5, $ritme_actual_6_10, $ritme_actual_11_15, $ritme_actual_16_20, $ritme_actual_21_25, $ritme_actual_26_31],
-        "gapGross" => [null, '+10', '+4', null, null, null, null],
-        "cancellationAssum" => [8, 1, 1, 1, 2, 1, 1],
-        "cancellationActual" => [0, 0, 0, 0, 0, 0, 0],
+        "effectiveNRS" => 76,
+        "forNPlus1RS" => 42,
+        "spkGrossPlan" => [122, 20, 20, 20, 20, 20, 22],
+        "spkGrossActual" => [54, 30, 24, null, null, null, null],
+        "gapGross" => ['-', 0, 1, 2, 3, 1, 1],
+        "cancellationAssum" => [8, 1, 1, 2, 2, 1, 1],
+        "cancellationActual" => [0, 0, 0, null, null, null, null],
         "cancellationRatio" => ['0%', '0%', '0%', '0%', '0%', '0%', '0%'],
         "cancelRatioStats" => [
             "threeMonthsAvg" => "4%",
             "loanRejection" => "2%"
         ],
-        "spkNettPlan" => [max(0, $tot_target_spk - 8), 19, 19, 19, 19, 19, 19],
-        "spkNettActual" => [$tot_actual_spk, $ritme_actual_1_5, $ritme_actual_6_10, $ritme_actual_11_15, $ritme_actual_16_20, $ritme_actual_21_25, $ritme_actual_26_31],
-        "gapNett" => [null, '+11', '+5', '-19', '-19', '-19', '-19'],
-        "effectiveToN1RS" => 48,
+        "spkNettPlan" => [114, 19, 19, 19, 19, 19, 19],
+        "spkNettActual" => [54, 30, 24, null, null, null, null],
+        "gapNett" => ['-', '+11', '+5', '-19', '-19', '-19', '-19'],
         "nettSpkVisualize" => [
-            ["period" => "1-5", "step" => ($ritme_actual_1_5 ?: 30), "accum" => ($ritme_actual_1_5 ?: 30)],
-            ["period" => "6-10", "step" => ($ritme_actual_6_10 ?: 24), "accum" => (($ritme_actual_1_5 ?: 30) + ($ritme_actual_6_10 ?: 24))],
-            ["period" => "11-15", "step" => 19, "accum" => 73],
-            ["period" => "16-20", "step" => 19, "accum" => 92],
-            ["period" => "21-25", "step" => 19, "accum" => 111],
-            ["period" => "26-31", "step" => 19, "accum" => 130]
+            ["period" => "1-5", "val" => 19],
+            ["period" => "6-10", "val" => 19],
+            ["period" => "11-15", "val" => 19],
+            ["period" => "16-20", "val" => 19],
+            ["period" => "21-25", "val" => 19],
+            ["period" => "26-31", "val" => 19]
         ],
-        "rsMetrics" => [
-            "avg5DaysSpk" => 19,
+        "rsPillar" => [
+            "ttl" => 114,
             "becomeOS" => 38,
-            "effectiveToMonthDO" => 76
+            "effectiveMonthRS" => 76,
+            "avgDays" => 8
         ]
     ],
     "mdpPlan" => [
+        "leftPillar" => [
+            "total" => 32,
+            "green" => 2,
+            "blue" => 30
+        ],
+        "ffsPillar" => 46,
         "ffsSellingPlan" => [
-            ["period" => "1-5", "value" => 38, "accum" => 38, "icon" => "truck"],
-            ["period" => "6-10", "value" => 6, "accum" => 44, "icon" => "truck"],
-            ["period" => "11-15", "value" => 20, "accum" => 64, "icon" => "truck-fast"],
-            ["period" => "16-20", "value" => 23, "accum" => 87, "icon" => "truck-ramp-box"],
-            ["period" => "21-25", "value" => 22, "accum" => 109, "icon" => "truck-plane"],
-            ["period" => "26-31", "value" => 8, "accum" => 117, "icon" => "truck-front"],
-            ["period" => "Reserve", "value" => 17, "accum" => 134, "icon" => "boxes-packing"]
+            ["period" => "1-5", "accum" => 46],
+            ["period" => "6-10", "accum" => 52],
+            ["period" => "11-15", "accum" => 72],
+            ["period" => "16-20", "accum" => 95],
+            ["period" => "21-25", "accum" => 117],
+            ["period" => "26-31", "accum" => 125]
         ],
-        "stepProgression" => [
-            ["period" => "1-5", "value" => 0, "accum" => 0],
-            ["period" => "6-10", "value" => 0, "accum" => 0],
-            ["period" => "11-15", "value" => 8, "accum" => 8],
-            ["period" => "16-20", "value" => 9, "accum" => 17],
-            ["period" => "21-25", "value" => 10, "accum" => 27],
-            ["period" => "26-31", "value" => 13, "accum" => 40]
-        ],
-        "accumMtdDoRs" => $tot_actual_do,
-        "totalSellingPlanAccum" => 134
+        "rsPlanSteps" => [19, 19, 19, 19, 19, 19],
+        "accumMtdDoRsValues" => [0, 0, 8, 17, 27, 40],
+        "fromNewOrder" => 76
     ],
     "closingEstimation" => [
-        "doRsTarget" => $tot_target_do,
-        "matchingWithOS" => $matching_with_os,
-        "newOrderSPK" => $new_order_spk,
-        "totalEstClosingMonth" => $total_est_closing,
-        "gapFromTarget" => $gap_closing,
-        "efficiencyOS" => $efficiency_os,
-        "nPlus1OpSPK" => 85,
-        "oldSPKMay21To31" => 38,
-        "constRatio" => 45
+        "oapTarget" => 92,
+        "matchingOutstanding" => 29,
+        "newOrderSPK" => 76,
+        "totalEstClosing" => 92,
+        "totalInvoiceableStock" => 46,
+        "efficiencySTO" => "24%"
     ],
-    "modelsBreakdown" => $models_breakdown
+    "table1Models" => $table1_models,
+    "table2Supply" => $table2_supply
 ];
 
 echo json_encode($response_data, JSON_PRETTY_PRINT);

@@ -1,865 +1,859 @@
 /* ==========================================================================
    AREA OPERATION (AO) REPORT - TUNAS TOYOTA KIARACONDONG
-   Interactive Digital Whiteboard & Operations Cockpit Styling
+   Interactive Physical Whiteboard Replica (31 Agustus 2026)
    ========================================================================== */
 
 :root {
-    --ao-primary-red: #c8102e;
-    --ao-dark-red: #9e0c22;
-    --ao-navy-bg: #0b132b;
-    --ao-card-bg: #ffffff;
-    --ao-border: #e2e8f0;
-    --ao-text-main: #0f172a;
-    --ao-text-muted: #64748b;
-    --ao-green: #10b981;
-    --ao-yellow: #f59e0b;
-    --ao-blue: #3b82f6;
-    --ao-purple: #8b5cf6;
-    --ao-orange: #f97316;
+    --wb-bg: #ffffff;
+    --wb-board-outer: #e2e8f0;
+    --wb-frame-metal: #94a3b8;
+    --wb-frame-dark: #64748b;
+    --wb-grid-line: #cbd5e1;
+    --wb-pen-black: #0f172a;
+    --wb-pen-red: #dc2626;
+    --wb-pen-blue: #2563eb;
+    --wb-pen-sky: #93c5fd;
+    --wb-pen-green: #16a34a;
+    --wb-pen-lime: #86efac;
+    --wb-pen-yellow: #fde047;
+    --wb-pen-gold: #eab308;
+    --wb-pen-orange: #f97316;
+    --wb-pen-peach: #fed7aa;
+    --wb-pen-purple: #9333ea;
+    --wb-font-hand: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Whiteboard Container Shell */
+/* Master Whiteboard Frame Container */
 .ao-board-container {
     background: #f8fafc;
-    border-radius: 20px;
-    border: 2px solid #cbd5e1;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-    padding: 24px;
-    margin-bottom: 25px;
+    border: 10px solid #cbd5e1;
+    border-radius: 18px;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+    padding: 16px 20px 24px 20px;
+    margin-bottom: 30px;
     position: relative;
-    overflow: hidden;
+    font-family: var(--wb-font-hand);
+    color: var(--wb-pen-black);
+    background-color: #ffffff;
 }
 
-/* Board Header */
-.ao-board-header {
-    display: flex;
-    flex-direction: column;
+/* Aluminium Whiteboard Corners & Bottom Marker Tray */
+.ao-board-container::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    right: 20px;
+    height: 4px;
+    background: linear-gradient(90deg, #94a3b8, #cbd5e1, #94a3b8);
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+.ao-board-container::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 10%;
+    right: 10%;
+    height: 8px;
+    background: linear-gradient(180deg, #94a3b8, #64748b);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+/* Marker Circle Badge (①, ②, ③, ④, etc.) */
+.marker-circle {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2.2px solid var(--wb-pen-red);
+    color: var(--wb-pen-red);
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 1;
+    margin-left: 6px;
+    vertical-align: middle;
+    background: rgba(220, 38, 38, 0.04);
+    box-shadow: 0 1px 2px rgba(220, 38, 38, 0.15);
+}
+
+/* Whiteboard Top Title & Toolbar */
+.ao-board-top-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 2.5px solid #0f172a;
     gap: 16px;
-    padding-bottom: 22px;
-    border-bottom: 2px dashed #cbd5e1;
-    margin-bottom: 22px;
-    text-align: center;
+    flex-wrap: wrap;
 }
 
-.ao-header-center-wrap {
-    display: flex;
-    flex-direction: column;
+.ao-board-main-title-box {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-}
-
-.ao-logo-top-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 4px;
-}
-
-.ao-logo-dark {
-    height: 42px;
-    max-width: 280px;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
-    transition: transform 0.2s ease;
-}
-
-.ao-logo-dark:hover {
-    transform: scale(1.02);
-}
-
-.ao-brand-badge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    gap: 12px;
+    border: 2.5px solid #0f172a;
+    padding: 6px 18px;
+    background: #ffffff;
+    box-shadow: 2px 2px 0px #0f172a;
 }
 
 .ao-title-main {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 900;
+    letter-spacing: 1px;
     color: #0f172a;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.ao-board-date-hand {
+    font-size: 19px;
+    font-weight: 800;
+    color: #0f172a;
+    padding-left: 12px;
+    border-left: 2px solid #0f172a;
+}
+
+.ao-board-logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ao-brand-badge-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 900;
+    font-size: 18px;
+    color: #1e3a8a;
     letter-spacing: 0.5px;
-    margin: 0;
-    text-transform: uppercase;
 }
 
-.ao-branch-tag {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--ao-primary-red);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    background: #fff1f2;
-    padding: 4px 14px;
-    border-radius: 20px;
-    border: 1px solid #fecdd3;
+.ao-brand-badge-text span.toyota {
+    color: #dc2626;
 }
 
 .ao-actions-toolbar {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.ao-date-pill {
-    background: #ffffff;
-    border: 1.5px solid #cbd5e1;
-    border-radius: 30px;
-    padding: 6px 16px;
-    font-size: 13px;
-    font-weight: 800;
-    color: #1e293b;
-    display: inline-flex;
-    align-items: center;
     gap: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-}
-
-/* 4-Quadrant Board Grid */
-.ao-quadrant-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.25fr;
-    gap: 22px;
-    margin-bottom: 24px;
-}
-
-@media (max-width: 1024px) {
-    .ao-quadrant-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Quadrant Card */
-.ao-quad-card {
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.03);
-    position: relative;
-}
-
-.ao-quad-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1.5px solid #f1f5f9;
-}
-
-.ao-quad-title {
-    font-size: 15px;
-    font-weight: 800;
-    color: #0f172a;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-}
-
-/* Stock Matching Visual Section */
-.ao-stock-bars-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.ao-bar-box {
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 12px;
-    text-align: center;
-    position: relative;
-}
-
-.ao-bar-box-title {
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-}
-
-.ao-bar-box-val {
-    font-size: 24px;
-    font-weight: 900;
-    color: #0f172a;
-    line-height: 1;
-    margin-bottom: 6px;
-}
-
-.ao-bar-progress {
-    height: 18px;
-    background: #e2e8f0;
-    border-radius: 6px;
-    display: flex;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.ao-bar-free {
-    background: #38bdf8;
-    height: 100%;
-    color: white;
-    font-size: 9px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ao-bar-match {
-    background: #fbbf24;
-    height: 100%;
-    color: #78350f;
-    font-size: 9px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ao-bar-sub {
-    font-size: 11px;
-    font-weight: 700;
-    color: #475569;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* OS Order & Unmatch / Match Subgrid */
-.ao-matching-subgrid {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.ao-sub-panel {
-    background: #f1f5f9;
-    border-radius: 12px;
-    padding: 12px;
-}
-
-.ao-sub-title {
-    font-size: 11px;
-    font-weight: 800;
-    color: #334155;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.ao-pill-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.ao-pill-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 11.5px;
-    font-weight: 700;
-    border: 1px solid #e2e8f0;
-}
-
-.ao-pill-badge {
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.badge-match-w1 { background: #fef08a; color: #854d0e; }
-.badge-match-w2 { background: #fed7aa; color: #9a3412; }
-.badge-match-w3 { background: #fecdd3; color: #9f1239; }
-.badge-match-w4 { background: #e9d5ff; color: #6b21a8; }
-.badge-firmed { background: #bbf7d0; color: #166534; }
-.badge-unmatch { background: #fee2e2; color: #991b1b; }
-
-/* Stepped Ladder Rhythm (5-Day Staircase) */
-.ao-ladder-container {
-    background: #f8fafc;
-    border-radius: 14px;
-    padding: 14px;
-    border: 1.5px solid #e2e8f0;
-    margin-top: 14px;
-}
-
-.ao-ladder-title {
-    font-size: 12px;
-    font-weight: 800;
-    color: #1e293b;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.ao-ladder-steps {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    height: 100px;
-    padding: 0 4px;
-}
-
-.ao-step-bar {
-    flex: 1;
-    background: #cbd5e1;
-    border-radius: 8px 8px 0 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 2px;
-    color: white;
-    font-size: 10px;
-    font-weight: 800;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.ao-step-bar.active-ladder-1 { background: #86efac; color: #14532d; height: 30%; }
-.ao-step-bar.active-ladder-2 { background: #4ade80; color: #14532d; height: 45%; }
-.ao-step-bar.active-ladder-3 { background: #22c55e; color: #ffffff; height: 60%; }
-.ao-step-bar.active-ladder-4 { background: #16a34a; color: #ffffff; height: 75%; }
-.ao-step-bar.active-ladder-5 { background: #15803d; color: #ffffff; height: 88%; }
-.ao-step-bar.active-ladder-6 { background: #14532d; color: #ffffff; height: 100%; }
-
-.ao-step-lbl {
-    font-size: 10px;
-    font-weight: 700;
-    color: #64748b;
-    margin-top: 4px;
-    text-align: center;
-}
-
-/* MDP Logistics Truck Row */
-.ao-truck-flow {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.ao-truck-node {
-    background: #f0fdf4;
-    border: 1.5px solid #bbf7d0;
-    border-radius: 10px;
-    padding: 8px 6px;
-    text-align: center;
-    position: relative;
-}
-
-.ao-truck-icon {
-    font-size: 16px;
-    color: #16a34a;
-    margin-bottom: 4px;
-}
-
-.ao-truck-val {
-    font-size: 14px;
-    font-weight: 900;
-    color: #0f172a;
-}
-
-.ao-truck-accum {
-    font-size: 9.5px;
-    font-weight: 700;
-    color: #15803d;
-}
-
-/* SPK Table Matrix */
-.ao-table-wrapper {
-    overflow-x: auto;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-}
-
-.ao-spk-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    text-align: center;
-}
-
-.ao-spk-table th {
-    background: #1e293b;
-    color: white;
-    font-weight: 800;
-    padding: 8px 10px;
-    white-space: nowrap;
-    border: 1px solid #334155;
-}
-
-.ao-spk-table td {
-    padding: 8px 10px;
-    font-weight: 700;
-    color: #1e293b;
-    border: 1px solid #e2e8f0;
-}
-
-.ao-spk-table tr:nth-child(even) td {
-    background: #f8fafc;
-}
-
-.ao-spk-table td.cell-gap-pos {
-    background: #dcfce7;
-    color: #15803d;
-    font-weight: 800;
-}
-
-.ao-spk-table td.cell-gap-neg {
-    background: #fee2e2;
-    color: #b91c1c;
-    font-weight: 800;
-}
-
-/* Closing Estimation Hero Card */
-.ao-closing-hero {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: white;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
-}
-
-.ao-closing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 14px;
-    align-items: center;
-}
-
-.ao-closing-stat {
-    padding: 10px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 12px;
-    text-align: center;
-}
-
-.ao-closing-stat.highlight-gold {
-    background: linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(217,119,6,0.15) 100%);
-    border: 1.5px solid #f59e0b;
-}
-
-.ao-closing-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #94a3b8;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-}
-
-.ao-closing-val {
-    font-size: 26px;
-    font-weight: 900;
-    color: #ffffff;
-    line-height: 1.1;
-}
-
-.ao-closing-sub {
-    font-size: 11px;
-    font-weight: 800;
-    color: #38bdf8;
-    margin-top: 4px;
-}
-
-/* Master Vehicle Model Breakdown Table */
-.ao-matrix-container {
-    background: white;
-    border: 1.5px solid #cbd5e1;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
-}
-
-.ao-matrix-header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.ao-matrix-table-wrap {
-    overflow-x: auto;
-    max-height: 600px;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-}
-
-.ao-matrix-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 12px;
-}
-
-.ao-matrix-table th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #0f172a;
-    color: white;
-    font-weight: 800;
-    padding: 10px 8px;
-    text-align: center;
-    border: 1px solid #334155;
-    white-space: nowrap;
-}
-
-.ao-matrix-table td {
-    padding: 8px 10px;
-    text-align: center;
-    border-bottom: 1px solid #e2e8f0;
-    border-right: 1px solid #f1f5f9;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.ao-matrix-table td.col-model {
-    text-align: left;
-    font-weight: 800;
-    color: #0f172a;
-    position: sticky;
-    left: 0;
-    background: #ffffff;
-    z-index: 5;
-    border-right: 2px solid #cbd5e1;
-    min-width: 170px;
-}
-
-.ao-matrix-table tr:hover td {
-    background: #f8fafc;
-}
-
-.ao-matrix-table tr:hover td.col-model {
-    background: #f1f5f9;
-}
-
-.ao-matrix-table tr.row-grand-total td {
-    background: #1e293b !important;
-    color: #ffffff !important;
-    font-size: 13px;
-    font-weight: 900;
-    border-top: 2px solid #f59e0b;
-}
-
-.ao-matrix-table tr.row-grand-total td.col-model {
-    background: #1e293b !important;
-    color: #fbbf24 !important;
-}
-
-/* Action Toolbar */
-.ao-actions-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     flex-wrap: wrap;
 }
 
 .btn-ao {
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 800;
-    border: none;
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1.5px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+}
+
+.btn-ao:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
 }
 
 .btn-ao-wa {
-    background: linear-gradient(135deg, #25d366, #128c7e);
-    color: white;
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+    background: #25d366;
+    color: #ffffff;
+    border-color: #16a34a;
 }
-
 .btn-ao-wa:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35);
+    background: #22c55e;
+    color: #ffffff;
 }
 
-.btn-ao-export {
-    background: #f1f5f9;
-    color: #334155;
-    border: 1.5px solid #cbd5e1;
+.btn-ao-projector {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+.btn-ao-projector:hover {
+    background: #1e293b;
+    color: #ffffff;
 }
 
-.btn-ao-export:hover {
-    background: #e2e8f0;
+/* TWO BIG COLUMNS WHITEBOARD LAYOUT */
+.ao-whiteboard-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 18px;
 }
 
-/* Mobile Swipe Hint */
-.ao-mobile-swipe-hint {
-    display: none;
+@media (max-width: 1200px) {
+    .ao-whiteboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* SECTION SHELL */
+.ao-section-panel {
+    border: 2px solid #0f172a;
+    background: #ffffff;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.ao-section-heading {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    background: #e0f2fe;
-    color: #0369a1;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 7px 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #bae6fd;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+
+/* -------------------------------------------------------------
+   LEFT COLUMN - SECTION 1: Stock Matching with OS
+   ------------------------------------------------------------- */
+.ao-stock-flow-layout {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(70px, 1fr)) 1.4fr;
+    gap: 10px;
+    align-items: end;
+}
+
+@media (max-width: 768px) {
+    .ao-stock-flow-layout {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Column 1 & 2: Full Stock & Invoiceable Stock */
+.ao-pillar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1.5px solid #0f172a;
+    background: #ffffff;
     text-align: center;
 }
 
-/* ==========================================================================
-   MOBILE & TABLET RESPONSIVENESS (Screens <= 768px)
-   ========================================================================== */
+.ao-pillar-head-val {
+    font-size: 20px;
+    font-weight: 900;
+    color: #0f172a;
+    padding: 4px 0;
+    border-bottom: 1.5px solid #0f172a;
+    width: 100%;
+}
 
-@media (max-width: 768px) {
-    .ao-mobile-swipe-hint {
-        display: flex;
-    }
+.ao-pillar-stack-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+}
 
-    .ao-board-container {
-        padding: 14px 12px;
-        border-radius: 14px;
-        border-width: 1.5px;
-        margin-bottom: 16px;
-    }
+.ao-block-free {
+    background: #93c5fd;
+    color: #0f172a;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1.5px solid #0f172a;
+    padding: 6px 2px;
+}
 
-    .ao-board-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding-bottom: 14px;
-        margin-bottom: 16px;
-    }
+.ao-block-free .label, .ao-block-match .label {
+    font-size: 10px;
+    font-weight: 700;
+}
 
-    .ao-brand-badge {
-        width: 100%;
-        gap: 10px;
-    }
+.ao-block-free .val, .ao-block-match .val {
+    font-size: 20px;
+    font-weight: 900;
+}
 
-    .ao-brand-badge img {
-        height: 26px !important;
-    }
+.ao-block-match {
+    background: #fde047;
+    color: #0f172a;
+    flex: 1.2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 2px;
+}
 
-    .ao-title-main {
-        font-size: 16px;
-    }
+.ao-pillar-footer-title {
+    font-size: 11px;
+    font-weight: 900;
+    padding: 5px 2px;
+    border-top: 1.5px solid #0f172a;
+    width: 100%;
+    background: #f8fafc;
+}
 
-    .ao-branch-tag {
-        font-size: 11px;
-    }
+/* Column 3: OS Order (Multi-layer stack) */
+.ao-os-stack-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+    font-size: 9.5px;
+    font-weight: 800;
+}
 
-    .ao-actions-toolbar {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
+.ao-os-layer {
+    padding: 2px 4px;
+    border-bottom: 1px solid #0f172a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    .ao-date-pill {
-        width: 100%;
-        justify-content: center;
-        padding: 6px 12px;
-        font-size: 11.5px;
-        box-sizing: border-box;
-    }
+.ao-os-layer.layer-gt60 {
+    background: #fed7aa;
+}
 
-    .btn-ao {
-        flex: 1 1 calc(50% - 4px);
-        justify-content: center;
-        font-size: 11.5px;
-        padding: 9px 8px;
-        box-sizing: border-box;
-    }
+.ao-os-layer.layer-3060 {
+    background: #bbf7d0;
+}
 
-    /* Hero Closing Card */
-    .ao-closing-hero {
-        padding: 14px 12px;
-        border-radius: 14px;
-        margin-bottom: 16px;
-    }
+.ao-os-layer.layer-lt30-green {
+    background: #86efac;
+    flex: 2;
+    flex-direction: column;
+    justify-content: center;
+}
 
-    .ao-closing-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
+.ao-os-layer.layer-lt30-yellow {
+    background: #fde047;
+    flex: 1.5;
+    flex-direction: column;
+    justify-content: center;
+}
 
-    .ao-closing-stat {
-        padding: 8px 6px;
-        border-radius: 10px;
-    }
+/* Column 4: Stock Matching (Unmatch & Match) */
+.ao-sm-stack-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+    font-size: 9px;
+    font-weight: 800;
+}
 
-    .ao-closing-stat.highlight-gold {
-        grid-column: span 2;
-        padding: 12px 8px;
-    }
+.ao-sm-top-row {
+    display: flex;
+    border-bottom: 1.5px solid #0f172a;
+    background: #ffffff;
+}
 
-    .ao-closing-label {
-        font-size: 10px;
-    }
+.ao-sm-top-cell {
+    flex: 1;
+    padding: 2px;
+    border-right: 1px solid #0f172a;
+    text-align: center;
+}
+.ao-sm-top-cell:last-child {
+    border-right: none;
+}
 
-    .ao-closing-val {
-        font-size: 20px;
-    }
+.ao-sm-unmatch-box {
+    background: #ffffff;
+    border-bottom: 1.5px solid #0f172a;
+    padding: 4px 2px;
+    flex: 2;
+}
 
-    .ao-closing-sub {
-        font-size: 10px;
-    }
+.ao-sm-subrow {
+    display: flex;
+    justify-content: space-between;
+    padding: 1px 4px;
+}
 
-    /* Quadrant Layout */
-    .ao-quadrant-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        margin-bottom: 16px;
-    }
+.ao-sm-match-box {
+    background: #bfdbfe;
+    padding: 4px 2px;
+    flex: 1.8;
+}
 
-    .ao-quad-card {
-        padding: 14px 12px;
-        border-radius: 14px;
-    }
+/* Right of Section 1: KPI & 6-step staircase */
+.ao-stock-kpi-ladder-col {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
 
-    .ao-quad-header {
-        margin-bottom: 12px;
-        padding-bottom: 8px;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
+.ao-kpi-ratio-row {
+    font-size: 15px;
+    font-weight: 900;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
 
-    .ao-quad-title {
-        font-size: 13.5px;
-    }
+.ao-kpi-potential-row {
+    font-size: 12.5px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
-    /* Stock Bars */
-    .ao-stock-bars-row {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-bottom: 12px;
-    }
+.ao-staircase-chart-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: auto;
+}
 
-    .ao-bar-box {
-        padding: 8px 6px;
-    }
+.ao-pillar-sub-od {
+    width: 50px;
+    border: 1.5px solid #0f172a;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 800;
+}
 
-    .ao-bar-box-val {
-        font-size: 19px;
-    }
+.ao-sub-od-top {
+    background: #fed7aa;
+    padding: 4px 2px;
+    border-bottom: 1px solid #0f172a;
+}
+.ao-sub-od-bot {
+    background: #fef08a;
+    padding: 18px 2px;
+}
 
-    .ao-bar-sub {
-        font-size: 9.5px;
-        flex-direction: column;
-        gap: 2px;
-        text-align: center;
-    }
+/* 6-step Green Staircase */
+.ao-stairs-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    flex: 1;
+    height: 120px;
+}
 
-    /* Subgrid & Panels */
-    .ao-matching-subgrid {
+.ao-stair-step {
+    flex: 1;
+    background: #4ade80;
+    border: 1.5px solid #0f172a;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.ao-stair-step.step-1 { height: 20%; }
+.ao-stair-step.step-2 { height: 35%; }
+.ao-stair-step.step-3 { height: 50%; }
+.ao-stair-step.step-4 { height: 65%; }
+.ao-stair-step.step-5 { height: 80%; }
+.ao-stair-step.step-6 { height: 95%; }
+
+.ao-pillar-gap-target {
+    width: 65px;
+    border: 1.5px solid #0f172a;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.ao-pillar-gap-target .gap-top {
+    padding: 10px 2px;
+    background: #ffffff;
+    border-bottom: 1.5px solid #0f172a;
+}
+
+.ao-pillar-gap-target .mtd-bot {
+    padding: 16px 2px;
+    background: #86efac;
+}
+
+/* -------------------------------------------------------------
+   LEFT COLUMN - SECTION 2: Matching Stock from Order / SPK Plan
+   ------------------------------------------------------------- */
+.ao-spk-section-grid {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .ao-spk-section-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
-        margin-bottom: 12px;
-    }
-
-    .ao-sub-panel {
-        padding: 10px;
-    }
-
-    .ao-pill-item {
-        font-size: 11px;
-        padding: 5px 8px;
-    }
-
-    .ao-ladder-container {
-        padding: 10px 8px;
-        border-radius: 12px;
-    }
-
-    .ao-ladder-steps {
-        height: 75px;
-        gap: 4px;
-    }
-
-    .ao-step-bar {
-        font-size: 9px;
-        padding: 2px 1px;
-    }
-
-    /* Truck Milestones */
-    .ao-truck-flow {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-    }
-
-    .ao-truck-node {
-        padding: 6px 4px;
-    }
-
-    .ao-truck-val {
-        font-size: 12px;
-    }
-
-    .ao-truck-accum {
-        font-size: 8.5px;
-    }
-
-    /* Table Matrix */
-    .ao-matrix-container {
-        padding: 14px 12px;
-        border-radius: 14px;
-    }
-
-    .ao-matrix-table-wrap {
-        max-height: 480px;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 10px;
-    }
-
-    .ao-matrix-table th {
-        padding: 8px 6px;
-        font-size: 10.5px;
-    }
-
-    .ao-matrix-table td {
-        padding: 7px 6px;
-        font-size: 11px;
-    }
-
-    .ao-matrix-table td.col-model {
-        min-width: 125px;
-        font-size: 11px;
-        padding: 7px 8px;
-        box-shadow: 2px 0 6px rgba(0,0,0,0.06);
     }
 }
 
-@media (max-width: 400px) {
-    .ao-truck-flow {
-        grid-template-columns: repeat(2, 1fr);
+.ao-table-wb {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10.5px;
+    font-weight: 800;
+    border: 2px solid #0f172a;
+    text-align: center;
+}
+
+.ao-table-wb th, .ao-table-wb td {
+    border: 1.5px solid #0f172a;
+    padding: 4px 3px;
+}
+
+.ao-table-wb th {
+    background: #f1f5f9;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.ao-row-green-actual {
+    background: #dcfce7;
+    color: #0f172a;
+}
+
+.ao-row-nett-plan {
+    background: #fef9c3;
+}
+
+.ao-spk-right-pane {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ao-cancel-ratio-box {
+    border: 1.5px solid #0f172a;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    background: #f8fafc;
+    width: fit-content;
+    margin-bottom: 8px;
+}
+
+.ao-nett-visual-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.ao-arrow-avg-days {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 900;
+    color: #0f172a;
+    padding: 4px 6px;
+    border: 1.5px solid #0f172a;
+    background: #e2e8f0;
+    text-align: center;
+    margin: 4px 0;
+    border-radius: 4px;
+}
+
+.ao-pillar-become-os {
+    width: 65px;
+    border: 1.5px solid #0f172a;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.ao-pillar-become-os .top-os {
+    background: #cbd5e1;
+    padding: 12px 2px;
+    border-bottom: 1.5px solid #0f172a;
+}
+
+.ao-pillar-become-os .bot-rs {
+    background: #fed7aa;
+    padding: 22px 2px;
+}
+
+/* -------------------------------------------------------------
+   LEFT COLUMN - SECTION 3: MDP Plan & FFS Selling Plan
+   ------------------------------------------------------------- */
+.ao-mdp-section-grid {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ao-pillar-mdp-split {
+    width: 45px;
+    border: 1.5px solid #0f172a;
+    text-align: center;
+    font-weight: 900;
+    font-size: 11px;
+}
+
+.ao-mdp-top-slice {
+    background: #86efac;
+    padding: 4px 2px;
+    border-bottom: 1.5px solid #0f172a;
+}
+
+.ao-mdp-bot-slice {
+    background: #93c5fd;
+    padding: 24px 2px;
+}
+
+.ao-pillar-ffs-oh {
+    width: 45px;
+    border: 1.5px solid #0f172a;
+    text-align: center;
+    font-weight: 900;
+    font-size: 11px;
+    background: #fed7aa;
+    padding: 28px 2px;
+}
+
+.ao-ffs-truck-ladder-wrap {
+    flex: 1;
+    min-width: 250px;
+}
+
+.ao-truck-stairs {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 95px;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 2px;
+}
+
+.ao-truck-step {
+    flex: 1;
+    background: #93c5fd;
+    border: 1.5px solid #0f172a;
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 4px;
+    font-size: 11px;
+    color: #1e3a8a;
+}
+
+.ao-truck-accum-boxes {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+}
+
+.ao-truck-accum-box {
+    flex: 1;
+    background: #fef08a;
+    border: 1px solid #0f172a;
+    font-size: 8.5px;
+    font-weight: 800;
+    text-align: center;
+    padding: 2px 0;
+}
+
+.ao-rs-steps-under {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 45px;
+    margin-top: 6px;
+}
+
+.ao-rs-step-bar {
+    flex: 1;
+    background: #86efac;
+    border: 1.5px solid #0f172a;
+    font-size: 9px;
+    font-weight: 900;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.ao-accum-rs-vals {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+    font-size: 8.5px;
+    font-weight: 800;
+    text-align: center;
+}
+.ao-accum-rs-vals span {
+    flex: 1;
+    border: 1px solid #0f172a;
+    padding: 1px 0;
+    background: #ffffff;
+}
+
+.ao-pillar-from-new-order {
+    width: 60px;
+    border: 1.5px solid #0f172a;
+    background: #86efac;
+    font-size: 10.5px;
+    font-weight: 900;
+    text-align: center;
+    padding: 38px 2px;
+}
+
+/* -------------------------------------------------------------
+   RIGHT COLUMN - SECTION 4: Closing Estimation & Table 1
+   ------------------------------------------------------------- */
+.ao-right-col-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ao-closing-estimation-card {
+    border: 2px solid #0f172a;
+    background: #ffffff;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+}
+
+.ao-closing-table-compact {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1.5px solid #0f172a;
+}
+
+.ao-closing-table-compact th, .ao-closing-table-compact td {
+    border: 1.5px solid #0f172a;
+    padding: 4px 6px;
+}
+
+.ao-closing-table-compact .th-gold {
+    background: #fef08a;
+    font-weight: 900;
+}
+
+.ao-closing-table-compact .td-blue {
+    background: #bfdbfe;
+    font-weight: 900;
+}
+
+/* Table 1: Model Gap OS & Matching */
+.ao-model-table-wrap {
+    max-height: 380px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 2px solid #0f172a;
+}
+
+.ao-model-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.ao-model-table th, .ao-model-table td {
+    border: 1px solid #0f172a;
+    padding: 3px 2px;
+    white-space: nowrap;
+}
+
+.ao-model-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.ao-th-yellow { background: #fef08a !important; color: #0f172a; }
+.ao-th-green { background: #bbf7d0 !important; color: #0f172a; }
+.ao-th-red { background: #fecaca !important; color: #991b1b; }
+.ao-th-peach { background: #fed7aa !important; color: #9a3412; }
+.ao-th-blue { background: #bfdbfe !important; color: #1e3a8a; }
+
+.ao-col-model-name {
+    text-align: left;
+    font-weight: 800;
+    padding-left: 6px !important;
+    background: #ffffff;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+.ao-row-grand-total {
+    background: #f1f5f9;
+    font-weight: 900;
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    border-top: 2px solid #0f172a;
+}
+
+/* -------------------------------------------------------------
+   RIGHT COLUMN - SECTION 5: Table 2 Supply & FTS
+   ------------------------------------------------------------- */
+.ao-table2-layout {
+    display: grid;
+    grid-template-columns: 85px 1fr;
+    gap: 8px;
+    align-items: start;
+}
+
+@media (max-width: 600px) {
+    .ao-table2-layout {
+        grid-template-columns: 1fr;
     }
 }
 
+.ao-side-param-box {
+    border: 2px solid #0f172a;
+    padding: 6px;
+    font-size: 9.5px;
+    font-weight: 800;
+    background: #f8fafc;
+    line-height: 1.4;
+}
 
+.ao-side-param-box .title {
+    font-weight: 900;
+    border-bottom: 1.5px solid #0f172a;
+    padding-bottom: 3px;
+    margin-bottom: 4px;
+    text-align: center;
+}
 
+/* FULLSCREEN / PROJECTOR MODE */
+.ao-board-container.ao-fullscreen-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    margin: 0;
+    border-radius: 0;
+    border: 8px solid #0f172a;
+    overflow-y: auto;
+    background: #ffffff;
+    box-shadow: none;
+    padding: 12px 18px;
+}
