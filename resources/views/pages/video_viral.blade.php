@@ -6,10 +6,10 @@
   <title>Sales App - Kircon Media Studio (Tunas Toyota Kiara Condong)</title>
   <meta name="description" content="Pusat Konten Digital, Video Showcase & Customer Stories Tunas Toyota Kiara Condong untuk Materi Promosi & Inspirasi Sales">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style.css?v=5.0">
-  <script src="../js/sidebar_desktop.js?v=20260914_viral_v5"></script>
+  <link rel="stylesheet" href="../css/style.css?v=20260914_viral_v6">
+  <script src="../js/sidebar_desktop.js?v=20260914_viral_v6"></script>
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#090d16">
+  <meta name="theme-color" content="#CC0000">
 
   <style>
     :root {
@@ -35,55 +35,22 @@
       padding: 0;
     }
 
-    /* Top Breadcrumb & Quick Action Bar */
-    .studio-top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .studio-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12.5px;
-      color: #64748b;
-      font-weight: 600;
-    }
-
-    .studio-breadcrumb a {
-      color: #64748b;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .studio-breadcrumb a:hover {
-      color: var(--primary-red);
-    }
-
-    .studio-breadcrumb .active-crumb {
-      color: #0f172a;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
+    /* =========================================================
+       AURORA NAVY & SOFT-UI ENTERPRISE DESIGN SYSTEM (v5)
+       ========================================================= */
     .studio-live-pill {
-      background: rgba(200, 16, 46, 0.1);
-      color: var(--primary-red);
-      border: 1px solid rgba(200, 16, 46, 0.25);
-      padding: 3px 8px;
+      background: rgba(200, 16, 46, 0.18);
+      color: #ff6b81;
+      border: 1px solid rgba(200, 16, 46, 0.4);
+      padding: 3px 10px;
       border-radius: 20px;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.5px;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      vertical-align: middle;
     }
 
     .studio-live-pill .dot-pulse {
@@ -100,139 +67,170 @@
       50% { opacity: 0.4; transform: scale(0.75); }
     }
 
-    .btn-add-media-header {
-      background: var(--red-gradient);
-      color: white;
-      border: none;
-      padding: 9px 18px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 12.5px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .btn-add-media-header:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(200, 16, 46, 0.45);
-    }
-
-    /* Executive Hero Banner */
-    .viral-hero-banner {
-      background: linear-gradient(135deg, #090d16 0%, #151d2f 50%, #290812 100%);
-      border-radius: 22px;
-      padding: 26px 30px;
-      color: white;
+    /* Executive Hero Banner (Aurora Navy Design System) */
+    .viral-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #172554 100%);
+      border-radius: var(--radius-lg, 22px);
+      padding: 24px 28px;
+      color: #ffffff;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
       margin-bottom: 24px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
-    .viral-hero-banner::before {
+    .viral-hero::after {
       content: '';
       position: absolute;
-      top: -80px;
+      top: -40px;
       right: -40px;
-      width: 260px;
-      height: 260px;
-      background: radial-gradient(circle, rgba(200, 16, 46, 0.35) 0%, transparent 70%);
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(200, 16, 46, 0.28) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
 
-    .viral-hero-banner::after {
-      content: '';
-      position: absolute;
-      bottom: -60px;
-      left: 15%;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .viral-badge-header {
-      display: inline-flex;
+    .viral-hero-header {
+      display: flex;
       align-items: center;
-      gap: 7px;
-      background: rgba(254, 44, 85, 0.16);
-      border: 1px solid rgba(254, 44, 85, 0.45);
-      color: #ff859d;
-      padding: 5px 14px;
-      border-radius: 30px;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 12px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
-    .hero-title {
-      font-size: 24px;
-      font-weight: 900;
+    .viral-hero-title-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .viral-hero-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #ff4d6d;
+      flex-shrink: 0;
+    }
+
+    .viral-hero-title-box h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 4px 0;
       letter-spacing: -0.5px;
-      margin: 0 0 8px 0;
-      line-height: 1.25;
+      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
     }
 
-    .hero-desc {
-      font-size: 13.5px;
-      color: #cbd5e1;
+    .viral-hero-title-box p {
       margin: 0;
-      line-height: 1.6;
-      max-width: 860px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      max-width: 760px;
     }
 
-    /* Hero Stats Deck (Clean, No Views / Likes) */
-    .viral-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
-      margin-top: 22px;
-    }
-
-    .stat-box {
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 14px 16px;
-      transition: transform 0.2s, background 0.2s;
-    }
-
-    .stat-box:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .stat-box .num {
-      font-size: 19px;
-      font-weight: 900;
-      color: #ffffff;
-      display: flex;
+    .btn-hero-add {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
+      background: linear-gradient(135deg, #c8102e 0%, #ef4444 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      white-space: nowrap;
     }
 
-    .stat-box .lbl {
+    .btn-hero-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(200, 16, 46, 0.5);
+      background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+    }
+
+    /* Soft-UI Stat Pills (Matching jadwal_input.blade.php) */
+    .viral-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-pill-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .stat-pill-card:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .stat-pill-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .stat-pill-icon.red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .stat-pill-icon.blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .stat-pill-icon.amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .stat-pill-icon.green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+    .stat-pill-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .stat-pill-val {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat-pill-lbl {
       font-size: 11px;
-      font-weight: 600;
       color: #94a3b8;
-      margin-top: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Toolbar: Search, Sort & Categories */
@@ -240,7 +238,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
 
     .toolbar-top-row {
@@ -253,12 +251,12 @@
     .search-input-wrapper {
       position: relative;
       flex: 1;
-      min-width: 260px;
+      min-width: 240px;
     }
 
     .search-input-wrapper i {
       position: absolute;
-      left: 16px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
       color: #94a3b8;
@@ -268,15 +266,15 @@
     .search-input-wrapper input {
       width: 100%;
       box-sizing: border-box;
-      padding: 13px 16px 13px 44px;
-      border-radius: 14px;
-      border: 1px solid #cbd5e1;
+      padding: 11px 16px 11px 40px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
       background: #ffffff;
-      font-size: 13.5px;
+      font-size: 13px;
       color: #0f172a;
       outline: none;
       transition: all 0.2s;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     .search-input-wrapper input:focus {
@@ -291,16 +289,16 @@
     }
 
     .sort-select {
-      padding: 12px 16px;
-      border-radius: 14px;
-      border: 1px solid #cbd5e1;
-      background: white;
-      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      font-size: 12.5px;
       font-weight: 700;
       color: #0f172a;
       outline: none;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       transition: border-color 0.2s;
     }
 
@@ -308,91 +306,92 @@
       border-color: var(--primary-red);
     }
 
-    /* Category Filter Pills */
+    /* Category Filter Pills (Soft-UI Enterprise standard) */
     .category-pills-wrap {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: thin;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
     .category-pills-wrap::-webkit-scrollbar {
-      height: 4px;
+      display: none;
     }
 
     .category-pill {
+      padding: 7px 15px;
+      border-radius: 20px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      color: #475569;
-      padding: 9px 18px;
-      border-radius: 30px;
-      font-size: 12.5px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
       cursor: pointer;
       white-space: nowrap;
-      display: flex;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      gap: 6px;
     }
 
     .category-pill:hover {
-      background: #f1f5f9;
+      background: #f8fafc;
       border-color: #cbd5e1;
       color: #0f172a;
     }
 
     .category-pill.active {
-      background: var(--red-gradient);
+      background: var(--primary-red);
       color: #ffffff;
-      border-color: transparent;
-      box-shadow: 0 4px 14px rgba(200, 16, 46, 0.3);
+      border-color: var(--primary-red);
+      box-shadow: 0 4px 10px rgba(200, 16, 46, 0.3);
     }
 
     .category-pill .pill-count {
-      background: rgba(0, 0, 0, 0.08);
+      background: rgba(0, 0, 0, 0.06);
       padding: 2px 7px;
       border-radius: 10px;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 800;
     }
 
     .category-pill.active .pill-count {
       background: rgba(255, 255, 255, 0.25);
-      color: white;
+      color: #ffffff;
     }
 
     /* Video Grid System */
     .video-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 22px;
+      gap: 20px;
     }
 
     /* Automotive Video Card */
     .video-card {
       background: #ffffff;
-      border-radius: 20px;
+      border-radius: 18px;
       overflow: hidden;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, border-color 0.3s;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s, border-color 0.25s;
       display: flex;
       flex-direction: column;
       position: relative;
     }
 
     .video-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1), 0 6px 14px rgba(200, 16, 46, 0.06);
-      border-color: rgba(200, 16, 46, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.09);
+      border-color: rgba(200, 16, 46, 0.25);
     }
 
     .video-card.card-playing {
       border-color: var(--primary-red);
-      box-shadow: 0 20px 40px rgba(200, 16, 46, 0.2);
+      box-shadow: 0 16px 36px rgba(200, 16, 46, 0.18);
     }
 
     /* =========================================================
@@ -925,72 +924,154 @@
       background: #ffffff;
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 768px) {
+      .content-body,
+      .viral-container {
+        padding: 14px !important;
+      }
+      .viral-hero {
+        padding: 18px 16px;
+        margin-bottom: 18px;
+      }
+      .viral-hero-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .btn-hero-add {
+        width: 100%;
+        justify-content: center;
+        padding: 11px 16px;
+      }
+      .viral-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .stat-pill-card {
+        padding: 10px 12px;
+        gap: 10px;
+      }
+      .stat-pill-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+      .stat-pill-val {
+        font-size: 15px;
+      }
+      .stat-pill-lbl {
+        font-size: 10px;
+      }
+      .toolbar-top-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .search-input-wrapper {
+        min-width: 100%;
+      }
+      .sort-select-wrapper {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .sort-select {
+        flex: 1;
+      }
+      .video-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
       .video-thumb-container.is-playing {
         height: 320px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .viral-hero-title-box h1 {
+        font-size: 18px;
+      }
+      .viral-hero-title-box p {
+        font-size: 12px;
+      }
+      .viral-stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="mobile-app">
-    <!-- Header Page (Upgraded by sidebar_desktop.js) -->
+  <div class="mobile-app" style="width: 100%; max-width: 1200px; margin: 0 auto; box-sizing: border-box; overflow-x: hidden; padding-bottom: 90px;">
+    <!-- Header Page (Harmonized with Design System v5) -->
     <header class="header-page">
-      <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
+      <a href="../index.html" title="Kembali ke Dashboard"><i class="fa-solid fa-arrow-left"></i></a>
       <h2>Kircon Media Studio</h2>
-      <button onclick="openAddVideoModal()" style="margin-left: auto; background: var(--red-gradient); color: white; border: none; padding: 7px 16px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(200,16,46,0.3);">
-        <i class="fa-solid fa-plus"></i> Tambah Media Sales
-      </button>
     </header>
 
-    <div class="content-body" style="padding: 18px 20px;">
+    <div class="content-body viral-container">
+      <!-- EXECUTIVE HERO BANNER (AURORA NAVY DESIGN SYSTEM) -->
+      <div class="viral-hero">
+        <div class="viral-hero-header">
+          <div class="viral-hero-title-box">
+            <div class="viral-hero-icon">
+              <i class="fa-solid fa-clapperboard"></i>
+            </div>
+            <div>
+              <h1>
+                Kircon Media Studio &amp; Showcase
+                <span class="studio-live-pill"><span class="dot-pulse"></span> LIVE</span>
+              </h1>
+              <p>Hub media resmi Tunas Toyota Kiara Condong: putar video langsung tanpa pop-up, materi promosi &amp; serah terima unit 1-klik share ke WhatsApp konsumen.</p>
+            </div>
+          </div>
 
-      <!-- TOP BREADCRUMB & CONTROLS -->
-      <div class="studio-top-bar">
-        <div class="studio-breadcrumb">
-          <a href="../index.html"><i class="fa-solid fa-house"></i> Beranda</a>
-          <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #94a3b8;"></i>
-          <span class="active-crumb">
-            Kircon Media Studio
-            <span class="studio-live-pill"><span class="dot-pulse"></span> LIVE SHOWROOM</span>
-          </span>
+          <button type="button" onclick="openAddVideoModal()" class="btn-hero-add">
+            <i class="fa-solid fa-plus"></i> Tambah Konten Video
+          </button>
         </div>
 
-        <button onclick="openAddVideoModal()" class="btn-add-media-header">
-          <i class="fa-solid fa-circle-plus"></i> Tambah Konten Video Sales
-        </button>
-      </div>
-
-      <!-- HERO BANNER -->
-      <div class="viral-hero-banner">
-        <div class="viral-badge-header">
-          <i class="fa-solid fa-film"></i> Official Showroom Media &amp; Showcase Center
-        </div>
-        <h1 class="hero-title">
-          Kircon Media Studio &amp; Showcase
-        </h1>
-        <p class="hero-desc">
-          Hub media resmi <strong>Tunas Toyota Kiara Condong</strong>. Putar video langsung di setiap kartu tanpa pop-up: momen serah terima unit, bedah fitur canggih kendaraan, serta materi promosi siap bagikan ke WhatsApp calon konsumen.
-        </p>
-
-        <!-- Stats Grid (Clean, No Views / Likes) -->
+        <!-- Quick Metrics Deck (Design System v5 Soft-UI Glass) -->
         <div class="viral-stats-grid">
-          <div class="stat-box">
-            <div class="num" id="statTotalVideos" style="color: #ffffff;"><i class="fa-solid fa-clapperboard" style="color: #ff334b;"></i> 12 Video</div>
-            <div class="lbl">Koleksi Media Resmi</div>
+          <div class="stat-pill-card">
+            <div class="stat-pill-icon red">
+              <i class="fa-solid fa-film"></i>
+            </div>
+            <div class="stat-pill-text">
+              <span class="stat-pill-val" id="statTotalVideos">12 Video</span>
+              <span class="stat-pill-lbl">Koleksi Media</span>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="num" style="color: #38bdf8;"><i class="fa-solid fa-car"></i> 10+ Model</div>
-            <div class="lbl">Katalog Unit Toyota</div>
+
+          <div class="stat-pill-card">
+            <div class="stat-pill-icon blue">
+              <i class="fa-solid fa-car"></i>
+            </div>
+            <div class="stat-pill-text">
+              <span class="stat-pill-val">10+ Model</span>
+              <span class="stat-pill-lbl">Katalog Unit Toyota</span>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="num" style="color: #d8a437;"><i class="fa-solid fa-circle-check"></i> Terverifikasi</div>
-            <div class="lbl">Cabang Kiara Condong</div>
+
+          <div class="stat-pill-card">
+            <div class="stat-pill-icon amber">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="stat-pill-text">
+              <span class="stat-pill-val">Resmi Cabang</span>
+              <span class="stat-pill-lbl">Kiara Condong</span>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="num" style="color: #34d399;"><i class="fa-brands fa-whatsapp"></i> 1-Klik Share</div>
-            <div class="lbl">Materi Closing Konsumen</div>
+
+          <div class="stat-pill-card">
+            <div class="stat-pill-icon green">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div class="stat-pill-text">
+              <span class="stat-pill-val">1-Klik Share</span>
+              <span class="stat-pill-lbl">Materi Closing WA</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1408,7 +1489,7 @@
     function updateStats() {
       const totalCount = currentVideos.length;
       const el = document.getElementById('statTotalVideos');
-      if (el) el.innerHTML = `<i class="fa-solid fa-clapperboard" style="color: #ff334b;"></i> ${totalCount} Video`;
+      if (el) el.textContent = `${totalCount} Video`;
 
       const categories = ['all', 'delivery', 'feature', 'tips', 'parodi', 'promo'];
       categories.forEach(cat => {
