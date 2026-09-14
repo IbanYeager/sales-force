@@ -6,8 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Area Operation (AO) Report</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_spv.css">
-  <link rel="stylesheet" href="../css/ao_report.css?v=20260831_center_darklogo">
+  <link rel="stylesheet" href="/css/style_spv.css?v=20260914_master">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260914_master">
+  <link rel="stylesheet" href="/css/ao_report.css?v=20260914_ao_v30">
+  <link rel="stylesheet" href="../css/ao_report.css?v=20260914_ao_v30">
 
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
@@ -107,10 +109,14 @@
             </div>
 
             <div class="ao-board-logo-area">
-                <div class="ao-brand-badge-text">
-                    <i class="fa-solid fa-tree" style="color:#0284c7;"></i> tunas <span class="toyota">TOYOTA</span> KIARACONDONG
+                <img src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png" 
+                     alt="Tunas Toyota" 
+                     style="height:28px; max-width:200px; object-fit:contain;" 
+                     onerror="this.style.display='none'; document.getElementById('txtLogoSpv').style.display='inline-flex';" />
+                <div class="ao-brand-badge-text" id="txtLogoSpv" style="display:none;">
+                    tunas <span class="toyota">TOYOTA</span> KIARACONDONG
                 </div>
-                <span class="marker-circle">1</span>
+                <span class="marker-circle" title="Section 1">1</span>
             </div>
 
             <div class="ao-actions-toolbar">
@@ -548,9 +554,9 @@
     </main>
   </div>
 
-  <script src="../js/ao_report_data.js"></script>
-  <script src="../js/ao_report.js"></script>
-  <script src="../js/spv_global.js?v=20260828"></script>
+  <script src="../js/ao_report_data.js?v=20260914_ao_v30"></script>
+  <script src="../js/ao_report.js?v=20260914_ao_v30"></script>
+  <script src="../js/spv_global.js?v=20260914_ao_v30"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         initAOReport('spv');

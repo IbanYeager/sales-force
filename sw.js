@@ -3,7 +3,7 @@
 // Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20260911-sidebar-polreg-sync-v25';
+const CACHE_VERSION = 'sft-pwa-v20260914-ao-report-fix-v30';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',
@@ -79,7 +79,7 @@ self.addEventListener('fetch', event => {
   // C. JavaScript and CSS: NETWORK-FIRST (So APK always gets latest code immediately)
   if (req.destination === 'script' || req.destination === 'style' || url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
     event.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'no-cache' })
         .then(response => {
           if (response && response.status === 200) {
             const responseClone = response.clone();
