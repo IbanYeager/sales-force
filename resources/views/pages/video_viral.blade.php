@@ -7,7 +7,7 @@
   <meta name="description" content="Pusat Konten Digital, Video Showcase & Customer Stories Tunas Toyota Kiara Condong untuk Materi Promosi & Inspirasi Sales">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=5.0">
-  <script src="../js/sidebar_desktop.js?v=20260914_viral_v3"></script>
+  <script src="../js/sidebar_desktop.js?v=20260914_viral_v4"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#090d16">
 
@@ -194,7 +194,7 @@
       max-width: 860px;
     }
 
-    /* Hero Stats Deck */
+    /* Hero Stats Deck (No Views/Likes) */
     .viral-stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -218,7 +218,7 @@
     }
 
     .stat-box .num {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 900;
       color: #ffffff;
       display: flex;
@@ -628,7 +628,7 @@
       box-shadow: 0 0 35px rgba(200, 16, 46, 0.75);
     }
 
-    /* Metrics Bar on Overlay Bottom */
+    /* Thumbnail Bottom Bar (Clean Vehicle Tag, No Views/Likes) */
     .thumb-bottom-row {
       display: flex;
       align-items: center;
@@ -639,30 +639,19 @@
       gap: 6px;
     }
 
-    .metrics-pill {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(9, 13, 22, 0.75);
-      backdrop-filter: blur(8px);
-      padding: 3px 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .metrics-pill.views i {
-      color: #f59e0b;
-    }
-
     .model-tag-pill {
-      font-size: 10px;
+      font-size: 10.5px;
       font-weight: 800;
       color: #93c5fd;
-      background: rgba(30, 58, 138, 0.5);
-      padding: 3px 8px;
+      background: rgba(30, 58, 138, 0.65);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
       border-radius: 8px;
-      border: 1px solid rgba(147, 197, 253, 0.25);
+      border: 1px solid rgba(147, 197, 253, 0.3);
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
     /* Card Details */
@@ -815,7 +804,7 @@
     }
 
     /* =========================================================
-       NEW 2-COLUMN EXECUTIVE THEATER MODAL (FIXED & ELEVATED)
+       2-COLUMN EXECUTIVE THEATER MODAL (CLEAN & NO METRICS)
        ========================================================= */
     .video-modal-overlay {
       position: fixed;
@@ -849,7 +838,7 @@
       box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.85), 0 0 45px rgba(200, 16, 46, 0.18);
       overflow: hidden;
       display: flex;
-      flex-direction: row; /* Desktop 2-column layout */
+      flex-direction: row;
       position: relative;
       animation: modalPop 0.32s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -859,7 +848,7 @@
       100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
-    /* Modal Left: Video Player Stage (No vertical overflow!) */
+    /* Modal Left: Video Player Stage */
     .modal-player-column {
       flex: 1.05;
       max-width: 380px;
@@ -892,7 +881,7 @@
       display: block;
     }
 
-    /* Modal Right: Details, Sales Copy & Actions */
+    /* Modal Right: Details, Sales Tips & WhatsApp Action */
     .modal-details-column {
       flex: 1.25;
       padding: 24px 26px;
@@ -1136,26 +1125,26 @@
           Kircon Media Studio &amp; Showcase
         </h1>
         <p class="hero-desc">
-          Hub media resmi <strong>Tunas Toyota Kiara Condong</strong>. Menyajikan video viral momen serah terima (delivery ceremony), bedah fitur canggih kendaraan, serta tips edukasi otomotif ber-views tertinggi untuk bahan promosi instan sales ke WhatsApp konsumen.
+          Hub media resmi <strong>Tunas Toyota Kiara Condong</strong>. Menyajikan video momen serah terima (delivery ceremony), bedah fitur canggih kendaraan, serta tips edukasi otomotif untuk materi promosi instan sales ke WhatsApp konsumen.
         </p>
 
-        <!-- Stats Grid -->
+        <!-- Stats Grid (Clean, No Views / Likes) -->
         <div class="viral-stats-grid">
           <div class="stat-box">
-            <div class="num" id="statTotalViews">5.2M+</div>
-            <div class="lbl">Total Penayangan</div>
+            <div class="num" id="statTotalVideos" style="color: #ffffff;"><i class="fa-solid fa-clapperboard" style="color: #ff334b;"></i> 12 Video</div>
+            <div class="lbl">Koleksi Media Resmi</div>
           </div>
           <div class="stat-box">
-            <div class="num" id="statTotalVideos">12 Video</div>
-            <div class="lbl">Koleksi Media</div>
+            <div class="num" style="color: #38bdf8;"><i class="fa-solid fa-car"></i> 10+ Model</div>
+            <div class="lbl">Katalog Unit Toyota</div>
           </div>
           <div class="stat-box">
-            <div class="num" style="color: #38bdf8;"><i class="fa-solid fa-circle-check"></i> Verified</div>
-            <div class="lbl">@tunastoyotakircon</div>
+            <div class="num" style="color: #d8a437;"><i class="fa-solid fa-circle-check"></i> Terverifikasi</div>
+            <div class="lbl">Cabang Kiara Condong</div>
           </div>
           <div class="stat-box">
-            <div class="num" style="color: #34d399;"><i class="fa-brands fa-whatsapp"></i> 1-Klik WA</div>
-            <div class="lbl">Format Siap Closing</div>
+            <div class="num" style="color: #34d399;"><i class="fa-brands fa-whatsapp"></i> 1-Klik Share</div>
+            <div class="lbl">Materi Closing Konsumen</div>
           </div>
         </div>
       </div>
@@ -1173,9 +1162,9 @@
               <i class="fa-solid fa-arrow-down-wide-short"></i> Urutkan:
             </label>
             <select id="viralSortSelect" class="sort-select" onchange="filterVideos()">
-              <option value="views">🔥 Views Terbanyak (Top Viral)</option>
-              <option value="likes">❤️ Likes Terbanyak</option>
+              <option value="featured">⭐ Rekomendasi Utama</option>
               <option value="latest">🕒 Terbaru Ditambahkan</option>
+              <option value="model">🚗 Model Mobil (A - Z)</option>
             </select>
           </div>
         </div>
@@ -1219,7 +1208,7 @@
   </div>
 
   <!-- =========================================================
-       MODAL 1: NEW 2-COLUMN SPLIT THEATER PLAYER MODAL
+       MODAL 1: 2-COLUMN SPLIT THEATER PLAYER (CLEAN, NO METRICS)
        ========================================================= -->
   <div class="video-modal-overlay" id="videoPlayerModal">
     <div class="video-modal-box">
@@ -1252,18 +1241,13 @@
           <!-- Video Title -->
           <h3 id="modalVideoTitle" style="font-size: 16px; font-weight: 800; margin: 0 0 8px 0; line-height: 1.4; color: #ffffff;"></h3>
           
-          <!-- Creator Info & Metrics -->
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+          <!-- Creator Info (Clean, No Views / Likes) -->
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
             <span style="font-size: 12px; color: #94a3b8; font-weight: 700; display: flex; align-items: center; gap: 5px;">
               <i class="fa-solid fa-circle-check" style="color: #38bdf8;"></i> <span id="modalVideoAuthor">@tunastoyotakircon</span>
             </span>
-            <span style="color: rgba(255,255,255,0.2);">•</span>
-            <span id="modalVideoViews" style="font-size: 12px; color: #f59e0b; font-weight: 800; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-fire"></i> <span>1.8M Views</span>
-            </span>
-            <span style="color: rgba(255,255,255,0.2);">•</span>
-            <span id="modalVideoLikes" style="font-size: 12px; color: #f43f5e; font-weight: 800; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-heart"></i> <span>142K Likes</span>
+            <span style="background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+              <i class="fa-solid fa-certificate" style="color: #d8a437;"></i> Konten Resmi Showroom
             </span>
           </div>
 
@@ -1366,11 +1350,6 @@
         </div>
 
         <div>
-          <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Jumlah Views / Tayangan (untuk urutan terpopuler):</label>
-          <input type="text" id="newVideoViews" class="modal-form-input" placeholder="Contoh: 1.4M Views atau 850K Views">
-        </div>
-
-        <div>
           <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Rekomendasi Pesan Promosi WhatsApp Konsumen:</label>
           <textarea id="newVideoDesc" class="modal-form-input" rows="3" style="resize: vertical;" placeholder="Tuliskan catatan kenapa video ini cocok dibagikan ke calon konsumen..."></textarea>
         </div>
@@ -1397,10 +1376,6 @@
         category: 'delivery',
         categoryName: 'Serah Terima Unit',
         platform: 'youtube',
-        views: '1.8M Views',
-        viewsCount: 1800000,
-        likes: '142K',
-        likesCount: 142000,
         author: '@tunastoyotakircon',
         desc: 'Momen serah terima unit dan kemegahan fasilitas showroom dealer Tunas Toyota Kiara Condong. Customer lounge ber-AC dingin, area serah terima karpet merah VIP, dan pelayanan ramah konsultan resmi.',
         modelName: 'Innova Zenix HEV',
@@ -1415,10 +1390,6 @@
         category: 'promo',
         categoryName: 'Promo & Event',
         platform: 'youtube',
-        views: '1.5M Views',
-        viewsCount: 1500000,
-        likes: '128K',
-        likesCount: 128000,
         author: '@tunastoyotakircon',
         desc: 'Rangkuman kemeriahan event showroom weekend sales di Tunas Kiara Condong. Banyak promo menarik: DP super ringan Calya & Avanza, bunga 0% Zenix, lucky dip voucher belanja, dan merchandise spesial.',
         modelName: 'New Calya 1.2 G',
@@ -1433,10 +1404,6 @@
         category: 'delivery',
         categoryName: 'Serah Terima Unit',
         platform: 'youtube',
-        views: '1.2M Views',
-        viewsCount: 1200000,
-        likes: '95K',
-        likesCount: 95000,
         author: '@tunastoyotakircon',
         desc: 'Spill kabin first-class New Alphard Hybrid warna Platinum White Pearl. Dilengkapi kursi Captain Seat elektrik dengan Ottoman, ambient lighting 14 warna, serta meja lipat multifungsi.',
         modelName: 'New Alphard VIP',
@@ -1451,10 +1418,6 @@
         category: 'delivery',
         categoryName: 'Serah Terima Unit',
         platform: 'youtube',
-        views: '940K Views',
-        viewsCount: 940000,
-        likes: '78K',
-        likesCount: 78000,
         author: '@tunastoyotakircon',
         desc: 'Katalog stok ready unit di pool cabang Tunas Toyota Kiara Condong: dari Veloz, Avanza, Raize, hingga Zenix Hybrid siap kirim cepat tanpa inden berlama-lama.',
         modelName: 'All New Veloz TSS',
@@ -1469,10 +1432,6 @@
         category: 'parodi',
         categoryName: 'Aktivitas & Tren Sales',
         platform: 'youtube',
-        views: '890K Views',
-        viewsCount: 890000,
-        likes: '68K',
-        likesCount: 68000,
         author: '@tunastoyotakircon',
         desc: 'Keseruan tim sales consultant Kircon merayakan momen penyerahan unit baru kepada konsumen dengan penuh senyuman, foto bersama, dan pemberian souvenir eksklusif Toyota.',
         modelName: 'New Agya GR Sport',
@@ -1487,10 +1446,6 @@
         category: 'feature',
         categoryName: 'Review & Rahasia Fitur',
         platform: 'youtube',
-        views: '820K Views',
-        viewsCount: 820000,
-        likes: '64K',
-        likesCount: 64000,
         author: '@tunastoyotakircon',
         desc: 'Ulasan performa mesin 1.000cc Turbocharged Toyota Raize yang bertenaga namun irit bensin, dipadukan transmisi D-CVT halus serta 6 airbags dan fitur blind spot monitor.',
         modelName: 'Raize Turbo GR',
@@ -1505,10 +1460,6 @@
         category: 'feature',
         categoryName: 'Review & Rahasia Fitur',
         platform: 'youtube',
-        views: '780K Views',
-        viewsCount: 780000,
-        likes: '61K',
-        likesCount: 61000,
         author: '@tunastoyotakircon',
         desc: 'Simulasi test drive rute Kiara Condong menuju tanjakan Dago & Punclut. Membuktikan ketangguhan torsi mesin dan kestabilan sasis Toyota generasi terbaru.',
         modelName: 'Fortuner GR Sport',
@@ -1523,10 +1474,6 @@
         category: 'delivery',
         categoryName: 'Serah Terima Unit',
         platform: 'youtube',
-        views: '730K Views',
-        viewsCount: 730000,
-        likes: '59K',
-        likesCount: 59000,
         author: '@tunastoyotakircon',
         desc: 'Kisah nyata kebahagiaan customer saat mobil impian diantar langsung ke garasi rumah dengan plat nomor rapi dan tangki bahan bakar siap jalan.',
         modelName: 'All New Avanza',
@@ -1541,10 +1488,6 @@
         category: 'tips',
         categoryName: 'Tips & Edukasi',
         platform: 'youtube',
-        views: '680K Views',
-        viewsCount: 680000,
-        likes: '52K',
-        likesCount: 52000,
         author: '@tunastoyotakircon',
         desc: 'Panduan cara menghitung kemampuan angsuran bulanan yang aman, tips lolos approval leasing 1 hari kerja, serta memilih tenor terbaik sesuai anggaran keluarga.',
         modelName: 'Yaris Cross HEV',
@@ -1559,10 +1502,6 @@
         category: 'tips',
         categoryName: 'Tips & Edukasi',
         platform: 'youtube',
-        views: '610K Views',
-        viewsCount: 610000,
-        likes: '48K',
-        likesCount: 48000,
         author: '@tunastoyotakircon',
         desc: 'Keunggulan bengkel resmi Tunas Toyota Kiara Condong: teknisi bersertifikasi internasional, garansi mesin & suku cadang asli Toyota Genuine Parts, serta layanan darurat 24 jam.',
         modelName: 'Hilux Rangga',
@@ -1577,10 +1516,6 @@
         category: 'feature',
         categoryName: 'Review & Rahasia Fitur',
         platform: 'youtube',
-        views: '570K Views',
-        viewsCount: 570000,
-        likes: '43K',
-        likesCount: 43000,
         author: '@tunastoyotakircon',
         desc: 'Eksplorasi pintu geser otomatis dengan kick sensor, panoramic sun-roof ganda, dan kabin lapang Toyota New Voxy yang sering disebut Mini Alphard.',
         modelName: 'All New Voxy VIP',
@@ -1595,10 +1530,6 @@
         category: 'tips',
         categoryName: 'Tips & Edukasi',
         platform: 'youtube',
-        views: '510K Views',
-        viewsCount: 510000,
-        likes: '38K',
-        likesCount: 38000,
         author: '@tunastoyotakircon',
         desc: 'Edukasi cara kerja sistem regenerative braking dan tips menjaga kebersihan saringan pendingin baterai lithium-ion garansi resmi 8 tahun Tunas Toyota.',
         modelName: 'Innova Zenix HEV',
@@ -1612,25 +1543,6 @@
     let currentCategory = 'all';
     let currentVideos = [];
     let currentActiveVideo = null;
-
-    function parseViewsToNumber(viewsStr) {
-      if (typeof viewsStr === 'number') return viewsStr;
-      if (!viewsStr) return 0;
-      const s = viewsStr.toString().toLowerCase().replace(/[^0-9.kmb]/g, '');
-      if (s.endsWith('m')) return parseFloat(s) * 1000000;
-      if (s.endsWith('k')) return parseFloat(s) * 1000;
-      if (s.endsWith('b')) return parseFloat(s) * 1000000000;
-      return parseFloat(s) || 0;
-    }
-
-    function parseLikesToNumber(likesStr) {
-      if (typeof likesStr === 'number') return likesStr;
-      if (!likesStr) return 0;
-      const s = likesStr.toString().toLowerCase().replace(/[^0-9.kmb]/g, '');
-      if (s.endsWith('m')) return parseFloat(s) * 1000000;
-      if (s.endsWith('k')) return parseFloat(s) * 1000;
-      return parseFloat(s) || 0;
-    }
 
     // Extract TikTok Video ID
     function extractTikTokVideoId(url) {
@@ -1708,8 +1620,8 @@
     }
 
     function initViralVideos() {
-      // Use v5 to immediately upgrade users with verified playable Tunas Toyota Kiara Condong videos
-      const stored = localStorage.getItem('sft_viral_videos_v5');
+      // Use v6: Clean layout with views and likes removed per user instruction
+      const stored = localStorage.getItem('sft_viral_videos_v6');
       if (stored) {
         try {
           currentVideos = JSON.parse(stored);
@@ -1718,7 +1630,7 @@
         }
       } else {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos_v5', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v6', JSON.stringify(currentVideos));
       }
       renderVideos();
       updateStats();
@@ -1727,19 +1639,7 @@
     function updateStats() {
       const totalCount = currentVideos.length;
       const el = document.getElementById('statTotalVideos');
-      if (el) el.textContent = `${totalCount} Video`;
-
-      let totalViewsNum = 0;
-      currentVideos.forEach(v => {
-        totalViewsNum += parseViewsToNumber(v.viewsCount || v.views);
-      });
-
-      const elViews = document.getElementById('statTotalViews');
-      if (elViews) {
-        elViews.textContent = (totalViewsNum >= 1000000) 
-          ? (totalViewsNum / 1000000).toFixed(1) + 'M+' 
-          : (totalViewsNum / 1000).toFixed(0) + 'K+';
-      }
+      if (el) el.innerHTML = `<i class="fa-solid fa-clapperboard" style="color: #ff334b;"></i> ${totalCount} Video`;
 
       // Update category pill counters
       const categories = ['all', 'delivery', 'feature', 'tips', 'parodi', 'promo'];
@@ -1771,7 +1671,7 @@
 
     function renderVideos() {
       const query = (document.getElementById('viralSearchInput')?.value || '').toLowerCase().trim();
-      const sortVal = document.getElementById('viralSortSelect')?.value || 'views';
+      const sortVal = document.getElementById('viralSortSelect')?.value || 'featured';
       const grid = document.getElementById('viralVideoGrid');
       const emptyState = document.getElementById('viralEmptyState');
 
@@ -1785,19 +1685,11 @@
         return matchCategory && matchQuery;
       });
 
-      // SORTING LOGIC: Views Terbanyak, Likes Terbanyak, atau Terbaru
-      if (sortVal === 'views') {
-        filtered.sort((a, b) => {
-          const vA = parseViewsToNumber(a.viewsCount || a.views);
-          const vB = parseViewsToNumber(b.viewsCount || b.views);
-          return vB - vA;
-        });
-      } else if (sortVal === 'likes') {
-        filtered.sort((a, b) => {
-          const lA = parseLikesToNumber(a.likesCount || a.likes);
-          const lB = parseLikesToNumber(b.likesCount || b.likes);
-          return lB - lA;
-        });
+      // SORTING LOGIC (Clean without views/likes)
+      if (sortVal === 'latest') {
+        filtered = [...filtered].reverse();
+      } else if (sortVal === 'model') {
+        filtered.sort((a, b) => (a.modelName || '').localeCompare(b.modelName || ''));
       }
 
       if (filtered.length === 0) {
@@ -1818,16 +1710,14 @@
 
           const platformClass = video.platform === 'tiktok' ? 'tiktok' : (video.platform === 'instagram' ? 'instagram' : 'youtube');
           
-          // Metallic Rank Badges for Top 3
+          // Recommendation Badges for Top 3
           let rankBadge = '';
-          if (sortVal === 'views') {
-            if (idx === 0) {
-              rankBadge = `<div class="rank-badge rank-1"><i class="fa-solid fa-crown"></i> #1 TOP VIRAL</div>`;
-            } else if (idx === 1) {
-              rankBadge = `<div class="rank-badge rank-2"><i class="fa-solid fa-medal"></i> #2 VIRAL</div>`;
-            } else if (idx === 2) {
-              rankBadge = `<div class="rank-badge rank-3"><i class="fa-solid fa-award"></i> #3 VIRAL</div>`;
-            }
+          if (idx === 0) {
+            rankBadge = `<div class="rank-badge rank-1"><i class="fa-solid fa-star"></i> REKOMENDASI UTAMA</div>`;
+          } else if (idx === 1) {
+            rankBadge = `<div class="rank-badge rank-2"><i class="fa-solid fa-thumbs-up"></i> PILIHAN SALES</div>`;
+          } else if (idx === 2) {
+            rankBadge = `<div class="rank-badge rank-3"><i class="fa-solid fa-award"></i> BEST CHOICE</div>`;
           }
 
           const stageTheme = video.stageTheme || 'stage-zenix';
@@ -1849,7 +1739,7 @@
                   <div class="stage-car-shadow"></div>
                 </div>
 
-                <!-- Overlay Badges & Metrics -->
+                <!-- Overlay Badges (Clean, No Views / Likes) -->
                 <div class="video-thumb-overlay">
                   <div class="thumb-top-row">
                     <span class="platform-badge ${platformClass}">${platformIcon}</span>
@@ -1864,11 +1754,10 @@
                   </div>
 
                   <div class="thumb-bottom-row">
-                    <div style="display: flex; gap: 6px;">
-                      <span class="metrics-pill views"><i class="fa-solid fa-fire"></i> ${video.views}</span>
-                      <span class="metrics-pill"><i class="fa-solid fa-heart" style="color: #fe2c55;"></i> ${video.likes}</span>
-                    </div>
-                    <span class="model-tag-pill">${modelName}</span>
+                    <span class="model-tag-pill"><i class="fa-solid fa-car-side"></i> ${modelName}</span>
+                    <span style="font-size: 10.5px; background: rgba(9,13,22,0.75); color: #cbd5e1; padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 5px;">
+                      <i class="fa-solid fa-play" style="font-size: 9px; color: #ff334b;"></i> Putar Video
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1948,7 +1837,7 @@
       }
     }
 
-    // Open Modal Video Player (NEW 2-COLUMN THEATER LAYOUT WITH RELIABLE NATIVE EMBED)
+    // Open Modal Video Player (Clean, No Views / Likes)
     function openVideoPlayer(id) {
       const v = currentVideos.find(item => item.id === id);
       if (!v) return;
@@ -1961,8 +1850,6 @@
       document.getElementById('modalVideoCategory').textContent = v.categoryName;
       document.getElementById('modalVideoModelText').textContent = v.modelName || 'Toyota';
       document.getElementById('modalVideoAuthor').textContent = v.author || '@tunastoyotakircon';
-      document.getElementById('modalVideoViews').innerHTML = `<i class="fa-solid fa-fire"></i> ${v.views}`;
-      document.getElementById('modalVideoLikes').innerHTML = `<i class="fa-solid fa-heart"></i> ${v.likes}`;
       
       const pitchEl = document.getElementById('modalVideoPitch');
       if (pitchEl) {
@@ -1981,7 +1868,7 @@
       const tiktokId = extractTikTokVideoId(v.videoUrl);
       const igCode = extractInstagramReelCode(v.videoUrl);
 
-      // 1. YOUTUBE SHORTS NATIVE PLAYER EMBED (Guaranteed 100% Playable, High Quality, Never "Unavailable")
+      // 1. YOUTUBE SHORTS NATIVE PLAYER EMBED (100% Playable)
       if (v.platform === 'youtube' || ytId) {
         const idToUse = ytId || 'gdwtyyYBjZ8';
         modalPlayerArea.innerHTML = `
@@ -2020,7 +1907,7 @@
           <div style="width: 100%; height: 100%; position: relative; background: #fff;">
             <iframe 
               src="https://www.instagram.com/reel/${igCode}/embed" 
-              style="width: 100%; height: 100%; border: none; display: block;" 
+              style="width: 100%; height: 480px; border: none; display: block;" 
               allowfullscreen>
             </iframe>
           </div>
@@ -2079,11 +1966,10 @@
       const carImg = `../assets/img/mobil/${modelVal[0]}`;
       const modelName = modelVal[1] || 'Toyota';
       const stageTheme = modelVal[2] || 'stage-zenix';
-      const viewsInput = document.getElementById('newVideoViews').value.trim() || '100K Views';
       const desc = document.getElementById('newVideoDesc').value.trim() || 'Konten video showcase resmi dari Tunas Toyota Kiara Condong.';
 
       if (!url) {
-        alert('Mohon masukkan link video TikTok/Instagram/YouTube!');
+        alert('Mohon masukkan link video YouTube Shorts/TikTok/Instagram!');
         return;
       }
       if (!title) {
@@ -2099,18 +1985,12 @@
         promo: 'Promo & Event'
       };
 
-      const viewsNum = parseViewsToNumber(viewsInput);
-
       const newVideo = {
         id: 'v_' + Date.now(),
         title: title,
         category: category,
         categoryName: catNames[category] || 'Media Showcase',
         platform: platform,
-        views: viewsInput.includes('View') ? viewsInput : `${viewsInput} Views`,
-        viewsCount: viewsNum,
-        likes: '1.5K',
-        likesCount: 1500,
         author: '@tunastoyotakircon',
         desc: desc,
         modelName: modelName,
@@ -2121,24 +2001,23 @@
       };
 
       currentVideos.unshift(newVideo);
-      localStorage.setItem('sft_viral_videos_v5', JSON.stringify(currentVideos));
+      localStorage.setItem('sft_viral_videos_v6', JSON.stringify(currentVideos));
       
       closeAddVideoModal();
       renderVideos();
       updateStats();
-      alert('🎉 Video berhasil disimpan! Konten langsung tampil di web dengan player theater 2-kolom dan otomatis diurutkan.');
+      alert('🎉 Video berhasil disimpan! Konten langsung tampil di katalog tanpa kolom views.');
 
       // Reset form
       document.getElementById('newVideoUrl').value = '';
       document.getElementById('newVideoTitle').value = '';
-      document.getElementById('newVideoViews').value = '';
       document.getElementById('newVideoDesc').value = '';
     }
 
     function resetVideosToDefault() {
       if (confirm('Kembalikan koleksi video ke daftar default resmi Tunas Toyota Kiara Condong?')) {
         currentVideos = DEFAULT_VIRAL_VIDEOS;
-        localStorage.setItem('sft_viral_videos_v5', JSON.stringify(currentVideos));
+        localStorage.setItem('sft_viral_videos_v6', JSON.stringify(currentVideos));
         renderVideos();
         updateStats();
         closeAddVideoModal();
