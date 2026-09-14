@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales App - Video Viral Tunas Toyota Kiara Condong</title>
-  <meta name="description" content="Koleksi Video Viral TikTok, Instagram Reels & YouTube Shorts Resmi Tunas Toyota Kiara Condong untuk Bahan Promosi & Inspirasi Sales">
+  <title>Sales App - Kircon Media Studio (Tunas Toyota Kiara Condong)</title>
+  <meta name="description" content="Pusat Konten Digital, Video Showcase & Customer Stories Tunas Toyota Kiara Condong untuk Materi Promosi & Inspirasi Sales">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=5.0">
   <script src="../js/sidebar_desktop.js?v=20260914_viral"></script>
@@ -552,9 +552,9 @@
     <!-- Header Page -->
     <header class="header-page">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
-      <h2>Koleksi Video Viral Kircon</h2>
-      <button onclick="openAddVideoModal()" style="margin-left: auto; background: #c8102e; color: white; border: none; padding: 6px 12px; border-radius: 10px; font-weight: 700; font-size: 11.5px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-        <i class="fa-solid fa-plus"></i> Tambah
+      <h2>Kircon Media Studio</h2>
+      <button onclick="openAddVideoModal()" style="margin-left: auto; background: #c8102e; color: white; border: none; padding: 6px 14px; border-radius: 10px; font-weight: 700; font-size: 11.5px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+        <i class="fa-solid fa-plus"></i> Tambah Media
       </button>
     </header>
 
@@ -563,13 +563,13 @@
       <!-- HERO BANNER -->
       <div class="viral-hero-banner">
         <div class="viral-badge-header">
-          <i class="fa-solid fa-fire"></i> Trending Showroom Content
+          <i class="fa-solid fa-photo-film"></i> Official Showroom Media &amp; Showcase
         </div>
         <h1 style="font-size: 22px; font-weight: 900; margin: 0 0 6px 0; line-height: 1.25;">
-          Galeri Video Viral Tunas Toyota Kiara Condong
+          Kircon Media Studio &amp; Showcase
         </h1>
         <p style="font-size: 13px; color: #cbd5e1; margin: 0; line-height: 1.5;">
-          Kumpulan momen serah terima haru, bedah fitur unik Zenix &amp; Alphard, tren TikTok sales, serta inspirasi promosi siap bagikan ke WhatsApp calon konsumen!
+          Pusat media digital resmi Tunas Toyota Kiara Condong: momen serah terima customer, bedah fitur kendaraan, tips edukasi otomotif, serta materi promosi siap bagikan ke WhatsApp calon konsumen.
         </p>
 
         <!-- Stats Grid -->
@@ -580,15 +580,15 @@
           </div>
           <div class="stat-box">
             <div class="num" id="statTotalVideos">12 Video</div>
-            <div class="lbl">Konten Viral</div>
+            <div class="lbl">Koleksi Media</div>
           </div>
           <div class="stat-box">
-            <div class="num"><i class="fa-brands fa-tiktok" style="color: #fe2c55;"></i> TikTok &amp; IG</div>
-            <div class="lbl">Platform Utama</div>
+            <div class="num"><i class="fa-brands fa-tiktok" style="color: #fe2c55;"></i> TikTok &amp; Reels</div>
+            <div class="lbl">Platform Resmi</div>
           </div>
           <div class="stat-box">
             <div class="num" style="color: #34d399;"><i class="fa-brands fa-whatsapp"></i> 1-Klik WA</div>
-            <div class="lbl">Bahan Broadcast</div>
+            <div class="lbl">Bahan Promosi Sales</div>
           </div>
         </div>
       </div>
@@ -598,17 +598,17 @@
         <div style="display: flex; gap: 10px;">
           <div class="search-input-wrapper">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="viralSearchInput" placeholder="Cari video (contoh: Zenix, Delivery, Alphard, Tips, Promo)..." oninput="filterVideos()">
+            <input type="text" id="viralSearchInput" placeholder="Cari konten media (contoh: Zenix, Delivery, Alphard, Tips, Promo)..." oninput="filterVideos()">
           </div>
         </div>
 
         <!-- Category Pills -->
         <div class="category-pills-wrap" id="categoryPillsContainer">
           <button class="category-pill active" onclick="selectCategory('all')">
-            <i class="fa-solid fa-fire"></i> Semua Video
+            <i class="fa-solid fa-layer-group"></i> Semua Konten
           </button>
           <button class="category-pill" onclick="selectCategory('delivery')">
-            <i class="fa-solid fa-champagne-glasses"></i> Serah Terima Haru
+            <i class="fa-solid fa-champagne-glasses"></i> Serah Terima Unit
           </button>
           <button class="category-pill" onclick="selectCategory('feature')">
             <i class="fa-solid fa-car-side"></i> Review &amp; Rahasia Fitur
@@ -617,10 +617,10 @@
             <i class="fa-solid fa-lightbulb"></i> Tips &amp; Edukasi
           </button>
           <button class="category-pill" onclick="selectCategory('parodi')">
-            <i class="fa-solid fa-face-smile"></i> Tren &amp; Parodi Sales
+            <i class="fa-solid fa-users"></i> Aktivitas &amp; Tren Sales
           </button>
           <button class="category-pill" onclick="selectCategory('promo')">
-            <i class="fa-solid fa-percent"></i> Promo &amp; Event
+            <i class="fa-solid fa-tags"></i> Promo &amp; Event
           </button>
         </div>
       </div>
@@ -672,12 +672,12 @@
     </div>
   </div>
 
-  <!-- MODAL 2: TAMBAH VIDEO VIRAL BARU -->
+  <!-- MODAL 2: TAMBAH VIDEO MEDIA BARU -->
   <div class="video-modal-overlay" id="addVideoModal">
     <div class="video-modal-box" style="background: #ffffff; color: #0f172a; max-width: 480px; padding: 22px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
         <h3 style="font-size: 16px; font-weight: 800; margin: 0; color: #0f172a;">
-          <i class="fa-solid fa-video" style="color: #c8102e;"></i> Tambah Video Viral Baru
+          <i class="fa-solid fa-photo-film" style="color: #c8102e;"></i> Tambah Konten Media Baru
         </h3>
         <button onclick="closeAddVideoModal()" style="background: none; border: none; font-size: 18px; color: #64748b; cursor: pointer;">
           <i class="fa-solid fa-xmark"></i>
@@ -996,7 +996,7 @@
       if (!v) return;
 
       const salesName = localStorage.getItem('namaSales') || 'Sales Consultant Tunas Toyota';
-      const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin share video viral seru & inspirasi resmi dari showroom kami nih:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton selengkapnya di tautan ini ya:\n👉 ${v.videoUrl}\n\nJika ingin simulasi hitungan kredit promo DP ringan atau jadwal test drive unitnya, saya siap bantu kapan saja ya Pak/Bu. Terima kasih! 🙏`;
+      const text = `Halo Bapak/Ibu, salam hangat dari *${salesName}* (Tunas Toyota Kiara Condong) 🚗✨\n\nIzin berbagi video ulasan & momen serah terima resmi dari showroom kami:\n\n🎬 *${v.title}*\n\n"${v.desc}"\n\nTonton selengkapnya di tautan berikut ya:\n👉 ${v.videoUrl}\n\nJika ingin info ketersediaan unit ready stock, simulasi hitungan DP ringan atau jadwal test drive, saya siap bantu kapan saja ya Pak/Bu. Terima kasih! 🙏`;
 
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
@@ -1009,7 +1009,7 @@
 
       const text = `🎬 ${v.title}\n\n${v.desc}\n\nLink: ${v.videoUrl}\n\n#TunasToyotaKircon #ToyotaBandung #SalesToyotaKircon`;
       navigator.clipboard.writeText(text);
-      alert('✅ Info video & link berhasil disalin ke clipboard! Siap dijadikan status WhatsApp atau dibagikan ke konsumen.');
+      alert('✅ Info video showcase & tautan berhasil disalin ke clipboard! Siap dibagikan ke calon konsumen.');
     }
 
     // Open Modal Video Player
@@ -1045,7 +1045,7 @@
       document.getElementById('modalExternalLinkBtn').href = v.videoUrl;
       
       const salesName = localStorage.getItem('namaSales') || 'Sales Tunas Toyota';
-      const waText = `Halo, tonton video viral Tunas Toyota Kircon ini yuk:\n*${v.title}*\nLink: ${v.videoUrl}`;
+      const waText = `Halo, tonton video showcase resmi Tunas Toyota Kircon ini yuk:\n*${v.title}*\nLink: ${v.videoUrl}`;
       document.getElementById('modalWaShareBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
 
       document.getElementById('videoPlayerModal').classList.add('active');
@@ -1070,7 +1070,7 @@
       const category = document.getElementById('newVideoCategory').value;
       const url = document.getElementById('newVideoUrl').value.trim() || 'https://www.tiktok.com/@tunastoyotakircon';
       const views = document.getElementById('newVideoViews').value.trim() || 'Baru';
-      const desc = document.getElementById('newVideoDesc').value.trim() || 'Video viral terbaru dari Tunas Toyota Kiara Condong.';
+      const desc = document.getElementById('newVideoDesc').value.trim() || 'Konten video showcase resmi dari Tunas Toyota Kiara Condong.';
 
       if (!title) {
         alert('Mohon isi judul video!');
@@ -1078,10 +1078,10 @@
       }
 
       const catNames = {
-        delivery: 'Serah Terima Haru',
+        delivery: 'Serah Terima Unit',
         feature: 'Review & Rahasia Fitur',
         tips: 'Tips & Edukasi',
-        parodi: 'Tren & Parodi Sales',
+        parodi: 'Aktivitas & Tren Sales',
         promo: 'Promo & Event'
       };
 
@@ -1089,7 +1089,7 @@
         id: 'v_' + Date.now(),
         title: title,
         category: category,
-        categoryName: catNames[category] || 'Video Viral',
+        categoryName: catNames[category] || 'Media Showcase',
         platform: platform,
         views: views,
         likes: '1.2K',
@@ -1106,7 +1106,7 @@
       closeAddVideoModal();
       renderVideos();
       updateStats();
-      alert('🎉 Video viral baru berhasil ditambahkan!');
+      alert('🎉 Video media baru berhasil ditambahkan!');
 
       // Reset form
       document.getElementById('newVideoTitle').value = '';

@@ -67,6 +67,15 @@ Route::get('/brosur', function () {
 Route::get('/e-brosur', function () {
     return redirect('/pages/elibrary');
 });
+Route::get('/media_studio', function () {
+    return app(PageController::class)->showSalesPage('video_viral');
+});
+Route::get('/media-studio', function () {
+    return app(PageController::class)->showSalesPage('video_viral');
+});
+Route::get('/media_hub', function () {
+    return app(PageController::class)->showSalesPage('video_viral');
+});
 
 foreach ($salesPages as $page) {
     Route::get("/{$page}", function () use ($page) {
