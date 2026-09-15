@@ -649,6 +649,142 @@ async function loadGoogleSheetSyncStatus() {
   }
 }
 
+// ==========================================
+// 🎯 WHAT-IF MONTH-END CLOSING SIMULATOR (KACAB)
+// ==========================================
+window.openWhatIfSimulatorModal = function() {
+  const modal = document.getElementById('modal-whatif-simulator');
+  if (modal) {
+    modal.style.display = 'flex';
+    runWhatIfClosingCalc();
+  }
+};
+
+window.closeWhatIfSimulatorModal = function() {
+  const modal = document.getElementById('modal-whatif-simulator');
+  if (modal) modal.style.display = 'none';
+};
+
+window.runWhatIfClosingCalc = function() {
+  const discount = parseInt(document.getElementById('simDiscountRange')?.value || 5000000);
+  const isLeasingBoost = document.getElementById('simLeasingBoost')?.checked ?? true;
+  const tradein = parseInt(document.getElementById('simTradeinRange')?.value || 2000000);
+  const closerBonus = parseInt(document.getElementById('simCloserRange')?.value || 500000);
+
+  // Update Labels
+  const lblDiscount = document.getElementById('labelSimDiscount');
+  if (lblDiscount) lblDiscount.textContent = `Rp ${discount.toLocaleString('id-ID')} / Unit`;
+
+  const lblTradein = document.getElementById('labelSimTradein');
+  if (lblTradein) lblTradein.textContent = `Rp ${tradein.toLocaleString('id-ID')} / Unit`;
+
+  const lblBonus = document.getElementById('labelSimCloserBonus');
+  if (lblBonus) lblBonus.textContent = `Rp ${closerBonus.toLocaleString('id-ID')} / SPK`;
+
+  // Simulator Model: Baseline target 104 units
+  const baselineTarget = 104;
+  const baselineClosing = 100;
+
+  const addedFromDiscount = Math.round((discount / 2500000) * 1.5);
+  const addedFromLeasing = isLeasingBoost ? 5 : 0;
+  const addedFromTradein = Math.round((tradein / 1000000) * 1);
+  const addedFromBonus = Math.round((closerBonus / 250000) * 1);
+
+  const totalAddedUnits = addedFromDiscount + addedFromLeasing + addedFromTradein + addedFromBonus;
+  const projectedTotalUnits = baselineClosing + totalAddedUnits;
+  const achievementPct = ((projectedTotalUnits / baselineTarget) * 100).toFixed(1);
+
+  const avgPricePerUnit = 350000000;
+  const addedRevenue = totalAddedUnits * avgPricePerUnit;
+  const revenueMiliar = (addedRevenue / 1000000000).toFixed(2);
+
+  // Margin retention %
+  const discountDrag = (discount / 15000000) * 4.5;
+  const bonusDrag = (closerBonus / 1000000) * 1.5;
+  const marginRetention = Math.max(88, (98 - discountDrag - bonusDrag)).toFixed(1);
+
+  window.whatIfSimData = {
+    discount,
+    isLeasingBoost,
+    tradein,
+    closerBonus,
+    totalAddedUnits,
+    projectedTotalUnits,
+    baselineTarget,
+    achievementPct,
+    revenueMiliar,
+    marginRetention
+  };
+
+  // Update UI Elements
+  const elTotal = document.getElementById('simResultTotalUnits');
+  if (elTotal) elTotal.innerHTML = `${projectedTotalUnits} <small style="font-size:16px; font-weight:700;">Unit</small>`;
+
+  const elPct = document.getElementById('simAchievementPct');
+  if (elPct) {
+    elPct.textContent = `${achievementPct}% Target`;
+    elPct.style.background = projectedTotalUnits >= baselineTarget ? '#16a34a' : '#d97706';
+  }
+
+  const elUnitsSub = document.getElementById('simResultUnitsSub');
+  if (elUnitsSub) {
+    elUnitsSub.textContent = `Target Cabang: ${baselineTarget} Unit · Surplus +${totalAddedUnits} Unit dari baseline penutupan normal.`;
+  }
+
+  const elRev = document.getElementById('simResultRevenueDelta');
+  if (elRev) elRev.textContent = `+Rp ${revenueMiliar} M`;
+
+  const elMargin = document.getElementById('simResultMarginRetention');
+  if (elMargin) {
+    elMargin.textContent = `${marginRetention}%`;
+    elMargin.style.color = marginRetention >= 92 ? '#15803d' : '#b45309';
+  }
+
+  const elRec = document.getElementById('simStrategyRecommendation');
+  if (elRec) {
+    elRec.textContent = `Melalui alokasi diskon Rp ${(discount/1000000).toFixed(0)} Jt${isLeasingBoost ? ' & akselerasi percepatan leasing' : ''}, cabang diproyeksikan mengamankan closing hingga ${projectedTotalUnits} Unit (${achievementPct}% target). Margin retention berada di level aman (${marginRetention}%).`;
+  }
+};
+
+window.broadcastWhatIfStrategyToSPV = function() {
+  const d = window.whatIfSimData || {
+    discount: 5000000,
+    isLeasingBoost: true,
+    tradein: 2000000,
+    closerBonus: 500000,
+    projectedTotalUnits: 118,
+    baselineTarget: 104,
+    achievementPct: '113.4%'
+  };
+
+  const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const kacabNama = localStorage.getItem('namaSales') || 'Kepala Cabang';
+
+  const text = `📢 *ARAHAN STRATEGIS KEPALA CABANG: AKSELERASI CLOSING BULAN INI* 📢
+📅 Tanggal: ${today}
+👔 Dari: Bapak ${kacabNama} (Kepala Cabang Tunas Toyota)
+━━━━━━━━━━━━━━━━━━━━━━
+Kepada Yth. Seluruh Rekan SPV (Supervisor) Tunas Toyota Kiara Condong,
+
+Berdasarkan analisis skenario penutupan bulan ini:
+🎯 *Target Cabang*: ${d.baselineTarget} Unit
+🚀 *Proyeksi Capaian*: *${d.projectedTotalUnits} Unit* (*${d.achievementPct}* Target Cabang)
+
+📋 *KEBIJAKAN & SUBSIDI RESMI DISETUJUI KACAB:*
+1. 🏷️ *Plafond Diskon Ekstra*: Subsidi s/d *Rp ${(d.discount/1000000).toFixed(0)} Juta/unit* untuk unit slow-moving & penutupan cepat pekan ini.
+2. ⚡ *Akselerasi F&I Leasing*: ${d.isLeasingBoost ? 'Prioritaskan eskalasi approval seluruh berkas tertahan > 5 hari ke AO Leasing rekanan.' : 'Standar operasional.'}
+3. 🔄 *Subsidi Trade-In OLX*: Tambahan s/d *Rp ${(d.tradein/1000000).toFixed(1)} Juta/unit* untuk deal tukar tambah.
+4. 💰 *Cash Closer Sales*: Insentif ekstra *Rp ${(d.closerBonus).toLocaleString('id-ID')} / SPK* deal resmi sebelum penutupan bulan.
+
+📌 *TINDAK LANJUT SPV:*
+Segera koordinasikan dengan seluruh wiraniaga di bawah naungan Anda dalam briefing pagi esok. Kawal seluruh hot prospek dan amankan closing!
+
+Terima kasih atas dedikasi dan kepemimpinan rekan-rekan SPV. Bersama kita tuntaskan target juara! 🏁💪🚗✨`;
+
+  closeWhatIfSimulatorModal();
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   guardKacab();
   renderKacabUser();
@@ -658,4 +794,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadFeed();
   loadAiSentinelKacab();
 });
+
 

@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../css/style.css?v=20260915">
-  <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915">
+  <link rel="stylesheet" href="../css/style.css?v=20260915_sph_v31">
+  <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915_sph_v31">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#d71920">
@@ -26,7 +26,7 @@
   <!-- TOP APP BAR -->
   <header class="sph-topbar">
     <div class="sph-topbar-left">
-      <a href="../index.html" class="sph-back-btn" title="Kembali ke Dashboard">
+      <a href="javascript:void(0)" onclick="if(window.history.length > 1) { window.history.back(); } else { window.location.href='../index.html'; }" class="sph-back-btn" title="Kembali">
         <i class="fa-solid fa-arrow-left"></i>
       </a>
       <div class="sph-topbar-title">
@@ -426,7 +426,7 @@
   </main>
 
   <!-- JavaScript -->
-  <script src="../js/quotation.js?v=20260915"></script>
+  <script src="../js/quotation.js?v=20260915_sph_v31"></script>
 </body>
 
 </html>

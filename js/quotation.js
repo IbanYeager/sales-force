@@ -48,6 +48,16 @@ function generateSphNumber() {
   return `${randomSeq}/SPH-SLS/TT-KC/${romawi}/${year}`;
 }
 
+function setElText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function setElHtml(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = val;
+}
+
 function populateModelDropdown() {
   const select = document.getElementById('sphModelSelect');
   if (!select) return;
@@ -67,6 +77,7 @@ function populateModelDropdown() {
 
 function onModelChanged() {
   const select = document.getElementById('sphModelSelect');
+  if (!select || !select.options || select.selectedIndex < 0) return;
   const selectedOpt = select.options[select.selectedIndex];
   if (!selectedOpt) return;
 
@@ -121,30 +132,31 @@ function updateSphLive() {
   const strExpDate = expDate.toLocaleDateString('id-ID', optDate);
 
   // Sync to SPH Paper Meta
-  document.getElementById('docSphNumber').textContent = currentSphNumber;
-  document.getElementById('docSphDate').textContent = strDate;
-  document.getElementById('docSphValidity').textContent = `${strExpDate} (${validityDays} Hari)`;
+  setElText('docSphNumber', currentSphNumber);
+  setElText('docSphDate', strDate);
+  setElText('docSphValidity', `${strExpDate} (${validityDays} Hari)`);
 
   let recipientHtml = `<strong>${customerName}</strong>`;
   if (customerCompany) {
     recipientHtml += `<br><span style="color:#475569; font-weight:600;">${customerCompany}</span>`;
   }
-  document.getElementById('docRecipientName').innerHTML = recipientHtml;
-  document.getElementById('docRecipientPhone').textContent = customerPhone;
-  document.getElementById('docRecipientCity').textContent = customerCity;
+  setElHtml('docRecipientName', recipientHtml);
+  setElText('docRecipientPhone', customerPhone);
+  setElText('docRecipientCity', customerCity);
 
   // 2. Data Unit & Banner
   const modelSelect = document.getElementById('sphModelSelect');
-  const selectedOpt = modelSelect ? modelSelect.options[modelSelect.selectedIndex] : null;
-  const modelName = selectedOpt ? selectedOpt.dataset.name : 'Toyota Unit';
-  const modelImg = selectedOpt ? selectedOpt.dataset.img : '../assets/img/mobil/zenix.webp';
+  const selectedOpt = modelSelect && modelSelect.selectedIndex >= 0 ? modelSelect.options[modelSelect.selectedIndex] : null;
+  const modelName = selectedOpt ? (selectedOpt.dataset.name || selectedOpt.textContent) : 'Toyota Unit';
+  const modelImg = selectedOpt ? (selectedOpt.dataset.img || '../assets/img/mobil/zenix.webp') : '../assets/img/mobil/zenix.webp';
 
   const colorChoice = document.getElementById('sphColorChoice')?.value.trim() || 'Pilihan Bebas (Sesuai Ketersediaan Unit)';
   const unitYear = document.getElementById('sphUnitYear')?.value || '2026';
 
-  document.getElementById('docUnitModel').textContent = modelName;
-  document.getElementById('docUnitColor').textContent = `Warna: ${colorChoice} | Tahun Perakitan: ${unitYear} (100% Baru OTR Jawa Barat)`;
-  document.getElementById('docUnitImg').src = modelImg;
+  setElText('docUnitModel', modelName);
+  setElText('docUnitColor', `Warna: ${colorChoice} | Tahun Perakitan: ${unitYear} (100% Baru OTR Jawa Barat)`);
+  const unitImgEl = document.getElementById('docUnitImg');
+  if (unitImgEl) unitImgEl.src = modelImg;
 
   // 3. Data Finansial
   const otr = parseFloat(document.getElementById('sphOtrInput')?.value) || 0;
@@ -275,13 +287,13 @@ function updateSphLive() {
   // 5. Data Sales & Tanda Tangan
   const salesName = localStorage.getItem('namaSales') || localStorage.getItem('user_nama') || 'Egy Pratama';
   const salesPhone = localStorage.getItem('noHpSales') || localStorage.getItem('user_telepon') || '0812-2154-1540';
-  const salesRole = localStorage.getItem('user_role') || 'Senior Sales Executive';
+  const salesRole = localStorage.getItem('peranSales') || localStorage.getItem('user_role') || 'Senior Sales Executive';
 
-  document.getElementById('docSalesName').textContent = salesName;
-  document.getElementById('docSalesContact').textContent = `HP/WA: ${salesPhone} | Tunas Toyota Kiara Condong`;
-  document.getElementById('docSignSalesName').textContent = salesName;
-  document.getElementById('docSignSalesRole').textContent = salesRole;
-  document.getElementById('docSignCustomerName').textContent = customerName;
+  setElText('docSalesName', salesName);
+  setElText('docSalesContact', `HP/WA: ${salesPhone} | Tunas Toyota Kiara Condong`);
+  setElText('docSignSalesName', salesName);
+  setElText('docSignSalesRole', salesRole);
+  setElText('docSignCustomerName', customerName);
 }
 
 function printQuotation() {
@@ -290,6 +302,9 @@ function printQuotation() {
 }
 
 function shareQuotationWA() {
+  if (document.getElementById('qModelSelect')) {
+    return shareLegacyQuotationWA();
+  }
   updateSphLive();
 
   const customerName = document.getElementById('sphCustomerName')?.value.trim() || 'Bapak/Ibu';
@@ -301,7 +316,7 @@ function shareQuotationWA() {
   const bookingFee = parseFloat(document.getElementById('sphBookingFeeInput')?.value) || 5000000;
   const hargaNett = Math.max(0, otr - diskon);
 
-  const salesName = document.getElementById('docSalesName').textContent;
+  const salesName = document.getElementById('docSalesName')?.textContent || 'Egy Pratama';
   const salesPhone = localStorage.getItem('noHpSales') || '0812-2154-1540';
 
   let msg = `📄 *SURAT PENAWARAN HARGA RESMI TUNAS TOYOTA* 📄\n` +
@@ -373,8 +388,9 @@ function copyQuotationText() {
   const otr = parseFloat(document.getElementById('sphOtrInput')?.value) || 0;
   const diskon = parseFloat(document.getElementById('sphDiskonInput')?.value) || 0;
   const hargaNett = Math.max(0, otr - diskon);
+  const salesName = document.getElementById('docSalesName')?.textContent || 'Sales Tunas Toyota';
 
-  const text = `Penawaran Resmi Tunas Toyota Kiara Condong\nNo: ${currentSphNumber}\nKonsumen: ${customerName}\nUnit: ${modelName}\nOTR: ${formatRupiah(otr)}\nDiskon: ${formatRupiah(diskon)}\nNetto: ${formatRupiah(hargaNett)}\nHubungi: ${document.getElementById('docSalesName').textContent}`;
+  const text = `Penawaran Resmi Tunas Toyota Kiara Condong\nNo: ${currentSphNumber}\nKonsumen: ${customerName}\nUnit: ${modelName}\nOTR: ${formatRupiah(otr)}\nDiskon: ${formatRupiah(diskon)}\nNetto: ${formatRupiah(hargaNett)}\nHubungi: ${salesName}`;
 
   navigator.clipboard.writeText(text).then(() => {
     alert('Teks ringkasan penawaran berhasil disalin ke clipboard!');
@@ -385,76 +401,194 @@ function copyQuotationText() {
 
 function switchMobileTab(view) {
   const workspace = document.querySelector('.sph-workspace');
+  if (!workspace) return;
   const tabBuilder = document.getElementById('tabMobileBuilder');
   const tabPreview = document.getElementById('tabMobilePreview');
 
   if (view === 'preview') {
     workspace.classList.remove('view-builder');
     workspace.classList.add('view-preview');
-    tabPreview.classList.add('active');
-    tabBuilder.classList.remove('active');
+    tabPreview?.classList.add('active');
+    tabBuilder?.classList.remove('active');
     updateSphLive();
   } else {
     workspace.classList.remove('view-preview');
     workspace.classList.add('view-builder');
-    tabBuilder.classList.add('active');
-    tabPreview.classList.remove('active');
+    tabBuilder?.classList.add('active');
+    tabPreview?.classList.remove('active');
   }
 }
 
 // Inisialisasi awal saat DOM siap
 document.addEventListener('DOMContentLoaded', () => {
-  currentSphNumber = generateSphNumber();
-  populateModelDropdown();
+  // 1. Jika halaman adalah SPH Studio (halaman resmi /pages/quotation.html)
+  if (document.getElementById('sphModelSelect')) {
+    currentSphNumber = generateSphNumber();
+    populateModelDropdown();
 
-  // Cek parameter URL dari kalkulator atau halaman lain
-  const params = new URLSearchParams(window.location.search);
-  const paramModel = params.get('model');
-  const paramOtr = params.get('otr');
-  const paramDiskon = params.get('diskon');
-  const paramScheme = params.get('scheme');
-  const paramTenor = params.get('tenor');
-  const paramDp = params.get('dp');
+    // Cek parameter URL dari kalkulator atau halaman lain
+    const params = new URLSearchParams(window.location.search);
+    const paramModel = params.get('model');
+    const paramOtr = params.get('otr');
+    const paramDiskon = params.get('diskon');
+    const paramScheme = params.get('scheme');
+    const paramTenor = params.get('tenor');
+    const paramDp = params.get('dp');
 
-  if (paramModel) {
-    const select = document.getElementById('sphModelSelect');
-    for (let opt of select.options) {
-      if (opt.value.toLowerCase().includes(paramModel.toLowerCase()) || opt.dataset.name.toLowerCase().includes(paramModel.toLowerCase())) {
-        opt.selected = true;
-        break;
+    if (paramModel) {
+      const select = document.getElementById('sphModelSelect');
+      if (select) {
+        for (let opt of select.options) {
+          if (opt.value.toLowerCase().includes(paramModel.toLowerCase()) || (opt.dataset.name && opt.dataset.name.toLowerCase().includes(paramModel.toLowerCase()))) {
+            opt.selected = true;
+            break;
+          }
+        }
       }
     }
+
+    if (paramOtr && !isNaN(paramOtr)) {
+      const oInput = document.getElementById('sphOtrInput');
+      if (oInput) oInput.value = paramOtr;
+    } else {
+      onModelChanged();
+    }
+
+    if (paramDiskon && !isNaN(paramDiskon)) {
+      const dInput = document.getElementById('sphDiskonInput');
+      if (dInput) dInput.value = paramDiskon;
+    }
+
+    if (paramScheme === 'cash') {
+      setScheme('cash');
+    } else {
+      setScheme('kredit');
+    }
+
+    if (paramTenor) {
+      const tSelect = document.getElementById('sphTenor');
+      if (tSelect) tSelect.value = paramTenor;
+    }
+
+    if (paramDp) {
+      const dpSelect = document.getElementById('sphDpPercent');
+      if (dpSelect) dpSelect.value = paramDp;
+    }
+
+    // Set tanggal hari ini
+    const dateInput = document.getElementById('sphDate');
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+
+    updateSphLive();
   }
 
-  if (paramOtr && !isNaN(paramOtr)) {
-    document.getElementById('sphOtrInput').value = paramOtr;
-  } else {
-    onModelChanged();
+  // 2. Jika halaman adalah Kalkulator Hub dengan Tab Quotation (kalkulator.blade.php)
+  if (document.getElementById('qModelSelect')) {
+    updateQuotationCalc();
   }
-
-  if (paramDiskon && !isNaN(paramDiskon)) {
-    document.getElementById('sphDiskonInput').value = paramDiskon;
-  }
-
-  if (paramScheme === 'cash') {
-    setScheme('cash');
-  } else {
-    setScheme('kredit');
-  }
-
-  if (paramTenor) {
-    const tSelect = document.getElementById('sphTenor');
-    if (tSelect) tSelect.value = paramTenor;
-  }
-
-  if (paramDp) {
-    const dpSelect = document.getElementById('sphDpPercent');
-    if (dpSelect) dpSelect.value = paramDp;
-  }
-
-  // Set tanggal hari ini
-  const dateInput = document.getElementById('sphDate');
-  if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-
-  updateSphLive();
 });
+
+// ══════════════════════════════════════════════════════════════════
+// BACKWARD COMPATIBILITY: Embedded Calculator Quotation Hub (kalkulator.blade.php)
+// ══════════════════════════════════════════════════════════════════
+function formatRupiahQuote(val) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
+}
+
+function updateQuotationCalc() {
+  const modelEl = document.getElementById('qModelSelect');
+  if (!modelEl) return;
+  const modelVal = modelEl.value;
+  const parts = modelVal.split('|');
+  const otr = parseFloat(parts[0]) || 0;
+  const modelName = parts[1] || 'Toyota Unit';
+
+  const namaKonsumen = document.getElementById('qNamaKonsumen')?.value.trim() || 'Bapak/Ibu Calon Konsumen';
+  const noWa = document.getElementById('qNoWa')?.value.trim() || '-';
+  const diskon = parseFloat(document.getElementById('qDiskon')?.value) || 0;
+  const dpPersen = parseFloat(document.getElementById('qDpPersen')?.value) || 20;
+  const tenor = parseInt(document.getElementById('qTenor')?.value) || 60;
+  const leasing = document.getElementById('qLeasing')?.value || 'ACC';
+
+  const hargaNett = Math.max(0, otr - diskon);
+  const dpNett = Math.round(hargaNett * (dpPersen / 100));
+  const sisaPlafond = hargaNett - dpNett;
+
+  const annualInterest = tenor === 12 ? 0.0 : 0.055;
+  const totalDebt = sisaPlafond + (sisaPlafond * annualInterest * (tenor / 12));
+  const angsuran = Math.round(totalDebt / tenor);
+
+  setElText('previewNamaKonsumen', namaKonsumen);
+  setElText('previewNoWa', 'WA: ' + noWa);
+  setElText('previewModel', modelName);
+  setElText('previewOtr', formatRupiahQuote(otr));
+  setElText('previewDiskon', '- ' + formatRupiahQuote(diskon));
+  setElText('previewHargaNett', formatRupiahQuote(hargaNett));
+  setElText('previewDpNett', formatRupiahQuote(dpNett));
+  setElText('previewTenor', tenor);
+  setElText('previewLeasing', leasing.split(' ')[0]);
+  setElText('previewAngsuran', formatRupiahQuote(angsuran) + ' /bln');
+  setElText('previewTotalDpBottom', formatRupiahQuote(dpNett));
+
+  const salesNama = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || 'Egy (Sales Consultant)';
+  setElText('previewSalesName', salesNama);
+
+  let bonuses = [];
+  if (document.getElementById('chkVkool')?.checked) bonuses.push('&bull; Free Kaca Film V-Kool / 3M');
+  if (document.getElementById('chkService')?.checked) bonuses.push('&bull; Free Service 4 Tahun / 50.000 KM');
+  if (document.getElementById('chkKarpet')?.checked) bonuses.push('&bull; Karpet Dasar Original Toyota');
+  if (document.getElementById('chkVoucher')?.checked) bonuses.push('&bull; Voucher Bensin Rp 1 Juta');
+
+  const bonusEl = document.getElementById('previewBonusList');
+  if (bonusEl) {
+    bonusEl.innerHTML = bonuses.length > 0 ? bonuses.join('<br>') : '&bull; Standard Factory Package';
+  }
+}
+
+function shareLegacyQuotationWA() {
+  updateQuotationCalc();
+
+  const namaKonsumen = document.getElementById('previewNamaKonsumen')?.textContent || 'Bapak/Ibu';
+  const noWa = document.getElementById('qNoWa')?.value.trim() || '';
+  const modelName = document.getElementById('previewModel')?.textContent || 'Toyota Unit';
+  const otr = document.getElementById('previewOtr')?.textContent || '';
+  const diskon = document.getElementById('previewDiskon')?.textContent || '';
+  const hargaNett = document.getElementById('previewHargaNett')?.textContent || '';
+  const dpNett = document.getElementById('previewDpNett')?.textContent || '';
+  const tenor = document.getElementById('previewTenor')?.textContent || '60';
+  const leasing = document.getElementById('qLeasing')?.value || 'ACC';
+  const angsuran = document.getElementById('previewAngsuran')?.textContent || '';
+  const salesNama = document.getElementById('previewSalesName')?.textContent || 'Egy';
+
+  let text = `📄 *SURAT PENAWARAN HARGA RESMI TUNAS TOYOTA* 📄\n` +
+             `Yth. *${namaKonsumen}*,\n\n` +
+             `Berikut kami sampaikan rincian penawaran harga spesial unit impian Anda:\n\n` +
+             `🚘 *Model*: ${modelName}\n` +
+             `🏷️ *Harga OTR Bandung*: ${otr}\n` +
+             `🎁 *Potongan Cashback/Diskon*: ${diskon}\n` +
+             `✨ *Harga Netto*: ${hargaNett}\n\n` +
+             `💳 *SKEMA KREDIT ESTIMASI*:\n` +
+             `• *Uang Muka (Total DP Nett)*: *${dpNett}*\n` +
+             `• *Angsuran*: *${angsuran}* (${tenor} Bulan via ${leasing})\n\n` +
+             `🎁 *BONUS INCLUDED*:\n` +
+             `• Free Kaca Film V-Kool / 3M Original\n` +
+             `• Free Service & Sparepart 4 Thn / 50.000 KM\n` +
+             `• Karpet Dasar Original Toyota\n` +
+             `• Priority Unit Ready Stock\n\n` +
+             `Untuk pemesanan / kunci unit warna impian hari ini, silakan balas pesan ini. Terima kasih!\n`;
+
+  if (typeof window.injectSocialSignature === 'function') {
+    text = window.injectSocialSignature(text, { nama: salesNama });
+  } else {
+    text += `\nSalam hangat,\n*${salesNama}*\nTunas Toyota Kiara Condong`;
+  }
+
+  let waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  if (noWa && noWa.length > 5) {
+    let cleanPhone = noWa.replace(/[^0-9]/g, '');
+    if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
+    waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+  }
+
+  window.open(waUrl, '_blank');
+}
