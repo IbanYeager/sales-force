@@ -14,8 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../css/style.css?v=20260915_sph_v31">
-  <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915_sph_v31">
+  <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915_sph_v32">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#d71920">
@@ -426,7 +425,7 @@
   </main>
 
   <!-- JavaScript -->
-  <script src="../js/quotation.js?v=20260915_sph_v31"></script>
+  <script src="../js/quotation.js?v=20260915_sph_v32"></script>
 </body>
 
 </html>
