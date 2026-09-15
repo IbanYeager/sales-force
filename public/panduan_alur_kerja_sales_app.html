@@ -7,7 +7,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20260915" />
+  <script src="js/sidebar_desktop.js?v=20260915"></script>
+
+  <script>
+    (function checkRolePortal() {
+      try {
+        const role = localStorage.getItem('peranSales');
+        const urlParams = new URLSearchParams(window.location.search);
+        const forcedRole = urlParams.get('role');
+        if (role === 'Kepala Cabang' || forcedRole === 'kacab') {
+          window.location.replace('pages_kacab/panduan.html');
+        } else if (role === 'Supervisor' || forcedRole === 'spv') {
+          window.location.replace('pages_spv/panduan.html');
+        }
+      } catch(e) {}
+    })();
+  </script>
   
   <style>
     :root {
@@ -489,7 +505,16 @@
 </head>
 <body>
 
-  <div class="main-wrap">
+  <div class="mobile-app" style="max-width: 1080px; padding-bottom: 70px;">
+    <header class="header-page">
+      <a href="javascript:void(0)" onclick="if(window.history.length>1){window.history.back();}else{window.location.href='index.html';}" class="header-back-btn" title="Kembali ke Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <h2>Panduan &amp; SOP Alur Kerja Sales App</h2>
+    </header>
+
+    <div class="container" style="margin-top: 15px;">
+      <div class="main-wrap">
     
     <!-- HEADER RESMI TUNAS TOYOTA -->
     <header class="top-header">
@@ -748,7 +773,9 @@
 
     </main>
 
-  </div>
+      </div> <!-- /main-wrap -->
+    </div> <!-- /container -->
+  </div> <!-- /mobile-app -->
 
   <script>
     function startAppTourFromGuide() {

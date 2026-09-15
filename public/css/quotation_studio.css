@@ -796,3 +796,172 @@ body.sph-body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   PORTAL KACAB THEME (Wine Maroon & Gold Accent)
+   ========================================================================== */
+.theme-kacab .sph-workspace {
+  max-width: 100%;
+  padding: 10px 0 40px;
+}
+
+.theme-kacab .sph-builder-card {
+  background: linear-gradient(180deg, rgba(30, 16, 20, 0.96) 0%, rgba(18, 10, 12, 0.98) 100%) !important;
+  border: 1px solid rgba(216, 164, 55, 0.35) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.theme-kacab .sph-card-header {
+  border-bottom: 1px solid rgba(216, 164, 55, 0.25) !important;
+}
+
+.theme-kacab .sph-card-header h2 {
+  color: #fef08a !important;
+}
+
+.theme-kacab .sph-card-header h2 i {
+  color: #d8a437 !important;
+}
+
+.theme-kacab .sph-pill-tag {
+  background: rgba(216, 164, 55, 0.18) !important;
+  color: #fde047 !important;
+  border: 1px solid rgba(216, 164, 55, 0.45) !important;
+  font-weight: 800 !important;
+}
+
+.theme-kacab .sph-section-title {
+  color: #d8a437 !important;
+  border-bottom: 1px solid rgba(216, 164, 55, 0.2) !important;
+}
+
+.theme-kacab .sph-section-title i {
+  color: #d8a437 !important;
+}
+
+.theme-kacab .sph-label {
+  color: #e2e8f0 !important;
+}
+
+.theme-kacab .sph-input,
+.theme-kacab .sph-select {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(216, 164, 55, 0.28) !important;
+  color: #ffffff !important;
+}
+
+.theme-kacab .sph-input:focus,
+.theme-kacab .sph-select:focus {
+  border-color: #d8a437 !important;
+  box-shadow: 0 0 0 3px rgba(216, 164, 55, 0.25) !important;
+}
+
+.theme-kacab .sph-segmented {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(216, 164, 55, 0.25) !important;
+}
+
+.theme-kacab .sph-segment-btn.active {
+  background: linear-gradient(135deg, #d8a437 0%, #b45309 100%) !important;
+  color: #1e1014 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(216, 164, 55, 0.35) !important;
+}
+
+.theme-kacab .btn-gold {
+  background: linear-gradient(135deg, #d8a437 0%, #b45309 100%) !important;
+  color: #1e1014 !important;
+  font-weight: 800 !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(216, 164, 55, 0.3) !important;
+}
+
+.theme-kacab .btn-gold:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   PORTAL SPV THEME (Deep Navy & Sky Blue Accent)
+   ========================================================================== */
+.theme-spv .sph-workspace {
+  max-width: 100%;
+  padding: 10px 0 40px;
+}
+
+.theme-spv .sph-builder-card {
+  background: linear-gradient(180deg, rgba(16, 24, 40, 0.96) 0%, rgba(11, 17, 32, 0.98) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.theme-spv .sph-card-header {
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+.theme-spv .sph-card-header h2 {
+  color: #e0f2fe !important;
+}
+
+.theme-spv .sph-card-header h2 i {
+  color: #38bdf8 !important;
+}
+
+.theme-spv .sph-pill-tag {
+  background: rgba(56, 189, 248, 0.18) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.45) !important;
+  font-weight: 800 !important;
+}
+
+.theme-spv .sph-section-title {
+  color: #38bdf8 !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
+}
+
+.theme-spv .sph-section-title i {
+  color: #38bdf8 !important;
+}
+
+.theme-spv .sph-label {
+  color: #e2e8f0 !important;
+}
+
+.theme-spv .sph-input,
+.theme-spv .sph-select {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  color: #ffffff !important;
+}
+
+.theme-spv .sph-input:focus,
+.theme-spv .sph-select:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+}
+
+.theme-spv .sph-segmented {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+.theme-spv .sph-segment-btn.active {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
+}
+
+.theme-spv .btn-spv-primary {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+}
+
+.theme-spv .btn-spv-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+

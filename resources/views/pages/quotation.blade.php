@@ -14,7 +14,25 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915_sph_v32">
+  <link rel="stylesheet" href="../css/style.css?v=20260915">
+  <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915_sph_v33">
+  <script src="../js/sidebar_desktop.js?v=20260915"></script>
+
+  <script>
+    // Deteksi otomatis jika user yang membuka adalah Kacab atau SPV
+    (function checkRoleRedirect() {
+      try {
+        const role = localStorage.getItem('peranSales');
+        const urlParams = new URLSearchParams(window.location.search);
+        const forcedRole = urlParams.get('role');
+        if (role === 'Kepala Cabang' || forcedRole === 'kacab') {
+          window.location.replace('../pages_kacab/quotation.html');
+        } else if (role === 'Supervisor' || forcedRole === 'spv') {
+          window.location.replace('../pages_spv/quotation.html');
+        }
+      } catch(e) {}
+    })();
+  </script>
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#d71920">

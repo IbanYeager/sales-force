@@ -20,6 +20,14 @@ class PageController extends Controller
      */
     public function panduan()
     {
+        $role = request()->get('role');
+        if ($role === 'kacab' && View::exists('pages_kacab.panduan')) {
+            return view('pages_kacab.panduan');
+        }
+        if ($role === 'spv' && View::exists('pages_spv.panduan')) {
+            return view('pages_spv.panduan');
+        }
+
         if (View::exists('panduan_alur_kerja_sales_app')) {
             return view('panduan_alur_kerja_sales_app');
         }
@@ -35,6 +43,23 @@ class PageController extends Controller
 
         if ($cleanPage === 'index' || $cleanPage === '' || $cleanPage === 'dashboard' || $cleanPage === 'home') {
             return $this->index();
+        }
+
+        if ($cleanPage === 'sph') {
+            $cleanPage = 'quotation';
+        }
+
+        if ($cleanPage === 'panduan' || $cleanPage === 'panduan_alur_kerja_sales_app') {
+            return $this->panduan();
+        }
+
+        if ($cleanPage === 'quotation') {
+            $role = request()->query('role');
+            if ($role === 'kacab') {
+                return $this->showKacabPage('quotation');
+            } elseif ($role === 'spv') {
+                return $this->showSpvPage('quotation');
+            }
         }
 
         if (View::exists("pages.{$cleanPage}")) {
@@ -55,6 +80,14 @@ class PageController extends Controller
             $cleanPage = 'index_spv';
         }
 
+        if ($cleanPage === 'panduan_alur_kerja_sales_app') {
+            $cleanPage = 'panduan';
+        }
+
+        if ($cleanPage === 'sph') {
+            $cleanPage = 'quotation';
+        }
+
         if (View::exists("pages_spv.{$cleanPage}")) {
             return view("pages_spv.{$cleanPage}");
         }
@@ -71,6 +104,14 @@ class PageController extends Controller
 
         if ($cleanPage === 'index' || empty($cleanPage)) {
             $cleanPage = 'index_kacab';
+        }
+
+        if ($cleanPage === 'panduan_alur_kerja_sales_app') {
+            $cleanPage = 'panduan';
+        }
+
+        if ($cleanPage === 'sph') {
+            $cleanPage = 'quotation';
         }
 
         if (View::exists("pages_kacab.{$cleanPage}")) {

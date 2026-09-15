@@ -15,6 +15,25 @@
   @endphp
   <link rel="stylesheet" href="{{ $prefix }}css/style.css?v=20260915" />
   <script src="{{ $prefix }}js/sidebar_desktop.js?v=20260915"></script>
+
+  <script>
+    (function checkRolePortal() {
+      try {
+        const role = localStorage.getItem('peranSales');
+        const urlParams = new URLSearchParams(window.location.search);
+        const forcedRole = urlParams.get('role');
+        const path = window.location.pathname;
+        const isSub = path.includes('/pages/') || path.includes('/pages_spv/') || path.includes('/pages_kacab/');
+        const prefix = isSub ? '../' : '';
+
+        if (role === 'Kepala Cabang' || forcedRole === 'kacab') {
+          window.location.replace(prefix + 'pages_kacab/panduan.html');
+        } else if (role === 'Supervisor' || forcedRole === 'spv') {
+          window.location.replace(prefix + 'pages_spv/panduan.html');
+        }
+      } catch(e) {}
+    })();
+  </script>
   
   <style>
     :root {
