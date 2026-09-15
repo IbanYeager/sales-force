@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Kacab Theme & 2026 Sales Dashboard Styles -->
-  <link rel="stylesheet" href="../css/style_kacab.css">
-  <link rel="stylesheet" href="../css/sales_dashboard.css">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_layout_perfect">
+  <link rel="stylesheet" href="../css/sales_dashboard.css?v=20260915_layout_perfect">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1e1014">
@@ -168,7 +168,7 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap:12px; text-align:center;">
+          <div class="kpi-mini-grid">
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
               <div style="font-size:11px; font-weight:700; color:#64748b;">Full Stock Cabang</div>
               <div style="font-size:22px; font-weight:900; color:#0f172a; margin:3px 0;">124</div>

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_spv.css">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_perfect">
 
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
@@ -273,7 +273,7 @@
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; text-align:center;">
+        <div class="kpi-mini-grid">
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
             <div style="font-size:11px; font-weight:700; color:#64748b;">Full Stock Cabang</div>
             <div style="font-size:20px; font-weight:900; color:#0f172a; margin:2px 0;">124</div>

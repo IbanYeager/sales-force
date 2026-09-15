@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../css/style_spv.css?v=20260915">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_perfect">
   <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915_spv_v2">
 
   <link rel="manifest" href="../manifest.json">

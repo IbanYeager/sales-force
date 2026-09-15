@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Performa Regional Jawa Barat</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_kacab.css">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_layout_perfect">
   <link rel="stylesheet" href="../css/performa_regional.css?v=20260901_1">
 
   <link rel="manifest" href="../manifest.json">

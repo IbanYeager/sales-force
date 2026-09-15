@@ -132,24 +132,80 @@ button {
 }
 
 /* ================================================================
-   LAYOUT
+   LAYOUT (Kacab Executive Dashboard)
    ================================================================ */
 .kcb-shell {
   display: flex;
   min-height: 100vh;
   min-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  box-sizing: border-box;
 }
 
-/* ---------------- SIDEBAR (desktop) ---------------- */
+@media (min-width: 901px) {
+  .kcb-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: var(--sidebar-w) !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    flex-shrink: 0 !important;
+    z-index: 900 !important;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08) !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(216, 164, 55, 0.35) rgba(255, 255, 255, 0.05);
+  }
+
+  .kcb-sidebar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .kcb-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .kcb-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(216, 164, 55, 0.35);
+    border-radius: 4px;
+  }
+
+  .kcb-main {
+    margin-left: var(--sidebar-w) !important;
+    width: calc(100% - var(--sidebar-w)) !important;
+    max-width: calc(100% - var(--sidebar-w)) !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    padding: 20px 24px 44px !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1150px) {
+  :root {
+    --sidebar-w: 236px;
+  }
+  .kcb-sidebar {
+    width: 236px !important;
+    padding: 16px 10px 14px !important;
+  }
+  .kcb-main {
+    margin-left: 236px !important;
+    width: calc(100% - 236px) !important;
+    max-width: calc(100% - 236px) !important;
+    padding: 16px 18px 36px !important;
+  }
+}
+
+/* ---------------- SIDEBAR (desktop base) ---------------- */
 .kcb-sidebar {
   width: var(--sidebar-w);
   background: linear-gradient(180deg, var(--sidebar-bg) 0%, var(--sidebar-bg-2) 100%);
   border-right: 1px solid var(--sidebar-border);
   padding: 22px 16px 18px;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -392,6 +448,35 @@ button {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 16px;
+}
+
+/* Responsive KPI 5-Column Mini Grid */
+.kpi-mini-grid {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  text-align: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 1280px) {
+  .kpi-mini-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .kpi-mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-mini-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .kcb-card {
@@ -2050,8 +2135,17 @@ button {
 }
 
 @media (max-width: 900px) {
+  .kcb-shell {
+    flex-direction: column;
+    width: 100%;
+  }
+
   .kcb-main {
-    padding: calc(var(--mobile-header-h) + 18px) 16px 34px;
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: calc(var(--mobile-header-h) + 18px) 16px 34px !important;
+    overflow-x: hidden !important;
   }
 
   .kcb-topbar {

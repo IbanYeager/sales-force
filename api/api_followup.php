@@ -152,6 +152,17 @@ if ($action === 'customers') {
     $where = [];
     $params = [];
 
+    $salesList = get_sales_list();
+    $salesMap = [];
+    $salesNameMap = [];
+    foreach ($salesList as $s) {
+        $salesMap[(int)$s['id']] = $s;
+        $cleanN = strtolower(trim($s['name']));
+        if ($cleanN !== '') {
+            $salesNameMap[$cleanN] = (int)$s['id'];
+        }
+    }
+
     if ($db_source === 'sales') {
         $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
     } elseif ($db_source === 'radar') {
@@ -169,19 +180,28 @@ if ($action === 'customers') {
         if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
             $spvSales = get_sales_list($spv);
             $spvSalesIds = array_map(fn($s) => (int)$s['id'], $spvSales);
+            $spvSalesNames = array_map(fn($s) => "'" . addslashes($s['name']) . "'", $spvSales);
             if (!empty($spvSalesIds)) {
                 $idList = implode(',', $spvSalesIds);
-                $where[] = "(assigned_sales_id IN ($idList) OR assigned_sales_id IS NULL OR assigned_sales_id = 0)";
+                $nameList = implode(',', $spvSalesNames);
+                $where[] = "(assigned_sales_id IN ($idList) OR sales_fu IN ($nameList) OR assigned_sales_id IS NULL OR assigned_sales_id = 0)";
             }
         }
     } elseif ($sales_id === 'unassigned') {
-        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
+        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0) AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0')";
     } elseif ($sales_id !== '') {
-        $where[] = "assigned_sales_id = ?";
-        $params[] = (int)$sales_id;
+        $targetSalesName = isset($salesMap[(int)$sales_id]) ? trim($salesMap[(int)$sales_id]['name']) : '';
+        if ($targetSalesName !== '') {
+            $where[] = "(assigned_sales_id = ? OR LOWER(sales_fu) = LOWER(?) OR sales_fu LIKE ?)";
+            $params[] = (int)$sales_id;
+            $params[] = $targetSalesName;
+            $params[] = "%$targetSalesName%";
+        } else {
+            $where[] = "assigned_sales_id = ?";
+            $params[] = (int)$sales_id;
+        }
     } else {
-        // Default if sales_id is empty: only show assigned_sales_id = 0 (empty)
-        $where[] = "assigned_sales_id = 0";
+        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
     }
 
     if ($status !== '' && $status !== 'all') {
@@ -205,17 +225,37 @@ if ($action === 'customers') {
 
     $customers = followup_query($sql, $params);
     $customers = is_array($customers) ? $customers : [];
-    $salesList = get_sales_list();
-    $salesMap = [];
-    foreach ($salesList as $s) {
-        $salesMap[$s['id']] = $s;
-    }
 
     // Attach sales name & db_source label
     foreach ($customers as &$c) {
         $sid = (int)($c['assigned_sales_id'] ?? 0);
-        $c['sales_name'] = isset($salesMap[$sid]) ? $salesMap[$sid]['name'] : 'Belum Ditugaskan';
-        $c['sales_phone'] = isset($salesMap[$sid]) ? $salesMap[$sid]['phone'] : '';
+        $sFu = trim($c['sales_fu'] ?? '');
+        if ($sid > 0 && isset($salesMap[$sid])) {
+            $c['sales_name'] = $salesMap[$sid]['name'];
+            $c['sales_phone'] = $salesMap[$sid]['phone'];
+        } elseif ($sFu !== '' && $sFu !== '-' && $sFu !== '0') {
+            $cleanFu = strtolower($sFu);
+            $matched = null;
+            if (isset($salesNameMap[$cleanFu])) {
+                $matched = $salesMap[$salesNameMap[$cleanFu]];
+            } else {
+                foreach ($salesList as $sl) {
+                    $slName = strtolower($sl['name']);
+                    if (strpos($slName, $cleanFu) !== false || strpos($cleanFu, $slName) !== false) {
+                        $matched = $sl;
+                        break;
+                    }
+                }
+            }
+            $c['sales_name'] = $matched ? $matched['name'] : $sFu;
+            $c['sales_phone'] = $matched ? $matched['phone'] : '';
+            if ($matched && empty($c['assigned_sales_id'])) {
+                $c['assigned_sales_id'] = $matched['id'];
+            }
+        } else {
+            $c['sales_name'] = 'Belum Ditugaskan';
+            $c['sales_phone'] = '';
+        }
         $src = $c['sync_source'] ?? '';
         $cat = $c['followup_category'] ?? '';
         $isRadar = ($src === 'pkb_excel_radar' || strpos($src, 'radar') !== false || strpos(strtolower($cat), 'radar') !== false);
@@ -623,11 +663,17 @@ if ($action === 'stats') {
 if ($action === 'sales') {
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
     $salesList = get_sales_list($spv);
-    $allCust = followup_query("SELECT assigned_sales_id, followup_status FROM followup_customers");
+    $allCust = followup_query("SELECT assigned_sales_id, sales_fu, followup_status FROM followup_customers");
+    $allCust = is_array($allCust) ? $allCust : [];
 
     foreach ($salesList as &$s) {
-        $sid = $s['id'];
-        $assigned = array_filter($allCust, fn($x) => (int)($x['assigned_sales_id'] ?? 0) === $sid);
+        $sid = (int)$s['id'];
+        $sName = strtolower(trim($s['name']));
+        $assigned = array_filter($allCust, function($x) use ($sid, $sName) {
+            $xSid = (int)($x['assigned_sales_id'] ?? 0);
+            $xFu = strtolower(trim($x['sales_fu'] ?? ''));
+            return ($xSid === $sid) || ($xSid === 0 && $xFu !== '' && ($xFu === $sName || strpos($sName, $xFu) !== false || strpos($xFu, $sName) !== false));
+        });
         $totalAssigned = count($assigned);
         $pending = array_filter($assigned, fn($x) => ($x['followup_status'] ?? '') === 'Belum Dihubungi');
         $pendingCount = count($pending);
