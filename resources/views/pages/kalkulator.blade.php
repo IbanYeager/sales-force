@@ -680,6 +680,9 @@
                             <button type="button" onclick="shareQuotationWA()" style="padding:12px; border-radius:12px; font-weight:700; font-size:12.5px; color:white; border:none; background:#25D366; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
                                 <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Kirim via WhatsApp
                             </button>
+                            <button type="button" onclick="openFullSphStudio()" style="grid-column: span 2; padding:13px; border-radius:12px; font-weight:800; font-size:13px; color:white; background:linear-gradient(135deg, #d71920 0%, #b91c1c 100%); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(215,25,32,0.35);">
+                                <i class="fa-solid fa-file-invoice-dollar"></i> Buka Studio SPH Lengkap A4 (Kop Surat &amp; Rekening Resmi) &rarr;
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -900,6 +903,23 @@
 
             // Scroll mulus ke preview penawaran
             document.getElementById('quotationPrintArea')?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openFullSphStudio() {
+            const modelSelect = document.getElementById('selectModel');
+            const hargaInput = document.getElementById('inputHarga');
+            const hargaVal = typeof parseNum === 'function' ? parseNum(hargaInput.value) : parseInt(hargaInput.value.replace(/[^0-9]/g, '')) || 0;
+            const selectedText = modelSelect.options[modelSelect.selectedIndex]?.text || '';
+            const tenor = typeof currentTenor !== 'undefined' ? currentTenor * 12 : 60;
+            const diskonVal = parseInt(document.getElementById('qDiskon')?.value) || 0;
+
+            let params = new URLSearchParams();
+            if (selectedText) params.set('model', selectedText);
+            if (hargaVal) params.set('otr', hargaVal);
+            if (tenor) params.set('tenor', tenor);
+            if (diskonVal) params.set('diskon', diskonVal);
+
+            window.location.href = 'quotation.html?' + params.toString();
         }
 
         // ── PERIKSA URL PARAMETER (?tab=quotation atau ?tab=leasing) ──

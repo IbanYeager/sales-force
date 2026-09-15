@@ -8,6 +8,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  @php
+    $isSub = strpos(request()->path(), 'pages') !== false;
+    $prefix = $isSub ? '../' : '';
+  @endphp
+  <link rel="stylesheet" href="{{ $prefix }}css/style.css?v=20260915" />
+  <script src="{{ $prefix }}js/sidebar_desktop.js?v=20260915"></script>
   
   <style>
     :root {
@@ -17,7 +24,7 @@
       --slate-dark: #0f172a;
       --slate-text: #1e293b;
       --slate-muted: #475569;
-      --bg-page: #f1f5f9;
+      --bg-page: #f8fafc;
       --card-bg: #ffffff;
       --border-color: #e2e8f0;
       --font-base: 16px;
@@ -40,12 +47,14 @@
       color: var(--slate-text);
       line-height: 1.6;
       font-size: var(--font-base);
-      padding: 20px 12px 60px 12px;
+      margin: 0;
+      padding: 0;
       transition: font-size 0.2s ease;
     }
 
     .main-wrap {
-      max-width: 900px;
+      width: 100%;
+      max-width: 1050px;
       margin: 0 auto;
       background: var(--card-bg);
       border-radius: 24px;
@@ -489,9 +498,18 @@
 </head>
 <body>
 
-  <div class="main-wrap">
+  <div class="mobile-app" style="max-width: 1080px; padding-bottom: 70px;">
+    <header class="header-page">
+      <a href="javascript:void(0)" onclick="handlePanduanBack()" class="header-back-btn" title="Kembali ke Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <h2>Panduan &amp; SOP Alur Kerja Sales App</h2>
+    </header>
+
+    <div class="container" style="margin-top: 15px;">
+      <div class="main-wrap">
     
-    <!-- HEADER RESMI TUNAS TOYOTA -->
+        <!-- HEADER RESMI TUNAS TOYOTA -->
     <header class="top-header">
       <div class="header-nav">
         <div class="brand-pill">
@@ -740,7 +758,7 @@
           <button type="button" class="btn-back-home" onclick="startAppTourFromGuide()" style="background:#0d2d5e;">
             <i class="fa-solid fa-play"></i> Putar Tutorial di Layar
           </button>
-          <a href="index.html" class="btn-back-home">
+          <a href="javascript:void(0)" onclick="handlePanduanBack()" class="btn-back-home">
             <i class="fa-solid fa-house"></i> Kembali ke Dashboard
           </a>
         </div>
@@ -748,14 +766,31 @@
 
     </main>
 
-  </div>
+      </div><!-- /.main-wrap -->
+    </div><!-- /.container -->
+  </div><!-- /.mobile-app -->
 
   <script>
+    function handlePanduanBack() {
+      const role = localStorage.getItem('peranSales');
+      const isSub = window.location.pathname.includes('/pages');
+      const p = isSub ? '../' : '';
+      if (role === 'Kepala Cabang') {
+        window.location.href = p + 'pages_kacab/index_kacab.html';
+      } else if (role === 'Supervisor') {
+        window.location.href = p + 'pages_spv/index_spv.html';
+      } else {
+        window.location.href = p + 'index.html';
+      }
+    }
+
     function startAppTourFromGuide() {
       try {
         localStorage.removeItem('sft_app_tour_completed_v1');
       } catch(e) {}
-      window.location.href = 'index.html?tour=1';
+      const isSub = window.location.pathname.includes('/pages');
+      const p = isSub ? '../' : '';
+      window.location.href = p + 'index.html?tour=1';
     }
 
     function toggleFontSize() {

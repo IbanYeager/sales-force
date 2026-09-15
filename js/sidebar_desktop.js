@@ -73,7 +73,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage || (hrefPage === 'polreg' && curPage === 'polreg_detail')) ? ' active' : '';
+            const isActive = (curPage === hrefPage || (hrefPage === 'polreg' && curPage === 'polreg_detail') || (hrefPage === 'panduan_alur_kerja_sales_app' && (curPage === 'panduan' || curPage === 'panduan_alur_kerja_sales_app'))) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -110,7 +110,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
-                ${navLinkKacab('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem')}
+                ${navLinkKacab('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span>')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
@@ -155,7 +155,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv') || (hrefPage === 'polreg' && curPage === 'polreg_detail')) ? ' active' : '';
+            const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv') || (hrefPage === 'polreg' && curPage === 'polreg_detail') || (hrefPage === 'panduan_alur_kerja_sales_app' && (curPage === 'panduan' || curPage === 'panduan_alur_kerja_sales_app'))) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -192,7 +192,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
-                ${navLinkSPV('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem')}
+                ${navLinkSPV('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span>')}
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
                 ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
@@ -239,7 +239,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage || (curPage === '' && (hrefPage === 'index' || hrefPage === '')) || (hrefPage === 'polreg' && curPage === 'polreg_detail')) ? ' active' : '';
+            const isActive = (curPage === hrefPage || (curPage === '' && (hrefPage === 'index' || hrefPage === '')) || (hrefPage === 'polreg' && curPage === 'polreg_detail') || (hrefPage === 'panduan_alur_kerja_sales_app' && (curPage === 'panduan' || curPage === 'panduan_alur_kerja_sales_app'))) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}" data-tags="${tags}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -273,7 +273,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Utama</p>
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
-                ${navLink('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-notif-badge" style="background:#f59e0b; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">SOP</span>', 'panduan alur kerja sop pesan mobil order tahapan flow tutorial cara pakai')}
+                ${navLink('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span>', 'panduan alur kerja sop pesan mobil order tahapan flow tutorial cara pakai')}
                 ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
@@ -283,7 +283,8 @@
 
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
                 ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR', 'harga pricelist otr brosur daftar')}
-                ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator & Smart Quotation', 'kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf')}
+                ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Finansial', 'kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf')}
+                ${navLink('pages/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d71920; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">A4 PDF</span>', 'sph quotation surat penawaran harga pdf resmi cetak tunai kredit leasing a4 kop surat')}
                 ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)', 'stok stock live inventory unit mobil t-stock')}
                 ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar', 'customer crm radar prospek data database')}
                 ${navLink('pages/battle_card.html', 'fa-solid fa-shield-halved', 'Battle Card &amp; Objection', 'battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata')}
