@@ -319,7 +319,7 @@
           <span style="font-size:11.5px; color:#64748b; font-weight:600;" id="tableCountText">Total: 0 Customer</span>
         </div>
 
-        <div style="overflow-x:auto;">
+        <div class="followup-table-scroll-container">
           <table class="followup-table">
             <thead>
               <tr>

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Monitoring SPV</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_kacab.css">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_compact_hier">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1e1014">
@@ -162,7 +162,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js?v=20260826_sheets_live"></script>
-  <script src="../js/kacab_monitoring.js?v=20260826_sheets_live"></script>
+  <script src="../js/kacab_monitoring.js?v=20260915_compact_hier"></script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>

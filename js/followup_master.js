@@ -18,7 +18,7 @@ let masterState = {
   },
   pagination: {
     currentPage: 1,
-    perPage: 50
+    perPage: 25
   }
 };
 
@@ -975,7 +975,7 @@ function renderCustomerTable() {
 
   const allList = masterState.customers || [];
   const totalCount = allList.length;
-  const perPage = masterState.pagination.perPage || 50;
+  const perPage = masterState.pagination.perPage || 25;
   const totalPages = Math.max(1, Math.ceil(totalCount / perPage));
 
   if (masterState.pagination.currentPage > totalPages) {
@@ -1273,8 +1273,8 @@ function renderPagination(startIndex, endIndex, totalCount, totalPages, currentP
       <div class="fu-per-page-wrap">
         <label style="font-size:11px; color:#64748b; font-weight:700;">Baris per halaman:</label>
         <select class="fu-per-page-select" onchange="changePerPage(this.value)">
-          <option value="25" ${perPage === 25 ? 'selected' : ''}>25</option>
-          <option value="50" ${perPage === 50 ? 'selected' : ''}>50 (Default)</option>
+          <option value="25" ${perPage === 25 ? 'selected' : ''}>25 (Default)</option>
+          <option value="50" ${perPage === 50 ? 'selected' : ''}>50</option>
           <option value="100" ${perPage === 100 ? 'selected' : ''}>100</option>
           <option value="200" ${perPage === 200 ? 'selected' : ''}>200</option>
         </select>
@@ -1550,7 +1550,7 @@ function toggleSelectCustomer(id) {
 
 function toggleSelectAll(checked) {
   const allList = masterState.customers || [];
-  const perPage = masterState.pagination.perPage || 50;
+  const perPage = masterState.pagination.perPage || 25;
   const currentPage = masterState.pagination.currentPage || 1;
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = Math.min(startIndex + perPage, allList.length);

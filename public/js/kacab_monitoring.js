@@ -23,7 +23,7 @@ async function loadHierarchy() {
       const el = document.querySelector(`.hier-group[data-spv="${CSS.escape(target)}"]`);
       if (el) {
         el.classList.add('open');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   } catch (e) {
@@ -164,7 +164,17 @@ function applyHierFilters() {
 }
 
 function toggleGroup(headerEl) {
-  headerEl.closest('.hier-group').classList.toggle('open');
+  const group = headerEl.closest('.hier-group');
+  const isOpening = !group.classList.contains('open');
+
+  // Jika membuka dan tidak dalam mode Buka Semua, tutup grup lain agar halaman tetap ringkas dan tidak memanjang ke bawah
+  if (isOpening && !allExpanded) {
+    document.querySelectorAll('.hier-group.open').forEach(g => {
+      if (g !== group) g.classList.remove('open');
+    });
+  }
+
+  group.classList.toggle('open');
 }
 
 function toggleAllGroups() {

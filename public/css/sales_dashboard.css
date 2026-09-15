@@ -1114,10 +1114,13 @@ body {
 
 .table-responsive {
   width: 100%;
+  max-height: 520px;
+  overflow-y: auto;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
+  scrollbar-width: thin;
 }
 
 .data-table {
@@ -1126,6 +1129,14 @@ body {
   text-align: left;
   font-size: 0.775rem;
   white-space: nowrap;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-surface);
+  box-shadow: 0 1px 0 var(--border-subtle);
 }
 
 .data-table th {

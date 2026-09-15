@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Database Follow-Up (CRM)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/css/style_kacab.css">
-  <link rel="stylesheet" href="/css/followup.css?v=20260829_executive">
+  <link rel="stylesheet" href="/css/style_kacab.css?v=20260915_compact_fu">
+  <link rel="stylesheet" href="/css/followup.css?v=20260915_compact_fu">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -603,7 +603,7 @@
             <span style="font-size:11.5px; color:#64748b; font-weight:600;" id="tableCountText">Total: 0 Customer</span>
           </div>
 
-          <div style="overflow-x:auto;">
+          <div class="followup-table-scroll-container">
             <table class="followup-table">
               <thead>
                 <tr>
@@ -640,7 +640,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/custom_alert.js?v=25"></script>
   <script src="/js/kacab_global.js?v=20260824_dendi"></script>
-  <script src="/js/followup_master.js?v=20260910_nophone"></script>
+  <script src="/js/followup_master.js?v=20260915_compact_fu"></script>
   <script src="/js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 </html>
