@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -155,18 +155,33 @@
       body {
         background: white !important;
         color: black !important;
+        font-size: 12px !important;
       }
 
       .kcb-sidebar,
       .report-actions,
       .mh-burger,
-      .mh-avatar {
+      .mh-avatar,
+      .kcb-topbar,
+      .sidebar-footer {
         display: none !important;
       }
 
       .kcb-main {
         margin: 0 !important;
         padding: 0 !important;
+        width: 100% !important;
+      }
+
+      .print-only-header,
+      .print-only-signatures {
+        display: block !important;
+      }
+
+      .rep-card, .pay-card, .olx-section {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
       }
     }
   </style>
@@ -193,6 +208,8 @@
 
       <nav class="kcb-nav">
         <a href="index_kacab.html" id="navDash"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
+        <a href="../panduan_alur_kerja_sales_app.html" id="navPanduan"><i class="fa-solid fa-book-bookmark"></i>Panduan &amp; SOP Sistem <span class="sidebar-sop-badge" style="font-size:9px; background:linear-gradient(135deg, #10b981, #059669); color:white; padding:1px 6px; border-radius:10px; font-weight:800; margin-left:auto; display:inline-flex; align-items:center; gap:3px;"><span style="width:4px; height:4px; border-radius:50%; background:#fff;"></span>SOP</span></a>
+        <a href="../pages/quotation.html" id="navQuotation"><i class="fa-solid fa-file-invoice-dollar"></i>Studio SPH &amp; Quotation <span style="background:#d71920; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span></a>
         <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
         <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
@@ -217,6 +234,24 @@
 
     <!-- MAIN -->
     <main class="kcb-main">
+      <!-- PRINT-ONLY LETTERHEAD KOP SURAT DEALER -->
+      <div class="print-only-header" style="display:none; margin-bottom:20px; border-bottom:2.5px solid #0f172a; padding-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <img src="../image/logo_tunas_toyota.png" alt="Tunas Toyota" style="height:50px;">
+            <div>
+              <h2 style="font-size:17px; font-weight:900; color:#0f172a; margin:0; text-transform:uppercase; letter-spacing:0.5px;">PT TUNAS RIDEAN TBK — TUNAS TOYOTA</h2>
+              <p style="font-size:11px; color:#475569; margin:3px 0 0 0;">Cabang Bandung Kiara Condong &middot; Jl. Ibrahim Adjie No. 123, Bandung, Jawa Barat</p>
+              <p style="font-size:10px; color:#64748b; margin:1px 0 0 0;">Telp: (022) 730-1234 &middot; Website: tunastoyotabandung.co.id</p>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:11px; font-weight:800; color:#b91c1c; border:1.5px solid #b91c1c; padding:3px 8px; border-radius:6px; text-transform:uppercase;">Confidential &middot; Internal Executive</span>
+            <div style="font-size:10px; color:#64748b; margin-top:4px;">Dicetak pada: <strong id="printTimestamp">-</strong></div>
+          </div>
+        </div>
+      </div>
+
       <div class="kcb-topbar">
         <div>
           <h2 id="pageTitle">Laporan Eksekutif Cabang</h2>
@@ -357,6 +392,20 @@
         <!-- Container Daftar SPV -->
         <div id="olxSpvContainer" class="olx-spv-list">
           <p class="mini-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data pencapaian OLX per SPV...</p>
+        </div>
+      </div>
+
+      <!-- PRINT-ONLY SIGNATURE SECTION -->
+      <div class="print-only-signatures" style="display:none; margin-top:40px; page-break-inside:avoid;">
+        <div style="display:flex; justify-content:space-between; text-align:center; padding:0 30px;">
+          <div>
+            <div style="font-size:11px; color:#475569; margin-bottom:60px;">Disusun Oleh,<br><strong>Koordinator Supervisor (SPV)</strong></div>
+            <div style="font-size:12px; font-weight:800; color:#0f172a; border-top:1px solid #0f172a; padding-top:4px; min-width:180px;">( Tim Supervisor )</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:#475569; margin-bottom:60px;">Mengetahui &amp; Menyetujui,<br><strong>Kepala Cabang (Kacab)</strong></div>
+            <div style="font-size:12px; font-weight:800; color:#0f172a; border-top:1px solid #0f172a; padding-top:4px; min-width:180px;" id="printKacabSignName">( Kepala Cabang )</div>
+          </div>
         </div>
       </div>
 

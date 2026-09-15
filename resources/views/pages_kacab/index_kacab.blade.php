@@ -38,7 +38,8 @@
 
       <nav class="kcb-nav">
         <a href="index_kacab.html" id="navDash" class="active"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
-        <a href="../panduan_alur_kerja_sales_app.html" id="navPanduan"><i class="fa-solid fa-book-bookmark"></i>Panduan &amp; SOP Sistem</a>
+        <a href="../panduan_alur_kerja_sales_app.html" id="navPanduan"><i class="fa-solid fa-book-bookmark"></i>Panduan &amp; SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span></a>
+        <a href="../pages/quotation.html" id="navSph"><i class="fa-solid fa-file-invoice-dollar"></i>Studio SPH &amp; Quotation</a>
         <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
         <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
@@ -155,9 +156,15 @@
               </div>
             </div>
 
-            <div style="display:flex; align-items:center; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-sm" onclick="openWhatIfSimulatorModal()" style="background:linear-gradient(135deg, #d97706, #b45309); color:white; border:none; font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(217,119,6,0.3);">
+                <i class="fa-solid fa-sliders"></i> What-If Simulator Closing
+              </button>
+              <button class="btn btn-sm" onclick="location.href='../pages/quotation.html'" style="background:linear-gradient(135deg, #d71920, #b91c1c); color:white; border:none; font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(215,25,32,0.25);">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Studio SPH
+              </button>
               <button class="btn btn-sm" onclick="location.href='ao_report_kacab.html'" style="background:linear-gradient(135deg, #1e1014, #4a1525); color:#d8a437; border:1px solid rgba(216,164,55,0.4); font-weight:800; font-size:12px; padding:9px 16px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 4px 14px rgba(30,16,20,0.25);">
-                <i class="fa-solid fa-expand"></i> Buka Papan AO Report Eksekutif
+                <i class="fa-solid fa-expand"></i> Papan AO Report
               </button>
             </div>
           </div>
@@ -419,6 +426,139 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-outline" id="btn-reset-default-data">Kembalikan Data Bawaan 2026</button>
             <button type="button" class="btn btn-primary" id="btn-cancel-upload">Tutup</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           MODAL: WHAT-IF MONTH-END CLOSING SIMULATOR (KEPALA CABANG)
+           ==================================================================== -->
+      <div class="modal-backdrop" id="modal-whatif-simulator" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+        <div style="background:white; border-radius:22px; max-width:820px; width:94%; padding:26px; box-shadow:0 25px 60px rgba(0,0,0,0.3); max-height:92vh; overflow-y:auto; border:1px solid #cbd5e1;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1.5px solid #f1f5f9; padding-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, #d97706, #78350f); color:white; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 14px rgba(217,119,6,0.35);">
+                <i class="fa-solid fa-sliders"></i>
+              </div>
+              <div>
+                <h3 style="font-size:18px; font-weight:900; color:#0f172a; margin:0;">
+                  What-If Simulator: Skenario Closing Akhir Bulan
+                </h3>
+                <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
+                  Eksplorasi dampak kebijakan subsidi diskon, percepatan leasing F&amp;I, dan trade-in terhadap target cabang (104 Unit).
+                </p>
+              </div>
+            </div>
+            <button onclick="closeWhatIfSimulatorModal()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#94a3b8;">&times;</button>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:22px;">
+            <!-- Left: Simulation Controls -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:18px;">
+              <h4 style="font-size:13px; font-weight:800; color:#1e293b; margin:0 0 14px 0; text-transform:uppercase; letter-spacing:0.5px;">
+                <i class="fa-solid fa-gears" style="color:#d97706; margin-right:6px;"></i> Variabel Kebijakan Kacab
+              </h4>
+
+              <!-- Variable 1: Extra Discount Subsidy -->
+              <div style="margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <label style="font-size:12px; font-weight:700; color:#334155;">Subsidi Diskon Ekstra Unit Tertahan:</label>
+                  <span id="labelSimDiscount" style="font-size:12px; font-weight:800; color:#b45309;">Rp 5.000.000 / Unit</span>
+                </div>
+                <input type="range" id="simDiscountRange" min="0" max="15000000" step="1000000" value="5000000" oninput="runWhatIfClosingCalc()" style="width:100%; accent-color:#d97706; cursor:pointer;">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:#94a3b8; margin-top:2px;">
+                  <span>Rp 0</span>
+                  <span>Rp 7.5 Juta</span>
+                  <span>Rp 15 Juta</span>
+                </div>
+              </div>
+
+              <!-- Variable 2: Leasing Acceleration -->
+              <div style="margin-bottom:16px; background:white; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <div style="font-size:12px; font-weight:700; color:#0f172a;">Akselerasi Approval F&amp;I Leasing</div>
+                  <div style="font-size:10.5px; color:#64748b;">Eskalasi prioritas SPK tertahan &gt; 5 hari ke AO Leasing</div>
+                </div>
+                <input type="checkbox" id="simLeasingBoost" checked onchange="runWhatIfClosingCalc()" style="width:18px; height:18px; accent-color:#d97706; cursor:pointer;">
+              </div>
+
+              <!-- Variable 3: Trade-in Push -->
+              <div style="margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <label style="font-size:12px; font-weight:700; color:#334155;">Subsidi Trade-In OLX Autos:</label>
+                  <span id="labelSimTradein" style="font-size:12px; font-weight:800; color:#0369a1;">Rp 2.000.000 / Unit</span>
+                </div>
+                <input type="range" id="simTradeinRange" min="0" max="5000000" step="500000" value="2000000" oninput="runWhatIfClosingCalc()" style="width:100%; accent-color:#0284c7; cursor:pointer;">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:#94a3b8; margin-top:2px;">
+                  <span>Rp 0</span>
+                  <span>Rp 2.5 Juta</span>
+                  <span>Rp 5 Juta</span>
+                </div>
+              </div>
+
+              <!-- Variable 4: Sales Fast Closer Incentive -->
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <label style="font-size:12px; font-weight:700; color:#334155;">Insentif Cash Closer Sales:</label>
+                  <span id="labelSimCloserBonus" style="font-size:12px; font-weight:800; color:#15803d;">Rp 500.000 / SPK</span>
+                </div>
+                <input type="range" id="simCloserRange" min="0" max="1000000" step="100000" value="500000" oninput="runWhatIfClosingCalc()" style="width:100%; accent-color:#16a34a; cursor:pointer;">
+              </div>
+            </div>
+
+            <!-- Right: Projected Result Outputs -->
+            <div style="display:flex; flex-direction:column; justify-content:space-between;">
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <!-- Main KPI Card -->
+                <div style="background:linear-gradient(135deg, #fef3c7, #fde68a); border:1.5px solid #f59e0b; border-radius:16px; padding:16px;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                      <span style="font-size:11px; font-weight:800; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">Proyeksi Total Closing Bulan Ini</span>
+                      <h3 style="font-size:32px; font-weight:900; color:#78350f; margin:4px 0;" id="simResultTotalUnits">118 <small style="font-size:16px; font-weight:700;">Unit</small></h3>
+                    </div>
+                    <span id="simAchievementPct" style="font-size:12px; font-weight:900; background:#d97706; color:white; padding:4px 10px; border-radius:20px;">
+                      113.4% Target
+                    </span>
+                  </div>
+                  <p style="font-size:11.5px; color:#92400e; margin:6px 0 0 0; font-weight:600;" id="simResultUnitsSub">
+                    Target Cabang: 104 Unit &middot; Surplus +14 Unit dari baseline.
+                  </p>
+                </div>
+
+                <!-- Secondary Metric Grid -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+                    <div style="font-size:11px; font-weight:700; color:#64748b;">Est. Tambahan Omset</div>
+                    <div style="font-size:18px; font-weight:900; color:#0284c7; margin-top:2px;" id="simResultRevenueDelta">+Rp 4.90 M</div>
+                    <div style="font-size:10px; color:#0369a1; margin-top:2px;">Gross Sales Inflow</div>
+                  </div>
+
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+                    <div style="font-size:11px; font-weight:700; color:#64748b;">Margin Retention</div>
+                    <div style="font-size:18px; font-weight:900; color:#15803d; margin-top:2px;" id="simResultMarginRetention">93.8%</div>
+                    <div style="font-size:10px; color:#166534; margin-top:2px;">Status: Sangat Sehat</div>
+                  </div>
+                </div>
+
+                <!-- Strategic Summary Box -->
+                <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px 14px;">
+                  <div style="font-size:12px; font-weight:800; color:#166534; margin-bottom:4px;">
+                    <i class="fa-solid fa-lightbulb" style="color:#16a34a;"></i> Kesimpulan Analisis Strategis Kacab:
+                  </div>
+                  <p style="font-size:11px; color:#14532d; margin:0; line-height:1.4;" id="simStrategyRecommendation">
+                    Dengan alokasi subsidi diskon terkontrol dan akselerasi F&amp;I leasing, cabang diproyeksikan mengamankan closing hingga 118 Unit, melampaui target 104 unit dengan margin cabang tetap aman.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Bottom Actions -->
+              <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
+                <button class="btn" style="background:#f1f5f9; color:#475569; font-weight:700; border:1px solid #cbd5e1; padding:10px 16px; border-radius:10px; cursor:pointer;" onclick="closeWhatIfSimulatorModal()">Tutup</button>
+                <button class="btn" style="background:linear-gradient(135deg, #25D366, #128C7E); color:white; font-weight:800; border:none; padding:10px 18px; border-radius:10px; cursor:pointer; box-shadow:0 3px 12px rgba(37,211,102,0.3); display:inline-flex; align-items:center; gap:6px;" onclick="broadcastWhatIfStrategyToSPV()">
+                  <i class="fa-brands fa-whatsapp"></i> Broadcast Arahan Strategis ke SPV
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

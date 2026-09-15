@@ -151,6 +151,10 @@ window.loadOlxAchievementData = function() {
 }
 
 function exportReportPDF() {
+  const timeEl = document.getElementById('printTimestamp');
+  if (timeEl) timeEl.textContent = new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+  const signEl = document.getElementById('printKacabSignName');
+  if (signEl) signEl.textContent = `( ${localStorage.getItem('namaSales') || 'Kepala Cabang'} )`;
   window.print();
 }
 

@@ -610,9 +610,268 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
     };
 
+    // ==========================================
+    // ⚡ 5. SPV EARLY WARNING RADAR & RUN-RATE VELOCITY
+    // ==========================================
+    window.loadSpvEarlyWarningAndRunRate = async function() {
+      const spv = localStorage.getItem('spvSales') || localStorage.getItem('namaSales') || '';
+      const now = new Date();
+      const currentDay = now.getDate();
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const remainingDays = Math.max(1, lastDayOfMonth - currentDay + 1);
+
+      let stuckCount = 0;
+      let hotCount = 0;
+      let zeroActivityCount = 0;
+      let targetSpk = 30;
+      let realisasiSpk = 0;
+
+      // 1. Fetch SPK Data for Stuck Leasing & Target
+      try {
+        const spkUrl = (spv === 'Semua' || !spv) ? `../api/api_spk.php?all=true` : `../api/api_spk.php?spv=${encodeURIComponent(spv)}`;
+        const spkRes = await fetch(spkUrl);
+        const spkJson = await spkRes.json();
+        if (spkJson.status === 'success' && Array.isArray(spkJson.data)) {
+          realisasiSpk = spkJson.data.filter(s => s.status === 'Disetujui' || s.status === 'SPK' || s.status === 'DO').length;
+          
+          const fiveDaysAgo = new Date();
+          fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+          stuckCount = spkJson.data.filter(s => {
+            const isPending = (s.status === 'Menunggu' || s.status === 'Pending');
+            if (!isPending) return false;
+            if (!s.created_at) return true;
+            const created = new Date(s.created_at);
+            return isNaN(created) || created <= fiveDaysAgo;
+          }).length;
+        }
+      } catch (e) {
+        console.error('Error fetching SPK for Early Warning Radar:', e);
+      }
+
+      // 2. Fetch Target data
+      try {
+        const spvParam = window.currentSpvFilter || spv || 'Semua';
+        const tUrl = `../api/api_target.php?spv=${encodeURIComponent(spvParam)}`;
+        const tRes = await fetch(tUrl);
+        const tJson = await tRes.json();
+        if (tJson.status === 'success') {
+          targetSpk = Math.max(tJson.target_spk_total || 30, 1);
+          if (tJson.realisasi_spk_total !== undefined) {
+            realisasiSpk = tJson.realisasi_spk_total;
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching target for Run Rate:', e);
+      }
+
+      // 3. Fetch Wiraniaga Status for Zero Activity
+      try {
+        const wirUrl = (spv === 'Semua' || !spv) ? `../api/api_wiraniaga.php?spv=Semua` : `../api/api_wiraniaga.php?spv=${encodeURIComponent(spv)}`;
+        const wirRes = await fetch(wirUrl);
+        const wirJson = await wirRes.json();
+        if (wirJson.status === 'success' && Array.isArray(wirJson.data)) {
+          zeroActivityCount = wirJson.data.filter(s => s.status === 'Tidak Aktif').length;
+        }
+      } catch (e) {
+        console.error('Error fetching Wiraniaga for zero checkin:', e);
+      }
+
+      // 4. Stagnant Hot Leads (estimated from stagnant + follow-up pool)
+      hotCount = (window.realStagnantCount && window.realStagnantCount > 0) ? window.realStagnantCount : Math.max(stuckCount + 1, 2);
+
+      // Compute Required Run-Rate
+      const sisaSpk = Math.max(0, targetSpk - realisasiSpk);
+      const requiredRunRate = (sisaSpk / remainingDays).toFixed(1);
+
+      window.spvRadarData = {
+        targetSpk: targetSpk,
+        realisasiSpk: realisasiSpk,
+        sisaSpk: sisaSpk,
+        remainingDays: remainingDays,
+        runRate: requiredRunRate,
+        stuckCount: stuckCount,
+        hotCount: hotCount,
+        zeroActivityCount: zeroActivityCount
+      };
+
+      // Update DOM
+      const elStuck = document.getElementById('spvAlertStuckLeasing');
+      if (elStuck) elStuck.innerHTML = `${stuckCount} <small style="font-size:13px; font-weight:700;">SPK</small>`;
+      const elStuckSub = document.getElementById('spvAlertStuckSub');
+      if (elStuckSub) {
+        elStuckSub.textContent = stuckCount > 0 
+          ? `Terdapat ${stuckCount} pengajuan leasing tertahan > 5 hari. Segera kawal koordinasi ke AO leasing.`
+          : `Seluruh pengajuan leasing tim berjalan lancar dan terverifikasi.`;
+      }
+
+      const elHot = document.getElementById('spvAlertHotLeads');
+      if (elHot) elHot.innerHTML = `${hotCount} <small style="font-size:13px; font-weight:700;">Prospek</small>`;
+      const elHotSub = document.getElementById('spvAlertHotSub');
+      if (elHotSub) {
+        elHotSub.textContent = hotCount > 0
+          ? `${hotCount} prospek hot siap beli butuh tindak lanjut. Dorong sales jadwalkan test drive hari ini.`
+          : `Tidak ada prospek hot yang terlantar lebih dari 48 jam.`;
+      }
+
+      const elZero = document.getElementById('spvAlertZeroActivity');
+      if (elZero) elZero.innerHTML = `${zeroActivityCount} <small style="font-size:13px; font-weight:700;">Sales</small>`;
+      const elZeroSub = document.getElementById('spvAlertZeroSub');
+      if (elZeroSub) {
+        elZeroSub.textContent = zeroActivityCount > 0
+          ? `${zeroActivityCount} wiraniaga belum check-in GPS canvassing atau input aktivitas hari ini.`
+          : `Seluruh wiraniaga tim telah aktif check-in dan beraktivitas hari ini.`;
+      }
+
+      const elRunRate = document.getElementById('spvRunRateVal');
+      if (elRunRate) elRunRate.innerHTML = `${requiredRunRate} <small style="font-size:12px; font-weight:700;">SPK/Hari</small>`;
+      const elRunRateSub = document.getElementById('spvRunRateSub');
+      if (elRunRateSub) {
+        elRunRateSub.textContent = `Dibutuhkan ${sisaSpk} SPK lagi dalam sisa ${remainingDays} hari kalender untuk mencapai 100% target.`;
+      }
+
+      const elHealthTag = document.getElementById('spvRadarHealthTag');
+      if (elHealthTag) {
+        const issuesTotal = stuckCount + zeroActivityCount;
+        if (issuesTotal > 0) {
+          elHealthTag.style.background = '#fef2f2';
+          elHealthTag.style.color = '#b91c1c';
+          elHealthTag.style.borderColor = '#fecaca';
+          elHealthTag.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${issuesTotal} Poin Butuh Perhatian`;
+        } else {
+          elHealthTag.style.background = '#f0fdf4';
+          elHealthTag.style.color = '#15803d';
+          elHealthTag.style.borderColor = '#bbf7d0';
+          elHealthTag.innerHTML = `<i class="fa-solid fa-circle-check"></i> Radar Tim Sehat`;
+        }
+      }
+    };
+
+    // ==========================================
+    // 📢 6. TEAM WHATSAPP BROADCAST MODAL
+    // ==========================================
+    window.openTeamBroadcastModal = function() {
+      const modal = document.getElementById('teamBroadcastModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        updateTeamBroadcastText();
+      }
+    };
+
+    window.closeTeamBroadcastModal = function() {
+      const modal = document.getElementById('teamBroadcastModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.updateTeamBroadcastText = function() {
+      const topic = document.getElementById('teamBroadcastTopic')?.value || 'velocity_runrate';
+      const spvNama = localStorage.getItem('spvSales') || localStorage.getItem('namaSales') || 'Supervisor';
+      const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const r = window.spvRadarData || {
+        targetSpk: 30,
+        realisasiSpk: 12,
+        sisaSpk: 18,
+        remainingDays: 14,
+        runRate: '1.3',
+        stuckCount: 2,
+        hotCount: 4,
+        zeroActivityCount: 1
+      };
+
+      let text = '';
+
+      if (topic === 'velocity_runrate') {
+        text = `🚀 *ARAHAN SPV: KEJAR LAJU CLOSING (RUN-RATE SPEED)* 🚀
+📅 Tanggal: ${today}
+👔 Dari: SPV ${spvNama}
+━━━━━━━━━━━━━━━━━━━━━━
+📊 *STATUS PIPELINE & TARGET TIM:*
+• Target Cabang: *${r.targetSpk} SPK*
+• Realisasi Saat Ini: *${r.realisasiSpk} SPK*
+• Sisa Target: *${r.sisaSpk} SPK* (Tersisa ${r.remainingDays} hari kerja)
+
+⚡ *KECEPATAN MINIMAL DIBUTUHKAN:*
+Wajib closing minimal *${r.runRate} SPK / Hari* agar target 100% tercapai!
+
+🎯 *ACTION PLAN HARI INI:*
+1. Hubungi kembali semua calon pembeli yang sudah terima Surat Penawaran Harga (SPH).
+2. Tawarkan simulasi kredit DP Ringan & Bunga 0% bagi unit ready stock (Avanza, Veloz, Zenix, Yaris Cross).
+3. Pastikan seluruh canvassing & follow-up tercatat di Sales App sebelum pukul 17:00.
+
+Mari satukan semangat, kita tembus target bulan ini! 💪🚗✨`;
+      } else if (topic === 'stuck_leasing') {
+        text = `⚠️ *URGENT SPV: SEGERA PROSES LEASING TERTUNDA* ⚠️
+📅 Tanggal: ${today}
+👔 Dari: SPV ${spvNama}
+━━━━━━━━━━━━━━━━━━━━━━
+Rekan-rekan wiraniaga, terdeteksi *${r.stuckCount} SPK* dengan status approval leasing tertahan lebih dari 5 hari.
+
+📌 *INSTRUKSI SEGERA:*
+1. Sales yang memiliki berkas pending, segera telpon Account Officer (AO) leasing terkait hari ini.
+2. Pastikan kekurangan dokumen (KTP/KK/Rek Koran/PBB) segera dilengkapi.
+3. Jika ada kendala persetujuan atau kebutuhan subsidi diskon khusus, langsung infokan ke saya untuk dibantu approval/eskalasi.
+
+Jangan sampai konsumen membatalkan pesanan karena lambatnya proses leasing! 🙏`;
+      } else if (topic === 'hot_prospects') {
+        text = `🔥 *PRIORITAS CLOSING: GERAKKAN HOT LEADS STAGNAN* 🔥
+📅 Tanggal: ${today}
+👔 Dari: SPV ${spvNama}
+━━━━━━━━━━━━━━━━━━━━━━
+Pantauan sistem mendeteksi ada sekitar *${r.hotCount} Hot Leads* yang belum menerima follow-up dalam 48 jam terakhir.
+
+💡 *TIPS CO-CLOSING:*
+• Hubungi konsumen via WhatsApp / Telpon pagi ini dengan kabar promo terbaru.
+• Jadwalkan Test Drive ke rumah atau kantor konsumen hari ini atau akhir pekan.
+• Buatkan format Surat Penawaran Harga (SPH) resmi dari menu *Studio SPH* agar penawaran terlihat profesional dan dipercaya konsumen.
+
+Segera konfirmasi jika butuh pendampingan closing bersama saya! 💪`;
+      } else if (topic === 'weekend_push') {
+        text = `🎯 *WEEKEND SPECIAL DEALS & DISKON PUSH* 🎯
+📅 Tanggal: ${today}
+👔 Dari: SPV ${spvNama}
+━━━━━━━━━━━━━━━━━━━━━━
+Menyambut akhir pekan ini, tim kita meluncurkan program percepatan SPK:
+✨ Plafond Diskon Khusus untuk unit Fast Moving & Ready Stock.
+✨ Bonus Aksesoris & Paket Servis Berkala Tambahan.
+✨ Fasilitas Trade-In OLX Autos dengan penawaran harga terbaik.
+
+Manfaatkan kesempatan ini untuk closing seluruh prospek potensial Anda. Gaspol! 🏁🔥`;
+      } else {
+        text = `📢 *INSTRUKSI SPV TIM TOYOTA*
+📅 Tanggal: ${today}
+👔 SPV: ${spvNama}
+
+[Tuliskan instruksi atau pengumuman Anda di sini...]`;
+      }
+
+      const area = document.getElementById('teamBroadcastTextarea');
+      if (area) area.value = text;
+    };
+
+    window.copyTeamBroadcastText = function() {
+      const area = document.getElementById('teamBroadcastTextarea');
+      if (!area) return;
+      area.select();
+      document.execCommand('copy');
+      if (window.showCustomAlert) {
+        showCustomAlert('Berhasil Disalin!', 'Teks instruksi tim berhasil disalin ke clipboard.', 'success');
+      } else {
+        alert('Teks instruksi berhasil disalin!');
+      }
+    };
+
+    window.sendTeamBroadcastWA = function() {
+      const area = document.getElementById('teamBroadcastTextarea');
+      const text = area ? area.value : '';
+      closeTeamBroadcastModal();
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    };
+
     // Initialize all early warning & tracker functions on load
     document.addEventListener('DOMContentLoaded', () => {
       loadEarlyWarningChecklist();
       loadPipelineFunnelData();
       loadDailyActivityTracker();
+      loadSpvEarlyWarningAndRunRate();
     });
+

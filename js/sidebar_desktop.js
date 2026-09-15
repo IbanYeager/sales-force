@@ -111,6 +111,7 @@
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
                 ${navLinkKacab('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span>')}
+                ${navLinkKacab('pages/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d71920; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">A4 PDF</span>')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
@@ -193,6 +194,7 @@
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
                 ${navLinkSPV('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span>')}
+                ${navLinkSPV('pages/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d71920; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">A4 PDF</span>')}
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
                 ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
