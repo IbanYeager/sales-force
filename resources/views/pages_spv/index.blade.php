@@ -30,7 +30,6 @@
 
       <nav class="spv-nav">
         <a href="index_spv.html" id="navDash" class="active"><i class="fa-solid fa-gauge"></i>Dashboard</a>
-        <a href="panduan.html" id="navPanduan"><i class="fa-solid fa-book-bookmark"></i>Panduan &amp; SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span></a>
         <a href="quotation.html" id="navSph"><i class="fa-solid fa-file-invoice-dollar"></i>Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#0284c7; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span></a>
         <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target</a>
         <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Wiraniaga</a>

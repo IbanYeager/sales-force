@@ -21,11 +21,11 @@ class PageController extends Controller
     public function panduan()
     {
         $role = request()->get('role');
-        if ($role === 'kacab' && View::exists('pages_kacab.panduan')) {
-            return view('pages_kacab.panduan');
+        if ($role === 'kacab') {
+            return redirect('/pages_kacab/index_kacab.html');
         }
-        if ($role === 'spv' && View::exists('pages_spv.panduan')) {
-            return view('pages_spv.panduan');
+        if ($role === 'spv') {
+            return redirect('/pages_spv/index_spv.html');
         }
 
         if (View::exists('panduan_alur_kerja_sales_app')) {
@@ -80,8 +80,8 @@ class PageController extends Controller
             $cleanPage = 'index_spv';
         }
 
-        if ($cleanPage === 'panduan_alur_kerja_sales_app') {
-            $cleanPage = 'panduan';
+        if ($cleanPage === 'panduan' || $cleanPage === 'panduan_alur_kerja_sales_app') {
+            return redirect('/pages_spv/index_spv.html');
         }
 
         if ($cleanPage === 'sph') {
@@ -106,8 +106,8 @@ class PageController extends Controller
             $cleanPage = 'index_kacab';
         }
 
-        if ($cleanPage === 'panduan_alur_kerja_sales_app') {
-            $cleanPage = 'panduan';
+        if ($cleanPage === 'panduan' || $cleanPage === 'panduan_alur_kerja_sales_app') {
+            return redirect('/pages_kacab/index_kacab.html');
         }
 
         if ($cleanPage === 'sph') {

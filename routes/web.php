@@ -22,24 +22,10 @@ Route::get('/panduan_alur_kerja_sales_app.html', [PageController::class, 'pandua
 Route::get('/panduan_alur_kerja_sales_app', [PageController::class, 'panduan']);
 Route::get('/pages/panduan_alur_kerja_sales_app.html', [PageController::class, 'panduan']);
 Route::get('/pages/panduan_alur_kerja_sales_app', [PageController::class, 'panduan']);
-Route::get('/pages_spv/panduan_alur_kerja_sales_app.html', function() {
-    return app(PageController::class)->showSpvPage('panduan');
-});
-Route::get('/pages_spv/panduan_alur_kerja_sales_app', function() {
-    return app(PageController::class)->showSpvPage('panduan');
-});
-Route::get('/pages_kacab/panduan_alur_kerja_sales_app.html', function() {
-    return app(PageController::class)->showKacabPage('panduan');
-});
-Route::get('/pages_kacab/panduan_alur_kerja_sales_app', function() {
-    return app(PageController::class)->showKacabPage('panduan');
-});
-
 // Portal SPV (Supervisor)
 Route::prefix('spv')->group(function () {
     Route::get('/', [PageController::class, 'showSpvPage'])->name('spv.dashboard');
     Route::get('/sph', function() { return app(PageController::class)->showSpvPage('quotation'); });
-    Route::get('/panduan', function() { return app(PageController::class)->showSpvPage('panduan'); });
     Route::get('/{page}', [PageController::class, 'showSpvPage'])->name('spv.page');
 });
 Route::get('/pages_spv/sph.html', function() { return app(PageController::class)->showSpvPage('quotation'); });
@@ -50,7 +36,6 @@ Route::get('/pages_spv/{page}', [PageController::class, 'showSpvPage']);
 Route::prefix('kacab')->group(function () {
     Route::get('/', [PageController::class, 'showKacabPage'])->name('kacab.dashboard');
     Route::get('/sph', function() { return app(PageController::class)->showKacabPage('quotation'); });
-    Route::get('/panduan', function() { return app(PageController::class)->showKacabPage('panduan'); });
     Route::get('/{page}', [PageController::class, 'showKacabPage'])->name('kacab.page');
 });
 Route::get('/pages_kacab/sph.html', function() { return app(PageController::class)->showKacabPage('quotation'); });
