@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_perfect">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_executive_v34">
 
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
@@ -125,122 +125,124 @@
       </div>
 
       <!-- ===== SPV EARLY WARNING RADAR & RUN-RATE COCKPIT ===== -->
-      <div class="spv-card" style="margin-bottom:18px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:18px; padding:20px; box-shadow:0 6px 20px rgba(0,0,0,0.04);">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px; border-bottom:1.5px solid #f1f5f9; padding-bottom:14px;">
+      <div class="spv-card" style="margin-bottom:14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; padding:16px 18px; box-shadow:0 3px 14px rgba(0,0,0,0.03);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
           <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 4px 12px rgba(239,68,68,0.3);">
+            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 3px 10px rgba(239,68,68,0.25);">
               <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
+                <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">
                   Early Warning Pipeline &amp; Run-Rate Tracker
                 </h3>
-                <span id="spvRadarHealthTag" style="font-size:11px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:800; padding:2px 9px; border-radius:20px;">
-                  <i class="fa-solid fa-circle-exclamation"></i> Radar Tim Aktif
+                <span id="spvRadarHealthTag" style="font-size:10px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:800; padding:2px 8px; border-radius:20px;">
+                  <i class="fa-solid fa-circle-exclamation"></i> Radar Aktif
                 </span>
               </div>
-              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
-                Deteksi otomatis SPK tertahan leasing, leads terbengkalai, dan kecepatan laju closing tim.
+              <p style="font-size:11.5px; color:#64748b; margin:2px 0 0 0;">
+                Deteksi otomatis SPK tertahan leasing, leads stagnant, dan ritme laju closing tim.
               </p>
             </div>
           </div>
 
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-sm" onclick="openTeamBroadcastModal()" style="background:#25D366; color:white; font-weight:800; font-size:12px; padding:8px 14px; border-radius:10px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 8px rgba(37,211,102,0.3);">
-              <i class="fa-brands fa-whatsapp"></i> Broadcast Instruksi Tim
+            <button class="btn btn-sm" onclick="openTeamBroadcastModal()" style="background:#25D366; color:white; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:5px; cursor:pointer; box-shadow:0 2px 6px rgba(37,211,102,0.25);">
+              <i class="fa-brands fa-whatsapp"></i> Broadcast Tim
             </button>
-            <button class="btn btn-sm" onclick="location.href='spv_coaching.html'" style="background:#f1f5f9; color:#0f172a; font-weight:800; font-size:12px; padding:8px 14px; border-radius:10px; border:1px solid #cbd5e1; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+            <button class="btn btn-sm" onclick="location.href='spv_coaching.html'" style="background:#f1f5f9; color:#0f172a; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px; border:1px solid #cbd5e1; display:inline-flex; align-items:center; gap:5px; cursor:pointer;">
               <i class="fa-solid fa-chalkboard-user"></i> Radar Coaching
             </button>
-            <button class="btn btn-sm" onclick="location.href='../pages/quotation.html'" style="background:linear-gradient(135deg, #d71920, #b91c1c); color:white; font-weight:800; font-size:12px; padding:8px 14px; border-radius:10px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 8px rgba(215,25,32,0.3);">
+            <button class="btn btn-sm" onclick="location.href='../pages/quotation.html'" style="background:linear-gradient(135deg, #d71920, #b91c1c); color:white; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:5px; cursor:pointer; box-shadow:0 2px 6px rgba(215,25,32,0.25);">
               <i class="fa-solid fa-file-invoice-dollar"></i> Studio SPH
             </button>
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:14px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
           <!-- Tile 1: SPK Tertahan Leasing -->
-          <div style="background:#fff1f2; border:1px solid #fecaca; border-radius:14px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="background:#fff1f2; border:1px solid #fecaca; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:11px; font-weight:800; color:#991b1b; text-transform:uppercase; letter-spacing:0.5px;">Leasing Stuck &gt; 5 Hari</span>
-                <h4 style="font-size:24px; font-weight:900; color:#b91c1c; margin:4px 0;" id="spvAlertStuckLeasing">0 <small style="font-size:13px; font-weight:700;">SPK</small></h4>
+                <span style="font-size:10px; font-weight:800; color:#991b1b; text-transform:uppercase; letter-spacing:0.5px;">Leasing Stuck &gt; 5 Hari</span>
+                <h4 style="font-size:20px; font-weight:900; color:#b91c1c; margin:2px 0;" id="spvAlertStuckLeasing">0 <small style="font-size:12px; font-weight:700;">SPK</small></h4>
               </div>
-              <div style="width:32px; height:32px; border-radius:8px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:14px;">
+              <div style="width:28px; height:28px; border-radius:7px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:13px;">
                 <i class="fa-solid fa-clock-rotate-left"></i>
               </div>
             </div>
-            <p style="font-size:11px; color:#b91c1c; margin:6px 0 0 0; line-height:1.4;" id="spvAlertStuckSub">
-              Menunggu approval leasing &gt; 5 hari kerja. Segera co-follow up ke AO terkait.
+            <p style="font-size:10.5px; color:#b91c1c; margin:4px 0 0 0; line-height:1.35;" id="spvAlertStuckSub">
+              Menunggu approval leasing &gt; 5 hari kerja. Segera follow up ke AO terkait.
             </p>
           </div>
 
           <!-- Tile 2: Hot Leads Stagnant -->
-          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:14px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:11px; font-weight:800; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">Hot Leads &gt; 48 Jam</span>
-                <h4 style="font-size:24px; font-weight:900; color:#d97706; margin:4px 0;" id="spvAlertHotLeads">0 <small style="font-size:13px; font-weight:700;">Prospek</small></h4>
+                <span style="font-size:10px; font-weight:800; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">Hot Leads &gt; 48 Jam</span>
+                <h4 style="font-size:20px; font-weight:900; color:#d97706; margin:2px 0;" id="spvAlertHotLeads">0 <small style="font-size:12px; font-weight:700;">Prospek</small></h4>
               </div>
-              <div style="width:32px; height:32px; border-radius:8px; background:#fef3c7; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:14px;">
+              <div style="width:28px; height:28px; border-radius:7px; background:#fef3c7; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:13px;">
                 <i class="fa-solid fa-fire"></i>
               </div>
             </div>
-            <p style="font-size:11px; color:#92400e; margin:6px 0 0 0; line-height:1.4;" id="spvAlertHotSub">
+            <p style="font-size:10.5px; color:#92400e; margin:4px 0 0 0; line-height:1.35;" id="spvAlertHotSub">
               Prospek siap beli belum dihubungi ulang. Dorong sales jadwalkan test drive.
             </p>
           </div>
 
           <!-- Tile 3: Sales Nihil Aktivitas Hari Ini -->
-          <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:14px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:11px; font-weight:800; color:#0369a1; text-transform:uppercase; letter-spacing:0.5px;">Sales Belum Check-in</span>
-                <h4 style="font-size:24px; font-weight:900; color:#0284c7; margin:4px 0;" id="spvAlertZeroActivity">0 <small style="font-size:13px; font-weight:700;">Sales</small></h4>
+                <span style="font-size:10px; font-weight:800; color:#0369a1; text-transform:uppercase; letter-spacing:0.5px;">Sales Belum Check-in</span>
+                <h4 style="font-size:20px; font-weight:900; color:#0284c7; margin:2px 0;" id="spvAlertZeroActivity">0 <small style="font-size:12px; font-weight:700;">Sales</small></h4>
               </div>
-              <div style="width:32px; height:32px; border-radius:8px; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:14px;">
+              <div style="width:28px; height:28px; border-radius:7px; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:13px;">
                 <i class="fa-solid fa-user-slash"></i>
               </div>
             </div>
-            <p style="font-size:11px; color:#0369a1; margin:6px 0 0 0; line-height:1.4;" id="spvAlertZeroSub">
+            <p style="font-size:10.5px; color:#0369a1; margin:4px 0 0 0; line-height:1.35;" id="spvAlertZeroSub">
               Belum ada geotag GPS check-in canvassing atau aktivitas tercatat hari ini.
             </p>
           </div>
 
           <!-- Tile 4: Run-Rate Velocity Speed -->
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Laju Closing Tim</span>
-                <h4 style="font-size:22px; font-weight:900; color:#0f172a; margin:4px 0;" id="spvRunRateVal">0.8 <small style="font-size:12px; font-weight:700;">SPK/Hari</small></h4>
+                <span style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Laju Closing Tim</span>
+                <h4 style="font-size:20px; font-weight:900; color:#0f172a; margin:2px 0;" id="spvRunRateVal">0.8 <small style="font-size:12px; font-weight:700;">SPK/Hari</small></h4>
               </div>
-              <div style="width:32px; height:32px; border-radius:8px; background:#f1f5f9; color:#475569; display:flex; align-items:center; justify-content:center; font-size:14px;">
+              <div style="width:28px; height:28px; border-radius:7px; background:#f1f5f9; color:#475569; display:flex; align-items:center; justify-content:center; font-size:13px;">
                 <i class="fa-solid fa-gauge-high"></i>
               </div>
             </div>
-            <p style="font-size:11px; color:#64748b; margin:6px 0 0 0; line-height:1.4;" id="spvRunRateSub">
-              Kecepatan yang dibutuhkan tim agar mencapai target 100% kuota.
+            <p style="font-size:10.5px; color:#64748b; margin:4px 0 0 0; line-height:1.35;" id="spvRunRateSub">
+              Kecepatan ritme closing yang dibutuhkan tim untuk mencapai 100% kuota.
             </p>
           </div>
         </div>
       </div>
 
       <!-- ===== TARGET & BRIEFING BANNER ===== -->
-      <div class="spv-card" style="margin-bottom:18px; background: linear-gradient(135deg, #101828 0%, #1e293b 100%); color: white; border: none; box-shadow: 0 10px 25px rgba(16, 24, 40, 0.25);">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div class="spv-card" style="margin-bottom:14px; background: linear-gradient(135deg, #101828 0%, #1e293b 100%); color: white; border: none; box-shadow: 0 4px 18px rgba(16, 24, 40, 0.2); padding:14px 18px; border-radius:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
-            <span style="background: rgba(255,255,255,0.15); color:#cbd5e1; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">
-              <i class="fa-solid fa-wand-magic-sparkles" style="color:#f59e0b;"></i> Smart SPV Assistant
-            </span>
-            <h3 style="font-size:20px; font-weight:800; color:white; margin:8px 0 4px;">Briefing Pagi & Broadcaster Tim Sales</h3>
-            <p style="font-size:13px; color:#94a3b8; margin:0;">Generate rangkuman evaluasi tim otomatis dan bagikan ke WhatsApp tim sales dalam 1-klik.</p>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="background: rgba(255,255,255,0.15); color:#cbd5e1; font-size:10px; font-weight:800; padding:2px 8px; border-radius:14px; text-transform:uppercase; letter-spacing:0.5px;">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color:#f59e0b;"></i> Smart SPV Assistant
+              </span>
+              <h3 style="font-size:15px; font-weight:800; color:white; margin:0;">Briefing Pagi &amp; Broadcaster Tim Sales</h3>
+            </div>
+            <p style="font-size:11.5px; color:#94a3b8; margin:3px 0 0 0;">Generate rangkuman evaluasi tim otomatis dan bagikan ke WhatsApp tim sales dalam 1-klik.</p>
           </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn" style="background:#25D366; color:white; font-weight:700; border:none; padding:10px 18px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="location.href='briefing_generator.html'">
-              <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Briefing Auto-Gen
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-sm" style="background:#25D366; color:white; font-weight:700; border:none; padding:7px 14px; border-radius:9px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;" onclick="location.href='briefing_generator.html'">
+              <i class="fa-brands fa-whatsapp" style="font-size:14px;"></i> Briefing Auto-Gen
             </button>
-            <button class="btn" style="background:rgba(255,255,255,0.12); color:white; font-weight:700; border:1px solid rgba(255,255,255,0.2); padding:10px 18px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="openDiscountCalcModal()">
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.12); color:white; font-weight:700; border:1px solid rgba(255,255,255,0.2); padding:7px 14px; border-radius:9px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;" onclick="openDiscountCalcModal()">
               <i class="fa-solid fa-calculator"></i> Approval Diskon Desk
             </button>
           </div>
@@ -248,62 +250,62 @@
       </div>
 
       <!-- ===== AREA OPERATION (AO) REPORT LIVE WIDGET ===== -->
-      <div class="spv-card" style="margin-bottom:18px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:16px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,0.04);">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1.5px solid #f1f5f9; padding-bottom:12px;">
+      <div class="spv-card" style="margin-bottom:14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; padding:14px 16px; box-shadow:0 3px 12px rgba(0,0,0,0.03);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
           <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:40px; height:40px; border-radius:12px; background:#e0f2fe; color:#0369a1; display:flex; align-items:center; justify-content:center; font-size:18px;">
+            <div style="width:36px; height:36px; border-radius:10px; background:#e0f2fe; color:#0369a1; display:flex; align-items:center; justify-content:center; font-size:16px;">
               <i class="fa-solid fa-chalkboard-user"></i>
             </div>
             <div>
-              <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
+              <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
                 Papan Area Operation (AO) Report
-                <span style="font-size:10.5px; background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:12px; font-weight:800; border:1px solid #bbf7d0;">
+                <span style="font-size:10px; background:#dcfce7; color:#15803d; padding:2px 7px; border-radius:12px; font-weight:800; border:1px solid #bbf7d0;">
                   <i class="fa-solid fa-circle-check"></i> Matching 86%
                 </span>
               </h3>
-              <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">
+              <p style="font-size:11.5px; color:#64748b; margin:2px 0 0 0;">
                 Pantauan ritme 5-harian SPK/DO, Matching Stock OS (42 Unit), dan Proyeksi Closing 104 Unit.
               </p>
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <button class="btn btn-sm" onclick="location.href='ao_report_spv.html'" style="background:linear-gradient(135deg, #1e293b, #0f172a); color:white; font-weight:800; font-size:12px; padding:8px 14px; border-radius:10px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(15,23,42,0.2);">
-              <i class="fa-solid fa-expand"></i> Buka Papan AO Report SPV
+            <button class="btn btn-sm" onclick="location.href='ao_report_spv.html'" style="background:linear-gradient(135deg, #1e293b, #0f172a); color:white; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:5px; cursor:pointer; box-shadow:0 2px 6px rgba(15,23,42,0.2);">
+              <i class="fa-solid fa-expand"></i> Buka AO Report
             </button>
           </div>
         </div>
 
         <div class="kpi-mini-grid">
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
-            <div style="font-size:11px; font-weight:700; color:#64748b;">Full Stock Cabang</div>
-            <div style="font-size:20px; font-weight:900; color:#0f172a; margin:2px 0;">124</div>
-            <div style="font-size:10px; font-weight:700; color:#0369a1;">Free: 82 | Match: 42</div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 6px;">
+            <div style="font-size:10.5px; font-weight:700; color:#64748b;">Full Stock Cabang</div>
+            <div style="font-size:18px; font-weight:900; color:#0f172a; margin:2px 0;">124</div>
+            <div style="font-size:9.5px; font-weight:700; color:#0369a1;">Free: 82 | Match: 42</div>
           </div>
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
-            <div style="font-size:11px; font-weight:700; color:#64748b;">OS Order &lt;30d</div>
-            <div style="font-size:20px; font-weight:900; color:#2563eb; margin:2px 0;">48</div>
-            <div style="font-size:10px; font-weight:700; color:#1d4ed8;">Firmed: 18 | Match: 30</div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 6px;">
+            <div style="font-size:10.5px; font-weight:700; color:#64748b;">OS Order &lt;30d</div>
+            <div style="font-size:18px; font-weight:900; color:#2563eb; margin:2px 0;">48</div>
+            <div style="font-size:9.5px; font-weight:700; color:#1d4ed8;">Firmed: 18 | Match: 30</div>
           </div>
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
-            <div style="font-size:11px; font-weight:700; color:#64748b;">SPK Gross Actual</div>
-            <div style="font-size:20px; font-weight:900; color:#d97706; margin:2px 0;">54</div>
-            <div style="font-size:10px; font-weight:700; color:#b45309;">Ritme: +14 Gap Positif</div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 6px;">
+            <div style="font-size:10.5px; font-weight:700; color:#64748b;">SPK Gross Actual</div>
+            <div style="font-size:18px; font-weight:900; color:#d97706; margin:2px 0;">54</div>
+            <div style="font-size:9.5px; font-weight:700; color:#b45309;">Ritme: +14 Gap Positif</div>
           </div>
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
-            <div style="font-size:11px; font-weight:700; color:#64748b;">DO Target Cabang</div>
-            <div style="font-size:20px; font-weight:900; color:#059669; margin:2px 0;">92</div>
-            <div style="font-size:10px; font-weight:700; color:#047857;">Potensi fr OS: 52</div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 6px;">
+            <div style="font-size:10.5px; font-weight:700; color:#64748b;">DO Target Cabang</div>
+            <div style="font-size:18px; font-weight:900; color:#059669; margin:2px 0;">92</div>
+            <div style="font-size:9.5px; font-weight:700; color:#047857;">Potensi fr OS: 52</div>
           </div>
-          <div style="background:linear-gradient(135deg, #fef3c7, #fde68a); border:1.5px solid #f59e0b; border-radius:12px; padding:10px;">
-            <div style="font-size:11px; font-weight:800; color:#92400e;">Est. Closing Bulan</div>
-            <div style="font-size:22px; font-weight:900; color:#78350f; margin:2px 0;">104</div>
-            <div style="font-size:10px; font-weight:800; color:#b45309;">+12 Over Target 🎉</div>
+          <div style="background:linear-gradient(135deg, #fef3c7, #fde68a); border:1px solid #f59e0b; border-radius:10px; padding:8px 6px;">
+            <div style="font-size:10.5px; font-weight:800; color:#92400e;">Est. Closing Bulan</div>
+            <div style="font-size:18px; font-weight:900; color:#78350f; margin:2px 0;">104</div>
+            <div style="font-size:9.5px; font-weight:800; color:#b45309;">+12 Over Target 🎉</div>
           </div>
         </div>
       </div>
 
       <!-- ===== TARGET & AKSES CEPAT ===== -->
-      <div class="grid-2" style="margin-bottom:18px;">
+      <div class="grid-2" style="margin-bottom:14px;">
         <section class="spv-card" style="animation-delay:0.14s;">
           <h3 class="card-label">Target &amp; Pencapaian Tim</h3>
 
@@ -622,7 +624,7 @@
   <script src="../js/spv_index.js?v=20260819_master"></script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
-  <script src="../js/spv_global.js"></script>
+  <script src="../js/spv_global.js?v=20260915_layout_executive_v34"></script>
 </body>
 
 </html>

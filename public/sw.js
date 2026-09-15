@@ -3,7 +3,7 @@
 // Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20260915-layout-perfect-v33';
+const CACHE_VERSION = 'sft-pwa-v20260915-layout-executive-v34';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',

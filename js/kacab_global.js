@@ -1,6 +1,14 @@
 // kacab_global.js — Fungsi bersama seluruh halaman Kacab:
 // guard login, render user, drawer mobile, dan pengambilan data hierarki cabang.
 
+if (typeof window !== 'undefined') {
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+  window.addEventListener('pageshow', () => { window.scrollTo(0, 0); });
+}
+
 function logoutUser() {
   try {
     localStorage.clear();

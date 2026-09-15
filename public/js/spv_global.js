@@ -1,5 +1,13 @@
 // spv_global.js - Global background polling, notification sound, and mobile drawer for all SPV pages
 
+if (typeof window !== 'undefined') {
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+    window.addEventListener('pageshow', () => { window.scrollTo(0, 0); });
+}
+
 // ── Global SPV Logout Function ──────────────────────────
 function logoutUser() {
     try {

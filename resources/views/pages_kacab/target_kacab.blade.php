@@ -6,35 +6,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Kelola Target Cabang</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_layout_perfect">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_layout_executive_v34">
   <style>
     /* Styling khusus Halaman Target Kacab */
     .target-summary-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .ts-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: 14px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
-      gap: 16px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      gap: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     }
 
     .ts-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
     .ts-icon.gold {
@@ -48,157 +49,189 @@
     }
 
     .ts-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--muted);
       margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .ts-val {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 900;
       color: var(--text);
     }
 
-    .target-card {
+    /* Executive Target Card & Toolbar */
+    .target-box-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      margin-bottom: 18px;
+      border-radius: 16px;
+      padding: 18px 20px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
     }
 
-    .tc-head {
+    .target-toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .tc-spv-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .tc-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #1e1014, #3b141d);
-      color: var(--gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .tc-spv-info h3 {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .tc-sub {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .tc-stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .tc-stat-box {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 16px;
-    }
-
-    .tc-stat-box .lbl {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .tc-stat-box .val {
-      font-size: 15px;
-      font-weight: 900;
-      color: var(--text);
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .tc-progress {
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-
-    .tc-progress .fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.4s ease;
-    }
-
-    .tc-stat-box .pct {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
-    .tc-model-breakdown {
-      background: var(--surface-2);
-      border-radius: 14px;
-      padding: 14px 16px;
-    }
-
-    .mb-title {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .model-chips {
-      display: flex;
+      gap: 10px;
       flex-wrap: wrap;
-      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .model-chip {
-      background: var(--surface);
+    .target-search-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .target-search-input {
+      position: relative;
+      min-width: 220px;
+      flex: 1;
+      max-width: 320px;
+    }
+
+    .target-search-input i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .target-search-input input {
+      width: 100%;
+      padding: 7px 12px 7px 34px;
+      border-radius: 9px;
+      border: 1.5px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 600;
+      background: var(--surface-2);
+      color: var(--text);
+      outline: none;
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
+
+    .target-search-input input:focus {
+      border-color: var(--gold);
+      background: #fff;
+    }
+
+    .target-filter-select {
+      padding: 7px 12px;
+      border-radius: 9px;
+      border: 1.5px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-2);
+      background: var(--surface-2);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .view-toggle-btns {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface-2);
+      padding: 3px;
+      border-radius: 9px;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 6px 12px;
+    }
+
+    .view-btn {
+      padding: 5px 11px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
+      gap: 5px;
+      transition: var(--transition);
     }
 
-    .model-chip .m-name {
-      font-weight: 600;
-      color: var(--text-2);
+    .view-btn.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
-    .model-chip .m-val {
-      font-weight: 900;
-      color: var(--gold-deep);
-      background: var(--gold-soft);
-      padding: 2px 6px;
-      border-radius: 6px;
+    /* Executive Target Table */
+    .table-target-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .table-target {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    .table-target th {
+      background: #f8fafc;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1.5px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .table-target td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .table-target tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-target tbody tr:hover {
+      background: #fbfcfe;
+    }
+
+    /* Target Compact Card Grid */
+    .target-grid-compact {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
+    }
+
+    .target-card-compact {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 15px 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .target-card-compact:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
     }
 
     /* Edit Modal */
@@ -336,9 +369,45 @@
         </div>
       </div>
 
-      <!-- TARGET MATRIX LIST -->
-      <div id="targetMatrixContainer">
-        <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat matriks target cabang...</p>
+      <!-- EXECUTIVE TARGET MATRIX & KUOTA CABANG -->
+      <div class="target-box-card">
+        <div class="target-toolbar">
+          <div class="target-search-group">
+            <div class="target-search-input">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchTargetInput" placeholder="Cari nama wiraniaga..." oninput="filterTargetMatrix()">
+            </div>
+            <select id="filterSpvTeamTarget" class="target-filter-select" onchange="filterTargetMatrix()">
+              <option value="Semua">Semua Tim SPV</option>
+              <option value="Ryan">Tim Pak Ryan</option>
+              <option value="Alvin">Tim Pak Alvin</option>
+              <option value="Riva">Tim Pak Riva</option>
+            </select>
+            <select id="filterTingkatanTarget" class="target-filter-select" onchange="filterTargetMatrix()">
+              <option value="Semua">Semua Tingkatan</option>
+              <option value="Trainee">Trainee</option>
+              <option value="Junior">Junior</option>
+              <option value="Senior">Senior</option>
+              <option value="Executive">Executive</option>
+            </select>
+            <span id="targetCountBadge" style="font-size:11.5px; font-weight:800; color:var(--muted); background:var(--surface-2); padding:5px 10px; border-radius:8px; border:1px solid var(--border);">
+              Memuat...
+            </span>
+          </div>
+
+          <div class="view-toggle-btns">
+            <button type="button" class="view-btn active" id="btnViewTable" onclick="setTargetViewMode('table')">
+              <i class="fa-solid fa-table-list"></i> Tabel Eksekutif
+            </button>
+            <button type="button" class="view-btn" id="btnViewGrid" onclick="setTargetViewMode('grid')">
+              <i class="fa-solid fa-grip"></i> Grid Kompak
+            </button>
+          </div>
+        </div>
+
+        <div id="targetMatrixContainer">
+          <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat matriks target cabang...</p>
+        </div>
       </div>
     </main>
   </div>
@@ -375,8 +444,8 @@
   </div>
 
   <script src="../custom_alert.js"></script>
-  <script src="../js/kacab_global.js?v=20260826_sheets_live"></script>
-  <script src="../js/kacab_target.js?v=20260826_sheets_live"></script>
+  <script src="../js/kacab_global.js?v=20260915_layout_executive_v34"></script>
+  <script src="../js/kacab_target.js?v=20260915_layout_executive_v34"></script>
 
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
