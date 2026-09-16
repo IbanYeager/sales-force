@@ -73,7 +73,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage || (hrefPage === 'polreg' && curPage === 'polreg_detail') || ((hrefPage === 'panduan' || hrefPage === 'panduan_alur_kerja_sales_app') && (curPage === 'panduan' || curPage === 'panduan_alur_kerja_sales_app')) || ((hrefPage === 'quotation' || hrefPage === 'sph') && (curPage === 'quotation' || curPage === 'sph'))) ? ' active' : '';
+            const isActive = (curPage === hrefPage || ((hrefPage === 'panduan' || hrefPage === 'panduan_alur_kerja_sales_app') && (curPage === 'panduan' || curPage === 'panduan_alur_kerja_sales_app')) || ((hrefPage === 'quotation' || hrefPage === 'sph') && (curPage === 'quotation' || curPage === 'sph'))) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -120,7 +120,6 @@
                 ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
-                ${navLinkKacab('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
                 ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
                 ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
@@ -155,7 +154,7 @@
             const cleanHref = href.replace(/\.html$/, '');
             const fullHref = prefix + cleanHref;
             let hrefPage = cleanHref.split('/').pop();
-            const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv') || (hrefPage === 'polreg' && curPage === 'polreg_detail') || ((hrefPage === 'panduan' || hrefPage === 'panduan_alur_kerja_sales_app') && (curPage === 'panduan' || curPage === 'panduan_alur_kerja_sales_app')) || ((hrefPage === 'quotation' || hrefPage === 'sph') && (curPage === 'quotation' || curPage === 'sph'))) ? ' active' : '';
+            const isActive = (curPage === hrefPage || (curPage === 'index' && hrefPage === 'index_spv') || ((hrefPage === 'panduan' || hrefPage === 'panduan_alur_kerja_sales_app') && (curPage === 'panduan' || curPage === 'panduan_alur_kerja_sales_app')) || ((hrefPage === 'quotation' || hrefPage === 'sph') && (curPage === 'quotation' || curPage === 'sph'))) ? ' active' : '';
             return `<a href="${fullHref}" class="sidebar-nav-link${isActive}"><i class="${icon}"></i> ${label}</a>`;
         }
 
@@ -201,7 +200,6 @@
                 ${navLinkSPV('pages_spv/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas <span class="sidebar-notif-badge" id="sidebarAktivitasBadge" style="display:none; margin-left:auto; background:#2563eb;">0</span>')}
                 ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-wand-magic-sparkles', 'Briefing Auto-Gen')}
                 ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
-                ${navLinkSPV('pages/polreg.html', 'fa-solid fa-chart-pie', 'Peta Polreg Wilayah')}
                 ${navLinkSPV('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
                 ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -12,7 +12,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=5.0" />
   <link rel="stylesheet" href="../css/polreg.css?v=5.0">
-  <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
+  <script>
+    // Proteksi role: Peta Polreg khusus Sales, arahkan SPV dan Kacab ke dashboard masing-masing
+    (function checkRoleRedirect() {
+      try {
+        const role = localStorage.getItem('peranSales');
+        if (role === 'Kepala Cabang') {
+          window.location.replace('../pages_kacab/index_kacab.html');
+        } else if (role === 'Supervisor') {
+          window.location.replace('../pages_spv/index_spv.html');
+        }
+      } catch(e) {}
+    })();
+  </script>
+  <script src="../js/sidebar_desktop.js?v=20260916_nopolreg"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 

@@ -10,7 +10,20 @@
   <link rel="stylesheet" href="../css/polreg_detail.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
+  <script>
+    // Proteksi role: Detail Polreg khusus Sales, arahkan SPV dan Kacab ke dashboard masing-masing
+    (function checkRoleRedirect() {
+      try {
+        const role = localStorage.getItem('peranSales');
+        if (role === 'Kepala Cabang') {
+          window.location.replace('../pages_kacab/index_kacab.html');
+        } else if (role === 'Supervisor') {
+          window.location.replace('../pages_spv/index_spv.html');
+        }
+      } catch(e) {}
+    })();
+  </script>
+  <script src="../js/sidebar_desktop.js?v=20260916_nopolreg"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 </head>
