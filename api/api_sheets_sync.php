@@ -99,8 +99,8 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
 
     $cache_file = __DIR__ . '/../storage/sheets_target_cache.csv';
     $candidate_urls = [
-        "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/gviz/tq?tqx=out:csv",
-        "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/export?format=csv"
+        "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/export?format=csv",
+        "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/gviz/tq?tqx=out:csv"
     ];
 
     $csvData = false;
@@ -158,7 +158,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
 
     // Ambil seluruh akun sales di database untuk pencocokan
     $sales_map = [];
-    $res_sales = $conn->query("SELECT id, username, nama_lengkap, nama_spv, tingkatan, is_active FROM sales_accounts");
+    $res_sales = $conn->query("SELECT id, username, nama_lengkap, nama_spv, tingkatan, is_active FROM sales_accounts ORDER BY is_active DESC, id ASC");
     if ($res_sales) {
         while ($row = $res_sales->fetch_assoc()) {
             $spv_key = normalizeName($row['nama_spv']);
@@ -193,7 +193,12 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         'pakriva_giyono' => 'giono',
         'pakriva_giono' => 'giyono',
         'pakriva_shovie' => 'shovia',
-        'pakriva_shovia' => 'shovie'
+        'pakriva_shovia' => 'shovie',
+        'burahma_fia' => 'fia',
+        'burahma_isna' => 'isna',
+        'burahma_neo' => 'neo',
+        'burahma_firzi' => 'firzi',
+        'burahma_tian' => 'tian'
     ];
 
     // Target baseline default jika belum ada target khusus
@@ -212,8 +217,13 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         'jajang' => ['target_spk' => 3, 'target_do' => 2], 'juarna' => ['target_spk' => 3, 'target_do' => 2],
         'galih_ryan' => ['target_spk' => 3, 'target_do' => 2], 'reza' => ['target_spk' => 3, 'target_do' => 2],
         'dadan' => ['target_spk' => 3, 'target_do' => 2], 'fani' => ['target_spk' => 3, 'target_do' => 2],
-        'igo' => ['target_spk' => 3, 'target_do' => 2], 'fia' => ['target_spk' => 5, 'target_do' => 2],
-        'rahma' => ['target_spk' => 3, 'target_do' => 2]
+        'igo' => ['target_spk' => 3, 'target_do' => 2],
+        'fia' => ['target_spk' => 4, 'target_do' => 3],
+        'isna' => ['target_spk' => 4, 'target_do' => 3],
+        'neo' => ['target_spk' => 4, 'target_do' => 3],
+        'firzi' => ['target_spk' => 2, 'target_do' => 2],
+        'tian' => ['target_spk' => 2, 'target_do' => 2],
+        'rahma' => ['target_spk' => 7, 'target_do' => 7]
     ];
 
     // Cek apakah format spreadsheet adalah Rekap 12-Bulan (Januari - Desember)
@@ -249,6 +259,9 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 continue;
             } elseif (stripos($full_row_text, 'Tim Pak Riva') !== false || (stripos($full_row_text, 'Riva') !== false && !is_numeric($c0))) {
                 $current_spv = "Pak Riva";
+                continue;
+            } elseif (stripos($full_row_text, 'Tim Bu Rahma') !== false || stripos($full_row_text, 'Bu Rahma') !== false || (stripos($c0, 'Bu Rahma') !== false && !is_numeric($c0))) {
+                $current_spv = "Bu Rahma";
                 continue;
             }
 
@@ -287,7 +300,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 $conn->query("UPDATE sales_accounts SET nama_spv = '$current_spv', is_active = 1 WHERE id = $sales_id");
             } else {
                 // Auto-create akun jika ada anggota baru di spreadsheet
-                $safe_spv_code = strtolower(str_replace('Pak ', '', $current_spv));
+                $safe_spv_code = strtolower(str_replace(['Pak ', 'Bu '], '', $current_spv));
                 $username = $norm_name . ($safe_spv_code ? '_' . $safe_spv_code : '');
                 $c_usr = $conn->query("SELECT id FROM sales_accounts WHERE username = '$username'");
                 if ($c_usr && $c_usr->num_rows > 0) {
@@ -399,10 +412,17 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 $current_spv = "Pak Alvin"; continue;
             } elseif (stripos($full_row_text, 'Tim Pak Riva') !== false || stripos($col0, 'Pak Riva') !== false || stripos($col1, 'Pak Riva') !== false) {
                 $current_spv = "Pak Riva"; continue;
+            } elseif (stripos($full_row_text, 'Tim Bu Rahma') !== false || stripos($col0, 'Bu Rahma') !== false || stripos($col1, 'Bu Rahma') !== false || (stripos($full_row_text, 'Bu Rahma') !== false && !is_numeric($col0))) {
+                $current_spv = "Bu Rahma"; continue;
+            }
+
+            // Fallback cerdas: jika setelah tim Pak Riva nomor urut kembali ke 1 dan nama adalah Fia/Neo/Firzi/Tian
+            if ($current_spv === 'Pak Riva' && $col0 === '1' && in_array(strtolower($col1), ['fia', 'neo', 'firzi', 'tian'])) {
+                $current_spv = "Bu Rahma";
             }
 
             // Validasi baris data: harus ada nomor urut di col0 dan nama sales di col1
-            if (!is_numeric($col0) || empty($col1) || stripos($col1, 'Sales') !== false || stripos($col1, 'Total') !== false) {
+            if (!is_numeric($col0) || empty($col1) || stripos($col1, 'Sales') !== false || stripos($col1, 'Total') !== false || stripos($col0, 'Jumlah') !== false) {
                 continue;
             }
 
@@ -463,7 +483,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 $sales_id = intval($matched['id']);
                 $conn->query("UPDATE sales_accounts SET nama_spv = '$current_spv', is_active = 1 WHERE id = $sales_id");
             } else {
-                $safe_spv_code = strtolower(str_replace('Pak ', '', $current_spv));
+                $safe_spv_code = strtolower(str_replace(['Pak ', 'Bu '], '', $current_spv));
                 $username = $norm_name . ($safe_spv_code ? '_' . $safe_spv_code : '');
                 $c_usr = $conn->query("SELECT id FROM sales_accounts WHERE username = '$username'");
                 if ($c_usr && $c_usr->num_rows > 0) {

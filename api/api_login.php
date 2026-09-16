@@ -132,8 +132,6 @@ function normalizePhotoUrl($foto) {
                 'irvan'      => ['name' => 'Irvan', 'spv' => 'Pak Ryan'],
                 'wendy'      => ['name' => 'Wendy', 'spv' => 'Pak Ryan'],
                 'rahma'      => ['name' => 'Rahma', 'spv' => 'Pak Ryan'],
-                'isna'       => ['name' => 'Isna Nurhayati', 'spv' => 'Pak Ryan'],
-                'neo'        => ['name' => 'Frederick Neo', 'spv' => 'Pak Ryan'],
 
                 // Tim Pak Alvin (17 Sales)
                 'dadi'       => ['name' => 'Dadi', 'spv' => 'Pak Alvin'],
@@ -176,7 +174,14 @@ function normalizePhotoUrl($foto) {
                 'reninurbayani' => ['name' => 'Reni Nurbayani', 'spv' => 'Pak Riva'],
                 'nuri'       => ['name' => 'Nuri Lestari Kristianty', 'spv' => 'Pak Riva'],
                 'nurilestari' => ['name' => 'Nuri Lestari Kristianty', 'spv' => 'Pak Riva'],
-                'uki'        => ['name' => 'Uki', 'spv' => 'Pak Riva']
+                'uki'        => ['name' => 'Uki', 'spv' => 'Pak Riva'],
+
+                // Tim Bu Rahma (5 Sales)
+                'fia'        => ['name' => 'Fia', 'spv' => 'Bu Rahma'],
+                'isna'       => ['name' => 'Isna Nurhayati', 'spv' => 'Bu Rahma'],
+                'neo'        => ['name' => 'Frederick Neo', 'spv' => 'Bu Rahma'],
+                'firzi'      => ['name' => 'Firzi', 'spv' => 'Bu Rahma'],
+                'tian'       => ['name' => 'Tian', 'spv' => 'Bu Rahma']
             ];
 
             $userLower = strtolower($username);

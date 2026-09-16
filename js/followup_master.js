@@ -4113,6 +4113,9 @@ function openSmartDistributionModal() {
               <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px;" onclick="filterDistSalesByTeam('Pak Riva')">
                 Tim Pak Riva
               </button>
+              <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px;" onclick="filterDistSalesByTeam('Bu Rahma')">
+                Tim Bu Rahma
+              </button>
               <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px; color:#ef4444 !important;" onclick="filterDistSalesByTeam('none')">
                 <i class="fa-solid fa-xmark"></i> Batal Pilih
               </button>

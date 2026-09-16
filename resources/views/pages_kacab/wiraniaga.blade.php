@@ -124,6 +124,7 @@
               <option value="Pak Ryan">Tim Pak Ryan</option>
               <option value="Pak Alvin">Tim Pak Alvin</option>
               <option value="Pak Riva">Tim Pak Riva</option>
+              <option value="Bu Rahma">Tim Bu Rahma</option>
             </select>
             <div class="search-box">
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -229,6 +230,7 @@
                 <option value="Pak Ryan">Pak Ryan</option>
                 <option value="Pak Alvin">Pak Alvin</option>
                 <option value="Pak Riva">Pak Riva</option>
+                <option value="Bu Rahma">Bu Rahma</option>
               </select>
             </div>
           </div>
