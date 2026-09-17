@@ -89,9 +89,3 @@ public/uploads/olx/*
 !public/uploads/olx/.gitkeep
 public/uploads/dokumen/*
 !public/uploads/dokumen/.gitkeep
-
-# Galeri aktivitas
-aktivitas/*
-!aktivitas/.gitkeep
-public/aktivitas/*
-!public/aktivitas/.gitkeep
