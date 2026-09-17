@@ -115,444 +115,438 @@
         </div>
       </div>
 
-      <!-- Main Interactive Whiteboard Container -->
-      <!-- Main Interactive Whiteboard Container (Replika Papan Tulis Kantor) -->
-      <div class="ao-board-container" id="aoBoardMainContainer">
+      <!-- Main Interactive Excel Workbook Container -->
+      <div class="ao-excel-workbook" id="aoExcelWorkbook">
         
-        <!-- Top Whiteboard Header & Toolbar -->
-        <div class="ao-board-top-strip">
-            <div class="ao-board-main-title-box">
-                <h1 class="ao-title-main">OPERATION REPORT</h1>
-                <div class="ao-board-date-hand" id="aoReportDate">31 Agustus 2026</div>
-            </div>
-
-            <div class="ao-board-logo-area">
-                <img src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png" 
-                     alt="Tunas Toyota" 
-                     style="height:26px; max-width:180px; object-fit:contain;" 
-                     onerror="this.style.display='none'; document.getElementById('txtLogoSpv').style.display='inline-flex';" />
-                <div class="ao-brand-badge-text" id="txtLogoSpv" style="display:none;">
-                    tunas <span class="toyota">TOYOTA</span> KIARACONDONG
+        <!-- Excel Application Titlebar -->
+        <div class="ao-excel-titlebar">
+            <div class="ao-excel-title-left">
+                <div class="excel-app-icon"><i class="fa-solid fa-file-excel"></i></div>
+                <div class="excel-title-text">
+                    <span class="workbook-name">AO TUNAS TOYOTA AUG 2026 - 01 AUG 2026.xlsx</span>
+                    <span class="sheet-sub">AREA OPERATION REPORT &bull; TUNAS NATIONAL KIARACONDONG</span>
                 </div>
+                <span class="excel-status-badge"><i class="fa-solid fa-circle-check"></i> Live Data</span>
             </div>
-
-            <!-- Quick Navigation Jump Bar -->
-            <div class="ao-nav-jump-bar">
-                <button class="ao-jump-pill active" onclick="aoScrollToSection('aoSec1')"><span class="marker-circle-mini">2</span> Stock Matching</button>
-                <button class="ao-jump-pill" onclick="aoScrollToSection('aoSec2')"><span class="marker-circle-mini">10</span> SPK Plan</button>
-                <button class="ao-jump-pill" onclick="aoScrollToSection('aoSec3')">MDP &amp; FFS</button>
-                <button class="ao-jump-pill" onclick="aoScrollToSection('aoSec4')"><span class="marker-circle-mini">1</span> Closing &amp; Gap</button>
-                <button class="ao-jump-pill" onclick="aoScrollToSection('aoSec5')">Supply &amp; FTS</button>
+            <div class="ao-excel-title-right">
+                <div class="excel-asof-date" id="aoReportDate">As of 01 Agustus 2026</div>
             </div>
+        </div>
 
-            <div class="ao-actions-toolbar">
-                <button class="btn-ao btn-ao-nav" onclick="aoScrollHorizontal(-350)" title="Geser ke Kiri"><i class="fa-solid fa-chevron-left"></i></button>
-                <button class="btn-ao btn-ao-nav" onclick="aoScrollHorizontal(350)" title="Geser ke Kanan"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn-ao btn-ao-projector" id="btnAoProjector" title="Mode Layar Penuh untuk Proyektor TV Rapat">
+        <!-- Excel Actions Toolbar -->
+        <div class="ao-excel-toolbar">
+            <div class="excel-toolbar-group">
+                <button class="btn-excel btn-excel-import" onclick="openAoImportModal()" title="Impor File Excel Update AO Report (.xlsx)">
+                    <i class="fa-solid fa-file-arrow-up" style="color:#2563eb;"></i> Impor File Excel AO
+                </button>
+                <button class="btn-excel" onclick="window.AOReportData.exportToCSV()" title="Unduh CSV Format Excel">
+                    <i class="fa-solid fa-download" style="color:#16a34a;"></i> Ekspor CSV
+                </button>
+            </div>
+            <div class="excel-toolbar-group">
+                <button class="btn-excel" id="btnAoProjector" title="Layar Penuh untuk Proyektor Rapat">
                     <i class="fa-solid fa-expand"></i> Mode Proyektor TV
                 </button>
-                <button class="btn-ao btn-ao-wa" id="btnAoSendWA" title="Bagikan Ringkasan AO ke WhatsApp">
+                <button class="btn-excel btn-excel-wa" id="btnAoSendWA" title="Bagikan Ringkasan AO ke WhatsApp">
                     <i class="fa-brands fa-whatsapp"></i> Broadcast WA
-                </button>
-                <button class="btn-ao btn-ao-export" id="btnAoExportCSV" title="Unduh Data Format Excel / CSV">
-                    <i class="fa-solid fa-file-excel" style="color:#16a34a;"></i> Ekspor CSV
-                </button>
-                <button class="btn-ao btn-ao-import" onclick="openAoImportModal()" title="Impor File Excel Update AO Report (.xlsx)">
-                    <i class="fa-solid fa-file-arrow-up" style="color:#2563eb;"></i> Impor Excel AO
                 </button>
             </div>
         </div>
 
-        <!-- Horizontal Panoramic Whiteboard Track -->
-        <div class="ao-whiteboard-horizontal-track" id="aoWhiteboardTrack">
+        <!-- Sheets Viewport (Tab Panes) -->
+        <div class="ao-sheets-viewport">
 
-            <!-- PANEL 1: SECTION 1: Stock Matching with OS (②) -->
-            <div class="ao-panel-card ao-panel-stock" id="aoSec1">
-                <div class="ao-section-heading">
-                    <span>Stock Matching with OS <span class="marker-circle">2</span></span>
-                </div>
-                <div class="ao-stock-flow-layout">
-                    <!-- Column 1: Full Stock -->
-                    <div class="ao-pillar-col">
-                        <div class="ao-pillar-head-val" id="wbFullStockTotal">46</div>
-                        <div class="ao-pillar-stack-body">
-                            <div class="ao-block-free">
-                                <span class="label">Free for sales</span>
-                                <span class="val" id="wbFullStockFree">30</span>
-                            </div>
-                            <div class="ao-block-match">
-                                <span class="label">match</span>
-                                <span class="val" id="wbFullStockMatch">16</span>
-                            </div>
+            <!-- ========================================================= -->
+            <!-- SHEET 1: AO Report(0) (Section A & B, Closing Estimation) -->
+            <!-- ========================================================= -->
+            <div class="ao-sheet-pane active" id="sheet_aoReport0">
+                
+                <!-- ROW 1: [A] Stock Matching with OS & Closing Estimation -->
+                <div class="ao-secA-row">
+                    <!-- Left: [A] Stock Matching with OS -->
+                    <div class="excel-table-card">
+                        <div class="excel-section-header">
+                            <span><i class="fa-solid fa-layer-group" style="color:#2563eb;"></i> [A] Stock Matching with OS</span>
+                            <span class="badge" style="background:#eff6ff; color:#1d4ed8; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #bfdbfe;">Lingkaran 2</span>
                         </div>
-                        <div class="ao-pillar-footer-title">Full Stock</div>
-                    </div>
-
-                    <!-- Column 2: Invoiceable Stock -->
-                    <div class="ao-pillar-col">
-                        <div class="ao-pillar-head-val" id="wbInvStockTotal">46</div>
-                        <div class="ao-pillar-stack-body">
-                            <div class="ao-block-free">
-                                <span class="label">Free for sales</span>
-                                <span class="val" id="wbInvStockFree">30</span>
-                            </div>
-                            <div class="ao-block-match">
-                                <span class="label">match</span>
-                                <span class="val" id="wbInvStockMatch">16</span>
-                            </div>
-                        </div>
-                        <div class="ao-pillar-footer-title">Invoiceable Stk</div>
-                    </div>
-
-                    <!-- Column 3: OS Order -->
-                    <div class="ao-pillar-col">
-                        <div class="ao-pillar-head-val" id="wbOsOrderTotal">29</div>
-                        <div class="ao-os-stack-body">
-                            <div class="ao-os-layer layer-gt60">
-                                <span>&gt;60 days</span>
-                                <span>match 0</span>
-                            </div>
-                            <div class="ao-os-layer layer-3060">
-                                <span>4 (30-60d)</span>
-                                <span>match 2</span>
-                            </div>
-                            <div class="ao-os-layer layer-gt60" style="font-size:7.5px;">
-                                <span>&gt;60 days</span>
-                                <span>firmed &amp; match 0</span>
-                            </div>
-                            <div class="ao-os-layer layer-3060" style="font-size:7.5px;">
-                                <span>30-60 days</span>
-                                <span>firmed &amp; match 0</span>
-                            </div>
-                            <div class="ao-os-layer layer-lt30-green">
-                                <div>firmed OS &lt;30 days</div>
-                                <div style="display:flex; justify-content:space-between; width:100%; font-size:11px; font-weight:900;">
-                                    <span>25</span>
-                                    <span>6 firmed</span>
+                        <div class="excel-table-scroll">
+                            <div class="ao-excel-pillars-grid">
+                                <!-- Pillar 1: Full Stock -->
+                                <div class="excel-pillar-box">
+                                    <div class="excel-pillar-head">Full Stock</div>
+                                    <div class="excel-pillar-total" id="wbFullStockTotal">123</div>
+                                    <div class="excel-pillar-body">
+                                        <div class="excel-sub-block bg-soft-blue">
+                                            <span>Free for sales</span>
+                                            <strong id="wbFullStockFree">81</strong>
+                                        </div>
+                                        <div class="excel-sub-block">
+                                            <span>Match</span>
+                                            <strong id="wbFullStockMatch">42</strong>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="ao-os-layer layer-lt30-yellow">
-                                <span style="font-size:12px; font-weight:900;">19</span>
-                                <span style="font-size:8px;">(PL + CPI)</span>
-                            </div>
-                        </div>
-                        <div class="ao-pillar-footer-title">OS Order</div>
-                    </div>
 
-                    <!-- Column 4: Stock Matching -->
-                    <div class="ao-pillar-col">
-                        <div class="ao-pillar-head-val" style="font-size:10px; padding:5px 0;">Stock Match</div>
-                        <div class="ao-sm-stack-body">
-                            <div class="ao-sm-top-row">
-                                <div class="ao-sm-top-cell">2 <span style="font-size:7px; display:block;">unfirmed &gt;30d</span></div>
-                                <div class="ao-sm-top-cell">2 <span style="font-size:7px; display:block;">unfirmed &lt;30d</span></div>
-                            </div>
-                            <div class="ao-sm-unmatch-box">
-                                <div style="font-weight:900; font-size:9px; margin-bottom:2px;"><span id="wbSmUnmatchTotal">10</span> unmatch</div>
-                                <div class="ao-sm-subrow"><span>1</span><span>firmed &gt;30d</span></div>
-                                <div class="ao-sm-subrow"><span>5</span><span>firmed &lt;30d</span></div>
-                                <div class="ao-sm-subrow"><span>4</span><span>unfirmed &lt;30d</span></div>
-                                <div class="ao-sm-subrow"><span>0</span><span>unfirmed &gt;30d</span></div>
-                            </div>
-                            <div class="ao-sm-match-box">
-                                <div style="font-weight:900; font-size:9px; margin-bottom:2px;"><span id="wbSmMatchTotal">16</span> match</div>
-                                <div class="ao-sm-subrow"><span>1</span><span>firmed &gt;30d</span></div>
-                                <div class="ao-sm-subrow"><span style="font-size:11px; font-weight:900;">15</span><span>(PL + CPI)</span></div>
-                            </div>
-                        </div>
-                        <div class="ao-pillar-footer-title">Matching</div>
-                    </div>
-
-                    <!-- Right of Section 1: KPI & 6-step staircase -->
-                    <div class="ao-stock-kpi-ladder-col">
-                        <div>
-                            <div class="ao-kpi-ratio-row">
-                                <span>MATCHING RATIO <strong style="font-size:16px;" id="wbMatchingRatioVal">34</strong> %</span>
-                                <span class="marker-circle">3</span>
-                            </div>
-                            <div class="ao-kpi-potential-row">
-                                <span>Total potential DO: <strong id="wbPotentialDoVal">16</strong></span>
-                                <span class="marker-circle">5</span>
-                            </div>
-                        </div>
-
-                        <div class="ao-staircase-chart-row">
-                            <div class="ao-pillar-sub-od">
-                                <div class="ao-sub-od-top">0 MDP</div>
-                                <div class="ao-sub-od-bot">16<br><span style="font-size:7.5px;">on hand</span></div>
-                            </div>
-
-                            <div class="ao-stairs-wrap">
-                                <div class="ao-stair-step step-1" title="1-5: 2"></div>
-                                <div class="ao-stair-step step-2" title="6-10: 3"></div>
-                                <div class="ao-stair-step step-3" title="11-15: 3"></div>
-                                <div class="ao-stair-step step-4" title="16-20: 3"></div>
-                                <div class="ao-stair-step step-5" title="21-25: 3"></div>
-                                <div class="ao-stair-step step-6" title="26-31: 2">16</div>
-                            </div>
-
-                            <div class="ao-pillar-gap-target">
-                                <div class="gap-top">
-                                    <span style="font-size:8px; display:block;">92 Tgt</span>
-                                    <span>GAP</span>
-                                    <div style="font-size:14px; font-weight:900;" id="wbGapTargetVal">76</div>
-                                    <span class="marker-circle" style="width:18px; height:18px; font-size:10px;">6</span>
+                                <!-- Pillar 2: Invoiceable Stock -->
+                                <div class="excel-pillar-box">
+                                    <div class="excel-pillar-head">Invoicable Stk</div>
+                                    <div class="excel-pillar-total" id="wbInvStockTotal">123</div>
+                                    <div class="excel-pillar-body">
+                                        <div class="excel-sub-block bg-soft-blue">
+                                            <span>Free for sales</span>
+                                            <strong id="wbInvStockFree">81</strong>
+                                        </div>
+                                        <div class="excel-sub-block">
+                                            <span>Match</span>
+                                            <strong id="wbInvStockMatch">42</strong>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mtd-bot">
-                                    <div style="font-size:14px; font-weight:900;" id="wbMtdActualVal">16</div>
-                                    <span style="font-size:8px;">MTD</span>
-                                    <span class="marker-circle" style="width:18px; height:18px; font-size:10px;">4</span>
+
+                                <!-- Pillar 3: OS Order -->
+                                <div class="excel-pillar-box">
+                                    <div class="excel-pillar-head">OS Order</div>
+                                    <div class="excel-pillar-total" id="wbOsOrderTotal">53</div>
+                                    <div class="excel-pillar-body">
+                                        <div class="excel-sub-block" style="background:#fee2e2; color:#991b1b; font-size:10px;">
+                                            <span>&gt;60 days</span>
+                                            <span>Match <strong id="wbOsGt60Match">0</strong></span>
+                                        </div>
+                                        <div class="excel-sub-block" style="background:#fef3c7; color:#92400e; font-size:10px;">
+                                            <span>30-60 days (<strong id="wbOs3060">4</strong>)</span>
+                                            <span>Match <strong id="wbOs3060Match">2</strong></span>
+                                        </div>
+                                        <div class="excel-sub-block bg-yellow" style="font-size:10px; flex-direction:column; align-items:flex-start;">
+                                            <span style="font-weight:700;">firmed OS &lt;30 days</span>
+                                            <div style="display:flex; justify-content:space-between; width:100%; margin-top:2px;">
+                                                <span>Firmed: <strong id="wbOsLt30Firmed">18</strong></span>
+                                                <span>PL+CPI: <strong id="wbOsLt30PlCpi">30</strong></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pillar 4: Stock Matching -->
+                                <div class="excel-pillar-box">
+                                    <div class="excel-pillar-head">Stock Matching</div>
+                                    <div class="excel-pillar-total" style="font-size:14px; padding:10px 4px;">
+                                        <span style="color:#16a34a;">Match <strong id="wbStockMatchTotal">42</strong></span>
+                                    </div>
+                                    <div class="excel-pillar-body">
+                                        <div class="excel-sub-block" style="font-size:10px;">
+                                            <span>Firmed &gt;30d:</span>
+                                            <strong id="wbStockMatchFirmedGt30">1</strong>
+                                        </div>
+                                        <div class="excel-sub-block" style="font-size:10px;">
+                                            <span>PL + CPI:</span>
+                                            <strong id="wbStockMatchPlCpi">41</strong>
+                                        </div>
+                                        <div class="excel-sub-block" style="background:#f1f5f9; font-size:10px;">
+                                            <span>Unmatch:</span>
+                                            <strong id="wbStockUnmatchTotal" style="color:#dc2626;">5</strong>
+                                        </div>
+                                        <div class="excel-sub-block" style="font-size:9.5px;">
+                                            <span>firmed &gt;30d: <strong id="wbStockUnmatchFirmedGt30">1</strong></span>
+                                            <span>firmed &lt;30d: <strong id="wbStockUnmatchFirmedLt30">4</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pillar 5: Matching Ratio & Potential -->
+                                <div class="excel-pillar-box" style="background:#f8fafc;">
+                                    <div class="excel-pillar-head" style="background:#e2e8f0;">MATCHING RATIO</div>
+                                    <div style="padding:14px 6px; text-align:center;">
+                                        <div style="font-size:24px; font-weight:900; color:#1e40af;" id="wbKpiMatchRatio">79%</div>
+                                        <div style="font-size:10px; color:#64748b; margin-top:2px;">Rasio Kecocokan OS</div>
+                                    </div>
+                                    <div class="excel-pillar-body" style="padding:6px 8px; border-top:1px solid #e2e8f0; font-size:11px;">
+                                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                            <span>Total Potential DO:</span>
+                                            <strong id="wbKpiPotentialDO" style="color:#15803d;">53</strong>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                            <span>Target DO:</span>
+                                            <strong id="wbKpiTargetDO">92</strong>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between;">
+                                            <span>MTD Actual:</span>
+                                            <strong id="wbKpiMtdActual" class="badge" style="background:#dbeafe; color:#1e40af; padding:1px 6px;">10</strong>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- PANEL 2: SECTION 2: Matching Stock from Order / SPK Plan (⑩) -->
-            <div class="ao-panel-card ao-panel-spk" id="aoSec2">
-                <div class="ao-section-heading">
-                    <div>
-                        <span>Matching Stock from Order &mdash; SPK plan</span>
-                        <span class="marker-circle">10</span>
+                    <!-- Right: Closing Estimation Table -->
+                    <div class="excel-table-card">
+                        <div class="excel-section-header">
+                            <span><i class="fa-solid fa-calculator" style="color:#16a34a;"></i> Closing Estimation</span>
+                            <span class="badge" style="background:#f0fdf4; color:#166534; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #bbf7d0;">Lingkaran 1</span>
+                        </div>
+                        <div class="excel-table-scroll">
+                            <table class="excel-grid">
+                                <thead>
+                                    <tr>
+                                        <th class="cell-left">Parameter Estimasi</th>
+                                        <th style="width:70px;">Vol</th>
+                                        <th style="width:70px;">% Tgt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background:#f8fafc; font-weight:800;">
+                                        <td class="cell-left">OAP Target</td>
+                                        <td class="cell-right" id="wbCloseOapTarget">92</td>
+                                        <td class="cell-center">100%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-left">[A] Matching with Outstanding</td>
+                                        <td class="cell-right cell-bold" id="wbCloseMatchOS">53</td>
+                                        <td class="cell-center" id="wbCloseMatchOSPct">58%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-left">[B] New Order (SPK)</td>
+                                        <td class="cell-right cell-bold" id="wbCloseNewSPK">39</td>
+                                        <td class="cell-center" id="wbCloseNewSPKPct">42%</td>
+                                    </tr>
+                                    <tr class="bg-amber-light" style="font-weight:900;">
+                                        <td class="cell-left">Total Estimasi Closing [A+B]</td>
+                                        <td class="cell-right" id="wbCloseTotalEst">92</td>
+                                        <td class="cell-center" id="wbCloseTotalEstPct">100%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-left">Total Invoicable Stock</td>
+                                        <td class="cell-right" id="wbCloseInvStock">133</td>
+                                        <td class="cell-center">-</td>
+                                    </tr>
+                                    <tr class="bg-light-green" style="font-weight:800;">
+                                        <td class="cell-left">Efficiency (STO)</td>
+                                        <td class="cell-right" id="wbCloseEffSTO">69%</td>
+                                        <td class="cell-center"><i class="fa-solid fa-check" style="color:#16a34a;"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-                <div class="ao-spk-section-grid">
-                    <div>
-                        <table class="ao-table-wb">
+
+                <!-- ROW 2: [B] Matching Stock from Order (SPK Plan) -->
+                <div class="excel-table-card">
+                    <div class="excel-section-header">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span><i class="fa-solid fa-bullseye" style="color:#d97706;"></i> [B] Matching Stock from Order &mdash; SPK Plan</span>
+                            <span class="badge" style="background:#fef3c7; color:#92400e; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">Lingkaran 10</span>
+                        </div>
+                        <div style="font-size:11.5px; font-weight:700; color:#475569;">
+                            Effective to N RS: <strong class="bg-amber" style="padding:2px 8px; border-radius:4px;" id="wbEffectiveNRS">76</strong>
+                            &nbsp;&bull;&nbsp;
+                            For N+1 RS: <strong style="padding:2px 8px; border-radius:4px; background:#e2e8f0;" id="wbForNPlus1RS">42</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: minmax(650px, 1.8fr) minmax(280px, 1fr); gap:12px; padding:10px;">
+                        <!-- SPK Plan Grid Table -->
+                        <div class="excel-table-scroll">
+                            <table class="excel-grid">
+                                <thead>
+                                    <tr>
+                                        <th class="cell-left" style="min-width:140px;">Metrik SPK</th>
+                                        <th style="width:50px;">TTL</th>
+                                        <th>1-5</th>
+                                        <th>6-10</th>
+                                        <th>11-15</th>
+                                        <th>16-20</th>
+                                        <th>21-25</th>
+                                        <th>26-31</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wbSpkPlanTableBody">
+                                    <!-- Injected dynamically by ao_report.js -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Stepped Visualizer (Nett SPK 5-daily stairs) -->
+                        <div style="border:1px solid var(--excel-border); border-radius:6px; background:#ffffff; display:flex; flex-direction:column;">
+                            <div style="background:#f8fafc; border-bottom:1px solid var(--excel-border); padding:6px 10px; font-size:11px; font-weight:800; color:#334155; display:flex; justify-content:space-between;">
+                                <span>Nett SPK Visualize (5-Harian)</span>
+                                <span style="color:#16a34a;"><i class="fa-solid fa-arrow-trend-up"></i> Target 114</span>
+                            </div>
+                            <div class="spk-step-container" id="wbSpkStepProgression">
+                                <!-- Injected dynamically -->
+                            </div>
+                            <div style="padding:6px 10px; font-size:10.5px; color:#64748b; background:#f8fafc; border-top:1px solid var(--excel-border); display:flex; justify-content:space-between;">
+                                <span>Cancel Ratio 3m: <strong>4%</strong></span>
+                                <span>Loan Rejection: <strong>2%</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 3: MDP Plan & FFS Selling Plan -->
+                <div class="excel-table-card">
+                    <div class="excel-section-header">
+                        <span><i class="fa-solid fa-chart-line" style="color:#0284c7;"></i> MDP Plan &amp; FFS Selling Plan</span>
+                        <div style="font-size:11.5px; color:#475569;">
+                            OH Stock: <strong id="wbMdpOHStock">38</strong> &bull; Total Supply: <strong id="wbMdpTtlSupply">129</strong> &bull; From New Order: <strong id="wbFromNewOrderVal">76</strong>
+                        </div>
+                    </div>
+                    <div class="excel-table-scroll" style="padding:10px;">
+                        <table class="excel-grid">
                             <thead>
                                 <tr>
-                                    <th rowspan="2" style="text-align:left;">Metrik SPK</th>
-                                    <th rowspan="2">TTL</th>
-                                    <th colspan="5" style="background:#e0f2fe; color:#0369a1;">Effective to N RS: 76</th>
-                                    <th colspan="1" style="background:#fef08a; color:#854d0e;">N+1: 42</th>
-                                </tr>
-                                <tr>
+                                    <th class="cell-left">Periode FFS</th>
                                     <th>1-5</th>
                                     <th>6-10</th>
                                     <th>11-15</th>
                                     <th>16-20</th>
                                     <th>21-25</th>
                                     <th>26-31</th>
+                                    <th>Full Month</th>
                                 </tr>
                             </thead>
-                            <tbody id="wbSpkTableBody">
-                                <!-- Injected by js -->
+                            <tbody>
+                                <tr>
+                                    <td class="cell-left cell-bold">FFS Accumulative Plan</td>
+                                    <td>38</td><td>44</td><td>53</td><td>67</td><td>82</td><td>94</td><td class="cell-bold bg-peach">111</td>
+                                </tr>
+                                <tr class="bg-light-green">
+                                    <td class="cell-left cell-bold">Actual DO Accumulative</td>
+                                    <td>0</td><td>0</td><td>8</td><td>17</td><td>27</td><td>39</td><td class="cell-bold">39</td>
+                                </tr>
+                                <tr>
+                                    <td class="cell-left">[B] RS / FFS MTD Ratio</td>
+                                    <td>0%</td><td>0%</td><td>12%</td><td>21%</td><td>29%</td><td>35%</td><td class="cell-bold bg-light-green">35%</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="ao-spk-right-pane">
-                        <div class="ao-cancel-ratio-box">
-                            <span style="font-weight:900;">Cancel ratio:</span>
-                            <div style="display:flex; gap:8px; margin-top:2px;">
-                                <span>3m: <strong id="wbCancel3mAvg">4%</strong></span>
-                                <span>Loan rej: <strong id="wbLoanRej">2%</strong></span>
-                            </div>
-                        </div>
-
-                        <div class="ao-nett-visual-row">
-                            <div style="flex:1;">
-                                <div style="font-size:9.5px; font-weight:900; color:#2563eb; margin-bottom:2px;">
-                                    <i class="fa-solid fa-arrow-right"></i> Nett SPK Visualize
-                                </div>
-                                <div class="ao-stairs-wrap" style="height:75px;">
-                                    <div class="ao-stair-step step-1">19</div>
-                                    <div class="ao-stair-step step-2">19</div>
-                                    <div class="ao-stair-step step-3">19</div>
-                                    <div class="ao-stair-step step-4">19</div>
-                                    <div class="ao-stair-step step-5">19</div>
-                                    <div class="ao-stair-step step-6">19</div>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; font-size:7.5px; font-weight:800; color:#64748b; margin-top:2px;">
-                                    <span>1-5</span><span>6-10</span><span>11-15</span><span>16-20</span><span>21-25</span><span>26-31</span>
-                                </div>
-                                <div style="font-size:9px; font-weight:900; text-align:center; margin-top:1px;">RS plan</div>
-                            </div>
-
-                            <div style="display:flex; flex-direction:column; align-items:center;">
-                                <div class="ao-arrow-avg-days">
-                                    <i class="fa-solid fa-arrows-left-right"></i> Avg 8d<br>SPK-AFI
-                                </div>
-
-                                <div class="ao-pillar-become-os">
-                                    <div class="top-os">
-                                        <div style="font-size:8px;">114</div>
-                                        <div>19</div>
-                                        <div style="font-size:12px; font-weight:900;" id="wbPillarBecomeOs">38</div>
-                                        <span style="font-size:7.5px;">Become OS</span>
-                                    </div>
-                                    <div class="bot-rs">
-                                        <div style="font-size:14px; font-weight:900;" id="wbPillarEffMonthRS">76</div>
-                                        <span style="font-size:7.5px;">Effective RS</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
+
             </div>
 
-            <!-- PANEL 3: SECTION 3: MDP Plan & FFS Selling Plan -->
-            <div class="ao-panel-card ao-panel-mdp" id="aoSec3">
-                <div class="ao-section-heading">
-                    <span>MDP &amp; FFS selling plan</span>
-                </div>
-                <div class="ao-mdp-section-grid">
-                    <div class="ao-pillar-mdp-split">
-                        <div style="padding:2px; font-size:11px; font-weight:900;" id="wbMdpPillarTotal">32</div>
-                        <div class="ao-mdp-top-slice" id="wbMdpSliceGreen">2</div>
-                        <div class="ao-mdp-bot-slice" id="wbMdpSliceBlue">30</div>
+            <!-- ========================================================= -->
+            <!-- SHEET 2: Action Plan (Supply, Alokasi & FTS 24 Model)       -->
+            <!-- ========================================================= -->
+            <div class="ao-sheet-pane" id="sheet_actionPlan">
+                <div class="excel-table-card">
+                    <div class="excel-section-header">
+                        <span><i class="fa-solid fa-truck-ramp-box" style="color:#2563eb;"></i> Action Plan &mdash; Supply, Alokasi &amp; FTS per Model Kendaraan</span>
+                        <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #bae6fd;">24 Model Resmi</span>
                     </div>
-
-                    <div class="ao-pillar-ffs-oh">
-                        <div style="font-size:13px; font-weight:900;" id="wbFfsPillarVal">46</div>
-                        <span style="font-size:8.5px;">FFS</span>
-                    </div>
-
-                    <div class="ao-ffs-truck-ladder-wrap">
-                        <div style="font-size:9.5px; font-weight:900; color:#2563eb; margin-bottom:2px;">
-                            <i class="fa-solid fa-arrow-right"></i> FFS selling plan
-                        </div>
-                        <div class="ao-truck-stairs">
-                            <div class="ao-truck-step" style="height:25%;"><i class="fa-solid fa-truck"></i></div>
-                            <div class="ao-truck-step" style="height:40%;"><i class="fa-solid fa-truck"></i></div>
-                            <div class="ao-truck-step" style="height:55%;"><i class="fa-solid fa-truck"></i></div>
-                            <div class="ao-truck-step" style="height:70%;"><i class="fa-solid fa-truck"></i></div>
-                            <div class="ao-truck-step" style="height:85%;"><i class="fa-solid fa-truck"></i></div>
-                            <div class="ao-truck-step" style="height:100%;"><i class="fa-solid fa-truck"></i></div>
-                        </div>
-                        <div class="ao-truck-accum-boxes">
-                            <div class="ao-truck-accum-box">46</div>
-                            <div class="ao-truck-accum-box">52</div>
-                            <div class="ao-truck-accum-box">72</div>
-                            <div class="ao-truck-accum-box">95</div>
-                            <div class="ao-truck-accum-box">117</div>
-                            <div class="ao-truck-accum-box">125</div>
-                        </div>
-
-                        <div class="ao-rs-steps-under">
-                            <div class="ao-rs-step-bar">19</div>
-                            <div class="ao-rs-step-bar">19</div>
-                            <div class="ao-rs-step-bar">19</div>
-                            <div class="ao-rs-step-bar">19</div>
-                            <div class="ao-rs-step-bar">19</div>
-                            <div class="ao-rs-step-bar">19</div>
-                        </div>
-                        <div class="ao-accum-rs-vals">
-                            <span>0</span><span>0</span><span>8</span><span>17</span><span>27</span><span>40</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; font-size:7.5px; font-weight:800; color:#64748b; margin-top:2px;">
-                            <span>1-5</span><span>6-10</span><span>11-15</span><span>16-20</span><span>21-25</span><span>26-31</span>
-                            <span style="font-weight:900; color:#0f172a;">Accum. RS / FFS MTD</span>
-                        </div>
-                    </div>
-
-                    <div class="ao-pillar-from-new-order">
-                        <div style="font-size:15px; font-weight:900;" id="wbFromNewOrderVal">76</div>
-                        <span style="font-size:8.5px; display:block; margin-top:2px;">From new order</span>
-                        <span class="marker-circle" style="width:18px; height:18px; font-size:10px; margin-top:6px;">8</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANEL 4: SECTION 4: Closing Estimation (①) & Table 1 Model Gap -->
-            <div class="ao-panel-card ao-panel-closing" id="aoSec4">
-                <div class="ao-section-heading">
-                    <span>Closing Estimation <span class="marker-circle">1</span> &amp; Model Gap OS</span>
-                </div>
-
-                <div class="ao-closing-estimation-card">
-                    <table class="ao-closing-table-compact">
-                        <tbody>
-                            <tr>
-                                <th style="text-align:left;">OAP Target</th>
-                                <td class="th-gold" id="wbCloseOapTarget">92</td>
-                                <th style="text-align:left;">[A] Match w/ OS</th>
-                                <td id="wbCloseMatchOS">29</td>
-                            </tr>
-                            <tr>
-                                <th style="text-align:left;">[B] New Order (SPK)</th>
-                                <td id="wbCloseNewSPK">76</td>
-                                <th style="text-align:left;">Total Estimasi [A+B]</th>
-                                <td style="font-weight:900;" id="wbCloseTotalEst">92</td>
-                            </tr>
-                            <tr>
-                                <th style="text-align:left;">Total Inv. Stock</th>
-                                <td class="td-blue" id="wbCloseInvStock">46</td>
-                                <th style="text-align:left;">Efficiency (STO)</th>
-                                <td style="font-weight:900;" id="wbCloseEffSTO">24%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="ao-model-table-wrap">
-                    <table class="ao-model-table">
-                        <thead>
-                            <tr>
-                                <th rowspan="2" class="ao-th-yellow ao-col-model-name">Model</th>
-                                <th rowspan="2" class="ao-th-yellow">Gap OS<br><span style="font-size:7.5px;">TOTAL</span></th>
-                                <th colspan="5" class="ao-th-green">Match &amp; Unfirmed (PL + CPI)</th>
-                                <th rowspan="2" class="ao-th-red">Firmed</th>
-                                <th rowspan="2" class="ao-th-red">P.Loan</th>
-                                <th rowspan="2" class="ao-th-red">UNMATCH</th>
-                            </tr>
-                            <tr>
-                                <th class="ao-th-green">1 Mgg</th>
-                                <th class="ao-th-green">2 Mgg</th>
-                                <th class="ao-th-green">3 Mgg</th>
-                                <th class="ao-th-green">4 Mgg</th>
-                                <th class="ao-th-yellow">TOTAL</th>
-                            </tr>
-                        </thead>
-                        <tbody id="wbTable1Body">
-                            <!-- Injected by js -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- PANEL 5: SECTION 5: Table 2 Supply, Alokasi & FTS -->
-            <div class="ao-panel-card ao-panel-supply" id="aoSec5">
-                <div class="ao-section-heading">
-                    <span>Supply, Alokasi &amp; FTS Bulanan</span>
-                </div>
-                <div class="ao-table2-layout">
-                    <div class="ao-side-param-box">
-                        <div class="title">PARAM</div>
-                        <div><strong>N+1 OP:</strong> 114</div>
-                        <div style="margin-top:3px;"><strong>CKD SPK:</strong> 38</div>
-                        <div style="margin-top:3px;"><strong>Comp:</strong> 76</div>
-                    </div>
-
-                    <div class="ao-model-table-wrap" style="max-height:100%;">
-                        <table class="ao-model-table">
+                    <div class="excel-table-scroll">
+                        <table class="excel-grid">
                             <thead>
                                 <tr>
-                                    <th class="ao-col-model-name">Model</th>
-                                    <th class="ao-th-yellow">Stock</th>
-                                    <th class="ao-th-blue">MDP<br><span style="font-size:6.5px;">in/out</span></th>
-                                    <th>2nd Allo</th>
-                                    <th>C/O</th>
-                                    <th class="ao-th-peach">TTL Supply</th>
-                                    <th>DO<br><span style="font-size:6.5px;">act</span></th>
-                                    <th>Match</th>
-                                    <th class="ao-th-peach">FTS</th>
-                                    <th>SPK</th>
-                                    <th>DO</th>
-                                    <th class="ao-th-green">Net FTS</th>
+                                    <th style="width:36px;">No</th>
+                                    <th class="cell-left" style="min-width:180px;">Model Kendaraan</th>
+                                    <th class="bg-yellow" style="width:65px;">Stock</th>
+                                    <th class="bg-soft-blue-light" style="width:65px;">MDP<br><span style="font-size:9px; font-weight:normal;">in/out</span></th>
+                                    <th style="width:65px;">2nd Allo</th>
+                                    <th style="width:55px;">C/O</th>
+                                    <th class="bg-peach" style="width:80px;">TTL Supply</th>
+                                    <th style="width:65px;">DO<br><span style="font-size:9px; font-weight:normal;">act</span></th>
+                                    <th style="width:70px;">Stock Match</th>
+                                    <th class="bg-peach" style="width:70px;">FTS</th>
+                                    <th style="width:60px;">SPK</th>
+                                    <th style="width:60px;">DO</th>
+                                    <th class="bg-netfts" style="width:75px;">Net FTS</th>
                                 </tr>
                             </thead>
                             <tbody id="wbTable2Body">
-                                <!-- Injected by js -->
+                                <!-- Injected dynamically by ao_report.js -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-        </div></div>
+            <!-- ========================================================= -->
+            <!-- SHEET 3: by MDL (Gap from OS & Matching)                  -->
+            <!-- ========================================================= -->
+            <div class="ao-sheet-pane" id="sheet_byMdl">
+                <div class="excel-table-card">
+                    <div class="excel-section-header">
+                        <span><i class="fa-solid fa-list-check" style="color:#d97706;"></i> by MDL &mdash; Gap from OS &amp; Matching per Model Kendaraan</span>
+                        <span class="badge" style="background:#fef3c7; color:#92400e; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">Distribusi Mingguan</span>
+                    </div>
+                    <div class="excel-table-scroll">
+                        <table class="excel-grid">
+                            <thead>
+                                <tr>
+                                    <th style="width:36px;">No</th>
+                                    <th class="cell-left" style="min-width:180px;">Model</th>
+                                    <th style="width:80px;">Gap from OS</th>
+                                    <th style="width:65px;">1 Minggu</th>
+                                    <th style="width:65px;">2 Minggu</th>
+                                    <th style="width:65px;">3 Minggu</th>
+                                    <th style="width:65px;">4 Minggu</th>
+                                    <th class="bg-yellow" style="width:80px;">Total Match</th>
+                                    <th class="bg-netfts" style="width:70px;">Firmed</th>
+                                    <th style="width:70px;">P. Loan</th>
+                                    <th style="width:75px;">UNMATCH</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wbTable1Body">
+                                <!-- Injected dynamically by ao_report.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- SHEET 4: Ringkasan Eksekutif                              -->
+            <!-- ========================================================= -->
+            <div class="ao-sheet-pane" id="sheet_ringkasan">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:18px;">
+                    <div style="background:#ffffff; border:1.5px solid #d0d7de; border-radius:8px; padding:14px; border-left:4px solid #2563eb;">
+                        <div style="font-size:11.5px; font-weight:700; color:#64748b;">TOTAL FULL STOCK</div>
+                        <div style="font-size:26px; font-weight:900; color:#0f172a; margin:4px 0;" id="sumFullStock">123</div>
+                        <div style="font-size:11px; color:#2563eb;">Free: <strong id="sumFreeStock">81</strong> &bull; Match: <strong id="sumMatchStock">42</strong></div>
+                    </div>
+                    <div style="background:#ffffff; border:1.5px solid #d0d7de; border-radius:8px; padding:14px; border-left:4px solid #eab308;">
+                        <div style="font-size:11.5px; font-weight:700; color:#64748b;">OUTSTANDING ORDER (OS)</div>
+                        <div style="font-size:26px; font-weight:900; color:#0f172a; margin:4px 0;" id="sumOsOrder">53</div>
+                        <div style="font-size:11px; color:#ca8a04;">Matching Ratio: <strong id="sumMatchRatio">79%</strong></div>
+                    </div>
+                    <div style="background:#ffffff; border:1.5px solid #d0d7de; border-radius:8px; padding:14px; border-left:4px solid #16a34a;">
+                        <div style="font-size:11.5px; font-weight:700; color:#64748b;">OAP TARGET CABANG</div>
+                        <div style="font-size:26px; font-weight:900; color:#0f172a; margin:4px 0;" id="sumOapTarget">92</div>
+                        <div style="font-size:11px; color:#16a34a;">Total Closing Est: <strong id="sumEstClosing">92</strong> (100%)</div>
+                    </div>
+                    <div style="background:#ffffff; border:1.5px solid #d0d7de; border-radius:8px; padding:14px; border-left:4px solid #8b5cf6;">
+                        <div style="font-size:11.5px; font-weight:700; color:#64748b;">STO EFFICIENCY</div>
+                        <div style="font-size:26px; font-weight:900; color:#0f172a; margin:4px 0;" id="sumStoEff">69%</div>
+                        <div style="font-size:11px; color:#7c3aed;">Optimal Stock Turnover</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Excel Bottom Sheet Tabs Bar -->
+        <div class="ao-excel-tabbar">
+            <div class="excel-tab-scroll-nav">
+                <button class="excel-tab-nav-btn" onclick="switchAoTabStep(-1)" title="Lembar Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="excel-tab-nav-btn" onclick="switchAoTabStep(1)" title="Lembar Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="excel-tabs-list">
+                <button class="excel-tab-item active" id="tabBtn_aoReport0" onclick="switchAoSheet('aoReport0')">
+                    <i class="fa-solid fa-table-cells" style="color:#107c41;"></i> AO Report(0)
+                </button>
+                <button class="excel-tab-item" id="tabBtn_actionPlan" onclick="switchAoSheet('actionPlan')">
+                    <i class="fa-solid fa-truck-ramp-box" style="color:#2563eb;"></i> Action Plan (Supply &amp; FTS)
+                </button>
+                <button class="excel-tab-item" id="tabBtn_byMdl" onclick="switchAoSheet('byMdl')">
+                    <i class="fa-solid fa-list-check" style="color:#d97706;"></i> by MDL (Gap OS)
+                </button>
+                <button class="excel-tab-item" id="tabBtn_ringkasan" onclick="switchAoSheet('ringkasan')">
+                    <i class="fa-solid fa-chart-pie" style="color:#8b5cf6;"></i> Ringkasan Eksekutif
+                </button>
+            </div>
+        </div>
+
       </div>
     </main>
   </div>
