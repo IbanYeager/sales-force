@@ -188,12 +188,131 @@ function closeGalleryLightbox() {
   }
 }
 
-function shareCurrentPhoto() {
+let toastTimer = null;
+function showGalleryToast(htmlContent, type = 'info', duration = 3500) {
+  const toast = document.getElementById('galleryToast');
+  if (!toast) return;
+  if (toastTimer) clearTimeout(toastTimer);
+  toast.innerHTML = htmlContent;
+  toast.classList.add('show');
+  if (duration > 0) {
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, duration);
+  }
+}
+
+function hideGalleryToast() {
+  const toast = document.getElementById('galleryToast');
+  if (toast) toast.classList.remove('show');
+}
+
+function convertBlobToPng(blob) {
+  return new Promise((resolve) => {
+    if (blob.type === 'image/png') {
+      return resolve(blob);
+    }
+    const img = new Image();
+    const url = URL.createObjectURL(blob);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob((pngBlob) => {
+        resolve(pngBlob || blob);
+      }, 'image/png');
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(blob);
+    };
+    img.src = url;
+  });
+}
+
+async function shareCurrentPhoto() {
   const item = currentFilteredPhotos[currentLightboxIndex];
   if (!item) return;
-  const encodedUrl = window.location.origin + '/sft/' + item.file_url;
-  const text = `Dokumentasi Foto Aktivitas Tunas Toyota:\n📸 Foto: ${encodedUrl}`;
-  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+
+  const btn = document.getElementById('lightboxShareWABtn');
+  if (btn) btn.disabled = true;
+
+  showGalleryToast('<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px;"></i> Menyiapkan foto untuk WhatsApp...', 'info', 0);
+
+  try {
+    const encodedUrl = '../' + item.file_url;
+    const res = await fetch(encodedUrl);
+    if (!res.ok) throw new Error('Gagal mengunduh file foto.');
+    
+    const blob = await res.blob();
+    const mimeType = blob.type || 'image/jpeg';
+    const filename = item.file_name || 'foto_aktivitas.jpeg';
+    const photoFile = new File([blob], filename, { type: mimeType });
+
+    // 1. Kirim BERKAS FOTO LANGSUNG via Web Share API (Didukung penuh di HP Android & iOS)
+    let canShareFile = false;
+    try {
+      canShareFile = navigator.canShare && navigator.canShare({ files: [photoFile] });
+    } catch (e) {
+      canShareFile = false;
+    }
+
+    if (canShareFile) {
+      hideGalleryToast();
+      await navigator.share({
+        files: [photoFile],
+        title: 'Foto Aktivitas Tunas Toyota'
+      });
+      if (btn) btn.disabled = false;
+      return;
+    }
+
+    // 2. Fallback untuk Desktop / Komputer / Browser Tanpa Web Share File:
+    // Salin foto langsung ke Clipboard agar bisa langsung di-Paste (Ctrl+V) di chat WhatsApp
+    let copiedToClipboard = false;
+    try {
+      const pngBlob = await convertBlobToPng(blob);
+      if (navigator.clipboard && window.ClipboardItem) {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': pngBlob })
+        ]);
+        copiedToClipboard = true;
+      }
+    } catch (clipErr) {
+      console.warn('Clipboard write image failed:', clipErr);
+    }
+
+    // Unduh otomatis file foto agar siap di-drag/lampirkan
+    const dlLink = document.createElement('a');
+    dlLink.href = URL.createObjectURL(blob);
+    dlLink.download = filename;
+    document.body.appendChild(dlLink);
+    dlLink.click();
+    document.body.removeChild(dlLink);
+
+    // Buka WhatsApp Web
+    window.open('https://web.whatsapp.com/', '_blank');
+
+    if (copiedToClipboard) {
+      showGalleryToast('<i class="fa-solid fa-circle-check" style="color:#10b981; margin-right:6px;"></i> Foto telah disalin! Tekan <b>Ctrl + V</b> (Paste) langsung di chat WhatsApp.', 'success', 5000);
+    } else {
+      showGalleryToast('<i class="fa-solid fa-circle-check" style="color:#10b981; margin-right:6px;"></i> Foto telah diunduh! Silakan lampirkan langsung ke chat WhatsApp.', 'success', 5000);
+    }
+
+  } catch (err) {
+    console.error('Error sharing photo:', err);
+    if (err.name === 'AbortError') {
+      // User membatalkan dialog share
+      hideGalleryToast();
+    } else {
+      showGalleryToast('<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; margin-right:6px;"></i> Gagal membagikan foto.', 'error', 3000);
+    }
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 // Keyboard shortcuts for lightbox navigation

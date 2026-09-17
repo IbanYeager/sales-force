@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -71,7 +71,7 @@
         <span style="font-size: 13px; font-weight: 800;" id="lightboxDateLabel">Foto Aktivitas</span>
       </div>
       <div style="display: flex; gap: 10px; align-items: center;">
-        <button type="button" style="background: rgba(255,255,255,0.15); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px;" onclick="shareCurrentPhoto()" title="Share WhatsApp">
+        <button type="button" id="lightboxShareWABtn" style="background: #25D366; border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(37,211,102,0.4);" onclick="shareCurrentPhoto()" title="Kirim Foto ke WhatsApp">
           <i class="fa-brands fa-whatsapp"></i>
         </button>
         <a id="lightboxDownloadBtn" href="#" download style="background: rgba(255,255,255,0.15); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; text-decoration: none;" title="Unduh Foto">
@@ -105,7 +105,10 @@
     </div>
   </div>
 
-  <script src="../js/riwayat_foto_aktivitas.js?v=20260905_pameran_event"></script>
+  <!-- Floating Gallery Toast Notification -->
+  <div id="galleryToast" class="gallery-toast-notification"></div>
+
+  <script src="../js/riwayat_foto_aktivitas.js?v=20260917_wa_direct_photo"></script>
 </body>
 
 </html>
