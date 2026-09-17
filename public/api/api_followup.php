@@ -94,11 +94,11 @@ function auto_expire_pending_followups() {
     try {
         $thresholdTime = date('Y-m-d H:i:s', strtotime('-2 days'));
 
-        // Find customers that have been in 'Customer pending' for more than 2 days
+        // Find customers that have been in 'Customer pending' or 'Menunggu respon' for more than 2 days
         $sqlFind = "
             SELECT id, name, remarks, followup_status, followup_date, last_contacted_at, updated_at
             FROM followup_customers
-            WHERE (remarks = 'Customer pending' OR remarks LIKE '%pending%')
+            WHERE (remarks = 'Menunggu respon' OR remarks = 'Customer pending' OR remarks LIKE '%pending%' OR remarks LIKE '%menunggu respon%')
               AND followup_status != 'Deal / Selesai'
               AND (
                 (followup_date IS NOT NULL AND followup_date != '' AND followup_date <= ?)
@@ -308,6 +308,7 @@ if ($action === 'dashboard_analytics') {
             'SPK berhasil' => 0,
             'Customer tertarik' => 0,
             'Customer janjian' => 0,
+            'Menunggu respon' => 0,
             'Customer pending' => 0,
             'Customer menolak' => 0,
             'Customer tidak aktif' => 0,
@@ -333,8 +334,8 @@ if ($action === 'dashboard_analytics') {
                 $responseBreakdown['Customer tertarik']++;
             } elseif (stripos($rem, 'janjian') !== false) {
                 $responseBreakdown['Customer janjian']++;
-            } elseif (stripos($rem, 'pending') !== false) {
-                $responseBreakdown['Customer pending']++;
+            } elseif (stripos($rem, 'pending') !== false || stripos($rem, 'menunggu respon') !== false) {
+                $responseBreakdown['Menunggu respon']++;
             } elseif (stripos($rem, 'menolak') !== false) {
                 $responseBreakdown['Customer menolak']++;
             } elseif (stripos($rem, 'tidak aktif') !== false) {
@@ -350,7 +351,7 @@ if ($action === 'dashboard_analytics') {
             if ($hasFu) $cust_fu++;
 
             // Connected: calls/WA that connected
-            $isConnected = ($conn || $cont || $prosp || $isSpk || in_array($rem, ['SPK berhasil', 'Customer tertarik', 'Customer janjian', 'Customer pending', 'Customer menolak']));
+            $isConnected = ($conn || $cont || $prosp || $isSpk || in_array($rem, ['SPK berhasil', 'Customer tertarik', 'Customer janjian', 'Menunggu respon', 'Customer pending', 'Customer menolak']));
             if ($isConnected) $connected++;
 
             // Contacted: 2-way communication established (Connected minus 'Customer Tidak Diangkat' & 'Customer tidak aktif')
@@ -1230,7 +1231,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $connected = 'TRUE';
         $contacted = 'TRUE';
         $prospect = 'TRUE';
-        if ($remarks === '' || $remarks === 'Customer pending' || $remarks === 'Customer menolak' || $remarks === 'Customer tidak diangkat' || $remarks === 'Customer tidak aktif') {
+        if ($remarks === '' || $remarks === 'Customer pending' || $remarks === 'Menunggu respon' || $remarks === 'Customer menolak' || $remarks === 'Customer tidak diangkat' || $remarks === 'Customer tidak aktif') {
             $remarks = 'Customer tertarik';
         }
         if (!$status || $status === 'Belum Dihubungi' || $status === 'Tidak Tertarik') {
@@ -1249,7 +1250,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     } else {
         // 6. Default / Menunggu Respon: Connected = TRUE, tapi Contacted/Prospect/SPK masih kosong (menunggu respon customer)
         if ($connected === 'TRUE') {
-            if ($remarks === '') $remarks = 'Customer pending';
+            if ($remarks === '' || $remarks === 'Customer pending') $remarks = 'Menunggu respon';
             if (!$status || $status === 'Belum Dihubungi') {
                 $status = 'Menunggu Respon';
             }

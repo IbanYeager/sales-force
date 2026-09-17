@@ -372,6 +372,7 @@ function renderChartResponseDistribution(responses) {
     'SPK berhasil',
     'Customer tertarik',
     'Customer janjian',
+    'Menunggu respon',
     'Customer pending',
     'Customer menolak',
     'Customer tidak aktif'
@@ -2161,7 +2162,8 @@ function openEditSingleCustomerModal(customerId) {
                 <option value="Minta simulasi kredit" ${c.remarks === 'Minta simulasi kredit' ? 'selected' : ''}>Minta simulasi kredit</option>
                 <option value="Janjian test drive" ${c.remarks === 'Janjian test drive' ? 'selected' : ''}>Janjian test drive</option>
                 <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>SPK berhasil</option>
-                <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending</option>
+                <option value="Menunggu respon" ${(c.remarks === 'Menunggu respon' || c.remarks === 'Customer pending') ? 'selected' : ''}>Menunggu respon</option>
+                <option value="Customer pending" style="display:none;" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending</option>
                 <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>Customer menolak</option>
                 <option value="Beli di dealer/merk lain" ${c.remarks === 'Beli di dealer/merk lain' ? 'selected' : ''}>Beli di dealer/merk lain</option>
                 <option value="Customer tidak aktif" ${c.remarks === 'Customer tidak aktif' ? 'selected' : ''}>Customer tidak aktif</option>
@@ -2342,7 +2344,7 @@ function handleSingleModalTamChange(field) {
       if (elSalesFuStatus) elSalesFuStatus.value = 'Closed';
     } else if (connectedVal === 'TRUE') {
       if (elRemarks && elRemarks.value === 'Customer tidak aktif') {
-        elRemarks.value = 'Customer pending';
+        elRemarks.value = 'Menunggu respon';
       }
     }
   } else if (field === 'contacted') {
@@ -2356,7 +2358,7 @@ function handleSingleModalTamChange(field) {
     } else if (contactedVal === 'TRUE') {
       elConnected.value = 'TRUE';
       if (elRemarks && (elRemarks.value === 'Customer tidak aktif' || elRemarks.value === 'Customer tidak diangkat')) {
-        elRemarks.value = 'Customer pending';
+        elRemarks.value = 'Menunggu respon';
       }
     }
   } else if (field === 'prospect') {
@@ -2393,7 +2395,7 @@ function handleSingleModalTamChange(field) {
         if (elStatus) elStatus.value = 'Tertarik / Jadwal Servis';
         if (elSalesFuStatus) elSalesFuStatus.value = 'Open';
       } else {
-        if (elRemarks) elRemarks.value = 'Customer pending';
+        if (elRemarks) elRemarks.value = 'Menunggu respon';
       }
     }
   }
@@ -2604,6 +2606,7 @@ function openBatchEditModal(initialScope = null) {
                   <option value="Minta simulasi kredit">Minta simulasi kredit</option>
                   <option value="Janjian test drive">Janjian test drive</option>
                   <option value="SPK berhasil">SPK berhasil</option>
+                  <option value="Menunggu respon">Menunggu respon</option>
                   <option value="Customer pending">Customer pending</option>
                   <option value="Customer menolak">Customer menolak</option>
                   <option value="Beli di dealer/merk lain">Beli di dealer/merk lain</option>

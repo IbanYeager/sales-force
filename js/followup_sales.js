@@ -1105,7 +1105,8 @@ function renderSingleCustomerCardHtml(c, num) {
                 <option value="SPK berhasil" ${c.remarks === 'SPK berhasil' ? 'selected' : ''}>SPK Berhasil / Closing Deal</option>
               </optgroup>
               <optgroup label="FOLLOW-UP LANJUTAN">
-                <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending (Follow-Up Lanjut)</option>
+                <option value="Menunggu respon" ${(c.remarks === 'Menunggu respon' || c.remarks === 'Customer pending') ? 'selected' : ''}>Menunggu respon (Follow-Up Lanjut)</option>
+                <option value="Customer pending" style="display:none;" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending</option>
                 <option value="Tunggu gajian/dana" ${c.remarks === 'Tunggu gajian/dana' ? 'selected' : ''}>Menunggu Gajian / Dana Siap</option>
                 <option value="Cek harga mobil lama" ${c.remarks === 'Cek harga mobil lama' ? 'selected' : ''}>Proses Cek Harga Trade-In</option>
               </optgroup>
@@ -1460,7 +1461,8 @@ function renderCustomerTableView(list) {
             <option value="">-- Remarks --</option>
             <option value="Customer janjian" ${c.remarks === 'Customer janjian' ? 'selected' : ''}>Customer janjian</option>
             <option value="Customer menolak" ${c.remarks === 'Customer menolak' ? 'selected' : ''}>Customer menolak</option>
-            <option value="Customer pending" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending</option>
+            <option value="Menunggu respon" ${(c.remarks === 'Menunggu respon' || c.remarks === 'Customer pending') ? 'selected' : ''}>Menunggu respon</option>
+            <option value="Customer pending" style="display:none;" ${c.remarks === 'Customer pending' ? 'selected' : ''}>Customer pending</option>
             <option value="Customer tertarik" ${c.remarks === 'Customer tertarik' ? 'selected' : ''}>Customer tertarik</option>
             <option value="Customer tidak aktif" ${c.remarks === 'Customer tidak aktif' ? 'selected' : ''}>Customer tidak aktif</option>
             <option value="Customer tidak diangkat" ${c.remarks === 'Customer tidak diangkat' ? 'selected' : ''}>Customer tidak diangkat</option>
@@ -1590,9 +1592,9 @@ function setFuToggle(customerId, field, value) {
     c.spk = 'FALSE';
     c.remarks = 'Customer tidak aktif';
   } else if (field === 'connected' && value === 'TRUE') {
-    // Kalo connected IYA -> jika sebelumnya tidak aktif, ubah ke pending
+    // Kalo connected IYA -> jika sebelumnya tidak aktif, ubah ke Menunggu respon
     if (!c.remarks || c.remarks === 'Customer tidak aktif') {
-      c.remarks = 'Customer pending';
+      c.remarks = 'Menunggu respon';
     }
   } else if (field === 'contacted' && value === 'FALSE') {
     // 2. Kalo contacted TIDAK -> otomatis remarks 'Customer tidak diangkat'
@@ -1600,10 +1602,10 @@ function setFuToggle(customerId, field, value) {
     c.spk = 'FALSE';
     c.remarks = 'Customer tidak diangkat';
   } else if (field === 'contacted' && value === 'TRUE') {
-    // Kalo contacted IYA -> otomatis connected IYA & remarks 'Customer pending'
+    // Kalo contacted IYA -> otomatis connected IYA & remarks 'Menunggu respon'
     c.connected = 'TRUE';
     if (!c.remarks || c.remarks === 'Customer tidak aktif' || c.remarks === 'Customer tidak diangkat') {
-      c.remarks = 'Customer pending';
+      c.remarks = 'Menunggu respon';
     }
   } else if (field === 'prospect' && value === 'TRUE') {
     // 3. Kalo prospect IYA -> otomatis connected, contacted & remarks 'Customer tertarik'
@@ -1625,9 +1627,9 @@ function setFuToggle(customerId, field, value) {
     c.remarks = 'SPK berhasil';
     c.sales_fu_status = 'Closed';
   } else if (field === 'spk' && value === 'FALSE') {
-    // Kalo SPK TIDAK -> jika sebelumnya SPK berhasil, kembalikan ke tertarik / pending & status Open
+    // Kalo SPK TIDAK -> jika sebelumnya SPK berhasil, kembalikan ke tertarik / Menunggu respon & status Open
     if (c.remarks === 'SPK berhasil') {
-      c.remarks = (c.prospect === 'TRUE') ? 'Customer tertarik' : 'Customer pending';
+      c.remarks = (c.prospect === 'TRUE') ? 'Customer tertarik' : 'Menunggu respon';
       c.sales_fu_status = 'Open';
     }
   }
@@ -2676,7 +2678,7 @@ async function executeSendWhatsApp() {
   const contactedVal = (isDeal || isInterested) ? 'TRUE' : (isRejected ? 'FALSE' : '');
   const prospectVal = (isDeal || isInterested) ? 'TRUE' : (isRejected ? 'FALSE' : '');
   const spkVal = isDeal ? 'TRUE' : (isRejected ? 'FALSE' : '');
-  const remarksVal = isDeal ? 'SPK berhasil' : (isInterested ? 'Customer tertarik' : (isRejected ? 'Customer menolak' : 'Customer pending'));
+  const remarksVal = isDeal ? 'SPK berhasil' : (isInterested ? 'Customer tertarik' : (isRejected ? 'Customer menolak' : 'Menunggu respon'));
   const salesFuStatusVal = (isDeal || isRejected) ? 'Closed' : 'Open';
 
   // Optimistic UI updates in-place without page reset / DOM rebuild
@@ -3510,7 +3512,7 @@ async function runBackgroundBlastLoop() {
           contacted: '',
           prospect: '',
           spk: '',
-          remarks: 'Customer pending',
+          remarks: 'Menunggu respon',
           sales_fu_status: 'Open'
         });
 
@@ -3525,7 +3527,7 @@ async function runBackgroundBlastLoop() {
             contacted: '',
             prospect: '',
             spk: '',
-            remarks: 'Customer pending',
+            remarks: 'Menunggu respon',
             sales_fu_status: 'Open',
             notes: `Follow up otomatis via Auto-Blast WA (${currentTmpl.title || 'Template'})`,
             reason_followup: `Auto-Blast WA Gateway (${currentTmpl.title || 'Template'})`,
@@ -3749,7 +3751,7 @@ async function executeSendCurrentBlastCustomer() {
     contacted: '',
     prospect: '',
     spk: '',
-    remarks: 'Customer pending',
+    remarks: 'Menunggu respon',
     sales_fu_status: 'Open'
   });
 
@@ -3764,7 +3766,7 @@ async function executeSendCurrentBlastCustomer() {
         contacted: '',
         prospect: '',
         spk: '',
-        remarks: 'Customer pending',
+        remarks: 'Menunggu respon',
         sales_fu_status: 'Open',
         notes: `Follow up otomatis via Auto-Blast WA (${currentTmpl.title || 'Template'})`,
         reason_followup: `Auto-Blast WhatsApp (${currentTmpl.title || 'Template'})`,
