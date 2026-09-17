@@ -599,27 +599,370 @@ $raw_data = [
     ]
 ];
 
-// Opsi bulan yang tersedia
-$available_months = [
-    'Januari 2026',
-    'Februari 2026',
-    'Maret 2026',
-    'April 2026',
-    'Mei 2026',
-    'Juni 2026',
-    'Juli 2026'
-];
+// ════════════════════════════════════════════════════════════════
+// DATABASE INTEGRATION & AUTO-SEEDING (MySQL & SQLite Fallback)
+// ════════════════════════════════════════════════════════════════
+$is_db_ready = false;
+$sqlite_pdo = null;
 
-// Filter data berdasar bulan
-$filtered_data = [];
-if ($month_filter !== 'all' && in_array($month_filter, $available_months)) {
-    foreach ($raw_data as $row) {
-        if ($row['month'] === $month_filter) {
-            $filtered_data[] = $row;
+if (isset($conn) && $conn instanceof mysqli && !$conn->connect_error) {
+    try {
+        $conn->query("
+            CREATE TABLE IF NOT EXISTS tabel_olx_pencapaian (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                month VARCHAR(50) NOT NULL,
+                sales VARCHAR(100) NOT NULL,
+                spv VARCHAR(100) NOT NULL,
+                merk VARCHAR(100) NOT NULL,
+                type VARCHAR(150) NOT NULL,
+                tahun INT NOT NULL,
+                warna VARCHAR(50) DEFAULT '',
+                harga BIGINT NOT NULL DEFAULT 0,
+                km VARCHAR(50) DEFAULT '',
+                pajak VARCHAR(50) DEFAULT 'ON',
+                ket VARCHAR(255) DEFAULT '',
+                hasil VARCHAR(50) NOT NULL DEFAULT 'Nego',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+
+        $chk = $conn->query("SELECT COUNT(*) as c FROM tabel_olx_pencapaian");
+        if ($chk && ($cRow = $chk->fetch_assoc()) && intval($cRow['c']) === 0) {
+            $stmt = $conn->prepare("INSERT INTO tabel_olx_pencapaian (month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            if ($stmt) {
+                foreach ($raw_data as $rd) {
+                    $stmt->bind_param("sssssisissss", 
+                        $rd['month'], $rd['sales'], $rd['spv'], $rd['merk'], $rd['type'],
+                        $rd['tahun'], $rd['warna'], $rd['harga'], $rd['km'], $rd['pajak'],
+                        $rd['ket'], $rd['hasil']
+                    );
+                    $stmt->execute();
+                }
+                $stmt->close();
+            }
+        }
+        $is_db_ready = true;
+    } catch (Throwable $e) {}
+}
+
+if (!$is_db_ready) {
+    try {
+        $sqlite_path = __DIR__ . '/olx_pencapaian.sqlite';
+        $sqlite_pdo = new PDO("sqlite:" . $sqlite_path);
+        $sqlite_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $sqlite_pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        $sqlite_pdo->exec("
+            CREATE TABLE IF NOT EXISTS tabel_olx_pencapaian (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                month TEXT NOT NULL,
+                sales TEXT NOT NULL,
+                spv TEXT NOT NULL,
+                merk TEXT NOT NULL,
+                type TEXT NOT NULL,
+                tahun INTEGER NOT NULL,
+                warna TEXT DEFAULT '',
+                harga INTEGER NOT NULL DEFAULT 0,
+                km TEXT DEFAULT '',
+                pajak TEXT DEFAULT 'ON',
+                ket TEXT DEFAULT '',
+                hasil TEXT NOT NULL DEFAULT 'Nego',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+        ");
+
+        $cnt = $sqlite_pdo->query("SELECT COUNT(*) as c FROM tabel_olx_pencapaian")->fetch()['c'];
+        if (intval($cnt) === 0) {
+            $stmt = $sqlite_pdo->prepare("INSERT INTO tabel_olx_pencapaian (month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $sqlite_pdo->beginTransaction();
+            foreach ($raw_data as $rd) {
+                $stmt->execute([
+                    $rd['month'], $rd['sales'], $rd['spv'], $rd['merk'], $rd['type'],
+                    $rd['tahun'], $rd['warna'], $rd['harga'], $rd['km'], $rd['pajak'],
+                    $rd['ket'], $rd['hasil']
+                ]);
+            }
+            $sqlite_pdo->commit();
+        }
+        $is_db_ready = true;
+    } catch (Throwable $e) {}
+}
+
+// ════════════════════════════════════════════════════════════════
+// REST API ENDPOINTS: POST (CREATE, UPDATE, STATUS, DELETE)
+// ════════════════════════════════════════════════════════════════
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'POST') {
+    $rawInput = file_get_contents('php://input');
+    $input = json_decode($rawInput, true);
+    if (!is_array($input)) $input = $_POST;
+    $action = $input['action'] ?? '';
+
+    if ($action === 'add') {
+        $month = trim($input['month'] ?? date('F Y'));
+        $sales = trim($input['sales'] ?? '');
+        $spv = trim($input['spv'] ?? '');
+        $merk = trim($input['merk'] ?? 'Toyota');
+        $type = trim($input['type'] ?? '');
+        $tahun = intval($input['tahun'] ?? date('Y'));
+        $warna = trim($input['warna'] ?? '');
+        $harga = floatval($input['harga'] ?? 0);
+        $km = trim($input['km'] ?? '');
+        $pajak = trim($input['pajak'] ?? 'ON');
+        $ket = trim($input['ket'] ?? '');
+        $hasil = trim($input['hasil'] ?? 'Nego');
+
+        if (!$sales || !$type) {
+            echo json_encode(['status' => 'error', 'message' => 'Nama wiraniaga dan tipe kendaraan wajib diisi!']);
+            exit;
+        }
+
+        if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
+            $stmt = $conn->prepare("INSERT INTO tabel_olx_pencapaian (month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssisissss", $month, $sales, $spv, $merk, $type, $tahun, $warna, $harga, $km, $pajak, $ket, $hasil);
+            $stmt->execute();
+            $newId = $conn->insert_id;
+            $stmt->close();
+            echo json_encode(['status' => 'success', 'message' => 'Data trade-in berhasil ditambahkan!', 'id' => $newId]);
+            exit;
+        } elseif ($sqlite_pdo) {
+            $stmt = $sqlite_pdo->prepare("INSERT INTO tabel_olx_pencapaian (month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$month, $sales, $spv, $merk, $type, $tahun, $warna, $harga, $km, $pajak, $ket, $hasil]);
+            $newId = $sqlite_pdo->lastInsertId();
+            echo json_encode(['status' => 'success', 'message' => 'Data trade-in berhasil ditambahkan!', 'id' => $newId]);
+            exit;
         }
     }
-} else {
-    $filtered_data = $raw_data;
+
+    if ($action === 'update') {
+        $id = intval($input['id'] ?? 0);
+        if (!$id) {
+            echo json_encode(['status' => 'error', 'message' => 'ID data tidak valid']);
+            exit;
+        }
+        $month = trim($input['month'] ?? '');
+        $sales = trim($input['sales'] ?? '');
+        $spv = trim($input['spv'] ?? '');
+        $merk = trim($input['merk'] ?? '');
+        $type = trim($input['type'] ?? '');
+        $tahun = intval($input['tahun'] ?? 0);
+        $warna = trim($input['warna'] ?? '');
+        $harga = floatval($input['harga'] ?? 0);
+        $km = trim($input['km'] ?? '');
+        $pajak = trim($input['pajak'] ?? 'ON');
+        $ket = trim($input['ket'] ?? '');
+        $hasil = trim($input['hasil'] ?? 'Nego');
+
+        if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
+            $stmt = $conn->prepare("UPDATE tabel_olx_pencapaian SET month=?, sales=?, spv=?, merk=?, type=?, tahun=?, warna=?, harga=?, km=?, pajak=?, ket=?, hasil=? WHERE id=?");
+            $stmt->bind_param("sssssisissssi", $month, $sales, $spv, $merk, $type, $tahun, $warna, $harga, $km, $pajak, $ket, $hasil, $id);
+            $stmt->execute();
+            $stmt->close();
+            echo json_encode(['status' => 'success', 'message' => 'Data trade-in berhasil diperbarui!']);
+            exit;
+        } elseif ($sqlite_pdo) {
+            $stmt = $sqlite_pdo->prepare("UPDATE tabel_olx_pencapaian SET month=?, sales=?, spv=?, merk=?, type=?, tahun=?, warna=?, harga=?, km=?, pajak=?, ket=?, hasil=? WHERE id=?");
+            $stmt->execute([$month, $sales, $spv, $merk, $type, $tahun, $warna, $harga, $km, $pajak, $ket, $hasil, $id]);
+            echo json_encode(['status' => 'success', 'message' => 'Data trade-in berhasil diperbarui!']);
+            exit;
+        }
+    }
+
+    if ($action === 'update_status') {
+        $id = intval($input['id'] ?? 0);
+        $hasil = trim($input['hasil'] ?? 'Deal');
+        $harga = isset($input['harga']) && $input['harga'] !== '' ? floatval($input['harga']) : null;
+        $ket = isset($input['ket']) ? trim($input['ket']) : null;
+
+        if (!$id) {
+            echo json_encode(['status' => 'error', 'message' => 'ID data tidak valid']);
+            exit;
+        }
+
+        if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
+            if ($harga !== null && $ket !== null) {
+                $stmt = $conn->prepare("UPDATE tabel_olx_pencapaian SET hasil=?, harga=?, ket=? WHERE id=?");
+                $stmt->bind_param("sdsi", $hasil, $harga, $ket, $id);
+            } elseif ($harga !== null) {
+                $stmt = $conn->prepare("UPDATE tabel_olx_pencapaian SET hasil=?, harga=? WHERE id=?");
+                $stmt->bind_param("sdi", $hasil, $harga, $id);
+            } else {
+                $stmt = $conn->prepare("UPDATE tabel_olx_pencapaian SET hasil=? WHERE id=?");
+                $stmt->bind_param("si", $hasil, $id);
+            }
+            $stmt->execute();
+            $stmt->close();
+            echo json_encode(['status' => 'success', 'message' => "Status unit berhasil diubah menjadi '$hasil'!"]);
+            exit;
+        } elseif ($sqlite_pdo) {
+            if ($harga !== null && $ket !== null) {
+                $stmt = $sqlite_pdo->prepare("UPDATE tabel_olx_pencapaian SET hasil=?, harga=?, ket=? WHERE id=?");
+                $stmt->execute([$hasil, $harga, $ket, $id]);
+            } elseif ($harga !== null) {
+                $stmt = $sqlite_pdo->prepare("UPDATE tabel_olx_pencapaian SET hasil=?, harga=? WHERE id=?");
+                $stmt->execute([$hasil, $harga, $id]);
+            } else {
+                $stmt = $sqlite_pdo->prepare("UPDATE tabel_olx_pencapaian SET hasil=? WHERE id=?");
+                $stmt->execute([$hasil, $id]);
+            }
+            echo json_encode(['status' => 'success', 'message' => "Status unit berhasil diubah menjadi '$hasil'!"]);
+            exit;
+        }
+    }
+
+    if ($action === 'delete') {
+        $id = intval($input['id'] ?? 0);
+        if (!$id) {
+            echo json_encode(['status' => 'error', 'message' => 'ID data tidak valid']);
+            exit;
+        }
+        if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
+            $stmt = $conn->prepare("DELETE FROM tabel_olx_pencapaian WHERE id=?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+            echo json_encode(['status' => 'success', 'message' => 'Data trade-in berhasil dihapus!']);
+            exit;
+        } elseif ($sqlite_pdo) {
+            $stmt = $sqlite_pdo->prepare("DELETE FROM tabel_olx_pencapaian WHERE id=?");
+            $stmt->execute([$id]);
+            echo json_encode(['status' => 'success', 'message' => 'Data trade-in berhasil dihapus!']);
+            exit;
+        }
+    }
+}
+
+// ════════════════════════════════════════════════════════════════
+// REST API: GET (LIST DATA & AGGREGATED METRICS)
+// ════════════════════════════════════════════════════════════════
+$available_months = [];
+$db_rows = [];
+
+if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
+    // Distinct months
+    $resM = $conn->query("SELECT DISTINCT month FROM tabel_olx_pencapaian ORDER BY id ASC");
+    if ($resM) {
+        while ($rm = $resM->fetch_assoc()) {
+            if (!empty($rm['month']) && !in_array($rm['month'], $available_months)) {
+                $available_months[] = $rm['month'];
+            }
+        }
+    }
+
+    // Build query filters
+    $where = [];
+    $params = [];
+    $types = "";
+
+    if ($month_filter !== 'all' && $month_filter !== '') {
+        $where[] = "month = ?";
+        $params[] = $month_filter;
+        $types .= "s";
+    }
+
+    $spv_filter = isset($_GET['spv']) ? trim($_GET['spv']) : 'all';
+    if ($spv_filter !== 'all' && $spv_filter !== '' && strtolower($spv_filter) !== 'semua') {
+        $cleanSpv = str_replace(['Pak ', 'Bu '], '', $spv_filter);
+        $where[] = "(spv = ? OR spv LIKE ?)";
+        $params[] = $cleanSpv;
+        $params[] = "%$cleanSpv%";
+        $types .= "ss";
+    }
+
+    $status_filter = isset($_GET['status']) ? trim($_GET['status']) : 'all';
+    if ($status_filter !== 'all' && $status_filter !== '') {
+        $where[] = "hasil = ?";
+        $params[] = $status_filter;
+        $types .= "s";
+    }
+
+    $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+    if ($search_query !== '') {
+        $sTerm = "%$search_query%";
+        $where[] = "(sales LIKE ? OR merk LIKE ? OR type LIKE ? OR ket LIKE ? OR warna LIKE ?)";
+        $params[] = $sTerm; $params[] = $sTerm; $params[] = $sTerm; $params[] = $sTerm; $params[] = $sTerm;
+        $types .= "sssss";
+    }
+
+    $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+    $sql = "SELECT id, month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil, created_at FROM tabel_olx_pencapaian $whereSql ORDER BY id DESC";
+
+    if (empty($params)) {
+        $res = $conn->query($sql);
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $row['id'] = (int)$row['id'];
+                $row['tahun'] = (int)$row['tahun'];
+                $row['harga'] = (float)$row['harga'];
+                $db_rows[] = $row;
+            }
+        }
+    } else {
+        $stmt = $conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            while ($row = $res->fetch_assoc()) {
+                $row['id'] = (int)$row['id'];
+                $row['tahun'] = (int)$row['tahun'];
+                $row['harga'] = (float)$row['harga'];
+                $db_rows[] = $row;
+            }
+            $stmt->close();
+        }
+    }
+} elseif ($sqlite_pdo) {
+    // SQLite query
+    $stmtM = $sqlite_pdo->query("SELECT DISTINCT month FROM tabel_olx_pencapaian ORDER BY id ASC");
+    $available_months = array_column($stmtM->fetchAll(), 'month');
+
+    $where = [];
+    $params = [];
+    if ($month_filter !== 'all' && $month_filter !== '') {
+        $where[] = "month = ?";
+        $params[] = $month_filter;
+    }
+    $spv_filter = isset($_GET['spv']) ? trim($_GET['spv']) : 'all';
+    if ($spv_filter !== 'all' && $spv_filter !== '' && strtolower($spv_filter) !== 'semua') {
+        $cleanSpv = str_replace(['Pak ', 'Bu '], '', $spv_filter);
+        $where[] = "(spv = ? OR spv LIKE ?)";
+        $params[] = $cleanSpv;
+        $params[] = "%$cleanSpv%";
+    }
+    $status_filter = isset($_GET['status']) ? trim($_GET['status']) : 'all';
+    if ($status_filter !== 'all' && $status_filter !== '') {
+        $where[] = "hasil = ?";
+        $params[] = $status_filter;
+    }
+    $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+    if ($search_query !== '') {
+        $sTerm = "%$search_query%";
+        $where[] = "(sales LIKE ? OR merk LIKE ? OR type LIKE ? OR ket LIKE ? OR warna LIKE ?)";
+        $params[] = $sTerm; $params[] = $sTerm; $params[] = $sTerm; $params[] = $sTerm; $params[] = $sTerm;
+    }
+
+    $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+    $stmt = $sqlite_pdo->prepare("SELECT id, month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil, created_at FROM tabel_olx_pencapaian $whereSql ORDER BY id DESC");
+    $stmt->execute($params);
+    $db_rows = $stmt->fetchAll();
+    foreach ($db_rows as &$row) {
+        $row['id'] = (int)$row['id'];
+        $row['tahun'] = (int)$row['tahun'];
+        $row['harga'] = (float)$row['harga'];
+    }
+}
+
+// Fallback if DB completely unavailable
+if (empty($db_rows) && !$is_db_ready) {
+    $db_rows = $raw_data;
+}
+
+if (empty($available_months)) {
+    $available_months = ['Januari 2026', 'Februari 2026', 'Maret 2026', 'April 2026', 'Mei 2026', 'Juni 2026', 'Juli 2026', 'Agustus 2026', 'September 2026'];
 }
 
 // Grouping per SPV
@@ -629,7 +972,7 @@ $total_deal_all = 0;
 $total_nominal_deal_all = 0;
 $total_estimasi_all = 0;
 
-foreach ($filtered_data as $item) {
+foreach ($db_rows as $item) {
     $spv = $item['spv'];
     if (!isset($spv_groups[$spv])) {
         $spv_groups[$spv] = [
@@ -705,9 +1048,7 @@ foreach ($spv_groups as $spv_key => $spv_data) {
         ? round(($spv_data['deal_count'] / $spv_data['total_unit']) * 100, 1) 
         : 0;
     
-    // Convert sales_summary to array
     $spv_data['sales_summary'] = array_values($spv_data['sales_summary']);
-    
     $spv_list[] = $spv_data;
 }
 
@@ -736,5 +1077,7 @@ echo json_encode([
         'total_estimasi' => $total_estimasi_all,
         'win_rate' => $win_rate_all
     ],
-    'spv_data' => $spv_list
+    'spv_data' => $spv_list,
+    'items' => $db_rows
 ]);
+
