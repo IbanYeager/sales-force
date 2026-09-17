@@ -6,10 +6,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Area Operation (AO) Report</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/css/style_spv.css?v=20260915_layout_perfect">
-  <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_perfect">
-  <link rel="stylesheet" href="/css/ao_report.css?v=20260914_ao_v30">
-  <link rel="stylesheet" href="../css/ao_report.css?v=20260914_ao_v30">
+  <link rel="stylesheet" href="/css/style_spv.css?v=20260917_modal_fix">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260917_modal_fix">
+  <link rel="stylesheet" href="/css/ao_report.css?v=20260917_modal_fix">
+  <link rel="stylesheet" href="../css/ao_report.css?v=20260917_modal_fix">
+
+  <style>
+    /* Critical Modal Styles to guarantee hidden state on load */
+    .ao-modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 999999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+  </style>
 
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
@@ -539,9 +557,9 @@
     </main>
   </div>
 
-  <script src="../js/ao_report_data.js?v=20260914_ao_v30"></script>
-  <script src="../js/ao_report.js?v=20260914_ao_v30"></script>
-  <script src="../js/spv_global.js?v=20260914_ao_v30"></script>
+  <script src="../js/ao_report_data.js?v=20260917_modal_fix"></script>
+  <script src="../js/ao_report.js?v=20260917_modal_fix"></script>
+  <script src="../js/spv_global.js?v=20260917_modal_fix"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         initAOReport('spv');
@@ -562,7 +580,7 @@
   </script>
 
   <!-- Modal Dialog: Impor Excel AO Report (SPV) -->
-  <div id="modalAoImport" class="ao-modal-backdrop" onclick="if(event.target===this) closeAoImportModal()">
+  <div id="modalAoImport" class="ao-modal-backdrop" style="display:none;" onclick="if(event.target===this) closeAoImportModal()">
     <div class="ao-modal-card">
       <div class="ao-modal-header">
         <h3 class="ao-modal-title">
