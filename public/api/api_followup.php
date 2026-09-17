@@ -86,8 +86,8 @@ function get_sales_list($spv = '') {
 
 /**
  * Auto-Expiry Engine:
- * If customer remarks is 'Customer pending' (Menunggu Respon) and > 2 days (48 hours) without update,
- * automatically change remarks to 'Customer tidak diangkat' / 'Customer tidak aktif'.
+ * If customer remarks is 'Customer pending' or 'Menunggu respon' and > 2 days (48 hours) without update,
+ * automatically change remarks to 'Customer menolak' & status to 'Tidak Tertarik' (Closed).
  */
 function auto_expire_pending_followups() {
     global $is_mysql, $conn, $sqlite_pdo;
@@ -115,17 +115,19 @@ function auto_expire_pending_followups() {
                 $cid = (int)$ec['id'];
                 followup_execute("
                     UPDATE followup_customers
-                    SET remarks = 'Customer tidak diangkat',
-                        contacted = 'FALSE',
+                    SET remarks = 'Customer menolak',
+                        followup_status = 'Tidak Tertarik',
                         sales_fu_status = 'Closed',
+                        prospect = 'FALSE',
+                        spk = 'FALSE',
                         updated_at = ?
                     WHERE id = ?
                 ", [$now, $cid]);
 
                 followup_execute("
                     INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, old_status, new_status, note)
-                    VALUES (?, NULL, 'Sistem Auto-Expiry', 'auto_timeout', ?, ?, 'Otomatis diubah ke \"Customer tidak diangkat\" karena melewati batas waktu 2 hari menunggu respon.')
-                ", [$cid, $ec['remarks'] ?? 'Customer pending', 'Customer tidak diangkat']);
+                    VALUES (?, NULL, 'Sistem Auto-Expiry', 'auto_timeout', ?, 'Customer menolak', 'Otomatis diubah ke \"Customer menolak\" karena melewati batas waktu 2 hari tanpa update.')
+                ", [$cid, $ec['remarks'] ?? 'Menunggu respon']);
             }
         }
     } catch (Throwable $e) {
