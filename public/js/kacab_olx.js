@@ -107,6 +107,8 @@ async function fetchOlxData() {
 
     if (data.status === 'success') {
       currentOlxData = data.items || [];
+      if (data.top_sales_podium) renderPodium(data.top_sales_podium);
+      if (data.spv_matrix) renderMatrix(data.spv_matrix);
       updateKpiCards(data.summary);
       renderLeaderboard(data.spv_data);
       renderTable(currentOlxData);
@@ -116,6 +118,137 @@ async function fetchOlxData() {
   } catch (err) {
     console.error('Error fetching OLX data:', err);
     if (tableBody) tableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:20px; color:#ef4444;">Gagal terhubung ke server.</td></tr>`;
+  }
+}
+
+function renderPodium(topSales) {
+  const grid = document.getElementById('olxPodiumGrid');
+  if (!grid) return;
+
+  // Expected 4 sales strictly ordered from left: Fadil, Egy, Jajang, Intan
+  const defaultList = [
+    { key: 'fadil', display_name: 'Fadil', full_name: 'Muhammad Fadil Fahmi', spv: 'Alvin', photo: '../images/olx_top/fadil.jpg', deal_count: 6, total_omset: 1580000000 },
+    { key: 'egy', display_name: 'Egy', full_name: 'Egy', spv: 'Ryan', photo: '../images/olx_top/egy.jpg', deal_count: 5, total_omset: 1140000000 },
+    { key: 'jajang', display_name: 'Jajang', full_name: 'Jajang', spv: 'Ryan', photo: '../images/olx_top/jajang.jpg', deal_count: 4, total_omset: 1475000000 },
+    { key: 'intan', display_name: 'Intan', full_name: 'Intan', spv: 'Alvin', photo: '../images/olx_top/intan.jpg', deal_count: 4, total_omset: 885000000 }
+  ];
+
+  const sales = (topSales && topSales.length >= 4) ? topSales : defaultList;
+
+  let html = sales.slice(0, 4).map((s, idx) => {
+    return `
+      <div class="olx-podium-card">
+        <span class="olx-podium-rank-badge" style="background:#b45309;">${idx + 1}</span>
+        <div class="olx-podium-photo-wrap">
+          <img src="${s.photo}" alt="${escapeHtml(s.display_name)}" class="olx-podium-photo" onerror="this.src='../images/default-avatar.png'">
+        </div>
+        <div class="olx-podium-deal-box">
+          <span class="olx-deal-label">JUMLAH DEAL</span>
+          <div class="olx-deal-sales-name" title="${escapeHtml(s.full_name || s.display_name)}">${escapeHtml(s.display_name)}</div>
+          <span class="olx-deal-spv-tag"><i class="fa-solid fa-user-tie"></i> Tim SPV ${escapeHtml(s.spv)}</span>
+          <div>
+            <span class="olx-deal-count-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">
+              <i class="fa-solid fa-check"></i> ${s.deal_count} Deal
+            </span>
+          </div>
+          <div class="olx-deal-omset">${formatRupiahShort(s.total_omset || 0)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // 5th empty slot matching physical board
+  html += `
+    <div class="olx-podium-empty" style="cursor:pointer;" onclick="openAddModal()">
+      <i class="fa-solid fa-circle-plus"></i>
+      <span class="olx-deal-label" style="color:rgba(255,255,255,0.7);">JUMLAH DEAL</span>
+      <div style="font-size:13px; font-weight:800; margin-top:2px;">Tambah Transaksi</div>
+      <div style="font-size:10px; color:rgba(255,255,255,0.6); margin-top:4px;">Klik untuk input deal baru</div>
+    </div>
+  `;
+
+  grid.innerHTML = html;
+}
+
+function renderMatrix(matrix) {
+  const tbody = document.getElementById('olxMatrixBody');
+  const tfoot = document.getElementById('olxMatrixFoot');
+  if (!tbody || !matrix || !matrix.rows) return;
+
+  const rows = matrix.rows;
+  const totals = matrix.totals || { alvin: 0, ryan: 0, riva: 0, dealer_total: 0 };
+
+  const monthIcons = {
+    'Januari': 'fa-snowflake',
+    'Februari': 'fa-heart',
+    'Maret': 'fa-clover',
+    'April': 'fa-seedling',
+    'Mei': 'fa-sun',
+    'Juni': 'fa-umbrella-beach',
+    'Juli': 'fa-fire',
+    'Agustus': 'fa-flag',
+    'September': 'fa-leaf',
+    'Oktober': 'fa-tree',
+    'November': 'fa-cloud',
+    'Desember': 'fa-gift'
+  };
+
+  tbody.innerHTML = rows.map(r => {
+    const icon = monthIcons[r.month] || 'fa-calendar-day';
+    const isPastOrCurrent = (r.total > 0 || ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus'].includes(r.month));
+
+    const renderVal = (val) => {
+      if (!isPastOrCurrent && val === 0) {
+        return `<span class="olx-matrix-num-empty">-</span>`;
+      }
+      if (val > 0) {
+        return `<span class="olx-matrix-num-deal" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">${val}</span>`;
+      }
+      return `<span class="olx-matrix-num-zero">0</span>`;
+    };
+
+    const renderTotal = (val) => {
+      if (!isPastOrCurrent && val === 0) {
+        return `<span class="olx-matrix-num-empty">-</span>`;
+      }
+      return `<strong style="font-size:14px; color:${val > 0 ? '#0f172a' : '#94a3b8'};">${val}</strong>`;
+    };
+
+    return `
+      <tr>
+        <td class="olx-matrix-month-cell">
+          <i class="fa-solid ${icon}" style="color:#d8a437; width:16px; font-size:12px;"></i>
+          ${escapeHtml(r.month)}
+        </td>
+        <td>${renderVal(r.alvin)}</td>
+        <td>${renderVal(r.ryan)}</td>
+        <td>${renderVal(r.riva)}</td>
+        <td style="background:#f8fafc;">${renderTotal(r.total)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  if (tfoot) {
+    tfoot.innerHTML = `
+      <tr>
+        <th style="text-align:left; padding-left:20px; font-size:14px;">
+          <i class="fa-solid fa-crown" style="color:#fde047; margin-right:6px;"></i> TOTAL DEAL
+        </th>
+        <th>
+          <span class="olx-matrix-total-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">${totals.alvin}</span>
+        </th>
+        <th>
+          <span class="olx-matrix-total-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">${totals.ryan}</span>
+        </th>
+        <th>
+          <span class="olx-matrix-total-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">${totals.riva}</span>
+        </th>
+        <th style="background:#b45309; color:#ffffff;">
+          <div style="font-size:16px; font-weight:900;">${totals.dealer_total} Deal</div>
+          <div style="font-size:10px; opacity:0.85;">Closing Sukses</div>
+        </th>
+      </tr>
+    `;
   }
 }
 

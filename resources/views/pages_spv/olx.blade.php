@@ -75,6 +75,91 @@
         </div>
       </div>
 
+      <!-- HERO SHOWCASE: TOP SALES CLOSING OLX MOBBI -->
+      <section class="olx-board-hero">
+        <div class="olx-board-header">
+          <div class="olx-board-title-group">
+            <h2>
+              <i class="fa-solid fa-award" style="color:#fde047;"></i>
+              TUNAS TOYOTA KIARACONDONG
+            </h2>
+            <div style="font-size:12px; color:#fecdd3; margin-top:3px; font-weight:600;">
+              Papan Prestasi Resmi Transaksi Tukar Tambah Wiraniaga Cabang Kiaracondong
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="olx-brand-pill">
+              <span class="olx-mobbi-badge">CLOSING olx mobbi</span>
+              <span class="olx-mobbi-sub">member of ASTRA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 PODIUM SLOTS (FADIL, EGY, JAJANG, INTAN) -->
+        <div class="olx-podium-grid" id="olxPodiumGrid">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- PAPAN REKAP DEAL BULANAN PER SPV (ALVIN | RYAN | RIVA) -->
+      <section class="olx-matrix-card">
+        <div class="olx-matrix-header">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="olx-matrix-badge-deal">
+              <i class="fa-solid fa-handshake"></i> DEAL
+            </span>
+            <div>
+              <h3 style="font-size:15px; font-weight:800; margin:0; color:#ffffff;">Papan Rekap Closing Deal Bulanan Tim Supervisor</h3>
+              <p style="font-size:11.5px; color:#94a3b8; margin:2px 0 0;">Sinkronisasi otomatis hasil closing trade-in per periode Januari - Desember</p>
+            </div>
+          </div>
+          <div style="font-size:12px; font-weight:700; color:#cbd5e1;">
+            <i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Data Terverifikasi Hostinger
+          </div>
+        </div>
+
+        <div class="olx-matrix-table-wrap">
+          <table class="olx-matrix-table">
+            <thead>
+              <tr>
+                <th style="width:180px; text-align:left; padding-left:20px;">Periode</th>
+                <th style="width:200px;">
+                  <div class="olx-matrix-spv-header">
+                    <img src="../images/olx_top/spv_alvin.jpg" alt="Alvin" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
+                    <span class="olx-matrix-spv-name">ALVIN</span>
+                    <span style="font-size:10px; opacity:0.8; font-weight:600;">Supervisor 1</span>
+                  </div>
+                </th>
+                <th style="width:200px;">
+                  <div class="olx-matrix-spv-header">
+                    <img src="../images/olx_top/spv_ryan.jpg" alt="Ryan" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
+                    <span class="olx-matrix-spv-name">RYAN</span>
+                    <span style="font-size:10px; opacity:0.8; font-weight:600;">Supervisor 2</span>
+                  </div>
+                </th>
+                <th style="width:200px;">
+                  <div class="olx-matrix-spv-header">
+                    <img src="../images/olx_top/spv_riva.jpg" alt="Riva" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
+                    <span class="olx-matrix-spv-name">RIVA</span>
+                    <span style="font-size:10px; opacity:0.8; font-weight:600;">Supervisor 3</span>
+                  </div>
+                </th>
+                <th style="width:140px;">
+                  <div style="font-size:13px; font-weight:900;">TOTAL DEALER</div>
+                  <div style="font-size:10px; opacity:0.8;">Akumulasi Bulanan</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="olxMatrixBody">
+              <!-- Rendered via JS -->
+            </tbody>
+            <tfoot id="olxMatrixFoot">
+              <!-- Rendered via JS -->
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
       <!-- 5 EXECUTIVE KPI TILES -->
       <div class="olx-kpi-grid">
         <div class="olx-kpi-card">

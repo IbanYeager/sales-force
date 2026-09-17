@@ -31,6 +31,7 @@ uploads/import_*.xlsx
 public/uploads/import_*.xlsx
 scratch/
 polreg/
+TR - Active Inventory*.xlsx
 
 # Keep composer.json local only to prevent Hostinger auto composer trigger
 composer.json
