@@ -6,12 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Area Operation (AO) Report</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/css/style_spv.css?v=20260917_modal_fix">
-  <link rel="stylesheet" href="../css/style_spv.css?v=20260917_modal_fix">
-  <link rel="stylesheet" href="/css/ao_report.css?v=20260917_modal_fix">
-  <link rel="stylesheet" href="../css/ao_report.css?v=20260917_modal_fix">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260917_excel_v3">
+  <link rel="stylesheet" href="/css/style_spv.css?v=20260917_excel_v3">
+  <link rel="stylesheet" href="../css/ao_report.css?v=20260917_excel_v3">
+  <link rel="stylesheet" href="/css/ao_report.css?v=20260917_excel_v3">
 
   <style>
+    @php
+      $aoCssPath = public_path('css/ao_report.css');
+      if (file_exists($aoCssPath)) {
+          include $aoCssPath;
+      }
+    @endphp
+
     /* Critical Modal Styles to guarantee hidden state on load */
     .ao-modal-backdrop {
       display: none;
@@ -551,9 +558,9 @@
     </main>
   </div>
 
-  <script src="../js/ao_report_data.js?v=20260917_modal_fix"></script>
-  <script src="../js/ao_report.js?v=20260917_modal_fix"></script>
-  <script src="../js/spv_global.js?v=20260917_modal_fix"></script>
+  <script src="../js/ao_report_data.js?v=20260917_excel_v3"></script>
+  <script src="../js/ao_report.js?v=20260917_excel_v3"></script>
+  <script src="../js/spv_global.js?v=20260917_excel_v3"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         initAOReport('spv');

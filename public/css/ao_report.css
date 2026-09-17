@@ -295,12 +295,12 @@
 /* Section [A] Layout Split: Stock Matching with OS (Left) & Closing Estimation (Right) */
 .ao-secA-row {
     display: grid;
-    grid-template-columns: minmax(680px, 1.6fr) minmax(360px, 1fr);
-    gap: 16px;
-    margin-bottom: 20px;
+    grid-template-columns: minmax(560px, 1.65fr) minmax(300px, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1050px) {
     .ao-secA-row {
         grid-template-columns: 1fr;
     }
