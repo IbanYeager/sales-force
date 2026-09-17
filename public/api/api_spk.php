@@ -60,17 +60,25 @@ if ($method === 'GET') {
     }
 
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
-        $spv_clean = str_replace('Pak ', '', $spv);
+        $spv_lower = strtolower($spv);
+        if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
+            $where_spv = "(sa.nama_spv = 'Bu Rahma' OR sa.nama_spv LIKE '%Rahma%')";
+        } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
+            $where_spv = "(sa.nama_spv = 'Pak Ryan' OR sa.nama_spv LIKE '%Ryan%') AND (sa.nama_spv NOT LIKE '%Rahma%')";
+        } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
+            $where_spv = "(sa.nama_spv = 'Pak Ryan' OR sa.nama_spv LIKE '%Ryan%' OR sa.nama_spv = 'Bu Rahma' OR sa.nama_spv LIKE '%Rahma%')";
+        } else {
+            $spv_clean = str_replace(['Pak ', 'Bu '], '', $spv);
+            $spv_esc = $conn->real_escape_string($spv);
+            $like_esc = $conn->real_escape_string("%$spv_clean%");
+            $where_spv = "(sa.nama_spv = '$spv_esc' OR sa.nama_spv LIKE '$like_esc')";
+        }
         $query = "SELECT s.id, s.sales_account_id, sa.nama_lengkap as nama_sales, s.nama_customer, s.no_hp, s.nik, s.no_kk, s.tempat_lahir, s.tanggal_lahir, s.jenis_kelamin, s.alamat, s.rt_rw, s.kelurahan, s.kecamatan, s.kota, s.provinsi, s.agama, s.status_perkawinan, s.pekerjaan, s.foto_ktp, s.foto_kk, s.model, s.nominal, s.tipe_pembelian, s.status, s.created_at 
                   FROM tabel_spk s
                   LEFT JOIN sales_accounts sa ON s.sales_account_id = sa.id
-                  WHERE (sa.nama_spv = ? OR sa.nama_spv LIKE ?)
+                  WHERE $where_spv
                   ORDER BY s.id DESC";
         $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $likeSpv = "%$spv_clean%";
-            $stmt->bind_param("ss", $spv, $likeSpv);
-        }
     } elseif ($all || !empty($spv)) {
         $query = "SELECT s.id, s.sales_account_id, sa.nama_lengkap as nama_sales, s.nama_customer, s.no_hp, s.nik, s.no_kk, s.tempat_lahir, s.tanggal_lahir, s.jenis_kelamin, s.alamat, s.rt_rw, s.kelurahan, s.kecamatan, s.kota, s.provinsi, s.agama, s.status_perkawinan, s.pekerjaan, s.foto_ktp, s.foto_kk, s.model, s.nominal, s.tipe_pembelian, s.status, s.created_at 
                   FROM tabel_spk s

@@ -10,17 +10,27 @@ require 'koneksi.php';
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    if (isset($_GET['spv'])) {
+    if (isset($_GET['spv']) && strtolower($_GET['spv']) !== 'semua' && strtolower($_GET['spv']) !== 'all' && strtolower($_GET['spv']) !== 'master') {
         $spv = $_GET['spv'];
+        $spv_lower = strtolower($spv);
+        if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
+            $where_spv = "(sa.nama_spv = 'Bu Rahma' OR sa.nama_spv LIKE '%Rahma%')";
+        } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
+            $where_spv = "(sa.nama_spv = 'Pak Ryan' OR sa.nama_spv LIKE '%Ryan%') AND (sa.nama_spv NOT LIKE '%Rahma%')";
+        } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
+            $where_spv = "(sa.nama_spv = 'Pak Ryan' OR sa.nama_spv LIKE '%Ryan%' OR sa.nama_spv = 'Bu Rahma' OR sa.nama_spv LIKE '%Rahma%')";
+        } else {
+            $spv_clean = str_replace(['Pak ', 'Bu '], '', $spv);
+            $spv_esc = $conn->real_escape_string($spv);
+            $like_esc = $conn->real_escape_string("%$spv_clean%");
+            $where_spv = "(sa.nama_spv = '$spv_esc' OR sa.nama_spv LIKE '$like_esc')";
+        }
         $query = "SELECT t.id, t.sales_account_id, sa.nama_lengkap as nama_sales, sa.no_hp as hp_sales, t.nama_kendaraan, t.jenis_type, t.tahun, t.warna, t.harga_estimasi, t.lokasi_kecamatan, t.deskripsi_kondisi, t.foto_paths, t.created_at, t.status 
                   FROM tabel_trade_in t 
                   JOIN sales_accounts sa ON t.sales_account_id = sa.id 
-                  WHERE sa.nama_spv = ? 
+                  WHERE $where_spv 
                   ORDER BY t.id DESC";
         $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $stmt->bind_param("s", $spv);
-        }
     } elseif (isset($_GET['all'])) {
         $query = "SELECT t.id, t.sales_account_id, sa.nama_lengkap as nama_sales, sa.no_hp as hp_sales, t.nama_kendaraan, t.jenis_type, t.tahun, t.warna, t.harga_estimasi, t.lokasi_kecamatan, t.deskripsi_kondisi, t.foto_paths, t.created_at, t.status 
                   FROM tabel_trade_in t 

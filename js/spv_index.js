@@ -45,6 +45,7 @@ function logoutUser() {
       localStorage.setItem('spv_master_filter', val);
       loadTarget();
       loadPendingApprovals();
+      renderLeaderboardAndStagnant();
     }
 
     async function loadTarget() {
@@ -150,6 +151,10 @@ function logoutUser() {
     document.addEventListener('DOMContentLoaded', () => {
       guardSPV();
       renderUser();
+      const filterSelect = document.getElementById('selectSpvTeamFilter');
+      if (filterSelect && window.currentSpvFilter) {
+        filterSelect.value = window.currentSpvFilter;
+      }
       loadTarget();
       loadPendingApprovals();
       renderLeaderboardAndStagnant();
@@ -284,7 +289,7 @@ Tetap semangat, jaga kesehatan & pastikan setiap follow-up tercatat di Sales App
     // 🏆 PURE REAL DB LEADERBOARD & RADAR PROSPEK MACET
     // ==========================================
     async function renderLeaderboardAndStagnant() {
-      const spv = localStorage.getItem('spvSales') || localStorage.getItem('namaSales') || '';
+      const spv = window.currentSpvFilter || localStorage.getItem('spvSales') || localStorage.getItem('namaSales') || 'Semua';
       const month = new Date().getMonth() + 1;
 
       // 1. Fetch Real Wiraniaga & Target Data from DB

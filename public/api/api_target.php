@@ -222,12 +222,22 @@ if ($method === 'GET') {
 
     if ($conn && !$conn->connect_error) {
         if ($spv !== '' && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master' && !isset($_GET['id_sales'])) {
-            $spv_clean = str_replace('Pak ', '', $spv);
+            $spv_lower = strtolower($spv);
+            if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
+                $spv_condition = "(s.nama_spv = 'Bu Rahma' OR s.nama_spv LIKE '%Rahma%')";
+            } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
+                $spv_condition = "(s.nama_spv = 'Pak Ryan' OR s.nama_spv LIKE '%Ryan%') AND (s.nama_spv NOT LIKE '%Rahma%')";
+            } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
+                $spv_condition = "(s.nama_spv = 'Pak Ryan' OR s.nama_spv LIKE '%Ryan%' OR s.nama_spv = 'Bu Rahma' OR s.nama_spv LIKE '%Rahma%')";
+            } else {
+                $spv_clean = str_replace(['Pak ', 'Bu '], '', $spv);
+                $spv_condition = "(s.nama_spv = '$spv' OR s.nama_spv LIKE '%$spv_clean%')";
+            }
             $q_target = $conn->query("SELECT t.periode_bulan, SUM(t.target_spk) as target_spk, SUM(t.target_do) as target_do, 
                                       SUM(t.realisasi_spk) as realisasi_spk, SUM(t.realisasi_do) as realisasi_do 
                                       FROM target_do_bulanan t 
                                       JOIN sales_accounts s ON t.sales_account_id = s.id 
-                                      WHERE (s.nama_spv = '$spv' OR s.nama_spv LIKE '%$spv_clean%') AND s.is_active = 1 
+                                      WHERE $spv_condition AND s.is_active = 1 
                                       GROUP BY t.periode_bulan");
         } elseif (!isset($_GET['id_sales'])) {
             // Master Aggregate for All Branch Teams

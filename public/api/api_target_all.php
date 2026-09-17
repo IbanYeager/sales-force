@@ -60,8 +60,17 @@ if ($method === 'GET') {
     // Sales Consultants Query - Strictly select Active Sales, plus sales with records in the requested month
     $where_clause = "WHERE (is_active = 1 OR id IN (SELECT sales_account_id FROM target_do_bulanan WHERE periode_bulan = $current_month AND (realisasi_spk > 0 OR realisasi_do > 0)))";
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
-        $spv_clean = str_replace('Pak ', '', $spv);
-        $where_clause .= " AND (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+        $spv_lower = strtolower($spv);
+        if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
+            $where_clause .= " AND (nama_spv = 'Bu Rahma' OR nama_spv LIKE '%Rahma%')";
+        } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
+            $where_clause .= " AND (nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%') AND (nama_spv NOT LIKE '%Rahma%')";
+        } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
+            $where_clause .= " AND (nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%' OR nama_spv = 'Bu Rahma' OR nama_spv LIKE '%Rahma%')";
+        } else {
+            $spv_clean = str_replace(['Pak ', 'Bu '], '', $spv);
+            $where_clause .= " AND (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
+        }
     }
 
     $whiteboard_targets = [
