@@ -32,9 +32,18 @@ $nama_bulan_list = [
     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
 $report_date_str = "31 Agustus 2026";
-$period_month_str = "Agustus 2026";
+$storeFile = __DIR__ . '/ao_report_data_store.json';
+if (file_exists($storeFile)) {
+    $content = @file_get_contents($storeFile);
+    $storedData = json_decode($content, true);
+    if (is_array($storedData) && !empty($storedData['stock'])) {
+        echo json_encode($storedData, JSON_PRETTY_PRINT);
+        if ($conn) $conn->close();
+        exit();
+    }
+}
 
-// Whiteboard Baseline Data (31 Agustus 2026)
+// Whiteboard Baseline Data (Fallback if no import exists)
 $full_stock_total = 46;
 $full_stock_match = 16;
 $full_stock_free = 30;

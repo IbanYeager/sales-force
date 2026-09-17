@@ -367,9 +367,120 @@
         if (activeBtn) activeBtn.classList.add('active');
     }
 
+    let selectedAoFile = null;
+
+    function openAoImportModal() {
+        const modal = document.getElementById('modalAoImport');
+        if (modal) {
+            modal.style.display = 'flex';
+            resetAoImportForm();
+        }
+    }
+
+    function closeAoImportModal() {
+        const modal = document.getElementById('modalAoImport');
+        if (modal) modal.style.display = 'none';
+        resetAoImportForm();
+    }
+
+    function resetAoImportForm() {
+        selectedAoFile = null;
+        const fileInput = document.getElementById('inputAoFile');
+        if (fileInput) fileInput.value = '';
+        const info = document.getElementById('aoSelectedFileInfo');
+        if (info) info.style.display = 'none';
+        const progress = document.getElementById('aoUploadProgress');
+        if (progress) progress.style.display = 'none';
+        const btn = document.getElementById('btnSubmitAoImport');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Proses &amp; Terapkan';
+        }
+    }
+
+    function handleAoFileSelected(files) {
+        if (!files || !files.length) return;
+        const file = files[0];
+        if (!file.name.toLowerCase().endsWith('.xlsx')) {
+            alert('Harap pilih file Excel berformat .xlsx');
+            return;
+        }
+        selectedAoFile = file;
+        const nameEl = document.getElementById('aoSelectedFileName');
+        if (nameEl) nameEl.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+        const info = document.getElementById('aoSelectedFileInfo');
+        if (info) info.style.display = 'flex';
+    }
+
+    async function submitAoImport(role = 'spv') {
+        if (!selectedAoFile) {
+            alert('Silakan pilih file Excel (.xlsx) terlebih dahulu!');
+            return;
+        }
+
+        const btn = document.getElementById('btnSubmitAoImport');
+        const progress = document.getElementById('aoUploadProgress');
+        const bar = document.getElementById('aoProgressBar');
+        const percent = document.getElementById('aoProgressPercent');
+        const text = document.getElementById('aoProgressText');
+
+        if (btn) btn.disabled = true;
+        if (progress) progress.style.display = 'block';
+        if (bar) bar.style.width = '30%';
+        if (percent) percent.textContent = '30%';
+        if (text) text.textContent = 'Mengunggah file ke server...';
+
+        const formData = new FormData();
+        formData.append('file', selectedAoFile);
+        formData.append('role', role);
+
+        try {
+            if (bar) bar.style.width = '60%';
+            if (percent) percent.textContent = '60%';
+            if (text) text.textContent = 'Memproses & mengurai sheet AO Report...';
+
+            const res = await fetch('../api/api_ao_report_import.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.status === 'success') {
+                if (bar) bar.style.width = '100%';
+                if (percent) percent.textContent = '100%';
+                if (text) text.textContent = 'Selesai!';
+
+                setTimeout(async () => {
+                    closeAoImportModal();
+                    if (window.showCustomAlert) {
+                        window.showCustomAlert('Berhasil Impor AO Report', result.message, 'success');
+                    } else {
+                        alert(result.message);
+                    }
+                    if (window.renderAllAOComponents) {
+                        await window.renderAllAOComponents(true);
+                    }
+                }, 400);
+            } else {
+                throw new Error(result.message || 'Gagal mengimpor file.');
+            }
+        } catch (err) {
+            console.error('AO Import error:', err);
+            alert('Gagal mengimpor file AO Report: ' + err.message);
+            if (btn) btn.disabled = false;
+            if (progress) progress.style.display = 'none';
+        }
+    }
+
     window.aoScrollHorizontal = aoScrollHorizontal;
     window.aoScrollToSection = aoScrollToSection;
     window.initAOReport = initAOReport;
     window.renderAllAOComponents = renderAllAOComponents;
+    window.openAoImportModal = openAoImportModal;
+    window.closeAoImportModal = closeAoImportModal;
+    window.handleAoFileSelected = handleAoFileSelected;
+    window.submitAoImport = submitAoImport;
 
 })(window, document);
+

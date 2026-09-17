@@ -1,0 +1,741 @@
+{
+  "status": "success",
+  "branch": "TUNAS TOYOTA KIARACONDONG",
+  "reportDate": "10 Agustus 2026",
+  "periodMonth": "Agustus 2026",
+  "importedAt": "2026-09-17T02:27:13.049Z",
+  "stock": {
+    "fullStock": {
+      "total": 123,
+      "free": 81,
+      "match": 42
+    },
+    "invoiceableStock": {
+      "total": 123,
+      "free": 81,
+      "match": 42
+    },
+    "osOrder": {
+      "total": 53,
+      "gt60Days": {
+        "total": 1,
+        "match": 0
+      },
+      "d30To60Days": {
+        "total": 4,
+        "match": 0
+      },
+      "firmedOSLt30": {
+        "total": 48,
+        "firmed": 18,
+        "plCpi": 30
+      }
+    },
+    "stockMatching": {
+      "matchUnfirmedGt30": 2,
+      "matchUnfirmedLt30": 2,
+      "unmatchStock": 5,
+      "unmatchBreakdown": {
+        "firmedGt30": 1,
+        "firmedLt30": 5,
+        "unfirmedLt30": 7,
+        "unfirmedGt30": 7
+      },
+      "matchStock": 42,
+      "matchBreakdown": {
+        "firmedGt30": 18,
+        "plCpi": 24
+      }
+    },
+    "kpi": {
+      "matchingRatio": 79,
+      "targetDO": 92,
+      "potentialDoFromOS": 53,
+      "gapTarget": 39,
+      "mtdActual": 10,
+      "mdpVal": 0,
+      "onHandStock": 16
+    },
+    "ritme5Harian": [
+      {
+        "period": "1-5",
+        "value": 3,
+        "accum": 3
+      },
+      {
+        "period": "6-10",
+        "value": 7,
+        "accum": 10
+      },
+      {
+        "period": "11-15",
+        "value": 0,
+        "accum": 10
+      },
+      {
+        "period": "16-20",
+        "value": 0,
+        "accum": 10
+      },
+      {
+        "period": "21-25",
+        "value": 0,
+        "accum": 10
+      },
+      {
+        "period": "26-31",
+        "value": 0,
+        "accum": 10
+      }
+    ]
+  },
+  "spkPlan": {
+    "periods": [
+      "TTL",
+      "1-5",
+      "6-10",
+      "11-15",
+      "16-20",
+      "21-25",
+      "26-31"
+    ],
+    "effectiveNRS": 76,
+    "forNPlus1RS": 42,
+    "spkGrossPlan": [
+      122,
+      20,
+      20,
+      20,
+      20,
+      20,
+      22
+    ],
+    "spkGrossActual": [
+      54,
+      30,
+      24,
+      null,
+      null,
+      null,
+      null
+    ],
+    "gapGross": [
+      "-",
+      "+10",
+      "+4",
+      "-20",
+      "-20",
+      "-20",
+      "-22"
+    ],
+    "cancellationAssum": [
+      6,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "cancellationActual": [
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      null
+    ],
+    "cancellationRatio": [
+      "0%",
+      "0%",
+      "0%",
+      "0%",
+      "0%",
+      "0%",
+      "0%"
+    ],
+    "cancelRatioStats": {
+      "threeMonthsAvg": "4%",
+      "loanRejection": "2%"
+    },
+    "spkNettPlan": [
+      114,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19
+    ],
+    "spkNettActual": [
+      54,
+      30,
+      24,
+      null,
+      null,
+      null,
+      null
+    ],
+    "gapNett": [
+      "-",
+      "+11",
+      "+5",
+      "-19",
+      "-19",
+      "-19",
+      "-19"
+    ],
+    "nettSpkVisualize": [
+      {
+        "period": "1-5",
+        "val": 19
+      },
+      {
+        "period": "6-10",
+        "val": 19
+      },
+      {
+        "period": "11-15",
+        "val": 19
+      },
+      {
+        "period": "16-20",
+        "val": 19
+      },
+      {
+        "period": "21-25",
+        "val": 19
+      },
+      {
+        "period": "26-31",
+        "val": 19
+      }
+    ],
+    "rsPillar": {
+      "ttl": 114,
+      "becomeOS": 38,
+      "effectiveMonthRS": 76,
+      "avgDays": 8
+    }
+  },
+  "mdpPlan": {
+    "leftPillar": {
+      "total": 32,
+      "green": 2,
+      "blue": 30
+    },
+    "ffsPillar": 46,
+    "ffsSellingPlan": [
+      {
+        "period": "1-5",
+        "accum": 38
+      },
+      {
+        "period": "6-10",
+        "accum": 44
+      },
+      {
+        "period": "11-15",
+        "accum": 53
+      },
+      {
+        "period": "16-20",
+        "accum": 67
+      },
+      {
+        "period": "21-25",
+        "accum": 82
+      },
+      {
+        "period": "26-31",
+        "accum": 111
+      }
+    ],
+    "rsPlanSteps": [
+      19,
+      19,
+      19,
+      19,
+      19,
+      19
+    ],
+    "accumMtdDoRsValues": [
+      0,
+      0,
+      8,
+      17,
+      27,
+      39
+    ],
+    "fromNewOrder": 76
+  },
+  "closingEstimation": {
+    "oapTarget": 92,
+    "matchingOutstanding": 53,
+    "newOrderSPK": 39,
+    "totalEstClosing": 92,
+    "totalInvoiceableStock": 133,
+    "efficiencySTO": "69%"
+  },
+  "table1Models": [
+    {
+      "model": "Avanza New",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Veloz New",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Raize",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Agya",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Calya",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Yaris",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Innova",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Fortuner 4x2",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Rush",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    },
+    {
+      "model": "Others",
+      "gapOS": 0,
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "totalMatch": 0,
+      "firmed": 0,
+      "pLoan": 0,
+      "unmatch": 0
+    }
+  ],
+  "table2Supply": [
+    {
+      "model": "Avanza New",
+      "stock": 5,
+      "mdp": 15,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 20,
+      "doActual": 1,
+      "stockMatching": 7,
+      "fts": 12,
+      "spk": 77,
+      "do": 1,
+      "netFts": -65
+    },
+    {
+      "model": "Veloz Hybrid",
+      "stock": 7,
+      "mdp": 6,
+      "secondAllo": 17,
+      "co": 0,
+      "ttlSupply": 30,
+      "doActual": 0,
+      "stockMatching": 17,
+      "fts": 13,
+      "spk": 83,
+      "do": 0,
+      "netFts": -70
+    },
+    {
+      "model": "Raize",
+      "stock": 0,
+      "mdp": 3,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 3,
+      "doActual": 1,
+      "stockMatching": 1,
+      "fts": 1,
+      "spk": 0,
+      "do": 1,
+      "netFts": 1
+    },
+    {
+      "model": "Rush",
+      "stock": 5,
+      "mdp": 5,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 10,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 10,
+      "spk": 77,
+      "do": 0,
+      "netFts": -67
+    },
+    {
+      "model": "Agya",
+      "stock": 1,
+      "mdp": 5,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 6,
+      "doActual": 0,
+      "stockMatching": 3,
+      "fts": 3,
+      "spk": 10,
+      "do": 0,
+      "netFts": -7
+    },
+    {
+      "model": "Agya GR-S",
+      "stock": 1,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 1,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 1,
+      "spk": 0,
+      "do": 0,
+      "netFts": 1
+    },
+    {
+      "model": "Calya",
+      "stock": 4,
+      "mdp": 13,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 17,
+      "doActual": 2,
+      "stockMatching": 8,
+      "fts": 7,
+      "spk": 43,
+      "do": 2,
+      "netFts": -36
+    },
+    {
+      "model": "Yaris",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Yaris Cross Gasoline",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Yaris Cross Hybrid",
+      "stock": 0,
+      "mdp": 2,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 2,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 2,
+      "spk": 10,
+      "do": 0,
+      "netFts": -8
+    },
+    {
+      "model": "Innova",
+      "stock": 3,
+      "mdp": 11,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 14,
+      "doActual": 2,
+      "stockMatching": 2,
+      "fts": 10,
+      "spk": 77,
+      "do": 2,
+      "netFts": -67
+    },
+    {
+      "model": "Innova Zenix Hybrid",
+      "stock": 6,
+      "mdp": 12,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 18,
+      "doActual": 2,
+      "stockMatching": 1,
+      "fts": 15,
+      "spk": 93,
+      "do": 2,
+      "netFts": -78
+    },
+    {
+      "model": "Innova Zenix",
+      "stock": 4,
+      "mdp": 1,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 5,
+      "doActual": 0,
+      "stockMatching": 1,
+      "fts": 4,
+      "spk": 33,
+      "do": 0,
+      "netFts": -29
+    },
+    {
+      "model": "Fortuner 4x2",
+      "stock": 2,
+      "mdp": 3,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 5,
+      "doActual": 0,
+      "stockMatching": 1,
+      "fts": 4,
+      "spk": 33,
+      "do": 0,
+      "netFts": -29
+    },
+    {
+      "model": "Alphard",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Alphard Hybrid",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Voxy",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Hilux D-Cab",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 1,
+      "co": 0,
+      "ttlSupply": 1,
+      "doActual": 1,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 1,
+      "netFts": 0
+    },
+    {
+      "model": "Hilux S-Cab",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Hilux S-Cab 4x4",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Hilux Rangga",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Hiace",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Hiace Premio",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 0,
+      "co": 0,
+      "ttlSupply": 0,
+      "doActual": 0,
+      "stockMatching": 0,
+      "fts": 0,
+      "spk": 0,
+      "do": 0,
+      "netFts": 0
+    },
+    {
+      "model": "Others",
+      "stock": 0,
+      "mdp": 0,
+      "secondAllo": 1,
+      "co": 0,
+      "ttlSupply": 1,
+      "doActual": 1,
+      "stockMatching": 1,
+      "fts": -1,
+      "spk": 0,
+      "do": 1,
+      "netFts": -1
+    }
+  ]
+}

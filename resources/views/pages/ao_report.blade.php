@@ -66,6 +66,9 @@
                         <button class="btn-ao btn-ao-export" id="btnAoExportCSV" title="Unduh Data Format Excel / CSV">
                             <i class="fa-solid fa-file-excel" style="color:#16a34a;"></i> Ekspor CSV
                         </button>
+                        <span style="display:inline-flex; align-items:center; gap:5px; background:#f1f5f9; color:#475569; border:1.5px solid #cbd5e1; border-radius:7px; font-size:11px; font-weight:800; padding:6px 10px;" title="Akses Read-Only untuk Wiraniaga">
+                            <i class="fa-solid fa-lock" style="color:#64748b;"></i> Read-Only
+                        </span>
                     </div>
                 </div>
 

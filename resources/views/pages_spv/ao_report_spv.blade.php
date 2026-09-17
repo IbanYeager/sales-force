@@ -139,6 +139,9 @@
                 <button class="btn-ao btn-ao-export" id="btnAoExportCSV" title="Unduh Data Format Excel / CSV">
                     <i class="fa-solid fa-file-excel" style="color:#16a34a;"></i> Ekspor CSV
                 </button>
+                <button class="btn-ao btn-ao-import" onclick="openAoImportModal()" title="Impor File Excel Update AO Report (.xlsx)">
+                    <i class="fa-solid fa-file-arrow-up" style="color:#2563eb;"></i> Impor Excel AO
+                </button>
             </div>
         </div>
 
@@ -557,5 +560,56 @@
         window.location.href = '../pages/login_spv.html';
     }
   </script>
+
+  <!-- Modal Dialog: Impor Excel AO Report (SPV) -->
+  <div id="modalAoImport" class="ao-modal-backdrop" onclick="if(event.target===this) closeAoImportModal()">
+    <div class="ao-modal-card">
+      <div class="ao-modal-header">
+        <h3 class="ao-modal-title">
+          <i class="fa-solid fa-file-arrow-up" style="color:#2563eb;"></i> Impor Data Excel AO Report
+        </h3>
+        <button class="ao-modal-close" onclick="closeAoImportModal()" title="Tutup">&times;</button>
+      </div>
+      <div class="ao-modal-body">
+        <div class="ao-dropzone" onclick="document.getElementById('inputAoFile').click()" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault(); this.classList.remove('dragover'); handleAoFileSelected(event.dataTransfer.files)">
+          <i class="fa-solid fa-cloud-arrow-up ao-dropzone-icon"></i>
+          <div class="ao-dropzone-text">Pilih atau Tarik File Excel ke Sini</div>
+          <div class="ao-dropzone-hint">Mendukung format spreadsheet <strong>.xlsx</strong> resmi Tunas Toyota (AO Report, Action Plan, by MDL)</div>
+          <input type="file" id="inputAoFile" accept=".xlsx" style="display:none;" onchange="handleAoFileSelected(this.files)">
+        </div>
+
+        <div id="aoSelectedFileInfo" style="display:none; margin-top:14px; padding:10px 14px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; align-items:center; gap:10px;">
+          <i class="fa-solid fa-file-excel" style="color:#16a34a; font-size:20px;"></i>
+          <div style="flex:1; overflow:hidden;">
+            <div id="aoSelectedFileName" style="font-size:12.5px; font-weight:700; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">-</div>
+            <div style="font-size:11px; color:#64748b;">Siap diproses dan diintegrasikan ke papan operasional</div>
+          </div>
+          <button type="button" onclick="resetAoImportForm()" style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:14px;" title="Batalkan file"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+
+        <div id="aoUploadProgress" style="display:none; margin-top:14px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#475569; margin-bottom:5px;">
+            <span id="aoProgressText">Memproses file...</span>
+            <span id="aoProgressPercent">0%</span>
+          </div>
+          <div style="width:100%; height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
+            <div id="aoProgressBar" style="width:0%; height:100%; background:linear-gradient(90deg, #2563eb, #3b82f6); transition:width 0.3s ease;"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px; padding:10px 12px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; font-size:11px; color:#475569; line-height:1.4;">
+          <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i>
+          <strong>Catatan:</strong> Data akan otomatis menguraikan sheet <em>AO Report(0)</em>, <em>Action Plan</em>, dan <em>by MDL</em> serta langsung memperbarui papan live tanpa perlu reload halaman.
+        </div>
+      </div>
+      <div class="ao-modal-footer">
+        <button type="button" class="btn-ao" onclick="closeAoImportModal()" style="border:1px solid #cbd5e1; background:#f8fafc;">Batal</button>
+        <button type="button" class="btn-ao btn-ao-import" id="btnSubmitAoImport" onclick="submitAoImport('spv')" style="background:#2563eb; color:#ffffff; border-color:#1d4ed8; padding:7px 16px;">
+          <i class="fa-solid fa-upload"></i> Proses &amp; Terapkan
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
