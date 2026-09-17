@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css?v=20260914_master" />
     <link rel="stylesheet" href="../css/style.css?v=20260914_master" />
-    <link rel="stylesheet" href="../css/ao_report.css?v=20260917_excel_v4" />
-    <link rel="stylesheet" href="/css/ao_report.css?v=20260917_excel_v4" />
+    <link rel="stylesheet" href="../css/ao_report.css?v=20260917_excel_v5" />
+    <link rel="stylesheet" href="/css/ao_report.css?v=20260917_excel_v5" />
     <style>
       @php
         $aoCssPath = public_path('css/ao_report.css');
@@ -85,7 +85,7 @@
                             <div class="excel-table-card">
                                 <div class="excel-section-header">
                                     <span><i class="fa-solid fa-layer-group" style="color:#2563eb;"></i> [A] Stock Matching with OS</span>
-                                    <span class="badge" style="background:#eff6ff; color:#1d4ed8; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #bfdbfe;">Lingkaran 2</span>
+                                    <span class="ao-badge-pill" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">Lingkaran 2</span>
                                 </div>
                                 <div class="excel-table-scroll">
                                     <div class="ao-excel-pillars-grid">
@@ -186,9 +186,9 @@
                                                     <span>Target DO:</span>
                                                     <strong id="wbKpiTargetDO">92</strong>
                                                 </div>
-                                                <div style="display:flex; justify-content:space-between;">
+                                                <div style="display:flex; justify-content:space-between; align-items:center;">
                                                     <span>MTD Actual:</span>
-                                                    <strong id="wbKpiMtdActual" class="badge" style="background:#dbeafe; color:#1e40af; padding:1px 6px;">10</strong>
+                                                    <strong id="wbKpiMtdActual" class="ao-badge-pill" style="background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; font-weight:800;">10</strong>
                                                 </div>
                                             </div>
                                         </div>
@@ -200,7 +200,7 @@
                             <div class="excel-table-card">
                                 <div class="excel-section-header">
                                     <span><i class="fa-solid fa-calculator" style="color:#16a34a;"></i> Closing Estimation</span>
-                                    <span class="badge" style="background:#f0fdf4; color:#166534; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #bbf7d0;">Lingkaran 1</span>
+                                    <span class="ao-badge-pill" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;">Lingkaran 1</span>
                                 </div>
                                 <div class="excel-table-scroll">
                                     <table class="excel-grid">
@@ -253,7 +253,7 @@
                             <div class="excel-section-header">
                                 <div style="display:flex; align-items:center; gap:12px;">
                                     <span><i class="fa-solid fa-bullseye" style="color:#d97706;"></i> [B] Matching Stock from Order &mdash; SPK Plan</span>
-                                    <span class="badge" style="background:#fef3c7; color:#92400e; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">Lingkaran 10</span>
+                                    <span class="ao-badge-pill" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;">Lingkaran 10</span>
                                 </div>
                                 <div style="font-size:11.5px; font-weight:700; color:#475569;">
                                     Effective to N RS: <strong class="bg-amber" style="padding:2px 8px; border-radius:4px;" id="wbEffectiveNRS">76</strong>
@@ -350,7 +350,7 @@
                         <div class="excel-table-card">
                             <div class="excel-section-header">
                                 <span><i class="fa-solid fa-truck-ramp-box" style="color:#2563eb;"></i> Action Plan &mdash; Supply, Alokasi &amp; FTS per Model Kendaraan</span>
-                                <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #bae6fd;">24 Model Resmi</span>
+                                <span class="ao-badge-pill" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">24 Model Resmi</span>
                             </div>
                             <div class="excel-table-scroll">
                                 <table class="excel-grid">
@@ -386,7 +386,7 @@
                         <div class="excel-table-card">
                             <div class="excel-section-header">
                                 <span><i class="fa-solid fa-list-check" style="color:#d97706;"></i> by MDL &mdash; Gap from OS &amp; Matching per Model Kendaraan</span>
-                                <span class="badge" style="background:#fef3c7; color:#92400e; font-size:11px; padding:2px 8px; border-radius:4px; border:1px solid #fde68a;">Distribusi Mingguan</span>
+                                <span class="ao-badge-pill" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;">Distribusi Mingguan</span>
                             </div>
                             <div class="excel-table-scroll">
                                 <table class="excel-grid">
