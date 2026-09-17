@@ -36,10 +36,17 @@ Route::get('/pages_spv/{page}', [PageController::class, 'showSpvPage']);
 Route::prefix('kacab')->group(function () {
     Route::get('/', [PageController::class, 'showKacabPage'])->name('kacab.dashboard');
     Route::get('/sph', function() { return app(PageController::class)->showKacabPage('quotation'); });
+    Route::get('/after_sales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
+    Route::get('/aftersales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
+    Route::get('/bengkel', function() { return app(PageController::class)->showKacabPage('after_sales'); });
     Route::get('/{page}', [PageController::class, 'showKacabPage'])->name('kacab.page');
 });
 Route::get('/pages_kacab/sph.html', function() { return app(PageController::class)->showKacabPage('quotation'); });
 Route::get('/pages_kacab/sph', function() { return app(PageController::class)->showKacabPage('quotation'); });
+Route::get('/pages_kacab/after_sales.html', function() { return app(PageController::class)->showKacabPage('after_sales'); });
+Route::get('/pages_kacab/after_sales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
+Route::get('/pages_kacab/aftersales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
+Route::get('/pages_kacab/bengkel', function() { return app(PageController::class)->showKacabPage('after_sales'); });
 Route::get('/pages_kacab/{page}', [PageController::class, 'showKacabPage']);
 
 // Direct SPH Aliases for Sales

@@ -114,6 +114,10 @@ class PageController extends Controller
             $cleanPage = 'quotation';
         }
 
+        if ($cleanPage === 'aftersales' || $cleanPage === 'bengkel') {
+            $cleanPage = 'after_sales';
+        }
+
         if (View::exists("pages_kacab.{$cleanPage}")) {
             return view("pages_kacab.{$cleanPage}");
         }
