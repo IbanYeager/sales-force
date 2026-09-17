@@ -26,7 +26,12 @@ $input = json_decode($rawInput, true) ?? $_POST;
 
 // Parse incoming message and sender phone
 $sender = $input['sender'] ?? ($input['phone'] ?? ($input['from'] ?? ($input['wa_number'] ?? '')));
-$message = trim($input['message'] ?? ($input['text'] ?? ($input['body'] ?? ($_GET['msg'] ?? ''))));
+$message = trim($input['message'] ?? ($input['text'] ?? ($input['body'] ?? ($_GET['msg'] ?? ($_POST['msg'] ?? '')))));
+
+// Parse incoming media URL, attachment, or document (Fonnte, Wablas, or Custom POST)
+$mediaUrl = $input['url'] ?? ($input['file'] ?? ($input['attachment'] ?? ($input['media_url'] ?? ($_GET['media_url'] ?? ($_POST['media_url'] ?? '')))));
+$filename = $input['filename'] ?? ($input['name'] ?? ($_GET['filename'] ?? ($_POST['filename'] ?? '')));
+$mimeType = $input['mimetype'] ?? ($input['mime_type'] ?? ($input['type'] ?? ($_GET['mime'] ?? ($_POST['mime'] ?? ''))));
 
 // If testing via GET parameter (e.g. api_wa_bot.php?msg=stok+alphard&sender=08123456789)
 if (empty($message) && isset($_GET['msg'])) {
@@ -36,33 +41,39 @@ if (empty($sender) && isset($_GET['sender'])) {
     $sender = trim($_GET['sender']);
 }
 
-if (empty($message)) {
+if (empty($message) && empty($mediaUrl)) {
     echo json_encode([
         'status' => 'standby',
-        'info' => 'T-STOCK WhatsApp Webhook siap menerima pesan masuk.',
+        'info' => 'T-STOCK WhatsApp Webhook siap menerima pesan teks, foto, atau file dokumen masuk.',
         'usage' => [
             'method' => 'POST',
             'payload_example' => [
                 'sender' => '08123456789',
-                'message' => 'stok alphard putih ready apa aja?'
+                'message' => 'stok alphard putih ready apa aja?',
+                'media_url' => 'https://.../foto_stok.jpg'
             ]
         ]
     ]);
     exit;
 }
 
-// 1. Check if user is triggering Stock Update / Admin Registration / Help
+// 1. Process Request (Media / Image / Document VS Text Update VS Query)
 $aiConfig = getAiConfig(__DIR__ . '/config_ai.json');
-$geminiKey = $aiConfig['gemini_api_key'] ?? '';
+$geminiKey = resolveGeminiApiKey();
 
-$isStockUpdate = detectStockUpdateIntent($message);
-
-if ($isStockUpdate) {
-    // Mode Mutasi / Ekstraksi Data: Update stock langsung ke database via WhatsApp
-    $aiReplyRaw = handleWhatsAppStockUpdate($conn, $sender, $message, $geminiKey);
+if (!empty($mediaUrl)) {
+    // Mode Media: Ekstraksi foto/screenshot (Gemini Vision) atau file dokumen (Excel/CSV/PDF)
+    $aiReplyRaw = handleWhatsAppMediaStockUpdate($conn, $sender, $mediaUrl, $message, $filename, $mimeType);
 } else {
-    // Mode Query: Tanya ketersediaan stok mobil ke database T-STOCK
-    $aiReplyRaw = generateDirectSqlResponse($conn, $message);
+    $isStockUpdate = detectStockUpdateIntent($message);
+
+    if ($isStockUpdate) {
+        // Mode Mutasi / Ekstraksi Data: Update stock langsung ke database via WhatsApp
+        $aiReplyRaw = handleWhatsAppStockUpdate($conn, $sender, $message, $geminiKey);
+    } else {
+        // Mode Query: Tanya ketersediaan stok mobil ke database T-STOCK
+        $aiReplyRaw = generateDirectSqlResponse($conn, $message);
+    }
 }
 
 // 2. Format reply for WhatsApp (clean markdown without HTML tags)
