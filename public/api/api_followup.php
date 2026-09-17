@@ -354,7 +354,7 @@ if ($action === 'dashboard_analytics') {
             if ($isConnected) $connected++;
 
             // Contacted: 2-way communication established (Connected minus 'Customer Tidak Diangkat' & 'Customer tidak aktif')
-            $isContacted = ($cont || $prosp || $isSpk || in_array($rem, ['SPK berhasil', 'Customer tertarik', 'Customer janjian', 'Customer pending', 'Customer menolak']));
+            $isContacted = ($cont || $prosp || $isSpk || in_array($rem, ['SPK berhasil', 'Customer tertarik', 'Customer janjian', 'Customer menolak']));
             if ($isContacted) $contacted++;
 
             // Hot Prospect: Customer tertarik + Customer janjian + SPK
@@ -1136,43 +1136,63 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     $curr = !empty($current) ? $current[0] : [];
 
     // 1. Connected (No. Aktif / Tersambung)
-    if (isset($input['connected']) && $input['connected'] !== '') {
-        $cRaw = strtoupper(trim($input['connected']));
-        $connected = ($cRaw === 'IYA' || $cRaw === 'YA' || $cRaw === '1' || $cRaw === 'TRUE') ? 'TRUE' : 'FALSE';
+    if (isset($input['connected'])) {
+        $cRaw = strtoupper(trim((string)$input['connected']));
+        if ($cRaw === 'IYA' || $cRaw === 'YA' || $cRaw === '1' || $cRaw === 'TRUE') {
+            $connected = 'TRUE';
+        } elseif ($cRaw === 'FALSE' || $cRaw === 'TIDAK' || $cRaw === '0') {
+            $connected = 'FALSE';
+        } else {
+            $connected = '';
+        }
     } else {
         if (!empty($input['status']) && $input['status'] !== 'Belum Dihubungi') {
             $connected = 'TRUE';
         } else {
-            $connected = !empty($curr['connected']) ? $curr['connected'] : 'FALSE';
+            $connected = !empty($curr['connected']) ? $curr['connected'] : '';
         }
     }
 
     // 2. Contacted (Respon / Komunikasi Terkirim)
-    if (isset($input['contacted']) && $input['contacted'] !== '') {
-        $cRaw = strtoupper(trim($input['contacted']));
-        $contacted = ($cRaw === 'IYA' || $cRaw === 'YA' || $cRaw === '1' || $cRaw === 'TRUE') ? 'TRUE' : 'FALSE';
-    } else {
-        if (!empty($input['status']) && $input['status'] !== 'Belum Dihubungi') {
+    if (isset($input['contacted'])) {
+        $cRaw = strtoupper(trim((string)$input['contacted']));
+        if ($cRaw === 'IYA' || $cRaw === 'YA' || $cRaw === '1' || $cRaw === 'TRUE') {
             $contacted = 'TRUE';
+        } elseif ($cRaw === 'FALSE' || $cRaw === 'TIDAK' || $cRaw === '0') {
+            $contacted = 'FALSE';
         } else {
-            $contacted = !empty($curr['contacted']) ? $curr['contacted'] : 'FALSE';
+            $contacted = '';
         }
+    } else {
+        $contacted = !empty($curr['contacted']) ? $curr['contacted'] : '';
     }
 
     // 3. Prospect (Minat Beli / Upgrade)
-    if (isset($input['prospect']) && $input['prospect'] !== '') {
-        $pRaw = strtoupper(trim($input['prospect']));
-        $prospect = ($pRaw === 'IYA' || $pRaw === 'YA' || $pRaw === '1' || $pRaw === 'TRUE') ? 'TRUE' : 'FALSE';
+    if (isset($input['prospect'])) {
+        $pRaw = strtoupper(trim((string)$input['prospect']));
+        if ($pRaw === 'IYA' || $pRaw === 'YA' || $pRaw === '1' || $pRaw === 'TRUE') {
+            $prospect = 'TRUE';
+        } elseif ($pRaw === 'FALSE' || $pRaw === 'TIDAK' || $pRaw === '0') {
+            $prospect = 'FALSE';
+        } else {
+            $prospect = '';
+        }
     } else {
-        $prospect = !empty($curr['prospect']) ? $curr['prospect'] : 'FALSE';
+        $prospect = !empty($curr['prospect']) ? $curr['prospect'] : '';
     }
 
     // 4. SPK (Closing Transaksi)
-    if (isset($input['spk']) && $input['spk'] !== '') {
-        $sRaw = strtoupper(trim($input['spk']));
-        $spk = ($sRaw === 'IYA' || $sRaw === 'YA' || $sRaw === '1' || $sRaw === 'TRUE') ? 'TRUE' : 'FALSE';
+    if (isset($input['spk'])) {
+        $sRaw = strtoupper(trim((string)$input['spk']));
+        if ($sRaw === 'IYA' || $sRaw === 'YA' || $sRaw === '1' || $sRaw === 'TRUE') {
+            $spk = 'TRUE';
+        } elseif ($sRaw === 'FALSE' || $sRaw === 'TIDAK' || $sRaw === '0') {
+            $spk = 'FALSE';
+        } else {
+            $spk = '';
+        }
     } else {
-        $spk = !empty($curr['spk']) ? $curr['spk'] : 'FALSE';
+        $spk = !empty($curr['spk']) ? $curr['spk'] : '';
     }
 
     // SMART DECISION TREE (Sistem Pintar SFT CRM)
@@ -1196,17 +1216,8 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
             $status = 'Menunggu Respon';
         }
         if ($sales_fu_status === '') $sales_fu_status = 'Open';
-    } elseif ($prospect === 'FALSE') {
-        // 3. Kalo prospek TIDAK -> 'Customer menolak'
-        $connected = 'TRUE';
-        $contacted = 'TRUE';
-        $prospect = 'FALSE';
-        $spk = 'FALSE';
-        $remarks = 'Customer menolak';
-        $status = 'Tidak Tertarik';
-        $sales_fu_status = 'Closed';
     } elseif ($spk === 'TRUE') {
-        // 5. Kalo SPK IYA (Semuanya IYA) -> 'SPK berhasil'
+        // 3. Kalo SPK IYA (Semuanya IYA) -> 'SPK berhasil'
         $connected = 'TRUE';
         $contacted = 'TRUE';
         $prospect = 'TRUE';
@@ -1214,12 +1225,11 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $remarks = 'SPK berhasil';
         $status = 'Deal / Selesai';
         $sales_fu_status = 'Closed';
-    } else {
-        // 4. Kalo prospek IYA & SPK TIDAK -> 'Customer tertarik'
+    } elseif ($prospect === 'TRUE') {
+        // 4. Kalo prospek IYA & SPK belum -> 'Customer tertarik'
         $connected = 'TRUE';
         $contacted = 'TRUE';
         $prospect = 'TRUE';
-        $spk = 'FALSE';
         if ($remarks === '' || $remarks === 'Customer pending' || $remarks === 'Customer menolak' || $remarks === 'Customer tidak diangkat' || $remarks === 'Customer tidak aktif') {
             $remarks = 'Customer tertarik';
         }
@@ -1227,6 +1237,24 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
             $status = 'Tertarik / Jadwal Servis';
         }
         if ($sales_fu_status === '') $sales_fu_status = 'Open';
+    } elseif ($prospect === 'FALSE') {
+        // 5. Kalo prospek TIDAK -> 'Customer menolak'
+        $connected = 'TRUE';
+        $contacted = 'TRUE';
+        $prospect = 'FALSE';
+        $spk = 'FALSE';
+        $remarks = 'Customer menolak';
+        $status = 'Tidak Tertarik';
+        $sales_fu_status = 'Closed';
+    } else {
+        // 6. Default / Menunggu Respon: Connected = TRUE, tapi Contacted/Prospect/SPK masih kosong (menunggu respon customer)
+        if ($connected === 'TRUE') {
+            if ($remarks === '') $remarks = 'Customer pending';
+            if (!$status || $status === 'Belum Dihubungi') {
+                $status = 'Menunggu Respon';
+            }
+            if ($sales_fu_status === '') $sales_fu_status = 'Open';
+        }
     }
 
     $reason_followup = trim($input['reason_followup'] ?? ($input['reason'] ?? ($input['notes'] ?? '')));

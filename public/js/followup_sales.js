@@ -2100,14 +2100,6 @@ function handleTemplateSelectChange(val) {
   }
 }
 
-function closeWhatsAppModal() {
-  const modalWA = document.getElementById('modalWhatsAppFollowup');
-  if (modalWA) {
-    modalWA.classList.remove('active');
-    modalWA.classList.remove('show');
-    modalWA.style.display = 'none';
-  }
-}
 
 function updateLiveBubble(text) {
   const bubble = document.getElementById('waLiveBubble');
@@ -2558,11 +2550,11 @@ function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
   c.followup_date = nowIso;
   c.followup_status = nextStatus;
 
-  // Set TAM 4-Pilar logically: Connected & Contacted are always TRUE when WA is sent
-  c.connected = tamData.connected || 'TRUE';
-  c.contacted = tamData.contacted || 'TRUE';
-  c.prospect = tamData.prospect || ((nextStatus === 'Deal / Selesai' || nextStatus === 'Tertarik / Jadwal Servis') ? 'TRUE' : (c.prospect || 'FALSE'));
-  c.spk = tamData.spk || (nextStatus === 'Deal / Selesai' ? 'TRUE' : (c.spk || 'FALSE'));
+  // Set TAM 4-Pilar logically: Connected is TRUE when WA is sent, contacted & others stay blank unless explicitly provided
+  c.connected = (tamData.connected !== undefined && tamData.connected !== null) ? tamData.connected : 'TRUE';
+  c.contacted = (tamData.contacted !== undefined && tamData.contacted !== null) ? tamData.contacted : ((nextStatus === 'Deal / Selesai' || nextStatus === 'Tertarik / Jadwal Servis') ? 'TRUE' : '');
+  c.prospect = (tamData.prospect !== undefined && tamData.prospect !== null) ? tamData.prospect : ((nextStatus === 'Deal / Selesai' || nextStatus === 'Tertarik / Jadwal Servis') ? 'TRUE' : '');
+  c.spk = (tamData.spk !== undefined && tamData.spk !== null) ? tamData.spk : (nextStatus === 'Deal / Selesai' ? 'TRUE' : '');
   if (tamData.remarks) c.remarks = tamData.remarks;
   if (tamData.sales_fu_status) c.sales_fu_status = tamData.sales_fu_status;
 
@@ -2681,9 +2673,9 @@ async function executeSendWhatsApp() {
   const isRejected = (nextStatus === 'Tidak Tertarik');
 
   const connectedVal = 'TRUE';
-  const contactedVal = 'TRUE';
-  const prospectVal = (isDeal || isInterested) ? 'TRUE' : 'FALSE';
-  const spkVal = isDeal ? 'TRUE' : 'FALSE';
+  const contactedVal = (isDeal || isInterested) ? 'TRUE' : (isRejected ? 'FALSE' : '');
+  const prospectVal = (isDeal || isInterested) ? 'TRUE' : (isRejected ? 'FALSE' : '');
+  const spkVal = isDeal ? 'TRUE' : (isRejected ? 'FALSE' : '');
   const remarksVal = isDeal ? 'SPK berhasil' : (isInterested ? 'Customer tertarik' : (isRejected ? 'Customer menolak' : 'Customer pending'));
   const salesFuStatusVal = (isDeal || isRejected) ? 'Closed' : 'Open';
 
@@ -2731,7 +2723,7 @@ async function executeSendWhatsApp() {
     }
 
     if (typeof showCustomAlert === 'function') {
-      showCustomAlert('WhatsApp Terkirim!', `Pesan untuk ${customerName} telah dibuka di WA. Respon TAM otomatis tercatat (Connected & Contacted = Iya).`, 'success');
+      showCustomAlert('WhatsApp Terkirim!', `Pesan untuk ${customerName} telah dibuka di WA. Respon TAM: Connected = Iya, pilar lainnya menunggu respon customer.`, 'success');
     }
   } catch (e) {
     console.error('Error updating status after WhatsApp send:', e);
@@ -3515,9 +3507,9 @@ async function runBackgroundBlastLoop() {
         // Update card CRM
         updateSingleCardAfterWhatsApp(c.id, 'Menunggu Respon', {
           connected: 'TRUE',
-          contacted: 'TRUE',
-          prospect: c.prospect || 'FALSE',
-          spk: 'FALSE',
+          contacted: '',
+          prospect: '',
+          spk: '',
           remarks: 'Customer pending',
           sales_fu_status: 'Open'
         });
@@ -3530,9 +3522,9 @@ async function runBackgroundBlastLoop() {
             id: c.id,
             status: 'Menunggu Respon',
             connected: 'TRUE',
-            contacted: 'TRUE',
-            prospect: c.prospect || 'FALSE',
-            spk: 'FALSE',
+            contacted: '',
+            prospect: '',
+            spk: '',
             remarks: 'Customer pending',
             sales_fu_status: 'Open',
             notes: `Follow up otomatis via Auto-Blast WA (${currentTmpl.title || 'Template'})`,
@@ -3754,9 +3746,9 @@ async function executeSendCurrentBlastCustomer() {
   // Auto record in CRM backend
   updateSingleCardAfterWhatsApp(c.id, 'Menunggu Respon', {
     connected: 'TRUE',
-    contacted: 'TRUE',
-    prospect: c.prospect || 'FALSE',
-    spk: 'FALSE',
+    contacted: '',
+    prospect: '',
+    spk: '',
     remarks: 'Customer pending',
     sales_fu_status: 'Open'
   });
@@ -3769,9 +3761,9 @@ async function executeSendCurrentBlastCustomer() {
         id: c.id,
         status: 'Menunggu Respon',
         connected: 'TRUE',
-        contacted: 'TRUE',
-        prospect: c.prospect || 'FALSE',
-        spk: 'FALSE',
+        contacted: '',
+        prospect: '',
+        spk: '',
         remarks: 'Customer pending',
         sales_fu_status: 'Open',
         notes: `Follow up otomatis via Auto-Blast WA (${currentTmpl.title || 'Template'})`,
