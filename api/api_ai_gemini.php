@@ -265,10 +265,10 @@ function getLiveSqlContext($conn, $userQuery) {
 
         $res = $conn->query($sql);
 
-        if ($res && $res->num_rows > 0) {
-            $tree = [];
-            $totalAll = 0;
+        $tree = [];
+        $totalAll = 0;
 
+        if ($res && $res->num_rows > 0) {
             while ($r = $res->fetch_assoc()) {
                 $v = cleanModelVariantName($r['product_description']);
                 $c = cleanColorName($r['color_description']);
@@ -294,9 +294,48 @@ function getLiveSqlContext($conn, $userQuery) {
                 $tree[$v]['colors'][$c]['sites'][$s] = ($tree[$v]['colors'][$c]['sites'][$s] ?? 0) + $qty;
                 $totalAll += $qty;
             }
+        }
 
+        // Gabungkan unit dari tabel_inventory (Real-time update via WA / SPV)
+        $whereInvCtx = ["stok > 0", "status = 'Tersedia'"];
+        if (!empty($matchedModels)) {
+            $mCond = [];
+            foreach ($matchedModels as $m) {
+                $mCond[] = "LOWER(model) LIKE '%" . strtolower($m) . "%'";
+            }
+            $whereInvCtx[] = "(" . implode(" OR ", $mCond) . ")";
+        }
+        $resInvCtx = $conn->query("SELECT * FROM tabel_inventory WHERE " . implode(" AND ", $whereInvCtx));
+        if ($resInvCtx && $resInvCtx->num_rows > 0) {
+            while ($ri = $resInvCtx->fetch_assoc()) {
+                $v = cleanModelVariantName($ri['model'] . ' ' . $ri['varian']);
+                $c = cleanColorName(!empty($ri['warna']) ? $ri['warna'] : 'Semua Warna');
+                $s = !empty($ri['lokasi_1']) ? cleanSiteName($ri['lokasi_1']) : 'TR Kiaracondong';
+                $qty = (int)$ri['stok'];
+
+                if (!isset($tree[$v])) {
+                    $tree[$v] = [
+                        'total' => 0,
+                        'colors' => []
+                    ];
+                }
+                if (!isset($tree[$v]['colors'][$c])) {
+                    $tree[$v]['colors'][$c] = [
+                        'total' => 0,
+                        'sites' => []
+                    ];
+                }
+
+                $tree[$v]['total'] += $qty;
+                $tree[$v]['colors'][$c]['total'] += $qty;
+                $tree[$v]['colors'][$c]['sites'][$s] = ($tree[$v]['colors'][$c]['sites'][$s] ?? 0) + $qty;
+                $totalAll += $qty;
+            }
+        }
+
+        if (!empty($tree)) {
             $modelTitle = !empty($matchedModels) ? ucwords(implode(' / ', $matchedModels)) : 'Toyota';
-            $context .= "### DATA LIVE STOK GUDANG UNIT READY SPESIFIK (Tabel 'stock_inventory_essential'):\n";
+            $context .= "### DATA LIVE STOK GUDANG UNIT READY SPESIFIK (Tabel 'stock_inventory_essential' & 'tabel_inventory'):\n";
             $context .= "Total Ready {$modelTitle}: {$totalAll} Unit\n\n";
 
             foreach ($tree as $vName => $vData) {
@@ -552,11 +591,10 @@ function generateDirectSqlResponse($conn, $userQuery) {
                 ORDER BY product_description ASC, qty DESC";
 
         $res = $conn->query($sql);
+        $tree = [];
+        $totalAll = 0;
 
         if ($res && $res->num_rows > 0) {
-            $tree = [];
-            $totalAll = 0;
-
             while ($r = $res->fetch_assoc()) {
                 $v = cleanModelVariantName($r['product_description']);
                 $c = cleanColorName($r['color_description']);
@@ -584,7 +622,46 @@ function generateDirectSqlResponse($conn, $userQuery) {
                 $tree[$v]['colors'][$c]['locations'][$locKey] = ($tree[$v]['colors'][$c]['locations'][$locKey] ?? 0) + $qty;
                 $totalAll += $qty;
             }
+        }
 
+        // KONSISTENSI DATABASE: Gabungkan unit dari tabel_inventory (Update Real-time via WA Bot / SPV Panel)
+        $whereInv = ["stok > 0", "status = 'Tersedia'"];
+        if (!empty($matchedModels)) {
+            $mCond = [];
+            foreach ($matchedModels as $m) {
+                $mCond[] = "LOWER(model) LIKE '%" . strtolower($m) . "%'";
+            }
+            $whereInv[] = "(" . implode(" OR ", $mCond) . ")";
+        }
+        $resInv = $conn->query("SELECT * FROM tabel_inventory WHERE " . implode(" AND ", $whereInv));
+        if ($resInv && $resInv->num_rows > 0) {
+            while ($ri = $resInv->fetch_assoc()) {
+                $v = cleanModelVariantName($ri['model'] . ' ' . $ri['varian']);
+                $c = cleanColorName(!empty($ri['warna']) ? $ri['warna'] : 'Semua Warna');
+                $locKey = !empty($ri['lokasi_1']) ? cleanSiteName($ri['lokasi_1']) : 'TR Kiaracondong';
+                $qty = (int)$ri['stok'];
+
+                if (!isset($tree[$v])) {
+                    $tree[$v] = [
+                        'total' => 0,
+                        'colors' => []
+                    ];
+                }
+                if (!isset($tree[$v]['colors'][$c])) {
+                    $tree[$v]['colors'][$c] = [
+                        'total' => 0,
+                        'locations' => []
+                    ];
+                }
+
+                $tree[$v]['total'] += $qty;
+                $tree[$v]['colors'][$c]['total'] += $qty;
+                $tree[$v]['colors'][$c]['locations'][$locKey] = ($tree[$v]['colors'][$c]['locations'][$locKey] ?? 0) + $qty;
+                $totalAll += $qty;
+            }
+        }
+
+        if (!empty($tree)) {
             $modelTitle = !empty($matchedModels) ? ucwords(implode(' / ', $matchedModels)) : 'Toyota';
             $reply = "🚗 **Stok Ready {$modelTitle}** (Total: **{$totalAll} Unit**)\n";
 

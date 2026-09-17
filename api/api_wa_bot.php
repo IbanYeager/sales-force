@@ -18,6 +18,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS
 require_once __DIR__ . '/koneksi.php';
 define('AI_ENGINE_ONLY', true);
 require_once __DIR__ . '/api_ai_gemini.php';
+require_once __DIR__ . '/wa_stock_updater.php';
 
 // Capture incoming webhook payload
 $rawInput = file_get_contents('php://input');
@@ -50,11 +51,23 @@ if (empty($message)) {
     exit;
 }
 
-// 1. Generate Intelligent AI Response from T-STOCK SQL Engine
-$aiReplyRaw = generateDirectSqlResponse($conn, $message);
+// 1. Check if user is triggering Stock Update / Admin Registration / Help
+$aiConfig = getAiConfig(__DIR__ . '/config_ai.json');
+$geminiKey = $aiConfig['gemini_api_key'] ?? '';
+
+$isStockUpdate = detectStockUpdateIntent($message);
+
+if ($isStockUpdate) {
+    // Mode Mutasi / Ekstraksi Data: Update stock langsung ke database via WhatsApp
+    $aiReplyRaw = handleWhatsAppStockUpdate($conn, $sender, $message, $geminiKey);
+} else {
+    // Mode Query: Tanya ketersediaan stok mobil ke database T-STOCK
+    $aiReplyRaw = generateDirectSqlResponse($conn, $message);
+}
 
 // 2. Format reply for WhatsApp (clean markdown without HTML tags)
 $waFormattedReply = cleanForWhatsApp($aiReplyRaw);
+
 
 // 3. Log into database table 'tabel_wa_logs'
 $conn->query("CREATE TABLE IF NOT EXISTS tabel_wa_logs (
@@ -127,8 +140,10 @@ function cleanForWhatsApp($text) {
     // Ensure clean line breaks
     $t = trim($t);
     
-    // Add signature footer
-    $t .= "\n\n━━━━━━━━━━━━━━━━━━━━\n_🤖 Dibalas otomatis oleh T-STOCK AI (Tunas Toyota Kiara Condong)_";
+    // Add signature footer if not already present
+    if (strpos($t, 'T-STOCK AI') === false) {
+        $t .= "\n\n━━━━━━━━━━━━━━━━━━━━\n_🤖 Dibalas otomatis oleh T-STOCK AI (Tunas Toyota Kiara Condong)_";
+    }
     
     return $t;
 }
