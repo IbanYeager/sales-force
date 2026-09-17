@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css?v=20260914_master" />
     <link rel="stylesheet" href="../css/style.css?v=20260914_master" />
-    <link rel="stylesheet" href="../css/ao_report.css?v=20260917_excel_v3" />
-    <link rel="stylesheet" href="/css/ao_report.css?v=20260917_excel_v3" />
+    <link rel="stylesheet" href="../css/ao_report.css?v=20260917_excel_v4" />
+    <link rel="stylesheet" href="/css/ao_report.css?v=20260917_excel_v4" />
     <style>
       @php
         $aoCssPath = public_path('css/ao_report.css');
@@ -470,8 +470,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="../js/ao_report_data.js?v=20260917_excel_v3"></script>
-    <script src="../js/ao_report.js?v=20260917_excel_v3"></script>
+    <script src="../js/ao_report_data.js?v=20260917_excel_v4"></script>
+    <script src="../js/ao_report.js?v=20260917_excel_v4"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             initAOReport('sales');

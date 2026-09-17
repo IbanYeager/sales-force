@@ -367,14 +367,65 @@
         const btn = document.getElementById('btnAoProjector');
         if (!wb) return;
 
-        wb.classList.toggle('ao-fullscreen-active');
-        const isFull = wb.classList.contains('ao-fullscreen-active');
+        const isCurrentlyFull = wb.classList.contains('ao-fullscreen-active');
+        const willBeFull = !isCurrentlyFull;
+
+        wb.classList.toggle('ao-fullscreen-active', willBeFull);
+        document.body.classList.toggle('ao-projector-active', willBeFull);
+        document.documentElement.classList.toggle('ao-projector-active', willBeFull);
+
+        if (willBeFull) {
+            try {
+                if (wb.requestFullscreen) {
+                    wb.requestFullscreen().catch(() => {});
+                } else if (wb.webkitRequestFullscreen) {
+                    wb.webkitRequestFullscreen();
+                }
+            } catch (e) {}
+        } else {
+            try {
+                if (document.fullscreenElement || document.webkitFullscreenElement) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                }
+            } catch (e) {}
+        }
+
         if (btn) {
-            btn.innerHTML = isFull 
-                ? '<i class="fa-solid fa-compress"></i> Keluar Layar Penuh'
-                : '<i class="fa-solid fa-expand"></i> Mode Proyektor';
+            btn.innerHTML = willBeFull 
+                ? '<i class="fa-solid fa-compress"></i> Keluar Layar Penuh (ESC)'
+                : '<i class="fa-solid fa-expand"></i> Mode Proyektor TV';
+            btn.classList.toggle('active', willBeFull);
         }
     }
+
+    // Handle escape or external exit from native fullscreen
+    document.addEventListener('fullscreenchange', function() {
+        const wb = document.getElementById('aoExcelWorkbook');
+        const btn = document.getElementById('btnAoProjector');
+        if (!wb) return;
+        if (!document.fullscreenElement && wb.classList.contains('ao-fullscreen-active')) {
+            wb.classList.remove('ao-fullscreen-active');
+            document.body.classList.remove('ao-projector-active');
+            document.documentElement.classList.remove('ao-projector-active');
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-expand"></i> Mode Proyektor TV';
+                btn.classList.remove('active');
+            }
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const wb = document.getElementById('aoExcelWorkbook');
+            if (wb && wb.classList.contains('ao-fullscreen-active')) {
+                toggleProjectorMode();
+            }
+        }
+    });
 
     // EXCEL IMPORT MODAL LOGIC
     let selectedAoFile = null;
