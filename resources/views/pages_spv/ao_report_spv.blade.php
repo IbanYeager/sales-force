@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Area Operation (AO) Report</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_spv.css?v=20260917_excel_v4">
-  <link rel="stylesheet" href="/css/style_spv.css?v=20260917_excel_v4">
-  <link rel="stylesheet" href="../css/ao_report.css?v=20260917_excel_v5">
-  <link rel="stylesheet" href="/css/ao_report.css?v=20260917_excel_v5">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260917_pro_v1">
+  <link rel="stylesheet" href="/css/style_spv.css?v=20260917_pro_v1">
+  <link rel="stylesheet" href="../css/ao_report.css?v=20260917_pro_v1">
+  <link rel="stylesheet" href="/css/ao_report.css?v=20260917_pro_v1">
 
   <style>
     @php
@@ -90,29 +90,26 @@
         </div>
         <div class="spv-user">
           <div class="avatar-status">
-            <img id="spvAvatar" src="https://ui-avatars.com/api/?name=SPV&background=1c2740&color=ffffff&bold=true" alt="Avatar">
             <img id="spvAvatar" src="https://ui-avatars.com/api/?name=Pak+Ryan&background=0D1B3E&color=ffffff&bold=true" alt="Avatar">
             <span class="dot"></span>
           </div>
           <div class="meta">
-            <span class="name" id="spvNama">Supervisor</span>
-            <span class="role" id="spvRole">Supervisor Toyota</span>
             <span class="name" id="spvNama">Pak Ryan</span>
-            <span class="role" id="spvRole">Supervisor</span>
+            <span class="role" id="spvRole">Supervisor Toyota</span>
           </div>
         </div>
       </div>
 
-      <!-- ===== MASTER TEAM FILTER BAR ===== -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: white; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 10px;">
+      <!-- ===== SPV TEAM FILTER BAR ===== -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #0f172a;">
-          <span style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 8px; border: 1px solid #bae6fd;">
+          <span style="background: #eff6ff; color: #1d4ed8; padding: 4px 10px; border-radius: 8px; border: 1px solid #bfdbfe; font-size: 11.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
             <i class="fa-solid fa-users-viewfinder"></i> SPV Scope
           </span>
-          <span>Filter Tim Supervisor:</span>
+          <span style="color: #334155; font-weight: 700;">Filter Tim Supervisor:</span>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
-          <select id="selectSpvTeamFilter" class="form-control" style="width: auto; padding: 6px 12px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12.5px; background: #f8fafc;" onchange="applyTeamFilter(this.value)">
+          <select id="selectSpvTeamFilter" class="form-control" style="width: auto; height: 36px; padding: 0 14px; font-weight: 700; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 12.5px; background: #f8fafc; color: #0f172a; cursor: pointer;" onchange="applyTeamFilter(this.value)">
             <option value="Semua">Semua Tim (Total Cabang - 42 Sales)</option>
             <option value="Ryan">Tim Pak Ryan (11 Sales)</option>
             <option value="Riva">Tim Pak Riva (10 Sales)</option>
@@ -558,9 +555,9 @@
     </main>
   </div>
 
-  <script src="../js/ao_report_data.js?v=20260917_excel_v4"></script>
-  <script src="../js/ao_report.js?v=20260917_excel_v4"></script>
-  <script src="../js/spv_global.js?v=20260917_excel_v4"></script>
+  <script src="../js/ao_report_data.js?v=20260917_pro_v1"></script>
+  <script src="../js/ao_report.js?v=20260917_pro_v1"></script>
+  <script src="../js/spv_global.js?v=20260917_pro_v1"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         initAOReport('spv');

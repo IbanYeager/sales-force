@@ -5,8 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_executive_v34">
+  <link rel="stylesheet" href="../css/style_spv.css?v=20260917_pro_v1">
+  <link rel="stylesheet" href="/css/style_spv.css?v=20260917_pro_v1">
 
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
@@ -73,22 +73,25 @@
       </div>
 
       <!-- ===== MASTER TEAM FILTER BAR ===== -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: white; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #0f172a;">
-          <span style="background: #fef3c7; color: #b45309; padding: 3px 8px; border-radius: 8px; border: 1px solid #fde68a;">
+      <div class="spv-master-scope-bar">
+        <div class="scope-info-group">
+          <span class="badge-master-mode">
             <i class="fa-solid fa-crown"></i> Master Mode
           </span>
-          <span>Cakupan Pengawasan Supervisor &amp; Cabang:</span>
+          <span class="scope-title">Cakupan Pengawasan:</span>
+          <span class="scope-desc">Monitoring Terpadu Seluruh Tim Wiraniaga &amp; Cabang</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <label style="font-size: 12px; font-weight: 700; color: #475569;">Pilih Tim SPV:</label>
-          <select id="selectSpvTeamFilter" class="form-control" style="width: auto; padding: 6px 12px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12.5px; background: #f8fafc;" onchange="changeSpvTeamFilter(this.value)">
-            <option value="Semua">Semua Tim (Master View - Seluruh 42 Sales)</option>
-            <option value="Ryan">Tim Pak Ryan</option>
-            <option value="Riva">Tim Pak Riva</option>
-            <option value="Dani">Tim Pak Dani</option>
-            <option value="Hendra">Tim Pak Hendra</option>
-          </select>
+        <div class="scope-filter-group">
+          <label for="selectSpvTeamFilter" class="scope-filter-label"><i class="fa-solid fa-filter"></i> Pilih Tim SPV:</label>
+          <div class="scope-select-wrap">
+            <select id="selectSpvTeamFilter" class="form-control scope-select" onchange="changeSpvTeamFilter(this.value)">
+              <option value="Semua">Semua Tim (Master View - Seluruh 42 Sales)</option>
+              <option value="Ryan">Tim Pak Ryan</option>
+              <option value="Riva">Tim Pak Riva</option>
+              <option value="Dani">Tim Pak Dani</option>
+              <option value="Hendra">Tim Pak Hendra</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -117,108 +120,112 @@
           <div class="body">
             <div class="label">Total Wiraniaga</div>
             <div class="value" id="dashSalesCount">0</div>
-            <div class="sub"><span class="pos" id="dashSalesActive">0 Aktif</span> &middot; <span class="neg"
-                id="dashSalesInactive">0 Inaktif</span></div>
+            <div class="sub">
+              <span class="live-pulse-dot"></span>
+              <span class="pos" id="dashSalesActive">0 Aktif</span>
+              <span>&middot;</span>
+              <span class="neg" id="dashSalesInactive">0 Inaktif</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- ===== SPV EARLY WARNING RADAR & RUN-RATE COCKPIT ===== -->
-      <div class="spv-card" style="margin-bottom:14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; padding:16px 18px; box-shadow:0 3px 14px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 3px 10px rgba(239,68,68,0.25);">
+      <div class="ew-cockpit-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 3px 10px rgba(239,68,68,0.25);">
               <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">
+                <h3 style="font-size:15.5px; font-weight:800; color:#0f172a; margin:0; letter-spacing:-0.2px;">
                   Early Warning Pipeline &amp; Run-Rate Tracker
                 </h3>
-                <span id="spvRadarHealthTag" style="font-size:10px; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:800; padding:2px 8px; border-radius:20px;">
-                  <i class="fa-solid fa-circle-exclamation"></i> Radar Aktif
+                <span id="spvRadarHealthTag" style="font-size:11px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-weight:800; padding:2px 9px; border-radius:20px; display:inline-flex; align-items:center; gap:5px;">
+                  <i class="fa-solid fa-circle-check"></i> Radar Tim Sehat
                 </span>
               </div>
-              <p style="font-size:11.5px; color:#64748b; margin:2px 0 0 0;">
+              <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">
                 Deteksi otomatis SPK tertahan leasing, leads stagnant, dan ritme laju closing tim.
               </p>
             </div>
           </div>
 
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-sm" onclick="openTeamBroadcastModal()" style="background:#25D366; color:white; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:5px; cursor:pointer; box-shadow:0 2px 6px rgba(37,211,102,0.25);">
+            <button class="btn btn-sm" onclick="openTeamBroadcastModal()" style="background:#25D366; color:white; font-weight:700; font-size:12px; height:34px; padding:0 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 6px rgba(37,211,102,0.25);">
               <i class="fa-brands fa-whatsapp"></i> Broadcast Tim
             </button>
-            <button class="btn btn-sm" onclick="location.href='spv_coaching.html'" style="background:#f1f5f9; color:#0f172a; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px; border:1px solid #cbd5e1; display:inline-flex; align-items:center; gap:5px; cursor:pointer;">
+            <button class="btn btn-sm" onclick="location.href='spv_coaching.html'" style="background:#ffffff; color:#0f172a; font-weight:700; font-size:12px; height:34px; padding:0 12px; border-radius:8px; border:1.5px solid #cbd5e1; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
               <i class="fa-solid fa-chalkboard-user"></i> Radar Coaching
             </button>
-            <button class="btn btn-sm" onclick="location.href='../pages/quotation.html'" style="background:linear-gradient(135deg, #d71920, #b91c1c); color:white; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:5px; cursor:pointer; box-shadow:0 2px 6px rgba(215,25,32,0.25);">
+            <button class="btn btn-sm" onclick="location.href='../pages/quotation.html'" style="background:linear-gradient(135deg, #d71920, #b91c1c); color:white; font-weight:700; font-size:12px; height:34px; padding:0 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 6px rgba(215,25,32,0.25);">
               <i class="fa-solid fa-file-invoice-dollar"></i> Studio SPH
             </button>
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+        <div class="ew-card-grid">
           <!-- Tile 1: SPK Tertahan Leasing -->
-          <div style="background:#fff1f2; border:1px solid #fecaca; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div class="ew-card ew-card-leasing">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:10px; font-weight:800; color:#991b1b; text-transform:uppercase; letter-spacing:0.5px;">Leasing Stuck &gt; 5 Hari</span>
-                <h4 style="font-size:20px; font-weight:900; color:#b91c1c; margin:2px 0;" id="spvAlertStuckLeasing">0 <small style="font-size:12px; font-weight:700;">SPK</small></h4>
+                <span class="ew-title">Leasing Stuck &gt; 5 Hari</span>
+                <h4 class="ew-val" id="spvAlertStuckLeasing">0 <small style="font-size:13px; font-weight:700;">SPK</small></h4>
               </div>
-              <div style="width:28px; height:28px; border-radius:7px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:13px;">
+              <div class="ew-icon-box">
                 <i class="fa-solid fa-clock-rotate-left"></i>
               </div>
             </div>
-            <p style="font-size:10.5px; color:#b91c1c; margin:4px 0 0 0; line-height:1.35;" id="spvAlertStuckSub">
+            <p class="ew-sub" id="spvAlertStuckSub">
               Menunggu approval leasing &gt; 5 hari kerja. Segera follow up ke AO terkait.
             </p>
           </div>
 
           <!-- Tile 2: Hot Leads Stagnant -->
-          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div class="ew-card ew-card-leads">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:10px; font-weight:800; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">Hot Leads &gt; 48 Jam</span>
-                <h4 style="font-size:20px; font-weight:900; color:#d97706; margin:2px 0;" id="spvAlertHotLeads">0 <small style="font-size:12px; font-weight:700;">Prospek</small></h4>
+                <span class="ew-title">Hot Leads &gt; 48 Jam</span>
+                <h4 class="ew-val" id="spvAlertHotLeads">0 <small style="font-size:13px; font-weight:700;">Prospek</small></h4>
               </div>
-              <div style="width:28px; height:28px; border-radius:7px; background:#fef3c7; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:13px;">
+              <div class="ew-icon-box">
                 <i class="fa-solid fa-fire"></i>
               </div>
             </div>
-            <p style="font-size:10.5px; color:#92400e; margin:4px 0 0 0; line-height:1.35;" id="spvAlertHotSub">
+            <p class="ew-sub" id="spvAlertHotSub">
               Prospek siap beli belum dihubungi ulang. Dorong sales jadwalkan test drive.
             </p>
           </div>
 
           <!-- Tile 3: Sales Nihil Aktivitas Hari Ini -->
-          <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div class="ew-card ew-card-checkin">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:10px; font-weight:800; color:#0369a1; text-transform:uppercase; letter-spacing:0.5px;">Sales Belum Check-in</span>
-                <h4 style="font-size:20px; font-weight:900; color:#0284c7; margin:2px 0;" id="spvAlertZeroActivity">0 <small style="font-size:12px; font-weight:700;">Sales</small></h4>
+                <span class="ew-title">Sales Belum Check-in</span>
+                <h4 class="ew-val" id="spvAlertZeroActivity">0 <small style="font-size:13px; font-weight:700;">Sales</small></h4>
               </div>
-              <div style="width:28px; height:28px; border-radius:7px; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:13px;">
+              <div class="ew-icon-box">
                 <i class="fa-solid fa-user-slash"></i>
               </div>
             </div>
-            <p style="font-size:10.5px; color:#0369a1; margin:4px 0 0 0; line-height:1.35;" id="spvAlertZeroSub">
+            <p class="ew-sub" id="spvAlertZeroSub">
               Belum ada geotag GPS check-in canvassing atau aktivitas tercatat hari ini.
             </p>
           </div>
 
           <!-- Tile 4: Run-Rate Velocity Speed -->
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div class="ew-card ew-card-velocity">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
-                <span style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Laju Closing Tim</span>
-                <h4 style="font-size:20px; font-weight:900; color:#0f172a; margin:2px 0;" id="spvRunRateVal">0.8 <small style="font-size:12px; font-weight:700;">SPK/Hari</small></h4>
+                <span class="ew-title">Laju Closing Tim</span>
+                <h4 class="ew-val" id="spvRunRateVal">0.8 <small style="font-size:12px; font-weight:700;">SPK/Hari</small></h4>
               </div>
-              <div style="width:28px; height:28px; border-radius:7px; background:#f1f5f9; color:#475569; display:flex; align-items:center; justify-content:center; font-size:13px;">
+              <div class="ew-icon-box">
                 <i class="fa-solid fa-gauge-high"></i>
               </div>
             </div>
-            <p style="font-size:10.5px; color:#64748b; margin:4px 0 0 0; line-height:1.35;" id="spvRunRateSub">
+            <p class="ew-sub" id="spvRunRateSub">
               Kecepatan ritme closing yang dibutuhkan tim untuk mencapai 100% kuota.
             </p>
           </div>
@@ -538,12 +545,7 @@
         </div>
 
         <div>
-          <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Pilih Template Instruksi SPV</label>
           <select id="nudgeTemplateSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #cbd5e1; font-weight:600;" onchange="applyNudgeTemplate()">
-            <option value="activity_warning">Teguran Input Aktivitas Harian</option>
-            <option value="followup_prospect">Instruksi Follow-Up Prospek Tertunda</option>
-            <option value="spk_target">Pendorong Target SPK Pekan Ini</option>
-            <option value="custom">Tulis Pesan Instruksi Kustom</option>
             <option value="activity_warning">Teguran Input Aktivitas Harian</option>
             <option value="followup_prospect">Instruksi Follow-Up Prospek Tertunda</option>
             <option value="spk_target">Pendorong Target SPK Pekan Ini</option>
@@ -619,11 +621,22 @@
     </main>
   </div>
 
+  <script>
+    // Ensure SPV role is active when directly viewing SPV dashboard
+    (function() {
+      const currentPeran = localStorage.getItem('peranSales');
+      if (!currentPeran || currentPeran !== 'Supervisor') {
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('peranSales', 'Supervisor');
+        if (!localStorage.getItem('namaSales') || localStorage.getItem('namaSales') === 'Kepala Cabang') {
+          localStorage.setItem('namaSales', 'Pak Ryan');
+        }
+      }
+    })();
+  </script>
   <script src="../custom_alert.js"></script>
-  <script src="../js/spv_index.js?v=20260819_master"></script>
-
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
-  <script src="../js/spv_global.js?v=20260915_layout_executive_v34"></script>
+  <script src="../js/spv_index.js?v=20260917_pro_v1"></script>
+  <script src="../js/spv_global.js?v=20260917_pro_v1"></script>
 </body>
 
 </html>

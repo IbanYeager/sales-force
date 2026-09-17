@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Area Operation (AO) Report</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_kacab.css?v=20260917_excel_v4">
-  <link rel="stylesheet" href="/css/style_kacab.css?v=20260917_excel_v4">
-  <link rel="stylesheet" href="../css/ao_report.css?v=20260917_excel_v5">
-  <link rel="stylesheet" href="/css/ao_report.css?v=20260917_excel_v5">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20260917_pro_v1">
+  <link rel="stylesheet" href="/css/style_kacab.css?v=20260917_pro_v1">
+  <link rel="stylesheet" href="../css/ao_report.css?v=20260917_pro_v1">
+  <link rel="stylesheet" href="/css/ao_report.css?v=20260917_pro_v1">
 
   <style>
     @php
@@ -535,9 +535,9 @@
     </main>
   </div>
 
-  <script src="../js/kacab_global.js?v=20260917_excel_v4"></script>
-  <script src="../js/ao_report_data.js?v=20260917_excel_v4"></script>
-  <script src="../js/ao_report.js?v=20260917_excel_v4"></script>
+  <script src="../js/kacab_global.js?v=20260917_pro_v1"></script>
+  <script src="../js/ao_report_data.js?v=20260917_pro_v1"></script>
+  <script src="../js/ao_report.js?v=20260917_pro_v1"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         initAOReport('kacab');

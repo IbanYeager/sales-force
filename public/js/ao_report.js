@@ -186,23 +186,54 @@
             tbody.innerHTML = html;
         }
 
-        // Stepped Visualizer
+        // Stepped Visualizer (Nett SPK 5-daily staircase run-rate)
         const stepWrap = document.getElementById('wbSpkStepProgression');
-        if (stepWrap && p.rsPlanSteps) {
-            const steps = [
-                { label: '1-5', val: 19, height: '30%' },
-                { label: '6-10', val: 38, height: '44%' },
-                { label: '11-15', val: 57, height: '58%' },
-                { label: '16-20', val: 76, height: '72%' },
-                { label: '21-25', val: 95, height: '86%' },
-                { label: '26-31', val: 114, height: '100%' }
-            ];
-            stepWrap.innerHTML = steps.map(s => `
-                <div class="spk-step-bar" style="height: ${s.height};">
-                    <span>${s.val}</span>
-                    <span style="font-size:9px; opacity:0.8;">${s.label}</span>
-                </div>
-            `).join('');
+        if (stepWrap) {
+            const periods = ['1-5', '6-10', '11-15', '16-20', '21-25', '26-31'];
+            const targetAccum = [19, 38, 57, 76, 95, 114];
+            const actualValues = p.spkNettActual || p.spkGrossActual || [];
+            
+            let runningActual = 0;
+            const steps = periods.map((period, idx) => {
+                const tgt = targetAccum[idx];
+                const actPeriod = actualValues[idx + 1];
+                let isRecorded = actPeriod !== null && actPeriod !== undefined && !isNaN(actPeriod);
+                let barClass = 'upcoming';
+
+                if (isRecorded) {
+                    runningActual += Number(actPeriod);
+                    barClass = runningActual >= tgt ? 'achieved' : 'surplus';
+                }
+
+                const heightPct = Math.min(100, Math.max(22, Math.round((tgt / 114) * 100)));
+
+                return {
+                    period,
+                    tgt,
+                    actPeriod,
+                    runningActual,
+                    barClass,
+                    heightPct,
+                    isRecorded
+                };
+            });
+
+            stepWrap.innerHTML = steps.map(s => {
+                const tooltipText = s.isRecorded 
+                    ? `Periode ${s.period}: Aktual +${s.actPeriod} (Kumulatif ${s.runningActual} vs Tgt ${s.tgt})` 
+                    : `Periode ${s.period}: Target Kumulatif ${s.tgt} SPK`;
+                return `
+                    <div class="spk-step-column" title="${tooltipText}">
+                        <span class="spk-step-val-badge">${s.isRecorded ? s.runningActual : s.tgt}</span>
+                        <div class="spk-step-bar-wrap">
+                            <div class="spk-step-bar ${s.barClass}" style="height: ${s.heightPct}%;">
+                                ${s.isRecorded ? '<i class="fa-solid fa-check" style="font-size:8px;"></i>' : ''}
+                            </div>
+                        </div>
+                        <span class="spk-step-label">${s.period}</span>
+                    </div>
+                `;
+            }).join('');
         }
     }
 
