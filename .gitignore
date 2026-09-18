@@ -90,3 +90,10 @@ public/uploads/olx/*
 !public/uploads/olx/.gitkeep
 public/uploads/dokumen/*
 !public/uploads/dokumen/.gitkeep
+
+# Aktivitas & Event Galeri uploads
+aktivitas/*
+!aktivitas/.gitkeep
+public/aktivitas/*
+!public/aktivitas/.gitkeep
+

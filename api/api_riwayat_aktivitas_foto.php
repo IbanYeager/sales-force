@@ -113,13 +113,16 @@ if (file_exists(dirname(dirname(__DIR__)) . '/artisan')) {
 }
 
 function resolvePhotoFile($fName, $projectRoot) {
+    $parentDir = dirname($projectRoot);
     $searchPaths = [
         ['dir' => $projectRoot . '/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
         ['dir' => $projectRoot . '/public/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
         ['dir' => $projectRoot . '/aktivitas/', 'rel' => 'aktivitas/'],
         ['dir' => $projectRoot . '/public/aktivitas/', 'rel' => 'aktivitas/'],
         ['dir' => $projectRoot . '/uploads/', 'rel' => 'uploads/'],
-        ['dir' => $projectRoot . '/public/uploads/', 'rel' => 'uploads/']
+        ['dir' => $projectRoot . '/public/uploads/', 'rel' => 'uploads/'],
+        ['dir' => $parentDir . '/persistent_storage_sft/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
+        ['dir' => $parentDir . '/persistent_storage_sft/aktivitas/', 'rel' => 'aktivitas/']
     ];
 
     foreach ($searchPaths as $sp) {

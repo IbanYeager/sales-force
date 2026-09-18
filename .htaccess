@@ -6,8 +6,8 @@
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
 
-# Prevent direct listing of directories
-Options -Indexes
+# Prevent direct listing of directories and allow symlink traversal
+Options -Indexes +FollowSymLinks
 
 # Block direct access to sensitive files and databases
 <FilesMatch "\.(sqlite|db|sql|log|env|git|htaccess|ini|sh|bat|cmd|bak)$">

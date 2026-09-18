@@ -1,5 +1,5 @@
-# Disable directory listing
-Options -Indexes -MultiViews
+# Disable directory listing and allow symlink traversal
+Options -Indexes -MultiViews +FollowSymLinks
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
