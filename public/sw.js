@@ -3,7 +3,7 @@
 // Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20260918-olx-only-2-cards-v1';
+const CACHE_VERSION = 'sft-pwa-v20260918-olx-lux-v8';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',

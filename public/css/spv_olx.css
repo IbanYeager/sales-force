@@ -403,138 +403,164 @@
   font-weight: 600;
 }
 
-/* 5 Photo Frame Podium Grid */
+/* 4-Column Showcase Grid */
 .olx-podium-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
 }
 
 @media (max-width: 1024px) {
-  .olx-podium-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
   .olx-podium-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+@media (max-width: 640px) {
+  .olx-podium-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .olx-podium-card {
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 24px 16px;
+  text-align: center;
+  position: relative;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
-  position: relative;
-  border: 2px solid #ffffff;
+  align-items: center;
+  overflow: hidden;
 }
 
 .olx-podium-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.olx-podium-card-total {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.25) 0%, rgba(180, 83, 9, 0.4) 100%);
+  border: 1.5px solid rgba(251, 191, 36, 0.55);
+  box-shadow: 0 10px 30px -5px rgba(217, 119, 6, 0.4);
+}
+
+.olx-podium-card-total:hover {
+  border-color: rgba(253, 224, 71, 0.8);
+  box-shadow: 0 20px 45px -5px rgba(217, 119, 6, 0.6), 0 0 25px rgba(251, 191, 36, 0.3);
 }
 
 .olx-podium-rank-badge {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  width: 26px;
-  height: 26px;
+  top: 12px;
+  left: 12px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: #d7123a;
   color: #ffffff;
   font-weight: 900;
-  font-size: 12px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
   z-index: 2;
-  border: 1.5px solid #ffffff;
 }
 
-.olx-podium-photo-wrap {
-  width: 100%;
-  height: 155px;
-  background: #f1f5f9;
+.olx-podium-avatar-wrap {
   position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin: 4px auto 14px;
 }
 
-.olx-podium-photo {
+.olx-podium-avatar {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
   object-position: top center;
-  transition: transform 0.3s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  display: block;
 }
 
-.olx-podium-card:hover .olx-podium-photo {
-  transform: scale(1.05);
+.olx-trophy-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px auto 14px;
+  color: #78350f;
+  font-size: 34px;
+  box-shadow: 0 8px 22px rgba(245, 158, 11, 0.45);
+  border: 3px solid #ffffff;
 }
 
-.olx-podium-deal-box {
-  background: #ffffff;
-  padding: 10px 12px;
-  text-align: center;
-  border-top: 1.5px solid #f1f5f9;
-}
-
-.olx-deal-label {
-  font-size: 9.5px;
+.olx-card-label {
+  font-size: 10.5px;
   font-weight: 800;
-  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-bottom: 3px;
+  letter-spacing: 1px;
+  color: #fecdd3;
+  margin-bottom: 4px;
   display: block;
 }
 
-.olx-deal-sales-name {
-  font-size: 14px;
+.olx-card-name {
+  font-size: 16px;
   font-weight: 900;
-  color: #0f172a;
-  line-height: 1.2;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.olx-deal-spv-tag {
-  font-size: 10px;
-  font-weight: 700;
-  color: #0284c7;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.olx-deal-count-badge {
-  background: linear-gradient(135deg, #d7123a 0%, #b91c1c 100%);
   color: #ffffff;
-  font-size: 12px;
+  letter-spacing: 0.3px;
+  margin: 0 0 3px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.olx-card-role {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.olx-deal-badge-pill {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
   font-weight: 900;
-  padding: 4px 10px;
-  border-radius: 8px;
+  font-size: 14.5px;
+  padding: 7px 18px;
+  border-radius: 30px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 2px 8px rgba(215, 18, 58, 0.25);
+  gap: 7px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.olx-deal-omset {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #059669;
-  margin-top: 4px;
+.olx-deal-badge-total {
+  background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 15.5px;
+  padding: 7px 20px;
+  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.45);
+  border: 1.5px solid rgba(254, 240, 138, 0.6);
 }
 
 /* Empty podium card slot */

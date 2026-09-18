@@ -47,47 +47,70 @@ function renderPodium(spvShowcase) {
   if (!grid) return;
 
   const defaultList = [
-    { key: 'alvin', display_name: 'ALVIN', role: 'Supervisor 1', deal_count: 16, photo: '../images/olx_top/spv_alvin.jpg', gradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' },
-    { key: 'feryanto', display_name: 'FERYANTO', role: 'Supervisor 2', deal_count: 15, photo: '../images/olx_top/spv_ryan.jpg', gradient: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' },
-    { key: 'caisariva', display_name: 'MUHAMMAD CAISARIVA', role: 'Supervisor 3', deal_count: 2, photo: '../images/olx_top/spv_riva.jpg', gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)' }
+    {
+      key: 'alvin',
+      display_name: 'ALVIN',
+      role: 'Supervisor 1',
+      deal_count: 16,
+      photo: '../images/olx_top/spv_alvin.jpg',
+      ringColor: '#38bdf8',
+      rankBadge: '1',
+      rankBg: 'linear-gradient(135deg, #f59e0b, #d97706)'
+    },
+    {
+      key: 'feryanto',
+      display_name: 'FERYANTO (RYAN)',
+      role: 'Supervisor 2',
+      deal_count: 15,
+      photo: '../images/olx_top/spv_ryan.jpg',
+      ringColor: '#c084fc',
+      rankBadge: '2',
+      rankBg: 'linear-gradient(135deg, #94a3b8, #64748b)'
+    },
+    {
+      key: 'caisariva',
+      display_name: 'MUHAMMAD CAISARIVA (RIVA)',
+      role: 'Supervisor 3',
+      deal_count: 2,
+      photo: '../images/olx_top/spv_riva.jpg',
+      ringColor: '#34d399',
+      rankBadge: '3',
+      rankBg: 'linear-gradient(135deg, #d97706, #b45309)'
+    }
   ];
 
   let list = defaultList;
   if (spvShowcase && spvShowcase.length >= 3) {
-    list = spvShowcase.map((s, idx) => {
-      const def = defaultList[idx] || {};
+    list = defaultList.map((def, idx) => {
+      const s = spvShowcase[idx] || {};
       return {
-        key: s.key || def.key,
-        display_name: s.display_name || def.display_name,
-        role: s.role || def.role,
-        deal_count: s.deal_count !== undefined ? s.deal_count : def.deal_count,
-        photo: s.photo || def.photo,
-        gradient: s.gradient || def.gradient
+        ...def,
+        deal_count: s.deal_count !== undefined ? s.deal_count : def.deal_count
       };
     });
   }
 
-  const rankBadges = ['1', '2', '3'];
   const totalDeals = list.reduce((acc, cur) => acc + (parseInt(cur.deal_count) || 0), 0) || 33;
 
-  let html = list.map((spv, index) => {
+  let html = list.map((spv) => {
     return `
-      <div class="olx-podium-card" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 18px 14px; text-align: center; backdrop-filter: blur(8px); position: relative; transition: transform 0.2s, box-shadow 0.2s;">
-        <span class="olx-podium-rank-badge" style="background: #eab308; color: #713f12; font-weight: 900; border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-bottom: 8px;">
-          ${rankBadges[index]}
+      <div class="olx-podium-card">
+        <span class="olx-podium-rank-badge" style="background: ${spv.rankBg};">
+          ${spv.rankBadge}
         </span>
-        <div class="olx-podium-avatar-wrap" style="position: relative; width: 68px; height: 68px; margin: 0 auto 10px;">
-          <img src="${spv.photo}" alt="${spv.display_name}" class="olx-podium-avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: top center; border: 2.5px solid #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onerror="this.src='../images/default-avatar.png'">
+        <div class="olx-podium-avatar-wrap">
+          <img src="${spv.photo}" alt="${spv.display_name}" class="olx-podium-avatar" style="border: 3px solid ${spv.ringColor};" onerror="this.src='../images/default-avatar.png'">
         </div>
-        <div class="olx-podium-deal-box">
-          <span class="olx-deal-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #fecdd3;">PENCAPAIAN DEAL</span>
-          <div class="olx-deal-sales-name" style="font-size: 14.5px; font-weight: 900; margin: 4px 0 2px; color: #ffffff;">${spv.display_name}</div>
-          <span class="olx-deal-spv-tag" style="font-size: 11px; color: #e2e8f0; display: block; margin-bottom: 10px;">${spv.role}</span>
-          <div>
-            <span class="olx-deal-count-badge" style="background: #10b981; color: #ffffff; font-weight: 800; font-size: 13.5px; padding: 5px 14px; border-radius: 20px; display: inline-block; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);">
-              <i class="fa-solid fa-circle-check"></i> ${spv.deal_count} Deal
-            </span>
-          </div>
+        <span class="olx-card-label">PENCAPAIAN DEAL</span>
+        <div class="olx-card-name">${spv.display_name}</div>
+        <span class="olx-card-role">${spv.role}</span>
+        <div>
+          <span class="olx-deal-badge-pill">
+            <i class="fa-solid fa-circle-check"></i> ${spv.deal_count} Deal
+          </span>
+        </div>
+        <div style="font-size: 11px; color: #94a3b8; margin-top: 10px; font-weight: 600;">
+          <i class="fa-regular fa-calendar-check" style="color: #38bdf8;"></i> Periode 2026
         </div>
       </div>
     `;
@@ -95,21 +118,23 @@ function renderPodium(spvShowcase) {
 
   // 4th slot: GRAND TOTAL DEALER
   html += `
-    <div class="olx-podium-card" style="background: linear-gradient(135deg, rgba(216, 164, 55, 0.25) 0%, rgba(180, 83, 9, 0.35) 100%); border: 1.5px solid rgba(253, 224, 71, 0.5); border-radius: 16px; padding: 18px 14px; text-align: center;">
-      <span class="olx-podium-rank-badge" style="background: #ffffff; color: #b45309; font-weight: 900; border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-bottom: 8px;"><i class="fa-solid fa-crown"></i></span>
-      <div style="margin: 6px auto 12px; width: 64px; height: 64px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #d8a437; font-size: 26px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+    <div class="olx-podium-card olx-podium-card-total">
+      <span class="olx-podium-rank-badge" style="background: linear-gradient(135deg, #f59e0b, #b45309);">
+        <i class="fa-solid fa-crown"></i>
+      </span>
+      <div class="olx-trophy-circle">
         <i class="fa-solid fa-trophy"></i>
       </div>
-      <div class="olx-podium-deal-box">
-        <span class="olx-deal-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #fef08a;">TOTAL CABANG</span>
-        <div class="olx-deal-sales-name" style="font-size: 15px; font-weight: 900; margin: 4px 0 2px; color: #ffffff;">GRAND TOTAL</div>
-        <span class="olx-deal-spv-tag" style="font-size: 11px; color: #fef08a; display: block; margin-bottom: 10px;">Semua Supervisor</span>
-        <div>
-          <span class="olx-deal-count-badge" style="background: #ffffff; color: #b45309; font-weight: 900; font-size: 14px; padding: 5px 16px; border-radius: 20px; display: inline-block; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">
-            <i class="fa-solid fa-award"></i> ${totalDeals} Deal
-          </span>
-        </div>
-        <div style="font-size: 10.5px; color: #fef08a; margin-top: 8px;">Jan - Sep 2026</div>
+      <span class="olx-card-label" style="color: #fef08a;">TOTAL CABANG</span>
+      <div class="olx-card-name" style="color: #ffffff; font-size: 17px;">GRAND TOTAL</div>
+      <span class="olx-card-role" style="color: #fde68a;">Semua Tim Supervisor</span>
+      <div>
+        <span class="olx-deal-badge-total">
+          <i class="fa-solid fa-award"></i> ${totalDeals} Deal
+        </span>
+      </div>
+      <div style="font-size: 11px; color: #fef08a; margin-top: 10px; font-weight: 700;">
+        <i class="fa-solid fa-certificate"></i> Terverifikasi Excel 2026
       </div>
     </div>
   `;
@@ -147,23 +172,23 @@ function renderMatrix(matrix) {
   const rows = mat.rows;
   const totals = mat.totals || { alvin: 16, feryanto: 15, caisariva: 2, dealer_total: 33 };
 
-  const monthIcons = {
-    'Januari': 'fa-snowflake',
-    'Februari': 'fa-heart',
-    'Maret': 'fa-clover',
-    'April': 'fa-seedling',
-    'Mei': 'fa-sun',
-    'Juni': 'fa-umbrella-beach',
-    'Juli': 'fa-fire',
-    'Agustus': 'fa-flag',
-    'September': 'fa-leaf',
-    'Oktober': 'fa-tree',
-    'November': 'fa-cloud',
-    'Desember': 'fa-gift'
+  const monthConfig = {
+    'Januari': { icon: 'fa-snowflake', color: '#0284c7', bg: '#e0f2fe' },
+    'Februari': { icon: 'fa-heart', color: '#e11d48', bg: '#ffe4e6' },
+    'Maret': { icon: 'fa-clover', color: '#16a34a', bg: '#dcfce7' },
+    'April': { icon: 'fa-seedling', color: '#059669', bg: '#d1fae5' },
+    'Mei': { icon: 'fa-sun', color: '#d97706', bg: '#fef3c7' },
+    'Juni': { icon: 'fa-umbrella-beach', color: '#0284c7', bg: '#e0f2fe' },
+    'Juli': { icon: 'fa-fire', color: '#ea580c', bg: '#ffedd5' },
+    'Agustus': { icon: 'fa-flag', color: '#dc2626', bg: '#fee2e2' },
+    'September': { icon: 'fa-leaf', color: '#15803d', bg: '#dcfce7' },
+    'Oktober': { icon: 'fa-tree', color: '#b45309', bg: '#fef3c7' },
+    'November': { icon: 'fa-cloud', color: '#475569', bg: '#f1f5f9' },
+    'Desember': { icon: 'fa-gift', color: '#7c3aed', bg: '#f3e8ff' }
   };
 
   tbody.innerHTML = rows.map(r => {
-    const icon = monthIcons[r.month] || 'fa-calendar-day';
+    const cfg = monthConfig[r.month] || { icon: 'fa-calendar-day', color: '#0284c7', bg: '#e0f2fe' };
     const isPastOrCurrent = (r.total > 0 || ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September'].includes(r.month));
 
     const valAlvin = r.alvin !== undefined ? r.alvin : 0;
@@ -173,25 +198,86 @@ function renderMatrix(matrix) {
 
     const renderVal = (val) => {
       if (!isPastOrCurrent && (val === 0 || val === '-' || val === undefined)) {
-        return `<span class="olx-matrix-num-empty" style="color:#94a3b8; font-weight:700;">-</span>`;
+        return `<span style="color:#cbd5e1; font-weight:700; font-size:14px;">-</span>`;
       }
       if (val > 0) {
-        return `<span class="olx-matrix-num-deal" style="background:#ecfdf5; color:#059669; font-weight:800; padding:4px 12px; border-radius:8px; display:inline-block; border:1px solid #a7f3d0; box-shadow:0 1px 3px rgba(5,150,105,0.15);">${val}</span>`;
+        return `
+          <span style="
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: #065f46;
+            font-weight: 900;
+            font-size: 14.5px;
+            padding: 5px 16px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            border: 1.5px solid #a7f3d0;
+            box-shadow: 0 2px 6px rgba(16,185,129,0.18);
+          ">
+            ${val}
+          </span>
+        `;
       }
-      return `<span class="olx-matrix-num-zero" style="color:#94a3b8; font-weight:600;">0</span>`;
+      return `
+        <span style="
+          display: inline-block;
+          width: 28px;
+          height: 28px;
+          line-height: 28px;
+          border-radius: 50%;
+          background: #f1f5f9;
+          color: #94a3b8;
+          font-weight: 700;
+          font-size: 12.5px;
+        ">
+          0
+        </span>
+      `;
     };
 
     const renderTotalVal = (val) => {
       if (!isPastOrCurrent && (val === 0 || val === '-' || val === undefined)) {
-        return `<span class="olx-matrix-num-empty" style="color:#94a3b8; font-weight:700;">-</span>`;
+        return `<span style="color:#cbd5e1; font-weight:700; font-size:14px;">-</span>`;
       }
-      return `<span style="font-weight:900; font-size:15px; color:#0f172a;">${val}</span>`;
+      return `
+        <span style="
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          color: #ffffff;
+          font-weight: 900;
+          font-size: 14.5px;
+          padding: 6px 18px;
+          border-radius: 10px;
+          display: inline-block;
+          min-width: 48px;
+          box-shadow: 0 2px 8px rgba(15,23,42,0.25);
+        ">
+          ${val}
+        </span>
+      `;
     };
 
     return `
       <tr>
-        <td style="font-weight:700; color:#1e293b; padding-left:20px;">
-          <i class="fa-solid ${icon}" style="color:#0284c7; width:20px; margin-right:6px;"></i> ${r.month}
+        <td style="font-weight:800; color:#1e293b; padding-left:22px; text-align:left;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="
+              width: 32px;
+              height: 32px;
+              border-radius: 8px;
+              background: ${cfg.bg};
+              color: ${cfg.color};
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              flex-shrink: 0;
+            ">
+              <i class="fa-solid ${cfg.icon}"></i>
+            </span>
+            <span style="font-size: 14px; font-weight: 800; color: #1e293b;">${r.month}</span>
+          </div>
         </td>
         <td style="text-align:center;">${renderVal(valAlvin)}</td>
         <td style="text-align:center;">${renderVal(valFeryanto)}</td>
@@ -208,28 +294,43 @@ function renderMatrix(matrix) {
     const dealerTotal = totals.dealer_total ?? (totAlvin + totFeryanto + totCaisariva) ?? 33;
 
     tfoot.innerHTML = `
-      <tr style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff;">
-        <td style="padding: 16px 20px; font-weight: 900; font-size: 13.5px; text-transform: uppercase; letter-spacing: 0.5px;">
-          <i class="fa-solid fa-trophy" style="color: #facc15; margin-right: 6px;"></i> TOTAL DEAL (2026)
+      <tr style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #ffffff;">
+        <td style="padding: 18px 22px; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; text-align:left;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="
+              width: 34px;
+              height: 34px;
+              border-radius: 8px;
+              background: rgba(251, 191, 36, 0.2);
+              color: #fbbf24;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 16px;
+            ">
+              <i class="fa-solid fa-trophy"></i>
+            </span>
+            <span>TOTAL DEAL (2026)</span>
+          </div>
         </td>
         <td style="text-align: center; padding: 16px 14px;">
-          <span style="background: #2563eb; color: #ffffff; font-weight: 900; font-size: 15px; padding: 6px 18px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);">
+          <span style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-weight: 900; font-size: 15px; padding: 7px 20px; border-radius: 24px; display: inline-block; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4); border: 1px solid rgba(255,255,255,0.25);">
             ${totAlvin} Deal
           </span>
         </td>
         <td style="text-align: center; padding: 16px 14px;">
-          <span style="background: #7c3aed; color: #ffffff; font-weight: 900; font-size: 15px; padding: 6px 18px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);">
+          <span style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #ffffff; font-weight: 900; font-size: 15px; padding: 7px 20px; border-radius: 24px; display: inline-block; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); border: 1px solid rgba(255,255,255,0.25);">
             ${totFeryanto} Deal
           </span>
         </td>
         <td style="text-align: center; padding: 16px 14px;">
-          <span style="background: #059669; color: #ffffff; font-weight: 900; font-size: 15px; padding: 6px 18px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);">
+          <span style="background: linear-gradient(135deg, #059669, #047857); color: #ffffff; font-weight: 900; font-size: 15px; padding: 7px 20px; border-radius: 24px; display: inline-block; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4); border: 1px solid rgba(255,255,255,0.25);">
             ${totCaisariva} Deal
           </span>
         </td>
         <td style="text-align: center; padding: 16px 14px;">
-          <span style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: #ffffff; font-weight: 900; font-size: 16px; padding: 6px 18px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);">
-            ${dealerTotal} Deal
+          <span style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff; font-weight: 900; font-size: 16px; padding: 8px 22px; border-radius: 24px; display: inline-block; box-shadow: 0 4px 16px rgba(220, 38, 38, 0.5); border: 1.5px solid rgba(254, 202, 202, 0.4);">
+            <i class="fa-solid fa-crown" style="color:#fef08a; margin-right:4px;"></i> ${dealerTotal} Deal
           </span>
         </td>
       </tr>
