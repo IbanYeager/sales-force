@@ -549,7 +549,8 @@ function sync_google_sheet_data($sheetUrl = null) {
         }
     }
 
-    // Post-sync safety reconciliation: ensure any existing leads having sales_fu string get assigned_sales_id linked
+    // Post-sync safety reconciliation:
+    // 1. Ensure any existing leads having sales_fu string get assigned_sales_id linked
     foreach ($salesLookup as $key => $sData) {
         $sid = (int)$sData['id'];
         $sName = $sData['name'];
@@ -559,6 +560,20 @@ function sync_google_sheet_data($sheetUrl = null) {
             WHERE (assigned_sales_id IS NULL OR assigned_sales_id = 0) 
               AND (LOWER(sales_fu) = ? OR sales_fu = ?)
         ", [$sid, strtolower($sName), $sName]);
+    }
+
+    // 2. CRITICAL: Ensure any existing leads with assigned_sales_id > 0 (already assigned or followed up) have their sales_fu filled!
+    foreach ($salesDbRows as $sAcc) {
+        $sid = (int)$sAcc['id'];
+        $sName = trim($sAcc['nama_lengkap'] ?? ($sAcc['username'] ?? ''));
+        if ($sid > 0 && $sName !== '') {
+            followup_execute("
+                UPDATE followup_customers 
+                SET sales_fu = ? 
+                WHERE assigned_sales_id = ? 
+                  AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0')
+            ", [$sName, $sid]);
+        }
     }
 
     $now = date('Y-m-d H:i:s');

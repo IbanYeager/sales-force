@@ -901,7 +901,7 @@ if ($action === 'bulk_assign') {
         for ($i = 0; $i < count($customer_ids); $i++) {
             $cid = (int)$customer_ids[$i];
             $assignedSales = $salesList[$i % $numSales];
-            followup_execute("UPDATE followup_customers SET assigned_sales_id = ? WHERE id = ?", [$assignedSales['id'], $cid]);
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ? WHERE id = ?", [$assignedSales['id'], $assignedSales['name'], $cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', 'Auto-distribusi ke sales (Prioritas Unassigned)')", [$cid, $assignedSales['id'], $assignedSales['name']]);
         }
         echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibagi rata ke $numSales wiraniaga (mengutamakan data belum ditugaskan)."]);
@@ -912,7 +912,7 @@ if ($action === 'bulk_assign') {
     if (empty($sales_id) || $sales_id === '0' || $sales_id === 'unassign') {
         foreach ($customer_ids as $cid) {
             $cid = (int)$cid;
-            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE id = ?", [$cid]);
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE id = ?", [$cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Pembagian database ke sales dibatalkan oleh SPV/Kacab')", [$cid]);
         }
         echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibatalkan penugasannya dari sales."]);
@@ -934,7 +934,7 @@ if ($action === 'bulk_assign') {
 
     foreach ($customer_ids as $cid) {
         $cid = (int)$cid;
-        followup_execute("UPDATE followup_customers SET assigned_sales_id = ? WHERE id = ?", [$targetSales['id'], $cid]);
+        followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ? WHERE id = ?", [$targetSales['id'], $targetSales['name'], $cid]);
         followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', ?)", [$cid, $targetSales['id'], $targetSales['name'], "Ditugaskan ke " . $targetSales['name']]);
     }
 
@@ -1320,8 +1320,25 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     }
 
     $now = date('Y-m-d H:i:s');
-    $current = followup_query("SELECT followup_status, notes, assigned_sales_id FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
+    $current = followup_query("SELECT followup_status, notes, assigned_sales_id, sales_fu, vin, phone, name FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
     $oldStatus = !empty($current) ? $current[0]['followup_status'] : '';
+    $currAssignedId = !empty($current) ? (int)$current[0]['assigned_sales_id'] : 0;
+    $currSalesFu = !empty($current) ? trim($current[0]['sales_fu'] ?? '') : '';
+
+    $effectiveSalesId = $sales_id ?: $currAssignedId;
+    $salesList = get_sales_list();
+    $effectiveSalesName = '';
+    if ($effectiveSalesId > 0) {
+        foreach ($salesList as $s) {
+            if ((int)$s['id'] === $effectiveSalesId) {
+                $effectiveSalesName = $s['name'];
+                break;
+            }
+        }
+    }
+    if ($effectiveSalesName === '' && $currSalesFu !== '') {
+        $effectiveSalesName = $currSalesFu;
+    }
 
     followup_execute("
         UPDATE followup_customers SET
@@ -1338,6 +1355,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
             last_contacted_at = ?,
             last_template_used = CASE WHEN ? != '' THEN ? ELSE last_template_used END,
             assigned_sales_id = CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) AND ? > 0 THEN ? ELSE assigned_sales_id END,
+            sales_fu = CASE WHEN (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-') AND ? != '' THEN ? ELSE sales_fu END,
             visit_photo = CASE WHEN ? != '' THEN ? ELSE visit_photo END
         WHERE id = ?
     ", [
@@ -1347,7 +1365,8 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $reason_followup, $reason_followup,
         $now,
         $template_used, $template_used,
-        $sales_id, $sales_id,
+        $effectiveSalesId, $effectiveSalesId,
+        $effectiveSalesName, $effectiveSalesName,
         $visitPhotoUrl, $visitPhotoUrl,
         $id
     ]);
@@ -1357,7 +1376,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         VALUES (?, ?, 'sales_fu_submission', ?, ?, ?, ?)
     ", [
         $id,
-        $sales_id ?: ($current[0]['assigned_sales_id'] ?? null),
+        $effectiveSalesId ?: null,
         $oldStatus,
         $status,
         "Follow-Up TAM: Connected=$connected, Contacted=$contacted, Prospect=$prospect, SPK=$spk, Remarks=$remarks, Status=$sales_fu_status. Alasan: $reason_followup",
@@ -1370,31 +1389,25 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         if (!empty($webhookRows) && !empty($webhookRows[0]['setting_value'])) {
             $scriptUrl = trim($webhookRows[0]['setting_value']);
             if (filter_var($scriptUrl, FILTER_VALIDATE_URL)) {
-                $salesList = get_sales_list();
-                $salesName = "Sales #$sales_id";
-                foreach ($salesList as $s) {
-                    if ((int)$s['id'] === $sales_id) {
-                        $salesName = $s['name'];
-                        break;
-                    }
-                }
-                $cCust = followup_query("SELECT vin, phone, name FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
-                $vin = !empty($cCust) ? $cCust[0]['vin'] : '';
-                $phone = !empty($cCust) ? $cCust[0]['phone'] : '';
+                $vin = !empty($current) ? ($current[0]['vin'] ?? '') : '';
+                $phone = !empty($current) ? ($current[0]['phone'] ?? '') : '';
 
                 $webhookPayload = [
                     'customer_id' => $id,
                     'vin' => $vin,
                     'phone' => $phone,
-                    'name' => !empty($cCust) ? $cCust[0]['name'] : '',
+                    'name' => !empty($current) ? ($current[0]['name'] ?? '') : '',
                     'connected' => $connected,
                     'contacted' => $contacted,
                     'prospect' => $prospect,
                     'spk' => $spk,
                     'remarks' => $remarks,
+                    'sales_fu' => $effectiveSalesName,
+                    'sales_name' => $effectiveSalesName,
+                    'sales_fu_status' => $sales_fu_status,
+                    'status_fu' => $sales_fu_status,
                     'reason_followup' => $reason_followup,
                     'followup_date' => $now,
-                    'sales_name' => $salesName,
                     'status' => $status
                 ];
 
