@@ -2037,14 +2037,15 @@ function renderTemplateDropdownOptions(preferredId = null) {
   tmplSelect.innerHTML = '';
 
   const allTemplates = followupState.templates || [];
-  const defaultTemplates = allTemplates.filter(t => (t.is_default == 1 || !t.sales_id));
-  const customTemplates = allTemplates.filter(t => (t.is_default != 1 && (t.sales_id || t.created_by || t.category === 'kustom')));
+  const isDefault = t => (t.is_default == 1 || t.is_default === '1' || t.is_default === true);
+  const defaultTemplates = allTemplates.filter(t => isDefault(t));
+  const customTemplates = allTemplates.filter(t => !isDefault(t));
 
   // Determine which template to select
   let selectedId = preferredId;
   const exists = allTemplates.some(t => String(t.id) === String(selectedId));
   if (!exists) {
-    const def = allTemplates.find(t => t.is_default == 1) || allTemplates[0];
+    const def = defaultTemplates[0] || allTemplates[0];
     selectedId = def ? def.id : null;
   }
 
@@ -2065,7 +2066,7 @@ function renderTemplateDropdownOptions(preferredId = null) {
   // 2. Group: Template Kustom Sales
   if (customTemplates.length > 0) {
     const groupCust = document.createElement('optgroup');
-    groupCust.label = 'Template Kustom Anda';
+    groupCust.label = '⭐ Template Kustom Anda';
     customTemplates.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
@@ -2084,6 +2085,10 @@ function renderTemplateDropdownOptions(preferredId = null) {
   optNew.style.color = '#10b981';
   tmplSelect.appendChild(optNew);
 
+  if (selectedId) {
+    tmplSelect.value = selectedId;
+  }
+
   return selectedId;
 }
 
@@ -2093,8 +2098,14 @@ function handleTemplateSelectChange(val) {
     openCustomTemplateModal();
     // Revert select back to previously stored
     const lastId = localStorage.getItem('sft_last_template_id');
-    if (lastId) {
-      document.getElementById('waTemplateSelect').value = lastId;
+    const tmplSelect = document.getElementById('waTemplateSelect');
+    if (tmplSelect) {
+      if (lastId && tmplSelect.querySelector(`option[value="${lastId}"]`)) {
+        tmplSelect.value = lastId;
+      } else {
+        const firstOpt = tmplSelect.querySelector('option:not([value="NEW_CUSTOM"])');
+        if (firstOpt) tmplSelect.value = firstOpt.value;
+      }
     }
   } else {
     localStorage.setItem('sft_last_template_id', val);
@@ -2263,9 +2274,9 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
   const defaultContent = initialContent || `Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hormat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\n[Tuliskan penawaran promo / follow up spesial Bpk/Ibu di sini]\n\nBoleh saya kirimkan detail lengkapnya Bpk/Ibu? Terima kasih! 🙏`;
 
   const html = `
-    <div class="modal-overlay active" id="modalCreateCustomTemplate" style="display:flex; z-index:99999;" onclick="closeCustomTemplateModal()">
-      <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg, 16px); padding:20px 22px;" onclick="event.stopPropagation()">
-        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+    <div class="modal-overlay active show" id="modalCreateCustomTemplate" style="display:flex !important; opacity:1 !important; visibility:visible !important; z-index:10000005 !important; position:fixed !important; top:0 !important; left:0 !important; right:0 !important; bottom:0 !important; width:100vw !important; height:100vh !important; background:rgba(7,13,34,0.78) !important; backdrop-filter:blur(8px) !important; -webkit-backdrop-filter:blur(8px) !important; align-items:center !important; justify-content:center !important; padding:16px !important; box-sizing:border-box !important; pointer-events:auto !important;" onclick="closeCustomTemplateModal()">
+      <div class="modal-content" style="max-width:580px; width:100% !important; border-radius:var(--fu-radius-lg, 16px) !important; padding:20px 22px !important; opacity:1 !important; transform:none !important; display:block !important; position:relative !important; z-index:10000006 !important; background:#ffffff !important; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5) !important;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:flex-start;">
           <div>
             <div style="display:inline-flex; align-items:center; gap:5px; background:#f0fdf4; color:#15803d; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px; border:1px solid #86efac;">
               <i class="fa-solid fa-star"></i> Template Kustom Pribadi
@@ -2274,7 +2285,7 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
               ${editId ? 'Edit Template WhatsApp' : 'Buat Template WhatsApp Kustom'}
             </h3>
           </div>
-          <button class="btn-close-modal" onclick="closeCustomTemplateModal()"><i class="fa-solid fa-xmark"></i></button>
+          <button type="button" class="btn-close-modal" onclick="closeCustomTemplateModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <form onsubmit="handleSaveCustomTemplate(event, ${editId})">
@@ -2282,11 +2293,11 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
             <div>
               <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Judul Template *</label>
-              <input type="text" id="custTmplTitle" required class="fu-input" style="font-size:12px; padding:7px 10px;" placeholder="Cth: Promo DP 10 Jt Veloz" value="${escapeHtml(editTitle)}">
+              <input type="text" id="custTmplTitle" required class="fu-input" style="font-size:12px; padding:7px 10px; width:100%; box-sizing:border-box;" placeholder="Cth: Promo DP 10 Jt Veloz" value="${escapeHtml(editTitle)}">
             </div>
             <div>
               <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Kategori Template</label>
-              <select id="custTmplCategory" class="fu-select" style="font-size:12px; padding:7px 10px;">
+              <select id="custTmplCategory" class="fu-select" style="font-size:12px; padding:7px 10px; width:100%; box-sizing:border-box;">
                 <option value="promo" ${editCategory === 'promo' ? 'selected' : ''}>Promo &amp; Diskon</option>
                 <option value="tradein" ${editCategory === 'tradein' ? 'selected' : ''}>Trade-In / Upgrade</option>
                 <option value="csat" ${editCategory === 'csat' ? 'selected' : ''}>CSAT &amp; Tanya Kabar</option>
@@ -2314,14 +2325,14 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
           <!-- Message Textarea -->
           <div class="form-group" style="margin-bottom:16px;">
             <label style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:4px; display:block;">Isi Pesan Template *</label>
-            <textarea id="custTmplContent" required class="form-control" rows="6" style="font-size:12px; line-height:1.5; font-family:inherit; border-radius:10px;" placeholder="Ketik format pesan WhatsApp...">${escapeHtml(defaultContent)}</textarea>
+            <textarea id="custTmplContent" required class="form-control" rows="6" style="font-size:12px; line-height:1.5; font-family:inherit; border-radius:10px; width:100%; box-sizing:border-box;" placeholder="Ketik format pesan WhatsApp...">${escapeHtml(defaultContent)}</textarea>
             <div style="font-size:11px; color:#64748b; margin-top:4px;">
               <i class="fa-solid fa-circle-info"></i> <em>Variabel di dalam kurung kurawal seperti {nama_customer} akan otomatis digantikan sesuai data prospek saat dikirim.</em>
             </div>
           </div>
 
           <div style="display:flex; gap:10px;">
-            <button type="submit" class="btn-fu btn-fu-emerald" style="flex:1; justify-content:center; padding:11px 18px; font-size:13px;">
+            <button type="submit" class="btn-fu btn-fu-emerald" style="flex:1; justify-content:center; padding:11px 18px; font-size:13px; font-weight:800;">
               <i class="fa-solid fa-floppy-disk"></i> Simpan Template ke Database
             </button>
             <button type="button" class="btn-fu btn-fu-secondary" style="padding:11px 18px; font-size:13px;" onclick="closeCustomTemplateModal()">
@@ -2334,6 +2345,11 @@ function openCustomTemplateModal(initialContent = '', editId = 0, editTitle = ''
   `;
 
   document.body.insertAdjacentHTML('beforeend', html);
+  const m = document.getElementById('modalCreateCustomTemplate');
+  if (m) {
+    m.classList.add('active', 'show');
+    m.style.display = 'flex';
+  }
 }
 
 function closeCustomTemplateModal() {
@@ -2422,10 +2438,11 @@ function openTemplateManagerModalSales() {
   document.getElementById('modalTemplateManagerSales')?.remove();
 
   const allTemplates = followupState.templates || [];
+  const isDefaultCheck = t => (t.is_default == 1 || t.is_default === '1' || t.is_default === true);
 
   let cardsHtml = '';
   allTemplates.forEach(t => {
-    const isCustom = (t.is_default != 1 && (t.sales_id || t.created_by || t.category === 'kustom'));
+    const isCustom = !isDefaultCheck(t);
     cardsHtml += `
       <div style="background:#f8fafc; border:1.5px solid ${isCustom ? '#86efac' : '#e2e8f0'}; border-radius:12px; padding:12px 14px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
@@ -2454,8 +2471,8 @@ function openTemplateManagerModalSales() {
   });
 
   const html = `
-    <div class="modal-overlay active" id="modalTemplateManagerSales" style="display:flex; z-index:99999;" onclick="closeTemplateManagerModalSales()">
-      <div class="modal-content" style="max-width:620px; border-radius:var(--fu-radius-lg, 16px); padding:20px 22px; max-height:88vh; overflow-y:auto;" onclick="event.stopPropagation()">
+    <div class="modal-overlay active show" id="modalTemplateManagerSales" style="display:flex !important; opacity:1 !important; visibility:visible !important; z-index:10000005 !important; position:fixed !important; top:0 !important; left:0 !important; right:0 !important; bottom:0 !important; width:100vw !important; height:100vh !important; background:rgba(7,13,34,0.78) !important; backdrop-filter:blur(8px) !important; -webkit-backdrop-filter:blur(8px) !important; align-items:center !important; justify-content:center !important; padding:16px !important; box-sizing:border-box !important; pointer-events:auto !important;" onclick="closeTemplateManagerModalSales()">
+      <div class="modal-content" style="max-width:620px; width:100% !important; border-radius:var(--fu-radius-lg, 16px) !important; padding:20px 22px !important; max-height:88vh; overflow-y:auto; opacity:1 !important; transform:none !important; display:block !important; position:relative !important; z-index:10000006 !important; background:#ffffff !important; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5) !important;" onclick="event.stopPropagation()">
         <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <div style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px;">
@@ -2487,6 +2504,11 @@ function openTemplateManagerModalSales() {
   `;
 
   document.body.insertAdjacentHTML('beforeend', html);
+  const m = document.getElementById('modalTemplateManagerSales');
+  if (m) {
+    m.classList.add('active', 'show');
+    m.style.display = 'flex';
+  }
 }
 
 function closeTemplateManagerModalSales() {
@@ -2785,20 +2807,6 @@ function switchFollowupSubTab(tab) {
       renderCustomerCards();
     }
   }
-}
-
-function switchCustomerTab(tab) {
-  followupState.activeTab = tab;
-  const tabFu = document.getElementById('tabBtnFollowup');
-  const tabKb = document.getElementById('tabBtnKanban');
-  const viewFu = document.getElementById('followupSectionView');
-  const kanban = document.getElementById('kanbanBoard');
-
-  if (tabFu) tabFu.classList.toggle('active', tab === 'followup');
-  if (tabKb) tabKb.classList.toggle('active', tab === 'kanban');
-
-  if (viewFu) viewFu.style.display = tab === 'followup' ? 'block' : 'none';
-  if (kanban) kanban.style.display = tab === 'kanban' ? 'flex' : 'none';
 }
 
 // =========================================================================
@@ -3880,40 +3888,5 @@ function copyAllBlastLinks() {
   });
 }
 
-function switchFollowupSubTab(subTab) {
-  followupState.subTab = subTab;
-  const btnMyTasks = document.getElementById('subBtnMyTasks');
-  const btnOrphanPool = document.getElementById('subBtnOrphanPool');
-  const btnRadar = document.getElementById('subBtnRadar');
-
-  const containerData = document.getElementById('followupDataContainer');
-  const containerRadar = document.getElementById('followupRadarContainer');
-  const filterCard = document.getElementById('fuFilterCard');
-
-  if (btnMyTasks) btnMyTasks.classList.toggle('active', subTab === 'my_tasks');
-  if (btnOrphanPool) btnOrphanPool.classList.toggle('active', subTab === 'orphan_pool');
-  if (btnRadar) btnRadar.classList.toggle('active', subTab === 'radar');
-
-  if (subTab === 'radar') {
-    if (containerData) containerData.style.display = 'none';
-    if (filterCard) filterCard.style.display = 'none';
-    if (containerRadar) {
-      containerRadar.style.display = 'block';
-      if (window.SalesSuperpowers && typeof SalesSuperpowers.renderRadarCockpit === 'function') {
-        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 1);
-      }
-    }
-  } else {
-    if (containerRadar) containerRadar.style.display = 'none';
-    if (containerData) containerData.style.display = 'block';
-    if (filterCard) filterCard.style.display = 'block';
-
-    if (subTab === 'orphan_pool') {
-      loadOrphanLeads();
-    } else {
-      renderCustomerCards();
-    }
-  }
-}
 window.switchFollowupSubTab = switchFollowupSubTab;
 

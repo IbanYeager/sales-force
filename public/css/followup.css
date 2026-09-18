@@ -1309,6 +1309,41 @@ tr.card-just-followed-up td {
 .modal-overlay.show .modal-content {
   transform: translateY(0) scale(1) !important;
   display: block !important;
+  opacity: 1 !important;
+}
+
+/* --- TOP LAYER MODALS (CUSTOM TEMPLATE & TEMPLATE MANAGER) --- */
+#modalCreateCustomTemplate,
+#modalTemplateManagerSales,
+#modalMasterCustomTmpl {
+  z-index: 10000005 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(7, 13, 34, 0.8) !important;
+}
+
+#modalCreateCustomTemplate.active,
+#modalCreateCustomTemplate.show,
+#modalTemplateManagerSales.active,
+#modalTemplateManagerSales.show,
+#modalMasterCustomTmpl.active,
+#modalMasterCustomTmpl.show {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+#modalCreateCustomTemplate .modal-content,
+#modalTemplateManagerSales .modal-content,
+#modalMasterCustomTmpl .modal-content {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  display: block !important;
+  position: relative !important;
+  z-index: 10000006 !important;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.6) !important;
 }
 
 .modal-header {

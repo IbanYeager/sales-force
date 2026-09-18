@@ -3392,8 +3392,8 @@ function openCustomTemplateModalMaster(initialContent = '', editId = 0, editTitl
   const defaultContent = initialContent || `Halo Bpk/Ibu *{nama_customer}*,\n\nSalam hormat dari saya *{nama_sales}* - *{dealer}* 🚗✨\n\n[Tuliskan penawaran promo / follow up spesial Bpk/Ibu di sini]\n\nBoleh saya kirimkan detail lengkapnya Bpk/Ibu? Terima kasih! 🙏`;
 
   const html = `
-    <div class="modal-overlay active" id="modalMasterCustomTmpl" style="display:flex; z-index:99999;" onclick="closeCustomTemplateModalMaster()">
-      <div class="modal-content" style="max-width:580px; border-radius:var(--fu-radius-lg, 16px); padding:20px 22px;" onclick="event.stopPropagation()">
+    <div class="modal-overlay active show" id="modalMasterCustomTmpl" style="display:flex !important; opacity:1 !important; visibility:visible !important; z-index:10000005 !important; position:fixed !important; top:0 !important; left:0 !important; right:0 !important; bottom:0 !important; width:100vw !important; height:100vh !important; background:rgba(7,13,34,0.78) !important; backdrop-filter:blur(8px) !important; -webkit-backdrop-filter:blur(8px) !important; align-items:center !important; justify-content:center !important; padding:16px !important; box-sizing:border-box !important; pointer-events:auto !important;" onclick="closeCustomTemplateModalMaster()">
+      <div class="modal-content" style="max-width:580px; width:100% !important; border-radius:var(--fu-radius-lg, 16px) !important; padding:20px 22px !important; opacity:1 !important; transform:none !important; display:block !important; position:relative !important; z-index:10000006 !important; background:#ffffff !important; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5) !important;" onclick="event.stopPropagation()">
         <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
           <div>
             <div style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1d4ed8; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px; border:1px solid #bfdbfe;">
@@ -3445,7 +3445,7 @@ function openCustomTemplateModalMaster(initialContent = '', editId = 0, editTitl
           </div>
 
           <div style="display:flex; gap:10px;">
-            <button type="submit" class="btn-fu btn-fu-emerald" style="flex:1; justify-content:center; padding:11px 18px; font-size:13px;">
+            <button type="submit" class="btn-fu btn-fu-emerald" style="flex:1; justify-content:center; padding:11px 18px; font-size:13px; font-weight:800;">
               <i class="fa-solid fa-floppy-disk"></i> Simpan Template
             </button>
             <button type="button" class="btn-fu btn-fu-secondary" style="padding:11px 18px; font-size:13px;" onclick="closeCustomTemplateModalMaster()">
@@ -3457,6 +3457,11 @@ function openCustomTemplateModalMaster(initialContent = '', editId = 0, editTitl
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', html);
+  const m = document.getElementById('modalMasterCustomTmpl');
+  if (m) {
+    m.classList.add('active', 'show');
+    m.style.display = 'flex';
+  }
 }
 
 function closeCustomTemplateModalMaster() {
