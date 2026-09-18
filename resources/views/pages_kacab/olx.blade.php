@@ -6,8 +6,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Manajemen &amp; Pengaturan Hasil OLX</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_layout_perfect">
-  <link rel="stylesheet" href="../css/spv_olx.css?v=20260917_olx_master">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20260918_v1">
+  <link rel="stylesheet" href="../css/spv_olx.css?v=20260918_v1">
+
+  <style>
+    /* Critical styling fallback untuk mencegah tampilan unstyled jika CSS external ter-cache */
+    .olx-board-hero {
+      background: linear-gradient(135deg, #700018 0%, #a30826 35%, #1e1b4b 100%) !important;
+      border-radius: 20px !important;
+      padding: 24px 28px !important;
+      color: #ffffff !important;
+      margin-bottom: 26px !important;
+      box-shadow: 0 10px 30px -5px rgba(163, 8, 38, 0.35) !important;
+      position: relative !important;
+      overflow: hidden !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    .olx-board-title-group h2 {
+      color: #ffffff !important;
+      margin: 0;
+      font-size: 22px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .olx-matrix-card {
+      background: #ffffff !important;
+      border-radius: 18px !important;
+      border: 1px solid #e2e8f0 !important;
+      overflow: hidden !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+      margin-bottom: 26px !important;
+    }
+    .olx-matrix-header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+      color: #ffffff !important;
+      padding: 16px 22px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      flex-wrap: wrap !important;
+      gap: 12px !important;
+    }
+    .olx-matrix-table thead th {
+      background: #1e3a8a !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      padding: 12px 14px !important;
+      vertical-align: middle !important;
+    }
+    .olx-matrix-spv-avatar {
+      width: 52px !important;
+      height: 52px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important;
+      object-position: top center !important;
+      border: 2px solid #ffffff !important;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25) !important;
+      display: block !important;
+      margin: 0 auto 4px !important;
+    }
+  </style>
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1e1014">
@@ -523,8 +583,8 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_olx.js?v=20260917_master"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/kacab_olx.js?v=20260918_v1"></script>
+  <script src="../js/pwa-app.js?v=20260918_v1"></script>
 </body>
 
 </html>

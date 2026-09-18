@@ -326,15 +326,15 @@
    PHYSICAL BOARD HERO & TOP SALES PODIUM (CLOSING OLX MOBBI)
    ════════════════════════════════════════════════════════════════ */
 .olx-board-hero {
-  background: linear-gradient(135deg, #700018 0%, #a30826 35%, #1e1b4b 100%);
-  border-radius: 20px;
-  padding: 24px 28px;
-  color: #ffffff;
-  margin-bottom: 26px;
-  box-shadow: 0 10px 30px -5px rgba(163, 8, 38, 0.35);
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, #700018 0%, #a30826 35%, #1e1b4b 100%) !important;
+  border-radius: 20px !important;
+  padding: 24px 28px !important;
+  color: #ffffff !important;
+  margin-bottom: 26px !important;
+  box-shadow: 0 10px 30px -5px rgba(163, 8, 38, 0.35) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 .olx-board-hero::before {
@@ -571,8 +571,8 @@
 }
 
 .olx-matrix-header {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  color: #ffffff !important;
   padding: 16px 22px;
   display: flex;
   justify-content: space-between;
@@ -607,8 +607,8 @@
 }
 
 .olx-matrix-table thead th {
-  background: #1e3a8a;
-  color: #ffffff;
+  background: #1e3a8a !important;
+  color: #ffffff !important;
   font-weight: 800;
   padding: 12px 14px;
   border-right: 1px solid rgba(255,255,255,0.12);
@@ -623,13 +623,14 @@
 }
 
 .olx-matrix-spv-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  object-fit: cover;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
   object-position: top center;
   border: 2px solid #ffffff;
   box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  display: block;
 }
 
 .olx-matrix-spv-name {
