@@ -909,26 +909,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         const gradient = avatarGradients[idx % avatarGradients.length];
                         const avatarText = spv.spv_name.substr(0, 2).toUpperCase();
 
-                        // Build unit rows (showing unit details, excluding sales name and revenue)
+                        // Build unit rows strictly without sales name and without price
                         const unitRows = spv.items.map(item => {
-                            let resultBadgeClass = 'olx-badge-nego';
-                            if (item.hasil === 'Deal') {
-                                resultBadgeClass = 'olx-badge-deal';
-                            } else if (item.hasil === 'Cek Unit') {
-                                resultBadgeClass = 'olx-badge-cek';
-                            }
-
                             return `
                                 <tr>
                                     <td>
-                                        <div style="font-weight:700;">${item.merk} ${item.type}</div>
+                                        <div style="font-weight:700;">Closing Deal OLX</div>
                                         <div style="font-size:10px;color:#64748b;">${item.month || ''}</div>
                                     </td>
-                                    <td>${item.tahun} • ${item.warna}</td>
-                                    <td>${item.km} • Pajak ${item.pajak}</td>
+                                    <td>${item.cabang || 'Tunas Toyota - Kiaracondong'}</td>
                                     <td>
-                                        <span class="olx-badge ${resultBadgeClass}">${item.ket}</span>
+                                        <span class="olx-badge olx-badge-deal">
+                                            <i class="fa-solid fa-check"></i> ${item.hasil || 'Deal'}
+                                        </span>
                                     </td>
+                                    <td style="font-size:11px; color:#64748b;">${item.ket || 'Closing Deal OLX mobbi'}</td>
                                 </tr>`;
                         }).join('');
 
@@ -941,47 +936,36 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </div>
                                         <div class="olx-spv-info">
                                             <h4>SPV ${spv.spv_name}</h4>
-                                            <p>Supervisor Trade-In • ${spv.total_unit} Total Unit</p>
+                                            <p>Supervisor Trade-In • Tunas Kiaracondong</p>
                                         </div>
                                     </div>
                                     <div class="olx-spv-badges">
                                         <span class="olx-badge olx-badge-deal"><i class="fa-solid fa-check"></i> ${spv.deal_count} Deal</span>
-                                        <span class="olx-badge olx-badge-nego"><i class="fa-solid fa-clock"></i> ${spv.nego_count} Nego/Prospek</span>
-                                        <span class="olx-badge olx-badge-cek"><i class="fa-solid fa-chart-line"></i> ${spv.win_rate}% Rate</span>
+                                        <span class="olx-badge olx-badge-cek"><i class="fa-solid fa-building"></i> Kircon</span>
                                     </div>
                                 </div>
 
                                 <div class="olx-spv-metrics">
                                     <div class="olx-metric-item">
-                                        <span class="olx-metric-label">Total Trade-In</span>
-                                        <span class="olx-metric-val" style="color:#0284c7;">${spv.total_unit} Unit</span>
-                                        <span class="olx-metric-sub">Pengajuan Unit</span>
-                                    </div>
-                                    <div class="olx-metric-item">
-                                        <span class="olx-metric-label">Unit Closing</span>
+                                        <span class="olx-metric-label">Closing Deal</span>
                                         <span class="olx-metric-val" style="color:#059669;">${spv.deal_count} Deal</span>
-                                        <span class="olx-metric-sub">${spv.nego_count} Prospek/Nego</span>
+                                        <span class="olx-metric-sub">Pencapaian 2026</span>
                                     </div>
                                     <div class="olx-metric-item">
-                                        <span class="olx-metric-label">Win Rate</span>
-                                        <span class="olx-metric-val" style="color:#2563eb;">${spv.win_rate}%</span>
-                                        <span class="olx-metric-sub">${spv.deal_count} dari ${spv.total_unit} Unit</span>
+                                        <span class="olx-metric-label">Status Cabang</span>
+                                        <span class="olx-metric-val" style="color:#0284c7; font-size:13px;">Kiaracondong</span>
+                                        <span class="olx-metric-sub">Tunas Toyota</span>
                                     </div>
-                                </div>
-
-                                <div class="olx-spv-progress-wrap">
-                                    <div class="olx-spv-progress-head">
-                                        <span>Pencapaian Deal Trade-In</span>
-                                        <span>${spv.win_rate}% (${spv.deal_count}/${spv.total_unit} Unit)</span>
-                                    </div>
-                                    <div class="olx-spv-bar-bg">
-                                        <div class="olx-spv-bar-fill" style="width: ${spv.win_rate}%;"></div>
+                                    <div class="olx-metric-item">
+                                        <span class="olx-metric-label">Verifikasi</span>
+                                        <span class="olx-metric-val" style="color:#2563eb;">100%</span>
+                                        <span class="olx-metric-sub">Excel Report</span>
                                     </div>
                                 </div>
 
                                 <button type="button" class="olx-btn-detail" onclick="toggleOlxSpvDetail(${idx})">
                                     <i class="fa-solid fa-list-check"></i>
-                                    <span id="olxBtnText_${idx}">Lihat Detail Unit (${spv.total_unit})</span>
+                                    <span id="olxBtnText_${idx}">Lihat Rincian Deal (${spv.deal_count})</span>
                                     <i class="fa-solid fa-chevron-down" id="olxBtnIcon_${idx}" style="transition: transform 0.3s;"></i>
                                 </button>
 
@@ -990,10 +974,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <table class="olx-unit-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Merk &amp; Type</th>
-                                                    <th>Tahun / Warna</th>
-                                                    <th>KM / Pajak</th>
-                                                    <th>Hasil / Keterangan</th>
+                                                    <th>Transaksi &amp; Bulan</th>
+                                                    <th>Cabang</th>
+                                                    <th>Status</th>
+                                                    <th>Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

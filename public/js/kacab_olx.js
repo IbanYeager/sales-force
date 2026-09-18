@@ -1,4 +1,4 @@
-// js/kacab_olx.js - Logika Pusat Manajemen & Pengaturan Hasil OLX untuk Kepala Cabang (Kacab)
+// js/kacab_olx.js - Logika Pusat Manajemen & Pengaturan Hasil OLX untuk Kepala Cabang (Cabang Kiaracondong)
 document.addEventListener('DOMContentLoaded', () => {
   initKacabOlx();
 });
@@ -58,7 +58,6 @@ async function loadAvailableMonths() {
         });
       }
 
-      // Also populate month selects in Add/Edit modals
       populateModalMonthSelects();
     }
   } catch (err) {
@@ -68,21 +67,19 @@ async function loadAvailableMonths() {
 
 function populateModalMonthSelects() {
   const months = allAvailableMonths.length > 0 ? allAvailableMonths : [
-    'Januari 2026', 'Februari 2026', 'Maret 2026', 'April 2026', 'Mei 2026', 'Juni 2026', 'Juli 2026', 'Agustus 2026', 'September 2026', 'Oktober 2026', 'November 2026', 'Desember 2026'
+    'Januari 2026', 'Februari 2026', 'Maret 2026', 'April 2026', 'Mei 2026', 'Juni 2026', 'Juli 2026', 'Agustus 2026', 'September 2026'
   ];
 
-  ['addMonth', 'editMonth'].forEach(elemId => {
-    const el = document.getElementById(elemId);
-    if (el) {
-      el.innerHTML = '';
-      months.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.textContent = m;
-        el.appendChild(opt);
-      });
-    }
-  });
+  const addMonthEl = document.getElementById('addMonth');
+  if (addMonthEl) {
+    addMonthEl.innerHTML = '';
+    months.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      addMonthEl.appendChild(opt);
+    });
+  }
 }
 
 async function fetchOlxData() {
@@ -93,7 +90,7 @@ async function fetchOlxData() {
 
   const tableBody = document.getElementById('olxTableBody');
   if (tableBody) {
-    tableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data trade-in OLX...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:#64748b;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data trade-in OLX...</td></tr>`;
   }
 
   try {
@@ -109,69 +106,98 @@ async function fetchOlxData() {
 
     if (data.status === 'success') {
       currentOlxData = data.items || [];
-      renderPodium(data.top_sales_podium);
+      renderPodium(data.spv_showcase);
       renderMatrix(data.spv_matrix);
       updateKpiCards(data.summary);
       renderLeaderboard(data.spv_data);
       renderTable(currentOlxData);
     } else {
-      if (tableBody) tableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:20px; color:#ef4444;">Gagal memuat data: ${data.message || 'Error'}</td></tr>`;
+      if (tableBody) tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#ef4444;">Gagal memuat data: ${data.message || 'Error'}</td></tr>`;
     }
   } catch (err) {
     console.error('Error fetching OLX data:', err);
-    if (tableBody) tableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:20px; color:#ef4444;">Gagal terhubung ke server.</td></tr>`;
+    if (tableBody) tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#ef4444;">Gagal terhubung ke server.</td></tr>`;
   }
 }
 
-function renderPodium(topSales) {
+// ════════════════════════════════════════════════════════════════
+// RENDER HERO SHOWCASE (SPV CLOSING DEALS KIARACONDONG)
+// ALVIN, FERYANTO, MUHAMMAD CAISARIVA, TOTAL DEALER
+// ════════════════════════════════════════════════════════════════
+function renderPodium(spvShowcase) {
   const grid = document.getElementById('olxPodiumGrid');
   if (!grid) return;
 
-  // Expected 4 sales strictly ordered from left: Fadil, Egy, Jajang, Intan
   const defaultList = [
-    { key: 'fadil', display_name: 'Fadil', full_name: 'Muhammad Fadil Fahmi', spv: 'Alvin', photo: '../images/olx_top/fadil.jpg', deal_count: 6, total_omset: 1580000000 },
-    { key: 'egy', display_name: 'Egy', full_name: 'Egy', spv: 'Ryan', photo: '../images/olx_top/egy.jpg', deal_count: 5, total_omset: 1140000000 },
-    { key: 'jajang', display_name: 'Jajang', full_name: 'Jajang', spv: 'Ryan', photo: '../images/olx_top/jajang.jpg', deal_count: 4, total_omset: 1475000000 },
-    { key: 'intan', display_name: 'Intan', full_name: 'Intan', spv: 'Alvin', photo: '../images/olx_top/intan.jpg', deal_count: 4, total_omset: 885000000 }
+    { key: 'alvin', display_name: 'ALVIN', role: 'Supervisor 1', deal_count: 16, photo: '../images/olx_top/spv_alvin.jpg', gradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' },
+    { key: 'feryanto', display_name: 'FERYANTO', role: 'Supervisor 2', deal_count: 15, photo: '../images/olx_top/spv_ryan.jpg', gradient: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' },
+    { key: 'caisariva', display_name: 'MUHAMMAD CAISARIVA', role: 'Supervisor 3', deal_count: 2, photo: '../images/olx_top/spv_riva.jpg', gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)' }
   ];
 
-  const sales = (topSales && topSales.length >= 4) ? topSales : defaultList;
+  let list = defaultList;
+  if (spvShowcase && spvShowcase.length >= 3) {
+    list = spvShowcase.map((s, idx) => {
+      const def = defaultList[idx] || {};
+      return {
+        ...def,
+        ...s,
+        photo: def.photo || '../images/default-avatar.png',
+        gradient: def.gradient || 'linear-gradient(135deg, #334155, #1e293b)'
+      };
+    });
+  }
 
-  let html = sales.slice(0, 4).map((s, idx) => {
+  const totalDeals = list.reduce((acc, cur) => acc + (cur.deal_count || 0), 0);
+
+  let html = list.map((s, idx) => {
     return `
-      <div class="olx-podium-card">
-        <span class="olx-podium-rank-badge" style="background:#b45309;">${idx + 1}</span>
-        <div class="olx-podium-photo-wrap">
-          <img src="${s.photo}" alt="${escapeHtml(s.display_name)}" class="olx-podium-photo" onerror="this.src='../images/default-avatar.png'">
+      <div class="olx-podium-card" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 18px 14px; text-align: center;">
+        <span class="olx-podium-rank-badge" style="background: #eab308; color: #713f12; font-weight: 900; border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-bottom: 8px;">${idx + 1}</span>
+        <div class="olx-podium-photo-wrap" style="margin: 0 auto 10px;">
+          <img src="${s.photo}" alt="${escapeHtml(s.display_name)}" class="olx-podium-photo" style="width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid #ffffff; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.3);" onerror="this.src='../images/default-avatar.png'">
         </div>
         <div class="olx-podium-deal-box">
-          <span class="olx-deal-label">JUMLAH DEAL</span>
-          <div class="olx-deal-sales-name" title="${escapeHtml(s.full_name || s.display_name)}">${escapeHtml(s.display_name)}</div>
-          <span class="olx-deal-spv-tag"><i class="fa-solid fa-user-tie"></i> Tim SPV ${escapeHtml(s.spv)}</span>
+          <span class="olx-deal-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;">PENCAPAIAN DEAL</span>
+          <div class="olx-deal-sales-name" style="font-size: 15px; font-weight: 900; margin: 4px 0 2px; color: #ffffff;">${escapeHtml(s.display_name)}</div>
+          <span class="olx-deal-spv-tag" style="font-size: 11px; opacity: 0.85; display: block; margin-bottom: 10px;">${escapeHtml(s.role || 'Supervisor')}</span>
           <div>
-            <span class="olx-deal-count-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">
+            <span class="olx-deal-count-badge" style="background: #10b981; color: #ffffff; font-weight: 800; font-size: 13px; padding: 5px 14px; border-radius: 20px; display: inline-block; box-shadow: 0 3px 8px rgba(16,185,129,0.4);">
               <i class="fa-solid fa-check"></i> ${s.deal_count} Deal
             </span>
           </div>
-          <div class="olx-deal-omset">${formatRupiahShort(s.total_omset || 0)}</div>
+          <div style="font-size: 10.5px; opacity: 0.75; margin-top: 8px;">Tunas Kiaracondong</div>
         </div>
       </div>
     `;
   }).join('');
 
-  // 5th empty slot matching physical board
+  // 4th slot: GRAND TOTAL DEALER
   html += `
-    <div class="olx-podium-empty" style="cursor:pointer;" onclick="openAddModal()">
-      <i class="fa-solid fa-circle-plus"></i>
-      <span class="olx-deal-label" style="color:rgba(255,255,255,0.7);">JUMLAH DEAL</span>
-      <div style="font-size:13px; font-weight:800; margin-top:2px;">Tambah Transaksi</div>
-      <div style="font-size:10px; color:rgba(255,255,255,0.6); margin-top:4px;">Klik untuk input deal baru</div>
+    <div class="olx-podium-card" style="background: linear-gradient(135deg, rgba(216, 164, 55, 0.25) 0%, rgba(180, 83, 9, 0.35) 100%); border: 1.5px solid rgba(253, 224, 71, 0.5); border-radius: 16px; padding: 18px 14px; text-align: center;">
+      <span class="olx-podium-rank-badge" style="background: #ffffff; color: #b45309; font-weight: 900; border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-bottom: 8px;"><i class="fa-solid fa-crown"></i></span>
+      <div style="margin: 6px auto 12px; width: 64px; height: 64px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #d8a437; font-size: 26px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <div class="olx-podium-deal-box">
+        <span class="olx-deal-label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #fef08a;">TOTAL CABANG</span>
+        <div class="olx-deal-sales-name" style="font-size: 15px; font-weight: 900; margin: 4px 0 2px; color: #ffffff;">GRAND TOTAL</div>
+        <span class="olx-deal-spv-tag" style="font-size: 11px; color: #fef08a; display: block; margin-bottom: 10px;">Semua Supervisor</span>
+        <div>
+          <span class="olx-deal-count-badge" style="background: #ffffff; color: #b45309; font-weight: 900; font-size: 14px; padding: 5px 16px; border-radius: 20px; display: inline-block; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">
+            <i class="fa-solid fa-award"></i> ${totalDeals} Deal
+          </span>
+        </div>
+        <div style="font-size: 10.5px; color: #fef08a; margin-top: 8px;">Jan - Sep 2026</div>
+      </div>
     </div>
   `;
 
   grid.innerHTML = html;
 }
 
+// ════════════════════════════════════════════════════════════════
+// RENDER PAPAN MATRIX REKAP BULANAN (ALVIN | FERYANTO | CAISARIVA)
+// ════════════════════════════════════════════════════════════════
 function renderMatrix(matrix) {
   const tbody = document.getElementById('olxMatrixBody');
   const tfoot = document.getElementById('olxMatrixFoot');
@@ -179,25 +205,25 @@ function renderMatrix(matrix) {
 
   const defaultMatrix = {
     rows: [
-      { month: 'Januari', alvin: 1, ryan: 0, riva: 0, total: 1 },
-      { month: 'Februari', alvin: 1, ryan: 0, riva: 0, total: 1 },
-      { month: 'Maret', alvin: 2, ryan: 0, riva: 0, total: 2 },
-      { month: 'April', alvin: 1, ryan: 2, riva: 1, total: 4 },
-      { month: 'Mei', alvin: 3, ryan: 4, riva: 0, total: 7 },
-      { month: 'Juni', alvin: 2, ryan: 4, riva: 0, total: 6 },
-      { month: 'Juli', alvin: 2, ryan: 1, riva: 1, total: 4 },
-      { month: 'Agustus', alvin: 2, ryan: 3, riva: 0, total: 5 },
-      { month: 'September', alvin: 0, ryan: 0, riva: 0, total: 0 },
-      { month: 'Oktober', alvin: 0, ryan: 0, riva: 0, total: 0 },
-      { month: 'November', alvin: 0, ryan: 0, riva: 0, total: 0 },
-      { month: 'Desember', alvin: 0, ryan: 0, riva: 0, total: 0 }
+      { month: 'Januari', alvin: 1, feryanto: 0, caisariva: 0, total: 1 },
+      { month: 'Februari', alvin: 1, feryanto: 0, caisariva: 0, total: 1 },
+      { month: 'Maret', alvin: 2, feryanto: 0, caisariva: 0, total: 2 },
+      { month: 'April', alvin: 1, feryanto: 2, caisariva: 1, total: 4 },
+      { month: 'Mei', alvin: 3, feryanto: 4, caisariva: 0, total: 7 },
+      { month: 'Juni', alvin: 2, feryanto: 4, caisariva: 0, total: 6 },
+      { month: 'Juli', alvin: 2, feryanto: 1, caisariva: 1, total: 4 },
+      { month: 'Agustus', alvin: 2, feryanto: 2, caisariva: 0, total: 4 },
+      { month: 'September', alvin: 2, feryanto: 2, caisariva: 0, total: 4 },
+      { month: 'Oktober', alvin: 0, feryanto: 0, caisariva: 0, total: 0 },
+      { month: 'November', alvin: 0, feryanto: 0, caisariva: 0, total: 0 },
+      { month: 'Desember', alvin: 0, feryanto: 0, caisariva: 0, total: 0 }
     ],
-    totals: { alvin: 14, ryan: 14, riva: 2, dealer_total: 30 }
+    totals: { alvin: 16, feryanto: 15, caisariva: 2, dealer_total: 33 }
   };
 
   const mat = (matrix && matrix.rows && matrix.rows.length > 0) ? matrix : defaultMatrix;
   const rows = mat.rows;
-  const totals = mat.totals || { alvin: 0, ryan: 0, riva: 0, dealer_total: 0 };
+  const totals = mat.totals || { alvin: 16, feryanto: 15, caisariva: 2, dealer_total: 33 };
 
   const monthIcons = {
     'Januari': 'fa-snowflake',
@@ -216,16 +242,16 @@ function renderMatrix(matrix) {
 
   tbody.innerHTML = rows.map(r => {
     const icon = monthIcons[r.month] || 'fa-calendar-day';
-    const isPastOrCurrent = (r.total > 0 || ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus'].includes(r.month));
+    const isPastOrCurrent = (r.total > 0 || ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September'].includes(r.month));
 
     const renderVal = (val) => {
       if (!isPastOrCurrent && val === 0) {
         return `<span class="olx-matrix-num-empty">-</span>`;
       }
       if (val > 0) {
-        return `<span class="olx-matrix-num-deal" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">${val}</span>`;
+        return `<span class="olx-matrix-num-deal" style="background:#ecfdf5; color:#059669; font-weight:800; padding:3px 9px; border-radius:6px; display:inline-block; border:1px solid #a7f3d0;">${val}</span>`;
       }
-      return `<span class="olx-matrix-num-zero">0</span>`;
+      return `<span class="olx-matrix-num-zero" style="color:#94a3b8;">0</span>`;
     };
 
     const renderTotal = (val) => {
@@ -237,14 +263,14 @@ function renderMatrix(matrix) {
 
     return `
       <tr>
-        <td class="olx-matrix-month-cell">
-          <i class="fa-solid ${icon}" style="color:#d8a437; width:16px; font-size:12px;"></i>
+        <td class="olx-matrix-month-cell" style="padding-left:20px; font-weight:700;">
+          <i class="fa-solid ${icon}" style="color:#0284c7; width:16px; font-size:12px;"></i>
           ${escapeHtml(r.month)}
         </td>
-        <td>${renderVal(r.alvin)}</td>
-        <td>${renderVal(r.ryan)}</td>
-        <td>${renderVal(r.riva)}</td>
-        <td style="background:#f8fafc;">${renderTotal(r.total)}</td>
+        <td style="text-align:center;">${renderVal(r.alvin)}</td>
+        <td style="text-align:center;">${renderVal(r.feryanto)}</td>
+        <td style="text-align:center;">${renderVal(r.caisariva)}</td>
+        <td style="background:#f8fafc; text-align:center;">${renderTotal(r.total)}</td>
       </tr>
     `;
   }).join('');
@@ -253,18 +279,18 @@ function renderMatrix(matrix) {
     tfoot.innerHTML = `
       <tr>
         <th style="text-align:left; padding-left:20px; font-size:14px;">
-          <i class="fa-solid fa-crown" style="color:#fde047; margin-right:6px;"></i> TOTAL DEAL
+          <i class="fa-solid fa-trophy" style="color:#eab308; margin-right:6px;"></i> TOTAL DEAL
         </th>
-        <th>
-          <span class="olx-matrix-total-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">${totals.alvin}</span>
+        <th style="text-align:center;">
+          <span class="olx-matrix-total-badge" style="background:#0284c7; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totals.alvin}</span>
         </th>
-        <th>
-          <span class="olx-matrix-total-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">${totals.ryan}</span>
+        <th style="text-align:center;">
+          <span class="olx-matrix-total-badge" style="background:#7c3aed; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totals.feryanto}</span>
         </th>
-        <th>
-          <span class="olx-matrix-total-badge" style="background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);">${totals.riva}</span>
+        <th style="text-align:center;">
+          <span class="olx-matrix-total-badge" style="background:#059669; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totals.caisariva}</span>
         </th>
-        <th style="background:#b45309; color:#ffffff;">
+        <th style="background:#d7123a; color:#ffffff; text-align:center;">
           <div style="font-size:16px; font-weight:900;">${totals.dealer_total} Deal</div>
           <div style="font-size:10px; opacity:0.85;">Closing Sukses</div>
         </th>
@@ -273,95 +299,91 @@ function renderMatrix(matrix) {
   }
 }
 
+// ════════════════════════════════════════════════════════════════
+// UPDATE KPI CARDS (NO MONEY / PRICES)
+// ════════════════════════════════════════════════════════════════
 function updateKpiCards(summary) {
   if (!summary) return;
 
-  const elTotalUnit = document.getElementById('kpiTotalUnit');
   const elTotalDeal = document.getElementById('kpiTotalDeal');
-  const elTotalNego = document.getElementById('kpiTotalNego');
-  const elTotalNominal = document.getElementById('kpiTotalNominal');
-  const elWinRate = document.getElementById('kpiWinRate');
+  const elDealAlvin = document.getElementById('kpiDealAlvin');
+  const elDealFeryanto = document.getElementById('kpiDealFeryanto');
+  const elDealCaisariva = document.getElementById('kpiDealCaisariva');
+  const elCabangKircon = document.getElementById('kpiCabangKircon');
 
-  if (elTotalUnit) elTotalUnit.textContent = `${summary.total_unit || 0} Unit`;
-  if (elTotalDeal) elTotalDeal.textContent = `${summary.total_deal || 0} Deal`;
-  if (elTotalNego) elTotalNego.textContent = `${summary.total_nego || 0} Prospek`;
-  if (elTotalNominal) elTotalNominal.textContent = formatRupiahShort(summary.total_nominal_deal || 0);
-  if (elWinRate) elWinRate.textContent = `${summary.win_rate || 0}%`;
+  if (elTotalDeal) elTotalDeal.textContent = `${summary.total_deal || 33} Deal`;
+  if (elDealAlvin) elDealAlvin.textContent = `${summary.deal_alvin || 16} Deal`;
+  if (elDealFeryanto) elDealFeryanto.textContent = `${summary.deal_feryanto || 15} Deal`;
+  if (elDealCaisariva) elDealCaisariva.textContent = `${summary.deal_caisariva || 2} Deal`;
+  if (elCabangKircon) elCabangKircon.textContent = 'Kiaracondong';
 }
 
+// ════════════════════════════════════════════════════════════════
+// RENDER REKAP PERFORMA ANTAR TIM SPV (NO SALES, NO PRICES)
+// ════════════════════════════════════════════════════════════════
 function renderLeaderboard(spvData) {
   const container = document.getElementById('leaderboardContainer');
   if (!container) return;
 
-  if (!spvData || spvData.length === 0) {
-    container.innerHTML = '<p style="font-size:12px; color:#64748b;">Belum ada data pencapaian SPV.</p>';
-    return;
-  }
+  const defaultSpvs = [
+    { spv_name: 'ALVIN', deal_count: 16 },
+    { spv_name: 'FERYANTO', deal_count: 15 },
+    { spv_name: 'MUHAMMAD CAISARIVA', deal_count: 2 }
+  ];
+
+  const data = (spvData && spvData.length > 0) ? spvData : defaultSpvs;
 
   const avatarGradients = {
-    'Alvin': 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-    'Ryan': 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-    'Riva': 'linear-gradient(135deg, #059669 0%, #047857 100%)'
+    'ALVIN': 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+    'FERYANTO': 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+    'MUHAMMAD CAISARIVA': 'linear-gradient(135deg, #059669 0%, #047857 100%)'
   };
 
-  container.innerHTML = spvData.map(spv => {
-    const gradient = avatarGradients[spv.spv_name] || 'linear-gradient(135deg, #475569, #334155)';
-    const salesList = spv.sales_summary || [];
-
-    salesList.sort((a, b) => b.deal_count - a.deal_count || b.total_unit - a.total_unit);
+  container.innerHTML = data.map(spv => {
+    const sName = spv.spv_name.toUpperCase();
+    const gradient = avatarGradients[sName] || 'linear-gradient(135deg, #475569, #334155)';
 
     return `
-      <div class="olx-spv-box" style="border-top: 3px solid #d8a437;">
-        <div class="olx-spv-head">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:36px; height:36px; border-radius:10px; background:${gradient}; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px;">
-              ${(spv.spv_name || 'SPV').substring(0, 2).toUpperCase()}
+      <div class="olx-spv-box" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:18px 20px; box-shadow:0 3px 12px rgba(0,0,0,0.02);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:42px; height:42px; border-radius:12px; background:${gradient}; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">
+              ${sName.substring(0, 2)}
             </div>
             <div>
-              <h4 style="font-size:14px; font-weight:800; color:#0f172a; margin:0;">Tim SPV ${escapeHtml(spv.spv_name)}</h4>
-              <p style="font-size:11px; color:#64748b; margin:2px 0 0;">${spv.total_unit} Total Unit • ${formatRupiahShort(spv.total_nominal_deal)}</p>
+              <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">Tim SPV ${escapeHtml(sName)}</h4>
+              <p style="font-size:11.5px; color:#64748b; margin:2px 0 0;">Tunas Toyota Kiaracondong</p>
             </div>
           </div>
           <div style="text-align:right;">
-            <span class="badge-status badge-deal"><i class="fa-solid fa-check"></i> ${spv.deal_count} Deal</span>
-            <div style="font-size:10px; font-weight:700; color:#b45309; margin-top:3px;">Win Rate: ${spv.win_rate}%</div>
+            <span class="badge-status badge-deal" style="font-size:12px; padding:6px 12px;">
+              <i class="fa-solid fa-check"></i> ${spv.deal_count} Deal
+            </span>
           </div>
-        </div>
-
-        <div style="margin-top:8px;">
-          <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:6px;">Kontribusi Wiraniaga:</div>
-          ${salesList.slice(0, 4).map((s, idx) => `
-            <div class="olx-sales-item">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="width:16px; height:16px; border-radius:50%; background:#fef3c7; font-size:10px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; color:#b45309;">${idx+1}</span>
-                <span style="font-weight:700; color:#1e293b;">${escapeHtml(s.nama_sales)}</span>
-              </div>
-              <div>
-                <strong style="color:#059669;">${s.deal_count} Deal</strong>
-                <span style="color:#64748b; font-size:11px;">(${s.total_unit} Unit)</span>
-              </div>
-            </div>
-          `).join('')}
         </div>
       </div>
     `;
   }).join('');
 }
 
+// ════════════════════════════════════════════════════════════════
+// RENDER TABLE (COLUMNS: #, BULAN, CABANG, SPV, STATUS, KETERANGAN, AKSI)
+// STRICTLY NO SALES NAMES & NO PRICES
+// ════════════════════════════════════════════════════════════════
 function renderTable(items) {
   const tbody = document.getElementById('olxTableBody');
   const countEl = document.getElementById('totalRowsCount');
-  if (countEl) countEl.textContent = `${items.length} Data`;
+  if (countEl) countEl.textContent = `${items.length} Data Deal`;
 
   if (!tbody) return;
 
   if (items.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" style="text-align:center; padding:35px 20px; color:#64748b;">
-          <i class="fa-solid fa-car-tunnel" style="font-size:32px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
-          <strong style="font-size:14px; color:#0f172a;">Tidak Ada Data Trade-In OLX</strong>
-          <p style="font-size:12px; margin:4px 0 0;">Klik tombol <strong>"+ Tambah Data Trade-In"</strong> di atas untuk menambahkan unit baru.</p>
+        <td colspan="7" style="text-align:center; padding:35px 20px; color:#64748b;">
+          <i class="fa-solid fa-folder-open" style="font-size:32px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
+          <strong style="font-size:14px; color:#0f172a;">Tidak Ada Data Closing Deal</strong>
+          <p style="font-size:12px; margin:4px 0 0;">Klik tombol <strong>"+ Tambah Data Deal"</strong> di atas untuk menambahkan data.</p>
         </td>
       </tr>
     `;
@@ -369,71 +391,38 @@ function renderTable(items) {
   }
 
   tbody.innerHTML = items.map((item, idx) => {
-    const badgeClass = getStatusBadgeClass(item.hasil);
-    const hargaFormatted = item.harga > 0 ? formatRupiah(item.harga) : '<span style="color:#94a3b8;">Menunggu Cek</span>';
-
     return `
       <tr>
-        <td style="font-weight:700; color:#64748b;">${idx + 1}</td>
+        <td style="font-weight:700; color:#64748b; text-align:center;">${idx + 1}</td>
         <td style="white-space:nowrap;">
-          <span style="font-size:11.5px; font-weight:700; background:#f8fafc; border:1px solid #e2e8f0; padding:3px 8px; border-radius:6px;">
+          <span style="font-size:12px; font-weight:700; background:#f8fafc; border:1px solid #e2e8f0; padding:4px 10px; border-radius:6px;">
             ${escapeHtml(item.month || '-')}
           </span>
         </td>
+        <td style="font-weight:700; color:#0f172a;">${escapeHtml(item.cabang || 'Tunas Toyota - Kiaracondong')}</td>
         <td>
-          <div style="font-weight:800; color:#0f172a;">${escapeHtml(item.sales || '-')}</div>
-          <div style="font-size:11px; color:#b45309; font-weight:600;">Tim SPV ${escapeHtml(item.spv || '-')}</div>
-        </td>
-        <td>
-          <div style="font-weight:800; color:#0f172a;">${escapeHtml(item.merk)} ${escapeHtml(item.type)}</div>
-          <div style="font-size:11.5px; color:#64748b;">Th. ${item.tahun || '-'} • Warna: ${escapeHtml(item.warna || '-')}</div>
-        </td>
-        <td style="white-space:nowrap;">
-          <div><i class="fa-solid fa-gauge-high" style="color:#94a3b8; font-size:11px;"></i> ${escapeHtml(item.km || '-')}</div>
-          <div style="font-size:11px; color:#64748b;">Pajak: ${escapeHtml(item.pajak || '-')}</div>
-        </td>
-        <td style="font-weight:800; color:#0f172a; white-space:nowrap;">
-          ${hargaFormatted}
+          <span style="font-weight:800; color:#0284c7;">Tim SPV ${escapeHtml(item.spv || '-')}</span>
         </td>
         <td>
-          <span class="badge-status ${badgeClass}">
-            ${item.hasil === 'Deal' ? '<i class="fa-solid fa-check"></i> ' : ''}${escapeHtml(item.hasil)}
+          <span class="badge-status badge-deal">
+            <i class="fa-solid fa-check"></i> ${escapeHtml(item.hasil || 'Deal')}
           </span>
         </td>
-        <td style="font-size:12px; color:#475569; max-width:180px;">
-          ${escapeHtml(item.ket || '-')}
+        <td style="font-size:12px; color:#475569;">
+          ${escapeHtml(item.ket || 'Closing Deal OLX mobbi')}
         </td>
         <td style="text-align:center; white-space:nowrap;">
-          <div style="display:inline-flex; align-items:center; gap:5px;">
-            ${item.hasil !== 'Deal' ? `
-              <button class="btn-action-sm btn-deal-sm" title="Tandai Closing Deal" onclick="quickSetDeal(${item.id}, '${escapeJs(item.merk)} ${escapeJs(item.type)}', ${item.harga})">
-                <i class="fa-solid fa-check"></i> Deal
-              </button>
-            ` : ''}
-            <button class="btn-action-sm btn-edit-sm" title="Atur & Edit Data Lengkap" onclick="openEditModal(${item.id})">
-              <i class="fa-solid fa-pen-to-square"></i> Atur
-            </button>
-            <button class="btn-action-sm btn-del-sm" title="Hapus Data" onclick="deleteTradeIn(${item.id}, '${escapeJs(item.merk)} ${escapeJs(item.type)}')">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
+          <button class="btn-action-sm btn-del-sm" title="Hapus Data Deal" onclick="deleteTradeIn(${item.id})">
+            <i class="fa-solid fa-trash"></i> Hapus
+          </button>
         </td>
       </tr>
     `;
   }).join('');
 }
 
-function getStatusBadgeClass(hasil) {
-  const h = (hasil || '').toLowerCase();
-  if (h === 'deal') return 'badge-deal';
-  if (h === 'nego') return 'badge-nego';
-  if (h.includes('cek')) return 'badge-cek';
-  if (h === 'batal') return 'badge-batal';
-  return 'badge-pending';
-}
-
 // ════════════════════════════════════════════════════════════════
-// KACAB CONTROL: MODAL TAMBAH UNIT BARU
+// KACAB CONTROL: TAMBAH DATA DEAL BARU
 // ════════════════════════════════════════════════════════════════
 function openAddModal() {
   const modal = document.getElementById('modalAddOlx');
@@ -453,23 +442,9 @@ function closeAddModal() {
 async function saveAddTradeIn(e) {
   if (e) e.preventDefault();
 
-  const month = document.getElementById('addMonth')?.value || '';
-  const sales = document.getElementById('addSales')?.value.trim() || '';
-  const spv = document.getElementById('addSpv')?.value || 'Alvin';
-  const merk = document.getElementById('addMerk')?.value.trim() || 'Toyota';
-  const type = document.getElementById('addType')?.value.trim() || '';
-  const tahun = parseInt(document.getElementById('addTahun')?.value) || new Date().getFullYear();
-  const warna = document.getElementById('addWarna')?.value.trim() || '';
-  const harga = parseFloat(document.getElementById('addHarga')?.value) || 0;
-  const km = document.getElementById('addKm')?.value.trim() || '-';
-  const pajak = document.getElementById('addPajak')?.value.trim() || 'ON';
-  const ket = document.getElementById('addKet')?.value.trim() || '';
-  const hasil = document.getElementById('addHasil')?.value || 'Nego';
-
-  if (!sales || !type) {
-    alert('Nama wiraniaga dan tipe kendaraan wajib diisi!');
-    return;
-  }
+  const month = document.getElementById('addMonth')?.value || 'Januari 2026';
+  const spv = document.getElementById('addSpv')?.value || 'ALVIN';
+  const ket = document.getElementById('addKet')?.value.trim() || 'Closing Deal OLX mobbi';
 
   try {
     const res = await fetch('../api/api_olx_pencapaian.php', {
@@ -477,81 +452,33 @@ async function saveAddTradeIn(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'add',
-        month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil
+        month: month,
+        spv: spv,
+        hasil: 'Deal',
+        ket: ket
       })
     });
-    const json = await res.json();
+    const result = await res.json();
 
-    if (json.status === 'success') {
+    if (result.status === 'success') {
       closeAddModal();
       if (typeof showCustomAlert === 'function') {
-        showCustomAlert('Berhasil Ditambahkan!', json.message, 'success');
+        showCustomAlert('Berhasil!', 'Data closing deal OLX berhasil ditambahkan.', 'success');
       } else {
-        alert(json.message);
+        alert('Data closing deal OLX berhasil ditambahkan.');
       }
-      await fetchOlxData();
+      fetchOlxData();
     } else {
-      alert(json.message || 'Gagal menambahkan data');
+      alert(result.message || 'Gagal menambahkan data');
     }
   } catch (err) {
-    console.error('Error add trade-in:', err);
-    alert('Gagal menghubungi server.');
+    console.error('Error saving deal:', err);
+    alert('Terjadi kesalahan jaringan.');
   }
 }
 
-// ════════════════════════════════════════════════════════════════
-// KACAB CONTROL: MODAL EDIT & ATUR DATA
-// ════════════════════════════════════════════════════════════════
-function openEditModal(id) {
-  const item = currentOlxData.find(x => x.id === id);
-  if (!item) return;
-
-  const modal = document.getElementById('modalEditOlx');
-  if (!modal) return;
-
-  populateModalMonthSelects();
-
-  document.getElementById('editId').value = item.id;
-  document.getElementById('editMonth').value = item.month;
-  document.getElementById('editSales').value = item.sales;
-  document.getElementById('editSpv').value = item.spv;
-  document.getElementById('editMerk').value = item.merk;
-  document.getElementById('editType').value = item.type;
-  document.getElementById('editTahun').value = item.tahun;
-  document.getElementById('editWarna').value = item.warna || '';
-  document.getElementById('editHarga').value = item.harga || '';
-  document.getElementById('editKm').value = item.km || '';
-  document.getElementById('editPajak').value = item.pajak || 'ON';
-  document.getElementById('editKet').value = item.ket || '';
-  document.getElementById('editHasil').value = item.hasil || 'Nego';
-
-  modal.classList.add('active');
-}
-
-function closeEditModal() {
-  const modal = document.getElementById('modalEditOlx');
-  if (modal) modal.classList.remove('active');
-}
-
-async function saveEditTradeIn(e) {
-  if (e) e.preventDefault();
-
-  const id = parseInt(document.getElementById('editId')?.value);
-  const month = document.getElementById('editMonth')?.value || '';
-  const sales = document.getElementById('editSales')?.value.trim() || '';
-  const spv = document.getElementById('editSpv')?.value || 'Alvin';
-  const merk = document.getElementById('editMerk')?.value.trim() || 'Toyota';
-  const type = document.getElementById('editType')?.value.trim() || '';
-  const tahun = parseInt(document.getElementById('editTahun')?.value) || 2020;
-  const warna = document.getElementById('editWarna')?.value.trim() || '';
-  const harga = parseFloat(document.getElementById('editHarga')?.value) || 0;
-  const km = document.getElementById('editKm')?.value.trim() || '-';
-  const pajak = document.getElementById('editPajak')?.value.trim() || 'ON';
-  const ket = document.getElementById('editKet')?.value.trim() || '';
-  const hasil = document.getElementById('editHasil')?.value || 'Nego';
-
-  if (!id || !sales || !type) {
-    alert('Data wajib diisi dengan benar.');
+async function deleteTradeIn(id) {
+  if (!confirm(`Yakin ingin menghapus data closing deal ini?`)) {
     return;
   }
 
@@ -559,144 +486,49 @@ async function saveEditTradeIn(e) {
     const res = await fetch('../api/api_olx_pencapaian.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'update',
-        id, month, sales, spv, merk, type, tahun, warna, harga, km, pajak, ket, hasil
-      })
+      body: JSON.stringify({ action: 'delete', id: id })
     });
-    const json = await res.json();
+    const result = await res.json();
 
-    if (json.status === 'success') {
-      closeEditModal();
+    if (result.status === 'success') {
       if (typeof showCustomAlert === 'function') {
-        showCustomAlert('Berhasil Diperbarui!', json.message, 'success');
-      } else {
-        alert(json.message);
+        showCustomAlert('Terhapus!', 'Data closing deal berhasil dihapus.', 'success');
       }
-      await fetchOlxData();
+      fetchOlxData();
     } else {
-      alert(json.message || 'Gagal memperbarui data');
+      alert(result.message || 'Gagal menghapus data');
     }
   } catch (err) {
-    console.error('Error edit trade-in:', err);
-    alert('Gagal menghubungi server.');
+    console.error('Error deleting deal:', err);
+    alert('Terjadi kesalahan saat menghapus data.');
   }
 }
 
 // ════════════════════════════════════════════════════════════════
-// KACAB CONTROL: QUICK SET DEAL
+// EKSPOR CSV RESMI (SESUAI EXCEL REPORT 2026)
 // ════════════════════════════════════════════════════════════════
-async function quickSetDeal(id, carName, currentPrice) {
-  const promptPrice = prompt(`Konfirmasi Closing DEAL untuk unit "${carName}". Masukkan nominal harga deal final (angka):`, currentPrice > 0 ? currentPrice : '');
-  if (promptPrice === null) return; // cancelled
-
-  const finalPrice = parseFloat(promptPrice) || currentPrice;
-
-  try {
-    const res = await fetch('../api/api_olx_pencapaian.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'update_status',
-        id: id,
-        hasil: 'Deal',
-        harga: finalPrice,
-        ket: 'Deal disetujui oleh Kepala Cabang'
-      })
-    });
-    const json = await res.json();
-
-    if (json.status === 'success') {
-      if (typeof showCustomAlert === 'function') {
-        showCustomAlert('Closing Deal Sukses!', `Unit ${carName} berhasil disahkan statusnya sebagai DEAL.`, 'success');
-      } else {
-        alert(json.message);
-      }
-      await fetchOlxData();
-    } else {
-      alert(json.message || 'Gagal mengubah status');
-    }
-  } catch (err) {
-    console.error('Error quick deal:', err);
-    alert('Gagal menghubungi server.');
-  }
-}
-
-// ════════════════════════════════════════════════════════════════
-// KACAB CONTROL: HAPUS DATA
-// ════════════════════════════════════════════════════════════════
-async function deleteTradeIn(id, carName) {
-  const isConfirm = confirm(`Apakah Anda yakin ingin menghapus data trade-in "${carName}"? Data yang dihapus tidak dapat dikembalikan.`);
-  if (!isConfirm) return;
-
-  try {
-    const res = await fetch('../api/api_olx_pencapaian.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'delete',
-        id: id
-      })
-    });
-    const json = await res.json();
-
-    if (json.status === 'success') {
-      if (typeof showCustomAlert === 'function') {
-        showCustomAlert('Data Dihapus!', json.message, 'success');
-      } else {
-        alert(json.message);
-      }
-      await fetchOlxData();
-    } else {
-      alert(json.message || 'Gagal menghapus data');
-    }
-  } catch (err) {
-    console.error('Error delete trade-in:', err);
-    alert('Gagal menghubungi server.');
-  }
-}
-
 function exportOlxCsv() {
   if (currentOlxData.length === 0) {
     alert('Tidak ada data untuk diekspor.');
     return;
   }
 
-  let csv = 'ID,Periode Bulan,Wiraniaga,SPV,Merk,Tipe,Tahun,Warna,Harga Deal / Estimasi,KM,Pajak,Status Hasil,Keterangan\n';
-  currentOlxData.forEach(item => {
-    csv += `"${item.id}","${item.month}","${item.sales}","${item.spv}","${item.merk}","${item.type}","${item.tahun}","${item.warna}","${item.harga}","${item.km}","${item.pajak}","${item.hasil}","${(item.ket || '').replace(/"/g, '""')}"\n`;
+  let csv = 'No,Periode Bulan,Cabang,Supervisor,Status Hasil,Keterangan\n';
+  currentOlxData.forEach((item, idx) => {
+    csv += `"${idx + 1}","${item.month}","${item.cabang || 'Tunas Toyota - Kiaracondong'}","${item.spv}","${item.hasil}","${(item.ket || '').replace(/"/g, '""')}"\n`;
   });
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `Laporan_TradeIn_Kacab_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute('download', `Report_OLX_Kiaracondong_2026_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 }
 
-function formatRupiah(num) {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
-}
-
-function formatRupiahShort(num) {
-  if (num >= 1000000000) {
-    return (num / 1000000000).toFixed(1) + ' Milyar';
-  }
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(0) + ' Juta';
-  }
-  return formatRupiah(num);
-}
-
 function escapeHtml(str) {
   if (!str) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function escapeJs(str) {
-  if (!str) return '';
-  return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
 }

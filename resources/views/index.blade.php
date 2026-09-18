@@ -755,14 +755,16 @@
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <label for="olxAchievementMonthSelect" style="font-size: 11px; font-weight: 700; color: #64748b;"><i class="fa-regular fa-calendar"></i> Periode:</label>
                                 <select id="olxAchievementMonthSelect" class="olx-month-select" onchange="loadOlxAchievementData()">
-                                    <option value="all">Semua Bulan (Total)</option>
+                                    <option value="all" selected>Semua Periode (Total 33 Deal)</option>
                                     <option value="Januari 2026">Januari 2026</option>
                                     <option value="Februari 2026">Februari 2026</option>
                                     <option value="Maret 2026">Maret 2026</option>
                                     <option value="April 2026">April 2026</option>
                                     <option value="Mei 2026">Mei 2026</option>
                                     <option value="Juni 2026">Juni 2026</option>
-                                    <option value="Juli 2026" selected>Juli 2026</option>
+                                    <option value="Juli 2026">Juli 2026</option>
+                                    <option value="Agustus 2026">Agustus 2026</option>
+                                    <option value="September 2026">September 2026</option>
                                 </select>
                             </div>
                         </div>

@@ -137,6 +137,7 @@
       </div>
 
       <!-- HERO SHOWCASE: TOP SALES CLOSING OLX MOBBI -->
+      <!-- HERO SHOWCASE: RINGKASAN CLOSING DEAL OLX MOBBI KIARACONDONG -->
       <section class="olx-board-hero">
         <div class="olx-board-header">
           <div class="olx-board-title-group">
@@ -145,7 +146,7 @@
               TUNAS TOYOTA KIARACONDONG
             </h2>
             <div style="font-size:12px; color:#fecdd3; margin-top:3px; font-weight:600;">
-              Papan Prestasi &amp; Rekapitulasi Resmi Transaksi Trade-In Cabang Kiaracondong
+              Papan Prestasi &amp; Rekapitulasi Resmi Transaksi Trade-In Cabang Kiaracondong Periode 2026
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
@@ -156,13 +157,13 @@
           </div>
         </div>
 
-        <!-- 5 PODIUM SLOTS (FADIL, EGY, JAJANG, INTAN) -->
+        <!-- 4 SHOWCASE SLOTS (ALVIN, FERYANTO, MUHAMMAD CAISARIVA, TOTAL) -->
         <div class="olx-podium-grid" id="olxPodiumGrid">
           <!-- Populated dynamically via JS -->
         </div>
       </section>
 
-      <!-- PAPAN REKAP DEAL BULANAN PER SPV (ALVIN | RYAN | RIVA) -->
+      <!-- PAPAN REKAP DEAL BULANAN PER SPV (ALVIN | FERYANTO | MUHAMMAD CAISARIVA) -->
       <section class="olx-matrix-card">
         <div class="olx-matrix-header">
           <div style="display:flex; align-items:center; gap:12px;">
@@ -171,7 +172,7 @@
             </span>
             <div>
               <h3 style="font-size:15px; font-weight:800; margin:0; color:#ffffff;">Papan Rekap Closing Deal Bulanan Tim Supervisor</h3>
-              <p style="font-size:11.5px; color:#94a3b8; margin:2px 0 0;">Evaluasi hasil closing trade-in per supervisor periode Januari - Desember</p>
+              <p style="font-size:11.5px; color:#94a3b8; margin:2px 0 0;">Evaluasi hasil closing trade-in per supervisor periode Januari - September 2026</p>
             </div>
           </div>
           <div style="font-size:12px; font-weight:700; color:#cbd5e1;">
@@ -193,15 +194,15 @@
                 </th>
                 <th style="width:200px;">
                   <div class="olx-matrix-spv-header">
-                    <img src="../images/olx_top/spv_ryan.jpg" alt="Ryan" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
-                    <span class="olx-matrix-spv-name">RYAN</span>
+                    <img src="../images/olx_top/spv_ryan.jpg" alt="Feryanto" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
+                    <span class="olx-matrix-spv-name">FERYANTO</span>
                     <span style="font-size:10px; opacity:0.8; font-weight:600;">Supervisor 2</span>
                   </div>
                 </th>
                 <th style="width:200px;">
                   <div class="olx-matrix-spv-header">
-                    <img src="../images/olx_top/spv_riva.jpg" alt="Riva" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
-                    <span class="olx-matrix-spv-name">RIVA</span>
+                    <img src="../images/olx_top/spv_riva.jpg" alt="Muhammad Caisariva" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
+                    <span class="olx-matrix-spv-name">MUHAMMAD CAISARIVA</span>
                     <span style="font-size:10px; opacity:0.8; font-weight:600;">Supervisor 3</span>
                   </div>
                 </th>
@@ -221,61 +222,61 @@
         </div>
       </section>
 
-      <!-- 5 EXECUTIVE KPI TILES -->
+      <!-- 5 EXECUTIVE KPI TILES (FOCUSED ON DEALS, NO MONEY/PRICES) -->
       <div class="olx-kpi-grid">
-        <div class="olx-kpi-card" style="border-top: 3px solid #2563eb;">
-          <div class="olx-kpi-head">
-            <span class="olx-kpi-label">Total Unit Masuk</span>
-            <div class="olx-kpi-icon icon-blue"><i class="fa-solid fa-car-tunnel"></i></div>
-          </div>
-          <div class="olx-kpi-val" id="kpiTotalUnit">0 Unit</div>
-          <div class="olx-kpi-sub"><i class="fa-solid fa-file-waveform" style="color:#2563eb;"></i> Seluruh unit trade-in diajukan</div>
-        </div>
-
         <div class="olx-kpi-card" style="border-top: 3px solid #059669;">
           <div class="olx-kpi-head">
-            <span class="olx-kpi-label">Closing Deal</span>
+            <span class="olx-kpi-label">Total Closing Deal</span>
             <div class="olx-kpi-icon icon-emerald"><i class="fa-solid fa-circle-check"></i></div>
           </div>
-          <div class="olx-kpi-val" id="kpiTotalDeal" style="color:#059669;">0 Deal</div>
-          <div class="olx-kpi-sub"><i class="fa-solid fa-handshake" style="color:#059669;"></i> Transaksi SPK Trade-In Sukses</div>
+          <div class="olx-kpi-val" id="kpiTotalDeal" style="color:#059669;">33 Deal</div>
+          <div class="olx-kpi-sub"><i class="fa-solid fa-handshake" style="color:#059669;"></i> Total deal cabang Kiaracondong</div>
         </div>
 
-        <div class="olx-kpi-card" style="border-top: 3px solid #d97706;">
+        <div class="olx-kpi-card" style="border-top: 3px solid #2563eb;">
           <div class="olx-kpi-head">
-            <span class="olx-kpi-label">Nego / Prospek</span>
-            <div class="olx-kpi-icon icon-amber"><i class="fa-solid fa-hourglass-half"></i></div>
+            <span class="olx-kpi-label">Tim SPV ALVIN</span>
+            <div class="olx-kpi-icon icon-blue"><i class="fa-solid fa-user-tie"></i></div>
           </div>
-          <div class="olx-kpi-val" id="kpiTotalNego" style="color:#d97706;">0 Prospek</div>
-          <div class="olx-kpi-sub"><i class="fa-solid fa-comments" style="color:#d97706;"></i> Tahap appraisal / nego harga</div>
-        </div>
-
-        <div class="olx-kpi-card" style="border-top: 3px solid #b45309;">
-          <div class="olx-kpi-head">
-            <span class="olx-kpi-label">Total Omset Deal</span>
-            <div class="olx-kpi-icon icon-gold"><i class="fa-solid fa-money-bill-wave"></i></div>
-          </div>
-          <div class="olx-kpi-val" id="kpiTotalNominal" style="color:#b45309;">Rp 0</div>
-          <div class="olx-kpi-sub"><i class="fa-solid fa-coins" style="color:#b45309;"></i> Akumulasi nilai transaksi deal</div>
+          <div class="olx-kpi-val" id="kpiDealAlvin" style="color:#2563eb;">16 Deal</div>
+          <div class="olx-kpi-sub"><i class="fa-solid fa-calendar-check" style="color:#2563eb;"></i> Periode Jan - Sep 2026</div>
         </div>
 
         <div class="olx-kpi-card" style="border-top: 3px solid #7c3aed;">
           <div class="olx-kpi-head">
-            <span class="olx-kpi-label">Win Rate Closing</span>
-            <div class="olx-kpi-icon icon-purple"><i class="fa-solid fa-chart-line"></i></div>
+            <span class="olx-kpi-label">Tim SPV FERYANTO</span>
+            <div class="olx-kpi-icon icon-purple"><i class="fa-solid fa-user-tie"></i></div>
           </div>
-          <div class="olx-kpi-val" id="kpiWinRate" style="color:#7c3aed;">0%</div>
-          <div class="olx-kpi-sub"><i class="fa-solid fa-percent" style="color:#7c3aed;"></i> Rasio konversi Deal per Unit</div>
+          <div class="olx-kpi-val" id="kpiDealFeryanto" style="color:#7c3aed;">15 Deal</div>
+          <div class="olx-kpi-sub"><i class="fa-solid fa-calendar-check" style="color:#7c3aed;"></i> Periode Apr - Sep 2026</div>
+        </div>
+
+        <div class="olx-kpi-card" style="border-top: 3px solid #d97706;">
+          <div class="olx-kpi-head">
+            <span class="olx-kpi-label">Tim SPV M. CAISARIVA</span>
+            <div class="olx-kpi-icon icon-amber"><i class="fa-solid fa-user-tie"></i></div>
+          </div>
+          <div class="olx-kpi-val" id="kpiDealCaisariva" style="color:#d97706;">2 Deal</div>
+          <div class="olx-kpi-sub"><i class="fa-solid fa-calendar-check" style="color:#d97706;"></i> Periode Apr &amp; Jul 2026</div>
+        </div>
+
+        <div class="olx-kpi-card" style="border-top: 3px solid #b45309;">
+          <div class="olx-kpi-head">
+            <span class="olx-kpi-label">Cabang Terverifikasi</span>
+            <div class="olx-kpi-icon icon-gold"><i class="fa-solid fa-building"></i></div>
+          </div>
+          <div class="olx-kpi-val" id="kpiCabangKircon" style="font-size:16px; font-weight:800; color:#0f172a;">Kiaracondong</div>
+          <div class="olx-kpi-sub"><i class="fa-solid fa-circle-check" style="color:#10b981;"></i> 100% Sesuai Laporan Excel</div>
         </div>
       </div>
 
-      <!-- LEADERBOARD PENCAPAIAN PER SPV -->
+      <!-- REKAP PERFORMA ANTAR TIM SPV -->
       <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
         <div>
           <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
             <i class="fa-solid fa-trophy" style="color:#d8a437; margin-right:6px;"></i> Rekap Performa Trade-In Antar Tim SPV
           </h3>
-          <p style="font-size:12px; color:#64748b; margin:2px 0 0;">Evaluasi pencapaian unit dan ranking wiraniaga berprestasi tiap supervisor</p>
+          <p style="font-size:12px; color:#64748b; margin:2px 0 0;">Evaluasi pencapaian closing trade-in per supervisor cabang Kiaracondong</p>
         </div>
       </div>
 
@@ -291,13 +292,13 @@
               <i class="fa-solid fa-sliders" style="color:#d8a437; margin-right:8px;"></i> Manajemen &amp; Pengaturan Hasil Trade-In OLX
             </h1>
             <p class="subtitle" style="font-size:12.5px; color:#64748b; margin:2px 0 0;">
-              Gunakan tombol <strong>"Atur"</strong> atau <strong>"Deal"</strong> untuk mengubah status penutupan transaksi &amp; nominal harga
+              Daftar transaksi closing deal trade-in OLX mobbi Tunas Toyota Kiaracondong
             </p>
           </div>
 
           <div style="display:flex; align-items:center; gap:8px;">
             <button class="btn-gold-action" onclick="openAddModal()">
-              <i class="fa-solid fa-plus"></i> Tambah Data Trade-In
+              <i class="fa-solid fa-plus"></i> Tambah Data Deal
             </button>
             <button class="btn" style="background:#f1f5f9; color:#334155; font-weight:700; border:1px solid #cbd5e1; padding:9px 14px; border-radius:10px; cursor:pointer;" onclick="exportOlxCsv()">
               <i class="fa-solid fa-file-excel" style="color:#059669;"></i> Ekspor CSV
@@ -319,26 +320,22 @@
             <!-- Filter SPV -->
             <select id="selectSpv" class="olx-select" onchange="fetchOlxData()">
               <option value="all">Semua Tim SPV</option>
-              <option value="Alvin">Tim SPV Alvin</option>
-              <option value="Ryan">Tim SPV Ryan</option>
-              <option value="Riva">Tim SPV Riva</option>
+              <option value="ALVIN">Tim SPV ALVIN</option>
+              <option value="FERYANTO">Tim SPV FERYANTO</option>
+              <option value="MUHAMMAD CAISARIVA">Tim SPV MUHAMMAD CAISARIVA</option>
             </select>
 
             <!-- Filter Status -->
             <select id="selectStatus" class="olx-select" onchange="fetchOlxData()">
-              <option value="all">Semua Status Hasil</option>
+              <option value="all">Semua Status</option>
               <option value="Deal">Deal (Closing)</option>
-              <option value="Nego">Nego (Proses)</option>
-              <option value="Cek Unit">Cek Unit / Appraisal</option>
-              <option value="Pending">Pending</option>
-              <option value="Batal">Batal</option>
             </select>
           </div>
 
           <div style="display:flex; align-items:center; gap:8px;">
             <div style="position:relative;">
               <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
-              <input type="text" id="searchOlx" class="olx-input" placeholder="Cari mobil / sales / merk..." style="padding-left:32px; width:220px;">
+              <input type="text" id="searchOlx" class="olx-input" placeholder="Cari SPV / bulan..." style="padding-left:32px; width:220px;">
             </div>
             <span id="totalRowsCount" style="font-size:12px; font-weight:700; color:#64748b; white-space:nowrap;">0 Data</span>
           </div>
@@ -349,20 +346,18 @@
           <table class="olx-table">
             <thead>
               <tr>
-                <th style="width:40px;">#</th>
-                <th>Bulan</th>
-                <th>Wiraniaga &amp; SPV</th>
-                <th>Unit Kendaraan</th>
-                <th>KM &amp; Pajak</th>
-                <th>Nilai / Deal (Rp)</th>
+                <th style="width:50px;">#</th>
+                <th>Periode Bulan</th>
+                <th>Cabang</th>
+                <th>Supervisor (SPV)</th>
                 <th>Status Hasil</th>
                 <th>Keterangan</th>
-                <th style="text-align:center;">Pengaturan Kacab</th>
+                <th style="text-align:center;">Aksi</th>
               </tr>
             </thead>
             <tbody id="olxTableBody">
               <tr>
-                <td colspan="10" style="text-align:center; padding:30px; color:#64748b;">
+                <td colspan="7" style="text-align:center; padding:30px; color:#64748b;">
                   <i class="fa-solid fa-spinner fa-spin"></i> Memuat data trade-in OLX...
                 </td>
               </tr>
