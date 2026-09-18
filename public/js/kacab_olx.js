@@ -244,6 +244,10 @@ function renderMatrix(matrix) {
     const icon = monthIcons[r.month] || 'fa-calendar-day';
     const isPastOrCurrent = (r.total > 0 || ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September'].includes(r.month));
 
+    const valAlvin = r.alvin !== undefined ? r.alvin : 0;
+    const valFeryanto = (r.feryanto !== undefined ? r.feryanto : r.ryan) ?? 0;
+    const valCaisariva = (r.caisariva !== undefined ? r.caisariva : r.riva) ?? 0;
+
     const renderVal = (val) => {
       if (!isPastOrCurrent && val === 0) {
         return `<span class="olx-matrix-num-empty">-</span>`;
@@ -267,31 +271,36 @@ function renderMatrix(matrix) {
           <i class="fa-solid ${icon}" style="color:#0284c7; width:16px; font-size:12px;"></i>
           ${escapeHtml(r.month)}
         </td>
-        <td style="text-align:center;">${renderVal(r.alvin)}</td>
-        <td style="text-align:center;">${renderVal(r.feryanto)}</td>
-        <td style="text-align:center;">${renderVal(r.caisariva)}</td>
+        <td style="text-align:center;">${renderVal(valAlvin)}</td>
+        <td style="text-align:center;">${renderVal(valFeryanto)}</td>
+        <td style="text-align:center;">${renderVal(valCaisariva)}</td>
         <td style="background:#f8fafc; text-align:center;">${renderTotal(r.total)}</td>
       </tr>
     `;
   }).join('');
 
   if (tfoot) {
+    const totAlvin = totals.alvin ?? 16;
+    const totFeryanto = totals.feryanto ?? totals.ryan ?? 15;
+    const totCaisariva = totals.caisariva ?? totals.riva ?? 2;
+    const totDealer = totals.dealer_total ?? (totAlvin + totFeryanto + totCaisariva);
+
     tfoot.innerHTML = `
       <tr>
         <th style="text-align:left; padding-left:20px; font-size:14px;">
           <i class="fa-solid fa-trophy" style="color:#eab308; margin-right:6px;"></i> TOTAL DEAL
         </th>
         <th style="text-align:center;">
-          <span class="olx-matrix-total-badge" style="background:#0284c7; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totals.alvin}</span>
+          <span class="olx-matrix-total-badge" style="background:#0284c7; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totAlvin}</span>
         </th>
         <th style="text-align:center;">
-          <span class="olx-matrix-total-badge" style="background:#7c3aed; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totals.feryanto}</span>
+          <span class="olx-matrix-total-badge" style="background:#7c3aed; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totFeryanto}</span>
         </th>
         <th style="text-align:center;">
-          <span class="olx-matrix-total-badge" style="background:#059669; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totals.caisariva}</span>
+          <span class="olx-matrix-total-badge" style="background:#059669; color:#ffffff; font-size:14px; padding:4px 12px; border-radius:12px;">${totCaisariva}</span>
         </th>
         <th style="background:#d7123a; color:#ffffff; text-align:center;">
-          <div style="font-size:16px; font-weight:900;">${totals.dealer_total} Deal</div>
+          <div style="font-size:16px; font-weight:900;">${totDealer} Deal</div>
           <div style="font-size:10px; opacity:0.85;">Closing Sukses</div>
         </th>
       </tr>
@@ -312,9 +321,9 @@ function updateKpiCards(summary) {
   const elCabangKircon = document.getElementById('kpiCabangKircon');
 
   if (elTotalDeal) elTotalDeal.textContent = `${summary.total_deal || 33} Deal`;
-  if (elDealAlvin) elDealAlvin.textContent = `${summary.deal_alvin || 16} Deal`;
-  if (elDealFeryanto) elDealFeryanto.textContent = `${summary.deal_feryanto || 15} Deal`;
-  if (elDealCaisariva) elDealCaisariva.textContent = `${summary.deal_caisariva || 2} Deal`;
+  if (elDealAlvin) elDealAlvin.textContent = `${summary.deal_alvin ?? 16} Deal`;
+  if (elDealFeryanto) elDealFeryanto.textContent = `${summary.deal_feryanto ?? summary.deal_ryan ?? 15} Deal`;
+  if (elDealCaisariva) elDealCaisariva.textContent = `${summary.deal_caisariva ?? summary.deal_riva ?? 2} Deal`;
   if (elCabangKircon) elCabangKircon.textContent = 'Kiaracondong';
 }
 

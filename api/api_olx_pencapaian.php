@@ -270,10 +270,16 @@ if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
     $spv_filter = isset($_GET['spv']) ? trim($_GET['spv']) : 'all';
     if ($spv_filter !== 'all' && $spv_filter !== '' && strtolower($spv_filter) !== 'semua') {
         $cleanSpv = str_replace(['Pak ', 'Bu ', 'Tim SPV '], '', $spv_filter);
-        $where[] = "(spv = ? OR spv LIKE ?)";
-        $params[] = $cleanSpv;
-        $params[] = "%$cleanSpv%";
-        $types .= "ss";
+        if (stripos($cleanSpv, 'ryan') !== false || stripos($cleanSpv, 'feryanto') !== false) {
+            $where[] = "(spv LIKE '%FERYANTO%' OR spv LIKE '%RYAN%')";
+        } elseif (stripos($cleanSpv, 'riva') !== false || stripos($cleanSpv, 'caisariva') !== false) {
+            $where[] = "(spv LIKE '%CAISARIVA%' OR spv LIKE '%RIVA%')";
+        } else {
+            $where[] = "(spv = ? OR spv LIKE ?)";
+            $params[] = $cleanSpv;
+            $params[] = "%$cleanSpv%";
+            $types .= "ss";
+        }
     }
 
     $status_filter = isset($_GET['status']) ? trim($_GET['status']) : 'all';
@@ -325,9 +331,15 @@ if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
     $spv_filter = isset($_GET['spv']) ? trim($_GET['spv']) : 'all';
     if ($spv_filter !== 'all' && $spv_filter !== '' && strtolower($spv_filter) !== 'semua') {
         $cleanSpv = str_replace(['Pak ', 'Bu ', 'Tim SPV '], '', $spv_filter);
-        $where[] = "(spv = ? OR spv LIKE ?)";
-        $params[] = $cleanSpv;
-        $params[] = "%$cleanSpv%";
+        if (stripos($cleanSpv, 'ryan') !== false || stripos($cleanSpv, 'feryanto') !== false) {
+            $where[] = "(spv LIKE '%FERYANTO%' OR spv LIKE '%RYAN%')";
+        } elseif (stripos($cleanSpv, 'riva') !== false || stripos($cleanSpv, 'caisariva') !== false) {
+            $where[] = "(spv LIKE '%CAISARIVA%' OR spv LIKE '%RIVA%')";
+        } else {
+            $where[] = "(spv = ? OR spv LIKE ?)";
+            $params[] = $cleanSpv;
+            $params[] = "%$cleanSpv%";
+        }
     }
     $status_filter = isset($_GET['status']) ? trim($_GET['status']) : 'all';
     if ($status_filter !== 'all' && $status_filter !== '') {
@@ -354,7 +366,7 @@ if (empty($db_rows) && !$is_db_ready) {
     $db_rows = $raw_data;
 }
 
-// Grouping per SPV (ALVIN, FERYANTO, MUHAMMAD CAISARIVA)
+// Grouping per SPV (ALVIN, FERYANTO/RYAN, MUHAMMAD CAISARIVA/RIVA)
 $main_spvs = ['ALVIN', 'FERYANTO', 'MUHAMMAD CAISARIVA'];
 $spv_groups = [];
 foreach ($main_spvs as $sName) {
@@ -405,6 +417,7 @@ $spv_list = array_values($spv_groups);
 // ════════════════════════════════════════════════════════════════
 // 1. REKAP BULANAN DEAL PER SPV (PAPAN FISIK DEALER MATRIX)
 // Sesuai Report OLX by SPV Periode 2026.xlsx - Kiaracondong
+// Key kompatibel: alvin, feryanto & ryan, caisariva & riva
 // ════════════════════════════════════════════════════════════════
 $month_names = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 $matrix_rows = [];
@@ -417,7 +430,9 @@ foreach ($month_names as $mn) {
         'month' => $mn,
         'alvin' => 0,
         'feryanto' => 0,
+        'ryan' => 0,
         'caisariva' => 0,
+        'riva' => 0,
         'total' => 0
     ];
 }
@@ -436,9 +451,11 @@ if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
                         $tot_m_alvin += $cnt;
                     } elseif (stripos($spv, 'FERYANTO') !== false || stripos($spv, 'RYAN') !== false) {
                         $matrix_rows[$mn]['feryanto'] += $cnt;
+                        $matrix_rows[$mn]['ryan'] += $cnt;
                         $tot_m_feryanto += $cnt;
                     } elseif (stripos($spv, 'CAISARIVA') !== false || stripos($spv, 'RIVA') !== false) {
                         $matrix_rows[$mn]['caisariva'] += $cnt;
+                        $matrix_rows[$mn]['riva'] += $cnt;
                         $tot_m_caisariva += $cnt;
                     }
                     $matrix_rows[$mn]['total'] += $cnt;
@@ -461,9 +478,11 @@ if ($conn && $conn instanceof mysqli && !$conn->connect_error) {
                         $tot_m_alvin += $cnt;
                     } elseif (stripos($spv, 'FERYANTO') !== false || stripos($spv, 'RYAN') !== false) {
                         $matrix_rows[$mn]['feryanto'] += $cnt;
+                        $matrix_rows[$mn]['ryan'] += $cnt;
                         $tot_m_feryanto += $cnt;
                     } elseif (stripos($spv, 'CAISARIVA') !== false || stripos($spv, 'RIVA') !== false) {
                         $matrix_rows[$mn]['caisariva'] += $cnt;
+                        $matrix_rows[$mn]['riva'] += $cnt;
                         $tot_m_caisariva += $cnt;
                     }
                     $matrix_rows[$mn]['total'] += $cnt;
@@ -479,14 +498,16 @@ $spv_matrix = [
     'totals' => [
         'alvin' => $tot_m_alvin,
         'feryanto' => $tot_m_feryanto,
+        'ryan' => $tot_m_feryanto,
         'caisariva' => $tot_m_caisariva,
+        'riva' => $tot_m_caisariva,
         'dealer_total' => $tot_m_alvin + $tot_m_feryanto + $tot_m_caisariva
     ]
 ];
 
 // ════════════════════════════════════════════════════════════════
 // 2. EXECUTIVE SPV SHOWCASE (KIARACONDONG)
-// ALVIN, FERYANTO, MUHAMMAD CAISARIVA
+// ALVIN, FERYANTO (RYAN), MUHAMMAD CAISARIVA (RIVA)
 // ════════════════════════════════════════════════════════════════
 $spv_showcase = [
     [
@@ -498,14 +519,14 @@ $spv_showcase = [
     ],
     [
         'key' => 'feryanto',
-        'display_name' => 'FERYANTO',
+        'display_name' => 'FERYANTO / RYAN',
         'role' => 'Supervisor 2',
         'deal_count' => $tot_m_feryanto,
         'cabang' => 'Tunas Toyota - Kiaracondong'
     ],
     [
         'key' => 'caisariva',
-        'display_name' => 'MUHAMMAD CAISARIVA',
+        'display_name' => 'MUHAMMAD CAISARIVA / RIVA',
         'role' => 'Supervisor 3',
         'deal_count' => $tot_m_caisariva,
         'cabang' => 'Tunas Toyota - Kiaracondong'
@@ -523,7 +544,9 @@ echo json_encode([
         'total_unit' => $total_deal_all,
         'deal_alvin' => $tot_m_alvin,
         'deal_feryanto' => $tot_m_feryanto,
+        'deal_ryan' => $tot_m_feryanto,
         'deal_caisariva' => $tot_m_caisariva,
+        'deal_riva' => $tot_m_caisariva,
         'win_rate' => 100
     ],
     'spv_showcase' => $spv_showcase,

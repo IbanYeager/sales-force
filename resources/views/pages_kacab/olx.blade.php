@@ -194,15 +194,15 @@
                 </th>
                 <th style="width:200px;">
                   <div class="olx-matrix-spv-header">
-                    <img src="../images/olx_top/spv_ryan.jpg" alt="Feryanto" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
-                    <span class="olx-matrix-spv-name">FERYANTO</span>
+                    <img src="../images/olx_top/spv_ryan.jpg" alt="Feryanto / Ryan" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
+                    <span class="olx-matrix-spv-name">FERYANTO / RYAN</span>
                     <span style="font-size:10px; opacity:0.8; font-weight:600;">Supervisor 2</span>
                   </div>
                 </th>
                 <th style="width:200px;">
                   <div class="olx-matrix-spv-header">
-                    <img src="../images/olx_top/spv_riva.jpg" alt="Muhammad Caisariva" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
-                    <span class="olx-matrix-spv-name">MUHAMMAD CAISARIVA</span>
+                    <img src="../images/olx_top/spv_riva.jpg" alt="Muhammad Caisariva / Riva" class="olx-matrix-spv-avatar" onerror="this.src='../images/default-avatar.png'">
+                    <span class="olx-matrix-spv-name">MUHAMMAD CAISARIVA / RIVA</span>
                     <span style="font-size:10px; opacity:0.8; font-weight:600;">Supervisor 3</span>
                   </div>
                 </th>
@@ -321,8 +321,8 @@
             <select id="selectSpv" class="olx-select" onchange="fetchOlxData()">
               <option value="all">Semua Tim SPV</option>
               <option value="ALVIN">Tim SPV ALVIN</option>
-              <option value="FERYANTO">Tim SPV FERYANTO</option>
-              <option value="MUHAMMAD CAISARIVA">Tim SPV MUHAMMAD CAISARIVA</option>
+              <option value="FERYANTO">Tim SPV FERYANTO (RYAN)</option>
+              <option value="MUHAMMAD CAISARIVA">Tim SPV MUHAMMAD CAISARIVA (RIVA)</option>
             </select>
 
             <!-- Filter Status -->
@@ -578,8 +578,8 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_olx.js?v=20260918_v1"></script>
-  <script src="../js/pwa-app.js?v=20260918_v1"></script>
+  <script src="../js/kacab_olx.js?v=20260918_v6_ryan_riva"></script>
+  <script src="../js/pwa-app.js?v=20260918_v6_ryan_riva"></script>
 </body>
 
 </html>
