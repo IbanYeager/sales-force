@@ -569,8 +569,23 @@ if ($action === 'stats') {
     $where = [];
     $params = [];
     if ($sales_id !== '' && $sales_id !== 'all') {
-        $where[] = "assigned_sales_id = ?";
-        $params[] = (int)$sales_id;
+        $salesList = get_sales_list();
+        $targetSalesName = '';
+        foreach ($salesList as $s) {
+            if ((int)$s['id'] === (int)$sales_id) {
+                $targetSalesName = trim($s['name']);
+                break;
+            }
+        }
+        if ($targetSalesName !== '') {
+            $where[] = "(assigned_sales_id = ? OR LOWER(sales_fu) = LOWER(?) OR sales_fu LIKE ?)";
+            $params[] = (int)$sales_id;
+            $params[] = $targetSalesName;
+            $params[] = "%$targetSalesName%";
+        } else {
+            $where[] = "assigned_sales_id = ?";
+            $params[] = (int)$sales_id;
+        }
     }
     if ($db_source === 'sales') {
         $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
@@ -1947,7 +1962,7 @@ if ($action === 'distribute_quota') {
     }
 
     if ($only_unassigned) {
-        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
+        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0) AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0' OR sales_fu = 'Belum Ditugaskan')";
     }
 
     if ($category !== '' && $category !== 'all') {

@@ -212,7 +212,89 @@ function sync_google_sheet_data($sheetUrl = null) {
         followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
     } catch (Exception $e) {}
 
-    global $is_mysql, $sqlite_pdo, $conn;
+    // Pre-load all registered sales accounts to accurately map sheet sales_fu to assigned_sales_id
+    // Order by is_active DESC so active sales consultants take highest priority in name matching
+    $salesDbRows = followup_query("SELECT id, username, nama_lengkap, nama_spv, is_active FROM sales_accounts ORDER BY is_active DESC, id ASC");
+    $salesDbRows = is_array($salesDbRows) ? $salesDbRows : [];
+
+    $salesLookup = []; // lowercase key => ['id' => int, 'name' => string]
+    foreach ($salesDbRows as $sAcc) {
+        $sid = (int)$sAcc['id'];
+        $sName = trim($sAcc['nama_lengkap'] ?? '');
+        $uName = trim($sAcc['username'] ?? '');
+        if (!$sName && !$uName) continue;
+
+        $primaryName = $sName ?: $uName;
+
+        // Exact match on full name
+        if ($sName !== '') {
+            $lowerFull = strtolower($sName);
+            if (!isset($salesLookup[$lowerFull])) {
+                $salesLookup[$lowerFull] = ['id' => $sid, 'name' => $sName];
+            }
+            // Clean parenthesis e.g. "Agus (Ryan)" -> "agus"
+            $cleanParen = trim(preg_replace('/\s*\([^)]*\)/', '', $lowerFull));
+            if ($cleanParen !== '' && !isset($salesLookup[$cleanParen])) {
+                $salesLookup[$cleanParen] = ['id' => $sid, 'name' => $sName];
+            }
+            // First name word e.g. "Yani Andriyani" -> "yani"
+            $words = preg_split('/\s+/', $lowerFull);
+            if (!empty($words[0]) && strlen($words[0]) >= 3 && !isset($salesLookup[$words[0]])) {
+                $salesLookup[$words[0]] = ['id' => $sid, 'name' => $sName];
+            }
+        }
+
+        // Username match
+        if ($uName !== '') {
+            $lowerUser = strtolower($uName);
+            if (!isset($salesLookup[$lowerUser])) {
+                $salesLookup[$lowerUser] = ['id' => $sid, 'name' => $primaryName];
+            }
+            // Clean suffix like "_ryan", "_alvin", "_riva" e.g. "yani_ryan" -> "yani"
+            $cleanUser = preg_replace('/(_ryan|_alvin|_riva|_kacab|_spv|\d+)$/i', '', $lowerUser);
+            if ($cleanUser !== '' && strlen($cleanUser) >= 3 && !isset($salesLookup[$cleanUser])) {
+                $salesLookup[$cleanUser] = ['id' => $sid, 'name' => $primaryName];
+            }
+        }
+    }
+
+    // Common Indonesian name variations / spelling aliases
+    if (isset($salesLookup['yenni']) && !isset($salesLookup['yeni'])) {
+        $salesLookup['yeni'] = $salesLookup['yenni'];
+    }
+
+    $matchSales = function($rawSalesName) use ($salesLookup, $salesDbRows) {
+        $raw = trim($rawSalesName);
+        if (!$raw || $raw === '-' || $raw === '0' || strtolower($raw) === 'no data' || strtolower($raw) === 'unassigned' || strtolower($raw) === 'belum ditugaskan') {
+            return [null, ''];
+        }
+        $lower = strtolower($raw);
+        if (isset($salesLookup[$lower])) {
+            return [$salesLookup[$lower]['id'], $salesLookup[$lower]['name']];
+        }
+
+        // Substring / partial check across registered sales
+        foreach ($salesDbRows as $s) {
+            $sName = strtolower(trim($s['nama_lengkap'] ?? ''));
+            if ($sName && (strpos($sName, $lower) !== false || strpos($lower, $sName) !== false)) {
+                return [(int)$s['id'], $s['nama_lengkap']];
+            }
+        }
+
+        // Check first name match
+        $firstWord = explode(' ', $lower)[0] ?? '';
+        if ($firstWord && strlen($firstWord) >= 3) {
+            foreach ($salesDbRows as $s) {
+                $sFirst = explode(' ', strtolower(trim($s['nama_lengkap'] ?? '')))[0] ?? '';
+                if ($sFirst === $firstWord) {
+                    return [(int)$s['id'], $s['nama_lengkap']];
+                }
+            }
+        }
+
+        // Return null ID if no account matched, but preserve the raw text name in sales_fu
+        return [null, $raw];
+    };
 
     $rowsToInsert = [];
     $inserted = 0;
@@ -297,7 +379,12 @@ function sync_google_sheet_data($sheetUrl = null) {
         $remarks = $remarksIdx !== -1 ? trim($row[$remarksIdx] ?? '') : '';
         $salesFuStatus = $statusFuIdx !== -1 ? trim($row[$statusFuIdx] ?? 'Open') : 'Open';
         $reasonFu = $reasonFuIdx !== -1 ? trim($row[$reasonFuIdx] ?? '') : '';
-        $salesFu = $salesFuIdx !== -1 ? trim($row[$salesFuIdx] ?? '') : '';
+        
+        $rawSalesFu = $salesFuIdx !== -1 ? trim($row[$salesFuIdx] ?? '') : '';
+        list($matchedSalesId, $matchedSalesName) = $matchSales($rawSalesFu);
+        $assignedSalesId = $matchedSalesId; // int ID if matched to sales_accounts, or null
+        $salesFu = $matchedSalesName ?: $rawSalesFu;
+
         $fuDate = $fuDateIdx !== -1 ? trim($row[$fuDateIdx] ?? '') : '';
 
         $allSpk = $allSpkIdx !== -1 ? trim($row[$allSpkIdx] ?? '') : '';
@@ -325,7 +412,8 @@ function sync_google_sheet_data($sheetUrl = null) {
             $outletDo, $outletSrv, $srvComp,
             $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
             $category, $status,
-            $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo
+            $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo,
+            $assignedSalesId
         ];
     }
 
@@ -342,8 +430,9 @@ function sync_google_sheet_data($sheetUrl = null) {
                 outlet_do, outlet_service, service_compliance,
                 connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                 followup_category, followup_status, sync_source,
-                vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)
+                vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
+                assigned_sales_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(customer_code) DO UPDATE SET
                 name = excluded.name, car_model = excluded.car_model, last_car_model = excluded.last_car_model,
                 car_age = excluded.car_age, recommended_model = excluded.recommended_model,
@@ -359,12 +448,30 @@ function sync_google_sheet_data($sheetUrl = null) {
                 sales_fu_status = CASE WHEN excluded.sales_fu_status != 'Open' THEN excluded.sales_fu_status ELSE followup_customers.sales_fu_status END,
                 reason_followup = CASE WHEN excluded.reason_followup != '' THEN excluded.reason_followup ELSE followup_customers.reason_followup END,
                 followup_date = CASE WHEN excluded.followup_date IS NOT NULL THEN excluded.followup_date ELSE followup_customers.followup_date END,
+                followup_status = CASE 
+                    WHEN excluded.followup_status != 'Belum Dihubungi' AND excluded.followup_status != '' THEN excluded.followup_status
+                    WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.followup_status != '' THEN followup_customers.followup_status
+                    ELSE excluded.followup_status
+                END,
                 followup_category = excluded.followup_category,
                 vehicle_filter = excluded.vehicle_filter,
                 cust_type = excluded.cust_type,
                 priority_class = excluded.priority_class,
                 outlet_name = excluded.outlet_name,
-                sales_fu = CASE WHEN excluded.sales_fu != '' THEN excluded.sales_fu ELSE followup_customers.sales_fu END,
+                assigned_sales_id = CASE
+                    WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
+                        THEN followup_customers.assigned_sales_id
+                    WHEN excluded.assigned_sales_id IS NOT NULL AND excluded.assigned_sales_id > 0
+                        THEN excluded.assigned_sales_id
+                    ELSE followup_customers.assigned_sales_id
+                END,
+                sales_fu = CASE
+                    WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != ''
+                        THEN followup_customers.sales_fu
+                    WHEN excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-'
+                        THEN excluded.sales_fu
+                    ELSE followup_customers.sales_fu
+                END,
                 do_unit = CASE WHEN excluded.do_unit != 'FALSE' THEN excluded.do_unit ELSE followup_customers.do_unit END,
                 all_spk = excluded.all_spk,
                 all_do = excluded.all_do
@@ -379,7 +486,7 @@ function sync_google_sheet_data($sheetUrl = null) {
             $placeholders = [];
             $flatParams = [];
             foreach ($chunk as $rData) {
-                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?)";
+                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 foreach ($rData as $val) {
                     $flatParams[] = $val;
                 }
@@ -392,7 +499,8 @@ function sync_google_sheet_data($sheetUrl = null) {
                     outlet_do, outlet_service, service_compliance,
                     connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                     followup_category, followup_status, sync_source,
-                    vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do
+                    vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
+                    assigned_sales_id
                 ) VALUES " . implode(', ', $placeholders) . "
                 ON DUPLICATE KEY UPDATE
                     name = VALUES(name), car_model = VALUES(car_model), last_car_model = VALUES(last_car_model),
@@ -409,18 +517,48 @@ function sync_google_sheet_data($sheetUrl = null) {
                     sales_fu_status = CASE WHEN VALUES(sales_fu_status) != 'Open' THEN VALUES(sales_fu_status) ELSE sales_fu_status END,
                     reason_followup = CASE WHEN VALUES(reason_followup) != '' THEN VALUES(reason_followup) ELSE reason_followup END,
                     followup_date = CASE WHEN VALUES(followup_date) IS NOT NULL THEN VALUES(followup_date) ELSE followup_date END,
+                    followup_status = CASE 
+                        WHEN VALUES(followup_status) != 'Belum Dihubungi' AND VALUES(followup_status) != '' THEN VALUES(followup_status)
+                        WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.followup_status != '' THEN followup_customers.followup_status
+                        ELSE VALUES(followup_status)
+                    END,
                     followup_category = VALUES(followup_category),
                     vehicle_filter = VALUES(vehicle_filter),
                     cust_type = VALUES(cust_type),
                     priority_class = VALUES(priority_class),
                     outlet_name = VALUES(outlet_name),
-                    sales_fu = CASE WHEN VALUES(sales_fu) != '' THEN VALUES(sales_fu) ELSE sales_fu END,
+                    assigned_sales_id = CASE
+                        WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
+                            THEN followup_customers.assigned_sales_id
+                        WHEN VALUES(assigned_sales_id) IS NOT NULL AND VALUES(assigned_sales_id) > 0
+                            THEN VALUES(assigned_sales_id)
+                        ELSE followup_customers.assigned_sales_id
+                    END,
+                    sales_fu = CASE
+                        WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != ''
+                            THEN followup_customers.sales_fu
+                        WHEN VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-'
+                            THEN VALUES(sales_fu)
+                        ELSE followup_customers.sales_fu
+                    END,
                     do_unit = CASE WHEN VALUES(do_unit) != 'FALSE' THEN VALUES(do_unit) ELSE do_unit END,
                     all_spk = VALUES(all_spk),
                     all_do = VALUES(all_do)
             ";
             followup_execute($sql, $flatParams);
         }
+    }
+
+    // Post-sync safety reconciliation: ensure any existing leads having sales_fu string get assigned_sales_id linked
+    foreach ($salesLookup as $key => $sData) {
+        $sid = (int)$sData['id'];
+        $sName = $sData['name'];
+        followup_execute("
+            UPDATE followup_customers 
+            SET assigned_sales_id = ? 
+            WHERE (assigned_sales_id IS NULL OR assigned_sales_id = 0) 
+              AND (LOWER(sales_fu) = ? OR sales_fu = ?)
+        ", [$sid, strtolower($sName), $sName]);
     }
 
     $now = date('Y-m-d H:i:s');
