@@ -318,7 +318,7 @@ function renderLibrary() {
                             <button class="btn-card-action btn-card-brosur" onclick="viewCarBrochure('${model}')" title="Buka Brosur PDF Resmi">
                                 <i class="fa-solid fa-file-pdf"></i> <span>Brosur</span>
                             </button>
-                            <button class="btn-card-action btn-card-wa" onclick="quickShareCar('${model}')" title="Bagikan ke WhatsApp">
+                            <button class="btn-card-action btn-card-wa" onclick="shareCarBrochurePdf('${model}')" title="Kirim Brosur PDF ke WhatsApp">
                                 <i class="fa-brands fa-whatsapp"></i>
                             </button>
                         </div>
@@ -956,42 +956,7 @@ function copyCarSpecsToClipboard() {
 }
 
 async function quickShareCar(model) {
-    let variantName = '';
-    const pl = await fetchElibraryPricelist();
-    const rawVariants = pl.filter(p => {
-        const kat = (p.kategori_order || '').toLowerCase();
-        const isReguler = kat.includes('reguler') || kat.includes('regular');
-        if (!isReguler) return false;
-
-        let dbModel = p.model.trim().toLowerCase();
-        dbModel = dbModel.replace(/\s+hybrid/gi, '').replace(/\s+hev/gi, '').trim();
-        let eModel = model.trim().toLowerCase();
-
-        if (eModel === 'innova zenix') eModel = 'zenix';
-        if (eModel === 'innova reborn' && (dbModel === 'reborn' || dbModel === 'innova reborn')) return true;
-        if (eModel === 'corolla cross') eModel = 'cross';
-        if (eModel === 'corolla altis') eModel = 'altis';
-        if (eModel === 'hilux single cabin') eModel = 'single cabin';
-        if (eModel === 'hilux double cabin') eModel = 'double cabin';
-        if (eModel === 'hilux rangga') eModel = 'rangga';
-        if (eModel === 'hiace commuter') eModel = 'hi ace comm';
-        if (eModel === 'hiace premio') eModel = 'hi ace premio';
-
-        if (eModel === 'raize' && (dbModel === 'raize' || dbModel === 'raize improvement')) return true;
-        if (eModel === 'veloz' && (dbModel === 'veloz')) return true;
-        if (eModel === 'vios' && (dbModel === 'vios')) return true;
-
-        return dbModel === eModel;
-    });
-
-    if (rawVariants.length > 0) {
-        variantName = rawVariants[0].tipe_paket;
-        currentElibVariants = rawVariants;
-    }
-
-    const message = generateCarShareMessage(model, variantName, '');
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, '_blank');
+    return shareCarBrochurePdf(model);
 }
 
 // ─── Direct PDF Brochure Sharing (E-Catalog) ────────────

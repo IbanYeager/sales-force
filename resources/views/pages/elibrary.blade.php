@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -598,14 +598,14 @@
           <i class="fa-solid fa-book-open" style="font-size:17px;"></i> Buka Brosur Resmi PDF
         </button>
         <button type="button" class="btn-main"
-          style="width:100%; justify-content:center; padding:12px 16px; border-radius:14px; background:linear-gradient(135deg, #c8102e 0%, #99001c 100%); color:#ffffff; font-weight:800; font-size:13px; box-shadow: 0 6px 20px rgba(200,16,46,0.25); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
+          style="width:100%; justify-content:center; padding:13px 16px; border-radius:14px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; font-weight:800; font-size:13.5px; box-shadow: 0 4px 15px rgba(37,211,102,0.3); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
           onclick="shareCarBrochurePdf()">
-          <i class="fa-solid fa-file-pdf" style="font-size:17px;"></i> Kirim File E-Catalog PDF
+          <i class="fa-brands fa-whatsapp" style="font-size:19px;"></i> Kirim Brosur PDF ke WhatsApp
         </button>
         <button type="button" class="btn-main"
-          style="width:100%; justify-content:center; padding:12px 16px; border-radius:14px; background:linear-gradient(135deg, #25D366 0%, #15803d 100%); color:#ffffff; font-weight:800; font-size:13px; box-shadow: 0 4px 15px rgba(37,211,102,0.25); border:none; cursor:pointer; display:flex; align-items:center; gap:8px; transition:transform 0.2s;"
+          style="width:100%; justify-content:center; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,0.95); color:#15803d; font-weight:700; font-size:12px; border:1.5px solid #86efac; cursor:pointer; display:flex; align-items:center; gap:6px;"
           onclick="shareCarToWhatsApp()">
-          <i class="fa-brands fa-whatsapp" style="font-size:18px;"></i> Bagikan Info Lengkap ke WA
+          <i class="fa-solid fa-align-left" style="color:#15803d;"></i> Bagikan Format Teks Spesifikasi ke WA
         </button>
         <button type="button" class="btn-main"
           style="width:100%; justify-content:center; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,0.9); color:#0f172a; font-weight:700; font-size:12px; border:1.5px solid #cbd5e1; cursor:pointer; display:flex; align-items:center; gap:6px;"

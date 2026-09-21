@@ -524,6 +524,8 @@ function getSalesBrochureCaption(carName) {
   if (!salesName) salesName = 'Sales';
 
   let cleanCarName = (carName || 'Toyota').replace(/^toyota\s+/i, '').trim();
+  if (cleanCarName.toLowerCase() === 'double cabin') cleanCarName = 'Hilux Double Cabin';
+  if (cleanCarName.toLowerCase() === 'single cabin') cleanCarName = 'Hilux Single Cabin';
 
   // Format baku sesuai permintaan: "E catalog [Model] - [Sales] Tunas KC"
   return `E catalog ${cleanCarName} - ${salesName} Tunas KC`;
