@@ -63,7 +63,7 @@ function getUnitSpecs(model, type = '') {
     }
 
     // Fuel Configurations
-    if (m.match(/fortuner|innova reborn|hilux|hiace|dyna|land cruiser/)) {
+    if (m.match(/fortuner|innova reborn|hilux|single cabin|double cabin|hiace|dyna|land cruiser/)) {
         fuel = 'Diesel / Bensin';
     }
     if (m.match(/hybrid|hev|prius/)) fuel = 'Hybrid';
@@ -200,7 +200,7 @@ function getUnitSpecs(model, type = '') {
         if (t.match(/vrz/)) fitur += ', Power Back Door, Rear Seat Entertainment';
         if (t.match(/gr /)) fitur += ', GR Aerokit, Panoramic View Monitor, Wireless Charger';
         if (t.match(/2\.8/)) fitur += ', TSS (Toyota Safety Sense)';
-    } else if (m.match(/hilux double cabin/)) {
+    } else if (m.match(/hilux double cabin|double cabin/)) {
         fitur = '4x4 Shift-on-the-fly, Rear Differential Lock';
         if (t.match(/v |gr /)) fitur += ', 8" Head Unit, Bi-Beam LED, 6 Airbags';
         if (t.match(/gr /)) fitur += ', GR Aerokit, TSS, Paddle Shift, 360 Camera';
@@ -712,8 +712,11 @@ function renderColorSelector(model) {
         "innova zenix": "Zenix",
         "corolla altis": "Altis",
         "hilux double cabin": "Double Cabin",
+        "double cabin": "Double Cabin",
         "hilux single cabin": "Single Cabin",
+        "single cabin": "Single Cabin",
         "hilux rangga": "Rangga",
+        "rangga": "Rangga",
         "hiace premio": "Hi Ace Premio",
         "hiace commuter": "Hi Ace Commuter",
         "hi ace comm": "Hi Ace Commuter",
@@ -833,8 +836,11 @@ function generateCarShareMessage(model, variantName, selectedColor) {
             "innova zenix": "Zenix",
             "corolla altis": "Altis",
             "hilux double cabin": "Double Cabin",
+            "double cabin": "Double Cabin",
             "hilux single cabin": "Single Cabin",
+            "single cabin": "Single Cabin",
             "hilux rangga": "Rangga",
+            "rangga": "Rangga",
             "hiace premio": "Hi Ace Premio",
             "hiace commuter": "Hi Ace Commuter",
             "hi ace comm": "Hi Ace Commuter",
@@ -1011,7 +1017,7 @@ function getCarBrochureFilename(modelName) {
     if (m.includes('bz4x')) return 'bz4x.pdf';
     if (m.includes('land cruiser')) return 'land-cruiser.pdf';
     if (m.includes('rangga')) return 'hilux-rangga.pdf';
-    if (m.includes('hilux')) return 'hilux.pdf';
+    if (m.includes('hilux') || m.includes('single cabin') || m.includes('double cabin') || m.includes('d-cab') || m.includes('s-cab') || m.includes('dcab') || m.includes('scab')) return 'hilux.pdf';
     if (m.includes('hiace')) return 'hiace.pdf';
     if (m.includes('dyna')) return 'dyna.pdf';
     if (m.includes('gr 86') || m.includes('gr86')) return 'gr-86.pdf';
@@ -1038,6 +1044,8 @@ function getSalesBrochureCaptionElib(carName) {
     if (!salesName) salesName = 'Sales';
 
     let cleanCarName = (carName || 'Toyota').replace(/^toyota\s+/i, '').trim();
+    if (cleanCarName.toLowerCase() === 'double cabin') cleanCarName = 'Hilux Double Cabin';
+    if (cleanCarName.toLowerCase() === 'single cabin') cleanCarName = 'Hilux Single Cabin';
     return `E catalog ${cleanCarName} - ${salesName} Tunas KC`;
 }
 
@@ -1051,7 +1059,11 @@ async function shareCarBrochurePdf(customModel = null) {
 
     if (!pdfFileName) {
         isSharingElibPdf = false;
-        alert(`Brosur PDF resmi untuk ${model} sedang diperbarui.`);
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert('Informasi Brosur', `Brosur PDF resmi untuk ${model} sedang disiapkan.`, 'info');
+        } else {
+            alert(`Brosur PDF resmi untuk ${model} sedang disiapkan.`);
+        }
         return;
     }
 
@@ -1137,16 +1149,20 @@ window.viewCarBrochure = function (carName) {
 
     if (!pdfFileName) {
         if (typeof showCustomAlert === 'function') {
-            showCustomAlert(`Brosur PDF resmi untuk ${model} sedang disiapkan.`);
+            showCustomAlert('Informasi Brosur', `Brosur PDF resmi untuk ${model} sedang disiapkan.`, 'info');
         } else {
             alert(`Brosur PDF resmi untuk ${model} sedang disiapkan.`);
         }
         return;
     }
 
+    let displayTitle = model;
+    if (displayTitle.toLowerCase() === 'double cabin') displayTitle = 'Hilux Double Cabin';
+    if (displayTitle.toLowerCase() === 'single cabin') displayTitle = 'Hilux Single Cabin';
+
     const pdfUrl = `uploads/brosur/${pdfFileName}`;
     if (typeof window.openPdfModal === 'function') {
-        window.openPdfModal(model, pdfUrl);
+        window.openPdfModal(displayTitle, pdfUrl);
     } else {
         window.open(`../${pdfUrl}`, '_blank');
     }

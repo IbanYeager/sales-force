@@ -196,6 +196,14 @@ function showCustomAlert(title, text, type) {
     const existingAlert = document.getElementById('global-custom-alert-overlay');
     if (existingAlert) existingAlert.remove();
     
+    // Handle missing text or type gracefully
+    if (text === undefined || text === null) {
+        text = '';
+    }
+    if (!type) {
+        type = 'success';
+    }
+
     let bgClass = 'bg-success';
     let btnClass = 'btn-success';
     let svgIcon = '<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
@@ -220,6 +228,7 @@ function showCustomAlert(title, text, type) {
     
     // Support newlines in text
     const textHtml = String(text).replace(/\\n/g, '<br>');
+    const bodyHtml = text ? `<div class="custom-alert-body">${textHtml}</div>` : '';
     
     overlay.innerHTML = `
         <div class="custom-alert-box" onclick="event.stopPropagation()">
@@ -227,7 +236,7 @@ function showCustomAlert(title, text, type) {
                 <div class="custom-alert-icon">${svgIcon}</div>
                 <h3 class="custom-alert-title">${title}</h3>
             </div>
-            <div class="custom-alert-body">${textHtml}</div>
+            ${bodyHtml}
             <div class="custom-alert-footer">
                 <button type="button" class="custom-alert-btn ${btnClass}" id="customAlertBtn">Mengerti</button>
             </div>

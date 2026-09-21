@@ -7,7 +7,7 @@ No,Sales,Target SPK,Target DO,Actual SPK,Actual DO,,Tim Pak Ryan
 5,Yani,3,3,,,,Yani : SPK  | DO 
 6,Deno,3,3,3,1,,Deno : SPK 3 | DO 1
 7,Jajang,5,5,2,1,,Jajang : SPK 2 | DO 1
-8,Galih,3,3,1,,,Galih : SPK 1 | DO 
+8,Galih,3,3,1,1,,Galih : SPK 1 | DO 1
 9,Fanny,3,3,,,,Fanny : SPK  | DO 
 10,Dadan,3,2,1,,,Dadan : SPK 1 | DO 
 11,Juarna,3,3,,,,Juarna : SPK  | DO 
@@ -21,12 +21,12 @@ No,Sales,Target SPK,Target DO,Actual SPK,Actual DO,,Tim Pak Ryan
 19,Rahadian,2,2,,,,Rahadian : SPK  | DO 
 20,Isna,3,3,,,,Isna : SPK  | DO 
 21,Rahma,7,7,7,2,,Rahma : SPK 7 | DO 2
-Jumlah Keseluruhan,,61,56,26,5,,Total : SPK 26 | DO 5
+Jumlah Keseluruhan,,61,56,26,6,,Total : SPK 26 | DO 6
 ,,,,,,,
 Pak Alvin,,,,,,,Tim Pak Alvin
-1,Dadi,3,3,1,1,,Dadi : SPK 1 | DO 1
+1,Dadi,3,3,2,1,,Dadi : SPK 2 | DO 1
 2,Topik,3,3,,,,Topik : SPK  | DO 
-3,Indah,5,5,1,2,,Indah : SPK 1 | DO 2
+3,Indah,5,5,2,2,,Indah : SPK 2 | DO 2
 4,Andri,5,5,3,2,,Andri : SPK 3 | DO 2
 5,Rizki,5,5,1,,,Rizki : SPK 1 | DO 
 6,Ardian,4,4,3,,,Ardian : SPK 3 | DO 
@@ -44,7 +44,7 @@ Pak Alvin,,,,,,,Tim Pak Alvin
 18,Erlan,2,2,1,1,,Erlan : SPK 1 | DO 1
 19,Anan,2,2,,,,Anan : SPK  | DO 
 20,Tia,2,1,,,,Tia : SPK  | DO 
-Jumlah Keseluruhan,,58,58,24,13,,Total : SPK 24 | DO 13
+Jumlah Keseluruhan,,58,58,26,13,,Total : SPK 26 | DO 13
 ,,,,,,,
 Pak Riva,,,,,,,Tim Pak Riva
 1,Galih,5,4,3,1,,Galih : SPK 3 | DO 1
@@ -57,11 +57,11 @@ Pak Riva,,,,,,,Tim Pak Riva
 8,Gugum,3,2,2,1,,Gugum : SPK 2 | DO 1
 9,Noni,2,1,,,,Noni : SPK  | DO 
 10,Puspa,2,3,1,1,,Puspa : SPK 1 | DO 1
-11,Robi,2,2,1,,,Robi : SPK 1 | DO 
+11,Robi,2,2,2,,,Robi : SPK 2 | DO 
 12,Julia,2,2,,,,Julia : SPK  | DO 
 13,Ophie,2,2,,,,Ophie : SPK  | DO 
 14,Faris,1,1,,,,Faris : SPK  | DO 
-Jumlah Keseluruhan,,41,33,17,6,,Total : SPK 17 | DO 6
+Jumlah Keseluruhan,,41,33,18,6,,Total : SPK 18 | DO 6
 ,,,,,,,
 Bu Rahma,,,,,,,
 1,Fia,4,3,2,2,,Fia : SPK 2 | DO 2
@@ -71,5 +71,5 @@ Bu Rahma,,,,,,,
 5,Tian,2,2,,,,Tian : SPK  | DO 
 Jumlah Keseluruhan,,16,13,4,4,,Total : SPK 4 | DO 4
 ,,,,,,,
-,,,,,,,Total Keseluruhan SPK : 71
-,,,,,,,Total Keseluruhan DO : 34
+,,,,,,,Total Keseluruhan SPK : 74
+,,,,,,,Total Keseluruhan DO : 29
