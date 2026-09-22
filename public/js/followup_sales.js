@@ -199,6 +199,10 @@ function initFollowupTabs() {
                 Deal / Selesai
                 <span class="fu-filter-count-badge badge-emerald" id="countBadgeDeal">0</span>
               </button>
+              <button type="button" class="status-fu-tab-btn" id="btnStatusRejected" onclick="handleStatusFilter('Tidak Tertarik', this)">
+                <i class="fa-solid fa-ban" style="color:#ef4444;"></i> Tidak Tertarik
+                <span class="fu-filter-count-badge badge-rose" id="countBadgeRejected">0</span>
+              </button>
             </div>
           </div>
         </div>
@@ -345,7 +349,8 @@ async function loadFollowupCustomers() {
   try {
     loadSalesProfile();
     let salesId = (followupState.salesInfo && followupState.salesInfo.id) ? followupState.salesInfo.id : 1;
-    const res = await fetch(`../api/api_followup.php?action=customers&sales_id=${salesId}`);
+    let salesName = (followupState.salesInfo && followupState.salesInfo.name) ? followupState.salesInfo.name : '';
+    const res = await fetch(`../api/api_followup.php?action=customers&sales_id=${salesId}&sales_name=${encodeURIComponent(salesName)}`);
     const data = await res.json();
 
     if (data.success) {
@@ -694,6 +699,7 @@ function updateHeroStats() {
   const waiting = list.filter(c => c.followup_status === 'Menunggu Respon').length;
   const interested = list.filter(c => c.followup_status === 'Tertarik / Jadwal Servis').length;
   const deal = list.filter(c => c.followup_status === 'Deal / Selesai').length;
+  const rejected = list.filter(c => c.followup_status === 'Tidak Tertarik' || c.remarks === 'Customer menolak').length;
 
   const elTotal = document.getElementById('heroTotalCount');
   const elPending = document.getElementById('heroPendingCount');
@@ -714,6 +720,7 @@ function updateHeroStats() {
   const bWaiting = document.getElementById('countBadgeWaiting');
   const bInterested = document.getElementById('countBadgeInterested');
   const bDeal = document.getElementById('countBadgeDeal');
+  const bRejected = document.getElementById('countBadgeRejected');
 
   if (bAll) bAll.textContent = total;
   if (bBelum) bBelum.textContent = pending;
@@ -721,6 +728,7 @@ function updateHeroStats() {
   if (bWaiting) bWaiting.textContent = waiting;
   if (bInterested) bInterested.textContent = interested;
   if (bDeal) bDeal.textContent = deal;
+  if (bRejected) bRejected.textContent = rejected;
 }
 
 function renderCategoryPills() {
@@ -781,6 +789,7 @@ function handleStatusFilter(status, btn) {
     else if (status === 'Menunggu Respon') document.getElementById('btnStatusWaiting')?.classList.add('active');
     else if (status === 'Tertarik / Jadwal Servis') document.getElementById('btnStatusInterested')?.classList.add('active');
     else if (status === 'Deal / Selesai') document.getElementById('btnStatusDeal')?.classList.add('active');
+    else if (status === 'Tidak Tertarik') document.getElementById('btnStatusRejected')?.classList.add('active');
   }
 
   renderCustomerCards(false);
@@ -814,6 +823,8 @@ function renderCustomerCards(preserveRenderLimit = false) {
       list = list.filter(c => !c.followup_status || c.followup_status === 'Belum Dihubungi');
     } else if (followupState.activeStatus === 'sudah_fu') {
       list = list.filter(c => c.followup_status && c.followup_status !== 'Belum Dihubungi');
+    } else if (followupState.activeStatus === 'Tidak Tertarik') {
+      list = list.filter(c => c.followup_status === 'Tidak Tertarik' || c.remarks === 'Customer menolak');
     } else {
       list = list.filter(c => c.followup_status === followupState.activeStatus);
     }

@@ -98,11 +98,11 @@ function sync_google_sheet_data($sheetUrl = null) {
     $csvUrl = $sheetUrl;
     if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sheetUrl, $matches)) {
         $sheetId = $matches[1];
-        $gid = '1525199412'; // Default data sheet for Tunas Toyota Kiara Condong ('New FU Kiara Condong')
+        $gid = '1800685961'; // Default data sheet for Tunas Toyota Kiara Condong ('New FU Kiara Condong')
         if (preg_match('/gid=([0-9]+)/', $sheetUrl, $gMatches)) {
             $parsedGid = $gMatches[1];
-            if ($parsedGid === '1618304635' || $parsedGid === '607414573' || $parsedGid === '0') {
-                $gid = '1525199412';
+            if ($parsedGid === '1618304635' || $parsedGid === '607414573' || $parsedGid === '0' || empty($parsedGid)) {
+                $gid = '1800685961';
             } else {
                 $gid = $parsedGid;
             }
@@ -115,7 +115,7 @@ function sync_google_sheet_data($sheetUrl = null) {
         "http" => [
             "method" => "GET",
             "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\n",
-            "timeout" => 35
+            "timeout" => 45
         ],
         "ssl" => [
             "verify_peer" => false,
@@ -132,9 +132,18 @@ function sync_google_sheet_data($sheetUrl = null) {
         ];
     }
 
-    // Parse CSV rows
-    $lines = str_getcsv($csvContent, "\n");
-    if (empty($lines)) {
+    // Robust memory stream parsing with fgetcsv (prevents corrupting cells with multiline text)
+    $stream = fopen('php://memory', 'r+');
+    fwrite($stream, $csvContent);
+    rewind($stream);
+
+    $rawRows = [];
+    while (($rCols = fgetcsv($stream)) !== false) {
+        $rawRows[] = $rCols;
+    }
+    fclose($stream);
+
+    if (empty($rawRows)) {
         return ['success' => false, 'message' => 'Google Sheet kosong.'];
     }
 
@@ -142,8 +151,8 @@ function sync_google_sheet_data($sheetUrl = null) {
     $headerRowIdx = 0;
     $keywords = ['nama', 'customer', 'contact', 'telepon', 'phone', 'wa', 'vehicle', 'mobil', 'model', 'vin', 'cluster', 'priority'];
 
-    for ($r = 0; $r < min(10, count($lines)); $r++) {
-        $cols = array_map('strtolower', array_map('trim', str_getcsv($lines[$r], ",")));
+    for ($r = 0; $r < min(10, count($rawRows)); $r++) {
+        $cols = array_map('strtolower', array_map('trim', $rawRows[$r]));
         $matches = 0;
         foreach ($cols as $c) {
             foreach ($keywords as $k) {
@@ -156,7 +165,7 @@ function sync_google_sheet_data($sheetUrl = null) {
         }
     }
 
-    $rawHeaders = str_getcsv($lines[$headerRowIdx], ",");
+    $rawHeaders = $rawRows[$headerRowIdx];
     $headers = array_map('strtolower', array_map('trim', $rawHeaders));
 
     $findIdx = function($patterns) use ($headers) {
@@ -196,7 +205,7 @@ function sync_google_sheet_data($sheetUrl = null) {
     $remarksIdx = $findIdx(['/^remarks/i']);
     $statusFuIdx = $findIdx(['/^status.*fu/i']);
     $reasonFuIdx = $findIdx(['/^reason/i', '/^alasan/i']);
-    $salesFuIdx = $findIdx(['/^sales.*fu/i', '/sales/i', '/pic/i', '/wiraniaga/i']);
+    $salesFuIdx = $findIdx(['/^sales\s*fu/i', '/sales.*fu/i', '/^sales_fu$/i', '/sales\s*pic/i', '/wiraniaga/i', '/^pic$/i']);
     $fuDateIdx = $findIdx(['/tanggal.*pengisian/i', '/tanggal.*fu/i']);
     $allSpkIdx = $findIdx(['/all spk/i']);
     $allDoIdx = $findIdx(['/all do/i']);
@@ -259,9 +268,12 @@ function sync_google_sheet_data($sheetUrl = null) {
     }
 
     // Common Indonesian name variations / spelling aliases
-    if (isset($salesLookup['yenni']) && !isset($salesLookup['yeni'])) {
-        $salesLookup['yeni'] = $salesLookup['yenni'];
-    }
+    if (isset($salesLookup['yenni']) && !isset($salesLookup['yeni'])) $salesLookup['yeni'] = $salesLookup['yenni'];
+    if (isset($salesLookup['yeni']) && !isset($salesLookup['yenni'])) $salesLookup['yenni'] = $salesLookup['yeni'];
+    if (isset($salesLookup['egi']) && !isset($salesLookup['egy'])) $salesLookup['egy'] = $salesLookup['egi'];
+    if (isset($salesLookup['egy']) && !isset($salesLookup['egi'])) $salesLookup['egi'] = $salesLookup['egy'];
+    if (isset($salesLookup['fadil']) && !isset($salesLookup['fadhil'])) $salesLookup['fadhil'] = $salesLookup['fadil'];
+    if (isset($salesLookup['fadhil']) && !isset($salesLookup['fadil'])) $salesLookup['fadil'] = $salesLookup['fadhil'];
 
     $matchSales = function($rawSalesName) use ($salesLookup, $salesDbRows) {
         $raw = trim($rawSalesName);
@@ -299,9 +311,8 @@ function sync_google_sheet_data($sheetUrl = null) {
     $rowsToInsert = [];
     $inserted = 0;
 
-    for ($i = $headerRowIdx + 1; $i < count($lines); $i++) {
-        if (!trim($lines[$i])) continue;
-        $row = str_getcsv($lines[$i], ",");
+    for ($i = $headerRowIdx + 1; $i < count($rawRows); $i++) {
+        $row = $rawRows[$i];
         if (empty($row) || count($row) < 5) continue;
 
         $name = $nameIdx !== -1 ? trim($row[$nameIdx] ?? '') : '';
@@ -459,18 +470,24 @@ function sync_google_sheet_data($sheetUrl = null) {
                 priority_class = excluded.priority_class,
                 outlet_name = excluded.outlet_name,
                 assigned_sales_id = CASE
-                    WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
-                        THEN followup_customers.assigned_sales_id
-                    WHEN excluded.assigned_sales_id IS NOT NULL AND excluded.assigned_sales_id > 0
+                    WHEN excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-' AND excluded.sales_fu != 'Belum Ditugaskan' AND excluded.assigned_sales_id IS NOT NULL AND excluded.assigned_sales_id > 0
                         THEN excluded.assigned_sales_id
-                    ELSE followup_customers.assigned_sales_id
+                    WHEN followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
+                        THEN followup_customers.assigned_sales_id
+                    ELSE excluded.assigned_sales_id
                 END,
                 sales_fu = CASE
-                    WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != ''
-                        THEN followup_customers.sales_fu
-                    WHEN excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-'
+                    WHEN excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-' AND excluded.sales_fu != 'Belum Ditugaskan'
                         THEN excluded.sales_fu
-                    ELSE followup_customers.sales_fu
+                    WHEN followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan'
+                        THEN followup_customers.sales_fu
+                    ELSE excluded.sales_fu
+                END,
+                is_orphan = CASE
+                    WHEN (excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-' AND excluded.sales_fu != 'Belum Ditugaskan')
+                         OR (followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan')
+                        THEN 0
+                    ELSE followup_customers.is_orphan
                 END,
                 do_unit = CASE WHEN excluded.do_unit != 'FALSE' THEN excluded.do_unit ELSE followup_customers.do_unit END,
                 all_spk = excluded.all_spk,
@@ -528,18 +545,24 @@ function sync_google_sheet_data($sheetUrl = null) {
                     priority_class = VALUES(priority_class),
                     outlet_name = VALUES(outlet_name),
                     assigned_sales_id = CASE
-                        WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
-                            THEN followup_customers.assigned_sales_id
-                        WHEN VALUES(assigned_sales_id) IS NOT NULL AND VALUES(assigned_sales_id) > 0
+                        WHEN VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-' AND VALUES(sales_fu) != 'Belum Ditugaskan' AND VALUES(assigned_sales_id) IS NOT NULL AND VALUES(assigned_sales_id) > 0
                             THEN VALUES(assigned_sales_id)
-                        ELSE followup_customers.assigned_sales_id
+                        WHEN followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
+                            THEN followup_customers.assigned_sales_id
+                        ELSE VALUES(assigned_sales_id)
                     END,
                     sales_fu = CASE
-                        WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != ''
-                            THEN followup_customers.sales_fu
-                        WHEN VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-'
+                        WHEN VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-' AND VALUES(sales_fu) != 'Belum Ditugaskan'
                             THEN VALUES(sales_fu)
-                        ELSE followup_customers.sales_fu
+                        WHEN followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan'
+                            THEN followup_customers.sales_fu
+                        ELSE VALUES(sales_fu)
+                    END,
+                    is_orphan = CASE
+                        WHEN (VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-' AND VALUES(sales_fu) != 'Belum Ditugaskan')
+                             OR (followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan')
+                            THEN 0
+                        ELSE followup_customers.is_orphan
                     END,
                     do_unit = CASE WHEN VALUES(do_unit) != 'FALSE' THEN VALUES(do_unit) ELSE do_unit END,
                     all_spk = VALUES(all_spk),
@@ -550,16 +573,17 @@ function sync_google_sheet_data($sheetUrl = null) {
     }
 
     // Post-sync safety reconciliation:
-    // 1. Ensure any existing leads having sales_fu string get assigned_sales_id linked
+    // 1. Ensure any leads having sales_fu string get assigned_sales_id linked correctly & is_orphan reset to 0
     foreach ($salesLookup as $key => $sData) {
         $sid = (int)$sData['id'];
         $sName = $sData['name'];
-        followup_execute("
-            UPDATE followup_customers 
-            SET assigned_sales_id = ? 
-            WHERE (assigned_sales_id IS NULL OR assigned_sales_id = 0) 
-              AND (LOWER(sales_fu) = ? OR sales_fu = ?)
-        ", [$sid, strtolower($sName), $sName]);
+        if ($sid > 0) {
+            followup_execute("
+                UPDATE followup_customers 
+                SET assigned_sales_id = ?, is_orphan = 0 
+                WHERE (LOWER(sales_fu) = ? OR LOWER(sales_fu) = ? OR sales_fu = ?)
+            ", [$sid, strtolower($key), strtolower($sName), $sName]);
+        }
     }
 
     // 2. CRITICAL: Ensure any existing leads with assigned_sales_id > 0 (already assigned or followed up) have their sales_fu filled!

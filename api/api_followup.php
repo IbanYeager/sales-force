@@ -85,6 +85,113 @@ function get_sales_list($spv = '') {
 }
 
 /**
+ * Smart sales filter resolver:
+ * Matches companion accounts (e.g. Yani ID 79 active & ID 5 inactive, Egy ID 2 & ID 48)
+ * and matches name/alias tokens with word boundaries and case-insensitive equality.
+ * Guarantees that sales consultants NEVER lose sight of their followed-up leads.
+ */
+function get_sales_filter_clause($sales_id, $sales_name_param = '') {
+    $salesList = followup_query("SELECT id, username, nama_lengkap, nama_spv, is_active FROM sales_accounts");
+    $salesList = is_array($salesList) ? $salesList : [];
+
+    $targetIds = [];
+    $targetNames = [];
+    $likeTokens = [];
+
+    $checkId = (int)$sales_id;
+    if ($checkId > 0) {
+        $targetIds[] = $checkId;
+    }
+
+    $seedNames = [];
+    if (!empty($sales_name_param)) {
+        $seedNames[] = trim($sales_name_param);
+    }
+
+    foreach ($salesList as $s) {
+        if ((int)$s['id'] === $checkId) {
+            if (!empty($s['nama_lengkap'])) $seedNames[] = trim($s['nama_lengkap']);
+            if (!empty($s['username'])) $seedNames[] = trim($s['username']);
+            break;
+        }
+    }
+
+    $coreTokens = [];
+    $ignoredWords = ['tunas', 'toyota', 'kiaracondong', 'sales', 'ryan', 'alvin', 'riva', 'kacab', 'spv', 'admin', 'user'];
+
+    foreach ($seedNames as $sn) {
+        $lower = strtolower($sn);
+        $clean = trim(preg_replace('/(_ryan|_alvin|_riva|_kacab|_spv|\d+|\([^)]*\))/i', '', $lower));
+        $words = preg_split('/[\s_]+/', $clean);
+        $firstWord = $words[0] ?? '';
+        if ($firstWord && strlen($firstWord) >= 3 && !in_array($firstWord, $ignoredWords, true)) {
+            $coreTokens[] = $firstWord;
+        }
+        if (count($words) <= 2 && strlen($clean) >= 3 && !in_array($clean, $ignoredWords, true)) {
+            $coreTokens[] = $clean;
+        }
+    }
+    $coreTokens = array_unique(array_filter($coreTokens));
+
+    foreach ($salesList as $s) {
+        $sId = (int)$s['id'];
+        $sName = strtolower(trim($s['nama_lengkap'] ?? ''));
+        $sUser = strtolower(trim($s['username'] ?? ''));
+        $sWords = array_merge(
+            preg_split('/[\s_]+/', $sName),
+            preg_split('/[\s_]+/', $sUser)
+        );
+        $sWords = array_map('trim', array_filter($sWords));
+
+        $matched = false;
+        foreach ($coreTokens as $token) {
+            if (in_array($token, $sWords, true) || $sName === $token || $sUser === $token) {
+                $matched = true;
+                break;
+            }
+        }
+
+        if ($matched) {
+            $targetIds[] = $sId;
+            if (!empty($s['nama_lengkap'])) $targetNames[] = strtolower(trim($s['nama_lengkap']));
+            if (!empty($s['username'])) $targetNames[] = strtolower(trim($s['username']));
+        }
+    }
+
+    foreach ($coreTokens as $token) {
+        $likeTokens[] = $token;
+        $targetNames[] = $token;
+    }
+
+    $targetIds = array_values(array_unique($targetIds));
+    $targetNames = array_values(array_unique(array_filter($targetNames)));
+    $likeTokens = array_values(array_unique(array_filter($likeTokens)));
+
+    $clauses = [];
+    $params = [];
+
+    if (!empty($targetIds)) {
+        $placeholders = implode(',', array_fill(0, count($targetIds), '?'));
+        $clauses[] = "assigned_sales_id IN ($placeholders)";
+        foreach ($targetIds as $tid) $params[] = $tid;
+    }
+
+    if (!empty($targetNames)) {
+        $placeholders = implode(',', array_fill(0, count($targetNames), '?'));
+        $clauses[] = "LOWER(sales_fu) IN ($placeholders)";
+        foreach ($targetNames as $tn) $params[] = $tn;
+    }
+
+    foreach ($likeTokens as $lt) {
+        $clauses[] = "sales_fu LIKE ?";
+        $params[] = "%$lt%";
+    }
+
+    $sql = !empty($clauses) ? "(" . implode(" OR ", $clauses) . ")" : "1=1";
+    return [$sql, $params, $targetIds, $likeTokens];
+}
+
+/**
  * Auto-Expiry Engine:
  * If customer remarks is 'Customer pending' or 'Menunggu respon' and > 2 days (48 hours) without update,
  * automatically change remarks to 'Customer menolak' & status to 'Tidak Tertarik' (Closed).
@@ -146,6 +253,7 @@ if (in_array($action, ['customers', 'stats', 'sales', 'sales_dashboard', 'check_
 if ($action === 'customers') {
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
     $sales_id = isset($_GET['sales_id']) ? trim($_GET['sales_id']) : '';
+    $sales_name_param = isset($_GET['sales_name']) ? trim($_GET['sales_name']) : '';
     $status = isset($_GET['status']) ? trim($_GET['status']) : '';
     $category = isset($_GET['category']) ? trim($_GET['category']) : '';
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
@@ -192,15 +300,10 @@ if ($action === 'customers') {
     } elseif ($sales_id === 'unassigned') {
         $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0) AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0')";
     } elseif ($sales_id !== '') {
-        $targetSalesName = isset($salesMap[(int)$sales_id]) ? trim($salesMap[(int)$sales_id]['name']) : '';
-        if ($targetSalesName !== '') {
-            $where[] = "(assigned_sales_id = ? OR LOWER(sales_fu) = LOWER(?) OR sales_fu LIKE ?)";
-            $params[] = (int)$sales_id;
-            $params[] = $targetSalesName;
-            $params[] = "%$targetSalesName%";
-        } else {
-            $where[] = "assigned_sales_id = ?";
-            $params[] = (int)$sales_id;
+        list($salesClause, $salesParams) = get_sales_filter_clause($sales_id, $sales_name_param);
+        $where[] = $salesClause;
+        foreach ($salesParams as $sp) {
+            $params[] = $sp;
         }
     } else {
         $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
@@ -564,27 +667,16 @@ if ($action === 'dashboard_analytics') {
 // -------------------------------------------------------------
 if ($action === 'stats') {
     $sales_id = isset($_GET['sales_id']) ? trim($_GET['sales_id']) : '';
+    $sales_name_param = isset($_GET['sales_name']) ? trim($_GET['sales_name']) : '';
     $db_source = isset($_GET['db_source']) ? trim($_GET['db_source']) : 'all';
 
     $where = [];
     $params = [];
     if ($sales_id !== '' && $sales_id !== 'all') {
-        $salesList = get_sales_list();
-        $targetSalesName = '';
-        foreach ($salesList as $s) {
-            if ((int)$s['id'] === (int)$sales_id) {
-                $targetSalesName = trim($s['name']);
-                break;
-            }
-        }
-        if ($targetSalesName !== '') {
-            $where[] = "(assigned_sales_id = ? OR LOWER(sales_fu) = LOWER(?) OR sales_fu LIKE ?)";
-            $params[] = (int)$sales_id;
-            $params[] = $targetSalesName;
-            $params[] = "%$targetSalesName%";
-        } else {
-            $where[] = "assigned_sales_id = ?";
-            $params[] = (int)$sales_id;
+        list($salesClause, $salesParams) = get_sales_filter_clause($sales_id, $sales_name_param);
+        $where[] = $salesClause;
+        foreach ($salesParams as $sp) {
+            $params[] = $sp;
         }
     }
     if ($db_source === 'sales') {
