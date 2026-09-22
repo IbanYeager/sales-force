@@ -30,8 +30,13 @@ let executiveState = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  initSearchableFilters();
   initMasterDashboard();
 });
+
+if (document.readyState !== 'loading') {
+  initSearchableFilters();
+}
 
 async function initMasterDashboard() {
   await Promise.all([
@@ -887,6 +892,244 @@ async function refillSalesLeads(salesId, salesName, quota = 50) {
   }
 }
 
+/* ==========================================================================
+   SEARCHABLE SELECT DROPDOWNS ENGINE (Sales PIC & Kategori)
+   ========================================================================== */
+function setupSearchableSelect(selectId, defaultPlaceholder, searchPlaceholder) {
+  const originalSelect = document.getElementById(selectId);
+  if (!originalSelect) return;
+
+  const wrapId = selectId + '_searchable_wrap';
+  let wrapper = document.getElementById(wrapId);
+
+  if (!wrapper) {
+    wrapper = document.createElement('div');
+    wrapper.id = wrapId;
+    wrapper.className = 'fu-searchable-select-wrap';
+    originalSelect.parentNode.insertBefore(wrapper, originalSelect);
+    originalSelect.style.display = 'none';
+
+    wrapper.innerHTML = `
+      <button type="button" class="fu-searchable-trigger" id="${selectId}_trigger">
+        <span class="fu-searchable-label" id="${selectId}_label">${defaultPlaceholder}</span>
+        <span class="fu-searchable-icons">
+          <i class="fa-solid fa-xmark fu-searchable-clear" id="${selectId}_clear" style="display:none;" title="Reset pilihan"></i>
+          <i class="fa-solid fa-chevron-down fu-searchable-arrow"></i>
+        </span>
+      </button>
+      <div class="fu-searchable-dropdown" id="${selectId}_dropdown">
+        <div class="fu-searchable-search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="fu-searchable-search-input" id="${selectId}_search_input" placeholder="${searchPlaceholder}" autocomplete="off">
+          <i class="fa-solid fa-circle-xmark fu-searchable-search-clear" id="${selectId}_search_clear" style="display:none;"></i>
+        </div>
+        <div class="fu-searchable-options-list" id="${selectId}_options_list"></div>
+      </div>
+    `;
+
+    wrapper.appendChild(originalSelect);
+
+    const trigger = wrapper.querySelector('.fu-searchable-trigger');
+    const dropdown = wrapper.querySelector('.fu-searchable-dropdown');
+    const searchInput = wrapper.querySelector('.fu-searchable-search-input');
+    const searchClear = wrapper.querySelector('.fu-searchable-search-clear');
+    const clearBtn = wrapper.querySelector('.fu-searchable-clear');
+    const optionsList = wrapper.querySelector('.fu-searchable-options-list');
+
+    // Toggle dropdown
+    trigger.addEventListener('click', (e) => {
+      if (e.target.closest('.fu-searchable-clear')) return;
+      const isOpen = dropdown.classList.contains('is-open');
+      closeAllSearchableDropdowns();
+      if (!isOpen) {
+        // Adjust alignment if near right edge
+        const rect = trigger.getBoundingClientRect();
+        if (rect.right + 120 > window.innerWidth) {
+          dropdown.classList.add('align-right');
+        } else {
+          dropdown.classList.remove('align-right');
+        }
+        dropdown.classList.add('is-open');
+        trigger.classList.add('is-active');
+        searchInput.value = '';
+        searchClear.style.display = 'none';
+        filterSearchOptions(selectId, '');
+        setTimeout(() => searchInput.focus(), 60);
+      }
+    });
+
+    // Clear selection back to 'all'
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      originalSelect.value = 'all';
+      originalSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      updateSearchableUI(selectId);
+    });
+
+    // Search filter input
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      searchClear.style.display = q ? 'block' : 'none';
+      filterSearchOptions(selectId, q);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchClear.style.display = 'none';
+      filterSearchOptions(selectId, '');
+      searchInput.focus();
+    });
+
+    // Keyboard support
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAllSearchableDropdowns();
+      } else if (e.key === 'Enter') {
+        const firstVisible = optionsList.querySelector('.fu-searchable-option:not(.is-hidden)');
+        if (firstVisible) {
+          firstVisible.click();
+        }
+      }
+    });
+
+    // MutationObserver to automatically re-render when original select options change
+    try {
+      const observer = new MutationObserver(() => {
+        renderSearchableOptions(selectId);
+      });
+      observer.observe(originalSelect, { childList: true });
+    } catch (err) {
+      console.warn('MutationObserver not available', err);
+    }
+  }
+
+  renderSearchableOptions(selectId);
+}
+
+function filterSearchOptions(selectId, query) {
+  const optionsList = document.getElementById(selectId + '_options_list');
+  if (!optionsList) return;
+
+  const items = optionsList.querySelectorAll('.fu-searchable-option');
+  let visibleCount = 0;
+  items.forEach(item => {
+    const text = (item.dataset.text || '').toLowerCase();
+    if (!query || text.includes(query)) {
+      item.classList.remove('is-hidden');
+      visibleCount++;
+    } else {
+      item.classList.add('is-hidden');
+    }
+  });
+
+  let emptyMsg = optionsList.querySelector('.fu-searchable-empty');
+  if (visibleCount === 0) {
+    if (!emptyMsg) {
+      emptyMsg = document.createElement('div');
+      emptyMsg.className = 'fu-searchable-empty';
+      emptyMsg.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i><span>Tidak ada hasil pencarian</span>';
+      optionsList.appendChild(emptyMsg);
+    }
+    emptyMsg.style.display = 'flex';
+  } else if (emptyMsg) {
+    emptyMsg.style.display = 'none';
+  }
+}
+
+function renderSearchableOptions(selectId) {
+  const originalSelect = document.getElementById(selectId);
+  const optionsList = document.getElementById(selectId + '_options_list');
+  if (!originalSelect || !optionsList) return;
+
+  optionsList.innerHTML = '';
+  const options = Array.from(originalSelect.options);
+
+  options.forEach(opt => {
+    const optEl = document.createElement('div');
+    optEl.className = 'fu-searchable-option';
+    optEl.dataset.value = opt.value;
+    optEl.dataset.text = opt.text;
+    if (opt.value === originalSelect.value) {
+      optEl.classList.add('is-selected');
+    }
+
+    // Split text and badge if format has "(...)" at the end
+    const badgeMatch = opt.text.match(/^(.*?)\s*(\([^)]+\))$/);
+    if (badgeMatch) {
+      const mainText = badgeMatch[1];
+      const badgeText = badgeMatch[2];
+      const isFlame = mainText.includes('🔥');
+      optEl.innerHTML = `
+        <span class="fu-opt-name ${isFlame ? 'is-flame' : ''}">${mainText}</span>
+        <span class="fu-opt-badge">${badgeText}</span>
+      `;
+    } else {
+      optEl.innerHTML = `<span class="fu-opt-name">${opt.text}</span>`;
+    }
+
+    optEl.addEventListener('click', () => {
+      originalSelect.value = opt.value;
+      originalSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      updateSearchableUI(selectId);
+      closeAllSearchableDropdowns();
+    });
+
+    optionsList.appendChild(optEl);
+  });
+
+  updateSearchableUI(selectId);
+}
+
+function updateSearchableUI(selectId) {
+  const originalSelect = document.getElementById(selectId);
+  const label = document.getElementById(selectId + '_label');
+  const clearBtn = document.getElementById(selectId + '_clear');
+  const trigger = document.getElementById(selectId + '_trigger');
+  const optionsList = document.getElementById(selectId + '_options_list');
+
+  if (!originalSelect || !label || !trigger) return;
+
+  const selectedOpt = originalSelect.options[originalSelect.selectedIndex];
+  if (selectedOpt) {
+    label.textContent = selectedOpt.text;
+    const isFiltered = originalSelect.value && originalSelect.value !== 'all';
+    trigger.classList.toggle('has-selection', isFiltered);
+    if (clearBtn) {
+      clearBtn.style.display = isFiltered ? 'inline-flex' : 'none';
+    }
+  }
+
+  if (optionsList) {
+    optionsList.querySelectorAll('.fu-searchable-option').forEach(item => {
+      item.classList.toggle('is-selected', item.dataset.value === originalSelect.value);
+    });
+  }
+}
+
+function closeAllSearchableDropdowns() {
+  document.querySelectorAll('.fu-searchable-dropdown.is-open').forEach(el => {
+    el.classList.remove('is-open');
+  });
+  document.querySelectorAll('.fu-searchable-trigger.is-active').forEach(el => {
+    el.classList.remove('is-active');
+  });
+}
+
+// Global click outside listener
+if (!window._fuSearchableListenerBound) {
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.fu-searchable-select-wrap')) {
+      closeAllSearchableDropdowns();
+    }
+  });
+  window._fuSearchableListenerBound = true;
+}
+
+function initSearchableFilters() {
+  setupSearchableSelect('filterSalesSelect', 'Semua Sales PIC', 'Cari nama sales...');
+  setupSearchableSelect('filterCategorySelect', 'Semua Kategori', 'Cari kategori...');
+}
+
 function populateSalesDropdowns() {
   const filterSelect = document.getElementById('filterSalesSelect');
   const bulkSelect = document.getElementById('bulkSalesSelect');
@@ -897,6 +1140,7 @@ function populateSalesDropdowns() {
     masterState.salesList.forEach(s => {
       filterSelect.innerHTML += `<option value="${s.id}">${s.name} (${s.total_customers || 0} Task)</option>`;
     });
+    renderSearchableOptions('filterSalesSelect');
   }
 
   if (bulkSelect) {
@@ -923,6 +1167,7 @@ function populateCategoryDropdown() {
   Object.keys(cats).forEach(cat => {
     catSelect.innerHTML += `<option value="${cat}">${cat} (${cats[cat]})</option>`;
   });
+  renderSearchableOptions('filterCategorySelect');
 }
 
 async function loadMasterCustomers(resetPage = true) {
