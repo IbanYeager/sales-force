@@ -10,43 +10,70 @@
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1e1014">
   <style>
+    @media (min-width: 901px) {
+      html, body.kacab-theme {
+        height: 100vh;
+        overflow: hidden;
+      }
+      .kcb-shell {
+        height: 100vh;
+        overflow: hidden;
+      }
+      .kcb-main {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 18px 14px !important;
+        overflow: hidden;
+      }
+    }
+
+    .kcb-topbar {
+      margin-bottom: 8px !important;
+      padding-bottom: 0 !important;
+      flex-shrink: 0;
+    }
+
     .afs-wrapper {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      margin-top: 10px;
+      gap: 8px;
+      min-height: 0;
+      margin-top: 0;
     }
 
     .afs-action-bar {
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 14px 20px;
+      border-radius: 12px;
+      padding: 7px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      flex-shrink: 0;
     }
 
     .afs-badge-live {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       background: #ecfdf5;
       color: #065f46;
       border: 1px solid #a7f3d0;
-      padding: 6px 14px;
-      border-radius: 10px;
-      font-size: 12px;
+      padding: 4px 11px;
+      border-radius: 8px;
+      font-size: 11.5px;
       font-weight: 800;
       letter-spacing: 0.3px;
     }
 
     .afs-pulse-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #10b981;
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
@@ -55,7 +82,7 @@
 
     @keyframes pulseLive {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
@@ -69,14 +96,14 @@
     .afs-btn {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 12.5px;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 700;
       text-decoration: none;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
       border: 1px solid transparent;
     }
 
@@ -94,25 +121,26 @@
     .afs-btn-gold {
       background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.2);
+      box-shadow: 0 3px 10px rgba(180, 83, 9, 0.2);
     }
 
     .afs-btn-gold:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(180, 83, 9, 0.3);
+      box-shadow: 0 5px 14px rgba(180, 83, 9, 0.3);
       color: #ffffff;
     }
 
     .afs-frame-container {
       position: relative;
       width: 100%;
-      height: calc(100vh - 185px);
-      min-height: 840px;
+      flex: 1;
+      min-height: 0;
+      height: 100%;
       background: #ffffff;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
     .afs-frame-container.is-fullscreen {
@@ -154,8 +182,8 @@
     }
 
     .afs-spinner {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border: 3.5px solid #e2e8f0;
       border-top-color: #d8a437;
       border-radius: 50%;
@@ -274,7 +302,7 @@
           <!-- Embedded Iframe -->
           <iframe
             id="aftersalesFrame"
-            src="https://dashboard-bengkel-kiaracondong.vercel.app/"
+            src="https://dashboard-bengkel-kiaracondong.vercel.app/?embed=true"
             class="afs-iframe"
             title="Aftersales Intelligence Dashboard Kiaracondong"
             onload="onFrameLoaded()"
@@ -299,9 +327,15 @@
     function reloadAfterSalesFrame() {
       const loader = document.getElementById('frameLoader');
       const frame = document.getElementById('aftersalesFrame');
+      const btn = event ? (event.currentTarget || event.target.closest('button')) : null;
+      if (btn) {
+        const icon = btn.querySelector('i');
+        if (icon) icon.classList.add('fa-spin');
+        setTimeout(() => { if (icon) icon.classList.remove('fa-spin'); }, 1200);
+      }
       if (loader) loader.classList.remove('hidden');
       if (frame) {
-        frame.src = frame.src;
+        frame.src = 'https://dashboard-bengkel-kiaracondong.vercel.app/?embed=true&t=' + Date.now();
       }
     }
 

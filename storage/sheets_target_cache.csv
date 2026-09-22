@@ -1,9 +1,9 @@
 Pak Ryan,,,,,,,
 No,Sales,Target SPK,Target DO,Actual SPK,Actual DO,,Tim Pak Ryan
-1,Egy,7,7,3,1,,Egy : SPK 3 | DO 1
+1,Egy,7,7,3,2,,Egy : SPK 3 | DO 2
 2,Reza,3,3,1,,,Reza : SPK 1 | DO 
 3,Erick,4,4,2,,,Erick : SPK 2 | DO 
-4,Deni A,4,4,1,,,Deni A : SPK 1 | DO 
+4,Deni A,4,4,2,,,Deni A : SPK 2 | DO 
 5,Yani,3,3,,,,Yani : SPK  | DO 
 6,Deno,3,3,3,1,,Deno : SPK 3 | DO 1
 7,Jajang,5,5,2,1,,Jajang : SPK 2 | DO 1
@@ -15,40 +15,40 @@ No,Sales,Target SPK,Target DO,Actual SPK,Actual DO,,Tim Pak Ryan
 13,Jesy,2,1,1,,,Jesy : SPK 1 | DO 
 14,Igo,2,2,1,,,Igo : SPK 1 | DO 
 15,Hadi,2,1,,,,Hadi : SPK  | DO 
-16,Agus,2,2,3,,,Agus : SPK 3 | DO 
+16,Agus,2,2,3,1,,Agus : SPK 3 | DO 1
 17,Tama,2,1,,,,Tama : SPK  | DO 
 18,Wendy,2,2,,,,Wendy : SPK  | DO 
 19,Rahadian,2,2,,,,Rahadian : SPK  | DO 
 20,Isna,3,3,,,,Isna : SPK  | DO 
 21,Rahma,7,7,7,2,,Rahma : SPK 7 | DO 2
-Jumlah Keseluruhan,,61,56,26,6,,Total : SPK 26 | DO 6
+Jumlah Keseluruhan,,61,56,27,8,,Total : SPK 27 | DO 8
 ,,,,,,,
 Pak Alvin,,,,,,,Tim Pak Alvin
-1,Dadi,3,3,2,1,,Dadi : SPK 2 | DO 1
+1,Dadi,3,3,2,2,,Dadi : SPK 2 | DO 2
 2,Topik,3,3,,,,Topik : SPK  | DO 
 3,Indah,5,5,2,2,,Indah : SPK 2 | DO 2
-4,Andri,5,5,3,2,,Andri : SPK 3 | DO 2
+4,Andri,5,5,4,3,,Andri : SPK 4 | DO 3
 5,Rizki,5,5,1,,,Rizki : SPK 1 | DO 
 6,Ardian,4,4,3,,,Ardian : SPK 3 | DO 
 7,Fadil,3,3,3,1,,Fadil : SPK 3 | DO 1
 8,Udil,3,3,,,,Udil : SPK  | DO 
 9,Yeni,5,5,1,1,,Yeni : SPK 1 | DO 1
 10,Nova,3,3,,,,Nova : SPK  | DO 
-11,Deri,5,5,6,3,,Deri : SPK 6 | DO 3
+11,Deri,5,5,6,4,,Deri : SPK 6 | DO 4
 12,Ahmad,2,2,1,1,,Ahmad : SPK 1 | DO 1
 13,Luvita,2,2,,,,Luvita : SPK  | DO 
 14,Andrius,2,2,,,,Andrius : SPK  | DO 
 15,Kurnia,2,2,2,1,,Kurnia : SPK 2 | DO 1
 16,Intan,2,2,,,,Intan : SPK  | DO 
-17,Rico,2,2,1,,,Rico : SPK 1 | DO 
+17,Rico,2,2,2,,,Rico : SPK 2 | DO 
 18,Erlan,2,2,1,1,,Erlan : SPK 1 | DO 1
 19,Anan,2,2,,,,Anan : SPK  | DO 
 20,Tia,2,1,,,,Tia : SPK  | DO 
-Jumlah Keseluruhan,,58,58,26,13,,Total : SPK 26 | DO 13
+Jumlah Keseluruhan,,58,58,28,16,,Total : SPK 28 | DO 16
 ,,,,,,,
 Pak Riva,,,,,,,Tim Pak Riva
-1,Galih,5,4,3,1,,Galih : SPK 3 | DO 1
-2,Giyono,5,4,5,1,,Giyono : SPK 5 | DO 1
+1,Galih,5,4,4,1,,Galih : SPK 4 | DO 1
+2,Giyono,5,4,7,1,,Giyono : SPK 7 | DO 1
 3,Mustofa,4,3,,,,Mustofa : SPK  | DO 
 4,Nuri,3,2,1,,,Nuri : SPK 1 | DO 
 5,Reny,3,2,2,1,,Reny : SPK 2 | DO 1
@@ -61,7 +61,7 @@ Pak Riva,,,,,,,Tim Pak Riva
 12,Julia,2,2,,,,Julia : SPK  | DO 
 13,Ophie,2,2,,,,Ophie : SPK  | DO 
 14,Faris,1,1,,,,Faris : SPK  | DO 
-Jumlah Keseluruhan,,41,33,18,6,,Total : SPK 18 | DO 6
+Jumlah Keseluruhan,,41,33,21,6,,Total : SPK 21 | DO 6
 ,,,,,,,
 Bu Rahma,,,,,,,
 1,Fia,4,3,2,2,,Fia : SPK 2 | DO 2
@@ -71,5 +71,5 @@ Bu Rahma,,,,,,,
 5,Tian,2,2,,,,Tian : SPK  | DO 
 Jumlah Keseluruhan,,16,13,4,4,,Total : SPK 4 | DO 4
 ,,,,,,,
-,,,,,,,Total Keseluruhan SPK : 74
-,,,,,,,Total Keseluruhan DO : 29
+,,,,,,,Total Keseluruhan SPK : 80
+,,,,,,,Total Keseluruhan DO : 34
