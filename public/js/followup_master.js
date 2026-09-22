@@ -553,7 +553,7 @@ function renderSalesLeaderboardTable(salesList) {
   if (countBadge) countBadge.textContent = `${validSales.length} Wiraniaga Aktif`;
 
   if (validSales.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:32px; color:#64748b; font-weight:600;">Tidak ada data performa wiraniaga untuk filter ini.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:32px; color:#64748b; font-weight:600;">Tidak ada data performa wiraniaga untuk filter ini.</td></tr>`;
     return;
   }
 
@@ -565,10 +565,12 @@ function renderSalesLeaderboardTable(salesList) {
     else if (rank === 2) rankBadge = `<span class="fu-row-num-badge" style="background:linear-gradient(135deg, #f1f5f9, #e2e8f0); color:#334155; border-color:#cbd5e1;"><i class="fa-solid fa-medal"></i> 2</span>`;
     else if (rank === 3) rankBadge = `<span class="fu-row-num-badge" style="background:linear-gradient(135deg, #ffedd5, #fed7aa); color:#9a3412; border-color:#fb923c;"><i class="fa-solid fa-medal"></i> 3</span>`;
 
-    const rateNum = s.potency > 0 ? ((s.spk / s.potency) * 100) : 0;
-    const closingRate = rateNum.toFixed(1);
-    const rateColor = rateNum > 5 ? '#15803d' : (rateNum > 0 ? '#2563eb' : '#64748b');
-    const barBg = rateNum > 5 ? '#10b981' : (rateNum > 0 ? '#3b82f6' : '#cbd5e1');
+    const potency = s.potency || 0;
+    const sudahFu = s.cust_fu || 0;
+    const belumFu = Math.max(0, potency - sudahFu);
+    const fuProgress = potency > 0 ? Math.min(100, Math.round((sudahFu / potency) * 100)) : 0;
+    const fuProgressColor = fuProgress >= 80 ? '#15803d' : (fuProgress >= 40 ? '#2563eb' : '#b45309');
+    const fuProgressBg = fuProgress >= 80 ? '#10b981' : (fuProgress >= 40 ? '#3b82f6' : '#f59e0b');
 
     const spvTeam = s.spv ? `<div style="font-size:11px; color:#64748b; font-weight:600; margin-top:2px;"><i class="fa-solid fa-user-tie" style="font-size:10px; margin-right:3px; color:#94a3b8;"></i>${escapeHtml(s.spv)}</div>` : '';
 
@@ -586,8 +588,25 @@ function renderSalesLeaderboardTable(salesList) {
             </div>
           </div>
         </td>
-        <td class="num font-bold" style="font-size:13.5px;">${(s.potency || 0).toLocaleString('id-ID')}</td>
-        <td class="num">${(s.cust_fu || 0).toLocaleString('id-ID')}</td>
+        <td class="num font-bold" style="font-size:13.5px;" title="Total database customer yang dibagikan">${potency.toLocaleString('id-ID')}</td>
+        <td class="num" style="font-weight:700;">
+          <a href="javascript:void(0)" onclick="viewSalesDatabaseDetail('${escapeJs(s.sales_name)}', 'sudah_fu')" style="color:#15803d; text-decoration:none; padding:3px 8px; border-radius:6px; background:#dcfce7; display:inline-block;" title="Klik untuk memfilter daftar customer yang sudah di-FU oleh sales ini">
+            <i class="fa-solid fa-check" style="font-size:10px; margin-right:2px;"></i> ${sudahFu.toLocaleString('id-ID')}
+          </a>
+        </td>
+        <td class="num" style="font-weight:700;">
+          <a href="javascript:void(0)" onclick="viewSalesDatabaseDetail('${escapeJs(s.sales_name)}', 'belum_fu')" style="color:#b45309; text-decoration:none; padding:3px 8px; border-radius:6px; background:#fef3c7; display:inline-block;" title="Klik untuk memfilter daftar customer yang belum di-FU oleh sales ini">
+            <i class="fa-solid fa-hourglass-half" style="font-size:10px; margin-right:2px;"></i> ${belumFu.toLocaleString('id-ID')}
+          </a>
+        </td>
+        <td>
+          <div class="fu-rate-cell">
+            <span style="font-weight:800; font-size:12px; color:${fuProgressColor};">${fuProgress}%</span>
+            <div class="fu-rate-track" style="width:65px;">
+              <div class="fu-rate-fill" style="width:${fuProgress}%; background:${fuProgressBg};"></div>
+            </div>
+          </div>
+        </td>
         <td class="num">${(s.connected || 0).toLocaleString('id-ID')}</td>
         <td class="num">${(s.contacted || 0).toLocaleString('id-ID')}</td>
         <td class="num">
@@ -601,13 +620,10 @@ function renderSalesLeaderboardTable(salesList) {
         <td class="num">
           <span class="fu-do-pill"><i class="fa-solid fa-truck-ramp-box" style="font-size:10px;"></i> ${(s.do_unit || 0).toLocaleString('id-ID')} DO</span>
         </td>
-        <td class="num">
-          <div class="fu-rate-cell">
-            <span style="font-weight:800; font-size:12.5px; color:${rateColor};">${closingRate}%</span>
-            <div class="fu-rate-track">
-              <div class="fu-rate-fill" style="width:${Math.min(100, Math.max(0, rateNum * 5))}%; background:${barBg};"></div>
-            </div>
-          </div>
+        <td style="text-align:center;">
+          <button class="btn-fu btn-fu-crimson" style="padding:5px 10px; font-size:11px; border-radius:8px; white-space:nowrap;" onclick="viewSalesDatabaseDetail('${escapeJs(s.sales_name)}', 'all')" title="Buka Database Lengkap Sales Ini">
+            <i class="fa-solid fa-folder-open"></i> Buka Data
+          </button>
         </td>
       </tr>
     `;
@@ -615,6 +631,199 @@ function renderSalesLeaderboardTable(salesList) {
 
   tbody.innerHTML = html;
 }
+
+// -------------------------------------------------------------
+// NAVIGASI LANGSUNG DARI LEADERBOARD KE DETAIL DATABASE SALES
+// -------------------------------------------------------------
+function viewSalesDatabaseDetail(salesName, statusFilter = 'all') {
+  switchFollowupView('database');
+
+  let matchedSalesId = 'all';
+  if (salesName) {
+    const sLower = salesName.trim().toLowerCase();
+    const found = (masterState.salesList || []).find(s => {
+      const name = (s.name || '').toLowerCase();
+      return name === sLower || name.includes(sLower) || sLower.includes(name);
+    });
+    if (found) {
+      matchedSalesId = found.id;
+    } else {
+      const sel = document.getElementById('filterSalesSelect');
+      if (sel) {
+        for (let i = 0; i < sel.options.length; i++) {
+          const optText = (sel.options[i].text || '').toLowerCase();
+          if (optText.includes(sLower) || sLower.includes(optText)) {
+            matchedSalesId = sel.options[i].value;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  const salesSelect = document.getElementById('filterSalesSelect');
+  if (salesSelect && matchedSalesId !== 'all') {
+    salesSelect.value = matchedSalesId;
+    masterState.filters.sales_id = matchedSalesId;
+    updateSearchableUI('filterSalesSelect');
+  }
+
+  const statusSelect = document.getElementById('filterStatusSelect');
+  if (statusSelect) {
+    statusSelect.value = statusFilter;
+    masterState.filters.status = statusFilter;
+  }
+
+  loadMasterStats();
+  loadMasterCustomers(true);
+
+  setTimeout(() => {
+    const target = document.getElementById('salesFuProgressBanner') || document.getElementById('sectionCustomerDatabase');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 200);
+}
+window.viewSalesDatabaseDetail = viewSalesDatabaseDetail;
+
+// -------------------------------------------------------------
+// BANNER PROGRES FOLLOW-UP SALES TERPILIH
+// -------------------------------------------------------------
+function renderSalesProgressBanner() {
+  const banner = document.getElementById('salesFuProgressBanner');
+  if (!banner) return;
+
+  const salesId = masterState.filters.sales_id;
+  if (!salesId || salesId === 'all') {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    return;
+  }
+
+  const salesObj = (masterState.salesList || []).find(x => String(x.id) === String(salesId));
+  const salesName = salesObj ? salesObj.name : `Sales #${salesId}`;
+  const salesPhone = salesObj ? salesObj.phone : '';
+  const salesSpv = salesObj ? (salesObj.spv || 'Umum') : '';
+
+  const s = masterState.stats || {};
+  const byStatus = s.byStatus || {};
+
+  const totalAssigned = s.total || 0;
+  const pendingCount = byStatus['Belum Dihubungi'] || 0;
+  const processedCount = Math.max(0, totalAssigned - pendingCount);
+  const completionRate = totalAssigned > 0 ? Math.round((processedCount / totalAssigned) * 100) : 0;
+  const dealCount = byStatus['Deal / Selesai'] || 0;
+  const interestedCount = byStatus['Tertarik / Jadwal Servis'] || 0;
+
+  const activeStatus = masterState.filters.status || 'all';
+  const progressColor = completionRate >= 80 ? '#10b981' : (completionRate >= 40 ? '#3b82f6' : '#f59e0b');
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div style="background:linear-gradient(135deg, #0d1b3e 0%, #1e293b 100%); color:#ffffff; border-radius:18px; padding:18px 22px; box-shadow:0 10px 25px rgba(13,27,62,0.18); border:1px solid #334155; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg, #d7123a, #b91c1c); color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; box-shadow:0 4px 12px rgba(215,18,58,0.4);">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <h3 style="font-size:17px; font-weight:900; margin:0; color:#ffffff; letter-spacing:-0.3px;">
+                ${escapeHtml(salesName)}
+              </h3>
+              <span style="background:rgba(255,255,255,0.15); color:#f1f5f9; font-size:11px; font-weight:700; padding:2px 8px; border-radius:9999px;">
+                SPV: ${escapeHtml(salesSpv)}
+              </span>
+              <span style="background:${progressColor}; color:#ffffff; font-size:11px; font-weight:800; padding:2px 10px; border-radius:9999px;">
+                ${completionRate}% Selesai Di-FU
+              </span>
+            </div>
+            <p style="font-size:12px; color:#cbd5e1; margin:4px 0 0 0;">
+              Ringkasan database yang telah dibagikan dan progres follow-up untuk wiraniaga ini.
+            </p>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          ${salesPhone ? `
+            <a href="https://wa.me/${salesPhone}" target="_blank" class="btn-fu btn-fu-emerald" style="padding:7px 14px; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; border-radius:10px;">
+              <i class="fa-brands fa-whatsapp" style="font-size:14px;"></i> Chat WA Sales
+            </a>
+          ` : ''}
+          <button type="button" class="btn-fu" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:7px 14px; font-size:12px; border-radius:10px; cursor:pointer;" onclick="resetSalesFilterToAll()">
+            <i class="fa-solid fa-arrows-rotate"></i> Lihat Semua Sales
+          </button>
+        </div>
+      </div>
+
+      <!-- METRIC CARDS & QUICK FILTER PILLS -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:14px;">
+        <div onclick="quickFilterSalesStatus('all')" style="cursor:pointer; background:${activeStatus === 'all' ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.06)'}; border:1.5px solid ${activeStatus === 'all' ? '#60a5fa' : 'rgba(255,255,255,0.12)'}; border-radius:12px; padding:10px 14px; transition:all 0.2s;" title="Klik untuk tampilkan semua database sales ini">
+          <div style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Ditugaskan</div>
+          <div style="font-size:20px; font-weight:900; color:#ffffff; margin-top:2px;">${totalAssigned.toLocaleString('id-ID')}</div>
+          <div style="font-size:10.5px; color:#60a5fa; margin-top:2px; font-weight:600;"><i class="fa-solid fa-list-check"></i> Total Database</div>
+        </div>
+
+        <div onclick="quickFilterSalesStatus('sudah_fu')" style="cursor:pointer; background:${activeStatus === 'sudah_fu' ? 'rgba(16,185,129,0.35)' : 'rgba(255,255,255,0.06)'}; border:1.5px solid ${activeStatus === 'sudah_fu' ? '#34d399' : 'rgba(255,255,255,0.12)'}; border-radius:12px; padding:10px 14px; transition:all 0.2s;" title="Klik untuk filter hanya customer yang SUDAH di-FU">
+          <div style="font-size:11px; color:#86efac; font-weight:700; text-transform:uppercase;">Sudah di-FU</div>
+          <div style="font-size:20px; font-weight:900; color:#34d399; margin-top:2px;">${processedCount.toLocaleString('id-ID')}</div>
+          <div style="font-size:10.5px; color:#86efac; margin-top:2px; font-weight:600;"><i class="fa-solid fa-circle-check"></i> ${completionRate}% Selesai</div>
+        </div>
+
+        <div onclick="quickFilterSalesStatus('belum_fu')" style="cursor:pointer; background:${activeStatus === 'belum_fu' ? 'rgba(245,158,11,0.35)' : 'rgba(255,255,255,0.06)'}; border:1.5px solid ${activeStatus === 'belum_fu' ? '#fbbf24' : 'rgba(255,255,255,0.12)'}; border-radius:12px; padding:10px 14px; transition:all 0.2s;" title="Klik untuk filter hanya customer yang BELUM di-FU">
+          <div style="font-size:11px; color:#fde047; font-weight:700; text-transform:uppercase;">Belum di-FU</div>
+          <div style="font-size:20px; font-weight:900; color:#fbbf24; margin-top:2px;">${pendingCount.toLocaleString('id-ID')}</div>
+          <div style="font-size:10.5px; color:#fde047; margin-top:2px; font-weight:600;"><i class="fa-solid fa-clock"></i> Sisa Tertunda</div>
+        </div>
+
+        <div onclick="quickFilterSalesStatus('Tertarik / Jadwal Servis')" style="cursor:pointer; background:${activeStatus === 'Tertarik / Jadwal Servis' ? 'rgba(168,85,247,0.35)' : 'rgba(255,255,255,0.06)'}; border:1.5px solid ${activeStatus === 'Tertarik / Jadwal Servis' ? '#c084fc' : 'rgba(255,255,255,0.12)'}; border-radius:12px; padding:10px 14px; transition:all 0.2s;" title="Klik untuk filter customer Tertarik / Jadwal Servis">
+          <div style="font-size:11px; color:#d8b4fe; font-weight:700; text-transform:uppercase;">Hot Prospek</div>
+          <div style="font-size:20px; font-weight:900; color:#c084fc; margin-top:2px;">${interestedCount.toLocaleString('id-ID')}</div>
+          <div style="font-size:10.5px; color:#d8b4fe; margin-top:2px; font-weight:600;"><i class="fa-solid fa-fire"></i> Tertarik Servis</div>
+        </div>
+
+        <div onclick="quickFilterSalesStatus('Deal / Selesai')" style="cursor:pointer; background:${activeStatus === 'Deal / Selesai' ? 'rgba(16,185,129,0.35)' : 'rgba(255,255,255,0.06)'}; border:1.5px solid ${activeStatus === 'Deal / Selesai' ? '#34d399' : 'rgba(255,255,255,0.12)'}; border-radius:12px; padding:10px 14px; transition:all 0.2s;" title="Klik untuk filter customer Deal / Closing">
+          <div style="font-size:11px; color:#86efac; font-weight:700; text-transform:uppercase;">Deal / Closing</div>
+          <div style="font-size:20px; font-weight:900; color:#4ade80; margin-top:2px;">${dealCount.toLocaleString('id-ID')}</div>
+          <div style="font-size:10.5px; color:#86efac; margin-top:2px; font-weight:600;"><i class="fa-solid fa-trophy"></i> Closing Sukses</div>
+        </div>
+      </div>
+
+      <!-- PROGRESS BAR -->
+      <div style="background:rgba(255,255,255,0.12); border-radius:9999px; height:8px; overflow:hidden; position:relative;">
+        <div style="height:100%; width:${completionRate}%; background:linear-gradient(90deg, #10b981, #34d399); border-radius:9999px; transition:width 0.5s ease;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:11px; color:#94a3b8;">
+        <span><i class="fa-solid fa-hand-pointer"></i> Klik salah satu kartu di atas untuk memfilter daftar customer di bawah</span>
+        <span style="font-weight:700; color:#e2e8f0;">Progres: ${processedCount}/${totalAssigned} customer</span>
+      </div>
+    </div>
+  `;
+}
+window.renderSalesProgressBanner = renderSalesProgressBanner;
+
+function quickFilterSalesStatus(statusVal) {
+  const statusSelect = document.getElementById('filterStatusSelect');
+  if (statusSelect) {
+    statusSelect.value = statusVal;
+  }
+  masterState.filters.status = statusVal;
+  loadMasterCustomers(true);
+  renderSalesProgressBanner();
+}
+window.quickFilterSalesStatus = quickFilterSalesStatus;
+
+function resetSalesFilterToAll() {
+  const salesSelect = document.getElementById('filterSalesSelect');
+  if (salesSelect) {
+    salesSelect.value = 'all';
+  }
+  masterState.filters.sales_id = 'all';
+  updateSearchableUI('filterSalesSelect');
+  loadMasterStats();
+  loadMasterCustomers(true);
+}
+window.resetSalesFilterToAll = resetSalesFilterToAll;
 
 // -------------------------------------------------------------
 // SINKRONISASI LIVE GOOGLE SPREADSHEET
@@ -769,6 +978,7 @@ async function loadMasterStats() {
     if (data.success) {
       masterState.stats = data.stats || {};
       renderStatsTiles();
+      renderSalesProgressBanner();
       renderQuotaRefillNotification(masterState.stats.readyForRefillSales || []);
       populateCategoryDropdown();
     }
@@ -781,11 +991,29 @@ function renderStatsTiles() {
   const s = masterState.stats;
   const byStatus = s.byStatus || {};
 
-  document.getElementById('kpiTotal').textContent = s.total || 0;
-  document.getElementById('kpiPending').textContent = byStatus['Belum Dihubungi'] || 0;
-  document.getElementById('kpiWaiting').textContent = byStatus['Menunggu Respon'] || 0;
-  document.getElementById('kpiInterested').textContent = byStatus['Tertarik / Jadwal Servis'] || 0;
-  document.getElementById('kpiDeal').textContent = byStatus['Deal / Selesai'] || 0;
+  const elTotal = document.getElementById('kpiTotal');
+  const elPending = document.getElementById('kpiPending');
+  const elWaiting = document.getElementById('kpiWaiting');
+  const elInterested = document.getElementById('kpiInterested');
+  const elDeal = document.getElementById('kpiDeal');
+
+  if (elTotal) elTotal.textContent = (s.total || 0).toLocaleString('id-ID');
+  if (elPending) elPending.textContent = (byStatus['Belum Dihubungi'] || 0).toLocaleString('id-ID');
+  if (elWaiting) elWaiting.textContent = (byStatus['Menunggu Respon'] || 0).toLocaleString('id-ID');
+  if (elInterested) elInterested.textContent = (byStatus['Tertarik / Jadwal Servis'] || 0).toLocaleString('id-ID');
+  if (elDeal) elDeal.textContent = (byStatus['Deal / Selesai'] || 0).toLocaleString('id-ID');
+
+  const salesId = masterState.filters.sales_id;
+  const totalPill = document.querySelector('.card-blue .fu-kpi-sub .fu-badge-pill');
+  if (totalPill) {
+    if (salesId && salesId !== 'all') {
+      const sObj = (masterState.salesList || []).find(x => String(x.id) === String(salesId));
+      const sName = sObj ? sObj.name : `Sales #${salesId}`;
+      totalPill.innerHTML = `<i class="fa-solid fa-user-tag"></i> Sales: <strong>${escapeHtml(sName)}</strong>`;
+    } else {
+      totalPill.innerHTML = `<i class="fa-solid fa-building"></i> Seluruh Cabang`;
+    }
+  }
 }
 
 function renderQuotaRefillNotification(readySales) {

@@ -268,7 +268,7 @@
         </div>
 
         <div>
-          <select id="filterSalesSelect" class="fu-select" onchange="masterState.filters.sales_id = this.value; loadMasterCustomers();">
+          <select id="filterSalesSelect" class="fu-select" onchange="masterState.filters.sales_id = this.value; loadMasterStats(); loadMasterCustomers();">
             <option value="all">Semua Sales PIC</option>
           </select>
         </div>
@@ -311,6 +311,9 @@
           </button>
         </div>
       </div>
+
+      <!-- DEDICATED SALES PROGRESS SUMMARY STRIP (Appears when a specific sales is selected) -->
+      <div id="salesFuProgressBanner" style="display:none; margin-bottom:12px;"></div>
 
       <!-- MASTER TABLE -->
       <div class="followup-table-wrap">

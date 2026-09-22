@@ -353,16 +353,18 @@
             <table class="fu-analytics-table">
               <thead>
                 <tr>
-                  <th style="width:50px; text-align:center;">Peringkat</th>
+                  <th style="width:48px; text-align:center;">No.</th>
                   <th>Nama Wiraniaga</th>
-                  <th class="num">Leads Ditugaskan</th>
-                  <th class="num">Cust FU</th>
+                  <th class="num" title="Total database customer yang dibagikan ke sales">Ditugaskan</th>
+                  <th class="num" style="color:#15803d;" title="Jumlah customer yang sudah di-follow up">Sudah FU</th>
+                  <th class="num" style="color:#b45309;" title="Jumlah customer yang belum di-follow up">Belum FU</th>
+                  <th style="min-width:115px;" title="Persentase penyelesaian follow-up">Progres FU</th>
                   <th class="num">Connected</th>
                   <th class="num">Contacted</th>
                   <th class="num">Hot Prospek</th>
-                  <th class="num">SPK Closing</th>
-                  <th class="num">DO Unit</th>
-                  <th class="num">Closing Rate (%)</th>
+                  <th class="num">SPK</th>
+                  <th class="num">DO</th>
+                  <th style="text-align:center; min-width:85px;">Aksi</th>
                 </tr>
               </thead>
               <tbody id="tbodySalesLeaderboard">
@@ -573,7 +575,7 @@
           </div>
 
           <div>
-            <select id="filterSalesSelect" class="fu-select" onchange="masterState.filters.sales_id = this.value; loadMasterCustomers();">
+            <select id="filterSalesSelect" class="fu-select" onchange="masterState.filters.sales_id = this.value; loadMasterStats(); loadMasterCustomers();">
               <option value="all">Semua Sales PIC (50 Wiraniaga)</option>
             </select>
           </div>
@@ -596,6 +598,9 @@
             </select>
           </div>
         </div>
+
+        <!-- DEDICATED SALES PROGRESS SUMMARY STRIP (Appears when a specific sales is selected) -->
+        <div id="salesFuProgressBanner" style="display:none; margin-bottom:12px;"></div>
 
         <!-- MASTER TABLE -->
         <div class="followup-table-wrap">
