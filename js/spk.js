@@ -883,6 +883,35 @@ window.resetGameSpkForm = function() {
 // ── DIGITAL SPK OFFICIAL DOCUMENT HANDLERS ──────────────────
 let currentActiveDocSpk = null;
 
+function konversiAngkaKeTerbilang(angka) {
+  const bilangan = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
+  angka = Math.floor(Math.abs(Number(angka) || 0));
+  if (angka === 0) return 'Nol';
+  if (angka < 12) return bilangan[angka];
+  if (angka < 20) return konversiAngkaKeTerbilang(angka - 10) + ' Belas';
+  if (angka < 100) return konversiAngkaKeTerbilang(Math.floor(angka / 10)) + ' Puluh ' + (angka % 10 > 0 ? konversiAngkaKeTerbilang(angka % 10) : '');
+  if (angka < 200) return 'Seratus ' + (angka - 100 > 0 ? konversiAngkaKeTerbilang(angka - 100) : '');
+  if (angka < 1000) return konversiAngkaKeTerbilang(Math.floor(angka / 100)) + ' Ratus ' + (angka % 100 > 0 ? konversiAngkaKeTerbilang(angka % 100) : '');
+  if (angka < 2000) return 'Seribu ' + (angka - 1000 > 0 ? konversiAngkaKeTerbilang(angka - 1000) : '');
+  if (angka < 1000000) return konversiAngkaKeTerbilang(Math.floor(angka / 1000)) + ' Ribu ' + (angka % 1000 > 0 ? konversiAngkaKeTerbilang(angka % 1000) : '');
+  if (angka < 1000000000) return konversiAngkaKeTerbilang(Math.floor(angka / 1000000)) + ' Juta ' + (angka % 1000000 > 0 ? konversiAngkaKeTerbilang(angka % 1000000) : '');
+  if (angka < 1000000000000) return konversiAngkaKeTerbilang(Math.floor(angka / 1000000000)) + ' Milyar ' + (angka % 1000000000 > 0 ? konversiAngkaKeTerbilang(angka % 1000000000) : '');
+  return '';
+}
+
+function renderStnkCharacterBoxes(fullName) {
+  const container = document.getElementById('docStnkBoxes');
+  if (!container) return;
+  const cleanName = (fullName || '').toUpperCase();
+  const totalBoxes = 26;
+  let html = '';
+  for (let i = 0; i < totalBoxes; i++) {
+    const char = i < cleanName.length ? (cleanName[i] === ' ' ? '&nbsp;' : cleanName[i]) : '&nbsp;';
+    html += `<div class="stnk-char-box">${char}</div>`;
+  }
+  container.innerHTML = html;
+}
+
 window.openSpkDocumentModal = function(identifier) {
   const s = allSPKData.find(item => String(item.id) === String(identifier) || item.nama_customer === identifier);
   if (!s) {
@@ -893,48 +922,109 @@ window.openSpkDocumentModal = function(identifier) {
 
   currentActiveDocSpk = s;
 
-  // Populate data
+  // Tanggal & Nomor SPK
   const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  const spkNum = s.spk_number || `SPK/TKC/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(s.id || 1).padStart(4, '0')}`;
+  const spkNum = s.spk_number || `01 - ${String(s.id || 1).padStart(5, '0')}`;
 
   const elSpkNum = document.getElementById('docSpkNumber');
   const elSpkDate = document.getElementById('docSpkDate');
-  const elBadge = document.getElementById('docBadgeStatus');
   if (elSpkNum) elSpkNum.textContent = spkNum;
   if (elSpkDate) elSpkDate.textContent = dateStr;
-  
-  if (elBadge) {
-    elBadge.textContent = s.status || 'PENDING';
-    elBadge.className = 'chip ' + ((s.status === 'Disetujui' || s.status === 'DO') ? 'chip-green' : (s.status === 'Ditolak' ? 'chip-red' : 'chip-yellow'));
-  }
 
+  // Data Pembeli
   const elNama = document.getElementById('docNamaCust');
-  const elNik = document.getElementById('docNikKk');
   const elHp = document.getElementById('docHpCust');
+  const elEmail = document.getElementById('docEmailCust');
   const elAlamat = document.getElementById('docAlamatCust');
-  const elWilayah = document.getElementById('docWilayahCust');
+  const elNik = document.getElementById('docNikCust');
 
   if (elNama) elNama.textContent = s.nama_customer || '-';
-  if (elNik) elNik.textContent = (s.nik ? `NIK: ${s.nik}` : '') + (s.no_kk ? ` / KK: ${s.no_kk}` : (s.nik ? '' : '-'));
   if (elHp) elHp.textContent = s.no_hp || '-';
-  if (elAlamat) elAlamat.textContent = s.alamat || '-';
-  
-  const wilayahParts = [s.rt_rw ? `RT/RW ${s.rt_rw}` : '', s.kelurahan, s.kecamatan, s.kota, s.provinsi].filter(Boolean);
-  if (elWilayah) elWilayah.textContent = wilayahParts.length > 0 ? wilayahParts.join(', ') : '-';
+  if (elEmail) elEmail.textContent = s.email || '-';
 
-  const elModel = document.getElementById('docModelUnit');
-  const elHarga = document.getElementById('docHargaOtr');
-  const elTipe = document.getElementById('docTipeBeli');
-  const elSales = document.getElementById('docNamaSales');
+  const fullAlamat = [
+    s.alamat,
+    s.rt_rw ? `RT/RW ${s.rt_rw}` : '',
+    s.kelurahan ? `Kel. ${s.kelurahan}` : '',
+    s.kecamatan ? `Kec. ${s.kecamatan}` : '',
+    s.kota,
+    s.provinsi
+  ].filter(Boolean).join(', ');
+  if (elAlamat) elAlamat.textContent = fullAlamat || '-';
+
+  const nikDetail = [s.nik ? `NIK: ${s.nik}` : '', s.no_kk ? `KK: ${s.no_kk}` : ''].filter(Boolean).join(' / ');
+  if (elNik) elNik.textContent = nikDetail || '-';
+
+  // Faktur STNK a/n
+  renderStnkCharacterBoxes(s.nama_customer || '');
+  const elStnkTelp = document.getElementById('docStnkTelp');
+  const elStnkEmail = document.getElementById('docStnkEmail');
+  if (elStnkTelp) elStnkTelp.textContent = s.no_hp || '-';
+  if (elStnkEmail) elStnkEmail.textContent = s.email || '-';
+
+  // Format Nilai & Nominal
+  const nominalVal = Number(s.nominal) || (s.nominal_jt ? Number(s.nominal_jt) * 1000000 : 285000000);
+  const formattedNominal = formatRupiahInput ? formatRupiahInput(nominalVal.toString()) : nominalVal.toLocaleString('id-ID');
+
+  // Booking Fee / Tanda Jadi (Default Dealer Rp 5.000.000,-)
+  const bookingFee = Number(s.tanda_jadi) || (nominalVal > 400000000 ? 10000000 : 5000000);
+  const formattedBookingFee = formatRupiahInput ? formatRupiahInput(bookingFee.toString()) : bookingFee.toLocaleString('id-ID');
+  const terbilangBooking = konversiAngkaKeTerbilang(bookingFee).trim();
+
+  // Syarat Pembayaran (Cash vs Kredit)
+  const isCash = (s.tipe_pembelian || '').toLowerCase().includes('cash') || (s.tipe_pembelian || '').toLowerCase().includes('tunai');
+  const elChkCash = document.getElementById('docChkCash');
+  const elChkKredit = document.getElementById('docChkKredit');
+  if (elChkCash) elChkCash.textContent = isCash ? '[✔]' : '[ ]';
+  if (elChkKredit) elChkKredit.textContent = isCash ? '[ ]' : '[✔]';
+
+  const elTandaJadi = document.getElementById('docTandaJadiNominal');
+  if (elTandaJadi) elTandaJadi.textContent = `Rp ${formattedBookingFee},-`;
+
+  const elDpKredit = document.getElementById('docDpKredit');
+  const elAngsuranKredit = document.getElementById('docAngsuranKredit');
+  if (elDpKredit) elDpKredit.textContent = isCash ? '-' : (s.dp ? `Rp ${formatRupiahInput(s.dp.toString())}` : `Rp ${formatRupiahInput(Math.round(nominalVal * 0.2).toString())} (Est. 20%)`);
+  if (elAngsuranKredit) elAngsuranKredit.textContent = isCash ? '-' : (s.angsuran ? `Rp ${formatRupiahInput(s.angsuran.toString())}` : 'Sesuai Simulasi');
+
+  // Unit Keterangan & Harga
+  const elModel = document.getElementById('docModelUnitVal');
+  const elWarna = document.getElementById('docWarnaUnitVal');
+  const elHargaOtr = document.getElementById('docHargaOtrVal');
+  const elTotalOtr = document.getElementById('docTotalOtrVal');
+
+  if (elModel) elModel.textContent = s.model ? s.model.toUpperCase() : 'TOYOTA';
+  if (elWarna) elWarna.textContent = s.warna ? s.warna.toUpperCase() : 'Sesuai Permintaan Konsumen';
+  if (elHargaOtr) elHargaOtr.textContent = formattedNominal;
+  if (elTotalOtr) elTotalOtr.textContent = formattedNominal;
+
+  // Slip Tanda Terima Sementara (Kwitansi Bawah)
+  const elSlipSpk = document.getElementById('docSlipSpkNum');
+  const elSlipDate = document.getElementById('docSlipDate');
+  const elSlipNama = document.getElementById('docSlipNama');
+  const elSlipNominal = document.getElementById('docSlipNominal');
+  const elSlipTerbilang = document.getElementById('docSlipTerbilang');
+  const elSlipModel = document.getElementById('docSlipModel');
+
+  if (elSlipSpk) elSlipSpk.textContent = spkNum;
+  if (elSlipDate) elSlipDate.textContent = dateStr;
+  if (elSlipNama) elSlipNama.textContent = s.nama_customer || '-';
+  if (elSlipNominal) elSlipNominal.textContent = `Rp ${formattedBookingFee},-`;
+  if (elSlipTerbilang) elSlipTerbilang.textContent = `( ${terbilangBooking} Rupiah )`;
+  if (elSlipModel) elSlipModel.textContent = s.model ? s.model.toUpperCase() : 'KENDARAAN TOYOTA';
+
+  // Tanda Tangan
   const elSigner = document.getElementById('docSignerName');
+  const elSales = document.getElementById('docNamaSales');
+  const elKacab = document.getElementById('docNamaKacab');
+  const elSalesCode = document.getElementById('docSalesCode');
 
-  if (elModel) elModel.textContent = s.model || '-';
-  if (elHarga) elHarga.textContent = s.nominal_jt ? `Rp ${s.nominal_jt} Juta` : (s.nominal ? `Rp ${formatRupiahInput(s.nominal.toString())}` : '-');
-  if (elTipe) elTipe.textContent = s.tipe_pembelian || 'Kredit';
-  if (elSales) elSales.textContent = s.nama_sales || localStorage.getItem('namaSales') || 'Wiraniaga Tunas Toyota';
-  if (elSigner) elSigner.textContent = s.nama_customer || 'Customer Toyota';
+  if (elSigner) elSigner.textContent = s.nama_customer || 'Konsumen Toyota';
+  const salesName = s.nama_sales || localStorage.getItem('namaSales') || 'Wiraniaga Tunas Toyota';
+  if (elSales) elSales.textContent = salesName;
+  if (elSalesCode) elSalesCode.textContent = `Kode: ${s.kode_sales || 'TKC-SLS'}`;
+  if (elKacab) elKacab.textContent = 'Branch Management';
 
-  // Signature Image
+  // Gambar Tanda Tangan Konsumen dari Canvas
   const sigImg = document.getElementById('docSignatureImg');
   const noSign = document.getElementById('docNoSignPlaceholder');
   if (sigImg && noSign) {
@@ -969,7 +1059,8 @@ window.shareSpkDocumentWa = function() {
   const s = currentActiveDocSpk;
   const spkNum = document.getElementById('docSpkNumber')?.textContent || 'SPK/TKC/2026';
   const salesName = document.getElementById('docNamaSales')?.textContent || 'Wiraniaga Tunas Toyota';
-  const text = `Halo Bapak/Ibu *${s.nama_customer}*,\n\nTerima kasih telah melakukan pemesanan kendaraan resmi di *Tunas Toyota Kiara Condong Bandung*.\n\nBerikut adalah rincian *Surat Pemesanan Kendaraan (SPK)* Anda:\n📄 *No. Registrasi SPK:* ${spkNum}\n🚗 *Unit Kendaraan:* ${s.model}\n💰 *Sistem Pembelian:* ${s.tipe_pembelian || 'Kredit'}\n✅ *Status Dokumen:* Terverifikasi & Ditandatangani Digital\n\nSales Consultant Anda:\n👤 *${salesName}*\n📞 Kantor Tunas Toyota Kiara Condong: (022) 731-2000\n\n_Toyota Let's Go Beyond!_ 🚀🚗`;
+  const bookingFee = document.getElementById('docTandaJadiNominal')?.textContent || 'Rp 5.000.000,-';
+  const text = `Halo Bapak/Ibu *${s.nama_customer}*,\n\nTerima kasih atas pemesanan unit kendaraan resmi di *PT Tunas Ridean Tbk - Tunas Toyota Kiara Condong Bandung*.\n\nBerikut adalah ringkasan resmi *Surat Pesanan Kendaraan (SPK)* Anda:\n📄 *No. Registrasi SPK:* ${spkNum}\n🚗 *Tipe Unit:* ${s.model}\n💰 *Tanda Jadi (Booking Fee):* ${bookingFee}\n💳 *Sistem Pembelian:* ${s.tipe_pembelian || 'Kredit'}\n🏦 *Rekening Resmi Dealer:* BCA Cabang Bandung No. Rek. 001 088 0700 a/n PT TUNAS RIDEAN TBK\n\nSales Consultant Anda:\n👤 *${salesName}*\n🏢 Tunas Toyota Kiara Condong: Jl. Terusan Kiara Condong No. 154 Bandung • (022) 731-2000\n\n_Toyota Let's Go Beyond!_ 🚀🚗`;
 
   const phone = (s.no_hp || '').replace(/[^\d]/g, '');
   let phoneFormatted = phone;

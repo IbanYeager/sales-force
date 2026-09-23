@@ -652,122 +652,364 @@
       <!-- Body / Printable Paper -->
       <div class="spk-doc-body">
         <div class="spk-paper" id="spkDocPrintArea">
-          <!-- Kop Surat Dealer Resmi -->
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid #0d1b3e; padding-bottom:14px; margin-bottom:18px;">
-            <div style="display:flex; align-items:center; gap:14px;">
-              <img src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png" alt="Tunas Toyota" style="height:38px; object-fit:contain;">
-              <div>
-                <h3 style="font-size:15px; font-weight:900; margin:0; color:#0d1b3e; letter-spacing:0.3px;">PT. TUNAS RIDEAN TBK</h3>
-                <p style="font-size:11px; font-weight:700; color:#c8102e; margin:2px 0 0;">CABANG KIARA CONDONG - BANDUNG</p>
-                <p style="font-size:10px; color:#64748b; margin:1px 0 0;">Jl. Terusan Kiara Condong No. 154, Bandung • Telp. (022) 731-2000</p>
+          <!-- TOP HEADER: LOGO, TITLE, DEALER PT DETAILS -->
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; border-bottom:2px solid #000; padding-bottom:8px;">
+            <!-- Brand Logo Left -->
+            <div style="width:28%; display:flex; align-items:center; gap:8px;">
+              <img src="https://static.wixstatic.com/media/bce131_784db0a25e784dd7a840402d11e94630~mv2.png/v1/fill/w_680,h_72,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo%20Tunas%20Toyota.png" alt="Tunas Toyota" style="height:36px; max-width:160px; object-fit:contain;">
+            </div>
+
+            <!-- Title Center -->
+            <div style="width:44%; text-align:center;">
+              <h2 style="font-size:16px; font-weight:900; letter-spacing:1px; margin:4px 0 0; color:#000000; text-transform:uppercase; font-family:'Inter', Arial, sans-serif;">SURAT PESANAN KENDARAAN</h2>
+            </div>
+
+            <!-- Dealer PT Right -->
+            <div style="width:28%; text-align:right; font-size:9px; line-height:1.3; color:#000000;">
+              <div style="font-weight:900; font-size:10px;">PT. TUNAS RIDEAN TBK</div>
+              <div style="font-weight:700;">Cabang Kiara Condong</div>
+              <div style="color:#333;">Jl. Terusan Kiara Condong No. 154 Bandung 40284</div>
+              <div style="color:#333;">Telp: (022) 731-2000</div>
+            </div>
+          </div>
+
+          <!-- Date & SPK Number Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; font-weight:700; color:#000000; margin-bottom:6px; padding:0 2px;">
+            <div>Tanggal : <span id="docSpkDate" style="font-weight:800;">-</span></div>
+            <div>No. SPK : <span id="docSpkNumber" style="font-weight:900; font-size:11px; letter-spacing:0.5px;">-</span></div>
+          </div>
+
+          <!-- SECTION 1: DATA PEMBELI VS FAKTUR STNK A/N (2 BORDERED BOXES) -->
+          <div style="border:1.5px solid #000; display:grid; grid-template-columns:1fr 1fr; margin-bottom:0; font-size:9.5px; color:#000;">
+            <!-- Left: Data Pembeli -->
+            <div style="padding:6px 8px; border-right:1.5px solid #000;">
+              <table style="width:100%; border-collapse:collapse; font-size:9.5px;">
+                <tr>
+                  <td style="width:85px; vertical-align:top; font-weight:700; padding:2px 0;">Nama Pembeli</td>
+                  <td style="width:8px; vertical-align:top;">:</td>
+                  <td style="font-weight:800; padding:2px 0; text-transform:uppercase;" id="docNamaCust">-</td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top; font-weight:700; padding:2px 0;">Alamat</td>
+                  <td style="vertical-align:top;">:</td>
+                  <td style="padding:2px 0; line-height:1.25;" id="docAlamatCust">-</td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top; font-weight:700; padding:2px 0;">Telp / HP</td>
+                  <td style="vertical-align:top;">:</td>
+                  <td style="padding:2px 0;" id="docHpCust">-</td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top; font-weight:700; padding:2px 0;">Email</td>
+                  <td style="vertical-align:top;">:</td>
+                  <td style="padding:2px 0;" id="docEmailCust">-</td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top; font-weight:700; padding:2px 0;">NPWP / NIK</td>
+                  <td style="vertical-align:top;">:</td>
+                  <td style="padding:2px 0; font-weight:700;" id="docNikCust">-</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Right: Faktur STNK a/n -->
+            <div style="padding:6px 8px;">
+              <table style="width:100%; border-collapse:collapse; font-size:9.5px;">
+                <tr>
+                  <td style="width:90px; vertical-align:top; font-weight:700; padding:2px 0;">Faktur STNK a/n</td>
+                  <td style="width:8px; vertical-align:top;">:</td>
+                  <td style="padding:2px 0;">
+                    <!-- Character letter boxes grid -->
+                    <div id="docStnkBoxes" style="display:flex; flex-wrap:wrap; gap:1.5px; margin-bottom:2px;">
+                      <!-- Populated dynamically via JS -->
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top; font-weight:700; padding:2px 0;">Alamat</td>
+                  <td style="vertical-align:top;">:</td>
+                  <td style="padding:2px 0;" id="docStnkAlamat">S D A (Sama Dengan Alamat Pembeli)</td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top; font-weight:700; padding:2px 0;">Telp</td>
+                  <td style="vertical-align:top;">:</td>
+                  <td style="padding:2px 0;" id="docStnkTelp">-</td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top; font-weight:700; padding:2px 0;">Email</td>
+                  <td style="vertical-align:top;">:</td>
+                  <td style="padding:2px 0;" id="docStnkEmail">-</td>
+                </tr>
+                <tr>
+                  <td colspan="3" style="padding-top:2px; font-size:8px; color:#555; font-style:italic;">
+                    * Lampirkan Fotocopy Kartu NPWP / KTP
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECTION 2: 3-COLUMN TABLE (SYARAT PEMBAYARAN | KETERANGAN | HARGA) -->
+          <div style="border:1.5px solid #000; border-top:none; display:grid; grid-template-columns:35% 45% 20%; font-size:9.5px; color:#000;">
+            <!-- Column 1: Syarat Pembayaran -->
+            <div style="border-right:1.5px solid #000; display:flex; flex-direction:column;">
+              <div style="background:#f1f5f9; padding:4px 6px; font-weight:900; text-align:center; border-bottom:1.5px solid #000; font-size:9.5px; text-transform:uppercase;">
+                SYARAT PEMBAYARAN
               </div>
-            </div>
-            <div style="text-align:right;">
-              <span class="chip chip-green" id="docBadgeStatus" style="font-size:11px; font-weight:800; padding:4px 10px; text-transform:uppercase;">DISETUJUI</span>
-              <div style="font-size:11px; font-weight:800; color:#0d1b3e; margin-top:6px;" id="docSpkNumber">SPK/TKC/2026/09/0001</div>
-              <div style="font-size:10px; color:#64748b;" id="docSpkDate">12 September 2026</div>
-            </div>
-          </div>
+              <div style="padding:6px 8px; flex:1; display:flex; flex-direction:column; justify-content:space-between; font-size:9px;">
+                <div>
+                  <div style="font-weight:700; margin-bottom:2px;">
+                    <span id="docChkCash" style="font-weight:900; font-family:monospace; margin-right:4px;">[ ]</span> TUNAI / TRADE IN via : .............
+                  </div>
+                  <div style="padding-left:14px; line-height:1.35; color:#333;">
+                    <div>Uang Muka : Rp. <span id="docCashUangMuka">........................</span></div>
+                    <div>Harga Mobil Bekas : Rp. ........................</div>
+                    <div>Sisa : Rp. <span id="docCashSisa">........................</span></div>
+                  </div>
 
-          <div style="text-align:center; margin-bottom:18px;">
-            <h2 style="font-size:16px; font-weight:900; text-transform:uppercase; margin:0; color:#0d1b3e; letter-spacing:0.5px;">SURAT PEMESANAN KENDARAAN (SPK)</h2>
-            <p style="font-size:11px; color:#64748b; margin:3px 0 0;">Dokumen Bukti Pemesanan Unit Resmi Toyota Tunas Group</p>
-          </div>
+                  <div style="font-weight:700; margin-top:6px; margin-bottom:2px;">
+                    <span id="docChkKredit" style="font-weight:900; font-family:monospace; margin-right:4px;">[✔]</span> KREDIT
+                  </div>
+                  <div style="padding-left:14px; line-height:1.35; color:#333;">
+                    <div>Via : <span id="docLeasingVia" style="font-weight:700; color:#000;">TAF / ACC / MTF</span></div>
+                    <div>Jangka Waktu : <span id="docTenorThn">1 s/d 5</span> Tahun</div>
+                    <div>Bunga : Sesuai Ketentuan Leasing</div>
+                    <div>DP : Rp. <span id="docDpKredit">-</span></div>
+                    <div>Angsuran / Bulan : Rp. <span id="docAngsuranKredit">-</span></div>
+                    <div>Biaya Adm. : Include Paket</div>
+                    <div>Biaya Asuransi : Comprehensive All Risk</div>
+                  </div>
+                </div>
 
-          <!-- Section 1: Data Pemesan -->
-          <div style="margin-bottom:16px;">
-            <div style="background:#f1f5f9; padding:6px 12px; border-radius:6px; font-size:11.5px; font-weight:800; color:#0d1b3e; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-user" style="color:#c8102e;"></i> I. DATA PEMESAN (SESUAI KTP)
-            </div>
-            <table style="width:100%; font-size:11.5px; border-collapse:collapse;">
-              <tr>
-                <td style="width:30%; padding:4px 0; color:#64748b; font-weight:600;">Nama Lengkap</td>
-                <td style="width:2%; font-weight:700;">:</td>
-                <td style="font-weight:800; color:#0f172a;" id="docNamaCust">-</td>
-              </tr>
-              <tr>
-                <td style="padding:4px 0; color:#64748b; font-weight:600;">NIK KTP / No. KK</td>
-                <td style="font-weight:700;">:</td>
-                <td style="font-weight:700; color:#0f172a;" id="docNikKk">-</td>
-              </tr>
-              <tr>
-                <td style="padding:4px 0; color:#64748b; font-weight:600;">Nomor WhatsApp / HP</td>
-                <td style="font-weight:700;">:</td>
-                <td style="font-weight:700; color:#0f172a;" id="docHpCust">-</td>
-              </tr>
-              <tr>
-                <td style="padding:4px 0; color:#64748b; font-weight:600;">Alamat Lengkap KTP</td>
-                <td style="font-weight:700;">:</td>
-                <td style="font-weight:600; color:#0f172a;" id="docAlamatCust">-</td>
-              </tr>
-              <tr>
-                <td style="padding:4px 0; color:#64748b; font-weight:600;">Wilayah Domisili</td>
-                <td style="font-weight:700;">:</td>
-                <td style="font-weight:600; color:#0f172a;" id="docWilayahCust">-</td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- Section 2: Data Kendaraan & Transaksi -->
-          <div style="margin-bottom:18px;">
-            <div style="background:#f1f5f9; padding:6px 12px; border-radius:6px; font-size:11.5px; font-weight:800; color:#0d1b3e; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-car" style="color:#c8102e;"></i> II. DETAIL KENDARAAN &amp; PEMBAYARAN
-            </div>
-            <table style="width:100%; font-size:11.5px; border-collapse:collapse;">
-              <tr>
-                <td style="width:30%; padding:4px 0; color:#64748b; font-weight:600;">Model &amp; Varian Unit</td>
-                <td style="width:2%; font-weight:700;">:</td>
-                <td style="font-weight:800; color:#c8102e;" id="docModelUnit">-</td>
-              </tr>
-              <tr>
-                <td style="padding:4px 0; color:#64748b; font-weight:600;">Harga OTR</td>
-                <td style="font-weight:700;">:</td>
-                <td style="font-weight:800; color:#0f172a;" id="docHargaOtr">-</td>
-              </tr>
-              <tr>
-                <td style="padding:4px 0; color:#64748b; font-weight:600;">Sistem Pembelian</td>
-                <td style="font-weight:700;">:</td>
-                <td style="font-weight:700; color:#0f172a;" id="docTipeBeli">Kredit</td>
-              </tr>
-              <tr>
-                <td style="padding:4px 0; color:#64748b; font-weight:600;">Wiraniaga / Sales Consultant</td>
-                <td style="font-weight:700;">:</td>
-                <td style="font-weight:700; color:#0f172a;" id="docNamaSales">Wiraniaga Tunas Toyota</td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- Section 3: Tanda Tangan & Stempel Digital -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px; border-top:1.5px dashed #cbd5e1; padding-top:16px;">
-            <div style="text-align:center;">
-              <p style="font-size:11px; font-weight:700; color:#475569; margin:0 0 6px;">Pemesan / Konsumen,</p>
-              <div style="height:80px; display:flex; align-items:center; justify-content:center;">
-                <img id="docSignatureImg" src="" alt="Tanda Tangan" style="max-height:75px; max-width:180px; object-fit:contain; display:none;">
-                <div id="docNoSignPlaceholder" style="font-size:11px; color:#94a3b8; font-style:italic;">(Ditandatangani Digital)</div>
-              </div>
-              <p style="font-size:11.5px; font-weight:800; color:#0f172a; margin:4px 0 0; text-decoration:underline;" id="docSignerName">Bpk/Ibu Customer</p>
-              <span style="font-size:10px; color:#64748b;">Konsumen Toyota</span>
-            </div>
-
-            <div style="text-align:center; position:relative;">
-              <p style="font-size:11px; font-weight:700; color:#475569; margin:0 0 6px;">PT. Tunas Ridean Tbk - Kiara Condong,</p>
-              <!-- Stempel Digital Dealer -->
-              <div style="height:80px; display:flex; align-items:center; justify-content:center; position:relative;">
-                <div style="border:2px dashed #c8102e; border-radius:50%; width:75px; height:75px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#c8102e; transform:rotate(-12deg); opacity:0.85;">
-                  <span style="font-size:7.5px; font-weight:900;">TUNAS TOYOTA</span>
-                  <i class="fa-solid fa-circle-check" style="font-size:12px; margin:2px 0;"></i>
-                  <span style="font-size:7px; font-weight:800;">VERIFIED</span>
+                <div style="border-top:1px dashed #000; margin-top:6px; padding-top:4px;">
+                  <div style="font-weight:800; font-size:9.5px;">Pembayaran I (Tanda Jadi) :</div>
+                  <div style="font-weight:900; font-size:11.5px; color:#000; margin-top:1px;" id="docTandaJadiNominal">Rp 5.000.000,-</div>
                 </div>
               </div>
-              <p style="font-size:11.5px; font-weight:800; color:#0f172a; margin:4px 0 0; text-decoration:underline;">Branch Management</p>
-              <span style="font-size:10px; color:#64748b;">Official Authorized Dealer</span>
+            </div>
+
+            <!-- Column 2: Keterangan -->
+            <div style="border-right:1.5px solid #000; display:flex; flex-direction:column;">
+              <div style="background:#f1f5f9; padding:4px 6px; font-weight:900; text-align:center; border-bottom:1.5px solid #000; font-size:9.5px; text-transform:uppercase;">
+                KETERANGAN
+              </div>
+              <div style="padding:6px 8px; flex:1; display:flex; flex-direction:column; justify-content:space-between; font-size:9px;">
+                <div>
+                  <div style="font-weight:900; font-size:10px; margin-bottom:3px;">1 &nbsp; UNIT</div>
+                  <div style="margin-bottom:2px;">
+                    <span style="font-weight:800;">TYPE :</span>
+                    <span id="docModelUnitVal" style="font-weight:900; text-transform:uppercase; color:#000;">TOYOTA ALL NEW AVANZA 1.5 G CVT</span>
+                  </div>
+                  <div style="margin-bottom:5px;">
+                    <span style="font-weight:800;">WARNA :</span>
+                    <span id="docWarnaUnitVal" style="font-weight:700;">Sesuai Permintaan Konsumen</span>
+                  </div>
+
+                  <div style="font-weight:800; text-decoration:underline; margin-bottom:2px;">PERLENGKAPAN TAMBAHAN :</div>
+                  <ul style="margin:0 0 4px 0; padding-left:14px; font-size:8.5px; line-height:1.3; color:#333;">
+                    <li>Kaca Film Solar Gard / Llumar Full Resmi</li>
+                    <li>Karpet Bludru Toyota Original &amp; Tatakan Pelat Nomor</li>
+                    <li>Alat Pemadam Api Ringan (APAR) &amp; Kotak P3K</li>
+                    <li>Toolkit Lengkap, Dongkrak &amp; Segitiga Pengaman</li>
+                    <li>Free Jasa Servis &amp; Suku Cadang s/d 50.000 KM (T-Care)</li>
+                    <li>Layanan Telematika T-Intouch Terintegrasi</li>
+                  </ul>
+                  <div id="docTambahanBonusWrap" style="font-size:8.5px; font-weight:700; color:#000; display:none;">
+                    Program / Bonus: <span id="docTambahanBonus">-</span>
+                  </div>
+                </div>
+
+                <div style="margin:6px auto 2px auto; text-align:center;">
+                  <div style="border:1.5px solid #c8102e; color:#c8102e; display:inline-block; padding:2px 8px; font-weight:900; font-size:9px; letter-spacing:0.8px;">
+                    HARGA TIDAK MENGIKAT
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Column 3: Harga -->
+            <div style="display:flex; flex-direction:column;">
+              <div style="background:#f1f5f9; padding:4px 6px; font-weight:900; text-align:center; border-bottom:1.5px solid #000; font-size:9.5px; text-transform:uppercase;">
+                HARGA
+              </div>
+              <div style="padding:6px 8px; flex:1; display:flex; flex-direction:column; justify-content:space-between; font-size:9px; text-align:right;">
+                <div>
+                  <div style="color:#666; font-size:8px; margin-bottom:2px;">Harga OTR</div>
+                  <div style="font-weight:800; font-size:10px; color:#000;">
+                    Rp. <span id="docHargaOtrVal">-</span>
+                  </div>
+                </div>
+
+                <div style="border-top:1.5px solid #000; padding-top:4px; margin-top:20px;">
+                  <div style="font-size:8.5px; font-weight:800; color:#555; text-align:left;">TOTAL :</div>
+                  <div style="font-size:11px; font-weight:900; color:#000; margin-top:1px;">
+                    Rp. <span id="docTotalOtrVal">-</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Footer Catatan Otomatis -->
-          <div style="margin-top:20px; padding-top:10px; border-top:1px solid #e2e8f0; font-size:9.5px; color:#94a3b8; display:flex; justify-content:space-between; align-items:center;">
-            <span><i class="fa-solid fa-qrcode"></i> Terverifikasi Otomatis oleh Sistem Sales Force Automation Tunas Toyota</span>
-            <span>Ref: SFT-AUTO-GEN</span>
+          <!-- SECTION 3: 4-GRID SPEC & DELIVERY INFO -->
+          <div style="border:1.5px solid #000; border-top:none; display:grid; grid-template-columns:1fr 1fr; font-size:9px; color:#000;">
+            <div style="padding:3px 8px; border-right:1.5px solid #000; border-bottom:1px solid #000;">
+              <b>No. Rangka :</b> <span id="docNoRangka" style="color:#444;">TBA (Menunggu Alokasi ATPM)</span>
+            </div>
+            <div style="padding:3px 8px; border-bottom:1px solid #000;">
+              <b>No. Mesin :</b> <span id="docNoMesin" style="color:#444;">TBA (Menunggu Alokasi ATPM)</span>
+            </div>
+            <div style="padding:3px 8px; border-right:1.5px solid #000;">
+              <b>Sumber Prospek :</b> <span id="docSumberProspek" style="color:#444;">Showroom / Pameran / Digital SFT</span>
+            </div>
+            <div style="padding:3px 8px;">
+              <b>Rencana Penyerahan :</b> <span id="docRencanaKirim" style="color:#444;">Bulan Berjalan (TBA)</span>
+            </div>
+          </div>
+
+          <!-- SECTION 4: KETENTUAN (LEFT) & SIGNATURES (RIGHT) -->
+          <div style="border:1.5px solid #000; border-top:none; display:grid; grid-template-columns:52% 48%; font-size:8px; color:#000;">
+            <!-- Left: Ketentuan 1 s/d 7 -->
+            <div style="padding:5px 8px; border-right:1.5px solid #000; line-height:1.2;">
+              <div style="font-weight:900; font-size:8.5px; margin-bottom:2px; text-decoration:underline;">KETENTUAN :</div>
+              <ol style="margin:0; padding-left:13px; font-size:7.5px; line-height:1.2; color:#222;">
+                <li>Harga yang tercantum dalam Surat Pesanan ini tidak mengikat (sewaktu-waktu dapat berubah mengikuti perubahan BBN/Pajak atau regulasi ATPM sebelum Faktur terbit).</li>
+                <li>Tanda jadi berlaku 3 (tiga) bulan sejak tanggal pesanan. Apabila pembelian tidak terealisasi dalam periode tersebut (kecuali indent), maka Uang Tanda Jadi dianggap hangus.</li>
+                <li>Surat Pesanan ini dianggap SAH, apabila:
+                  <div style="padding-left:6px;">
+                    a. Telah ditandatangani oleh Pembeli<br>
+                    b. Telah disetujui oleh Pejabat Cabang<br>
+                    c. Uang Tanda Jadi / DP telah dilunasi oleh Pembeli
+                  </div>
+                </li>
+                <li>Pembayaran dengan Cek / Bilyet Giro / Transfer hanya ditujukan ke Rekening Resmi PT TUNAS RIDEAN TBK dan dianggap SAH apabila telah efektif masuk ke rekening.</li>
+                <li>Pembayaran Tunai dianggap SAH apabila telah diterbitkan Kwitansi Resmi oleh Kasir PT. Tunas Ridean Tbk.</li>
+                <li>Bila pesanan batal secara sepihak oleh Pembeli, pengembalian uang tanda jadi dipotong biaya administrasi sesuai kebijakan dealer.</li>
+                <li>Pembeli berkewajiban membayar tambahan biaya/pajak kendaraan dalam hal terdapat penambahan karena Pajak Progresif kepemilikan kendaraan bermotor.</li>
+              </ol>
+            </div>
+
+            <!-- Right: 3 Signatures (Pembeli, Wiraniaga, Kacab/SPV) -->
+            <div style="padding:5px 8px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; text-align:center;">
+                <!-- Pembeli -->
+                <div>
+                  <div style="font-weight:900; font-size:8px; margin-bottom:2px;">PEMBELI</div>
+                  <div style="height:48px; display:flex; align-items:center; justify-content:center;">
+                    <img id="docSignatureImg" src="" alt="TTD Pembeli" style="max-height:44px; max-width:100%; object-fit:contain; display:none;">
+                    <div id="docNoSignPlaceholder" style="font-size:7.5px; color:#999; font-style:italic;">(Tanda Tangan)</div>
+                  </div>
+                  <div style="border-top:1px solid #000; margin-top:2px; padding-top:2px;">
+                    <b style="font-size:7.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="docSignerName">Bpk/Ibu Konsumen</b>
+                    <span style="font-size:7px; color:#555;">Nama Jelas</span>
+                  </div>
+                </div>
+
+                <!-- Wiraniaga -->
+                <div>
+                  <div style="font-weight:900; font-size:8px; margin-bottom:2px;">WIRANIAGA</div>
+                  <div style="height:48px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <span style="font-size:7.5px; font-weight:800; color:#0d1b3e;">SALES FORCE</span>
+                    <span style="font-size:6.5px; color:#666;" id="docSalesCode">Kode: TKC-SLS</span>
+                  </div>
+                  <div style="border-top:1px solid #000; margin-top:2px; padding-top:2px;">
+                    <b style="font-size:7.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="docNamaSales">Wiraniaga Toyota</b>
+                    <span style="font-size:7px; color:#555;">Nama Jelas</span>
+                  </div>
+                </div>
+
+                <!-- Kacab / SPV -->
+                <div style="position:relative;">
+                  <div style="font-weight:900; font-size:8px; margin-bottom:2px;">KACAB / SPV</div>
+                  <!-- Stempel Resmi Tunas Toyota -->
+                  <div style="height:48px; display:flex; align-items:center; justify-content:center; position:relative;">
+                    <div style="border:1.5px dashed #c8102e; border-radius:50%; width:44px; height:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#c8102e; transform:rotate(-10deg); opacity:0.9;">
+                      <span style="font-size:5px; font-weight:900; line-height:1;">TUNAS TOYOTA</span>
+                      <i class="fa-solid fa-stamp" style="font-size:7px; margin:1px 0;"></i>
+                      <span style="font-size:5px; font-weight:800;">VERIFIED</span>
+                    </div>
+                  </div>
+                  <div style="border-top:1px solid #000; margin-top:2px; padding-top:2px;">
+                    <b style="font-size:7.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="docNamaKacab">Branch Management</b>
+                    <span style="font-size:7px; color:#555;">Nama Jelas</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:4px; border-top:1px dotted #ccc; padding-top:2px; display:flex; justify-content:space-between; font-size:6.5px; color:#666;">
+                <span>(1) Wiraniaga &rarr; Adm. Cabang &rarr; Accounting</span>
+                <span>(2) Wiraniaga &rarr; Adm. Cabang</span>
+                <span>(3) Lembar Konsumen</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PERFORATION TEAR LINE (Guntingan Kuitansi) -->
+          <div style="margin:6px 0 4px 0; display:flex; align-items:center; justify-content:space-between; font-size:7.5px; color:#475569;">
+            <span style="font-size:9px; letter-spacing:1px;">✂ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span>
+          </div>
+
+          <!-- SECTION 5: TANDA TERIMA UANG MUKA (SEMENTARA) / SLIP KUITANSI -->
+          <div style="border:1.5px solid #000; padding:5px 8px; font-size:8.5px; color:#000;">
+            <!-- Slip Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:3px;">
+              <div>
+                <div style="font-size:8.5px; font-weight:800;">No. SPK : <span id="docSlipSpkNum">-</span></div>
+                <div style="font-size:8px; color:#333;">Tanggal : <span id="docSlipDate">-</span></div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-weight:900; font-size:10px; letter-spacing:0.5px; text-decoration:underline;">TANDA TERIMA UANG MUKA (SEMENTARA)</div>
+                <div style="font-size:7.5px; color:#333;">Rek. BCA KCP No. 001 088 0700 a/n PT TUNAS RIDEAN TBK</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-weight:900; font-size:9px; color:#0d1b3e;">TUNAS TOYOTA</div>
+                <div style="font-size:7.5px; color:#555;">Kiara Condong Bandung</div>
+              </div>
+            </div>
+
+            <!-- Slip Body -->
+            <table style="width:100%; border-collapse:collapse; font-size:8.5px; margin-bottom:3px;">
+              <tr>
+                <td style="width:110px; font-weight:700; padding:1.5px 0;">Sudah Terima Dari</td>
+                <td style="width:8px;">:</td>
+                <td style="font-weight:800; text-transform:uppercase;" id="docSlipNama">-</td>
+              </tr>
+              <tr>
+                <td style="font-weight:700; padding:1.5px 0;">Uang Sejumlah</td>
+                <td>:</td>
+                <td style="font-weight:800;">
+                  <span id="docSlipNominal">Rp 5.000.000,-</span>
+                  <span style="font-weight:600; font-style:italic; color:#444; margin-left:6px;" id="docSlipTerbilang">( Lima Juta Rupiah )</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight:700; padding:1.5px 0;">Untuk Pembayaran</td>
+                <td>:</td>
+                <td>
+                  Uang Tanda Jadi / Booking Fee Pemesanan 1 (Satu) Unit Toyota <b id="docSlipModel">-</b>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Slip Signatures -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:8px; margin-top:2px;">
+              <div style="font-size:7px; color:#666; max-width:55%;">
+                * Pembayaran SAH apabila telah efektif masuk di Rekening Resmi PT Tunas Ridean Tbk atau diterbitkan kwitansi resmi kasir dealer.
+              </div>
+              <div style="display:flex; gap:16px; text-align:center;">
+                <div>
+                  <div style="height:22px;"></div>
+                  <div style="border-top:1px solid #000; padding-top:1px; width:90px;">
+                    <span style="font-size:7.5px; font-weight:700;">Pembeli</span>
+                  </div>
+                </div>
+                <div>
+                  <div style="height:22px;"></div>
+                  <div style="border-top:1px solid #000; padding-top:1px; width:110px;">
+                    <span style="font-size:7.5px; font-weight:700;">Kasir PT Tunas Ridean</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -789,6 +1031,10 @@
 
   <style>
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 5mm 8mm;
+      }
       body * {
         visibility: hidden !important;
       }
@@ -801,12 +1047,14 @@
         top: 0 !important;
         width: 100% !important;
         margin: 0 !important;
-        padding: 24px !important;
+        padding: 0 !important;
         background: #ffffff !important;
         border: none !important;
         box-shadow: none !important;
+        color: #000000 !important;
+        font-family: Arial, Helvetica, 'Inter', sans-serif !important;
       }
-      .no-print, .header-page, .input-mode-switcher-card, #inputBiasaContainer, #inputGameContainer {
+      .no-print, .header-page, .input-mode-switcher-card, #inputBiasaContainer, #inputGameContainer, .spk-doc-header, .spk-doc-overlay {
         display: none !important;
       }
     }
@@ -825,17 +1073,17 @@
     .spk-doc-sheet {
       background: #ffffff;
       width: 100%;
-      max-width: 820px;
-      max-height: 92vh;
-      border-radius: 20px;
+      max-width: 860px;
+      max-height: 94vh;
+      border-radius: 16px;
       box-shadow: 0 25px 60px rgba(0,0,0,0.35);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', Arial, sans-serif;
     }
     .spk-doc-header {
-      padding: 16px 22px;
+      padding: 14px 22px;
       background: #0d1b3e;
       color: white;
       display: flex;
@@ -843,17 +1091,32 @@
       align-items: center;
     }
     .spk-doc-body {
-      padding: 20px;
+      padding: 16px;
       overflow-y: auto;
       background: #f8fafc;
       flex: 1;
     }
     .spk-paper {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 28px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      font-family: Arial, Helvetica, 'Inter', sans-serif;
+      color: #000000;
+    }
+    .stnk-char-box {
+      width: 12px;
+      height: 15px;
+      border: 1px solid #000;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8.5px;
+      font-weight: 800;
+      line-height: 1;
+      text-transform: uppercase;
+      background: #fff;
     }
   </style>
 
