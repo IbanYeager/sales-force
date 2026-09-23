@@ -38,7 +38,6 @@
 
       <nav class="kcb-nav">
         <a href="index_kacab.html" id="navDash" class="active"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
-        <a href="quotation.html" id="navSph"><i class="fa-solid fa-file-invoice-dollar"></i>Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d8a437; color:#1e1014; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span></a>
         <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
         <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
@@ -244,9 +243,6 @@
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <button class="btn btn-sm" onclick="openWhatIfSimulatorModal()" style="background:linear-gradient(135deg, #d97706, #b45309); color:white; border:none; font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(217,119,6,0.3);">
                 <i class="fa-solid fa-sliders"></i> What-If Simulator Closing
-              </button>
-              <button class="btn btn-sm" onclick="location.href='../pages/quotation.html'" style="background:linear-gradient(135deg, #d71920, #b91c1c); color:white; border:none; font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(215,25,32,0.25);">
-                <i class="fa-solid fa-file-invoice-dollar"></i> Studio SPH
               </button>
               <button class="btn btn-sm" onclick="location.href='ao_report_kacab.html'" style="background:linear-gradient(135deg, #1e1014, #4a1525); color:#d8a437; border:1px solid rgba(216,164,55,0.4); font-weight:800; font-size:12px; padding:9px 16px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 4px 14px rgba(30,16,20,0.25);">
                 <i class="fa-solid fa-expand"></i> Papan AO Report

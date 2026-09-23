@@ -56,7 +56,7 @@ class PageController extends Controller
         if ($cleanPage === 'quotation') {
             $role = request()->query('role');
             if ($role === 'kacab') {
-                return $this->showKacabPage('quotation');
+                return redirect('/pages_kacab/index_kacab.html');
             } elseif ($role === 'spv') {
                 return $this->showSpvPage('quotation');
             }
@@ -136,8 +136,8 @@ class PageController extends Controller
             return redirect('/pages_kacab/index_kacab.html');
         }
 
-        if ($cleanPage === 'sph') {
-            $cleanPage = 'quotation';
+        if ($cleanPage === 'sph' || $cleanPage === 'quotation') {
+            return redirect('/pages_kacab/index_kacab.html');
         }
 
         if ($cleanPage === 'ao_report' || $cleanPage === 'ao_report_cabang') {
