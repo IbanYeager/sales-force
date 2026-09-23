@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../css/style.css?v=20260908_v24" />
   <link rel="stylesheet" href="../css/animations-premium.css?v=20260908_v24">
   <link rel="stylesheet" href="../css/brosur.css?v=20260908_v24">
-  <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
+  <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">

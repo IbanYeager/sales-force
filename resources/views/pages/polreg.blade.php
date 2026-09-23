@@ -25,7 +25,7 @@
       } catch(e) {}
     })();
   </script>
-  <script src="../js/sidebar_desktop.js?v=20260916_nopolreg"></script>
+  <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 

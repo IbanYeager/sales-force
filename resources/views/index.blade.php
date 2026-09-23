@@ -1559,7 +1559,7 @@
         </div><!-- /desktop-content -->
     </div><!-- /desktop-shell -->
 
-    <script src="js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
+    <script src="js/sidebar_desktop.js?v={{ time() }}"></script>
     <script src="js/ai_copilot.js?v=20260907_layout_fix"></script>
     <script src="js/script.js?v=20260908_rank_fix_v19"></script>
     <script src="js/sales_superpowers.js?v=1.0"></script>

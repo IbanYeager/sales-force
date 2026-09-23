@@ -6,7 +6,7 @@
   <title>WhatsApp Sales Studio - Tunas Toyota</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css">
-  <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
+  <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
   <style>
     .wa-container {
       display: grid;

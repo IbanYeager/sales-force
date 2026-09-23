@@ -14,7 +14,7 @@
     $prefix = $isSub ? '../' : '';
   @endphp
   <link rel="stylesheet" href="{{ $prefix }}css/style.css?v=20260915" />
-  <script src="{{ $prefix }}js/sidebar_desktop.js?v=20260915"></script>
+  <script src="{{ $prefix }}js/sidebar_desktop.js?v={{ time() }}"></script>
 
   <script>
     (function checkRolePortal() {

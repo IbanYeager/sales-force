@@ -7,7 +7,7 @@
   <meta name="description" content="Pusat Konten Digital, Video Showcase & Customer Stories Tunas Toyota Kiara Condong untuk Materi Promosi & Inspirasi Sales">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style.css?v=20260914_viral_v6">
-  <script src="../js/sidebar_desktop.js?v=20260914_viral_v6"></script>
+  <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 

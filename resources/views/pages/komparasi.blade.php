@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../css/style.css?v=5.0" />
     <link rel="stylesheet" href="../css/nco_dashboard.css?v=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/sidebar_desktop.js?v=20260911_polreg_sync"></script>
+    <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#0d1b3e">
     <style>

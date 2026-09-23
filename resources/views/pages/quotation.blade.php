@@ -16,7 +16,7 @@
   <!-- Styles -->
   <link rel="stylesheet" href="../css/style.css?v=20260915">
   <link rel="stylesheet" href="../css/quotation_studio.css?v=20260915_sph_v33">
-  <script src="../js/sidebar_desktop.js?v=20260915"></script>
+  <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
 
   <script>
     // Deteksi otomatis jika user yang membuka adalah Kacab atau SPV
