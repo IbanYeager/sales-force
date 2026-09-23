@@ -163,6 +163,19 @@ function escapeHtml(str) {
             reader.readAsDataURL(file);
         }
 
+        function dataURLtoFile(dataurl, filename) {
+            try {
+                let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new File([u8arr], filename, { type: mime });
+            } catch (e) {
+                return null;
+            }
+        }
+
         function handleNewFiles(event) {
             triggerFlash();
             
@@ -407,6 +420,8 @@ function escapeHtml(str) {
 
             const formData = new FormData();
             formData.append('tipe_Aktivitas', jenis);
+            const subJenis = document.getElementById('subJenisAktivitas')?.value || '';
+            formData.append('sub_jenis', subJenis);
             formData.append('keterangan', keterangan);
             formData.append('lokasi', lokasi);
             formData.append('status', status);
@@ -414,7 +429,15 @@ function escapeHtml(str) {
             formData.append('durasi', durasi);
             formData.append('sales_account_id', localStorage.getItem('salesId') || localStorage.getItem('idSales') || '1');
             formData.append('nama_sales', localStorage.getItem('namaSales') || 'Sales Consultant');
-            fotoAktivitasList.forEach((fotoObj) => { formData.append('foto[]', fotoObj.file); });
+            
+            fotoAktivitasList.forEach((fotoObj) => {
+                let fileToUpload = fotoObj.file;
+                if (fotoObj.watermarked && typeof dataURLtoFile === 'function') {
+                    const converted = dataURLtoFile(fotoObj.watermarked, (fotoObj.file && fotoObj.file.name) ? fotoObj.file.name : 'aktivitas.jpg');
+                    if (converted) fileToUpload = converted;
+                }
+                formData.append('foto[]', fileToUpload);
+            });
 
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 10px;"></i> Menyimpan...';
             btnSubmit.disabled = true;
@@ -432,15 +455,20 @@ function escapeHtml(str) {
                 }
 
                 if (result.status === 'success') {
+                    const successMsg = result.message || "Aktivitas berhasil disimpan!";
                     if (typeof showCustomAlert === 'function') {
-                        showCustomAlert("BERHASIL", "Aktivitas berhasil disimpan!", "success");
+                        showCustomAlert("BERHASIL", successMsg, "success");
                     } else {
-                        alert("Aktivitas berhasil disimpan ke Database!");
+                        alert(successMsg);
                     }
                     form.reset();
                     fotoAktivitasList = [];
                     renderPhotoGrid();
                     autoSelectSessionTime();
+                    const noticeBox = document.getElementById('pameranNoticeBox');
+                    if (noticeBox) noticeBox.style.display = 'none';
+                    const groupSub = document.getElementById('groupSubJenis');
+                    if (groupSub) groupSub.style.display = 'none';
                     loadDailySessionActivities();
                 } else {
                     if (typeof showCustomAlert === 'function') {
@@ -854,6 +882,12 @@ ${keterangan}
             const jenis = document.getElementById('jenisAktivitas').value;
             const groupSub = document.getElementById('groupSubJenis');
             const selectSub = document.getElementById('subJenisAktivitas');
+            const noticeBox = document.getElementById('pameranNoticeBox');
+
+            if (noticeBox) {
+                const isPameran = (jenis === 'Pameran' || jenis === 'Customer Gathering & Event');
+                noticeBox.style.display = isPameran ? 'block' : 'none';
+            }
 
             if (!spmSubCategories[jenis]) {
                 groupSub.style.display = 'none';

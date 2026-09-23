@@ -13,11 +13,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'koneksi.php';
+require_once __DIR__ . '/koneksi.php';
 
 if (!$conn) {
     echo json_encode(["status" => "error", "message" => "Koneksi ke database terputus. Pastikan MySQL pada Laragon aktif."]);
     exit();
+}
+
+// Tentukan root path proyek secara presisi (baik dipanggil dari /api atau /public/api)
+$projectRoot = dirname(__DIR__);
+if (file_exists(dirname(dirname(__DIR__)) . '/artisan')) {
+    $projectRoot = dirname(dirname(__DIR__));
+} else if (file_exists(dirname(__DIR__) . '/artisan')) {
+    $projectRoot = dirname(__DIR__);
+}
+
+/**
+ * Cek apakah aktivitas tergolong Pameran atau Event
+ */
+function checkIsPameranOrEvent($tipe, $keterangan = '', $status = '', $subJenis = '') {
+    $t = strtolower(trim($tipe ?? ''));
+    $k = strtolower(trim($keterangan ?? ''));
+    $s = strtolower(trim($status ?? ''));
+    $sub = strtolower(trim($subJenis ?? ''));
+
+    // Pengecualian tegas untuk jenis non-pameran / non-event
+    if (strpos($t, 'tiktok') !== false || strpos($t, 'database') !== false || strpos($t, 'digital marketing') !== false) {
+        return false;
+    }
+    if (strpos($t, 'residensial') !== false || strpos($t, 'fleet') !== false || strpos($t, 'referensi') !== false) {
+        return false;
+    }
+    if (strpos($t, 'meeting') !== false || strpos($t, 'makan') !== false) {
+        return false;
+    }
+
+    $keywords = [
+        'pameran',
+        'event',
+        'gathering',
+        'customer gathering',
+        'booth',
+        'exhibition',
+        'mall',
+        'borma',
+        'kings',
+        'cimall'
+    ];
+
+    foreach ($keywords as $kw) {
+        if (strpos($t, $kw) !== false || strpos($k, $kw) !== false || strpos($s, $kw) !== false || strpos($sub, $kw) !== false) {
+            return true;
+        }
+    }
+    return false;
 }
 
 try {
@@ -62,11 +111,25 @@ try {
                 exit();
             }
 
+            // Cari data aktivitas saat ini untuk cek tipe / status Pameran
+            $isPameran = false;
+            $qAct = $conn->query("SELECT tipe_aktivitas, keterangan, status FROM aktivitas WHERE id = $id LIMIT 1");
+            if ($qAct && $rAct = $qAct->fetch_assoc()) {
+                $isPameran = checkIsPameranOrEvent($rAct['tipe_aktivitas'], $rAct['keterangan'], $rAct['status']);
+            }
+
             // Handle upload foto laporan hasil
             $uploaded_files = [];
-            $upload_dir = __DIR__ . '/../uploads/laporan/';
-            if (!is_dir($upload_dir)) {
-                @mkdir($upload_dir, 0777, true);
+            $upload_dir = $projectRoot . '/uploads/laporan/';
+            $public_upload_dir = $projectRoot . '/public/uploads/laporan/';
+            $root_galeri_dir = $projectRoot . '/aktivitas/';
+            $public_galeri_dir = $projectRoot . '/public/aktivitas/';
+
+            if (!is_dir($upload_dir)) @mkdir($upload_dir, 0777, true);
+            if (!is_dir($public_upload_dir)) @mkdir($public_upload_dir, 0777, true);
+            if ($isPameran) {
+                if (!is_dir($root_galeri_dir)) @mkdir($root_galeri_dir, 0777, true);
+                if (!is_dir($public_galeri_dir)) @mkdir($public_galeri_dir, 0777, true);
             }
 
             if (isset($_FILES['foto_laporan'])) {
@@ -74,7 +137,7 @@ try {
                 if (is_array($_FILES['foto_laporan']['name'])) {
                     for ($i = 0; $i < $jumlah_foto; $i++) {
                         if (isset($_FILES['foto_laporan']['error'][$i]) && $_FILES['foto_laporan']['error'][$i] == 0) {
-                            $file_name = time() . '_lap_' . uniqid() . '_' . basename($_FILES['foto_laporan']['name'][$i]);
+                            $file_name = time() . '_lap_' . uniqid() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($_FILES['foto_laporan']['name'][$i]));
                             $file_path = $upload_dir . $file_name;
                             if (@move_uploaded_file($_FILES['foto_laporan']['tmp_name'][$i], $file_path)) {
                                 $uploaded_files[] = $file_name;
@@ -83,11 +146,23 @@ try {
                     }
                 } else {
                     if (isset($_FILES['foto_laporan']['error']) && $_FILES['foto_laporan']['error'] == 0) {
-                        $file_name = time() . '_lap_' . uniqid() . '_' . basename($_FILES['foto_laporan']['name']);
+                        $file_name = time() . '_lap_' . uniqid() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($_FILES['foto_laporan']['name']));
                         $file_path = $upload_dir . $file_name;
                         if (@move_uploaded_file($_FILES['foto_laporan']['tmp_name'], $file_path)) {
                             $uploaded_files[] = $file_name;
                         }
+                    }
+                }
+            }
+
+            // Sync foto laporan ke public uploads dan galeri jika pameran/event
+            foreach ($uploaded_files as $uf) {
+                $src = $upload_dir . $uf;
+                if (file_exists($src)) {
+                    if (is_dir($public_upload_dir)) @copy($src, $public_upload_dir . $uf);
+                    if ($isPameran) {
+                        if (is_dir($root_galeri_dir)) @copy($src, $root_galeri_dir . $uf);
+                        if (is_dir($public_galeri_dir)) @copy($src, $public_galeri_dir . $uf);
                     }
                 }
             }
@@ -102,7 +177,10 @@ try {
             $stmt->bind_param("sissi", $laporan_hasil, $jumlah_prospek, $foto_laporan_string, $foto_laporan_string, $id);
 
             if ($stmt->execute()) {
-                echo json_encode(["status" => "success", "message" => "Laporan hasil aktivitas berhasil disimpan!"]);
+                echo json_encode([
+                    "status" => "success", 
+                    "message" => "Laporan hasil aktivitas berhasil disimpan!" . ($isPameran ? " Foto otomatis terekap ke Galeri Riwayat Foto." : "")
+                ]);
             } else {
                 echo json_encode(["status" => "error", "message" => "Gagal memperbarui laporan: " . $stmt->error]);
             }
@@ -114,6 +192,7 @@ try {
 
         // Action 2: Create New Activity
         $tipe = $_POST['tipe_Aktivitas'] ?? $_POST['jenisAktivitas'] ?? $_POST['tipe_aktivitas'] ?? '';
+        $subJenis = $_POST['sub_jenis'] ?? $_POST['subJenisAktivitas'] ?? '';
         $keterangan = $_POST['keterangan'] ?? $_POST['keteranganAktivitas'] ?? '';
         $lokasi = $_POST['lokasi'] ?? '';
         $nama_sales = $_POST['nama_sales'] ?? 'Sales Consultant';
@@ -134,11 +213,21 @@ try {
         $laporan_hasil = $_POST['laporan_hasil'] ?? '';
         $jumlah_prospek = isset($_POST['jumlah_prospek']) ? intval($_POST['jumlah_prospek']) : 0;
 
+        // Cek apakah aktivitas ini termasuk kategori Pameran atau Event
+        $isPameranOrEvent = checkIsPameranOrEvent($tipe, $keterangan, $status, $subJenis);
+
         // Handle Upload Multi Foto
         $uploaded_files = [];
-        $upload_dir = __DIR__ . '/../uploads/lokasi/';
-        if (!is_dir($upload_dir)) {
-            @mkdir($upload_dir, 0777, true);
+        $upload_dir = $projectRoot . '/uploads/lokasi/';
+        $publicUploadDir = $projectRoot . '/public/uploads/lokasi/';
+        $galeriDir = $projectRoot . '/aktivitas/';
+        $publicGaleriDir = $projectRoot . '/public/aktivitas/';
+
+        if (!is_dir($upload_dir)) @mkdir($upload_dir, 0777, true);
+        if (!is_dir($publicUploadDir)) @mkdir($publicUploadDir, 0777, true);
+        if ($isPameranOrEvent) {
+            if (!is_dir($galeriDir)) @mkdir($galeriDir, 0777, true);
+            if (!is_dir($publicGaleriDir)) @mkdir($publicGaleriDir, 0777, true);
         }
 
         if (isset($_FILES['foto'])) {
@@ -146,7 +235,8 @@ try {
             if (is_array($_FILES['foto']['name'])) {
                 for ($i = 0; $i < $jumlah_foto; $i++) {
                     if (isset($_FILES['foto']['error'][$i]) && $_FILES['foto']['error'][$i] == 0) {
-                        $file_name = time() . '_' . uniqid() . '_' . basename($_FILES['foto']['name'][$i]);
+                        $sanitized_name = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($_FILES['foto']['name'][$i]));
+                        $file_name = time() . '_' . uniqid() . '_' . $sanitized_name;
                         $file_path = $upload_dir . $file_name;
                         if (@move_uploaded_file($_FILES['foto']['tmp_name'][$i], $file_path)) {
                             $uploaded_files[] = $file_name;
@@ -155,7 +245,8 @@ try {
                 }
             } else {
                 if (isset($_FILES['foto']['error']) && $_FILES['foto']['error'] == 0) {
-                    $file_name = time() . '_' . uniqid() . '_' . basename($_FILES['foto']['name']);
+                    $sanitized_name = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($_FILES['foto']['name']));
+                    $file_name = time() . '_' . uniqid() . '_' . $sanitized_name;
                     $file_path = $upload_dir . $file_name;
                     if (@move_uploaded_file($_FILES['foto']['tmp_name'], $file_path)) {
                         $uploaded_files[] = $file_name;
@@ -168,24 +259,6 @@ try {
 
         // Sync ke public/uploads/lokasi dan direktori aktivitas jika kategori pameran/event
         if (!empty($uploaded_files)) {
-            $publicUploadDir = __DIR__ . '/../public/uploads/lokasi/';
-            if (!is_dir($publicUploadDir)) @mkdir($publicUploadDir, 0777, true);
-
-            $tipeLower = strtolower($tipe);
-            $ketLower = strtolower($keterangan);
-            $isPameranOrEvent = (
-                (strpos($tipeLower, 'pameran') !== false || strpos($tipeLower, 'event') !== false || strpos($tipeLower, 'booth') !== false || strpos($tipeLower, 'gathering') !== false || strpos($ketLower, 'pameran') !== false || strpos($ketLower, 'event') !== false)
-                && strpos($tipeLower, 'tiktok') === false
-                && strpos($tipeLower, 'database') === false
-            );
-
-            $galeriDir = __DIR__ . '/../aktivitas/';
-            $publicGaleriDir = __DIR__ . '/../public/aktivitas/';
-            if ($isPameranOrEvent) {
-                if (!is_dir($galeriDir)) @mkdir($galeriDir, 0777, true);
-                if (!is_dir($publicGaleriDir)) @mkdir($publicGaleriDir, 0777, true);
-            }
-
             foreach ($uploaded_files as $uf) {
                 $src = $upload_dir . $uf;
                 if (file_exists($src)) {
@@ -217,8 +290,9 @@ try {
         if ($stmt->execute()) {
             echo json_encode([
                 "status" => "success",
-                "message" => "Aktivitas berhasil disimpan",
+                "message" => "Aktivitas berhasil disimpan" . ($isPameranOrEvent ? " dan foto otomatis terekap ke Galeri Riwayat Foto!" : ""),
                 "id" => $conn->insert_id,
+                "is_pameran" => $isPameranOrEvent,
                 "sesi_waktu" => $sesi_waktu,
                 "durasi" => $durasi
             ]);

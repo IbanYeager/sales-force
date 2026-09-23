@@ -54,9 +54,10 @@ function determineSession($timeStr) {
  * Filter ketat: HANYA aktivitas Pameran dan Event yang diizinkan masuk galeri.
  * Aktivitas seperti Live TikTok, Follow Up Database, dsb DITOLAK.
  */
-function isPameranOrEvent($tipe, $keterangan = '') {
+function isPameranOrEvent($tipe, $keterangan = '', $status = '') {
     $t = strtolower(trim($tipe ?? ''));
     $k = strtolower(trim($keterangan ?? ''));
+    $s = strtolower(trim($status ?? ''));
 
     // Pengecualian tegas untuk jenis aktivitas non-pameran / non-event
     if (strpos($t, 'tiktok') !== false || (strpos($t, 'live') !== false && strpos($t, 'event') === false)) {
@@ -96,7 +97,7 @@ function isPameranOrEvent($tipe, $keterangan = '') {
     ];
 
     foreach ($allowedKeywords as $kw) {
-        if (strpos($t, $kw) !== false || strpos($k, $kw) !== false) {
+        if (strpos($t, $kw) !== false || strpos($k, $kw) !== false || strpos($s, $kw) !== false) {
             return true;
         }
     }
@@ -115,14 +116,16 @@ if (file_exists(dirname(dirname(__DIR__)) . '/artisan')) {
 function resolvePhotoFile($fName, $projectRoot) {
     $parentDir = dirname($projectRoot);
     $searchPaths = [
-        ['dir' => $projectRoot . '/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
-        ['dir' => $projectRoot . '/public/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
         ['dir' => $projectRoot . '/aktivitas/', 'rel' => 'aktivitas/'],
         ['dir' => $projectRoot . '/public/aktivitas/', 'rel' => 'aktivitas/'],
+        ['dir' => $projectRoot . '/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
+        ['dir' => $projectRoot . '/public/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
+        ['dir' => $projectRoot . '/uploads/laporan/', 'rel' => 'uploads/laporan/'],
+        ['dir' => $projectRoot . '/public/uploads/laporan/', 'rel' => 'uploads/laporan/'],
         ['dir' => $projectRoot . '/uploads/', 'rel' => 'uploads/'],
         ['dir' => $projectRoot . '/public/uploads/', 'rel' => 'uploads/'],
-        ['dir' => $parentDir . '/persistent_storage_sft/uploads/lokasi/', 'rel' => 'uploads/lokasi/'],
-        ['dir' => $parentDir . '/persistent_storage_sft/aktivitas/', 'rel' => 'aktivitas/']
+        ['dir' => $parentDir . '/persistent_storage_sft/aktivitas/', 'rel' => 'aktivitas/'],
+        ['dir' => $parentDir . '/persistent_storage_sft/uploads/lokasi/', 'rel' => 'uploads/lokasi/']
     ];
 
     foreach ($searchPaths as $sp) {
@@ -146,21 +149,31 @@ $seenFiles = [];
 
 // 1. Ambil data dari database aktivitas yang terverifikasi Pameran & Event
 if ($conn) {
-    $resDb = $conn->query("SELECT id, sales_account_id, nama_sales, tipe_aktivitas, keterangan, lokasi, foto, status, sesi_waktu, created_at FROM aktivitas WHERE foto IS NOT NULL AND foto != '' ORDER BY created_at DESC, id DESC");
+    $resDb = $conn->query("SELECT id, sales_account_id, nama_sales, tipe_aktivitas, keterangan, lokasi, foto, foto_laporan, status, sesi_waktu, created_at 
+                           FROM aktivitas 
+                           WHERE (foto IS NOT NULL AND foto != '') OR (foto_laporan IS NOT NULL AND foto_laporan != '') 
+                           ORDER BY created_at DESC, id DESC");
     if ($resDb) {
         while ($row = $resDb->fetch_assoc()) {
             $tipeAktivitas = $row['tipe_aktivitas'] ?? '';
             $keterangan = $row['keterangan'] ?? '';
+            $statusAktivitas = $row['status'] ?? '';
 
             // Filter: Hanya izinkan Pameran & Event
-            if (!isPameranOrEvent($tipeAktivitas, $keterangan)) {
+            if (!isPameranOrEvent($tipeAktivitas, $keterangan, $statusAktivitas)) {
                 continue;
             }
 
-            $fotoField = $row['foto'];
-            $fileList = array_map('trim', explode(',', $fotoField));
+            $rawPhotos = [];
+            if (!empty($row['foto'])) {
+                $rawPhotos = array_merge($rawPhotos, explode(',', $row['foto']));
+            }
+            if (!empty($row['foto_laporan'])) {
+                $rawPhotos = array_merge($rawPhotos, explode(',', $row['foto_laporan']));
+            }
 
-            foreach ($fileList as $fotoItem) {
+            foreach ($rawPhotos as $fotoItem) {
+                $fotoItem = trim($fotoItem);
                 if (empty($fotoItem)) continue;
                 $fName = basename($fotoItem);
                 if (isset($seenFiles[$fName])) continue;
@@ -197,12 +210,18 @@ if ($conn) {
                 $session = $row['sesi_waktu'] ?: determineSession($timeStr);
                 $dateFormatted = formatIndonesianDate($dateStr);
 
+                $desc = $keterangan;
+                if (empty($desc)) {
+                    $desc = !empty($row['lokasi']) ? ('Dokumentasi Pameran di ' . $row['lokasi']) : 'Dokumentasi kegiatan Pameran & Event';
+                }
+
                 $photos[] = [
                     'file_name' => $fName,
                     'file_url' => $fileRelUrl,
                     'nama_sales' => $row['nama_sales'] ?: 'Sales Consultant',
-                    'keterangan' => $keterangan ?: 'Dokumentasi kegiatan Pameran & Event',
+                    'keterangan' => $desc,
                     'tipe_aktivitas' => $tipeAktivitas ?: 'Pameran (Exhibition)',
+                    'lokasi' => $row['lokasi'] ?? '',
                     'date' => $dateStr,
                     'date_formatted' => $dateFormatted,
                     'time' => substr($timeStr, 0, 5),

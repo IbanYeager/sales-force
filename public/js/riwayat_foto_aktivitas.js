@@ -9,10 +9,33 @@ let searchQuery = '';
 let currentLightboxIndex = 0;
 let currentViewDensity = 'compact'; // 'compact' or 'normal'
 
+function getApiEndpoint(endpoint) {
+  const isNested = window.location.pathname.includes('/pages/') || 
+                   window.location.pathname.includes('/pages_kacab/') || 
+                   window.location.pathname.includes('/pages_spv/') || 
+                   window.location.pathname.includes('/kacab/') || 
+                   window.location.pathname.includes('/spv/');
+  return (isNested ? '../api/' : 'api/') + endpoint;
+}
+
+function getGalleryImageUrl(relPath) {
+  if (!relPath) return '';
+  if (relPath.startsWith('http://') || relPath.startsWith('https://') || relPath.startsWith('data:')) {
+    return relPath;
+  }
+  const clean = relPath.replace(/^(\.\.\/)+/, '').replace(/^\//, '');
+  const isNested = window.location.pathname.includes('/pages/') || 
+                   window.location.pathname.includes('/pages_kacab/') || 
+                   window.location.pathname.includes('/pages_spv/') || 
+                   window.location.pathname.includes('/kacab/') || 
+                   window.location.pathname.includes('/spv/');
+  return (isNested ? '../' : '') + clean;
+}
+
 async function fetchGalleryData() {
   const loading = document.getElementById('galleryLoading');
   try {
-    const res = await fetch('../api/api_riwayat_aktivitas_foto.php');
+    const res = await fetch(getApiEndpoint('api_riwayat_aktivitas_foto.php'));
     const json = await res.json();
 
     if (json.status === 'success') {
@@ -54,13 +77,23 @@ function applyFiltersAndRender() {
   currentFilteredPhotos = allPhotos.filter(item => {
     const tipe = (item.tipe_aktivitas || '').toLowerCase();
     const ket = (item.keterangan || '').toLowerCase();
+    const fUrl = (item.file_url || '').toLowerCase();
 
     // Strict exclusion for non-pameran/event
     if (tipe.includes('tiktok') || tipe.includes('database') || tipe.includes('digital marketing') || tipe.includes('meeting') || tipe.includes('kebersamaan') || tipe.includes('makan')) {
       return false;
     }
 
-    const isAllowed = tipe.includes('pameran') || tipe.includes('event') || tipe.includes('booth') || tipe.includes('gathering') || ket.includes('pameran') || ket.includes('event') || (item.file_url && item.file_url.includes('aktivitas'));
+    const isAllowed = tipe.includes('pameran') || 
+                      tipe.includes('event') || 
+                      tipe.includes('booth') || 
+                      tipe.includes('gathering') || 
+                      tipe.includes('exhibition') || 
+                      ket.includes('pameran') || 
+                      ket.includes('event') || 
+                      ket.includes('borma') || 
+                      ket.includes('mall') || 
+                      fUrl.includes('aktivitas');
     return isAllowed;
   });
 
@@ -92,7 +125,7 @@ function renderGalleryTimeline(photos) {
   let html = `<div class="compact-photo-grid" style="${gridStyle}; margin-top: 10px;">`;
 
   photos.forEach((item, globalIndex) => {
-    const encodedUrl = '../' + item.file_url;
+    const encodedUrl = getGalleryImageUrl(item.file_url);
 
     html += `
       <div class="gallery-photo-card" onclick="openLightbox(${globalIndex})" title="Klik untuk perbesar">
@@ -128,7 +161,7 @@ function updateLightboxContent() {
   const item = currentFilteredPhotos[currentLightboxIndex];
   if (!item) return;
 
-  const encodedUrl = '../' + item.file_url;
+  const encodedUrl = getGalleryImageUrl(item.file_url);
   const imgEl = document.getElementById('lightboxMainImage');
   if (imgEl) imgEl.src = encodedUrl;
 
@@ -243,7 +276,7 @@ async function shareCurrentPhoto() {
   showGalleryToast('<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px;"></i> Menyiapkan foto untuk WhatsApp...', 'info', 0);
 
   try {
-    const encodedUrl = '../' + item.file_url;
+    const encodedUrl = getGalleryImageUrl(item.file_url);
     const res = await fetch(encodedUrl);
     if (!res.ok) throw new Error('Gagal mengunduh file foto.');
     

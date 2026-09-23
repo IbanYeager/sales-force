@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -114,6 +114,19 @@
                     <select id="subJenisAktivitas" class="form-control" onchange="updateKeteranganFromSub()">
                         <option value="" selected>Pilih detail lokasi/target...</option>
                     </select>
+                </div>
+
+                <!-- Auto Rekap Riwayat Foto Aktivitas Notification -->
+                <div class="form-group" id="pameranNoticeBox" style="display: none; margin-top: -4px; margin-bottom: 18px;">
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1.5px solid #93c5fd; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(37,99,235,0.06);">
+                        <div style="width: 34px; height: 34px; border-radius: 10px; background: #2563eb; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(37,99,235,0.25);">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <div style="font-size: 11.5px; color: #1e3a8a; line-height: 1.45;">
+                            <strong style="color: #1d4ed8; display: block; margin-bottom: 2px;">Auto-Rekap Galeri Cabang Aktif</strong>
+                            Foto kegiatan <strong>Pameran &amp; Event</strong> ini akan otomatis terekap ke <strong>Galeri Riwayat Foto Aktivitas</strong> cabang.
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
