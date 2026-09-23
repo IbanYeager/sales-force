@@ -117,12 +117,12 @@
       <section class="spv-card">
         <div class="card-head">
           <div>
-            <h1 class="title" style="font-size:18px; font-weight:800; color:#0f172a; margin:0;"><i class="fa-solid fa-users" style="color:#d7123a; margin-right:8px;"></i> Seluruh Wiraniaga Cabang (50 Sales)</h1>
+            <h1 class="title" style="font-size:18px; font-weight:800; color:#0f172a; margin:0;"><i class="fa-solid fa-users" style="color:#d7123a; margin-right:8px;"></i> Seluruh Wiraniaga Cabang</h1>
             <p class="subtitle" style="font-size:13px; color:#64748b; margin:4px 0 0;">Monitoring akun, konversi, presensi real-time, dan evaluasi AI coaching seluruh wiraniaga cabang</p>
           </div>
           <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 10px 14px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
-              <option value="Semua">Semua Tim (Master - 50 Sales)</option>
+              <option value="Semua">Semua Tim (Master)</option>
               <option value="Pak Ryan">Tim Pak Ryan</option>
               <option value="Pak Alvin">Tim Pak Alvin</option>
               <option value="Pak Riva">Tim Pak Riva</option>
@@ -133,6 +133,9 @@
               <input type="text" id="searchWiraniaga" placeholder="Cari nama / username..."
                 oninput="filterWiraniaga()">
             </div>
+            <button class="btn btn-outline-success" style="border: 1.5px solid #16a34a; color: #16a34a; font-weight:700; padding:10px 16px; border-radius:10px; background: #f0fdf4; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;" onclick="syncSpreadsheetNow(this)" title="Sinkronkan data akun wiraniaga langsung dari Google Spreadsheet live">
+              <i class="fa-solid fa-arrows-rotate"></i> Sinkron Spreadsheet
+            </button>
             <button class="btn btn-primary" style="background: linear-gradient(135deg, #1e1014, #3d1c24); color: #d8a437; border: 1px solid #d8a437; font-weight:700; padding:10px 16px; border-radius:10px;" onclick="openModalCreate()">
               <i class="fa-solid fa-user-plus"></i> Tambah Wiraniaga
             </button>

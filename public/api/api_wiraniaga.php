@@ -39,6 +39,24 @@ if ($checkTable) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
+    // Otomatis sinkronisasi akun dari Google Spreadsheet jika cache > 2 menit atau diminta via ?sync=1
+    $sync_needed = (isset($_GET['sync']) && $_GET['sync'] == '1');
+    if (!$sync_needed) {
+        $chk_sync = $conn->query("SELECT last_sync_at FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+        if ($chk_sync && $row_sync = $chk_sync->fetch_assoc()) {
+            $last_sync_time = strtotime($row_sync['last_sync_at'] ?? '2000-01-01');
+            if (time() - $last_sync_time > 120) { // Cek Google Sheets setiap 2 menit
+                $sync_needed = true;
+            }
+        }
+    }
+    if ($sync_needed && file_exists(__DIR__ . '/api_sheets_sync.php')) {
+        require_once __DIR__ . '/api_sheets_sync.php';
+        if (function_exists('syncGoogleSheetsToDb')) {
+            syncGoogleSheetsToDb($conn, intval(date('n')), intval(date('Y')));
+        }
+    }
+
     if (isset($_GET['count_only']) && $_GET['count_only'] == '1') {
         $resCount = $conn->query("SELECT COUNT(*) as total FROM sales_accounts WHERE is_active = 1");
         $total = ($resCount && $row = $resCount->fetch_assoc()) ? intval($row['total']) : 50;

@@ -570,6 +570,36 @@ let listDataWiraniaga = [];
       document.getElementById('modalCoaching').style.display = 'none';
     };
 
+    window.syncSpreadsheetNow = async function(btn) {
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyinkronkan...';
+      }
+      try {
+        const res = await fetch('../api/api_sheets_sync.php?action=pull');
+        const json = await res.json();
+        if (json.status === 'success') {
+          if (typeof showCustomAlert === 'function') {
+            showCustomAlert('Sinkronisasi Sukses!', `${json.message} (${json.synced_count} akun sales)`, 'success');
+          } else {
+            alert(json.message);
+          }
+          await loadWiraniaga();
+        } else {
+          alert('Sinkronisasi gagal: ' + (json.message || 'Terjadi kesalahan'));
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Gagal menghubungi server untuk sinkronisasi.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml || '<i class="fa-solid fa-arrows-rotate"></i> Sinkron Spreadsheet';
+        }
+      }
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
       guardSPV();
       renderUser();

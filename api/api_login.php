@@ -17,8 +17,8 @@ function verifyAndRehashPassword($inputPassword, $dbPassword, $table, $id, $conn
     if (password_verify($inputPassword, $dbPassword)) {
         return true;
     }
-    if ($inputPassword === $dbPassword) {
-        // Transparently upgrade plaintext password to hash in DB
+    if ($inputPassword === $dbPassword || md5($inputPassword) === $dbPassword) {
+        // Transparently upgrade plaintext/md5 password to hash in DB
         $newHash = password_hash($inputPassword, PASSWORD_DEFAULT);
         $conn->query("UPDATE {$table} SET password = '{$conn->real_escape_string($newHash)}' WHERE id = " . intval($id));
         return true;
@@ -82,11 +82,31 @@ function normalizePhotoUrl($foto) {
 
         if ($login_type === 'sales') {
             $u_clean = str_replace(' ', '', $username);
-            $query = "SELECT id, username, password, nama_lengkap, tingkatan, foto, nama_spv FROM sales_accounts WHERE username = '$username' OR LOWER(username) = LOWER('$username') OR REPLACE(username, ' ', '') = '$u_clean' LIMIT 1";
+            $query = "SELECT id, username, password, nama_lengkap, tingkatan, foto, nama_spv, is_active 
+                      FROM sales_accounts 
+                      WHERE username = '$username' 
+                         OR LOWER(username) = LOWER('$username') 
+                         OR REPLACE(username, ' ', '') = '$u_clean' 
+                         OR LOWER(nama_lengkap) = LOWER('$username') 
+                      LIMIT 1";
             $result = $conn ? $conn->query($query) : false;
+
+            // Jika akun belum ditemukan, coba sinkronisasi instan dari Google Spreadsheet
+            // Menangani kasus jika nama sales baru saja ditambahkan di Google Sheets
+            if ((!$result || $result->num_rows === 0) && file_exists(__DIR__ . '/api_sheets_sync.php')) {
+                require_once __DIR__ . '/api_sheets_sync.php';
+                if (function_exists('syncGoogleSheetsToDb') && $conn) {
+                    syncGoogleSheetsToDb($conn, intval(date('n')), intval(date('Y')));
+                    $result = $conn->query($query);
+                }
+            }
 
             if ($result && $result->num_rows > 0) {
                 $user = $result->fetch_assoc();
+                if (isset($user['is_active']) && intval($user['is_active']) === 0) {
+                    echo json_encode(["ok" => false, "message" => "Akun wiraniaga ini sudah dinonaktifkan atau telah dihapus dari spreadsheet."]);
+                    exit();
+                }
                 if (verifyAndRehashPassword($password, $user['password'], 'sales_accounts', $user['id'], $conn)) {
                     echo json_encode([
                         "ok" => true,
@@ -192,7 +212,7 @@ function normalizePhotoUrl($foto) {
             ];
 
             $userLower = strtolower($username);
-            if (array_key_exists($userLower, $salesMaster) && $password === '123456') {
+            if (!$conn && array_key_exists($userLower, $salesMaster) && $password === '123456') {
                 $acc = $salesMaster[$userLower];
                 echo json_encode([
                     "ok" => true,

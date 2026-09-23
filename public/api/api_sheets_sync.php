@@ -301,17 +301,28 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
             } else {
                 // Auto-create akun jika ada anggota baru di spreadsheet
                 $safe_spv_code = strtolower(str_replace(['Pak ', 'Bu '], '', $current_spv));
-                $username = $norm_name . ($safe_spv_code ? '_' . $safe_spv_code : '');
-                $c_usr = $conn->query("SELECT id FROM sales_accounts WHERE username = '$username'");
-                if ($c_usr && $c_usr->num_rows > 0) {
-                    $username .= '_' . rand(10, 99);
+                $clean_user = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $nama_sales));
+                if (empty($clean_user)) $clean_user = $norm_name;
+                
+                $chk_u = $conn->query("SELECT id FROM sales_accounts WHERE username = '$clean_user'");
+                if (!$chk_u || $chk_u->num_rows === 0) {
+                    $username = $clean_user;
+                } else {
+                    $spv_user = $clean_user . '_' . $safe_spv_code;
+                    $chk_u2 = $conn->query("SELECT id FROM sales_accounts WHERE username = '$spv_user'");
+                    if (!$chk_u2 || $chk_u2->num_rows === 0) {
+                        $username = $spv_user;
+                    } else {
+                        $username = $spv_user . '_' . rand(10, 99);
+                    }
                 }
-                $pass_hash = md5('123456');
+                $pass_hash = password_hash('123456', PASSWORD_DEFAULT);
                 $conn->query("INSERT INTO sales_accounts (username, password, nama_lengkap, tingkatan, nama_spv, is_active) 
                               VALUES ('$username', '$pass_hash', '$nama_sales', 'Executive', '$current_spv', 1)");
                 $sales_id = $conn->insert_id;
                 $matched = ['id' => $sales_id, 'username' => $username, 'nama_lengkap' => $nama_sales, 'nama_spv' => $current_spv];
                 $sales_map[$lookup_key] = $matched;
+                $sales_map[$norm_name] = $matched;
             }
 
             $active_sheet_ids[] = $sales_id;
@@ -484,12 +495,22 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 $conn->query("UPDATE sales_accounts SET nama_spv = '$current_spv', is_active = 1 WHERE id = $sales_id");
             } else {
                 $safe_spv_code = strtolower(str_replace(['Pak ', 'Bu '], '', $current_spv));
-                $username = $norm_name . ($safe_spv_code ? '_' . $safe_spv_code : '');
-                $c_usr = $conn->query("SELECT id FROM sales_accounts WHERE username = '$username'");
-                if ($c_usr && $c_usr->num_rows > 0) {
-                    $username .= '_' . rand(10, 99);
+                $clean_user = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $nama_sales));
+                if (empty($clean_user)) $clean_user = $norm_name;
+                
+                $chk_u = $conn->query("SELECT id FROM sales_accounts WHERE username = '$clean_user'");
+                if (!$chk_u || $chk_u->num_rows === 0) {
+                    $username = $clean_user;
+                } else {
+                    $spv_user = $clean_user . '_' . $safe_spv_code;
+                    $chk_u2 = $conn->query("SELECT id FROM sales_accounts WHERE username = '$spv_user'");
+                    if (!$chk_u2 || $chk_u2->num_rows === 0) {
+                        $username = $spv_user;
+                    } else {
+                        $username = $spv_user . '_' . rand(10, 99);
+                    }
                 }
-                $pass_hash = md5('123456');
+                $pass_hash = password_hash('123456', PASSWORD_DEFAULT);
                 $conn->query("INSERT INTO sales_accounts (username, password, nama_lengkap, tingkatan, nama_spv, is_active) 
                               VALUES ('$username', '$pass_hash', '$nama_sales', 'Executive', '$current_spv', 1)");
                 $sales_id = $conn->insert_id;
@@ -500,6 +521,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                     'nama_spv' => $current_spv
                 ];
                 $sales_map[$lookup_key] = $matched;
+                $sales_map[$norm_name] = $matched;
             }
 
             $active_sheet_ids[] = $sales_id;
@@ -528,10 +550,38 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         }
     }
 
-    // Update status aktif sales (dengan threshold proteksi minimal 10 orang agar tidak ter-deaktivasi massal jika sheet bermasalah)
+    // SINKRONISASI AKUN: Hapus atau nonaktifkan akun wiraniaga yang sudah TIDAK ADA lagi di Google Sheets
+    // Proteksi: Sheet harus valid dan minimal berisi 10 wiraniaga agar tidak menghapus massal jika API Google Sheets error
     if (!empty($active_sheet_ids) && count($active_sheet_ids) >= 10) {
         $id_list_str = implode(',', $active_sheet_ids);
-        $conn->query("UPDATE sales_accounts SET is_active = 0 WHERE id NOT IN ($id_list_str)");
+        
+        $res_orphans = $conn->query("SELECT id, username, nama_lengkap FROM sales_accounts WHERE id NOT IN ($id_list_str)");
+        if ($res_orphans && $res_orphans->num_rows > 0) {
+            while ($orphan = $res_orphans->fetch_assoc()) {
+                $orphan_id = intval($orphan['id']);
+                
+                // Cek apakah akun memiliki transaksi riil (SPK atau customer)
+                $has_data = false;
+                $chk_spk = $conn->query("SELECT id FROM tabel_spk WHERE sales_account_id = $orphan_id LIMIT 1");
+                if ($chk_spk && $chk_spk->num_rows > 0) $has_data = true;
+                
+                $chk_cust = $conn->query("SELECT id FROM tabel_customer WHERE sales_account_id = $orphan_id LIMIT 1");
+                if ($chk_cust && $chk_cust->num_rows > 0) $has_data = true;
+                
+                if (!$has_data) {
+                    // Benar-benar hapus dari database karena belum ada transaksi SPK/Customer
+                    $conn->query("DELETE FROM target_do_bulanan WHERE sales_account_id = $orphan_id");
+                    $conn->query("DELETE FROM tabel_notifikasi WHERE sales_account_id = $orphan_id");
+                    $conn->query("DELETE FROM tabel_trade_in WHERE sales_account_id = $orphan_id");
+                    $conn->query("DELETE FROM sales_accounts WHERE id = $orphan_id");
+                } else {
+                    // Jika pernah ada transaksi SPK/Customer, de-aktivasi agar histori laporan penjualan tetap utuh,
+                    // dan hapus target periode aktif agar tidak muncul di monitoring wiraniaga.
+                    $conn->query("UPDATE sales_accounts SET is_active = 0 WHERE id = $orphan_id");
+                    $conn->query("DELETE FROM target_do_bulanan WHERE sales_account_id = $orphan_id AND periode_bulan = $month AND periode_tahun = $year");
+                }
+            }
+        }
     }
 
     $nama_bulan_list = [
