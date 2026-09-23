@@ -62,6 +62,16 @@ class PageController extends Controller
             }
         }
 
+        if ($cleanPage === 'ao_report' || $cleanPage === 'ao_report_kacab' || $cleanPage === 'ao_report_spv') {
+            $role = request()->query('role');
+            if ($role === 'kacab' || $cleanPage === 'ao_report_kacab') {
+                return $this->showKacabPage('ao_report_kacab');
+            } elseif ($role === 'spv' || $cleanPage === 'ao_report_spv') {
+                return $this->showSpvPage('ao_report_spv');
+            }
+            $cleanPage = 'ao_report';
+        }
+
         if (View::exists("pages.{$cleanPage}")) {
             return view("pages.{$cleanPage}");
         }
@@ -86,6 +96,22 @@ class PageController extends Controller
 
         if ($cleanPage === 'sph') {
             $cleanPage = 'quotation';
+        }
+
+        if ($cleanPage === 'ao_report' || $cleanPage === 'ao_report_cabang') {
+            $cleanPage = 'ao_report_spv';
+        }
+
+        if ($cleanPage === 'peta_kunjungan') {
+            $cleanPage = 'peta_canvassing';
+        }
+
+        if ($cleanPage === 'approval_kacab') {
+            $cleanPage = 'approval';
+        }
+
+        if ($cleanPage === 'target_kacab') {
+            $cleanPage = 'target';
         }
 
         if (View::exists("pages_spv.{$cleanPage}")) {
@@ -114,8 +140,28 @@ class PageController extends Controller
             $cleanPage = 'quotation';
         }
 
+        if ($cleanPage === 'ao_report' || $cleanPage === 'ao_report_cabang') {
+            $cleanPage = 'ao_report_kacab';
+        }
+
         if ($cleanPage === 'aftersales' || $cleanPage === 'bengkel') {
             $cleanPage = 'after_sales';
+        }
+
+        if ($cleanPage === 'approval') {
+            $cleanPage = 'approval_kacab';
+        }
+
+        if ($cleanPage === 'laporan_eksekutif' || $cleanPage === 'laporan') {
+            $cleanPage = 'laporan_kacab';
+        }
+
+        if ($cleanPage === 'peta_canvassing' || $cleanPage === 'canvassing') {
+            $cleanPage = 'peta_kunjungan';
+        }
+
+        if ($cleanPage === 'target') {
+            $cleanPage = 'target_kacab';
         }
 
         if (View::exists("pages_kacab.{$cleanPage}")) {

@@ -26,16 +26,22 @@ Route::get('/pages/panduan_alur_kerja_sales_app', [PageController::class, 'pandu
 Route::prefix('spv')->group(function () {
     Route::get('/', [PageController::class, 'showSpvPage'])->name('spv.dashboard');
     Route::get('/sph', function() { return app(PageController::class)->showSpvPage('quotation'); });
+    Route::get('/ao_report', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
+    Route::get('/ao_report.html', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
     Route::get('/{page}', [PageController::class, 'showSpvPage'])->name('spv.page');
 });
 Route::get('/pages_spv/sph.html', function() { return app(PageController::class)->showSpvPage('quotation'); });
 Route::get('/pages_spv/sph', function() { return app(PageController::class)->showSpvPage('quotation'); });
+Route::get('/pages_spv/ao_report.html', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
+Route::get('/pages_spv/ao_report', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
 Route::get('/pages_spv/{page}', [PageController::class, 'showSpvPage']);
 
 // Portal Kacab (Kepala Cabang)
 Route::prefix('kacab')->group(function () {
     Route::get('/', [PageController::class, 'showKacabPage'])->name('kacab.dashboard');
     Route::get('/sph', function() { return app(PageController::class)->showKacabPage('quotation'); });
+    Route::get('/ao_report', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
+    Route::get('/ao_report.html', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
     Route::get('/after_sales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
     Route::get('/aftersales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
     Route::get('/bengkel', function() { return app(PageController::class)->showKacabPage('after_sales'); });
@@ -43,6 +49,8 @@ Route::prefix('kacab')->group(function () {
 });
 Route::get('/pages_kacab/sph.html', function() { return app(PageController::class)->showKacabPage('quotation'); });
 Route::get('/pages_kacab/sph', function() { return app(PageController::class)->showKacabPage('quotation'); });
+Route::get('/pages_kacab/ao_report.html', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
+Route::get('/pages_kacab/ao_report', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
 Route::get('/pages_kacab/after_sales.html', function() { return app(PageController::class)->showKacabPage('after_sales'); });
 Route::get('/pages_kacab/after_sales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
 Route::get('/pages_kacab/aftersales', function() { return app(PageController::class)->showKacabPage('after_sales'); });

@@ -113,6 +113,8 @@
                 ${navLinkKacab('pages_kacab/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d8a437; color:#1e1014; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span>')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
+                ${navLinkKacab('pages_kacab/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
+                ${navLinkKacab('pages_kacab/after_sales.html', 'fa-solid fa-wrench', 'After Sales')}
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
                 ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data ' + (localStorage.getItem('total_sales_count') || 50) + ' Wiraniaga')}
                 ${navLinkKacab('pages_kacab/approval_kacab.html', 'fa-solid fa-clipboard-check', 'Otorisasi & Approval')}
@@ -122,6 +124,7 @@
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
                 ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
+                ${navLinkKacab('pages_kacab/performa_regional.html', 'fa-solid fa-earth-asia', 'Performa Regional Jabar')}
                 ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
                 ${navLinkKacab('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
 
@@ -194,6 +197,7 @@
                 ${navLinkSPV('pages_spv/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#0284c7; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">A4 PDF</span>')}
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
+                ${navLinkSPV('pages_spv/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
                 ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
                 ${navLinkSPV('pages_spv/wiraniaga.html', 'fa-solid fa-users', 'Wiraniaga')}
                 ${navLinkSPV('pages_spv/approval.html', 'fa-solid fa-check-to-slot', 'Approval <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
