@@ -110,6 +110,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
+                ${(curPage === 'index_kacab') ? navLinkKacab('pages_kacab/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service <span class="sidebar-notif-badge" style="background:#d8a437; color:#1e1014; display:inline-block; margin-left:auto; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800;">LIVE</span>') : ''}
                 ${navLinkKacab('pages_kacab/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d8a437; color:#1e1014; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span>')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
@@ -195,6 +196,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
+                ${(curPage === 'index_spv') ? navLinkSPV('pages_spv/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service <span class="sidebar-notif-badge" style="background:#e11d48; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800;">LIVE</span>') : ''}
                 ${navLinkSPV('pages_spv/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#0284c7; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">A4 PDF</span>')}
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
@@ -278,6 +280,7 @@
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
                 ${navLink('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span>', 'panduan alur kerja sop pesan mobil order tahapan flow tutorial cara pakai')}
                 ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
+                ${navLink('pages/mtoyota_service.html', 'fa-solid fa-mobile-screen-button', 'Booking Service m-Toyota <span class="sidebar-notif-badge" style="background:#d7123a; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">LIVE</span>', 'mtoyota m-toyota booking service dec do fs1000 purna jual servis')}
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
@@ -301,7 +304,6 @@
                 ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)', 'kartu nama digital vcard qr kontak profil')}
                 ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub', 'after sales servis stnk bpkb retention loyalitas')}
                 ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony', 'handover ceremony serah terima piagam')}
-                ${navLink('pages/mtoyota_service.html', 'fa-solid fa-mobile-screen-button', 'Booking Service m-Toyota <span class="sidebar-notif-badge" style="background:#d7123a; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>', 'mtoyota m-toyota booking service dec do fs1000 purna jual servis')}
                 ${navLink('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio <span class="sidebar-notif-badge" style="background:#c8102e; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>', 'media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
