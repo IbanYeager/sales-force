@@ -79,11 +79,11 @@ if ($method === 'GET') {
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_lower = strtolower($spv);
         if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
-            $where_parts[] = "(nama_spv = 'Bu Rahma' OR nama_spv LIKE '%Rahma%')";
+            $where_parts[] = "(nama_spv = 'Bu Rahma' OR nama_spv LIKE '%Bu Rahma%')";
         } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
-            $where_parts[] = "(nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%') AND (nama_spv NOT LIKE '%Rahma%')";
+            $where_parts[] = "(nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%')";
         } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
-            $where_parts[] = "(nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%' OR nama_spv = 'Bu Rahma' OR nama_spv LIKE '%Rahma%')";
+            $where_parts[] = "(nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%')";
         } else {
             $spv_clean = str_replace(['Pak ', 'Bu '], '', $spv);
             $where_parts[] = "(nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";
