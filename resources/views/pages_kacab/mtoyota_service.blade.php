@@ -196,6 +196,239 @@
     .photo-preview-item img:hover {
       transform: scale(1.02);
     }
+
+    /* ── SOP Alur Kerja After-Sales & Onboarding Banner ── */
+    .sop-banner-card {
+      background: linear-gradient(135deg, #1b0e12 0%, #29141b 50%, #150a0d 100%);
+      border: 1px solid rgba(216, 164, 55, 0.4);
+      border-radius: 16px;
+      padding: 22px 24px;
+      color: #ffffff;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(30, 16, 20, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .sop-banner-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(216, 164, 55, 0.18) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .sop-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .sop-badge-pill {
+      background: rgba(216, 164, 55, 0.18);
+      border: 1px solid rgba(216, 164, 55, 0.4);
+      color: #d8a437;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sop-toggle-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .sop-toggle-btn:hover {
+      background: rgba(216, 164, 55, 0.25);
+      border-color: #d8a437;
+      color: #ffd67a;
+    }
+    .sop-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      position: relative;
+    }
+    @media (max-width: 1250px) {
+      .sop-steps-grid {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        scroll-snap-type: x mandatory;
+      }
+      .sop-step-node {
+        min-width: 155px;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+      }
+    }
+    .sop-step-node {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+    }
+    .sop-step-node:hover, .sop-step-node.active-step {
+      background: rgba(216, 164, 55, 0.18);
+      border-color: rgba(216, 164, 55, 0.7);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+    .sop-step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 6px auto;
+      transition: all 0.2s ease;
+    }
+    .sop-step-node.active-step .sop-step-num,
+    .sop-step-node:hover .sop-step-num {
+      background: #d8a437;
+      color: #1e1014;
+    }
+    .sop-step-icon {
+      font-size: 17px;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .sop-step-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #ffffff;
+      display: block;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sop-step-sub {
+      font-size: 9.5px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.25;
+      display: block;
+    }
+    .sop-flow-arrow {
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(216, 164, 55, 0.6);
+      font-size: 10px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .sop-detail-panel {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(216, 164, 55, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      display: block;
+      animation: fadeInSop 0.25s ease;
+    }
+    @keyframes fadeInSop {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .sop-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .sop-detail-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #ffd67a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sop-meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+    .sop-grid-columns {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 850px) {
+      .sop-grid-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+    .sop-checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      line-height: 1.45;
+    }
+    .sop-checklist-item i {
+      color: #10b981;
+      font-size: 13px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .sop-info-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 11.5px;
+    }
+    .sop-info-label {
+      color: #d8a437;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 10px;
+      margin-bottom: 4px;
+      display: block;
+      letter-spacing: 0.4px;
+    }
   </style>
 </head>
 
@@ -259,6 +492,133 @@
           <div class="meta">
             <span class="name" id="kacabNama">Kepala Cabang</span>
             <span class="role" id="kacabRole">Branch Manager</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOP Alur Kerja 7 Langkah: SPK -> DO -> DEC -> Booking Service -> Approve CRC -> Bengkel -> CAI -->
+      <div class="sop-banner-card">
+        <div class="sop-header-row">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span class="sop-badge-pill">
+              <i class="fa-solid fa-award"></i> STANDAR OPERASIONAL PROSEDUR (SOP)
+            </span>
+            <h3 style="margin:0; font-size:15px; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px;">
+              Alur Terintegrasi Penjualan ke After-Sales Tunas Toyota Kiara Condong
+            </h3>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-left:auto;">
+            <span style="font-size:11px; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-hand-pointer" style="color:#d8a437;"></i> Klik tiap tahapan untuk melihat checklist detail
+            </span>
+            <button type="button" class="sop-toggle-btn" id="btnToggleSop" onclick="toggleSopDetail()">
+              <i class="fa-solid fa-chevron-up" id="sopToggleIcon"></i> <span id="sopToggleText">Tutup Detail</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 7 Step Stepper Grid -->
+        <div class="sop-steps-grid">
+          <!-- Step 1: SPK -->
+          <div class="sop-step-node active-step" id="sopNode1" onclick="selectSopStep(1)">
+            <span class="sop-step-num">1</span>
+            <i class="fa-solid fa-file-signature sop-step-icon" style="color:#38bdf8;"></i>
+            <span class="sop-step-title">1. SPK</span>
+            <span class="sop-step-sub">Pemesanan &amp; DP</span>
+            <i class="fa-solid fa-chevron-right sop-flow-arrow"></i>
+          </div>
+
+          <!-- Step 2: DO -->
+          <div class="sop-step-node" id="sopNode2" onclick="selectSopStep(2)">
+            <span class="sop-step-num">2</span>
+            <i class="fa-solid fa-truck-ramp-box sop-step-icon" style="color:#fbbf24;"></i>
+            <span class="sop-step-title">2. DO</span>
+            <span class="sop-step-sub">Delivery Order</span>
+            <i class="fa-solid fa-chevron-right sop-flow-arrow"></i>
+          </div>
+
+          <!-- Step 3: DEC -->
+          <div class="sop-step-node" id="sopNode3" onclick="selectSopStep(3)">
+            <span class="sop-step-num">3</span>
+            <i class="fa-solid fa-mobile-screen-button sop-step-icon" style="color:#34d399;"></i>
+            <span class="sop-step-title">3. DEC</span>
+            <span class="sop-step-sub">Edukasi m-Toyota</span>
+            <i class="fa-solid fa-chevron-right sop-flow-arrow"></i>
+          </div>
+
+          <!-- Step 4: Booking Service -->
+          <div class="sop-step-node" id="sopNode4" onclick="selectSopStep(4)">
+            <span class="sop-step-num">4</span>
+            <i class="fa-solid fa-calendar-check sop-step-icon" style="color:#60a5fa;"></i>
+            <span class="sop-step-title">4. Booking Servis</span>
+            <span class="sop-step-sub">Reservasi App</span>
+            <i class="fa-solid fa-chevron-right sop-flow-arrow"></i>
+          </div>
+
+          <!-- Step 5: Approve CRC -->
+          <div class="sop-step-node" id="sopNode5" onclick="selectSopStep(5)">
+            <span class="sop-step-num">5</span>
+            <i class="fa-solid fa-clipboard-check sop-step-icon" style="color:#c084fc;"></i>
+            <span class="sop-step-title">5. Approve CRC</span>
+            <span class="sop-step-sub">Validasi Bengkel</span>
+            <i class="fa-solid fa-chevron-right sop-flow-arrow"></i>
+          </div>
+
+          <!-- Step 6: Bengkel -->
+          <div class="sop-step-node" id="sopNode6" onclick="selectSopStep(6)">
+            <span class="sop-step-num">6</span>
+            <i class="fa-solid fa-wrench sop-step-icon" style="color:#f472b6;"></i>
+            <span class="sop-step-title">6. Bengkel</span>
+            <span class="sop-step-sub">Pengerjaan GR/FS</span>
+            <i class="fa-solid fa-chevron-right sop-flow-arrow"></i>
+          </div>
+
+          <!-- Step 7: CAI -->
+          <div class="sop-step-node" id="sopNode7" onclick="selectSopStep(7)">
+            <span class="sop-step-num">7</span>
+            <i class="fa-solid fa-star sop-step-icon" style="color:#fb7185;"></i>
+            <span class="sop-step-title">7. CAI</span>
+            <span class="sop-step-sub">Survei Kepuasan</span>
+          </div>
+        </div>
+
+        <!-- Detail Information Panel for Selected Step -->
+        <div class="sop-detail-panel" id="sopDetailContainer">
+          <div class="sop-detail-header">
+            <div class="sop-detail-title" id="sopDetailTitle">
+              <i class="fa-solid fa-file-signature" style="color:#d8a437;"></i>
+              <span>TAHAP 1: SPK (SURAT PESANAN KENDARAAN)</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <span class="sop-meta-badge" id="sopPicBadge"><i class="fa-solid fa-user-tie"></i> PIC: Sales Consultant &amp; SPV</span>
+              <span class="sop-meta-badge" id="sopSlaBadge" style="background:rgba(216,164,55,0.25); color:#ffd67a;"><i class="fa-solid fa-stopwatch"></i> SLA: 1x24 Jam</span>
+            </div>
+          </div>
+
+          <div class="sop-grid-columns">
+            <div>
+              <div style="font-size:11.5px; font-weight:800; color:#ffd67a; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px;">
+                <i class="fa-solid fa-list-check" style="margin-right:6px;"></i> Checklist &amp; Ketentuan Standar Operasional:
+              </div>
+              <div id="sopChecklistContainer">
+                <!-- Checklist items injected via JS -->
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="sop-info-box">
+                <span class="sop-info-label"><i class="fa-solid fa-bullseye"></i> Sasaran Utama (Output)</span>
+                <div style="color:rgba(255,255,255,0.9); line-height:1.4;" id="sopOutputText">
+                  Unit dialokasikan resmi di sistem T-Stock, berkas leasing/cash terverifikasi kasir, konsumen menerima nomor resmi SPK.
+                </div>
+              </div>
+              <div class="sop-info-box">
+                <span class="sop-info-label"><i class="fa-solid fa-triangle-exclamation"></i> Titik Kritis Pengawasan Kacab</span>
+                <div style="color:#fca5a5; line-height:1.4;" id="sopCriticalText">
+                  Cek validitas bukti transfer ke rekening resmi PT Tunas Ridean (bukan rekening pribadi) dan kelengkapan KTP/KK pemohon.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -432,6 +792,197 @@
   <script src="../js/kacab_global.js"></script>
   <script src="../js/kacab_mtoyota.js?v={{ time() }}"></script>
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+
+  <!-- Script Pengatur Interaksi SOP 7 Langkah -->
+  <script>
+    const sopData = {
+      1: {
+        title: "TAHAP 1: SPK (SURAT PESANAN KENDARAAN)",
+        icon: "fa-solid fa-file-signature",
+        pic: "Sales Consultant & SPV",
+        sla: "1x24 Jam Pemesanan",
+        checklists: [
+          "Validasi identitas calon konsumen (KTP, KK, NPWP) sesuai data faktur yang dituju.",
+          "Verifikasi bukti booking fee / tanda jadi wajib masuk rekening resmi PT Tunas Ridean (anti-rekening pribadi).",
+          "Approval diskon & skema pembiayaan (Leasing / Tunai) melalui otorisasi SPV dan Kepala Cabang.",
+          "Pencatatan alokasi nomor rangka (VIN) dan warna unit kendaraan pada sistem T-Stock dan CRM."
+        ],
+        output: "Unit dialokasikan resmi di sistem T-Stock, berkas leasing/cash terverifikasi kasir, konsumen menerima nomor resmi SPK.",
+        critical: "Cek validitas bukti transfer ke rekening resmi PT Tunas Ridean (bukan rekening pribadi) dan kelengkapan KTP/KK pemohon."
+      },
+      2: {
+        title: "TAHAP 2: DO (DELIVERY ORDER / SERAH TERIMA)",
+        icon: "fa-solid fa-truck-ramp-box",
+        pic: "Sales Consultant, PDI & Tim Logistik",
+        sla: "Hari-H Serah Terima Unit",
+        checklists: [
+          "Pelunasan Total Down Payment (TDP) atau sisa pembayaran tunai telah dikonfirmasi Kasir / Finance.",
+          "Pemeriksaan Pre-Delivery Inspection (PDI) 100% lulus (kebersihan, fungsi kelistrikan, oli/cairan & ban serep).",
+          "Penerbitan Surat Jalan resmi (NVDO) dan berita acara serah terima kendaraan oleh admin logistik.",
+          "Pengecekan fisik bersama konsumen: kelengkapan toolkit, dongkrak, APAR, buku manual, & surat izin jalan sementara/STNK.",
+          "Sesi Handover Ceremony di Delivery Bay dan pengambilan foto dokumentasi bersama konsumen & kendaraan."
+        ],
+        output: "Kendaraan diserahkan dalam kondisi sempurna dan berita acara serah terima ditandatangani konsumen.",
+        critical: "Kondisi fisik unit harus 100% mulus (zero-defect) dan penjelasan buku servis/garansi wajib dilakukan."
+      },
+      3: {
+        title: "TAHAP 3: DEC (DIGITAL EXPLANATION CERTIFICATE)",
+        icon: "fa-solid fa-mobile-screen-button",
+        pic: "Sales Consultant (Didampingi SPV)",
+        sla: "Maks. 30 Menit Saat Handover DO",
+        checklists: [
+          "Membimbing konsumen mendownload aplikasi m-Toyota resmi di smartphone (Google Play / App Store).",
+          "Registrasi akun m-Toyota hingga terbit One Account ID & nomor rangka (VIN) mobil konsumen terhubung.",
+          "Edukasi fitur utama m-Toyota: tracking servis, histori perawatan, T-Care gratis oli/jasa s/d servis ke-7, dan call center 24 jam.",
+          "Pengisian tanda tangan digital DEC oleh konsumen melalui aplikasi / tablet sales.",
+          "Upload foto serah terima & bukti DEC ke sistem Sales Force Tracking (SFT)."
+        ],
+        output: "Akun m-Toyota aktif berstatus One Account ID valid dan sertifikat DEC tersimpan di sistem Toyota.",
+        critical: "Target realisasi aktivasi DEC cabang adalah 100% untuk menjaga kepatuhan KPI TAM dan sertifikasi wiraniaga."
+      },
+      4: {
+        title: "TAHAP 4: BOOKING SERVICE (m-TOYOTA)",
+        icon: "fa-solid fa-calendar-check",
+        pic: "Konsumen (Didampingi Sales) & Admin CRM",
+        sla: "H+14 Hari s/d Maks. 1 Bulan Pasca DO",
+        checklists: [
+          "Sales melakukan follow-up H+7 untuk memastikan unit berjalan baik dan mendampingi reservasi servis pertama.",
+          "Konsumen memilih menu 'Book a Service' pada aplikasi m-Toyota ke bengkel resmi Tunas Toyota Kiara Condong.",
+          "Pemilihan jenis pekerjaan Servis Berkala 1.000 KM (Free Service 1 - Inspeksi 60 item gratis).",
+          "Menentukan tanggal kedatangan, jam kedatangan (estimasi stall), dan memilih opsi Service Advisor (SA) favorit.",
+          "Konfirmasi keluhan atau permintaan khusus konsumen tercatat di aplikasi sebelum disubmit."
+        ],
+        output: "Nomor Booking ID m-Toyota terbit dan otomatis tersinkronisasi ke sistem CRC / DMS bengkel.",
+        critical: "Pastikan wiraniaga memandu booking sebelum 1 bulan/1.000 KM agar garansi mesin & servis gratis T-Care tidak gugur."
+      },
+      5: {
+        title: "TAHAP 5: APPROVE CRC (CUSTOMER RELATIONS COORDINATOR)",
+        icon: "fa-solid fa-clipboard-check",
+        pic: "CRC Officer & Frontliner Service Bengkel",
+        sla: "Maks. 2 Jam Setelah Booking Masuk",
+        checklists: [
+          "CRC mengecek notifikasi booking baru di Dashboard Bengkel / SFT Cabang secara real-time.",
+          "Verifikasi ketersediaan Service Stall (Express Maintenance atau General Repair) dan Service Advisor (SA).",
+          "Pengecekan kesiapan suku cadang TMO (oli, filter, part fast moving) sesuai tipe kendaraan.",
+          "Mengklik tombol 'Approve / Konfirmasi Booking' dan mengirim pesan WhatsApp konfirmasi otomatis kepada konsumen.",
+          "Reminder H-1 via WA/Telepon kepada konsumen untuk memastikan jam kedatangan kendaraan."
+        ],
+        output: "Slot stall bengkel terkunci, estimasi durasi servis ditentukan, dan konsumen menerima konfirmasi resmi.",
+        critical: "Waktu respon approval CRC maksimal 2 jam dan tingkat kehadiran (Show-Up Rate) konsumen wajib > 90%."
+      },
+      6: {
+        title: "TAHAP 6: BENGKEL (SERVICE EXECUTION & WORKSHOP)",
+        icon: "fa-solid fa-wrench",
+        pic: "Service Advisor (SA), Foreman & Teknisi GR",
+        sla: "Express Maintenance: 60 Menit | Reguler: Sesuai PKB",
+        checklists: [
+          "Penerimaan konsumen melalui antrean prioritas Booking m-Toyota (tanpa antre jalur reguler).",
+          "Walk-around check bersama konsumen untuk memeriksa kondisi fisik dan kilometernya.",
+          "Penerbitan PKB (Perintah Kerja Bengkel) dan pemasangan cover pelindung (seat, steering wheel, floor mat).",
+          "Pelaksanaan servis berkala (inspeksi 60 titik untuk 1.000 KM atau penggantian oli & suku cadang paket T-Care).",
+          "Final Inspection / Quality Control oleh Foreman bengkel untuk memastikan zero defect.",
+          "Cuci mobil gratis dan pembersihan ruang kemudi sebelum kendaraan diserahkan kembali.",
+          "Penjelasan hasil pekerjaan & pengisian buku servis/update riwayat servis di m-Toyota oleh SA."
+        ],
+        output: "Pengerjaan servis selesai tepat waktu, riwayat m-Toyota ter-update 'Completed', unit bersih dan siap pakai.",
+        critical: "Ketepatan waktu pengerjaan (On-Time Delivery > 95%) dan kualitas pengerjaan bengkel (No Repeat Repair)."
+      },
+      7: {
+        title: "TAHAP 7: CAI (CUSTOMER ACTION INDEX / CSI & NPS SURVEY)",
+        icon: "fa-solid fa-star",
+        pic: "Tim CRC, Branch Manager & TAM Auditor",
+        sla: "H+1 s/d H+3 Setelah Kendaraan Keluar Bengkel",
+        checklists: [
+          "CRC menghubungi konsumen via telepon/WA survei resmi untuk evaluasi kepuasan servis (CAI/CSI).",
+          "Penilaian 5 parameter utama: Keramahan SA, Kecepatan Layanan, Kualitas Perbaikan, Fasilitas Ruang Tunggu, & Biaya/Transparansi.",
+          "Pemberian rating bintang 5 dan ulasan langsung di aplikasi m-Toyota oleh konsumen.",
+          "Tindakan segera First Contact Resolution (FCR) jika terdapat komplain atau keluhan konsumen dalam tempo < 24 jam.",
+          "Kacab merekapitulasi indeks kepuasan pelanggan cabang untuk evaluasi bulanan bersama tim Sales & Service."
+        ],
+        output: "Skor indeks kepuasan CAI/CSI cabang mencapai target minimal 95% dan zero unresolved complaints.",
+        critical: "Penanganan segera jika ada suara konsumen tidak puas (detractor) untuk mencegah eskalasi ke TAM."
+      }
+    };
+
+    let activeSopStep = 1;
+    let isSopDetailOpen = true;
+
+    function selectSopStep(stepNum) {
+      activeSopStep = stepNum;
+      for (let i = 1; i <= 7; i++) {
+        const el = document.getElementById('sopNode' + i);
+        if (el) {
+          if (i === stepNum) {
+            el.classList.add('active-step');
+          } else {
+            el.classList.remove('active-step');
+          }
+        }
+      }
+
+      const data = sopData[stepNum];
+      if (!data) return;
+
+      const titleEl = document.getElementById('sopDetailTitle');
+      if (titleEl) {
+        titleEl.innerHTML = `<i class="${data.icon}" style="color:#d8a437;"></i> <span>${data.title}</span>`;
+      }
+
+      const picEl = document.getElementById('sopPicBadge');
+      if (picEl) {
+        picEl.innerHTML = `<i class="fa-solid fa-user-tie"></i> PIC: ${data.pic}`;
+      }
+
+      const slaEl = document.getElementById('sopSlaBadge');
+      if (slaEl) {
+        slaEl.innerHTML = `<i class="fa-solid fa-stopwatch"></i> SLA: ${data.sla}`;
+      }
+
+      const checkEl = document.getElementById('sopChecklistContainer');
+      if (checkEl) {
+        checkEl.innerHTML = data.checklists.map(item => `
+          <div class="sop-checklist-item">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>${item}</span>
+          </div>
+        `).join('');
+      }
+
+      const outEl = document.getElementById('sopOutputText');
+      if (outEl) outEl.textContent = data.output;
+
+      const critEl = document.getElementById('sopCriticalText');
+      if (critEl) critEl.textContent = data.critical;
+
+      // Pastikan panel terbuka saat user klik tahapan
+      if (!isSopDetailOpen) {
+        toggleSopDetail();
+      }
+    }
+
+    function toggleSopDetail() {
+      const panel = document.getElementById('sopDetailContainer');
+      const icon = document.getElementById('sopToggleIcon');
+      const text = document.getElementById('sopToggleText');
+      if (!panel) return;
+
+      if (isSopDetailOpen) {
+        panel.style.display = 'none';
+        isSopDetailOpen = false;
+        if (icon) icon.className = 'fa-solid fa-chevron-down';
+        if (text) text.textContent = 'Buka Detail';
+      } else {
+        panel.style.display = 'block';
+        isSopDetailOpen = true;
+        if (icon) icon.className = 'fa-solid fa-chevron-up';
+        if (text) text.textContent = 'Tutup Detail';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      selectSopStep(1);
+    });
+  </script>
 </body>
 
 </html>
