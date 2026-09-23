@@ -560,7 +560,7 @@
             <span class="sop-step-num">5</span>
             <i class="fa-solid fa-clipboard-check sop-step-icon" style="color:#c084fc;"></i>
             <span class="sop-step-title">5. Approve CRC</span>
-            <span class="sop-step-sub">Validasi Bengkel</span>
+            <span class="sop-step-sub">3 Days Follow Up</span>
             <i class="fa-solid fa-chevron-right sop-flow-arrow"></i>
           </div>
 
@@ -856,19 +856,20 @@
         critical: "Pastikan wiraniaga memandu booking sebelum 1 bulan/1.000 KM agar garansi mesin & servis gratis T-Care tidak gugur."
       },
       5: {
-        title: "TAHAP 5: APPROVE CRC (CUSTOMER RELATIONS COORDINATOR)",
+        title: "TAHAP 5: APPROVE CRC (3 DAYS FOLLOW UP)",
         icon: "fa-solid fa-clipboard-check",
         pic: "CRC Officer & Frontliner Service Bengkel",
-        sla: "Maks. 2 Jam Setelah Booking Masuk",
+        sla: "3 Days Follow Up Pasca Booking / H-1 Kedatangan",
         checklists: [
+          "Pelaksanaan 3 Days Follow Up untuk konfirmasi dan edukasi kesiapan servis konsumen.",
           "CRC mengecek notifikasi booking baru di Dashboard Bengkel / SFT Cabang secara real-time.",
           "Verifikasi ketersediaan Service Stall (Express Maintenance atau General Repair) dan Service Advisor (SA).",
           "Pengecekan kesiapan suku cadang TMO (oli, filter, part fast moving) sesuai tipe kendaraan.",
           "Mengklik tombol 'Approve / Konfirmasi Booking' dan mengirim pesan WhatsApp konfirmasi otomatis kepada konsumen.",
-          "Reminder H-1 via WA/Telepon kepada konsumen untuk memastikan jam kedatangan kendaraan."
+          "Reminder H-1 via WA/Telepon kepada konsumen untuk memastikan kepastian jam kedatangan kendaraan."
         ],
-        output: "Slot stall bengkel terkunci, estimasi durasi servis ditentukan, dan konsumen menerima konfirmasi resmi.",
-        critical: "Waktu respon approval CRC maksimal 2 jam dan tingkat kehadiran (Show-Up Rate) konsumen wajib > 90%."
+        output: "Proses 3 Days Follow Up tuntas, slot stall bengkel terkunci, dan konsumen menerima konfirmasi resmi.",
+        critical: "Waktu respon 3 Days Follow Up maksimal dan tingkat kehadiran (Show-Up Rate) konsumen wajib > 90%."
       },
       6: {
         title: "TAHAP 6: BENGKEL (SERVICE EXECUTION & WORKSHOP)",
