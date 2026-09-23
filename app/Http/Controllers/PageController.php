@@ -49,6 +49,10 @@ class PageController extends Controller
             $cleanPage = 'quotation';
         }
 
+        if ($cleanPage === 'mtoyota' || $cleanPage === 'booking_service' || $cleanPage === 'm-toyota') {
+            $cleanPage = 'mtoyota_service';
+        }
+
         if ($cleanPage === 'panduan' || $cleanPage === 'panduan_alur_kerja_sales_app') {
             return $this->panduan();
         }

@@ -301,6 +301,7 @@
                 ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)', 'kartu nama digital vcard qr kontak profil')}
                 ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub', 'after sales servis stnk bpkb retention loyalitas')}
                 ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony', 'handover ceremony serah terima piagam')}
+                ${navLink('pages/mtoyota_service.html', 'fa-solid fa-mobile-screen-button', 'Booking Service m-Toyota <span class="sidebar-notif-badge" style="background:#d7123a; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>', 'mtoyota m-toyota booking service dec do fs1000 purna jual servis')}
                 ${navLink('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio <span class="sidebar-notif-badge" style="background:#c8102e; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>', 'media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}

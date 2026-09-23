@@ -129,6 +129,9 @@
                 <a href="pages/delivery_ceremony.html" class="sidebar-nav-link" data-tags="handover ceremony serah terima piagam">
                     <i class="fa-solid fa-award"></i> Digital Delivery Ceremony
                 </a>
+                <a href="pages/mtoyota_service.html" class="sidebar-nav-link" data-tags="booking service mtoyota m-toyota dec do fs1000 purna jual servis berkala upload foto">
+                    <i class="fa-solid fa-mobile-screen-button" style="color:#d7123a;"></i> Booking Service m-Toyota <span class="sidebar-notif-badge" style="background:#d7123a; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>
+                </a>
                 <a href="pages/video_viral.html" class="sidebar-nav-link" data-tags="media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase">
                     <i class="fa-solid fa-photo-film" style="color:#c8102e;"></i> Kircon Media Studio <span class="sidebar-notif-badge" style="background:#c8102e; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>
                 </a>
@@ -999,6 +1002,10 @@
                             <a href="pages/delivery_ceremony.html" class="category-item modal-feature-item" data-tags="handover ceremony serah terima piagam sertifikat">
                                 <div class="category-icon"><i class="fa-solid fa-award"></i></div>
                                 <span class="category-text">Delivery Ceremony</span>
+                            </a>
+                            <a href="pages/mtoyota_service.html" class="category-item modal-feature-item" data-tags="booking service mtoyota m-toyota dec do fs1000 purna jual servis berkala upload foto">
+                                <div class="category-icon" style="background:#ffe4e6; color:#d7123a;"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                                <span class="category-text">m-Toyota Service</span>
                             </a>
                             <a href="pages/do.html" class="category-item modal-feature-item" data-tags="do delivery order surat jalan kirim serah terima cetak do">
                                 <div class="category-icon"><i class="fa-solid fa-truck"></i></div>

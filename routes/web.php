@@ -82,7 +82,8 @@ $salesPages = [
     'merchandise', 'notifikasi', 'olx', 'order_tracker', 'penjualan_kircon', 'pitstop',
     'polreg', 'polreg_detail', 'pricelist', 'promo', 'public_card', 'quotation', 'rental_testdrive', 'retention',
     'riwayat_foto_aktivitas', 'snake', 'target', 'tco', 'tebak', 'testdrive',
-    'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'video_viral', 'wa_studio'
+    'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'video_viral', 'wa_studio',
+    'mtoyota_service', 'mtoyota', 'booking_service'
 ];
 
 Route::get('/e-catalog', function () {
