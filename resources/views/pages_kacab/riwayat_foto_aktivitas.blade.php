@@ -28,6 +28,39 @@
       color: #1e1014 !important;
       border-color: #d8a437 !important;
     }
+    @media print {
+      .kcb-sidebar, .kcb-topbar, .gallery-filter-toolbar, .view-mode-btn, .hero-right-actions, #galleryLightbox, .gallery-toast-notification {
+        display: none !important;
+      }
+      .kcb-shell {
+        display: block !important;
+      }
+      .kcb-main {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .kcb-gallery-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      .gallery-top-hero {
+        background: #1e1014 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        margin-bottom: 20px !important;
+      }
+      .compact-photo-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 10px !important;
+      }
+      .gallery-photo-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        height: 180px !important;
+      }
+    }
   </style>
 </head>
 
@@ -115,6 +148,57 @@
               <i class="fa-solid fa-table-cells-large"></i>
             </button>
           </div>
+        </div>
+
+        <!-- Toolbar Filter Galeri Foto Kacab -->
+        <div class="gallery-filter-toolbar" style="margin-top: 14px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; align-items: center;">
+          <div class="search-box" style="min-width: 220px; flex: 1.5; display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px;">
+            <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8;"></i>
+            <input type="text" id="gallerySearchInput" placeholder="Cari foto sales, keterangan, lokasi..." oninput="handleGallerySearch(this.value)" style="border:none; outline:none; font-size:12.5px; width:100%; color:#1e293b;">
+          </div>
+
+          <div class="select-box" style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px 10px;">
+            <i class="fa-solid fa-location-dot" style="color: #c8102e; font-size: 12px;"></i>
+            <select id="galleryFilterLocation" onchange="applyGalleryDropdownFilters()" style="border:none; outline:none; font-size:12px; font-weight:600; color:#1e293b; background:transparent; cursor:pointer;">
+              <option value="">Semua Lokasi Pameran</option>
+              <option value="tsm">MALL TSM</option>
+              <option value="paskal">MALL PASKAL 23</option>
+              <option value="citylink">FESTIVAL CITYLINK</option>
+              <option value="miko">MIKO MALL</option>
+              <option value="borma">BORMA MARGACINTA / KIRCON</option>
+              <option value="kings">THE KINGS</option>
+              <option value="cimall">CIMAHI MALL</option>
+            </select>
+          </div>
+
+          <div class="select-box" style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px 10px;">
+            <i class="fa-solid fa-user-tie" style="color: #d97706; font-size: 12px;"></i>
+            <select id="galleryFilterSpv" onchange="onGallerySpvChange()" style="border:none; outline:none; font-size:12px; font-weight:600; color:#1e293b; background:transparent; cursor:pointer;">
+              <option value="">Semua SPV</option>
+            </select>
+          </div>
+
+          <div class="select-box" style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px 10px; min-width: 160px;">
+            <i class="fa-solid fa-users" style="color: #2563eb; font-size: 12px;"></i>
+            <select id="galleryFilterSales" onchange="applyGalleryDropdownFilters()" style="border:none; outline:none; font-size:12px; font-weight:600; color:#1e293b; background:transparent; cursor:pointer; width:100%;">
+              <option value="">Semua Wiraniaga</option>
+            </select>
+          </div>
+
+          <div class="select-box" style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px 10px;">
+            <i class="fa-solid fa-clock" style="color: #059669; font-size: 12px;"></i>
+            <select id="galleryFilterSession" onchange="applyGalleryDropdownFilters()" style="border:none; outline:none; font-size:12px; font-weight:600; color:#1e293b; background:transparent; cursor:pointer;">
+              <option value="">Semua Sesi</option>
+              <option value="Pagi">Pagi</option>
+              <option value="Siang">Siang</option>
+              <option value="Sore">Sore</option>
+              <option value="Malam">Malam</option>
+            </select>
+          </div>
+
+          <button type="button" onclick="printGalleryReport()" style="background: linear-gradient(135deg, #1e1014, #3d121c); color: #d8a437; border: 1px solid rgba(216,164,55,0.4); font-weight: 800; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); margin-left: auto;">
+            <i class="fa-solid fa-print"></i> Cetak Rekap PDF
+          </button>
         </div>
 
         <!-- Loading State -->

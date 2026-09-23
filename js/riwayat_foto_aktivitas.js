@@ -32,11 +32,40 @@ function getGalleryImageUrl(relPath) {
   return (isNested ? '../' : '') + clean;
 }
 
+let gallerySpvMap = {};
+let galleryAllWiraniaga = [];
+let gallerySearchQuery = '';
+let galleryLocationFilter = '';
+let gallerySpvFilter = '';
+let gallerySalesFilter = '';
+let gallerySessionFilter = '';
+
+function escapeHtml(str) {
+  if (!str && str !== 0) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 async function fetchGalleryData() {
   const loading = document.getElementById('galleryLoading');
   try {
     const res = await fetch(getApiEndpoint('api_riwayat_aktivitas_foto.php'));
     const json = await res.json();
+
+    // Fetch wiraniaga list to map sales to SPV for filtering
+    fetch(getApiEndpoint('api_wiraniaga.php')).then(r => r.json()).then(wirJson => {
+      if (wirJson.status === 'success' && Array.isArray(wirJson.data)) {
+        galleryAllWiraniaga = wirJson.data;
+        wirJson.data.forEach(s => {
+          gallerySpvMap[(s.nama_lengkap || '').trim()] = (s.nama_spv || '').trim();
+        });
+        buildGalleryDropdowns();
+      }
+    }).catch(() => {});
 
     if (json.status === 'success') {
       allPhotos = json.photos || [];
@@ -45,6 +74,7 @@ async function fetchGalleryData() {
       const countEl = document.getElementById('photoTotalCount');
       if (countEl) countEl.textContent = allPhotos.length;
 
+      buildGalleryDropdowns();
       applyFiltersAndRender();
 
       if (loading) loading.style.display = 'none';
@@ -55,6 +85,65 @@ async function fetchGalleryData() {
     console.error("Error fetching gallery:", err);
     if (loading) loading.innerHTML = '<div style="color: var(--primary-red);"><i class="fa-solid fa-link-slash"></i> Gagal menghubungi server.</div>';
   }
+}
+
+function buildGalleryDropdowns() {
+  const spvSel = document.getElementById('galleryFilterSpv');
+  if (spvSel && Object.keys(gallerySpvMap).length > 0) {
+    const currentSpv = spvSel.value;
+    const spvs = [...new Set(Object.values(gallerySpvMap))].filter(Boolean).sort();
+    spvSel.innerHTML = '<option value="">Semua SPV</option>' +
+      spvs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+    if (spvs.includes(currentSpv)) spvSel.value = currentSpv;
+  }
+  populateGallerySalesDropdown(gallerySpvFilter);
+}
+
+function populateGallerySalesDropdown(selectedSpv = '') {
+  const salesSel = document.getElementById('galleryFilterSales');
+  if (!salesSel) return;
+  const currentSales = salesSel.value;
+
+  const salesFromPhotos = allPhotos.map(p => (p.nama_sales || '').trim()).filter(Boolean);
+  const salesFromWir = galleryAllWiraniaga.map(w => (w.nama_lengkap || '').trim()).filter(Boolean);
+  let combined = [...new Set([...salesFromPhotos, ...salesFromWir])];
+
+  if (selectedSpv) {
+    combined = combined.filter(name => (gallerySpvMap[name] || '') === selectedSpv);
+  }
+
+  combined.sort((a, b) => a.localeCompare(b));
+
+  let html = '<option value="">Semua Wiraniaga</option>';
+  combined.forEach(name => {
+    html += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
+  });
+  salesSel.innerHTML = html;
+  if (currentSales && combined.includes(currentSales)) salesSel.value = currentSales;
+}
+
+function onGallerySpvChange() {
+  const spv = document.getElementById('galleryFilterSpv')?.value || '';
+  gallerySpvFilter = spv;
+  populateGallerySalesDropdown(spv);
+  applyFiltersAndRender();
+}
+
+function handleGallerySearch(val) {
+  gallerySearchQuery = (val || '').toLowerCase().trim();
+  applyFiltersAndRender();
+}
+
+function applyGalleryDropdownFilters() {
+  galleryLocationFilter = (document.getElementById('galleryFilterLocation')?.value || '').toLowerCase().trim();
+  gallerySpvFilter = (document.getElementById('galleryFilterSpv')?.value || '').trim();
+  gallerySalesFilter = (document.getElementById('galleryFilterSales')?.value || '').trim();
+  gallerySessionFilter = (document.getElementById('galleryFilterSession')?.value || '').trim();
+  applyFiltersAndRender();
+}
+
+function printGalleryReport() {
+  window.print();
 }
 
 function setViewDensity(mode) {
@@ -78,6 +167,8 @@ function applyFiltersAndRender() {
     const tipe = (item.tipe_aktivitas || '').toLowerCase();
     const ket = (item.keterangan || '').toLowerCase();
     const fUrl = (item.file_url || '').toLowerCase();
+    const sales = (item.nama_sales || '').trim();
+    const spv = gallerySpvMap[sales] || '';
 
     // Strict exclusion for non-pameran/event
     if (tipe.includes('tiktok') || tipe.includes('database') || tipe.includes('digital marketing') || tipe.includes('meeting') || tipe.includes('kebersamaan') || tipe.includes('makan')) {
@@ -94,7 +185,36 @@ function applyFiltersAndRender() {
                       ket.includes('borma') || 
                       ket.includes('mall') || 
                       fUrl.includes('aktivitas');
-    return isAllowed;
+    if (!isAllowed) return false;
+
+    // Filter Search
+    if (gallerySearchQuery) {
+      const hay = `${sales} ${ket} ${tipe} ${item.date_formatted || ''} ${item.lokasi || ''} ${item.file_name || ''}`.toLowerCase();
+      if (!hay.includes(gallerySearchQuery)) return false;
+    }
+
+    // Filter Lokasi
+    if (galleryLocationFilter) {
+      const locHay = `${ket} ${tipe} ${item.lokasi || ''} ${item.file_name || ''}`.toLowerCase();
+      if (!locHay.includes(galleryLocationFilter)) return false;
+    }
+
+    // Filter SPV
+    if (gallerySpvFilter && spv !== gallerySpvFilter) {
+      return false;
+    }
+
+    // Filter Sales
+    if (gallerySalesFilter && sales !== gallerySalesFilter) {
+      return false;
+    }
+
+    // Filter Session
+    if (gallerySessionFilter && item.session !== gallerySessionFilter) {
+      return false;
+    }
+
+    return true;
   });
 
   const countEl = document.getElementById('photoTotalCount');

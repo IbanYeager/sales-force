@@ -150,7 +150,7 @@ function renderSpvBoard(hierarchy) {
 async function loadFeed() {
   const feed = document.getElementById('feedList');
   try {
-    const res = await fetch('../api/api_aktivitas.php?limit=12');
+    const res = await fetch('../api/api_aktivitas.php?limit=15');
     const json = await res.json();
     if (json.status !== 'success' || !Array.isArray(json.data)) {
       feed.innerHTML = '<p class="loading-state" style="color:var(--red);">Gagal memuat aktivitas.</p>';
@@ -171,12 +171,23 @@ async function loadFeed() {
       const date = new Date(String(act.created_at).replace(/-/g, '/'));
       const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
       const dayStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+      const isPameran = (act.tipe_aktivitas || '').toLowerCase().includes('pameran') || !!act.foto_dokumentasi;
+      const pameranBadge = isPameran
+        ? `<span style="background:#eff6ff; color:#2563eb; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px;"><i class="fa-solid fa-camera"></i> Foto</span>`
+        : '';
+      const statusClass = (act.status || '').toLowerCase() === 'selesai' ? '#16a34a' : ((act.status || '').toLowerCase() === 'rencana' ? '#d97706' : '#2563eb');
+      const statusPill = act.status ? `<span style="font-size:10px; font-weight:800; color:${statusClass}; margin-left:4px;">&bull; ${escapeHtml(act.status)}</span>` : '';
+
       return `
-        <div class="feed-item" onclick="location.href='aktivitas.html'">
+        <div class="feed-item" onclick="location.href='aktivitas.html'" style="cursor:pointer;" title="Klik untuk rincian aktivitas">
           <div class="feed-icon"><i class="fa-solid ${activityIcon(act.tipe_aktivitas)}"></i></div>
           <div class="feed-body">
-            <div class="t">${escapeHtml(act.tipe_aktivitas)}</div>
-            <div class="m">${escapeHtml(act.nama_sales || 'Sales')} &middot; ${escapeHtml(act.keterangan || '')}</div>
+            <div class="t" style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+              <span>${escapeHtml(act.tipe_aktivitas)}</span>
+              ${pameranBadge}
+              ${statusPill}
+            </div>
+            <div class="m"><strong>${escapeHtml(act.nama_sales || 'Sales')}</strong> &middot; ${escapeHtml(act.keterangan || '')}</div>
           </div>
           <div class="feed-time">${dayStr}<br>${timeStr}</div>
         </div>`;
@@ -184,6 +195,90 @@ async function loadFeed() {
   } catch (e) {
     console.error(e);
     feed.innerHTML = '<p class="loading-state" style="color:var(--red);">Gagal menghubungkan ke server.</p>';
+  }
+}
+
+async function loadOperationalAktivitasSummary() {
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const [actRes, salesRes, fotoRes] = await Promise.allSettled([
+      fetch('../api/api_aktivitas.php?limit=500'),
+      fetch('../api/api_wiraniaga.php'),
+      fetch('../api/api_riwayat_aktivitas_foto.php')
+    ]);
+
+    let activities = [];
+    if (actRes.status === 'fulfilled') {
+      const actJson = await actRes.value.json();
+      if (actJson.status === 'success' && Array.isArray(actJson.data)) {
+        activities = actJson.data;
+      }
+    }
+
+    let salesList = [];
+    if (salesRes.status === 'fulfilled') {
+      const salesJson = await salesRes.value.json();
+      if (salesJson.status === 'success' && Array.isArray(salesJson.data)) {
+        salesList = salesJson.data;
+      }
+    }
+
+    let totalFotoCount = 0;
+    if (fotoRes.status === 'fulfilled') {
+      const fotoJson = await fotoRes.value.json();
+      if (fotoJson.status === 'success' && Array.isArray(fotoJson.data)) {
+        totalFotoCount = fotoJson.data.length;
+      }
+    }
+
+    // Filter today's activities
+    const todayActs = activities.filter(a => {
+      const d = (a.tanggal || a.created_at || '').substring(0, 10);
+      return d === todayStr;
+    });
+
+    const reportedSalesIds = new Set();
+    todayActs.forEach(a => {
+      if (a.sales_id) reportedSalesIds.add(String(a.sales_id));
+      if (a.nama_sales) reportedSalesIds.add(String(a.nama_sales).trim().toLowerCase());
+    });
+
+    const totalSales = salesList.length || 50;
+    let reportedCount = 0;
+    salesList.forEach(s => {
+      if (reportedSalesIds.has(String(s.id)) || reportedSalesIds.has(String(s.nama_lengkap).trim().toLowerCase())) {
+        reportedCount++;
+      }
+    });
+
+    const unreportedCount = Math.max(0, totalSales - reportedCount);
+    const reportedPct = totalSales > 0 ? Math.round((reportedCount / totalSales) * 100) : 0;
+
+    const elActCount = document.getElementById('kcbDashActCount');
+    if (elActCount) elActCount.textContent = todayActs.length;
+
+    const elActSub = document.getElementById('kcbDashActSub');
+    if (elActSub) elActSub.textContent = `${activities.length} riwayat terpantau`;
+
+    const elReported = document.getElementById('kcbDashActSalesReported');
+    if (elReported) elReported.innerHTML = `${reportedCount} <span style="font-size:13px; color:#64748b; font-weight:600;">/ ${totalSales} Sales</span>`;
+
+    const elReportedPct = document.getElementById('kcbDashActSalesPct');
+    if (elReportedPct) elReportedPct.textContent = `${reportedPct}% kepatuhan lapor`;
+
+    const elUnreported = document.getElementById('kcbDashActSalesUnreported');
+    if (elUnreported) elUnreported.innerHTML = `${unreportedCount} <span style="font-size:13px; color:#be123c; font-weight:600;">Sales</span>`;
+
+    const elUnreportedSub = document.getElementById('kcbDashActSalesUnreportedSub');
+    if (elUnreportedSub) {
+      elUnreportedSub.textContent = unreportedCount > 0 ? 'Perlu follow-up SPV' : 'Semua sales sudah lapor 🎉';
+    }
+
+    const elFotoCount = document.getElementById('kcbDashFotoCount');
+    if (elFotoCount) elFotoCount.innerHTML = `${totalFotoCount} <span style="font-size:13px; color:#64748b; font-weight:600;">Foto</span>`;
+  } catch (err) {
+    console.warn('Gagal memuat ringkasan aktivitas dashboard:', err);
   }
 }
 
@@ -792,6 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGoogleSheetSyncStatus();
   loadDashboard();
   loadFeed();
+  loadOperationalAktivitasSummary();
   loadAiSentinelKacab();
 });
 

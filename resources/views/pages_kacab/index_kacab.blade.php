@@ -135,6 +135,90 @@
           </div>
         </div>
 
+        <!-- ===== EXECUTIVE COCKPIT: MONITORING AKTIVITAS LAPANGAN & GALERI PAMERAN HARI INI ===== -->
+        <section class="kcb-card" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:16px; padding:18px 20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, #1e1014, #3b1d28); color:#d8a437; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 12px rgba(30,16,20,0.2);">
+                <i class="fa-solid fa-person-walking-luggage"></i>
+              </div>
+              <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
+                    Monitoring Aktivitas Lapangan &amp; Dokumentasi Pameran Cabang
+                  </h3>
+                  <span id="badgeLiveOpsStatus" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; font-weight:800; padding:3px 10px; border-radius:20px; font-size:11px;">
+                    <i class="fa-solid fa-circle" style="font-size:7px; color:#10b981;"></i> Pantauan Real-Time
+                  </span>
+                </div>
+                <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">
+                  Pantau kepatuhan input aktivitas seluruh wiraniaga hari ini, rekap foto pameran otomatis, serta tindakan teguran terarah ke SPV.
+                </p>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-sm" onclick="location.href='aktivitas.html'" style="background:linear-gradient(135deg, #1e1014, #4a1525); color:#d8a437; border:1px solid rgba(216,164,55,0.4); font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(30,16,20,0.2);">
+                <i class="fa-solid fa-timeline"></i> Timeline Aktivitas
+              </button>
+              <button class="btn btn-sm" onclick="location.href='riwayat_foto_aktivitas.html'" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:white; border:none; font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(37,99,235,0.25);">
+                <i class="fa-solid fa-images"></i> Galeri Foto Pameran
+              </button>
+            </div>
+          </div>
+
+          <!-- MINI STATS CARDS GRID -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+            <!-- CARD 1: AKTIVITAS HARI INI -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='aktivitas.html'" title="Klik untuk lihat timeline aktivitas">
+              <div style="width:40px; height:40px; border-radius:10px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:18px;">
+                <i class="fa-solid fa-list-check"></i>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:11px; font-weight:700; color:#64748b;">Aktivitas Hari Ini</div>
+                <div style="font-size:22px; font-weight:900; color:#0f172a;" id="kcbDashActCount">0</div>
+                <div style="font-size:10.5px; font-weight:700; color:#2563eb;" id="kcbDashActSub">Memuat aktivitas...</div>
+              </div>
+            </div>
+
+            <!-- CARD 2: SALES SUDAH LAPOR -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='aktivitas.html'" title="Lihat sales yang aktif melapor">
+              <div style="width:40px; height:40px; border-radius:10px; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; font-size:18px;">
+                <i class="fa-solid fa-user-check"></i>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:11px; font-weight:700; color:#64748b;">Sales Aktif Lapor</div>
+                <div style="font-size:22px; font-weight:900; color:#16a34a;" id="kcbDashActSalesReported">0 <span style="font-size:13px; color:#64748b; font-weight:600;">Sales</span></div>
+                <div style="font-size:10.5px; font-weight:700; color:#15803d;" id="kcbDashActSalesPct">0% dari total sales</div>
+              </div>
+            </div>
+
+            <!-- CARD 3: SALES BELUM LAPOR -->
+            <div style="background:#fff1f2; border:1px solid #fecdd3; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='aktivitas.html'" title="Klik untuk lihat daftar wiraniaga yang belum melapor">
+              <div style="width:40px; height:40px; border-radius:10px; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:18px;">
+                <i class="fa-solid fa-user-xmark"></i>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:11px; font-weight:700; color:#be123c;">Belum Lapor Hari Ini</div>
+                <div style="font-size:22px; font-weight:900; color:#e11d48;" id="kcbDashActSalesUnreported">0 <span style="font-size:13px; color:#be123c; font-weight:600;">Sales</span></div>
+                <div style="font-size:10.5px; font-weight:700; color:#be123c;" id="kcbDashActSalesUnreportedSub">Perlu follow-up SPV</div>
+              </div>
+            </div>
+
+            <!-- CARD 4: REKAP FOTO PAMERAN -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='riwayat_foto_aktivitas.html'" title="Buka Galeri Foto Pameran & Event">
+              <div style="width:40px; height:40px; border-radius:10px; background:#fdf4ff; color:#9333ea; display:flex; align-items:center; justify-content:center; font-size:18px;">
+                <i class="fa-solid fa-camera-retro"></i>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:11px; font-weight:700; color:#64748b;">Dokumentasi Pameran</div>
+                <div style="font-size:22px; font-weight:900; color:#9333ea;" id="kcbDashFotoCount">0 <span style="font-size:13px; color:#64748b; font-weight:600;">Foto</span></div>
+                <div style="font-size:10.5px; font-weight:700; color:#7e22ce;">Tersinkron Otomatis</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- ===== AREA OPERATION (AO) REPORT EXECUTIVE COCKPIT ===== -->
         <section class="kcb-card" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:16px; padding:20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
@@ -389,8 +473,9 @@
           </section>
 
           <section class="kcb-card" style="animation-delay:0.22s;">
-            <h3 class="card-label"><i class="fa-solid fa-bolt"></i> Aktivitas Terbaru
+            <h3 class="card-label"><i class="fa-solid fa-bolt"></i> Aktivitas Terbaru &amp; Pameran
               <span class="spacer"></span>
+              <a href="riwayat_foto_aktivitas.html" class="btn btn-ghost btn-sm" style="color:#2563eb; font-weight:700;"><i class="fa-solid fa-images"></i> Galeri Foto</a>
               <a href="aktivitas.html" class="btn btn-ghost btn-sm">Timeline <i class="fa-solid fa-arrow-right"></i></a>
             </h3>
             <div class="feed-list" id="feedList">

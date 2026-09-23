@@ -8,13 +8,16 @@ header("Access-Control-Allow-Methods: GET");
 require 'koneksi.php';
 
 // Filter parameter
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 200;
-if ($limit <= 0) $limit = 200;
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 500;
+if ($limit <= 0) $limit = 500;
 
 $sesi = isset($_GET['sesi']) ? $conn->real_escape_string($_GET['sesi']) : '';
 $status = isset($_GET['status']) ? $conn->real_escape_string($_GET['status']) : '';
 $sales_id = isset($_GET['sales_account_id']) ? intval($_GET['sales_account_id']) : (isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0);
 $nama_sales = isset($_GET['nama_sales']) ? $conn->real_escape_string(trim($_GET['nama_sales'])) : '';
+$date = isset($_GET['date']) ? $conn->real_escape_string(trim($_GET['date'])) : '';
+$date_start = isset($_GET['date_start']) ? $conn->real_escape_string(trim($_GET['date_start'])) : '';
+$date_end = isset($_GET['date_end']) ? $conn->real_escape_string(trim($_GET['date_end'])) : '';
 
 $exclude_status = isset($_GET['exclude_status']) ? $conn->real_escape_string($_GET['exclude_status']) : '';
 $only_today = isset($_GET['only_today']) ? intval($_GET['only_today']) : 0;
@@ -137,6 +140,15 @@ if (!empty($exclude_status)) {
 }
 if ($only_today == 1) {
     $where[] = "DATE(created_at) = CURDATE()";
+}
+if (!empty($date)) {
+    $where[] = "DATE(created_at) = '$date'";
+}
+if (!empty($date_start)) {
+    $where[] = "DATE(created_at) >= '$date_start'";
+}
+if (!empty($date_end)) {
+    $where[] = "DATE(created_at) <= '$date_end'";
 }
 
 // Isolasi Aktivitas per Sales
