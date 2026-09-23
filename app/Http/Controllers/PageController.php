@@ -118,6 +118,10 @@ class PageController extends Controller
             $cleanPage = 'target';
         }
 
+        if ($cleanPage === 'mtoyota' || $cleanPage === 'booking_service' || $cleanPage === 'm-toyota') {
+            $cleanPage = 'mtoyota_service';
+        }
+
         if (View::exists("pages_spv.{$cleanPage}")) {
             return view("pages_spv.{$cleanPage}");
         }
@@ -150,6 +154,10 @@ class PageController extends Controller
 
         if ($cleanPage === 'aftersales' || $cleanPage === 'bengkel') {
             $cleanPage = 'after_sales';
+        }
+
+        if ($cleanPage === 'mtoyota' || $cleanPage === 'booking_service' || $cleanPage === 'm-toyota') {
+            $cleanPage = 'mtoyota_service';
         }
 
         if ($cleanPage === 'approval') {

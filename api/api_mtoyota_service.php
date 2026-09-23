@@ -156,7 +156,46 @@ if ($method === 'GET') {
         exit();
     }
 
-    // 2. AUTOCOMPLETE CUSTOMER SPK / DO
+    // 2. FILTER OPTIONS (SPV LIST & SALES LIST)
+    if ($action === 'filters') {
+        $spv_list = [];
+        $sales_list = [];
+
+        $q_spv = $conn->query("SELECT DISTINCT nama_spv FROM sales_accounts WHERE nama_spv != '' AND nama_spv IS NOT NULL ORDER BY nama_spv ASC");
+        if ($q_spv) {
+            while ($r = $q_spv->fetch_assoc()) {
+                $spv_list[] = $r['nama_spv'];
+            }
+        }
+        if (empty($spv_list)) {
+            $spv_list = ['Ryan', 'Alvin', 'Riva', 'Rahma'];
+        }
+
+        $spv_param = isset($_GET['spv']) ? $conn->real_escape_string(trim($_GET['spv'])) : '';
+        $where_sales = "WHERE 1=1";
+        if (!empty($spv_param) && $spv_param !== 'Semua' && $spv_param !== 'all') {
+            $where_sales .= " AND (nama_spv = '$spv_param' OR nama_spv LIKE '%$spv_param%')";
+        }
+        $q_sales = $conn->query("SELECT id, nama_lengkap, nama_spv FROM sales_accounts $where_sales ORDER BY nama_lengkap ASC");
+        if ($q_sales) {
+            while ($r = $q_sales->fetch_assoc()) {
+                $sales_list[] = [
+                    'id' => intval($r['id']),
+                    'name' => $r['nama_lengkap'],
+                    'spv' => $r['nama_spv']
+                ];
+            }
+        }
+
+        echo json_encode([
+            "status" => "success",
+            "spv_list" => $spv_list,
+            "sales_list" => $sales_list
+        ]);
+        exit();
+    }
+
+    // 3. AUTOCOMPLETE CUSTOMER SPK / DO
     if ($action === 'customers') {
         $sales_id = isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0;
         $q = isset($_GET['q']) ? $conn->real_escape_string(trim($_GET['q'])) : '';
