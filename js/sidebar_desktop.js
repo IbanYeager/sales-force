@@ -121,6 +121,7 @@
                 ${navLinkKacab('pages_kacab/target_kacab.html', 'fa-solid fa-bullseye', 'Target & Produktivitas')}
                 ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
+                ${navLinkKacab('pages_kacab/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
                 ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}

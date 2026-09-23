@@ -42,6 +42,8 @@ Route::prefix('kacab')->group(function () {
     Route::get('/sph', function() { return app(PageController::class)->showKacabPage('quotation'); });
     Route::get('/ao_report', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
     Route::get('/ao_report.html', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
+    Route::get('/riwayat_foto_aktivitas', function() { return app(PageController::class)->showKacabPage('riwayat_foto_aktivitas'); });
+    Route::get('/riwayat_foto_aktivitas.html', function() { return app(PageController::class)->showKacabPage('riwayat_foto_aktivitas'); });
     Route::get('/after_sales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
     Route::get('/aftersales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
     Route::get('/bengkel', function() { return app(PageController::class)->showKacabPage('after_sales'); });
@@ -51,6 +53,8 @@ Route::get('/pages_kacab/sph.html', function() { return app(PageController::clas
 Route::get('/pages_kacab/sph', function() { return app(PageController::class)->showKacabPage('quotation'); });
 Route::get('/pages_kacab/ao_report.html', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
 Route::get('/pages_kacab/ao_report', function() { return app(PageController::class)->showKacabPage('ao_report_kacab'); });
+Route::get('/pages_kacab/riwayat_foto_aktivitas.html', function() { return app(PageController::class)->showKacabPage('riwayat_foto_aktivitas'); });
+Route::get('/pages_kacab/riwayat_foto_aktivitas', function() { return app(PageController::class)->showKacabPage('riwayat_foto_aktivitas'); });
 Route::get('/pages_kacab/after_sales.html', function() { return app(PageController::class)->showKacabPage('after_sales'); });
 Route::get('/pages_kacab/after_sales', function() { return app(PageController::class)->showKacabPage('after_sales'); });
 Route::get('/pages_kacab/aftersales', function() { return app(PageController::class)->showKacabPage('after_sales'); });

@@ -91,9 +91,13 @@ public/uploads/olx/*
 public/uploads/dokumen/*
 !public/uploads/dokumen/.gitkeep
 
-# Aktivitas & Event Galeri uploads
-aktivitas/*
-!aktivitas/.gitkeep
-public/aktivitas/*
-!public/aktivitas/.gitkeep
+# Aktivitas & Event Galeri uploads (Tracked for documentation gallery)
+!aktivitas/*.jpg
+!aktivitas/*.jpeg
+!aktivitas/*.png
+!aktivitas/*.webp
+!public/aktivitas/*.jpg
+!public/aktivitas/*.jpeg
+!public/aktivitas/*.png
+!public/aktivitas/*.webp
 
