@@ -130,6 +130,7 @@ if ($method === 'GET') {
 
         $res = $conn->query("SELECT 
             COUNT(*) as total_unit,
+            SUM(CASE WHEN one_account_id != '' THEN 1 ELSE 0 END) as total_app_aktif,
             SUM(CASE WHEN status_do = 'completed' THEN 1 ELSE 0 END) as total_do_selesai,
             SUM(CASE WHEN status_dec = 'completed' THEN 1 ELSE 0 END) as total_dec_selesai,
             SUM(CASE WHEN status_fs1000 = 'completed' THEN 1 ELSE 0 END) as total_fs1000_selesai,
@@ -144,6 +145,7 @@ if ($method === 'GET') {
             "status" => "success",
             "stats" => [
                 "total_unit" => intval($stats['total_unit'] ?? 0),
+                "total_app_aktif" => intval($stats['total_app_aktif'] ?? 0),
                 "total_do_selesai" => intval($stats['total_do_selesai'] ?? 0),
                 "total_dec_selesai" => intval($stats['total_dec_selesai'] ?? 0),
                 "total_fs1000_selesai" => intval($stats['total_fs1000_selesai'] ?? 0),
@@ -259,7 +261,7 @@ if ($method === 'GET') {
     }
 
     if (!empty($search)) {
-        $where .= " AND (customer_name LIKE '%$search%' OR customer_phone LIKE '%$search%' OR model_kendaraan LIKE '%$search%' OR no_polisi LIKE '%$search%' OR no_rangka LIKE '%$search%' OR sales_name LIKE '%$search%')";
+        $where .= " AND (customer_name LIKE '%$search%' OR customer_phone LIKE '%$search%' OR model_kendaraan LIKE '%$search%' OR no_polisi LIKE '%$search%' OR no_rangka LIKE '%$search%' OR sales_name LIKE '%$search%' OR one_account_id LIKE '%$search%')";
     }
 
     if ($stage === 'pending_dec') {

@@ -155,6 +155,7 @@ function renderTable(data) {
             ${item.no_polisi ? `<span style="font-weight:700; background:#f1f5f9; padding:1px 5px; border-radius:4px; margin-left:4px;">${item.no_polisi}</span>` : ''}
           </div>
           ${item.no_rangka ? `<div style="font-size:10px; color:#94a3b8; font-family:monospace;">VIN: ${item.no_rangka}</div>` : ''}
+          ${item.one_account_id ? `<div style="font-size:10px; color:#b45309; font-weight:700; margin-top:2px;"><i class="fa-solid fa-id-badge" style="color:#d8a437;"></i> OA: ${item.one_account_id}</div>` : '<div style="font-size:10px; color:#94a3b8; font-style:italic;">Belum Ada One Account</div>'}
         </td>
         <td>
           <div style="font-weight:700; color:#0f172a;">${item.sales_name || 'Wiraniaga'}</div>

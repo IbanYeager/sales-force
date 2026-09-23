@@ -915,7 +915,7 @@
                 if (json.status === 'success') {
                     const s = json.stats;
                     document.getElementById('kpiTotalUnit').textContent = s.total_unit || 0;
-                    document.getElementById('kpiDoDone').textContent = s.total_do_selesai || 0;
+                    document.getElementById('kpiDoDone').textContent = (s.total_app_aktif !== undefined ? s.total_app_aktif : s.total_do_selesai) || 0;
                     document.getElementById('kpiDecDone').textContent = s.total_dec_selesai || 0;
                     document.getElementById('kpiFsDone').textContent = (s.total_fs1000_selesai + s.total_sb_selesai) || 0;
                 }
@@ -997,6 +997,7 @@
                                 <span><i class="fa-brands fa-whatsapp" style="color:#10b981;"></i> ${escapeHtml(item.customer_phone)}</span>
                                 ${item.no_polisi ? `<span><i class="fa-solid fa-id-card-clip"></i> ${escapeHtml(item.no_polisi)}</span>` : ''}
                                 ${item.no_rangka ? `<span><i class="fa-solid fa-barcode"></i> ${escapeHtml(item.no_rangka)}</span>` : ''}
+                                ${item.one_account_id ? `<span style="background:rgba(215,18,58,0.1); color:#d7123a; font-weight:800; border:1px solid rgba(215,18,58,0.25);"><i class="fa-solid fa-circle-check"></i> OA: ${escapeHtml(item.one_account_id)}</span>` : '<span style="color:#64748b;"><i class="fa-regular fa-clock"></i> Belum Ada OA</span>'}
                                 <span><i class="fa-solid fa-calendar-day"></i> DO: ${item.tanggal_do ? item.tanggal_do : '-'}</span>
                             </div>
                         </div>
