@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css?v=5.0" />
-    <link rel="stylesheet" href="../css/market_analysis.css?v=5.0" />
+    <link rel="stylesheet" href="../css/market_analysis.css?v={{ time() }}" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
     <link rel="manifest" href="../manifest.json">
@@ -26,16 +26,7 @@
         </header>
 
         <div class="container market-container">
-            <!-- ═══ TOP SEGMENTED TAB BAR ═══ -->
-            <div class="market-main-tabs" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); padding: 6px; border-radius: 16px; border: 1.5px solid #e2e8f0; display: flex; gap: 6px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); position: sticky; top: 65px; z-index: 99;">
-                <button type="button" class="market-nav-btn active" id="btnTabMarket" onclick="switchMarketTab('market')" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #0d1b3e, #1e3a8a); color:white;">
-                    <i class="fa-solid fa-chart-pie"></i> Intelijen Pasar &amp; Dominasi
-                </button>
-                <button type="button" class="market-nav-btn" id="btnTabHousing" onclick="switchMarketTab('housing')" style="flex:1; padding:10px 14px; border:none; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:transparent; color:#64748b;">
-                    <i class="fa-solid fa-city"></i> Komplek Perumahan (Kanvasing)
-                </button>
-            </div>
-            <!-- Executive Hero Banner Header -->
+            <!-- Executive Hero Banner Header (Clean, spacious, unblocked) -->
             <div class="district-hero-card">
                 <div class="hero-glow-bg"></div>
 
@@ -46,10 +37,10 @@
                             <div class="hero-badge-tag">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> Data Analytics & Market Intelligence
                             </div>
-                            <h1 class="hero-title">
+                            <h1 class="hero-title" id="heroTitleTxt">
                                 Intelijen Pasar & Dominasi Wilayah
                             </h1>
-                            <p class="hero-subtitle">
+                            <p class="hero-subtitle" id="heroSubtitleTxt">
                                 Analisis komposisi segmen otomotif dan statistik pangsa pasar Toyota di wilayah Kota Bandung.
                             </p>
                         </div>
@@ -60,6 +51,16 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- ═══ TOP SEGMENTED TAB BAR (Rapi, Teratur, Tidak Menghalangi/Sticky) ═══ -->
+            <div class="market-main-tabs">
+                <button type="button" class="market-nav-btn active" id="btnTabMarket" onclick="switchMarketTab('market')">
+                    <i class="fa-solid fa-chart-pie"></i> Intelijen Pasar &amp; Dominasi
+                </button>
+                <button type="button" class="market-nav-btn" id="btnTabHousing" onclick="switchMarketTab('housing')">
+                    <i class="fa-solid fa-city"></i> Komplek Perumahan (Kanvasing)
+                </button>
             </div>
 
             <!-- District Pills Selector Bar -->
@@ -101,8 +102,10 @@
                 </div>
             </div>
 
-            <!-- Mode Switcher Card -->
-            <div class="mode-toggle-card">
+            <!-- ═══ TAB 1: INTELIJEN PASAR & DOMINASI SECTION ═══ -->
+            <div id="marketAnalyticsSection">
+                <!-- Mode Switcher Card -->
+                <div class="mode-toggle-card">
                 <div class="mode-toggle-info">
                     <div class="mode-toggle-title">
                         <i class="fa-solid fa-sliders"></i> Mode Analisis Data
@@ -253,9 +256,10 @@
                     </table>
                 </div>
             </div>
+            </div> <!-- ═══ END TAB 1 /#marketAnalyticsSection ═══ -->
 
-            <!-- Housing Complex Prospecting Section -->
-            <div class="market-table-card housing-card-section" id="housingSection">
+            <!-- ═══ TAB 2: HOUSING COMPLEX PROSPECTING SECTION ═══ -->
+            <div class="market-table-card housing-card-section" id="housingSection" style="display: none;">
                 <div class="table-card-header">
                     <div>
                         <h3 class="table-card-title">
@@ -311,27 +315,34 @@
     <script src="../js/market_analysis.js"></script>
     <script>
         function switchMarketTab(tabName) {
-            document.querySelectorAll('.market-nav-btn').forEach(btn => {
-                btn.style.background = 'transparent';
-                btn.style.color = '#64748b';
-            });
+            const marketSec = document.getElementById('marketAnalyticsSection');
+            const housingSec = document.getElementById('housingSection');
+            const btnMarket = document.getElementById('btnTabMarket');
+            const btnHousing = document.getElementById('btnTabHousing');
+            const heroTitle = document.getElementById('heroTitleTxt');
+            const heroSub = document.getElementById('heroSubtitleTxt');
 
             if (tabName === 'housing') {
-                const btn = document.getElementById('btnTabHousing');
-                if (btn) {
-                    btn.style.background = 'linear-gradient(135deg, #0d1b3e, #1e3a8a)';
-                    btn.style.color = 'white';
-                }
-                const sec = document.getElementById('housingSection');
-                if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+                if (btnHousing) btnHousing.classList.add('active');
+                if (btnMarket) btnMarket.classList.remove('active');
+                if (marketSec) marketSec.style.display = 'none';
+                if (housingSec) housingSec.style.display = 'block';
+                if (heroTitle) heroTitle.textContent = 'Pemetaan Komplek Perumahan (Kanvasing)';
+                if (heroSub) heroSub.textContent = 'Daftar komplek perumahan dan estimasi unit rumah di kecamatan terpilih untuk target kanvasing door-to-door sales.';
             } else {
-                const btn = document.getElementById('btnTabMarket');
-                if (btn) {
-                    btn.style.background = 'linear-gradient(135deg, #0d1b3e, #1e3a8a)';
-                    btn.style.color = 'white';
-                }
-                if (typeof switchMode === 'function') switchMode('composition');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (btnMarket) btnMarket.classList.add('active');
+                if (btnHousing) btnHousing.classList.remove('active');
+                if (marketSec) marketSec.style.display = 'block';
+                if (housingSec) housingSec.style.display = 'none';
+                if (heroTitle) heroTitle.textContent = 'Intelijen Pasar & Dominasi Wilayah';
+                if (heroSub) heroSub.textContent = 'Analisis komposisi segmen otomotif dan statistik pangsa pasar Toyota di wilayah Kota Bandung.';
+                
+                // Trigger chart resize agar visual chart tajam seketika
+                setTimeout(() => {
+                    if (typeof chartSegCompInstance !== 'undefined' && chartSegCompInstance) chartSegCompInstance.resize();
+                    if (typeof chartModelShareInstance !== 'undefined' && chartModelShareInstance) chartModelShareInstance.resize();
+                    if (typeof chartMonthlyTrendInstance !== 'undefined' && chartMonthlyTrendInstance) chartMonthlyTrendInstance.resize();
+                }, 50);
             }
         }
 

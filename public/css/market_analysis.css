@@ -32,6 +32,69 @@
     padding-bottom: 30px;
 }
 
+/* ── Top Main Segmented Navigation Tabs ────────────────────────────────── */
+.market-main-tabs {
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 16px;
+    border: 1.5px solid #e2e8f0;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    position: relative;
+    z-index: 5;
+}
+
+.market-nav-btn {
+    flex: 1;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: transparent;
+    color: #64748b;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.market-nav-btn:hover:not(.active) {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.market-nav-btn.active {
+    background: linear-gradient(135deg, #0d1b3e, #1e3a8a);
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(13, 27, 62, 0.25);
+}
+
+.market-nav-btn i {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+}
+
+.market-nav-btn.active i {
+    transform: scale(1.1);
+}
+
+@media (max-width: 640px) {
+    .market-main-tabs {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .market-nav-btn {
+        padding: 10px 14px;
+        font-size: 12px;
+    }
+}
+
 /* ── Unified Hero Banner Header ────────────────────────────────────────── */
 .district-hero-card {
     background: linear-gradient(135deg, #09142e 0%, #12285a 50%, #1d3d8f 100%);
