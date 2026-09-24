@@ -75,13 +75,12 @@ let listDataWiraniaga = [];
           window.currentWiraniagaSpvFilter = namaSpv;
         } else {
           // Kepala Cabang / Branch Manager can see all teams
-          const currentCount = listDataWiraniaga.length || localStorage.getItem('total_sales_count') || 50;
+          const currentCount = listDataWiraniaga.length || localStorage.getItem('total_sales_count') || 59;
           filterSpvEl.innerHTML = `
             <option value="Semua">Semua Tim (Master - ${currentCount} Sales)</option>
-            <option value="Pak Ryan">Tim Pak Ryan</option>
-            <option value="Pak Alvin">Tim Pak Alvin</option>
-            <option value="Pak Riva">Tim Pak Riva</option>
-            <option value="Bu Rahma">Tim Bu Rahma</option>
+            <option value="Pak Ryan">Tim Pak Ryan (25 Sales)</option>
+            <option value="Pak Alvin">Tim Pak Alvin (20 Sales)</option>
+            <option value="Pak Riva">Tim Pak Riva (14 Sales)</option>
           `;
         }
       }

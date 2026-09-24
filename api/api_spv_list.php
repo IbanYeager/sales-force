@@ -24,8 +24,8 @@ $spv_details = [];
 $total_online = 0;
 $total_offline = 0;
 
-// Ambil daftar SPV lengkap
-$res1 = $conn->query("SELECT id, username, nama_lengkap, foto, last_active, is_online FROM spv_accounts ORDER BY id ASC");
+// Ambil daftar SPV lengkap (Hanya 3 SPV resmi: Pak Ryan, Pak Alvin, Pak Riva)
+$res1 = $conn->query("SELECT id, username, nama_lengkap, foto, last_active, is_online FROM spv_accounts WHERE nama_lengkap NOT LIKE '%Rahma%' ORDER BY id ASC");
 if ($res1 && $res1->num_rows > 0) {
     while ($row = $res1->fetch_assoc()) {
         $isOn = intval($row['is_online']) === 1;
@@ -42,7 +42,7 @@ if ($res1 && $res1->num_rows > 0) {
 }
 
 // Distinct nama_spv dari sales_accounts sebagai backup
-$res2 = $conn->query("SELECT DISTINCT nama_spv FROM sales_accounts WHERE nama_spv IS NOT NULL AND nama_spv != ''");
+$res2 = $conn->query("SELECT DISTINCT nama_spv FROM sales_accounts WHERE nama_spv IS NOT NULL AND nama_spv != '' AND nama_spv NOT LIKE '%Rahma%'");
 if ($res2 && $res2->num_rows > 0) {
     while ($row = $res2->fetch_assoc()) {
         if (!in_array($row['nama_spv'], $spv_names)) {

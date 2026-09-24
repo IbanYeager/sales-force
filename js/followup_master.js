@@ -4697,7 +4697,7 @@ function openSmartDistributionModal() {
             <!-- Team Quick Select Buttons -->
             <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
               <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px;" onclick="filterDistSalesByTeam('all')">
-                <i class="fa-solid fa-check-double"></i> Pilih Semua (46)
+                <i class="fa-solid fa-check-double"></i> Pilih Semua (59)
               </button>
               <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px;" onclick="filterDistSalesByTeam('Pak Ryan')">
                 Tim Pak Ryan
@@ -4708,9 +4708,7 @@ function openSmartDistributionModal() {
               <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px;" onclick="filterDistSalesByTeam('Pak Riva')">
                 Tim Pak Riva
               </button>
-              <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px;" onclick="filterDistSalesByTeam('Bu Rahma')">
-                Tim Bu Rahma
-              </button>
+              
               <button type="button" class="btn-fu btn-fu-secondary" style="padding:5px 10px; font-size:11px; color:#ef4444 !important;" onclick="filterDistSalesByTeam('none')">
                 <i class="fa-solid fa-xmark"></i> Batal Pilih
               </button>

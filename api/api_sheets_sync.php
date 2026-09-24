@@ -261,7 +261,8 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
                 $current_spv = "Pak Riva";
                 continue;
             } elseif (stripos($full_row_text, 'Tim Bu Rahma') !== false || stripos($full_row_text, 'Bu Rahma') !== false || (stripos($c0, 'Bu Rahma') !== false && !is_numeric($c0))) {
-                $current_spv = "Bu Rahma";
+                // Bu Rahma adalah Calon SPV / coaching, secara resmi masuk ke Tim Pak Ryan
+                $current_spv = "Pak Ryan";
                 continue;
             }
 
@@ -424,12 +425,13 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
             } elseif (stripos($full_row_text, 'Tim Pak Riva') !== false || stripos($col0, 'Pak Riva') !== false || stripos($col1, 'Pak Riva') !== false) {
                 $current_spv = "Pak Riva"; continue;
             } elseif (stripos($full_row_text, 'Tim Bu Rahma') !== false || stripos($col0, 'Bu Rahma') !== false || stripos($col1, 'Bu Rahma') !== false || (stripos($full_row_text, 'Bu Rahma') !== false && !is_numeric($col0))) {
-                $current_spv = "Bu Rahma"; continue;
+                // Bu Rahma adalah Calon SPV / coaching, secara resmi masuk ke Tim Pak Ryan
+                $current_spv = "Pak Ryan"; continue;
             }
 
             // Fallback cerdas: jika setelah tim Pak Riva nomor urut kembali ke 1 dan nama adalah Fia/Neo/Firzi/Tian
             if ($current_spv === 'Pak Riva' && $col0 === '1' && in_array(strtolower($col1), ['fia', 'neo', 'firzi', 'tian'])) {
-                $current_spv = "Bu Rahma";
+                $current_spv = "Pak Ryan";
             }
 
             // Validasi baris data: harus ada nomor urut di col0 dan nama sales di col1

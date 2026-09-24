@@ -122,11 +122,10 @@
           </div>
           <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <select id="selectFilterSpvWiraniaga" class="form-control" style="width: auto; padding: 10px 14px; font-weight: 700; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; background: #f8fafc;" onchange="changeWiraniagaSpvFilter(this.value)">
-              <option value="Semua">Semua Tim (Master)</option>
-              <option value="Pak Ryan">Tim Pak Ryan</option>
-              <option value="Pak Alvin">Tim Pak Alvin</option>
-              <option value="Pak Riva">Tim Pak Riva</option>
-              <option value="Bu Rahma">Tim Bu Rahma</option>
+              <option value="Semua">Semua Tim (Master - 59 Sales)</option>
+              <option value="Pak Ryan">Tim Pak Ryan (25 Sales)</option>
+              <option value="Pak Alvin">Tim Pak Alvin (20 Sales)</option>
+              <option value="Pak Riva">Tim Pak Riva (14 Sales)</option>
             </select>
             <div class="search-box">
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -235,7 +234,6 @@
                 <option value="Pak Ryan">Pak Ryan</option>
                 <option value="Pak Alvin">Pak Alvin</option>
                 <option value="Pak Riva">Pak Riva</option>
-                <option value="Bu Rahma">Bu Rahma</option>
               </select>
             </div>
           </div>

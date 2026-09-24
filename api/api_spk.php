@@ -62,11 +62,11 @@ if ($method === 'GET') {
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_lower = strtolower($spv);
         if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
-            $where_spv = "(sa.nama_spv = 'Bu Rahma' OR sa.nama_spv LIKE '%Rahma%')";
+            $where_spv = "(sa.nama_spv = 'Pak Ryan' AND (sa.coaching_mentor = 'Bu Rahma' OR sa.username IN ('fia','isna','neo','firzi','tian')))";
         } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
-            $where_spv = "(sa.nama_spv = 'Pak Ryan' OR sa.nama_spv LIKE '%Ryan%') AND (sa.nama_spv NOT LIKE '%Rahma%')";
+            $where_spv = "(sa.nama_spv = 'Pak Ryan' AND (sa.coaching_mentor IS NULL OR sa.coaching_mentor = '') AND sa.username NOT IN ('fia','isna','neo','firzi','tian'))";
         } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
-            $where_spv = "(sa.nama_spv = 'Pak Ryan' OR sa.nama_spv LIKE '%Ryan%' OR sa.nama_spv = 'Bu Rahma' OR sa.nama_spv LIKE '%Rahma%')";
+            $where_spv = "(sa.nama_spv = 'Pak Ryan' OR sa.nama_spv LIKE '%Ryan%')";
         } else {
             $spv_clean = str_replace(['Pak ', 'Bu '], '', $spv);
             $spv_esc = $conn->real_escape_string($spv);

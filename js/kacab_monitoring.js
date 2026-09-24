@@ -83,6 +83,8 @@ function applyHierFilters() {
                 <span class="status-dot" style="${salesDotStyle} width:8px; height:8px;" title="${isSalesOnline ? 'Sales Online Sekarang' : 'Offline'}"></span>
                 <span>${escapeHtml(s.nama)}</span>
                 ${isSalesOnline ? '<span style="font-size:9.5px; font-weight:800; background:#dcfce7; color:#15803d; padding:1px 5px; border-radius:4px;">Online</span>' : ''}
+                ${s.username?.toLowerCase() === 'rahma' ? '<span style="font-size:9.5px; font-weight:700; background:#fef3c7; color:#92400e; padding:1px 6px; border-radius:4px; border:1px solid #fde68a;">Calon SPV</span>' : ''}
+                ${s.coaching_mentor === 'Bu Rahma' ? '<span style="font-size:9.5px; font-weight:700; background:#eff6ff; color:#1d4ed8; padding:1px 6px; border-radius:4px; border:1px solid #bfdbfe;">Coaching: Bu Rahma</span>' : ''}
               </div>
               <div class="sd" style="display:flex; align-items:center; gap:6px;">
                 <span>${escapeHtml(s.tingkatan)}</span>

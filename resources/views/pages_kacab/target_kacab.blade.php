@@ -380,10 +380,9 @@
             </div>
             <select id="filterSpvTeamTarget" class="target-filter-select" onchange="filterTargetMatrix()">
               <option value="Semua">Semua Tim SPV</option>
-              <option value="Ryan">Tim Pak Ryan</option>
-              <option value="Alvin">Tim Pak Alvin</option>
-              <option value="Riva">Tim Pak Riva</option>
-              <option value="Rahma">Tim Bu Rahma</option>
+              <option value="Ryan">Tim Pak Ryan (25 Sales)</option>
+              <option value="Alvin">Tim Pak Alvin (20 Sales)</option>
+              <option value="Riva">Tim Pak Riva (14 Sales)</option>
             </select>
             <select id="filterTingkatanTarget" class="target-filter-select" onchange="filterTargetMatrix()">
               <option value="Semua">Semua Tingkatan</option>

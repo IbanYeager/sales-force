@@ -112,11 +112,10 @@
             <i class="fa-solid fa-crown" style="color: #f59e0b;"></i>
             <span class="lbl">Tim:</span>
             <select id="selectFilterSpvTarget" onchange="loadMonitoringBoard()" style="font-weight:700;">
-              <option value="Semua">Semua Tim (Master - 50 Sales)</option>
-              <option value="Pak Ryan">Tim Pak Ryan</option>
-              <option value="Pak Alvin">Tim Pak Alvin</option>
-              <option value="Pak Riva">Tim Pak Riva</option>
-              <option value="Bu Rahma">Tim Bu Rahma</option>
+              <option value="Semua">Semua Tim (Master - 59 Sales)</option>
+              <option value="Pak Ryan">Tim Pak Ryan (25 Sales)</option>
+              <option value="Pak Alvin">Tim Pak Alvin (20 Sales)</option>
+              <option value="Pak Riva">Tim Pak Riva (14 Sales)</option>
             </select>
           </div>
           <div class="search-box">

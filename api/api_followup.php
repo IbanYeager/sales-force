@@ -75,7 +75,7 @@ function get_sales_list($spv = '') {
         $salesList = [
             ['id' => 1, 'name' => 'Rian Pratama', 'phone' => '6281223344551', 'role' => 'Senior Sales Executive', 'spv' => 'Pak Riva', 'target_monthly' => 35],
             ['id' => 2, 'name' => 'Siti Nurhaliza', 'phone' => '6281399887766', 'role' => 'Sales Executive', 'spv' => 'Pak Ryan', 'target_monthly' => 30],
-            ['id' => 3, 'name' => 'Dimas Anggoro', 'phone' => '6285712345678', 'role' => 'Sales Executive', 'spv' => 'Bu Rahma', 'target_monthly' => 25],
+            ['id' => 3, 'name' => 'Dimas Anggoro', 'phone' => '6285712345678', 'role' => 'Sales Executive', 'spv' => 'Pak Ryan', 'target_monthly' => 25],
             ['id' => 4, 'name' => 'Agus Setiawan', 'phone' => '6287811223344', 'role' => 'Sales Counter & CRM', 'spv' => 'Pak Alvin', 'target_monthly' => 40],
             ['id' => 5, 'name' => 'Putri Maharani', 'phone' => '6282155667788', 'role' => 'Sales Executive', 'spv' => 'Pak Riva', 'target_monthly' => 30]
         ];

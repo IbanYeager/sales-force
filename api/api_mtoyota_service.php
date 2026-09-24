@@ -170,7 +170,7 @@ if ($method === 'GET') {
             }
         }
         if (empty($spv_list)) {
-            $spv_list = ['Ryan', 'Alvin', 'Riva', 'Rahma'];
+            $spv_list = ['Ryan', 'Alvin', 'Riva'];
         }
 
         $spv_param = isset($_GET['spv']) ? $conn->real_escape_string(trim($_GET['spv'])) : '';

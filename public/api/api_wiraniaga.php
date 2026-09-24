@@ -71,7 +71,7 @@ if ($method === 'GET') {
     $conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
     $conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
 
-    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, last_active, no_hp, email, instagram_url, tiktok_url, facebook_url, website_url,
+    $query = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, coaching_mentor, last_active, no_hp, email, instagram_url, tiktok_url, facebook_url, website_url,
                      CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) THEN 1 ELSE 0 END as is_online,
                      DATE_FORMAT(created_at, '%d %b %Y') as created_at, 
                      DATE_FORMAT(created_at, '%Y-%m-%d') as created_at_raw 
@@ -97,9 +97,9 @@ if ($method === 'GET') {
     if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
         $spv_lower = strtolower($spv);
         if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
-            $where_parts[] = "(nama_spv = 'Bu Rahma' OR nama_spv LIKE '%Bu Rahma%')";
+            $where_parts[] = "(nama_spv = 'Pak Ryan' AND (coaching_mentor = 'Bu Rahma' OR username IN ('fia','isna','neo','firzi','tian')))";
         } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
-            $where_parts[] = "(nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%')";
+            $where_parts[] = "(nama_spv = 'Pak Ryan' AND (coaching_mentor IS NULL OR coaching_mentor = '') AND username NOT IN ('fia','isna','neo','firzi','tian'))";
         } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
             $where_parts[] = "(nama_spv = 'Pak Ryan' OR nama_spv LIKE '%Ryan%')";
         } else {

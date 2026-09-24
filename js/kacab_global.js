@@ -121,20 +121,33 @@ async function fetchBranchHierarchy(forceFresh = false) {
   const targetById = {};
   targetList.forEach(t => { targetById[String(t.sales_account_id)] = t; });
 
-  // Kelompokkan sales di bawah SPV masing-masing
+  // Kelompokkan sales di bawah SPV masing-masing (SPV resmi: Pak Ryan, Pak Alvin, Pak Riva)
   const groups = {};
-  spvNames.forEach(nm => { groups[nm] = []; });
+  spvNames.forEach(nm => {
+    if (!nm.toLowerCase().includes('rahma')) {
+      groups[nm] = [];
+    }
+  });
+  if (!groups['Pak Ryan']) groups['Pak Ryan'] = [];
+  if (!groups['Pak Alvin']) groups['Pak Alvin'] = [];
+  if (!groups['Pak Riva']) groups['Pak Riva'] = [];
 
   let totalSalesOnline = 0;
   let totalSalesOffline = 0;
 
   salesList.forEach(s => {
-    const spv = (s.nama_spv || '').trim() || 'Tanpa SPV';
+    let spv = (s.nama_spv || '').trim() || 'Tanpa SPV';
+    // Bu Rahma adalah Calon SPV / Coaching, secara resmi seluruh anggota tim masuk ke Tim Pak Ryan
+    if (spv === 'Bu Rahma' || spv.toLowerCase().includes('rahma')) {
+      spv = 'Pak Ryan';
+    }
     if (!groups[spv]) groups[spv] = [];
     const t = targetById[String(s.id)] || {};
     const isOn = s.is_online === true || s.is_online === 1;
     if (isOn) totalSalesOnline++;
     else totalSalesOffline++;
+
+    const isCoachingRahma = s.coaching_mentor === 'Bu Rahma' || ['fia', 'isna', 'neo', 'firzi', 'tian'].includes(s.username?.toLowerCase());
 
     groups[spv].push({
       id: Number(s.id),
@@ -143,6 +156,7 @@ async function fetchBranchHierarchy(forceFresh = false) {
       tingkatan: s.tingkatan || 'Magang',
       foto: s.foto || '',
       status: s.status || 'Aktif',
+      coaching_mentor: isCoachingRahma ? 'Bu Rahma' : (s.coaching_mentor || null),
       is_online: isOn,
       status_online: isOn ? 'Online' : 'Offline',
       last_active_formatted: s.last_active_formatted || 'Belum pernah aktif',
@@ -154,6 +168,9 @@ async function fetchBranchHierarchy(forceFresh = false) {
       evaluasi_do_label: t.evaluasi_do_label || ''
     });
   });
+
+  // Hapus grup Bu Rahma jika ada residual
+  delete groups['Bu Rahma'];
 
   let totalSpvOnline = 0;
   let totalSpvOffline = 0;

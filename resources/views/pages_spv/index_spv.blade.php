@@ -88,13 +88,13 @@
           <div class="scope-select-wrap">
             <select id="selectSpvTeamFilter" class="form-control scope-select" onchange="changeSpvTeamFilter(this.value)">
               <option value="Semua">Semua Tim (Total Cabang - Tanpa Dobel)</option>
-              <optgroup label="Tim Pak Ryan (Induk &amp; Sub-Tim)">
-                <option value="Ryan">Tim Pak Ryan (Total: Direct + Sub-Tim Rahma)</option>
-                <option value="Rahma">&nbsp;&nbsp;↳ Sub-Tim Bu Rahma (5 Sales)</option>
-                <option value="Ryan_Direct">&nbsp;&nbsp;↳ Tim Langsung Pak Ryan</option>
+              <optgroup label="Tim Pak Ryan (Induk &amp; Coaching)">
+                <option value="Ryan">Tim Pak Ryan (Total: 25 Sales)</option>
+                <option value="Rahma">&nbsp;&nbsp;↳ Coaching Bu Rahma - Calon SPV (5 Sales)</option>
+                <option value="Ryan_Direct">&nbsp;&nbsp;↳ Tim Langsung Pak Ryan (20 Sales)</option>
               </optgroup>
-              <option value="Alvin">Tim Pak Alvin</option>
-              <option value="Riva">Tim Pak Riva</option>
+              <option value="Alvin">Tim Pak Alvin (20 Sales)</option>
+              <option value="Riva">Tim Pak Riva (14 Sales)</option>
             </select>
           </div>
         </div>

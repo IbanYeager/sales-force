@@ -28,6 +28,9 @@ function verifyAndRehashPassword($inputPassword, $dbPassword, $table, $id, $conn
 
 function checkOtherRoleMessage($username, $password, $loginType, $conn) {
     if ($loginType !== 'spv') {
+        if ($username === 'rahma.spv') {
+            return "Akun Bu Rahma terdaftar sebagai Wiraniaga / Calon SPV (Tim Pak Ryan). Silakan login dengan username 'rahma' pada halaman Login Sales.";
+        }
         $res = $conn->query("SELECT id, password FROM spv_accounts WHERE username = '$username'");
         if ($res && $res->num_rows > 0) {
             $user = $res->fetch_assoc();
@@ -202,13 +205,13 @@ function normalizePhotoUrl($foto) {
                 'ophie'      => ['name' => 'Ophie', 'spv' => 'Pak Riva'],
                 'faris'      => ['name' => 'Faris', 'spv' => 'Pak Riva'],
 
-                // Tim Bu Rahma (5 Sales)
-                'fia'        => ['name' => 'Fia', 'spv' => 'Bu Rahma'],
-                'isna'       => ['name' => 'Isna', 'spv' => 'Bu Rahma'],
-                'isna_rahma' => ['name' => 'Isna', 'spv' => 'Bu Rahma'],
-                'neo'        => ['name' => 'Neo', 'spv' => 'Bu Rahma'],
-                'firzi'      => ['name' => 'Firzi', 'spv' => 'Bu Rahma'],
-                'tian'       => ['name' => 'Tian', 'spv' => 'Bu Rahma']
+                // Tim Bu Rahma (Coaching di bawah Tim Pak Ryan) (5 Sales)
+                'fia'        => ['name' => 'Fia', 'spv' => 'Pak Ryan'],
+                'isna'       => ['name' => 'Isna', 'spv' => 'Pak Ryan'],
+                'isna_rahma' => ['name' => 'Isna', 'spv' => 'Pak Ryan'],
+                'neo'        => ['name' => 'Neo', 'spv' => 'Pak Ryan'],
+                'firzi'      => ['name' => 'Firzi', 'spv' => 'Pak Ryan'],
+                'tian'       => ['name' => 'Tian', 'spv' => 'Pak Ryan']
             ];
 
             $userLower = strtolower($username);
