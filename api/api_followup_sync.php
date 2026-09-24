@@ -630,6 +630,17 @@ function sync_google_sheet_data($sheetUrl = null) {
 if ($action === 'pull_sheet') {
     $input = get_json_input();
     $sheetUrl = trim($input['google_sheet_url'] ?? '');
+    $isManual = !empty($input['manual']) || !empty($input['google_sheet_url']);
+
+    // Block any automated or background calls from cached scripts
+    if (!$isManual) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Sinkronisasi dibatalkan. Sinkronisasi hanya dapat dijalankan secara manual oleh pengguna.'
+        ]);
+        exit;
+    }
+
     $res = sync_google_sheet_data($sheetUrl);
     echo json_encode($res);
     exit;

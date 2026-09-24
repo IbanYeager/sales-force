@@ -831,6 +831,9 @@ window.resetSalesFilterToAll = resetSalesFilterToAll;
 // SINKRONISASI LIVE GOOGLE SPREADSHEET
 // -------------------------------------------------------------
 async function triggerGoogleSheetSync(showNotification = true) {
+  if (!showNotification) {
+    return; // Block background/silent sync calls completely
+  }
   try {
     if (showNotification && window.Swal) {
       Swal.fire({
@@ -846,7 +849,7 @@ async function triggerGoogleSheetSync(showNotification = true) {
     const res = await fetch('/api/api_followup_sync.php?action=pull_sheet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
+      body: JSON.stringify({ manual: true })
     });
 
     const data = await res.json();

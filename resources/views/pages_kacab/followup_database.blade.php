@@ -647,7 +647,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/custom_alert.js?v=25"></script>
   <script src="/js/kacab_global.js?v=20260824_dendi"></script>
-  <script src="/js/followup_master.js?v=20260922_searchable_filter"></script>
+  <script src="/js/followup_master.js?v=20260924_strict_manual_sync"></script>
   <script src="/js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 </html>
