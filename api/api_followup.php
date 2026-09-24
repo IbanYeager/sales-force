@@ -314,6 +314,8 @@ if ($action === 'customers') {
             $where[] = "(followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')";
         } elseif ($status === 'sudah_fu') {
             $where[] = "(followup_status != 'Belum Dihubungi' AND followup_status IS NOT NULL AND followup_status != '')";
+        } elseif ($status === 'uncontacted') {
+            $where[] = "((contacted IS NULL OR contacted = '' OR contacted = 'FALSE' OR contacted = '0') AND (connected IS NULL OR connected = '' OR connected = 'FALSE' OR connected = '0') AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') AND (prospect IS NULL OR prospect = '' OR prospect = 'FALSE' OR prospect = '0') AND (spk IS NULL OR spk = '' OR spk = 'FALSE' OR spk = '0') AND (followup_date IS NULL OR followup_date = ''))";
         } else {
             $where[] = "followup_status = ?";
             $params[] = $status;
@@ -773,7 +775,7 @@ if ($action === 'stats') {
 if ($action === 'sales') {
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
     $salesList = get_sales_list($spv);
-    $allCust = followup_query("SELECT assigned_sales_id, sales_fu, followup_status FROM followup_customers");
+    $allCust = followup_query("SELECT assigned_sales_id, sales_fu, followup_status, contacted, connected, prospect, spk, followup_date FROM followup_customers");
     $allCust = is_array($allCust) ? $allCust : [];
 
     foreach ($salesList as &$s) {
@@ -790,11 +792,28 @@ if ($action === 'sales') {
         $processedCount = $totalAssigned - $pendingCount;
         $deal = array_filter($assigned, fn($x) => ($x['followup_status'] ?? '') === 'Deal / Selesai');
 
+        $uncontacted = array_filter($assigned, function($x) {
+            $c = strtoupper(trim($x['contacted'] ?? ''));
+            $cn = strtoupper(trim($x['connected'] ?? ''));
+            $fu = trim($x['followup_status'] ?? '');
+            $dt = trim($x['followup_date'] ?? '');
+            $pr = strtoupper(trim($x['prospect'] ?? ''));
+            $sp = strtoupper(trim($x['spk'] ?? ''));
+            $isContacted = ($c === 'TRUE' || $c === 'IYA' || $c === 'YA' || $c === '1');
+            $isConnected = ($cn === 'TRUE' || $cn === 'IYA' || $cn === 'YA' || $cn === '1');
+            $isProspect = ($pr === 'TRUE' || $pr === 'IYA' || $pr === 'YA' || $pr === '1');
+            $isSpk = ($sp === 'TRUE' || $sp === 'IYA' || $sp === 'YA' || $sp === '1');
+            $isDoneStatus = (!empty($fu) && $fu !== 'Belum Dihubungi' && $fu !== 'Open');
+            return !$isContacted && !$isConnected && !$isProspect && !$isSpk && !$isDoneStatus && empty($dt);
+        });
+        $uncontactedCount = count($uncontacted);
+
         $completionRate = $totalAssigned > 0 ? round(($processedCount / $totalAssigned) * 100) : 0;
         $needsRefill = ($totalAssigned > 0 && ($pendingCount <= 5 || $completionRate >= 80));
 
         $s['total_customers'] = $totalAssigned;
         $s['pending_customers'] = $pendingCount;
+        $s['uncontacted_customers'] = $uncontactedCount;
         $s['processed_customers'] = $processedCount;
         $s['deal_customers'] = count($deal);
         $s['completion_rate'] = $completionRate;
@@ -1087,13 +1106,22 @@ if ($action === 'bulk_assign') {
 if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
     $input = get_json_input();
     $customer_ids = $input['customer_ids'] ?? [];
-    $target_sales_id = isset($input['sales_id']) ? (int)$input['sales_id'] : 0;
-    $scope = $input['scope'] ?? 'all'; // 'all' or 'pending'
+    $raw_sales_id = $input['sales_id'] ?? 0;
+    $target_sales_id = is_numeric($raw_sales_id) ? (int)$raw_sales_id : $raw_sales_id;
+    $scope = $input['scope'] ?? 'uncontacted'; // 'uncontacted', 'pending', 'all'
+    $is_all_sales = ($target_sales_id === 'all' || (string)$raw_sales_id === 'all' || !empty($input['all_sales']));
+
+    $uncontactedCond = "((contacted IS NULL OR contacted = '' OR contacted = 'FALSE' OR contacted = '0') 
+        AND (connected IS NULL OR connected = '' OR connected = 'FALSE' OR connected = '0') 
+        AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') 
+        AND (prospect IS NULL OR prospect = '' OR prospect = 'FALSE' OR prospect = '0') 
+        AND (spk IS NULL OR spk = '' OR spk = 'FALSE' OR spk = '0') 
+        AND (followup_date IS NULL OR followup_date = ''))";
 
     if (!empty($customer_ids) && is_array($customer_ids)) {
         foreach ($customer_ids as $cid) {
             $cid = (int)$cid;
-            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE id = ?", [$cid]);
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE id = ?", [$cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Pembagian database ke sales dibatalkan oleh SPV/Kacab')", [$cid]);
         }
         echo json_encode([
@@ -1101,8 +1129,57 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
             'message' => count($customer_ids) . " data customer berhasil dibatalkan penugasannya dari sales dan dikembalikan ke database unassigned/pool."
         ]);
         exit;
-    } elseif ($target_sales_id > 0) {
-        // Ambil nama sales target
+    } elseif ($is_all_sales) {
+        // Tarik dari SEMUA sales sekaligus
+        if ($scope === 'uncontacted') {
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id > 0 AND $uncontactedCond");
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id > 0 AND $uncontactedCond");
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Data belum diisi (Contacted & Connected kosong) dari seluruh sales ditarik kembali ke pool oleh SPV/Kacab')", [(int)$l['id']]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Sebanyak $count data customer yang BELUM DIISI (Contacted & Connected kosong) dari seluruh sales berhasil ditarik kembali ke pool prospek."
+            ]);
+            exit;
+        } elseif ($scope === 'pending') {
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id > 0 AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')");
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id > 0 AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')");
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Semua tugas Belum FU dari seluruh sales ditarik kembali ke pool oleh SPV/Kacab')", [(int)$l['id']]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Sebanyak $count data customer (Belum FU) dari seluruh sales berhasil ditarik kembali ke pool prospek."
+            ]);
+            exit;
+        } else {
+            // Tarik SEMUA database dari semua sales
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id > 0");
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id > 0");
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Seluruh database dari semua sales ditarik kembali ke pool oleh SPV/Kacab')", [(int)$l['id']]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Seluruh $count data customer dari semua sales berhasil ditarik kembali ke database pool."
+            ]);
+            exit;
+        }
+    } elseif ((int)$target_sales_id > 0) {
+        $target_sales_id = (int)$target_sales_id;
         $salesList = get_sales_list();
         $targetSalesName = "Sales #$target_sales_id";
         foreach ($salesList as $s) {
@@ -1112,11 +1189,26 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
             }
         }
 
-        if ($scope === 'pending') {
+        if ($scope === 'uncontacted') {
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ? AND $uncontactedCond", [$target_sales_id]);
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id = ? AND $uncontactedCond", [$target_sales_id]);
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Data belum diisi (Contacted & Connected kosong) dari $targetSalesName ditarik kembali oleh SPV/Kacab"]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Sebanyak $count data customer yang BELUM DIISI (Contacted & Connected kosong) dari $targetSalesName berhasil ditarik kembali ke database pool."
+            ]);
+            exit;
+        } elseif ($scope === 'pending') {
             $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
             $count = count($leads);
             if ($count > 0) {
-                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
                 foreach ($leads as $l) {
                     followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Semua tugas Belum FU dari $targetSalesName ditarik kembali"]);
                 }
@@ -1132,7 +1224,7 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
             $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ?", [$target_sales_id]);
             $count = count($leads);
             if ($count > 0) {
-                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ?", [$target_sales_id]);
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id = ?", [$target_sales_id]);
                 foreach ($leads as $l) {
                     followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Seluruh tugas dari $targetSalesName ditarik kembali"]);
                 }

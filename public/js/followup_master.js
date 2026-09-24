@@ -621,9 +621,14 @@ function renderSalesLeaderboardTable(salesList) {
           <span class="fu-do-pill"><i class="fa-solid fa-truck-ramp-box" style="font-size:10px;"></i> ${(s.do_unit || 0).toLocaleString('id-ID')} DO</span>
         </td>
         <td style="text-align:center;">
-          <button class="btn-fu btn-fu-crimson" style="padding:5px 10px; font-size:11px; border-radius:8px; white-space:nowrap;" onclick="viewSalesDatabaseDetail('${escapeJs(s.sales_name)}', 'all')" title="Buka Database Lengkap Sales Ini">
-            <i class="fa-solid fa-folder-open"></i> Buka Data
-          </button>
+          <div style="display:flex; align-items:center; justify-content:center; gap:4px;">
+            <button class="btn-fu btn-fu-crimson" style="padding:5px 8px; font-size:11px; border-radius:8px; white-space:nowrap;" onclick="viewSalesDatabaseDetail('${escapeJs(s.sales_name)}', 'all')" title="Buka Database Lengkap Sales Ini">
+              <i class="fa-solid fa-folder-open"></i> Buka Data
+            </button>
+            <button class="btn-fu" style="background:#fff7ed; color:#c2410c !important; border:1px solid #fed7aa; padding:5px 8px; font-size:11px; border-radius:8px; white-space:nowrap;" onclick="openRecallBySalesForName('${escapeJs(s.sales_name)}', 'uncontacted')" title="Tarik database yang belum diisi (contacted & connected kosong) dari sales ini">
+              <i class="fa-solid fa-arrow-rotate-left" style="color:#ea580c;"></i> Tarik
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -750,6 +755,9 @@ function renderSalesProgressBanner() {
               <i class="fa-brands fa-whatsapp" style="font-size:14px;"></i> Chat WA Sales
             </a>
           ` : ''}
+          <button type="button" class="btn-fu" style="background:#fff7ed; color:#c2410c !important; border:1px solid #fed7aa; padding:7px 14px; font-size:12px; border-radius:10px; cursor:pointer;" onclick="openRecallBySalesModal('${salesId}', 'uncontacted')" title="Tarik database yang belum diisi (contacted & connected kosong) dari sales ini">
+            <i class="fa-solid fa-arrow-rotate-left" style="color:#ea580c;"></i> Tarik Belum Diisi
+          </button>
           <button type="button" class="btn-fu" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:7px 14px; font-size:12px; border-radius:10px; cursor:pointer;" onclick="resetSalesFilterToAll()">
             <i class="fa-solid fa-arrows-rotate"></i> Lihat Semua Sales
           </button>
@@ -2327,83 +2335,126 @@ async function sendTaskNotificationToSales(salesId) {
 // -------------------------------------------------------------
 // RECALL ALL DATABASES FROM A SPECIFIC SALES MODAL
 // -------------------------------------------------------------
-function openRecallBySalesModal(preselectedSalesId = null) {
+function openRecallBySalesModal(preselectedSalesId = null, preselectedScope = 'uncontacted') {
   let modal = document.getElementById('modalRecallBySales');
-  if (!modal) {
-    const html = `
-      <div class="modal-overlay" id="modalRecallBySales" onclick="closeRecallBySalesModal()">
-        <div class="modal-content" style="max-width:520px; border-radius:18px; padding:24px;" onclick="event.stopPropagation()">
-          <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:18px;">
-            <div>
-              <div style="display:inline-flex; align-items:center; gap:6px; background:#fff7ed; color:#c2410c; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px; border:1px solid #fed7aa;">
-                <i class="fa-solid fa-user-xmark"></i> Batal Bagi Database per Sales
-              </div>
-              <h3 style="font-size:18px; font-weight:900; color:#0f172a; margin:0;">Tarik Semua Database Sales</h3>
+  if (modal) {
+    modal.remove();
+  }
+
+  const html = `
+    <div class="modal-overlay" id="modalRecallBySales" onclick="closeRecallBySalesModal()">
+      <div class="modal-content" style="max-width:540px; border-radius:20px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
+        <div class="modal-header" style="border-bottom:1.5px solid #e2e8f0; padding-bottom:14px; margin-bottom:18px;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#fff7ed; color:#c2410c; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:9999px; text-transform:uppercase; margin-bottom:4px; border:1px solid #fed7aa;">
+              <i class="fa-solid fa-user-xmark"></i> Batal Bagi / Tarik Database Sales
             </div>
-            <button class="btn-close-modal" onclick="closeRecallBySalesModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="font-size:18px; font-weight:900; color:#0f172a; margin:0;">Tarik Database Customer dari Sales</h3>
+          </div>
+          <button class="btn-close-modal" onclick="closeRecallBySalesModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <p style="font-size:12.5px; color:#64748b; line-height:1.5; margin-bottom:16px;">
+            Pilih wiraniaga atau pilih <strong>⚡ Semua Sales</strong> untuk menarik kembali data customer yang belum diisi (di mana <em>Contacted</em> &amp; <em>Connected</em> masih kosong). Data yang ditarik akan langsung kembali ke <strong>Pool Rebutan Prospek</strong>.
+          </p>
+
+          <div class="form-group-fu" style="margin-bottom:14px;">
+            <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Pilih Target Wiraniaga:</label>
+            <select id="recallSalesSelect" class="fu-select" style="width:100%; font-size:13px; font-weight:700; padding:10px 14px;" onchange="updateRecallSalesInfo()">
+              <option value="">-- Pilih Sales Target / Tarik Massal --</option>
+              <option value="all">⚡ SEMUA SALES (Tarik Massal Seluruh Cabang)</option>
+            </select>
           </div>
 
-          <div style="margin-bottom:16px;">
-            <p style="font-size:12.5px; color:#64748b; line-height:1.5; margin-bottom:16px;">
-              Pilih wiraniaga di bawah ini untuk <strong>menarik &amp; membatalkan seluruh database</strong> yang sedang dibagikan kepadanya. Seluruh database yang ditarik akan dikembalikan ke status <em>"Belum Ditugaskan / Pool Rebutan"</em>.
-            </p>
-
-            <div class="form-group-fu" style="margin-bottom:14px;">
-              <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Pilih Sales Wiraniaga:</label>
-              <select id="recallSalesSelect" class="fu-select" style="width:100%; font-size:13px; font-weight:700; padding:10px 14px;" onchange="updateRecallSalesInfo()">
-                <option value="">-- Pilih Sales Target --</option>
-              </select>
+          <!-- Info Preview Box -->
+          <div id="recallSalesInfoBox" style="display:none; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 16px; margin-bottom:16px;">
+            <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-chart-pie" style="color:#d7123a;"></i> Status Database Saat Ini:
             </div>
-
-            <!-- Info Preview Box -->
-            <div id="recallSalesInfoBox" style="display:none; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:12px 14px; margin-bottom:14px;">
-              <div style="font-size:11.5px; color:#64748b; margin-bottom:4px;">Total Database yang Sedang Dipegang:</div>
-              <div style="font-size:16px; font-weight:900; color:#0f172a;" id="recallSalesCountText">0 Customer</div>
-              <div style="font-size:11px; color:#b45309; margin-top:3px;" id="recallSalesPendingText">0 Belum di-FU</div>
-            </div>
-
-            <div class="form-group-fu" style="margin-bottom:18px;">
-              <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:8px; display:block;">Cakupan Database yang Ditarik:</label>
-              <div style="display:flex; flex-direction:column; gap:8px;">
-                <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; cursor:pointer;">
-                  <input type="radio" name="recallScope" value="all" checked style="accent-color:#d7123a; width:16px; height:16px;">
-                  <div>
-                    <strong style="display:block;">Tarik Seluruh Database (Semua Status)</strong>
-                    <span style="font-size:11px; color:#64748b;">Membatalkan seluruh database customer yang dipegang sales ini.</span>
-                  </div>
-                </label>
-                <label style="display:flex; align-items:center; gap:10px; font-size:12.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; cursor:pointer;">
-                  <input type="radio" name="recallScope" value="pending" style="accent-color:#d7123a; width:16px; height:16px;">
-                  <div>
-                    <strong style="display:block;">Hanya yang Belum Di-Follow Up</strong>
-                    <span style="font-size:11px; color:#64748b;">Hanya menarik customer yang statusnya masih Belum Dihubungi (tidak mengganggu yang sudah deal/proses).</span>
-                  </div>
-                </label>
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
+              <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; text-align:center;">
+                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">Total Dipegang</div>
+                <div style="font-size:16px; font-weight:900; color:#0f172a; margin-top:2px;" id="recallSalesCountText">0</div>
               </div>
+              <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:8px 10px; text-align:center;">
+                <div style="font-size:10px; color:#c2410c; font-weight:700; text-transform:uppercase;">Belum Diisi</div>
+                <div style="font-size:16px; font-weight:900; color:#ea580c; margin-top:2px;" id="recallSalesUncontactedText">0</div>
+              </div>
+              <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:8px 10px; text-align:center;">
+                <div style="font-size:10px; color:#15803d; font-weight:700; text-transform:uppercase;">Sudah Di-FU (Aman)</div>
+                <div style="font-size:16px; font-weight:900; color:#16a34a; margin-top:2px;" id="recallSalesProcessedText">0</div>
+              </div>
+            </div>
+            <div style="font-size:11px; color:#b45309; margin-top:8px; line-height:1.4;" id="recallSalesHintText">
+              <i class="fa-solid fa-circle-info"></i> Memilih <strong>Hanya yang Belum Diisi</strong> akan menjamin data customer yang sudah ada follow-up/respon tetap aman di sales.
             </div>
           </div>
 
-          <div style="display:flex; gap:10px;">
-            <button type="button" class="btn-fu" style="flex:1; justify-content:center; padding:12px; background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color:#fff !important; font-weight:800; font-size:13px; border:none; box-shadow:0 4px 14px rgba(234,88,12,0.35);" onclick="executeRecallBySales()">
-              <i class="fa-solid fa-user-xmark"></i> Tarik &amp; Batalkan Semua
-            </button>
-            <button type="button" class="btn-fu btn-fu-secondary" style="padding:12px 18px;" onclick="closeRecallBySalesModal()">
-              Batal
-            </button>
+          <div class="form-group-fu" style="margin-bottom:18px;">
+            <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:8px; display:block;">Cakupan Database yang Ingin Ditarik:</label>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:#1e293b; background:#fff7ed; border:1.5px solid #fed7aa; padding:11px 13px; border-radius:12px; cursor:pointer;">
+                <input type="radio" name="recallScope" value="uncontacted" checked style="accent-color:#ea580c; width:17px; height:17px; margin-top:2px;">
+                <div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <strong style="color:#9a3412;">Hanya yang Belum Diisi (Contacted &amp; Connected Kosong)</strong>
+                    <span style="background:#ea580c; color:#ffffff; font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; text-transform:uppercase;">Direkomendasikan</span>
+                  </div>
+                  <span style="font-size:11.5px; color:#7c2d12; display:block; margin-top:3px; line-height:1.4;">
+                    Hanya menarik data prospek yang benar-benar <strong>belum disentuh / belum diisi</strong> oleh sales. Data customer yang sudah dihubungi, ada respon, atau berprospek <strong>tetap aman dipegang sales</strong>.
+                  </span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; cursor:pointer;">
+                <input type="radio" name="recallScope" value="pending" style="accent-color:#d7123a; width:16px; height:16px; margin-top:2px;">
+                <div>
+                  <strong style="display:block;">Hanya yang Statusnya "Belum Dihubungi"</strong>
+                  <span style="font-size:11px; color:#64748b; display:block; margin-top:2px;">Hanya menarik customer yang status follow-up nya masih "Belum Dihubungi".</span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:#1e293b; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; cursor:pointer;">
+                <input type="radio" name="recallScope" value="all" style="accent-color:#d7123a; width:16px; height:16px; margin-top:2px;">
+                <div>
+                  <strong style="display:block;">Tarik Seluruh Database (Semua Status)</strong>
+                  <span style="font-size:11px; color:#64748b; display:block; margin-top:2px;">Membatalkan seluruh penugasan customer yang dipegang sales tanpa pengecualian.</span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn-fu" style="flex:1; justify-content:center; padding:12px; background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color:#fff !important; font-weight:800; font-size:13px; border:none; box-shadow:0 4px 14px rgba(234,88,12,0.35); border-radius:12px;" onclick="executeRecallBySales()">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Tarik Database Sekarang
+          </button>
+          <button type="button" class="btn-fu btn-fu-secondary" style="padding:12px 18px; border-radius:12px;" onclick="closeRecallBySalesModal()">
+            Batal
+          </button>
+        </div>
       </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', html);
-    modal = document.getElementById('modalRecallBySales');
-  }
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
+  modal = document.getElementById('modalRecallBySales');
 
   // Populate sales dropdown
   const select = document.getElementById('recallSalesSelect');
-  select.innerHTML = '<option value="">-- Pilih Sales Target --</option>';
-  masterState.salesList.forEach(s => {
-    select.innerHTML += `<option value="${s.id}" ${preselectedSalesId && String(s.id) === String(preselectedSalesId) ? 'selected' : ''}>${s.name} (${s.total_customers || 0} Customer)</option>`;
+  select.innerHTML = `
+    <option value="">-- Pilih Sales Target / Tarik Massal --</option>
+    <option value="all">⚡ SEMUA SALES (Tarik Massal Seluruh Cabang)</option>
+  `;
+  (masterState.salesList || []).forEach(s => {
+    const uncontactedCount = s.uncontacted_customers !== undefined ? s.uncontacted_customers : (s.pending_customers || 0);
+    select.innerHTML += `<option value="${s.id}" ${preselectedSalesId && String(s.id) === String(preselectedSalesId) ? 'selected' : ''}>${s.name} (${s.total_customers || 0} Data, ${uncontactedCount} Belum Diisi)</option>`;
   });
+
+  if (preselectedScope) {
+    const radio = modal.querySelector(`input[name="recallScope"][value="${preselectedScope}"]`);
+    if (radio) radio.checked = true;
+  }
 
   updateRecallSalesInfo();
 
@@ -2411,6 +2462,21 @@ function openRecallBySalesModal(preselectedSalesId = null) {
   modal.classList.add('show');
   modal.style.display = 'flex';
 }
+window.openRecallBySalesModal = openRecallBySalesModal;
+
+function openRecallBySalesForName(salesName, preselectedScope = 'uncontacted') {
+  let matchedSalesId = null;
+  if (salesName) {
+    const sLower = salesName.trim().toLowerCase();
+    const found = (masterState.salesList || []).find(s => {
+      const name = (s.name || '').toLowerCase();
+      return name === sLower || name.includes(sLower) || sLower.includes(name);
+    });
+    if (found) matchedSalesId = found.id;
+  }
+  openRecallBySalesModal(matchedSalesId, preselectedScope);
+}
+window.openRecallBySalesForName = openRecallBySalesForName;
 
 function closeRecallBySalesModal() {
   const modal = document.getElementById('modalRecallBySales');
@@ -2420,12 +2486,15 @@ function closeRecallBySalesModal() {
     modal.style.display = 'none';
   }
 }
+window.closeRecallBySalesModal = closeRecallBySalesModal;
 
 function updateRecallSalesInfo() {
   const select = document.getElementById('recallSalesSelect');
   const infoBox = document.getElementById('recallSalesInfoBox');
   const countText = document.getElementById('recallSalesCountText');
-  const pendingText = document.getElementById('recallSalesPendingText');
+  const uncontactedText = document.getElementById('recallSalesUncontactedText');
+  const processedText = document.getElementById('recallSalesProcessedText');
+  const hintText = document.getElementById('recallSalesHintText');
 
   if (!select || !infoBox) return;
   const salesId = select.value;
@@ -2434,63 +2503,110 @@ function updateRecallSalesInfo() {
     return;
   }
 
-  const s = masterState.salesList.find(x => String(x.id) === String(salesId));
+  infoBox.style.display = 'block';
+
+  if (salesId === 'all') {
+    let grandTotal = 0;
+    let grandUncontacted = 0;
+    let grandProcessed = 0;
+    (masterState.salesList || []).forEach(s => {
+      grandTotal += (s.total_customers || 0);
+      grandUncontacted += (s.uncontacted_customers !== undefined ? s.uncontacted_customers : (s.pending_customers || 0));
+      grandProcessed += (s.processed_customers || 0);
+    });
+    if (countText) countText.textContent = grandTotal.toLocaleString('id-ID');
+    if (uncontactedText) uncontactedText.textContent = grandUncontacted.toLocaleString('id-ID');
+    if (processedText) processedText.textContent = grandProcessed.toLocaleString('id-ID');
+    if (hintText) hintText.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#ea580c;"></i> Tarik massal akan memproses <strong>seluruh wiraniaga di cabang</strong> sekaligus. Rekomendasi: pilih opsi <em>Hanya yang Belum Diisi</em> agar data yang sudah dihubungi sales tetap aman.`;
+    return;
+  }
+
+  const s = (masterState.salesList || []).find(x => String(x.id) === String(salesId));
   if (s) {
-    infoBox.style.display = 'block';
-    countText.textContent = `${s.total_customers || 0} Data Customer`;
-    pendingText.textContent = `${s.pending_customers || 0} Customer Belum Dihubungi`;
+    const total = s.total_customers || 0;
+    const uncontacted = (s.uncontacted_customers !== undefined ? s.uncontacted_customers : (s.pending_customers || 0));
+    const processed = s.processed_customers || Math.max(0, total - uncontacted);
+
+    if (countText) countText.textContent = total.toLocaleString('id-ID');
+    if (uncontactedText) uncontactedText.textContent = uncontacted.toLocaleString('id-ID');
+    if (processedText) processedText.textContent = processed.toLocaleString('id-ID');
+    if (hintText) hintText.innerHTML = `<i class="fa-solid fa-shield-halved" style="color:#16a34a;"></i> <strong>${processed.toLocaleString('id-ID')} data</strong> yang sudah di-follow up sales <strong>${escapeHtml(s.name)}</strong> tidak akan terpengaruh jika Anda memilih opsi <em>Hanya yang Belum Diisi</em>.`;
   }
 }
+window.updateRecallSalesInfo = updateRecallSalesInfo;
 
 async function executeRecallBySales() {
   const select = document.getElementById('recallSalesSelect');
-  const salesId = select.value;
+  const salesId = select?.value;
   if (!salesId) {
     if (typeof showCustomAlert === 'function') {
-      showCustomAlert('Pilih Sales', 'Silakan pilih wiraniaga target yang ingin ditarik datanya.', 'warning');
+      showCustomAlert('Pilih Target Sales', 'Silakan pilih wiraniaga target atau pilih opsi "Semua Sales" untuk menarik massal.', 'warning');
     } else {
       alert('Pilih wiraniaga target terlebih dahulu.');
     }
     return;
   }
 
-  const s = masterState.salesList.find(x => String(x.id) === String(salesId));
-  const salesName = s ? s.name : 'Sales';
   const scopeEl = document.querySelector('input[name="recallScope"]:checked');
-  const scope = scopeEl ? scopeEl.value : 'all';
+  const scope = scopeEl ? scopeEl.value : 'uncontacted';
+
+  let targetName = 'Sales';
+  if (salesId === 'all') {
+    targetName = 'SEMUA WIRANIAGA (Seluruh Cabang)';
+  } else {
+    const s = (masterState.salesList || []).find(x => String(x.id) === String(salesId));
+    targetName = s ? s.name : `Sales #${salesId}`;
+  }
+
+  let scopeDesc = '';
+  if (scope === 'uncontacted') {
+    scopeDesc = 'yang <b>BELUM DIISI (Contacted & Connected kosong)</b>';
+  } else if (scope === 'pending') {
+    scopeDesc = 'yang <b>Belum Di-Follow Up</b>';
+  } else {
+    scopeDesc = '<b>SELURUHNYA (Semua Status)</b>';
+  }
+
+  const confirmHtml = `Tarik dan batalkan pembagian database ${scopeDesc} dari <strong>${escapeHtml(targetName)}</strong>?<br><br>
+    <div style="font-size:12px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; padding:10px 12px; border-radius:10px; line-height:1.4;">
+      <i class="fa-solid fa-shield-halved"></i> <strong>Jaminan Keamanan:</strong> Data customer yang sudah dihubungi / ada respon oleh sales <b>TIDAK AKAN TERTARIK</b> (tetap aman di sales).
+    </div>
+    <div style="font-size:12px; color:#64748b; margin-top:8px;">
+      Data yang ditarik akan langsung masuk ke status <b>Belum Ditugaskan / Pool Rebutan</b>.
+    </div>`;
 
   let isConfirmed = false;
-  const scopeDesc = scope === 'pending' ? 'yang <b>Belum Di-Follow Up</b>' : '<b>SELURUHNYA</b>';
-  const confirmHtml = `Tarik dan batalkan pembagian database ${scopeDesc} dari sales <strong>${escapeHtml(salesName)}</strong>?<br><br><span style="font-size:12px; color:#64748b;">Semua data yang ditarik akan langsung masuk ke Pool Rebutan / Belum Ditugaskan.</span>`;
-
   if (typeof Swal !== 'undefined') {
     const res = await Swal.fire({
       title: 'Konfirmasi Tarik Database?',
       html: confirmHtml,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: '<i class="fa-solid fa-user-xmark"></i> Ya, Tarik Semua',
+      confirmButtonText: '<i class="fa-solid fa-arrow-rotate-left"></i> Ya, Tarik Database',
       cancelButtonText: 'Batal',
       confirmButtonColor: '#ea580c',
       cancelButtonColor: '#64748b'
     });
     isConfirmed = res.isConfirmed;
   } else if (typeof customConfirm === 'function') {
-    isConfirmed = await customConfirm(`Tarik semua database dari ${salesName}?`);
+    isConfirmed = await customConfirm(`Tarik database ${scope} dari ${targetName}?`);
   } else {
-    isConfirmed = confirm(`Tarik semua database dari ${salesName}?`);
+    isConfirmed = confirm(`Tarik database ${scope} dari ${targetName}?`);
   }
 
   if (!isConfirmed) return;
 
   try {
+    const payload = {
+      sales_id: salesId === 'all' ? 'all' : parseInt(salesId, 10),
+      scope: scope
+    };
+    if (salesId === 'all') payload.all_sales = true;
+
     const res = await fetch('/api/api_followup.php?action=unassign_sales', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sales_id: parseInt(salesId, 10),
-        scope: scope
-      })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (data.success) {
@@ -2512,6 +2628,7 @@ async function executeRecallBySales() {
     console.error('Execute recall error', e);
   }
 }
+window.executeRecallBySales = executeRecallBySales;
 
 // =============================================================
 // EDIT SINGLE CUSTOMER / PERUSAHAAN (DENGAN PILIHAN LINGKUP)

@@ -583,6 +583,7 @@
           <div>
             <select id="filterStatusSelect" class="fu-select" onchange="masterState.filters.status = this.value; loadMasterCustomers();">
               <option value="all">Semua Status Follow Up</option>
+              <option value="uncontacted">⭕ Belum Diisi (Contacted & Connected Kosong)</option>
               <option value="belum_fu">Belum Di-Follow Up</option>
               <option value="sudah_fu">Sudah Di-Follow Up (Semua)</option>
               <option value="Menunggu Respon">Menunggu Respon</option>

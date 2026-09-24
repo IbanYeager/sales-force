@@ -85,6 +85,113 @@ function get_sales_list($spv = '') {
 }
 
 /**
+ * Smart sales filter resolver:
+ * Matches companion accounts (e.g. Yani ID 79 active & ID 5 inactive, Egy ID 2 & ID 48)
+ * and matches name/alias tokens with word boundaries and case-insensitive equality.
+ * Guarantees that sales consultants NEVER lose sight of their followed-up leads.
+ */
+function get_sales_filter_clause($sales_id, $sales_name_param = '') {
+    $salesList = followup_query("SELECT id, username, nama_lengkap, nama_spv, is_active FROM sales_accounts");
+    $salesList = is_array($salesList) ? $salesList : [];
+
+    $targetIds = [];
+    $targetNames = [];
+    $likeTokens = [];
+
+    $checkId = (int)$sales_id;
+    if ($checkId > 0) {
+        $targetIds[] = $checkId;
+    }
+
+    $seedNames = [];
+    if (!empty($sales_name_param)) {
+        $seedNames[] = trim($sales_name_param);
+    }
+
+    foreach ($salesList as $s) {
+        if ((int)$s['id'] === $checkId) {
+            if (!empty($s['nama_lengkap'])) $seedNames[] = trim($s['nama_lengkap']);
+            if (!empty($s['username'])) $seedNames[] = trim($s['username']);
+            break;
+        }
+    }
+
+    $coreTokens = [];
+    $ignoredWords = ['tunas', 'toyota', 'kiaracondong', 'sales', 'ryan', 'alvin', 'riva', 'kacab', 'spv', 'admin', 'user'];
+
+    foreach ($seedNames as $sn) {
+        $lower = strtolower($sn);
+        $clean = trim(preg_replace('/(_ryan|_alvin|_riva|_kacab|_spv|\d+|\([^)]*\))/i', '', $lower));
+        $words = preg_split('/[\s_]+/', $clean);
+        $firstWord = $words[0] ?? '';
+        if ($firstWord && strlen($firstWord) >= 3 && !in_array($firstWord, $ignoredWords, true)) {
+            $coreTokens[] = $firstWord;
+        }
+        if (count($words) <= 2 && strlen($clean) >= 3 && !in_array($clean, $ignoredWords, true)) {
+            $coreTokens[] = $clean;
+        }
+    }
+    $coreTokens = array_unique(array_filter($coreTokens));
+
+    foreach ($salesList as $s) {
+        $sId = (int)$s['id'];
+        $sName = strtolower(trim($s['nama_lengkap'] ?? ''));
+        $sUser = strtolower(trim($s['username'] ?? ''));
+        $sWords = array_merge(
+            preg_split('/[\s_]+/', $sName),
+            preg_split('/[\s_]+/', $sUser)
+        );
+        $sWords = array_map('trim', array_filter($sWords));
+
+        $matched = false;
+        foreach ($coreTokens as $token) {
+            if (in_array($token, $sWords, true) || $sName === $token || $sUser === $token) {
+                $matched = true;
+                break;
+            }
+        }
+
+        if ($matched) {
+            $targetIds[] = $sId;
+            if (!empty($s['nama_lengkap'])) $targetNames[] = strtolower(trim($s['nama_lengkap']));
+            if (!empty($s['username'])) $targetNames[] = strtolower(trim($s['username']));
+        }
+    }
+
+    foreach ($coreTokens as $token) {
+        $likeTokens[] = $token;
+        $targetNames[] = $token;
+    }
+
+    $targetIds = array_values(array_unique($targetIds));
+    $targetNames = array_values(array_unique(array_filter($targetNames)));
+    $likeTokens = array_values(array_unique(array_filter($likeTokens)));
+
+    $clauses = [];
+    $params = [];
+
+    if (!empty($targetIds)) {
+        $placeholders = implode(',', array_fill(0, count($targetIds), '?'));
+        $clauses[] = "assigned_sales_id IN ($placeholders)";
+        foreach ($targetIds as $tid) $params[] = $tid;
+    }
+
+    if (!empty($targetNames)) {
+        $placeholders = implode(',', array_fill(0, count($targetNames), '?'));
+        $clauses[] = "LOWER(sales_fu) IN ($placeholders)";
+        foreach ($targetNames as $tn) $params[] = $tn;
+    }
+
+    foreach ($likeTokens as $lt) {
+        $clauses[] = "sales_fu LIKE ?";
+        $params[] = "%$lt%";
+    }
+
+    $sql = !empty($clauses) ? "(" . implode(" OR ", $clauses) . ")" : "1=1";
+    return [$sql, $params, $targetIds, $likeTokens];
+}
+
+/**
  * Auto-Expiry Engine:
  * If customer remarks is 'Customer pending' or 'Menunggu respon' and > 2 days (48 hours) without update,
  * automatically change remarks to 'Customer menolak' & status to 'Tidak Tertarik' (Closed).
@@ -146,6 +253,7 @@ if (in_array($action, ['customers', 'stats', 'sales', 'sales_dashboard', 'check_
 if ($action === 'customers') {
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
     $sales_id = isset($_GET['sales_id']) ? trim($_GET['sales_id']) : '';
+    $sales_name_param = isset($_GET['sales_name']) ? trim($_GET['sales_name']) : '';
     $status = isset($_GET['status']) ? trim($_GET['status']) : '';
     $category = isset($_GET['category']) ? trim($_GET['category']) : '';
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
@@ -153,6 +261,17 @@ if ($action === 'customers') {
 
     $where = [];
     $params = [];
+
+    $salesList = get_sales_list();
+    $salesMap = [];
+    $salesNameMap = [];
+    foreach ($salesList as $s) {
+        $salesMap[(int)$s['id']] = $s;
+        $cleanN = strtolower(trim($s['name']));
+        if ($cleanN !== '') {
+            $salesNameMap[$cleanN] = (int)$s['id'];
+        }
+    }
 
     if ($db_source === 'sales') {
         $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
@@ -171,19 +290,23 @@ if ($action === 'customers') {
         if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
             $spvSales = get_sales_list($spv);
             $spvSalesIds = array_map(fn($s) => (int)$s['id'], $spvSales);
+            $spvSalesNames = array_map(fn($s) => "'" . addslashes($s['name']) . "'", $spvSales);
             if (!empty($spvSalesIds)) {
                 $idList = implode(',', $spvSalesIds);
-                $where[] = "(assigned_sales_id IN ($idList) OR assigned_sales_id IS NULL OR assigned_sales_id = 0)";
+                $nameList = implode(',', $spvSalesNames);
+                $where[] = "(assigned_sales_id IN ($idList) OR sales_fu IN ($nameList) OR assigned_sales_id IS NULL OR assigned_sales_id = 0)";
             }
         }
     } elseif ($sales_id === 'unassigned') {
-        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
+        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0) AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0')";
     } elseif ($sales_id !== '') {
-        $where[] = "assigned_sales_id = ?";
-        $params[] = (int)$sales_id;
+        list($salesClause, $salesParams) = get_sales_filter_clause($sales_id, $sales_name_param);
+        $where[] = $salesClause;
+        foreach ($salesParams as $sp) {
+            $params[] = $sp;
+        }
     } else {
-        // Default if sales_id is empty: only show assigned_sales_id = 0 (empty)
-        $where[] = "assigned_sales_id = 0";
+        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
     }
 
     if ($status !== '' && $status !== 'all') {
@@ -191,6 +314,8 @@ if ($action === 'customers') {
             $where[] = "(followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')";
         } elseif ($status === 'sudah_fu') {
             $where[] = "(followup_status != 'Belum Dihubungi' AND followup_status IS NOT NULL AND followup_status != '')";
+        } elseif ($status === 'uncontacted') {
+            $where[] = "((contacted IS NULL OR contacted = '' OR contacted = 'FALSE' OR contacted = '0') AND (connected IS NULL OR connected = '' OR connected = 'FALSE' OR connected = '0') AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') AND (prospect IS NULL OR prospect = '' OR prospect = 'FALSE' OR prospect = '0') AND (spk IS NULL OR spk = '' OR spk = 'FALSE' OR spk = '0') AND (followup_date IS NULL OR followup_date = ''))";
         } else {
             $where[] = "followup_status = ?";
             $params[] = $status;
@@ -207,17 +332,37 @@ if ($action === 'customers') {
 
     $customers = followup_query($sql, $params);
     $customers = is_array($customers) ? $customers : [];
-    $salesList = get_sales_list();
-    $salesMap = [];
-    foreach ($salesList as $s) {
-        $salesMap[$s['id']] = $s;
-    }
 
     // Attach sales name & db_source label
     foreach ($customers as &$c) {
         $sid = (int)($c['assigned_sales_id'] ?? 0);
-        $c['sales_name'] = isset($salesMap[$sid]) ? $salesMap[$sid]['name'] : 'Belum Ditugaskan';
-        $c['sales_phone'] = isset($salesMap[$sid]) ? $salesMap[$sid]['phone'] : '';
+        $sFu = trim($c['sales_fu'] ?? '');
+        if ($sid > 0 && isset($salesMap[$sid])) {
+            $c['sales_name'] = $salesMap[$sid]['name'];
+            $c['sales_phone'] = $salesMap[$sid]['phone'];
+        } elseif ($sFu !== '' && $sFu !== '-' && $sFu !== '0') {
+            $cleanFu = strtolower($sFu);
+            $matched = null;
+            if (isset($salesNameMap[$cleanFu])) {
+                $matched = $salesMap[$salesNameMap[$cleanFu]];
+            } else {
+                foreach ($salesList as $sl) {
+                    $slName = strtolower($sl['name']);
+                    if (strpos($slName, $cleanFu) !== false || strpos($cleanFu, $slName) !== false) {
+                        $matched = $sl;
+                        break;
+                    }
+                }
+            }
+            $c['sales_name'] = $matched ? $matched['name'] : $sFu;
+            $c['sales_phone'] = $matched ? $matched['phone'] : '';
+            if ($matched && empty($c['assigned_sales_id'])) {
+                $c['assigned_sales_id'] = $matched['id'];
+            }
+        } else {
+            $c['sales_name'] = 'Belum Ditugaskan';
+            $c['sales_phone'] = '';
+        }
         $src = $c['sync_source'] ?? '';
         $cat = $c['followup_category'] ?? '';
         $isRadar = ($src === 'pkb_excel_radar' || strpos($src, 'radar') !== false || strpos(strtolower($cat), 'radar') !== false);
@@ -524,27 +669,16 @@ if ($action === 'dashboard_analytics') {
 // -------------------------------------------------------------
 if ($action === 'stats') {
     $sales_id = isset($_GET['sales_id']) ? trim($_GET['sales_id']) : '';
+    $sales_name_param = isset($_GET['sales_name']) ? trim($_GET['sales_name']) : '';
     $db_source = isset($_GET['db_source']) ? trim($_GET['db_source']) : 'all';
 
     $where = [];
     $params = [];
     if ($sales_id !== '' && $sales_id !== 'all') {
-        $salesList = get_sales_list();
-        $targetSalesName = '';
-        foreach ($salesList as $s) {
-            if ((int)$s['id'] === (int)$sales_id) {
-                $targetSalesName = trim($s['name']);
-                break;
-            }
-        }
-        if ($targetSalesName !== '') {
-            $where[] = "(assigned_sales_id = ? OR LOWER(sales_fu) = LOWER(?) OR sales_fu LIKE ?)";
-            $params[] = (int)$sales_id;
-            $params[] = $targetSalesName;
-            $params[] = "%$targetSalesName%";
-        } else {
-            $where[] = "assigned_sales_id = ?";
-            $params[] = (int)$sales_id;
+        list($salesClause, $salesParams) = get_sales_filter_clause($sales_id, $sales_name_param);
+        $where[] = $salesClause;
+        foreach ($salesParams as $sp) {
+            $params[] = $sp;
         }
     }
     if ($db_source === 'sales') {
@@ -641,22 +775,45 @@ if ($action === 'stats') {
 if ($action === 'sales') {
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
     $salesList = get_sales_list($spv);
-    $allCust = followup_query("SELECT assigned_sales_id, followup_status FROM followup_customers");
+    $allCust = followup_query("SELECT assigned_sales_id, sales_fu, followup_status, contacted, connected, prospect, spk, followup_date FROM followup_customers");
+    $allCust = is_array($allCust) ? $allCust : [];
 
     foreach ($salesList as &$s) {
-        $sid = $s['id'];
-        $assigned = array_filter($allCust, fn($x) => (int)($x['assigned_sales_id'] ?? 0) === $sid);
+        $sid = (int)$s['id'];
+        $sName = strtolower(trim($s['name']));
+        $assigned = array_filter($allCust, function($x) use ($sid, $sName) {
+            $xSid = (int)($x['assigned_sales_id'] ?? 0);
+            $xFu = strtolower(trim($x['sales_fu'] ?? ''));
+            return ($xSid === $sid) || ($xSid === 0 && $xFu !== '' && ($xFu === $sName || strpos($sName, $xFu) !== false || strpos($xFu, $sName) !== false));
+        });
         $totalAssigned = count($assigned);
         $pending = array_filter($assigned, fn($x) => ($x['followup_status'] ?? '') === 'Belum Dihubungi');
         $pendingCount = count($pending);
         $processedCount = $totalAssigned - $pendingCount;
         $deal = array_filter($assigned, fn($x) => ($x['followup_status'] ?? '') === 'Deal / Selesai');
 
+        $uncontacted = array_filter($assigned, function($x) {
+            $c = strtoupper(trim($x['contacted'] ?? ''));
+            $cn = strtoupper(trim($x['connected'] ?? ''));
+            $fu = trim($x['followup_status'] ?? '');
+            $dt = trim($x['followup_date'] ?? '');
+            $pr = strtoupper(trim($x['prospect'] ?? ''));
+            $sp = strtoupper(trim($x['spk'] ?? ''));
+            $isContacted = ($c === 'TRUE' || $c === 'IYA' || $c === 'YA' || $c === '1');
+            $isConnected = ($cn === 'TRUE' || $cn === 'IYA' || $cn === 'YA' || $cn === '1');
+            $isProspect = ($pr === 'TRUE' || $pr === 'IYA' || $pr === 'YA' || $pr === '1');
+            $isSpk = ($sp === 'TRUE' || $sp === 'IYA' || $sp === 'YA' || $sp === '1');
+            $isDoneStatus = (!empty($fu) && $fu !== 'Belum Dihubungi' && $fu !== 'Open');
+            return !$isContacted && !$isConnected && !$isProspect && !$isSpk && !$isDoneStatus && empty($dt);
+        });
+        $uncontactedCount = count($uncontacted);
+
         $completionRate = $totalAssigned > 0 ? round(($processedCount / $totalAssigned) * 100) : 0;
         $needsRefill = ($totalAssigned > 0 && ($pendingCount <= 5 || $completionRate >= 80));
 
         $s['total_customers'] = $totalAssigned;
         $s['pending_customers'] = $pendingCount;
+        $s['uncontacted_customers'] = $uncontactedCount;
         $s['processed_customers'] = $processedCount;
         $s['deal_customers'] = count($deal);
         $s['completion_rate'] = $completionRate;
@@ -949,13 +1106,22 @@ if ($action === 'bulk_assign') {
 if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
     $input = get_json_input();
     $customer_ids = $input['customer_ids'] ?? [];
-    $target_sales_id = isset($input['sales_id']) ? (int)$input['sales_id'] : 0;
-    $scope = $input['scope'] ?? 'all'; // 'all' or 'pending'
+    $raw_sales_id = $input['sales_id'] ?? 0;
+    $target_sales_id = is_numeric($raw_sales_id) ? (int)$raw_sales_id : $raw_sales_id;
+    $scope = $input['scope'] ?? 'uncontacted'; // 'uncontacted', 'pending', 'all'
+    $is_all_sales = ($target_sales_id === 'all' || (string)$raw_sales_id === 'all' || !empty($input['all_sales']));
+
+    $uncontactedCond = "((contacted IS NULL OR contacted = '' OR contacted = 'FALSE' OR contacted = '0') 
+        AND (connected IS NULL OR connected = '' OR connected = 'FALSE' OR connected = '0') 
+        AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '') 
+        AND (prospect IS NULL OR prospect = '' OR prospect = 'FALSE' OR prospect = '0') 
+        AND (spk IS NULL OR spk = '' OR spk = 'FALSE' OR spk = '0') 
+        AND (followup_date IS NULL OR followup_date = ''))";
 
     if (!empty($customer_ids) && is_array($customer_ids)) {
         foreach ($customer_ids as $cid) {
             $cid = (int)$cid;
-            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE id = ?", [$cid]);
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE id = ?", [$cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Pembagian database ke sales dibatalkan oleh SPV/Kacab')", [$cid]);
         }
         echo json_encode([
@@ -963,8 +1129,57 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
             'message' => count($customer_ids) . " data customer berhasil dibatalkan penugasannya dari sales dan dikembalikan ke database unassigned/pool."
         ]);
         exit;
-    } elseif ($target_sales_id > 0) {
-        // Ambil nama sales target
+    } elseif ($is_all_sales) {
+        // Tarik dari SEMUA sales sekaligus
+        if ($scope === 'uncontacted') {
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id > 0 AND $uncontactedCond");
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id > 0 AND $uncontactedCond");
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Data belum diisi (Contacted & Connected kosong) dari seluruh sales ditarik kembali ke pool oleh SPV/Kacab')", [(int)$l['id']]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Sebanyak $count data customer yang BELUM DIISI (Contacted & Connected kosong) dari seluruh sales berhasil ditarik kembali ke pool prospek."
+            ]);
+            exit;
+        } elseif ($scope === 'pending') {
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id > 0 AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')");
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id > 0 AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')");
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Semua tugas Belum FU dari seluruh sales ditarik kembali ke pool oleh SPV/Kacab')", [(int)$l['id']]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Sebanyak $count data customer (Belum FU) dari seluruh sales berhasil ditarik kembali ke pool prospek."
+            ]);
+            exit;
+        } else {
+            // Tarik SEMUA database dari semua sales
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id > 0");
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id > 0");
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Seluruh database dari semua sales ditarik kembali ke pool oleh SPV/Kacab')", [(int)$l['id']]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Seluruh $count data customer dari semua sales berhasil ditarik kembali ke database pool."
+            ]);
+            exit;
+        }
+    } elseif ((int)$target_sales_id > 0) {
+        $target_sales_id = (int)$target_sales_id;
         $salesList = get_sales_list();
         $targetSalesName = "Sales #$target_sales_id";
         foreach ($salesList as $s) {
@@ -974,11 +1189,26 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
             }
         }
 
-        if ($scope === 'pending') {
+        if ($scope === 'uncontacted') {
+            $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ? AND $uncontactedCond", [$target_sales_id]);
+            $count = count($leads);
+            if ($count > 0) {
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id = ? AND $uncontactedCond", [$target_sales_id]);
+                foreach ($leads as $l) {
+                    followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Data belum diisi (Contacted & Connected kosong) dari $targetSalesName ditarik kembali oleh SPV/Kacab"]);
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'count' => $count,
+                'message' => "Sebanyak $count data customer yang BELUM DIISI (Contacted & Connected kosong) dari $targetSalesName berhasil ditarik kembali ke database pool."
+            ]);
+            exit;
+        } elseif ($scope === 'pending') {
             $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
             $count = count($leads);
             if ($count > 0) {
-                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id = ? AND (followup_status = 'Belum Dihubungi' OR followup_status IS NULL OR followup_status = '')", [$target_sales_id]);
                 foreach ($leads as $l) {
                     followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Semua tugas Belum FU dari $targetSalesName ditarik kembali"]);
                 }
@@ -994,7 +1224,7 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
             $leads = followup_query("SELECT id FROM followup_customers WHERE assigned_sales_id = ?", [$target_sales_id]);
             $count = count($leads);
             if ($count > 0) {
-                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, is_orphan = 1 WHERE assigned_sales_id = ?", [$target_sales_id]);
+                followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE assigned_sales_id = ?", [$target_sales_id]);
                 foreach ($leads as $l) {
                     followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', ?)", [(int)$l['id'], "Seluruh tugas dari $targetSalesName ditarik kembali"]);
                 }
@@ -1081,9 +1311,6 @@ if ($action === 'claim_orphan_lead') {
         exit;
     }
 
-    // 2. Atomic Claim: Update assigned_sales_id to the new claiming sales and clear is_orphan
-    $affected = followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, is_orphan = 0 WHERE id = ? AND (assigned_sales_id IS NULL OR assigned_sales_id = 0 OR assigned_sales_id = ?)", [$sales_id, $customer_id, $sales_id]);
-
     $salesList = get_sales_list();
     $salesName = "Sales #$sales_id";
     foreach ($salesList as $s) {
@@ -1092,6 +1319,9 @@ if ($action === 'claim_orphan_lead') {
             break;
         }
     }
+
+    // 2. Atomic Claim: Update assigned_sales_id & sales_fu to the new claiming sales and clear is_orphan
+    $affected = followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ?, is_orphan = 0 WHERE id = ? AND (assigned_sales_id IS NULL OR assigned_sales_id = 0 OR assigned_sales_id = ?)", [$sales_id, $salesName, $customer_id, $sales_id]);
 
     // 3. Record Audit Log
     followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'claimed', ?)", [
@@ -1929,7 +2159,7 @@ if ($action === 'distribute_quota') {
     }
 
     if ($only_unassigned) {
-        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0)";
+        $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0) AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0' OR sales_fu = 'Belum Ditugaskan')";
     }
 
     if ($category !== '' && $category !== 'all') {
@@ -2017,7 +2247,7 @@ if ($action === 'distribute_quota') {
             $lead = $availableLeads[$leadIndex];
             $leadId = (int)$lead['id'];
 
-            followup_execute("UPDATE followup_customers SET assigned_sales_id = ? WHERE id = ?", [$salesId, $leadId]);
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ? WHERE id = ?", [$salesId, $sales['name'], $leadId]);
             followup_execute("
                 INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note)
                 VALUES (?, ?, ?, 'quota_assigned', ?)
@@ -2115,7 +2345,7 @@ if ($action === 'add_more_leads_to_sales') {
 
     foreach ($unassignedLeads as $lead) {
         $leadId = (int)$lead['id'];
-        followup_execute("UPDATE followup_customers SET assigned_sales_id = ? WHERE id = ?", [$sales_id, $leadId]);
+        followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ? WHERE id = ?", [$sales_id, $targetSales['name'], $leadId]);
         followup_execute("
             INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note)
             VALUES (?, ?, ?, 'quota_refill', ?)
