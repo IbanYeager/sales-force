@@ -80,37 +80,30 @@
       <div class="fu-view-nav-wrap">
         <div class="fu-view-segmented">
           <button class="fu-view-tab active" id="tabExecutiveView" onclick="switchFollowupView('executive')">
-            <i class="fa-solid fa-chart-pie"></i> Executive Analytics Dashboard <span class="badge-count" id="badgeSyncStatus">Live Sync</span>
+            <i class="fa-solid fa-chart-pie"></i> Executive Analytics Dashboard
           </button>
           <button class="fu-view-tab" id="tabDatabaseView" onclick="switchFollowupView('database')">
             <i class="fa-solid fa-table-list"></i> Data Customer &amp; Penugasan <span class="badge-count" id="badgeTotalCust">0</span>
           </button>
         </div>
-
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:12px; color:#64748b; font-weight:600;" id="lastSyncIndicatorText"><i class="fa-solid fa-clock-rotate-left"></i> Terakhir Sinkron: Memuat...</span>
-          <button class="btn-fu btn-fu-emerald" onclick="triggerGoogleSheetSync(true)" title="Tarik pembaruan data terbaru dari Google Spreadsheet">
-            <i class="fa-solid fa-arrows-rotate"></i> Sinkronkan Spreadsheet
-          </button>
-        </div>
       </div>
 
       <!-- ============================================================== -->
-      <!-- SECTION 1: EXECUTIVE ANALYTICS DASHBOARD (SPREADSHEET SYNCED)   -->
+      <!-- SECTION 1: EXECUTIVE ANALYTICS DASHBOARD                      -->
       <!-- ============================================================== -->
       <div id="sectionExecutiveDashboard">
         <!-- LIVE SYNC BANNER & MODEL FILTER TOOLBAR -->
         <div class="fu-sync-banner">
           <div class="fu-sync-banner-left">
             <div class="fu-sync-icon-box">
-              <i class="fa-solid fa-file-excel"></i>
+              <i class="fa-solid fa-chart-line"></i>
             </div>
             <div class="fu-sync-info">
               <h4>
                 <span class="fu-sync-pulse"></span>
                 Tunas Toyota Kiara Condong — CRM Analytics Master
               </h4>
-              <p id="sheetSourceInfo">Tersinkronisasi otomatis dengan Google Spreadsheet (Tab: New FU Kiara Condong &amp; MASTER)</p>
+              <p id="sheetSourceInfo">Monitoring analitik eksekutif dan pembagian database prospek wiraniaga cabang</p>
             </div>
           </div>
 
