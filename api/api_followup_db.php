@@ -236,7 +236,11 @@ function init_followup_tables() {
             'sales_fu' => "VARCHAR(150) NULL",
             'do_unit' => "VARCHAR(20) DEFAULT 'FALSE'",
             'all_spk' => "VARCHAR(50) NULL",
-            'all_do' => "VARCHAR(50) NULL"
+            'all_do' => "VARCHAR(50) NULL",
+            'data_type' => "VARCHAR(50) NULL",
+            'customer_migration' => "VARCHAR(100) NULL",
+            'vehicle_model_spk' => "VARCHAR(100) NULL",
+            'vehicle_match' => "VARCHAR(50) NULL"
         ];
         foreach ($cols as $colName => $colDef) {
             $check = followup_query("SHOW COLUMNS FROM followup_customers LIKE '$colName'");
@@ -379,7 +383,11 @@ function init_followup_tables() {
             'sales_fu' => "TEXT NULL",
             'do_unit' => "TEXT DEFAULT 'FALSE'",
             'all_spk' => "TEXT NULL",
-            'all_do' => "TEXT NULL"
+            'all_do' => "TEXT NULL",
+            'data_type' => "TEXT NULL",
+            'customer_migration' => "TEXT NULL",
+            'vehicle_model_spk' => "TEXT NULL",
+            'vehicle_match' => "TEXT NULL"
         ];
         foreach ($sqlite_cols as $colName => $colDef) {
             try {
@@ -388,7 +396,7 @@ function init_followup_tables() {
         }
     }
 
-    $defaultSheetUrl = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1618304635#gid=1618304635';
+    $defaultSheetUrl = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
 
     // Seed default settings if empty or update default sheet url
     $chkSet = followup_query("SELECT setting_key FROM followup_settings LIMIT 1");
@@ -408,8 +416,12 @@ function init_followup_tables() {
         }
     } else {
         $currUrl = followup_query("SELECT setting_value FROM followup_settings WHERE setting_key = 'google_sheet_url' LIMIT 1");
-        if (empty($currUrl) || empty($currUrl[0]['setting_value'])) {
-            followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)", [$defaultSheetUrl]);
+        if (empty($currUrl) || empty($currUrl[0]['setting_value']) || strpos($currUrl[0]['setting_value'], '1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g') === false) {
+            if ($is_mysql && $conn) {
+                followup_execute("INSERT INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?) ON DUPLICATE KEY UPDATE setting_value = ?", [$defaultSheetUrl, $defaultSheetUrl]);
+            } else {
+                followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)", [$defaultSheetUrl]);
+            }
         }
     }
 

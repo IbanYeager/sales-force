@@ -48,7 +48,7 @@ if ($action === 'get_settings') {
         $settings[$r['setting_key']] = $r['setting_value'];
     }
 
-    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs/edit?usp=sharing';
+    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
     $defaultScript = 'https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec';
 
     if (empty($settings['google_sheet_url'])) {
@@ -89,7 +89,7 @@ function sync_google_sheet_data($sheetUrl = null) {
         $sheetUrl = !empty($rows) ? $rows[0]['setting_value'] : '';
     }
 
-    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1618304635#gid=1618304635';
+    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
     if (!$sheetUrl) {
         $sheetUrl = $defaultSheet;
     }
@@ -98,12 +98,10 @@ function sync_google_sheet_data($sheetUrl = null) {
     $csvUrl = $sheetUrl;
     if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sheetUrl, $matches)) {
         $sheetId = $matches[1];
-        $gid = '1800685961'; // Default data sheet for Tunas Toyota Kiara Condong ('New FU Kiara Condong')
+        $gid = '1525199412'; // Default data sheet for Tunas Toyota Kiara Condong CRM
         if (preg_match('/gid=([0-9]+)/', $sheetUrl, $gMatches)) {
             $parsedGid = $gMatches[1];
-            if ($parsedGid === '1618304635' || $parsedGid === '607414573' || $parsedGid === '0' || empty($parsedGid)) {
-                $gid = '1800685961';
-            } else {
+            if (!empty($parsedGid) && $parsedGid !== '0') {
                 $gid = $parsedGid;
             }
         }
@@ -209,6 +207,10 @@ function sync_google_sheet_data($sheetUrl = null) {
     $fuDateIdx = $findIdx(['/tanggal.*pengisian/i', '/tanggal.*fu/i']);
     $allSpkIdx = $findIdx(['/all spk/i']);
     $allDoIdx = $findIdx(['/all do/i']);
+    $dataTypeIdx = $findIdx(['/^type$/i', '/^data\s*type$/i', '/tipe\s*pembelian/i']);
+    $custMigrationIdx = $findIdx(['/customer\s*migration/i', '/migration/i', '/migrasi/i']);
+    $vehicleModelSpkIdx = $findIdx(['/vehicle\s*model\s*spk/i', '/model.*spk/i']);
+    $vehicleMatchIdx = $findIdx(['/vehicle\s*match/i', '/match/i']);
 
     // Begin SQLite Transaction or MySQL mass insert
     global $is_mysql, $sqlite_pdo, $conn;
@@ -401,7 +403,25 @@ function sync_google_sheet_data($sheetUrl = null) {
         $allSpk = $allSpkIdx !== -1 ? trim($row[$allSpkIdx] ?? '') : '';
         $allDo = $allDoIdx !== -1 ? trim($row[$allDoIdx] ?? '') : '';
 
-        $doUnit = (stripos($allDo, 'DO') !== false || $allDo === '1' || stripos($remarks, 'DO') !== false) ? 'TRUE' : 'FALSE';
+        $dataType = $dataTypeIdx !== -1 ? trim($row[$dataTypeIdx] ?? '') : '';
+        if ($dataType === 'NO DATA' || $dataType === '-' || $dataType === '#N/A' || $dataType === '#REF!') $dataType = '';
+
+        $custMigration = $custMigrationIdx !== -1 ? trim($row[$custMigrationIdx] ?? '') : '';
+        if ($custMigration === 'NO DATA' || $custMigration === '-' || $custMigration === '#N/A' || $custMigration === '#REF!') $custMigration = '';
+
+        $vehicleModelSpk = $vehicleModelSpkIdx !== -1 ? trim($row[$vehicleModelSpkIdx] ?? '') : '';
+        if ($vehicleModelSpk === 'NO DATA' || $vehicleModelSpk === '-' || $vehicleModelSpk === '#N/A' || $vehicleModelSpk === '#REF!') $vehicleModelSpk = '';
+
+        $vehicleMatch = $vehicleMatchIdx !== -1 ? trim($row[$vehicleMatchIdx] ?? '') : '';
+        if ($vehicleMatch === 'NO DATA' || $vehicleMatch === '-' || $vehicleMatch === '#N/A' || $vehicleMatch === '#REF!') $vehicleMatch = '';
+
+        $hasAllDo = (!empty($allDo) && $allDo !== '-' && $allDo !== '0' && stripos($allDo, 'DO') !== false);
+        $doUnit = ($hasAllDo || stripos($remarks, 'DO') !== false) ? 'TRUE' : 'FALSE';
+
+        $hasAllSpk = (!empty($allSpk) && $allSpk !== '-' && $allSpk !== '0' && stripos($allSpk, 'SPK') !== false);
+        if ($hasAllSpk || stripos($remarks, 'SPK berhasil') !== false) {
+            $spk = 'TRUE';
+        }
 
         // Target Recommended Unit
         $targetCar = $rec1 ?: ($vFilter !== 'OTHERS' ? $vFilter : ($lastCar ?: 'Toyota Unit'));
@@ -424,7 +444,8 @@ function sync_google_sheet_data($sheetUrl = null) {
             $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
             $category, $status,
             $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo,
-            $assignedSalesId
+            $assignedSalesId,
+            $dataType, $custMigration, $vehicleModelSpk, $vehicleMatch
         ];
     }
 
@@ -442,8 +463,9 @@ function sync_google_sheet_data($sheetUrl = null) {
                 connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                 followup_category, followup_status, sync_source,
                 vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
-                assigned_sales_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                assigned_sales_id,
+                data_type, customer_migration, vehicle_model_spk, vehicle_match
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(customer_code) DO UPDATE SET
                 name = excluded.name, car_model = excluded.car_model, last_car_model = excluded.last_car_model,
                 car_age = excluded.car_age, recommended_model = excluded.recommended_model,
@@ -489,9 +511,13 @@ function sync_google_sheet_data($sheetUrl = null) {
                         THEN 0
                     ELSE followup_customers.is_orphan
                 END,
-                do_unit = CASE WHEN excluded.do_unit != 'FALSE' THEN excluded.do_unit ELSE followup_customers.do_unit END,
+                do_unit = excluded.do_unit,
                 all_spk = excluded.all_spk,
-                all_do = excluded.all_do
+                all_do = excluded.all_do,
+                data_type = excluded.data_type,
+                customer_migration = excluded.customer_migration,
+                vehicle_model_spk = excluded.vehicle_model_spk,
+                vehicle_match = excluded.vehicle_match
         ");
         foreach ($rowsToInsert as $rData) {
             $sqlite_stmt->execute($rData);
@@ -503,7 +529,7 @@ function sync_google_sheet_data($sheetUrl = null) {
             $placeholders = [];
             $flatParams = [];
             foreach ($chunk as $rData) {
-                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 foreach ($rData as $val) {
                     $flatParams[] = $val;
                 }
@@ -517,7 +543,8 @@ function sync_google_sheet_data($sheetUrl = null) {
                     connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                     followup_category, followup_status, sync_source,
                     vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
-                    assigned_sales_id
+                    assigned_sales_id,
+                    data_type, customer_migration, vehicle_model_spk, vehicle_match
                 ) VALUES " . implode(', ', $placeholders) . "
                 ON DUPLICATE KEY UPDATE
                     name = VALUES(name), car_model = VALUES(car_model), last_car_model = VALUES(last_car_model),
@@ -564,9 +591,13 @@ function sync_google_sheet_data($sheetUrl = null) {
                             THEN 0
                         ELSE followup_customers.is_orphan
                     END,
-                    do_unit = CASE WHEN VALUES(do_unit) != 'FALSE' THEN VALUES(do_unit) ELSE do_unit END,
+                    do_unit = VALUES(do_unit),
                     all_spk = VALUES(all_spk),
-                    all_do = VALUES(all_do)
+                    all_do = VALUES(all_do),
+                    data_type = VALUES(data_type),
+                    customer_migration = VALUES(customer_migration),
+                    vehicle_model_spk = VALUES(vehicle_model_spk),
+                    vehicle_match = VALUES(vehicle_match)
             ";
             followup_execute($sql, $flatParams);
         }

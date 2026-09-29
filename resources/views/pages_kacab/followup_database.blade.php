@@ -119,6 +119,9 @@
                 <i class="fa-solid fa-car"></i> Others Model
               </button>
             </div>
+            <button class="fu-sync-btn-direct" id="btnSyncDirect" onclick="syncGoogleSheetNow()" title="Tarik data sinkronisasi terbaru dari Google Spreadsheet">
+              <i class="fa-solid fa-arrows-rotate"></i> Sinkron Spreadsheet
+            </button>
           </div>
         </div>
 
@@ -260,6 +263,61 @@
             </div>
             <div class="fu-chart-canvas-wrap">
               <canvas id="chartFleetRetail"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHARTS ROW: DATA TYPE (ADDITIONAL VS REPLACEMENT) & CUSTOMER MIGRATION -->
+        <div class="fu-charts-row-2">
+          <div class="fu-chart-card">
+            <div class="fu-chart-card-head">
+              <div>
+                <h3><i class="fa-solid fa-code-compare" style="color:#2563eb;"></i> Tipe Pembelian Leads (Additional vs Replacement)</h3>
+                <span class="card-sub">Distribusi transaksi leads repurchase: Penambahan Unit vs Penggantian Mobil</span>
+              </div>
+            </div>
+            <div class="fu-chart-canvas-wrap">
+              <canvas id="chartDataType"></canvas>
+            </div>
+            <div class="fu-chart-chips-wrap" id="chipsDataTypeSummary">
+              <div class="fu-chart-chip">
+                <span class="fu-chip-dot" style="background:#2563eb;"></span>
+                <span>Additional: <strong id="chipValAdditional">0 (0%)</strong></span>
+              </div>
+              <div class="fu-chart-chip">
+                <span class="fu-chip-dot" style="background:#059669;"></span>
+                <span>Replacement: <strong id="chipValReplacement">0 (0%)</strong></span>
+              </div>
+              <div class="fu-chart-chip">
+                <i class="fa-solid fa-file-signature" style="color:#d7123a;"></i>
+                <span>Total SPK Tipe: <strong id="chipValTotalType">0 Unit</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="fu-chart-card">
+            <div class="fu-chart-card-head">
+              <div>
+                <h3><i class="fa-solid fa-arrow-trend-up" style="color:#9333ea;"></i> Pola Migrasi Pelanggan (Customer Migration)</h3>
+                <span class="card-sub">Upgrade kelas unit, Straight Replacement (sekelas), atau Downgrade</span>
+              </div>
+            </div>
+            <div class="fu-chart-canvas-wrap">
+              <canvas id="chartCustomerMigration"></canvas>
+            </div>
+            <div class="fu-chart-chips-wrap" id="chipsMigrationSummary">
+              <div class="fu-chart-chip">
+                <span class="fu-chip-dot" style="background:#9333ea;"></span>
+                <span>Upgrade: <strong id="chipValUpgrade">0</strong></span>
+              </div>
+              <div class="fu-chart-chip">
+                <span class="fu-chip-dot" style="background:#3b82f6;"></span>
+                <span>Straight: <strong id="chipValStraight">0</strong></span>
+              </div>
+              <div class="fu-chart-chip">
+                <span class="fu-chip-dot" style="background:#f59e0b;"></span>
+                <span>Downgrade: <strong id="chipValDowngrade">0</strong></span>
+              </div>
             </div>
           </div>
         </div>
@@ -591,6 +649,14 @@
               <option value="all">Semua Kategori</option>
             </select>
           </div>
+
+          <div>
+            <select id="filterTypeSelect" class="fu-select" onchange="masterState.filters.dataType = this.value; loadMasterCustomers();">
+              <option value="all">Semua Tipe (Additional / Replacement)</option>
+              <option value="Additional">Additional (Penambahan Unit)</option>
+              <option value="Replacement">Replacement (Penggantian Mobil)</option>
+            </select>
+          </div>
         </div>
 
         <!-- DEDICATED SALES PROGRESS SUMMARY STRIP (Appears when a specific sales is selected) -->
@@ -614,6 +680,7 @@
                   <th style="min-width:230px;">Customer &amp; Kontak</th>
                   <th style="min-width:210px;">Unit Mobil &amp; Usia</th>
                   <th style="min-width:180px;">Kategori &amp; Klaster</th>
+                  <th style="min-width:160px;">Tipe &amp; Migrasi</th>
                   <th style="min-width:185px;">Status Terkini</th>
                   <th style="min-width:190px;">Sales PIC</th>
                   <th style="max-width:150px;">Catatan</th>
@@ -622,7 +689,7 @@
               </thead>
               <tbody id="masterCustomerTbody">
                 <tr>
-                  <td colspan="9" style="text-align:center; padding:30px; color:#64748b;">
+                  <td colspan="10" style="text-align:center; padding:30px; color:#64748b;">
                     Memuat data...
                   </td>
                 </tr>

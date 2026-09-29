@@ -256,6 +256,7 @@ if ($action === 'customers') {
     $sales_name_param = isset($_GET['sales_name']) ? trim($_GET['sales_name']) : '';
     $status = isset($_GET['status']) ? trim($_GET['status']) : '';
     $category = isset($_GET['category']) ? trim($_GET['category']) : '';
+    $data_type = isset($_GET['data_type']) ? trim($_GET['data_type']) : '';
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
     $db_source = isset($_GET['db_source']) ? trim($_GET['db_source']) : 'all';
 
@@ -327,6 +328,11 @@ if ($action === 'customers') {
         $params[] = $category;
     }
 
+    if ($data_type !== '' && $data_type !== 'all') {
+        $where[] = "data_type = ?";
+        $params[] = $data_type;
+    }
+
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
     $sql = "SELECT * FROM followup_customers $whereSql ORDER BY id DESC LIMIT 5000";
 
@@ -386,6 +392,7 @@ if ($action === 'dashboard_analytics') {
     $filterModel = isset($_GET['filter_model']) ? strtolower(trim($_GET['filter_model'])) : 'all'; // all, veloz_hybrid, others
     $filterCluster = isset($_GET['cluster']) ? trim($_GET['cluster']) : '';
     $filterClass = isset($_GET['priority_class']) ? strtoupper(trim($_GET['priority_class'])) : '';
+    $filterType = isset($_GET['data_type']) ? trim($_GET['data_type']) : '';
 
     // Clean up phantom/blank records from previous syncs if any
     try {
@@ -398,15 +405,16 @@ if ($action === 'dashboard_analytics') {
                recommended_model, cluster_name, priority, priority_class, district,
                connected, contacted, prospect, spk, remarks, sales_fu_status,
                reason_followup, followup_date, followup_status, sync_source,
-               vehicle_filter, cust_type, outlet_name, sales_fu, do_unit, all_spk, all_do
+               vehicle_filter, cust_type, outlet_name, sales_fu, do_unit, all_spk, all_do,
+               data_type, customer_migration, vehicle_model_spk, vehicle_match
         FROM followup_customers
         ORDER BY id ASC
     ");
 
     $allCust = is_array($allCust) ? $allCust : [];
 
-    // Apply model filter
-    $filtered = array_filter($allCust, function($c) use ($filterModel, $filterCluster, $filterClass) {
+    // Apply model and type filter
+    $filtered = array_filter($allCust, function($c) use ($filterModel, $filterCluster, $filterClass, $filterType) {
         $vf = strtoupper(trim($c['vehicle_filter'] ?? 'OTHERS'));
 
         if ($filterModel === 'veloz_hybrid') {
@@ -422,6 +430,10 @@ if ($action === 'dashboard_analytics') {
         if ($filterClass !== '' && $filterClass !== 'ALL') {
             $cls = strtoupper(trim($c['priority_class'] ?? 'MEDIUM'));
             if ($cls !== $filterClass) return false;
+        }
+
+        if ($filterType !== '' && $filterType !== 'all') {
+            if (strcasecmp($c['data_type'] ?? '', $filterType) !== 0) return false;
         }
 
         return true;
@@ -454,8 +466,10 @@ if ($action === 'dashboard_analytics') {
             $conn = strtoupper(trim($r['connected'] ?? 'FALSE')) === 'TRUE';
             $cont = strtoupper(trim($r['contacted'] ?? 'FALSE')) === 'TRUE';
             $prosp = strtoupper(trim($r['prospect'] ?? 'FALSE')) === 'TRUE';
-            $isSpk = strtoupper(trim($r['spk'] ?? 'FALSE')) === 'TRUE' || stripos($rem, 'SPK berhasil') !== false || !empty($r['all_spk']);
-            $isDo = strtoupper(trim($r['do_unit'] ?? 'FALSE')) === 'TRUE' || stripos($r['all_do'] ?? '', 'DO') !== false;
+            $hasAllSpk = !empty($r['all_spk']) && $r['all_spk'] !== '-' && $r['all_spk'] !== '0' && stripos($r['all_spk'], 'SPK') !== false;
+            $isSpk = strtoupper(trim($r['spk'] ?? 'FALSE')) === 'TRUE' || stripos($rem, 'SPK berhasil') !== false || $hasAllSpk;
+            $hasAllDo = !empty($r['all_do']) && $r['all_do'] !== '-' && $r['all_do'] !== '0' && stripos($r['all_do'], 'DO') !== false;
+            $isDo = strtoupper(trim($r['do_unit'] ?? 'FALSE')) === 'TRUE' || $hasAllDo || stripos($rem, 'DO') !== false;
 
             // Remarks response count
             if (isset($responseBreakdown[$rem])) {
@@ -536,6 +550,44 @@ if ($action === 'dashboard_analytics') {
         $typeRecords = array_filter($filtered, fn($r) => strtoupper(trim($r['cust_type'] ?? 'RETAIL')) === $ctype);
         $typeBreakdown[$ctype] = $calcFunnel($typeRecords);
     }
+
+    // 2b. Breakdown by Data Type (Additional vs Replacement) & Customer Migration
+    $dtAdditional = array_values(array_filter($filtered, fn($r) => stripos($r['data_type'] ?? '', 'Additional') !== false));
+    $dtReplacement = array_values(array_filter($filtered, fn($r) => stripos($r['data_type'] ?? '', 'Replacement') !== false));
+    $dtUnknown = array_values(array_filter($filtered, fn($r) => empty($r['data_type']) || (stripos($r['data_type'], 'Additional') === false && stripos($r['data_type'], 'Replacement') === false)));
+
+    $addCount = count($dtAdditional);
+    $repCount = count($dtReplacement);
+    $totalTypeCount = $addCount + $repCount;
+
+    $dataTypeBreakdown = [
+        'Additional' => [
+            'count' => $addCount,
+            'percentage' => $totalTypeCount > 0 ? round(($addCount / $totalTypeCount) * 100, 1) : 0,
+            'spk' => $addCount,
+            'do' => count(array_filter($dtAdditional, fn($r) => strtoupper(trim($r['do_unit'] ?? 'FALSE')) === 'TRUE' || stripos($r['all_do'] ?? '', 'DO') !== false))
+        ],
+        'Replacement' => [
+            'count' => $repCount,
+            'percentage' => $totalTypeCount > 0 ? round(($repCount / $totalTypeCount) * 100, 1) : 0,
+            'spk' => $repCount,
+            'do' => count(array_filter($dtReplacement, fn($r) => strtoupper(trim($r['do_unit'] ?? 'FALSE')) === 'TRUE' || stripos($r['all_do'] ?? '', 'DO') !== false))
+        ],
+        'total_classified' => $totalTypeCount,
+        'unclassified' => count($dtUnknown)
+    ];
+
+    // Customer Migration (Upgrade vs Straight Replacement vs Downgrade)
+    $migUpgrade = count(array_filter($filtered, fn($r) => stripos($r['customer_migration'] ?? '', 'Upgrade') !== false));
+    $migStraight = count(array_filter($filtered, fn($r) => stripos($r['customer_migration'] ?? '', 'Straight Replacement') !== false));
+    $migDowngrade = count(array_filter($filtered, fn($r) => stripos($r['customer_migration'] ?? '', 'Downgrade') !== false));
+
+    $migrationBreakdown = [
+        'Upgrade' => $migUpgrade,
+        'Straight Replacement' => $migStraight,
+        'Downgrade' => $migDowngrade,
+        'total' => $migUpgrade + $migStraight + $migDowngrade
+    ];
 
     // 3. Breakdown by Clusters
     $clustersMap = [];
@@ -631,7 +683,7 @@ if ($action === 'dashboard_analytics') {
         $settings[$sr['setting_key']] = $sr['setting_value'];
     }
 
-    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1618304635#gid=1618304635';
+    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
 
     echo json_encode([
         'success' => true,
@@ -640,6 +692,8 @@ if ($action === 'dashboard_analytics') {
         'funnel' => $overallFunnel,
         'class_breakdown' => $classBreakdown,
         'type_breakdown' => $typeBreakdown,
+        'data_type_breakdown' => $dataTypeBreakdown,
+        'migration_breakdown' => $migrationBreakdown,
         'cluster_breakdown' => $clusterBreakdown,
         'sales_performance' => $salesPerformance,
         'top_models' => $topModels,

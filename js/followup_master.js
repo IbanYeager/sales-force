@@ -14,6 +14,7 @@ let masterState = {
     sales_id: 'all',
     status: 'all',
     category: 'all',
+    dataType: 'all',
     db_source: 'sales'
   },
   pagination: {
@@ -159,6 +160,8 @@ function renderExecutiveDashboardUI(data) {
   // 2. Render Charts
   renderChartFunnelConversion(f);
   renderChartFleetRetail(data.type_breakdown || {});
+  renderChartDataType(data.data_type_breakdown || {});
+  renderChartCustomerMigration(data.migration_breakdown || {});
   renderChartTemperatureClass(data.class_breakdown || {});
   renderChartResponseDistribution(f.responses || {});
   renderChartTopModels(data.top_models || []);
@@ -294,6 +297,144 @@ function renderChartFleetRetail(types) {
         }
       },
       cutout: '68%'
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// CHART: DATA TYPE (ADDITIONAL VS REPLACEMENT) (DOUGHNUT)
+// -------------------------------------------------------------
+function renderChartDataType(typeData) {
+  const canvas = document.getElementById('chartDataType');
+  if (!canvas) return;
+
+  if (executiveState.charts.dataType) {
+    executiveState.charts.dataType.destroy();
+  }
+
+  const additional = typeData.Additional || 0;
+  const replacement = typeData.Replacement || 0;
+  const total = typeData.total || (additional + replacement);
+  const pctAdd = typeData.pct_additional !== undefined ? typeData.pct_additional : (total > 0 ? ((additional / total) * 100).toFixed(1) : 0);
+  const pctRep = typeData.pct_replacement !== undefined ? typeData.pct_replacement : (total > 0 ? ((replacement / total) * 100).toFixed(1) : 0);
+
+  // Update Summary Chips
+  const chipAdd = document.getElementById('chipValAdditional');
+  if (chipAdd) chipAdd.textContent = `${additional} (${pctAdd}%)`;
+
+  const chipRep = document.getElementById('chipValReplacement');
+  if (chipRep) chipRep.textContent = `${replacement} (${pctRep}%)`;
+
+  const chipTot = document.getElementById('chipValTotalType');
+  if (chipTot) chipTot.textContent = `${total} Unit`;
+
+  const ctx = canvas.getContext('2d');
+  executiveState.charts.dataType = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: [
+        `Additional (${additional} SPK - ${pctAdd}%)`,
+        `Replacement (${replacement} SPK - ${pctRep}%)`
+      ],
+      datasets: [{
+        data: [additional, replacement],
+        backgroundColor: ['#2563eb', '#059669'],
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 11 }, boxWidth: 12, padding: 12 }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(c) {
+              const val = c.raw || 0;
+              const p = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+              return ` ${c.label.split('(')[0].trim()}: ${val} SPK (${p}%)`;
+            }
+          }
+        }
+      },
+      cutout: '68%'
+    }
+  });
+}
+
+// -------------------------------------------------------------
+// CHART: CUSTOMER MIGRATION (BAR)
+// -------------------------------------------------------------
+function renderChartCustomerMigration(migData) {
+  const canvas = document.getElementById('chartCustomerMigration');
+  if (!canvas) return;
+
+  if (executiveState.charts.migration) {
+    executiveState.charts.migration.destroy();
+  }
+
+  const upgrade = migData.Upgrade || 0;
+  const straight = migData['Straight Replacement'] || 0;
+  const downgrade = migData.Downgrade || 0;
+  const total = migData.total || (upgrade + straight + downgrade);
+
+  // Update Summary Chips
+  const chipUpg = document.getElementById('chipValUpgrade');
+  if (chipUpg) chipUpg.textContent = `${upgrade} Unit`;
+
+  const chipStr = document.getElementById('chipValStraight');
+  if (chipStr) chipStr.textContent = `${straight} Unit`;
+
+  const chipDow = document.getElementById('chipValDowngrade');
+  if (chipDow) chipDow.textContent = `${downgrade} Unit`;
+
+  const ctx = canvas.getContext('2d');
+  executiveState.charts.migration = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Upgrade', 'Straight Replacement', 'Downgrade'],
+      datasets: [{
+        label: 'Jumlah SPK Migrasi',
+        data: [upgrade, straight, downgrade],
+        backgroundColor: ['#9333ea', '#3b82f6', '#f59e0b'],
+        borderRadius: 8,
+        barThickness: 28
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(c) {
+              const val = c.raw || 0;
+              const p = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+              return ` ${c.label}: ${val} SPK (${p}%)`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 } }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: '#f1f5f9' },
+          ticks: {
+            stepSize: 5,
+            font: { family: 'Plus Jakarta Sans', weight: '600' }
+          }
+        }
+      }
     }
   });
 }
@@ -1412,7 +1553,7 @@ async function loadMasterCustomers(resetPage = true) {
   if (tbody) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align:center; padding:30px; color:#64748b;">
+        <td colspan="10" style="text-align:center; padding:30px; color:#64748b;">
           <i class="fa-solid fa-spinner fa-spin" style="font-size:20px; color:#d7123a; margin-bottom:8px;"></i><br>
           Memuat database customer...
         </td>
@@ -1421,9 +1562,9 @@ async function loadMasterCustomers(resetPage = true) {
   }
 
   try {
-    const { search, sales_id, status, category, db_source } = masterState.filters;
+    const { search, sales_id, status, category, dataType, db_source } = masterState.filters;
     const spv = getLoggedInSpvName();
-    const url = `/api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&db_source=${db_source || 'sales'}&spv=${encodeURIComponent(spv)}`;
+    const url = `/api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&data_type=${encodeURIComponent(dataType || 'all')}&db_source=${db_source || 'sales'}&spv=${encodeURIComponent(spv)}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -1438,7 +1579,7 @@ async function loadMasterCustomers(resetPage = true) {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="9" style="text-align:center; padding:30px; color:#dc2626;">
+          <td colspan="10" style="text-align:center; padding:30px; color:#dc2626;">
             <i class="fa-solid fa-triangle-exclamation" style="font-size:20px; margin-bottom:8px;"></i><br>
             Gagal memuat data customer dari server.
           </td>
@@ -1479,7 +1620,7 @@ function renderCustomerTable() {
   if (totalCount === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align:center; padding:60px 20px; color:#94a3b8;">
+        <td colspan="10" style="text-align:center; padding:60px 20px; color:#94a3b8;">
           <i class="fa-solid fa-folder-open" style="font-size:32px; margin-bottom:12px; color:#cbd5e1;"></i><br>
           <strong style="font-size:14px; color:#0f172a;">Tidak ada data customer yang sesuai</strong><br>
           <span style="font-size:12px;">Coba ubah kata kunci pencarian atau filter kategori di atas.</span>
@@ -1575,7 +1716,32 @@ function renderCustomerTable() {
           </div>
         </td>
 
-        <!-- 5. Status Terkini -->
+        <!-- 5. Tipe & Migrasi -->
+        <td style="min-width:160px;">
+          ${c.data_type ? `
+            <div style="margin-bottom:4px;">
+              <span class="badge-type-pill ${c.data_type.toLowerCase() === 'additional' ? 'badge-type-additional' : 'badge-type-replacement'}">
+                <i class="fa-solid ${c.data_type.toLowerCase() === 'additional' ? 'fa-plus' : 'fa-arrows-rotate'}" style="font-size:9.5px;"></i>
+                ${escapeHtml(c.data_type)}
+              </span>
+            </div>
+          ` : `<span style="color:#94a3b8; font-size:11px;">-</span>`}
+          ${c.customer_migration ? `
+            <div>
+              <span class="badge-mig-pill">
+                <i class="fa-solid fa-route" style="font-size:9px;"></i>
+                ${escapeHtml(c.customer_migration)}
+              </span>
+            </div>
+          ` : ''}
+          ${c.vehicle_model_spk ? `
+            <div style="font-size:10px; color:#64748b; margin-top:3px;">
+              SPK: <strong style="color:#0f172a;">${escapeHtml(c.vehicle_model_spk)}</strong>
+            </div>
+          ` : ''}
+        </td>
+
+        <!-- 6. Status Terkini -->
         <td style="min-width:185px;">
           <select class="fu-table-select" onchange="inlineUpdateStatus(${c.id}, this.value)">
             <option value="Belum Dihubungi" ${c.followup_status === 'Belum Dihubungi' ? 'selected' : ''}>⚪ Belum Dihubungi</option>

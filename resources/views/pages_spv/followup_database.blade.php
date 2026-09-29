@@ -291,6 +291,14 @@
             <option value="all">Semua Kategori</option>
           </select>
         </div>
+
+        <div>
+          <select id="filterTypeSelect" class="fu-select" onchange="masterState.filters.dataType = this.value; loadMasterCustomers();">
+            <option value="all">Semua Tipe (Additional / Replacement)</option>
+            <option value="Additional">Additional (Penambahan Unit)</option>
+            <option value="Replacement">Replacement (Penggantian Mobil)</option>
+          </select>
+        </div>
       </div>
 
       <!-- NOTIFY SALES QUICK BAR -->
@@ -334,6 +342,7 @@
                 <th style="min-width:230px;">Customer &amp; Kontak</th>
                 <th style="min-width:210px;">Unit Mobil &amp; Usia</th>
                 <th style="min-width:180px;">Kategori &amp; Klaster</th>
+                <th style="min-width:160px;">Tipe &amp; Migrasi</th>
                 <th style="min-width:185px;">Status Terkini</th>
                 <th style="min-width:190px;">Sales PIC</th>
                 <th style="max-width:150px;">Catatan</th>
