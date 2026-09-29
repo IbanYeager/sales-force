@@ -3,6 +3,11 @@
  * Tunas Toyota Kiara Condong
  */
 
+// Register chartjs-plugin-datalabels globally if available
+if (typeof ChartDataLabels !== 'undefined') {
+  Chart.register(ChartDataLabels);
+}
+
 let masterState = {
   customers: [],
   salesList: [],
@@ -330,11 +335,14 @@ function renderChartDataType(typeData) {
     executiveState.charts.dataType.destroy();
   }
 
-  const additional = typeData.Additional || 0;
-  const replacement = typeData.Replacement || 0;
-  const total = typeData.total || (additional + replacement);
-  const pctAdd = typeData.pct_additional !== undefined ? typeData.pct_additional : (total > 0 ? ((additional / total) * 100).toFixed(1) : 0);
-  const pctRep = typeData.pct_replacement !== undefined ? typeData.pct_replacement : (total > 0 ? ((replacement / total) * 100).toFixed(1) : 0);
+  // Handle nested format: {Additional: {count: N, percentage: P}} or flat {Additional: N}
+  const rawAdd = typeData.Additional;
+  const rawRep = typeData.Replacement;
+  const additional = (typeof rawAdd === 'object' && rawAdd !== null) ? (rawAdd.count || 0) : (rawAdd || 0);
+  const replacement = (typeof rawRep === 'object' && rawRep !== null) ? (rawRep.count || 0) : (rawRep || 0);
+  const total = typeData.total_classified || typeData.total || (additional + replacement);
+  const pctAdd = total > 0 ? ((additional / total) * 100).toFixed(1) : 0;
+  const pctRep = total > 0 ? ((replacement / total) * 100).toFixed(1) : 0;
 
   // Update Summary Chips
   const chipAdd = document.getElementById('chipValAdditional');
