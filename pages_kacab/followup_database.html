@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -6,13 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Database Follow-Up (CRM)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/css/style_kacab.css?v=20260915_layout_perfect">
-  <link rel="stylesheet" href="/css/followup.css?v=20260922_searchable_filter">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_layout_perfect">
+  <link rel="stylesheet" href="../css/followup.css?v=20260929_datalabels">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
+  <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1e1014">
 </head>
 
@@ -67,7 +67,7 @@
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
-            <img id="kacabAvatar" src="/image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Kepala+Cabang&background=1E1014&color=fff'">
+            <img id="kacabAvatar" src="../image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Kepala+Cabang&background=1E1014&color=fff'">
             <span class="dot"></span>
           </div>
           <div class="meta">
@@ -102,7 +102,7 @@
             <div class="fu-sync-info">
               <h4>
                 <span class="fu-sync-pulse"></span>
-                Tunas Toyota Kiara Condong — CRM Analytics Master
+                Tunas Toyota Kiara Condong â€” CRM Analytics Master
               </h4>
               <p id="sheetSourceInfo">Monitoring analitik eksekutif dan pembagian database prospek wiraniaga cabang</p>
             </div>
@@ -541,7 +541,7 @@
               <i class="fa-solid fa-arrows-rotate" style="color:#0f9d58; font-size:13px;"></i> Sync Sheet
             </button>
 
-            <a href="/api/api_followup_sync.php?action=export_csv" class="btn-fu btn-fu-secondary">
+            <a href="../api/api_followup_sync.php?action=export_csv" class="btn-fu btn-fu-secondary">
               <i class="fa-solid fa-file-arrow-down" style="color:#0284c7; font-size:13px;"></i> Ekspor CSV
             </a>
 
@@ -620,9 +620,9 @@
 
           <div>
             <select id="filterDbSourceSelect" class="fu-select" onchange="switchMasterDbSource(this.value);" style="font-weight:800; border-color:#cbd5e1;">
-              <option value="sales">🎯 Database Khusus Sales</option>
-              <option value="radar">📡 Database Radar GPS (PKB Excel)</option>
-              <option value="all">🌐 Semua Database (Gabungan)</option>
+              <option value="sales">ðŸŽ¯ Database Khusus Sales</option>
+              <option value="radar">ðŸ“¡ Database Radar GPS (PKB Excel)</option>
+              <option value="all">ðŸŒ Semua Database (Gabungan)</option>
             </select>
           </div>
 
@@ -635,7 +635,7 @@
           <div>
             <select id="filterStatusSelect" class="fu-select" onchange="masterState.filters.status = this.value; loadMasterCustomers();">
               <option value="all">Semua Status Follow Up</option>
-              <option value="uncontacted">⭕ Belum Diisi (Contacted & Connected Kosong)</option>
+              <option value="uncontacted">â­• Belum Diisi (Contacted & Connected Kosong)</option>
               <option value="belum_fu">Belum Di-Follow Up</option>
               <option value="sudah_fu">Sudah Di-Follow Up (Semua)</option>
               <option value="Menunggu Respon">Menunggu Respon</option>
@@ -706,9 +706,9 @@
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="/custom_alert.js?v=25"></script>
-  <script src="/js/kacab_global.js?v=20260824_dendi"></script>
-  <script src="/js/followup_master.js?v=20260929_datalabels"></script>
-  <script src="/js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../custom_alert.js?v=25"></script>
+  <script src="../js/kacab_global.js?v=20260824_dendi"></script>
+  <script src="../js/followup_master.js?v=20260929_datalabels"></script>
+  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 </html>
