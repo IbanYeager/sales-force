@@ -241,6 +241,13 @@ function renderChartFunnelConversion(f) {
               return ` ${val.toLocaleString('id-ID')} Leads (${pctOfPotency}% dari Potensi)`;
             }
           }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#0f172a',
+          font: { family: 'Plus Jakarta Sans', weight: '800', size: 11 },
+          formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
         }
       },
       scales: {
@@ -294,6 +301,17 @@ function renderChartFleetRetail(types) {
         legend: {
           position: 'bottom',
           labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 11 }, boxWidth: 12, padding: 12 }
+        },
+        datalabels: {
+          color: '#ffffff',
+          font: { family: 'Plus Jakarta Sans', weight: '800', size: 13 },
+          formatter: (val, ctx) => {
+            const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            if (val === 0 || sum === 0) return '';
+            const pct = ((val / sum) * 100).toFixed(0);
+            return val + '\n(' + pct + '%)';
+          },
+          textAlign: 'center'
         }
       },
       cutout: '68%'
@@ -360,6 +378,16 @@ function renderChartDataType(typeData) {
               return ` ${c.label.split('(')[0].trim()}: ${val} SPK (${p}%)`;
             }
           }
+        },
+        datalabels: {
+          color: '#ffffff',
+          font: { family: 'Plus Jakarta Sans', weight: '800', size: 14 },
+          formatter: (val) => {
+            if (val === 0) return '';
+            const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;
+            return val + ' SPK\n(' + pct + '%)';
+          },
+          textAlign: 'center'
         }
       },
       cutout: '68%'
@@ -419,6 +447,13 @@ function renderChartCustomerMigration(migData) {
               return ` ${c.label}: ${val} SPK (${p}%)`;
             }
           }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          color: '#0f172a',
+          font: { family: 'Plus Jakarta Sans', weight: '800', size: 12 },
+          formatter: (val) => val > 0 ? val + ' SPK' : '0'
         }
       },
       scales: {
@@ -487,6 +522,13 @@ function renderChartTemperatureClass(classes) {
         legend: {
           position: 'bottom',
           labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 }, boxWidth: 10, padding: 10 }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          color: '#0f172a',
+          font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 },
+          formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
         }
       },
       scales: {
@@ -546,6 +588,18 @@ function renderChartResponseDistribution(responses) {
         legend: {
           position: 'bottom',
           labels: { font: { family: 'Plus Jakarta Sans', weight: '600', size: 9 }, boxWidth: 10, padding: 6 }
+        },
+        datalabels: {
+          color: '#ffffff',
+          font: { family: 'Plus Jakarta Sans', weight: '800', size: 11 },
+          formatter: (val, ctx) => {
+            const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            if (val === 0 || sum === 0) return '';
+            const pct = ((val / sum) * 100).toFixed(0);
+            return val + '\n(' + pct + '%)';
+          },
+          textAlign: 'center',
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
         }
       },
       cutout: '60%'
@@ -596,6 +650,13 @@ function renderChartTopModels(models) {
         legend: {
           position: 'bottom',
           labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 }, boxWidth: 10, padding: 8 }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          color: '#0f172a',
+          font: { family: 'Plus Jakarta Sans', weight: '700', size: 10 },
+          formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
         }
       },
       scales: {

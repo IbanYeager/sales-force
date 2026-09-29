@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/css/style_kacab.css?v=20260915_layout_perfect">
   <link rel="stylesheet" href="/css/followup.css?v=20260922_searchable_filter">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
