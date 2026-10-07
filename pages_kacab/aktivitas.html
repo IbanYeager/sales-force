@@ -570,22 +570,6 @@
       background: #2563eb;
       color: #ffffff;
     }
-    .btn-quick-prospek {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #334155;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 9px 12px;
-      border-radius: 9px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-quick-prospek:hover {
-      background: #cc1426;
-      border-color: #cc1426;
-      color: #ffffff;
-    }
     .sales-combobox-wrapper {
       position: relative;
       width: 100%;
@@ -1405,15 +1389,15 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Lokasi Kegiatan</label>
-            <div class="custom-input-wrapper">
-              <i class="fa-solid fa-location-dot input-icon"></i>
-              <input type="text" id="modalInputLokasi" name="lokasi" class="form-control with-icon" placeholder="Contoh: Festival Citylink Bandung / Borma Cijerah / Showroom Kiara Condong">
-            </div>
-          </div>
-
           <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Lokasi Kegiatan</label>
+              <div class="custom-input-wrapper">
+                <i class="fa-solid fa-location-dot input-icon"></i>
+                <input type="text" id="modalInputLokasi" name="lokasi" class="form-control with-icon" placeholder="Contoh: Festival Citylink Bandung / Borma / Showroom">
+              </div>
+            </div>
+
             <div class="form-group">
               <label class="form-label">Durasi Kegiatan</label>
               <div class="custom-select-wrapper">
@@ -1425,19 +1409,6 @@
                   <option value="3 Jam">3 Jam</option>
                   <option value="Full Day (4+ Jam)">Full Day (4+ Jam)</option>
                 </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Jumlah Prospek Didapat</label>
-              <div style="display:flex; gap:8px; align-items:center;">
-                <div class="custom-input-wrapper" style="flex:1;">
-                  <i class="fa-solid fa-users-viewfinder input-icon"></i>
-                  <input type="number" id="modalInputProspek" name="jumlah_prospek" class="form-control with-icon" min="0" value="0">
-                </div>
-                <button type="button" class="btn-quick-prospek" onclick="addProspekCount(1)" title="Tambah 1 Prospek">+1</button>
-                <button type="button" class="btn-quick-prospek" onclick="addProspekCount(2)" title="Tambah 2 Prospek">+2</button>
-                <button type="button" class="btn-quick-prospek" onclick="addProspekCount(5)" title="Tambah 5 Prospek">+5</button>
               </div>
             </div>
           </div>
@@ -1480,7 +1451,7 @@
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label class="form-label">Keterangan / Hasil Aktivitas <span class="req">*</span></label>
-            <textarea id="modalInputKeterangan" name="keterangan" rows="3" class="form-control" required placeholder="Tuliskan keterangan lengkap kegiatan, respon customer, unit yang diminati (Avanza/Veloz/Zenix), catatan prospek, dll..."></textarea>
+            <textarea id="modalInputKeterangan" name="keterangan" rows="3" class="form-control" required placeholder="Tuliskan keterangan lengkap atau catatan hasil kegiatan aktivitas sales..."></textarea>
           </div>
 
         </div>
@@ -1525,7 +1496,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v2"></script>
+  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v3"></script>
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
