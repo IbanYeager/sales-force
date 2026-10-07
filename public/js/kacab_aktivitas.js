@@ -348,13 +348,6 @@ function applyTimelineFilters() {
               <span class="tl-status ${statusClass(act.status)}">${escapeHtml(act.status)}</span>
             </div>
             <div class="tl-desc">${escapeHtml(act.keterangan || '')}</div>
-            
-            ${act.laporan_hasil ? `
-              <div style="margin-top:6px; background:#f0fdf4; border-left:3px solid #10b981; padding:4px 8px; border-radius:4px; font-size:11.5px; color:#166534;">
-                <strong>Hasil:</strong> ${escapeHtml(act.laporan_hasil)}
-                ${act.jumlah_prospek ? ` &bull; <strong>${act.jumlah_prospek} Prospek</strong>` : ''}
-              </div>
-            ` : ''}
 
             <div class="tl-meta">
               <span><i class="fa-solid fa-location-dot"></i>${escapeHtml(act.lokasi || 'Lokasi tidak terekam')}</span>
@@ -1030,9 +1023,9 @@ async function submitInputAktivitas(event) {
     formData.append('status', document.getElementById('modalInputStatus')?.value || 'Selesai');
     formData.append('lokasi', document.getElementById('modalInputLokasi')?.value || '');
     formData.append('durasi', document.getElementById('modalInputDurasi')?.value || '1 Jam');
-    formData.append('jumlah_prospek', document.getElementById('modalInputProspek')?.value || '0');
+    formData.append('jumlah_prospek', '0');
     formData.append('keterangan', ketVal);
-    formData.append('laporan_hasil', ketVal);
+    formData.append('laporan_hasil', '');
     
     // Lampirkan multi-foto
     selectedInputPhotos.forEach(file => {

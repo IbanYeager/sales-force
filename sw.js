@@ -3,7 +3,7 @@
 // Version: 2026.08.28_v2
 // =========================================================================
 
-const CACHE_VERSION = 'sft-pwa-v20261007-kacab-input-v3';
+const CACHE_VERSION = 'sft-pwa-v20261007-kacab-input-v4';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './image/icons/icon-192x192.png',

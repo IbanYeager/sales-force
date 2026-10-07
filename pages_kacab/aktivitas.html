@@ -1445,13 +1445,13 @@
             <div id="fotoPreviewGrid" class="foto-preview-grid"></div>
           </div>
 
-          <!-- Section 5: Keterangan / Laporan Hasil -->
+          <!-- Section 5: Keterangan Aktivitas -->
           <div class="form-section-title" style="margin-top:10px;">
-            <i class="fa-solid fa-clipboard-list"></i> 5. Catatan Keterangan &amp; Hasil Kegiatan
+            <i class="fa-solid fa-clipboard-list"></i> 5. Catatan Keterangan Aktivitas
           </div>
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">Keterangan / Hasil Aktivitas <span class="req">*</span></label>
-            <textarea id="modalInputKeterangan" name="keterangan" rows="3" class="form-control" required placeholder="Tuliskan keterangan lengkap atau catatan hasil kegiatan aktivitas sales..."></textarea>
+            <label class="form-label">Keterangan Aktivitas <span class="req">*</span></label>
+            <textarea id="modalInputKeterangan" name="keterangan" rows="3" class="form-control" required placeholder="Tuliskan catatan atau keterangan lengkap kegiatan aktivitas sales..."></textarea>
           </div>
 
         </div>
@@ -1496,7 +1496,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v3"></script>
+  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v4"></script>
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
