@@ -851,10 +851,193 @@
       box-shadow: 0 6px 18px rgba(204, 20, 38, 0.4);
       background: linear-gradient(135deg, #e01d31, #b31222);
     }
-    .btn-modal-save:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
+    /* Detail Activity Modal Enhancement */
+    .detail-overlay.open {
+      display: flex !important;
+      opacity: 1;
+    }
+    .zoom-overlay.open {
+      display: flex !important;
+    }
+    .badge-sesi-pill {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .badge-durasi-pill {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .det-sales-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+    .det-sales-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #cc1426;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .det-sales-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .det-sales-name {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .det-sales-meta {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .detail-photo-area {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .detail-photo-main-container {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0f172a;
+      max-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+    .detail-photo-main-container img {
+      width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      cursor: zoom-in;
+      transition: transform 0.2s;
+    }
+    .btn-zoom-corner {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s;
+    }
+    .btn-zoom-corner:hover {
+      background: #cc1426;
+    }
+    .det-photo-counter {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+    .detail-thumbs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0;
+    }
+    .detail-thumb-item {
+      width: 62px;
+      height: 62px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid #cbd5e1;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .detail-thumb-item:hover {
+      border-color: #94a3b8;
+    }
+    .detail-thumb-item.active {
+      border-color: #cc1426;
+      box-shadow: 0 0 0 2px rgba(204, 20, 38, 0.35);
+    }
+    .detail-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .det-keterangan-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #1e293b;
+      white-space: pre-wrap;
+      font-weight: 500;
+    }
+    .detail-modal-footer {
+      padding: 12px 22px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .btn-detail-close-btn {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #334155;
+      padding: 8px 18px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-detail-close-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
     }
   </style>
 </head>
@@ -1054,29 +1237,55 @@
   </div>
 
   <!-- Activity Detail Modal -->
-  <div id="activityDetailModal" class="detail-overlay">
+  <div id="activityDetailModal" class="detail-overlay" onclick="if(event.target===this)closeActivityDetail()">
     <div class="detail-modal">
       <div class="detail-header">
         <div class="detail-header-left">
           <div class="detail-header-icon"><i id="detIcon" class="fa-solid fa-list-check"></i></div>
           <div>
-            <h3 id="detTitle">Detail Aktivitas</h3>
-            <span class="detail-header-sub">Informasi detail perekaman sales</span>
+            <h3 id="detTitle">Detail Aktivitas Wiraniaga</h3>
+            <span class="detail-header-sub">Rincian lengkap perekaman kegiatan cabang</span>
           </div>
         </div>
-        <button class="detail-close" onclick="closeActivityDetail()" aria-label="Tutup detail"><i
-            class="fa-solid fa-xmark"></i></button>
+        <button type="button" class="detail-close" onclick="closeActivityDetail()" aria-label="Tutup detail">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
       <div class="detail-body">
+        <!-- Status & Time Bar -->
         <div class="detail-status-row">
-          <span id="detStatusBadge" class="badge badge-approved">Selesai</span>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span id="detStatusBadge" class="badge badge-approved">Selesai</span>
+            <span id="detSesiBadge" class="badge-sesi-pill"><i class="fa-solid fa-sun"></i> Sesi Pagi</span>
+            <span id="detDurasiBadge" class="badge-durasi-pill"><i class="fa-solid fa-hourglass-half"></i> 1 Jam</span>
+          </div>
           <span id="detTime" class="detail-time"><i class="fa-regular fa-clock"></i> -</span>
         </div>
 
+        <!-- Sales Profile Strip -->
+        <div class="det-sales-strip">
+          <div class="det-sales-avatar" id="detSalesAvatar">S</div>
+          <div class="det-sales-info">
+            <div class="det-sales-name" id="detNamaSalesVal">-</div>
+            <div class="det-sales-meta">
+              <span>SPV: <strong id="detSpvVal" style="color:#0f172a;">-</strong></span> &bull; 
+              <span id="detTingkatanVal" class="badge-tingkatan">Executive</span>
+            </div>
+          </div>
+          <div id="detSalesContactArea">
+            <!-- Dynamic WhatsApp button -->
+          </div>
+        </div>
+
+        <!-- Photo Documentation Area -->
         <div id="detPhotoArea" class="detail-photo-area">
-          <div class="detail-photo-main">
-            <img id="detMainPhoto" src="" onclick="zoomMainPhoto()" alt="Foto aktivitas">
+          <div class="detail-photo-main-container">
+            <img id="detMainPhoto" src="" onclick="zoomMainPhoto()" alt="Foto aktivitas" title="Klik untuk memperbesar">
+            <button type="button" class="btn-zoom-corner" onclick="zoomMainPhoto()" title="Perbesar Layar Penuh">
+              <i class="fa-solid fa-expand"></i> Layar Penuh
+            </button>
+            <span id="detPhotoCounter" class="det-photo-counter">Foto 1 dari 1</span>
           </div>
           <div id="detThumbs" class="detail-thumbs"></div>
         </div>
@@ -1093,51 +1302,42 @@
 
         <div class="detail-info-list">
           <div class="detail-info-row">
-            <div class="detail-info-icon violet"><i class="fa-solid fa-user"></i></div>
-            <div>
-              <div class="detail-info-label">Nama Sales</div>
-              <div class="detail-info-value" id="detNamaSalesVal">-</div>
-            </div>
-          </div>
-
-          <div class="detail-info-row">
-            <div class="detail-info-icon gold"><i class="fa-solid fa-user-tie"></i></div>
-            <div>
-              <div class="detail-info-label">SPV Pembina</div>
-              <div class="detail-info-value" id="detSpvVal">-</div>
-            </div>
-          </div>
-
-          <div class="detail-info-row">
             <div class="detail-info-icon blue"><i class="fa-solid fa-tag"></i></div>
-            <div>
-              <div class="detail-info-label">Tipe Aktivitas</div>
-              <div class="detail-info-value" id="detTipeVal">-</div>
-            </div>
-          </div>
-
-          <div class="detail-info-row">
-            <div class="detail-info-icon blue"><i class="fa-solid fa-align-left"></i></div>
             <div style="flex:1;">
-              <div class="detail-info-label">Keterangan</div>
-              <div class="detail-info-value" id="detKeteranganVal" style="white-space:pre-wrap; font-weight:500;">-
-              </div>
+              <div class="detail-info-label">Tipe Kegiatan</div>
+              <div class="detail-info-value" id="detTipeVal" style="font-weight:700; color:#0f172a;">-</div>
             </div>
           </div>
 
-          <div class="detail-info-row" style="flex-direction:column; align-items:stretch; gap:10px;">
-            <div style="display:flex; gap:12px; align-items:flex-start;">
-              <div class="detail-info-icon green"><i class="fa-solid fa-location-dot"></i></div>
-              <div>
-                <div class="detail-info-label">Lokasi</div>
-                <div class="detail-info-value" id="detLokasiVal">-</div>
+          <div class="detail-info-row" style="flex-direction:column; align-items:stretch; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; gap:12px; align-items:center;">
+                <div class="detail-info-icon green"><i class="fa-solid fa-location-dot"></i></div>
+                <div>
+                  <div class="detail-info-label">Lokasi Pelaksanaan</div>
+                  <div class="detail-info-value" id="detLokasiVal" style="font-weight:600; color:#1e293b;">-</div>
+                </div>
               </div>
+              <a id="detMapBtn" href="#" target="_blank" class="detail-map-btn" style="display:none;">
+                <i class="fa-solid fa-map-location-dot"></i> Buka Maps
+              </a>
             </div>
-            <a id="detMapBtn" href="#" target="_blank" class="detail-map-btn">
-              <i class="fa-solid fa-map-location-dot"></i> Buka Lokasi di Google Maps
-            </a>
+          </div>
+
+          <div class="detail-info-row" style="flex-direction:column; align-items:stretch; gap:6px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="detail-info-icon blue"><i class="fa-solid fa-align-left"></i></div>
+              <div class="detail-info-label" style="font-size:12px; font-weight:700; color:#334155;">Catatan &amp; Keterangan Kegiatan</div>
+            </div>
+            <div class="det-keterangan-box" id="detKeteranganVal">-</div>
           </div>
         </div>
+      </div>
+
+      <div class="detail-modal-footer">
+        <button type="button" class="btn-detail-close-btn" onclick="closeActivityDetail()">
+          <i class="fa-solid fa-xmark"></i> Tutup Detail
+        </button>
       </div>
     </div>
   </div>
@@ -1496,7 +1696,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v4"></script>
+  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v5"></script>
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 

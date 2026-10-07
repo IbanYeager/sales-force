@@ -374,38 +374,113 @@ function showActivityDetails(index) {
   const act = activitiesList[index];
   if (!act) return;
 
-  document.getElementById('detIcon').className = `fa-solid ${activityIcon(act.tipe_aktivitas)}`;
-  document.getElementById('detNamaSalesVal').textContent = act.nama_sales || 'Sales Consultant';
-  document.getElementById('detSpvVal').textContent = spvOfSales(act.nama_sales) || '-';
-  document.getElementById('detTipeVal').textContent = act.tipe_aktivitas;
-  document.getElementById('detKeteranganVal').textContent = act.keterangan;
-  document.getElementById('detLokasiVal').textContent = act.lokasi || 'Lokasi tidak terekam';
+  const iconEl = document.getElementById('detIcon');
+  if (iconEl) iconEl.className = `fa-solid ${activityIcon(act.tipe_aktivitas)}`;
+  
+  const salesName = act.nama_sales || 'Sales Consultant';
+  const spvName = act.nama_spv || spvOfSales(salesName) || 'Tanpa SPV';
+  
+  // Ambil data wiraniaga untuk tingkatan & kontak WA
+  const salesObj = allWiraniagaList.find(s => 
+    (s.nama_lengkap || '').trim().toLowerCase() === salesName.trim().toLowerCase() ||
+    String(s.id) === String(act.sales_account_id)
+  );
+  
+  const tingkatan = salesObj?.tingkatan || 'Executive';
+  const phone = (salesObj?.no_hp || '').replace(/[^0-9]/g, '');
 
+  const namaSalesEl = document.getElementById('detNamaSalesVal');
+  if (namaSalesEl) namaSalesEl.textContent = salesName;
+  
+  const spvEl = document.getElementById('detSpvVal');
+  if (spvEl) spvEl.textContent = spvName;
+  
+  const tingkatanEl = document.getElementById('detTingkatanVal');
+  if (tingkatanEl) tingkatanEl.textContent = tingkatan;
+
+  const avatarEl = document.getElementById('detSalesAvatar');
+  if (avatarEl) avatarEl.textContent = (salesName.charAt(0) || 'S').toUpperCase();
+
+  // Tombol WA
+  const contactArea = document.getElementById('detSalesContactArea');
+  if (contactArea) {
+    if (phone) {
+      const waPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
+      const waMsg = encodeURIComponent(`Halo ${salesName}, terkait aktivitas "${act.tipe_aktivitas}" hari ini di ${act.lokasi || 'lapangan'}...`);
+      contactArea.innerHTML = `
+        <a href="https://wa.me/${waPhone}?text=${waMsg}" target="_blank" style="background:#25D366; color:#ffffff; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(37,211,102,0.25);">
+          <i class="fa-brands fa-whatsapp"></i> Hubungi Sales
+        </a>`;
+    } else {
+      contactArea.innerHTML = '';
+    }
+  }
+
+  // Tipe & Lokasi
+  const tipeEl = document.getElementById('detTipeVal');
+  if (tipeEl) tipeEl.textContent = act.tipe_aktivitas;
+
+  const lokasiEl = document.getElementById('detLokasiVal');
+  if (lokasiEl) lokasiEl.textContent = act.lokasi || 'Lokasi tidak terekam';
+
+  // Keterangan
+  const ketEl = document.getElementById('detKeteranganVal');
+  if (ketEl) ketEl.textContent = act.keterangan || 'Tidak ada catatan keterangan';
+
+  // Status Badge
   const statusBadge = document.getElementById('detStatusBadge');
-  statusBadge.textContent = act.status;
-  if (act.status === 'Rencana') {
-    statusBadge.className = 'badge badge-pending';
-  } else if (act.status === 'Sedang Dilakukan') {
-    statusBadge.className = 'badge badge-waiting';
-  } else {
-    statusBadge.className = 'badge badge-approved';
+  if (statusBadge) {
+    statusBadge.textContent = act.status || 'Selesai';
+    if (act.status === 'Rencana') {
+      statusBadge.className = 'badge badge-pending';
+    } else if (act.status === 'Sedang Dilakukan') {
+      statusBadge.className = 'badge badge-waiting';
+    } else {
+      statusBadge.className = 'badge badge-approved';
+    }
   }
 
-  const date = new Date(String(act.created_at).replace(/-/g, '/'));
-  const timeStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  document.getElementById('detTime').innerHTML = `<i class="fa-regular fa-clock"></i> ${timeStr}`;
+  // Sesi & Durasi Badges
+  const sesiBadge = document.getElementById('detSesiBadge');
+  if (sesiBadge) {
+    const sesi = act.sesi_waktu || 'Pagi';
+    const sesiIcon = sesi === 'Pagi' ? 'fa-sun' : (sesi === 'Siang' ? 'fa-cloud-sun' : 'fa-moon');
+    sesiBadge.innerHTML = `<i class="fa-solid ${sesiIcon}"></i> Sesi ${sesi}`;
+  }
 
+  const durasiBadge = document.getElementById('detDurasiBadge');
+  if (durasiBadge) {
+    durasiBadge.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> ${escapeHtml(act.durasi || '1 Jam')}`;
+  }
+
+  // Format Hari & Tanggal Lengkap
+  const dateObj = new Date(String(act.created_at || '').replace(/-/g, '/'));
+  let formattedTime = '-';
+  if (!isNaN(dateObj.getTime())) {
+    const hari = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+    const tgl = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const jam = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
+    formattedTime = `${hari}, ${tgl} &bull; ${jam} WIB`;
+  }
+  const timeEl = document.getElementById('detTime');
+  if (timeEl) timeEl.innerHTML = `<i class="fa-regular fa-calendar-check"></i> ${formattedTime}`;
+
+  // Maps Link
   const mapBtn = document.getElementById('detMapBtn');
-  if (act.lokasi && act.lokasi.trim() !== '') {
-    mapBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.lokasi)}`;
-    mapBtn.style.display = 'flex';
-  } else {
-    mapBtn.style.display = 'none';
+  if (mapBtn) {
+    if (act.lokasi && act.lokasi.trim() !== '') {
+      mapBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.lokasi)}`;
+      mapBtn.style.display = 'inline-flex';
+    } else {
+      mapBtn.style.display = 'none';
+    }
   }
 
+  // Multi Foto Handling
   const photoArea = document.getElementById('detPhotoArea');
   const noPhotoBanner = document.getElementById('detNoPhotoBanner');
   const thumbs = document.getElementById('detThumbs');
+  const photoCounter = document.getElementById('detPhotoCounter');
 
   currentPhotoList = [];
   if (act.foto && String(act.foto).trim() !== '') {
@@ -418,38 +493,63 @@ function showActivityDetails(index) {
   }
 
   if (currentPhotoList.length > 0) {
-    photoArea.style.display = 'block';
+    if (photoArea) photoArea.style.display = 'flex';
     if (noPhotoBanner) noPhotoBanner.style.display = 'none';
     currentPhotoIndex = 0;
-    document.getElementById('detMainPhoto').src = currentPhotoList[0];
+    
+    const mainImg = document.getElementById('detMainPhoto');
+    if (mainImg) mainImg.src = currentPhotoList[0];
 
-    if (currentPhotoList.length > 1) {
-      thumbs.innerHTML = currentPhotoList.map((url, i) => `
-        <img src="${url}" class="detail-thumb ${i === 0 ? 'active' : ''}"
-          onclick="switchDetailPhoto(${i})" alt="Thumb ${i + 1}">
-      `).join('');
-      thumbs.style.display = 'flex';
-    } else {
-      thumbs.style.display = 'none';
+    if (photoCounter) {
+      photoCounter.textContent = `Foto 1 dari ${currentPhotoList.length}`;
+    }
+
+    if (thumbs) {
+      if (currentPhotoList.length > 1) {
+        thumbs.innerHTML = currentPhotoList.map((url, i) => `
+          <div class="detail-thumb-item ${i === 0 ? 'active' : ''}" onclick="switchDetailPhoto(${i})">
+            <img src="${url}" alt="Foto ${i + 1}">
+          </div>
+        `).join('');
+        thumbs.style.display = 'flex';
+      } else {
+        thumbs.style.display = 'none';
+      }
     }
   } else {
-    photoArea.style.display = 'none';
+    if (photoArea) photoArea.style.display = 'none';
     if (noPhotoBanner) noPhotoBanner.style.display = 'flex';
   }
 
-  document.getElementById('activityDetailModal').classList.add('open');
+  const modal = document.getElementById('activityDetailModal');
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+  }
 }
 
 function switchDetailPhoto(index) {
+  if (!currentPhotoList[index]) return;
   currentPhotoIndex = index;
-  document.getElementById('detMainPhoto').src = currentPhotoList[index];
-  document.querySelectorAll('.detail-thumb').forEach((th, i) => {
+  const mainImg = document.getElementById('detMainPhoto');
+  if (mainImg) mainImg.src = currentPhotoList[index];
+
+  const photoCounter = document.getElementById('detPhotoCounter');
+  if (photoCounter) {
+    photoCounter.textContent = `Foto ${index + 1} dari ${currentPhotoList.length}`;
+  }
+
+  document.querySelectorAll('.detail-thumb-item').forEach((th, i) => {
     th.classList.toggle('active', i === index);
   });
 }
 
 function closeActivityDetail() {
-  document.getElementById('activityDetailModal').classList.remove('open');
+  const modal = document.getElementById('activityDetailModal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
 }
 
 function zoomMainPhoto() {
@@ -460,12 +560,21 @@ function zoomMainPhoto() {
 
 function zoomImage(event, url) {
   if (event) event.stopPropagation();
-  document.getElementById('zoomedImg').src = url;
-  document.getElementById('imageZoomModal').classList.add('open');
+  const zoomedImg = document.getElementById('zoomedImg');
+  if (zoomedImg) zoomedImg.src = url;
+  const modal = document.getElementById('imageZoomModal');
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+  }
 }
 
 function closeImageZoom() {
-  document.getElementById('imageZoomModal').classList.remove('open');
+  const modal = document.getElementById('imageZoomModal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
 }
 
 // ── Modal Sales Belum Lapor Hari Ini ─────────────────────
