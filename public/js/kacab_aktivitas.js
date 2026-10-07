@@ -557,42 +557,168 @@ function broadcastTeguranSPV() {
 }
 
 // ── Input Aktivitas Sales oleh Kacab ─────────────────────
+// ── Input Aktivitas Sales oleh Kacab (Searchable Combobox) ───
 let selectedInputPhotos = [];
+let salesComboboxActiveIndex = -1;
+let currentFilteredSales = [];
 
-function populateInputSalesDropdown() {
-  const sel = document.getElementById('modalInputSales');
-  if (!sel) return;
-  const currentVal = sel.value;
+function highlightSearchMatch(text, query) {
+  if (!text) return '';
+  if (!query) return escapeHtml(text);
+  const qClean = query.trim();
+  if (!qClean) return escapeHtml(text);
   
-  let html = '<option value="">-- Pilih Sales yang Menjalankan Aktivitas --</option>';
-  const sorted = [...allWiraniagaList].sort((a, b) => (a.nama_lengkap || '').localeCompare(b.nama_lengkap || ''));
-  sorted.forEach(s => {
-    const spv = s.nama_spv ? ` (SPV: ${s.nama_spv})` : '';
-    html += `<option value="${escapeHtml(s.id)}" data-nama="${escapeHtml(s.nama_lengkap)}" data-spv="${escapeHtml(s.nama_spv || '-')}" data-tingkatan="${escapeHtml(s.tingkatan || 'Executive')}">${escapeHtml(s.nama_lengkap + spv)}</option>`;
-  });
-  sel.innerHTML = html;
-  if (currentVal) sel.value = currentVal;
+  const escapedText = escapeHtml(text);
+  const escapedQuery = escapeHtml(qClean);
+  const regex = new RegExp(`(${escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return escapedText.replace(regex, '<span class="sales-search-highlight">$1</span>');
 }
 
-function onInputSalesSelected() {
-  const sel = document.getElementById('modalInputSales');
-  const namaInput = document.getElementById('modalInputNamaSales');
-  const chipCard = document.getElementById('salesSelectedInfoCard');
-  if (!sel) return;
-  
-  const opt = sel.options[sel.selectedIndex];
-  if (!opt || !sel.value) {
-    if (namaInput) namaInput.value = '';
-    if (chipCard) chipCard.style.display = 'none';
+function openSalesDropdown() {
+  const menu = document.getElementById('salesDropdownMenu');
+  if (!menu) return;
+  filterSalesDropdown();
+  menu.style.display = 'flex';
+}
+
+function closeSalesDropdown() {
+  const menu = document.getElementById('salesDropdownMenu');
+  if (menu) menu.style.display = 'none';
+  salesComboboxActiveIndex = -1;
+}
+
+function filterSalesDropdown() {
+  const searchInput = document.getElementById('modalSalesSearchInput');
+  const btnClear = document.getElementById('btnClearSalesSearch');
+  const listEl = document.getElementById('salesDropdownList');
+  const countEl = document.getElementById('salesDropdownCount');
+  if (!listEl) return;
+
+  const query = (searchInput?.value || '').trim().toLowerCase();
+  if (btnClear) {
+    btnClear.style.display = (searchInput && searchInput.value) ? 'flex' : 'none';
+  }
+
+  // Filter wiraniaga
+  const sorted = [...allWiraniagaList].sort((a, b) => (a.nama_lengkap || '').localeCompare(b.nama_lengkap || ''));
+  if (!query) {
+    currentFilteredSales = sorted;
+  } else {
+    currentFilteredSales = sorted.filter(s => {
+      const name = (s.nama_lengkap || '').toLowerCase();
+      const spv = (s.nama_spv || '').toLowerCase();
+      const tingkatan = (s.tingkatan || '').toLowerCase();
+      return name.includes(query) || spv.includes(query) || tingkatan.includes(query);
+    });
+  }
+
+  if (countEl) {
+    countEl.textContent = query 
+      ? `Ditemukan ${currentFilteredSales.length} wiraniaga` 
+      : `Pilih wiraniaga (${sorted.length} sales cabang)`;
+  }
+
+  const selectedId = document.getElementById('modalInputSales')?.value;
+
+  if (currentFilteredSales.length === 0) {
+    listEl.innerHTML = `
+      <div style="text-align:center; padding:18px 12px; color:#64748b; font-size:12px;">
+        <i class="fa-solid fa-user-xmark" style="font-size:22px; color:#cbd5e1; margin-bottom:6px; display:block;"></i>
+        <div>Tidak ada wiraniaga dengan kata kunci "<strong>${escapeHtml(query)}</strong>"</div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:2px;">Coba ketik nama panggilan atau nama SPV</div>
+      </div>`;
+    salesComboboxActiveIndex = -1;
     return;
   }
+
+  listEl.innerHTML = currentFilteredSales.map((s, idx) => {
+    const isSelected = String(s.id) === String(selectedId);
+    const initial = (s.nama_lengkap || 'S').charAt(0).toUpperCase();
+    const highName = highlightSearchMatch(s.nama_lengkap || '', query);
+    const highSpv = highlightSearchMatch(s.nama_spv || 'Tanpa SPV', query);
+
+    return `
+      <div class="sales-dropdown-item ${isSelected ? 'is-selected' : ''}" 
+           id="salesDropdownItem_${idx}"
+           onmouseenter="setSalesDropdownActive(${idx})"
+           onclick="selectSalesItem('${escapeHtml(s.id)}', '${escapeHtml(s.nama_lengkap)}', '${escapeHtml(s.nama_spv || '-')}', '${escapeHtml(s.tingkatan || 'Executive')}')">
+        <div class="sales-item-left">
+          <div class="sales-item-avatar">${initial}</div>
+          <div class="sales-item-info">
+            <div class="sales-item-name">${highName}</div>
+            <div class="sales-item-spv">SPV: <strong style="color:#334155;">${highSpv}</strong></div>
+          </div>
+        </div>
+        <div class="sales-item-right">
+          <span class="badge-tingkatan">${escapeHtml(s.tingkatan || 'Executive')}</span>
+          ${isSelected ? '<i class="fa-solid fa-check" style="color:#cc1426; font-size:12px;"></i>' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  salesComboboxActiveIndex = -1;
+}
+
+function setSalesDropdownActive(idx) {
+  const prev = document.getElementById(`salesDropdownItem_${salesComboboxActiveIndex}`);
+  if (prev) prev.classList.remove('is-focused');
   
-  const nama = opt.getAttribute('data-nama') || '';
-  const spv = opt.getAttribute('data-spv') || '-';
-  const tingkatan = opt.getAttribute('data-tingkatan') || 'Executive';
-  
-  if (namaInput) namaInput.value = nama;
-  
+  salesComboboxActiveIndex = idx;
+  const curr = document.getElementById(`salesDropdownItem_${salesComboboxActiveIndex}`);
+  if (curr) curr.classList.add('is-focused');
+}
+
+function handleSalesKeyDown(e) {
+  const menu = document.getElementById('salesDropdownMenu');
+  if (!menu || menu.style.display === 'none') {
+    if (e.key === 'ArrowDown' || e.key === 'Enter') {
+      openSalesDropdown();
+      e.preventDefault();
+      return;
+    }
+  }
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (currentFilteredSales.length === 0) return;
+    const nextIdx = (salesComboboxActiveIndex + 1) % currentFilteredSales.length;
+    setSalesDropdownActive(nextIdx);
+    const curr = document.getElementById(`salesDropdownItem_${nextIdx}`);
+    if (curr) curr.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (currentFilteredSales.length === 0) return;
+    const prevIdx = (salesComboboxActiveIndex - 1 + currentFilteredSales.length) % currentFilteredSales.length;
+    setSalesDropdownActive(prevIdx);
+    const curr = document.getElementById(`salesDropdownItem_${prevIdx}`);
+    if (curr) curr.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (salesComboboxActiveIndex >= 0 && salesComboboxActiveIndex < currentFilteredSales.length) {
+      const s = currentFilteredSales[salesComboboxActiveIndex];
+      selectSalesItem(s.id, s.nama_lengkap, s.nama_spv || '-', s.tingkatan || 'Executive');
+    } else if (currentFilteredSales.length === 1) {
+      const s = currentFilteredSales[0];
+      selectSalesItem(s.id, s.nama_lengkap, s.nama_spv || '-', s.tingkatan || 'Executive');
+    }
+  } else if (e.key === 'Escape') {
+    closeSalesDropdown();
+  }
+}
+
+function selectSalesItem(id, nama, spv, tingkatan) {
+  const hiddenId = document.getElementById('modalInputSales');
+  const hiddenNama = document.getElementById('modalInputNamaSales');
+  const searchInput = document.getElementById('modalSalesSearchInput');
+  const chipCard = document.getElementById('salesSelectedInfoCard');
+  const btnClear = document.getElementById('btnClearSalesSearch');
+
+  if (hiddenId) hiddenId.value = id;
+  if (hiddenNama) hiddenNama.value = nama;
+  if (searchInput) searchInput.value = nama;
+  if (btnClear) btnClear.style.display = 'flex';
+
   if (chipCard) {
     chipCard.style.display = 'flex';
     const avatarEl = document.getElementById('salesCardAvatar');
@@ -600,23 +726,64 @@ function onInputSalesSelected() {
     const namaEl = document.getElementById('salesCardNama');
     if (namaEl) namaEl.textContent = nama;
     const spvEl = document.getElementById('salesCardSpv');
-    if (spvEl) spvEl.textContent = spv;
+    if (spvEl) spvEl.textContent = spv || '-';
     const tingkatanEl = document.getElementById('salesCardTingkatan');
-    if (tingkatanEl) tingkatanEl.textContent = tingkatan;
+    if (tingkatanEl) tingkatanEl.textContent = tingkatan || 'Executive';
   }
+
+  closeSalesDropdown();
+}
+
+function clearSalesSearch(refocus = true) {
+  const hiddenId = document.getElementById('modalInputSales');
+  const hiddenNama = document.getElementById('modalInputNamaSales');
+  const searchInput = document.getElementById('modalSalesSearchInput');
+  const chipCard = document.getElementById('salesSelectedInfoCard');
+  const btnClear = document.getElementById('btnClearSalesSearch');
+
+  if (hiddenId) hiddenId.value = '';
+  if (hiddenNama) hiddenNama.value = '';
+  if (searchInput) searchInput.value = '';
+  if (btnClear) btnClear.style.display = 'none';
+  if (chipCard) chipCard.style.display = 'none';
+
+  if (refocus && searchInput) {
+    searchInput.focus();
+    openSalesDropdown();
+  } else {
+    closeSalesDropdown();
+  }
+}
+
+function focusAndChangeSales() {
+  const searchInput = document.getElementById('modalSalesSearchInput');
+  if (searchInput) {
+    searchInput.focus();
+    searchInput.select();
+    openSalesDropdown();
+  }
+}
+
+function populateInputSalesDropdown() {
+  filterSalesDropdown();
+}
+
+function onInputSalesSelected() {
+  // Ditangani oleh selectSalesItem
 }
 
 function openInputAktivitasModal(preselectedSalesId = null) {
   const modal = document.getElementById('inputAktivitasModal');
   if (!modal) return;
   
-  populateInputSalesDropdown();
-  
   // Reset fields
   const form = document.getElementById('formInputAktivitas');
   if (form) form.reset();
   selectedInputPhotos = [];
   renderFotoPreviews();
+  
+  // Reset pilihan sales
+  clearSalesSearch(false);
   
   // Set default date to today
   const now = new Date();
@@ -630,13 +797,13 @@ function openInputAktivitasModal(preselectedSalesId = null) {
   
   // If preselected sales ID provided
   if (preselectedSalesId) {
-    const sel = document.getElementById('modalInputSales');
-    if (sel) {
-      sel.value = String(preselectedSalesId);
-      onInputSalesSelected();
+    const s = allWiraniagaList.find(item => 
+      String(item.id) === String(preselectedSalesId) || 
+      (item.nama_lengkap || '').toLowerCase() === String(preselectedSalesId).toLowerCase()
+    );
+    if (s) {
+      selectSalesItem(s.id, s.nama_lengkap, s.nama_spv || '-', s.tingkatan || 'Executive');
     }
-  } else {
-    onInputSalesSelected();
   }
   
   modal.style.display = 'flex';
@@ -913,4 +1080,12 @@ async function submitInputAktivitas(event) {
 
 document.addEventListener('DOMContentLoaded', () => {
   loadTimeline();
+  
+  // Tutup dropdown combobox saat klik di luar
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('salesComboboxWrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      closeSalesDropdown();
+    }
+  });
 });

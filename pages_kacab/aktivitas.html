@@ -586,6 +586,185 @@
       border-color: #cc1426;
       color: #ffffff;
     }
+    .sales-combobox-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .sales-input-field-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .sales-search-icon {
+      position: absolute;
+      left: 12px;
+      color: #94a3b8;
+      font-size: 13px;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+    .sales-input-field-wrapper:focus-within .sales-search-icon {
+      color: #cc1426;
+    }
+    .sales-search-input {
+      padding-left: 36px !important;
+      padding-right: 36px !important;
+      font-weight: 600;
+    }
+    .btn-clear-sales {
+      position: absolute;
+      right: 10px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      cursor: pointer;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 11px;
+      transition: all 0.15s;
+    }
+    .btn-clear-sales:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+    .sales-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 14px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.08);
+      z-index: 1050;
+      max-height: 270px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: fadeInDropdown 0.15s ease-out;
+    }
+    @keyframes fadeInDropdown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .sales-dropdown-header {
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .sales-dropdown-hint {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .sales-dropdown-hint kbd {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 3px;
+      padding: 1px 4px;
+      font-size: 9.5px;
+      font-family: inherit;
+    }
+    .sales-dropdown-list {
+      overflow-y: auto;
+      max-height: 225px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .sales-dropdown-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sales-dropdown-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .sales-dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      gap: 10px;
+      user-select: none;
+    }
+    .sales-dropdown-item:hover,
+    .sales-dropdown-item.is-focused {
+      background: #fef2f2;
+    }
+    .sales-dropdown-item.is-selected {
+      background: #fee2e2;
+      border-left: 3px solid #cc1426;
+    }
+    .sales-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+    .sales-item-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #cc1426;
+      font-weight: 800;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .sales-dropdown-item.is-selected .sales-item-avatar {
+      background: #cc1426;
+      color: #ffffff;
+    }
+    .sales-item-info {
+      min-width: 0;
+      flex: 1;
+    }
+    .sales-item-name {
+      font-weight: 700;
+      font-size: 12.5px;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sales-item-spv {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .sales-item-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .sales-search-highlight {
+      background: #fef08a;
+      color: #854d0e;
+      padding: 0 1px;
+      border-radius: 2px;
+      font-weight: 800;
+    }
     .sales-info-chip {
       display: flex;
       align-items: center;
@@ -625,6 +804,25 @@
       border-radius: 4px;
       font-size: 10px;
       font-weight: 700;
+    }
+    .btn-change-sales {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .btn-change-sales:hover {
+      background: #cc1426;
+      border-color: #cc1426;
+      color: #ffffff;
     }
     .input-modal-footer {
       padding: 14px 24px;
@@ -995,24 +1193,58 @@
           </div>
           <div class="form-group" style="margin-bottom: 8px;">
             <label class="form-label">Wiraniaga / Sales Pelaksana <span class="req">*</span></label>
-            <div class="custom-select-wrapper">
-              <i class="fa-solid fa-user select-icon"></i>
-              <select id="modalInputSales" name="sales_account_id" class="form-control with-icon" required onchange="onInputSalesSelected()">
-                <option value="">-- Pilih Sales yang Menjalankan Aktivitas --</option>
-              </select>
+            
+            <!-- Searchable Combobox Sales -->
+            <div class="sales-combobox-wrapper" id="salesComboboxWrapper">
+              <div class="sales-input-field-wrapper">
+                <i class="fa-solid fa-magnifying-glass sales-search-icon"></i>
+                <input type="text" 
+                       id="modalSalesSearchInput" 
+                       class="form-control sales-search-input" 
+                       placeholder="Ketik nama sales atau nama SPV..." 
+                       autocomplete="off"
+                       onfocus="openSalesDropdown()" 
+                       oninput="filterSalesDropdown()"
+                       onkeydown="handleSalesKeyDown(event)">
+                <button type="button" 
+                        id="btnClearSalesSearch" 
+                        class="btn-clear-sales" 
+                        onclick="clearSalesSearch()" 
+                        style="display:none;" 
+                        title="Hapus / Reset pencarian">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- Floating Dropdown Hasil Pencarian -->
+              <div id="salesDropdownMenu" class="sales-dropdown-menu" style="display:none;">
+                <div class="sales-dropdown-header">
+                  <span id="salesDropdownCount">Pilih wiraniaga cabang</span>
+                  <span class="sales-dropdown-hint"><kbd>↑</kbd><kbd>↓</kbd> Pilih &bull; <kbd>Enter</kbd></span>
+                </div>
+                <div id="salesDropdownList" class="sales-dropdown-list">
+                  <!-- Generated items via JS -->
+                </div>
+              </div>
             </div>
+
+            <!-- Hidden inputs untuk data POST -->
+            <input type="hidden" id="modalInputSales" name="sales_account_id" required>
             <input type="hidden" id="modalInputNamaSales" name="nama_sales">
 
             <!-- Card Info Sales Terpilih -->
             <div id="salesSelectedInfoCard" class="sales-info-chip" style="display:none;">
               <div class="sales-avatar-badge" id="salesCardAvatar">S</div>
-              <div class="sales-meta-chip">
+              <div class="sales-meta-chip" style="flex:1;">
                 <div class="sales-name-chip" id="salesCardNama">Nama Sales</div>
                 <div class="sales-spv-chip">
                   <span>SPV: <strong id="salesCardSpv" style="color:#0f172a;">-</strong></span> &bull; 
                   <span id="salesCardTingkatan" class="badge-tingkatan">Executive</span>
                 </div>
               </div>
+              <button type="button" class="btn-change-sales" onclick="focusAndChangeSales()" title="Ganti Sales">
+                <i class="fa-solid fa-arrows-rotate"></i> Ganti
+              </button>
             </div>
           </div>
 
@@ -1293,7 +1525,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v1"></script>
+  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v2"></script>
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 
