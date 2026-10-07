@@ -30,6 +30,534 @@
       background: #2563eb;
       color: #ffffff;
     }
+
+    /* Kacab Input Aktivitas Button & Modal Styling */
+    .btn-input-kacab-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #cc1426, #990f1d);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(204, 20, 38, 0.28);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+    }
+    .btn-input-kacab-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(204, 20, 38, 0.4);
+      background: linear-gradient(135deg, #e01d31, #b31222);
+    }
+    .btn-input-kacab-toolbar {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #cc1426;
+      color: #ffffff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(204, 20, 38, 0.25);
+      white-space: nowrap;
+    }
+    .btn-input-kacab-toolbar:hover {
+      background: #a30f1e;
+      transform: translateY(-1px);
+    }
+
+    /* Modal Overlay & Card */
+    .input-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 99998;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .input-modal-card {
+      background: #ffffff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+      border: 1px solid #cbd5e1;
+      animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalScaleUp {
+      from { opacity: 0; transform: scale(0.95) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .input-modal-header {
+      background: linear-gradient(135deg, #1e1014, #3d121c);
+      color: #ffffff;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid rgba(216, 164, 55, 0.4);
+    }
+    .input-modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .input-modal-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #cc1426, #8a0e1a);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      box-shadow: 0 4px 12px rgba(204, 20, 38, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      flex-shrink: 0;
+    }
+    .input-modal-header h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+    }
+    .input-modal-sub {
+      font-size: 12px;
+      color: #cbd5e1;
+      display: block;
+      margin-top: 2px;
+    }
+    .input-modal-close {
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: #ffffff;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .input-modal-close:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: rotate(90deg);
+    }
+    .input-modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .kacab-action-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #fdf2f2;
+      border: 1px solid #fee2e2;
+      border-left: 4px solid #cc1426;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 12px;
+      color: #7f1d1d;
+      line-height: 1.5;
+    }
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+      margin-top: 6px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px dashed #e2e8f0;
+      padding-bottom: 5px;
+    }
+    .form-section-title i {
+      color: #cc1426;
+    }
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 600px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .form-label .req {
+      color: #ef4444;
+    }
+    .form-sublabel {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .custom-input-wrapper,
+    .custom-select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .input-icon,
+    .select-icon {
+      position: absolute;
+      left: 12px;
+      color: #94a3b8;
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      font-family: inherit;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+    .form-control.with-icon {
+      padding-left: 36px;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #cc1426;
+      box-shadow: 0 0 0 3px rgba(204, 20, 38, 0.12);
+    }
+    .sesi-radio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 520px) {
+      .sesi-radio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .sesi-radio-card {
+      position: relative;
+      cursor: pointer;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 9px 12px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .sesi-radio-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .sesi-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .sesi-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .sesi-icon.morning {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    .sesi-icon.noon {
+      background: #ffedd5;
+      color: #ea580c;
+    }
+    .sesi-icon.evening {
+      background: #ede9fe;
+      color: #7c3aed;
+    }
+    .sesi-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .sesi-title {
+      font-weight: 700;
+      font-size: 12.5px;
+      color: #1e293b;
+    }
+    .sesi-time {
+      font-size: 10.5px;
+      color: #64748b;
+    }
+    .sesi-radio-card.active,
+    .sesi-radio-card:has(input:checked) {
+      background: #ffffff;
+      border-color: #cc1426;
+      box-shadow: 0 4px 12px rgba(204, 20, 38, 0.12);
+    }
+    .sesi-radio-card:has(input:checked) .sesi-title {
+      color: #cc1426;
+    }
+    .upload-dropzone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      background: #f8fafc;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .upload-dropzone:hover {
+      border-color: #cc1426;
+      background: #fdf2f2;
+    }
+    .dropzone-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .dropzone-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+    }
+    .btn-browse-file {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 5px 13px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .foto-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+      gap: 10px;
+    }
+    .foto-thumb-item {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 88px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border: 1px solid #e2e8f0;
+    }
+    .foto-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .foto-remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(220, 38, 38, 0.85);
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .foto-remove-btn:hover {
+      background: #dc2626;
+      transform: scale(1.1);
+    }
+    .btn-clear-photos {
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .quick-date-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-quick-date {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-quick-date:hover {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .btn-quick-prospek {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-quick-prospek:hover {
+      background: #cc1426;
+      border-color: #cc1426;
+      color: #ffffff;
+    }
+    .sales-info-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-top: 6px;
+    }
+    .sales-avatar-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #cc1426;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .sales-name-chip {
+      font-weight: 700;
+      font-size: 13px;
+      color: #0f172a;
+    }
+    .sales-spv-chip {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .badge-tingkatan {
+      background: #e2e8f0;
+      color: #334155;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .input-modal-footer {
+      padding: 14px 24px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .btn-modal-cancel {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #475569;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-modal-cancel:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+    .btn-modal-save {
+      background: linear-gradient(135deg, #cc1426, #990f1d);
+      border: none;
+      color: #ffffff;
+      padding: 9px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(204, 20, 38, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-modal-save:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(204, 20, 38, 0.4);
+      background: linear-gradient(135deg, #e01d31, #b31222);
+    }
+    .btn-modal-save:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
   </style>
 </head>
 
@@ -82,14 +610,20 @@
           <h2 id="pageTitle">Aktivitas Sales</h2>
           <p class="page-sub">Monitoring &amp; timeline aktivitas harian seluruh wiraniaga cabang</p>
         </div>
-        <div class="kcb-user">
-          <div class="avatar-status">
-            <img id="kcbAvatar" src="" alt="Avatar">
-            <span class="dot"></span>
-          </div>
-          <div class="meta">
-            <span class="name" id="kcbNama">Memuat...</span>
-            <span class="role" id="kcbRole">Memuat...</span>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <button type="button" class="btn-input-kacab-primary" onclick="openInputAktivitasModal()">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span>Input Aktivitas Sales</span>
+          </button>
+          <div class="kcb-user">
+            <div class="avatar-status">
+              <img id="kcbAvatar" src="" alt="Avatar">
+              <span class="dot"></span>
+            </div>
+            <div class="meta">
+              <span class="name" id="kcbNama">Memuat...</span>
+              <span class="role" id="kcbRole">Memuat...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -201,6 +735,9 @@
           </div>
 
           <div class="spacer"></div>
+          <button type="button" class="btn-input-kacab-toolbar" onclick="openInputAktivitasModal()">
+            <i class="fa-solid fa-plus"></i> Input Aktivitas
+          </button>
           <span class="result-count" id="activityCount"></span>
         </div>
 
@@ -307,6 +844,256 @@
     </div>
   </div>
 
+  <!-- Modal Input Aktivitas oleh Kacab -->
+  <div id="inputAktivitasModal" class="input-modal-overlay">
+    <div class="input-modal-card">
+      <div class="input-modal-header">
+        <div class="input-modal-header-left">
+          <div class="input-modal-icon">
+            <i class="fa-solid fa-clipboard-user"></i>
+          </div>
+          <div>
+            <h3>Input Aktivitas Wiraniaga</h3>
+            <span class="input-modal-sub">Catat kegiatan &amp; hasil aktivitas sales langsung oleh Kepala Cabang</span>
+          </div>
+        </div>
+        <button type="button" class="input-modal-close" onclick="closeInputAktivitasModal()" aria-label="Tutup modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="formInputAktivitas" onsubmit="submitInputAktivitas(event)" enctype="multipart/form-data">
+        <div class="input-modal-body">
+          
+          <!-- Banner info otorisasi kacab -->
+          <div class="kacab-action-banner">
+            <i class="fa-solid fa-shield-halved" style="font-size:16px; margin-top:2px;"></i>
+            <div>
+              <strong>Mode Otorisasi Kepala Cabang:</strong> Anda dapat mencatat aktivitas dan hasil kegiatan atas nama wiraniaga terkait. Data akan otomatis masuk ke timeline, laporan KPI cabang, dan galeri pameran.
+            </div>
+          </div>
+
+          <!-- Section 1: Sales / Wiraniaga -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-user-check"></i> 1. Pilih Wiraniaga &amp; Tim
+          </div>
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label class="form-label">Wiraniaga / Sales Pelaksana <span class="req">*</span></label>
+            <div class="custom-select-wrapper">
+              <i class="fa-solid fa-user select-icon"></i>
+              <select id="modalInputSales" name="sales_account_id" class="form-control with-icon" required onchange="onInputSalesSelected()">
+                <option value="">-- Pilih Sales yang Menjalankan Aktivitas --</option>
+              </select>
+            </div>
+            <input type="hidden" id="modalInputNamaSales" name="nama_sales">
+
+            <!-- Card Info Sales Terpilih -->
+            <div id="salesSelectedInfoCard" class="sales-info-chip" style="display:none;">
+              <div class="sales-avatar-badge" id="salesCardAvatar">S</div>
+              <div class="sales-meta-chip">
+                <div class="sales-name-chip" id="salesCardNama">Nama Sales</div>
+                <div class="sales-spv-chip">
+                  <span>SPV: <strong id="salesCardSpv" style="color:#0f172a;">-</strong></span> &bull; 
+                  <span id="salesCardTingkatan" class="badge-tingkatan">Executive</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Waktu Pelaksanaan -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-calendar-day"></i> 2. Tanggal &amp; Sesi Waktu Pelaksanaan
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label class="form-label" style="margin-bottom:0;">Tanggal Kegiatan <span class="req">*</span></label>
+                <div class="quick-date-btns">
+                  <button type="button" class="btn-quick-date" onclick="setInputDatePreset('today')">Hari Ini</button>
+                  <button type="button" class="btn-quick-date" onclick="setInputDatePreset('yesterday')">Kemarin</button>
+                </div>
+              </div>
+              <div class="custom-input-wrapper">
+                <i class="fa-solid fa-calendar-days input-icon"></i>
+                <input type="date" id="modalInputTanggal" name="tanggal" class="form-control with-icon" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Jam Pelaksanaan <span class="form-sublabel">(Waktu mulai)</span></label>
+              <div class="custom-input-wrapper">
+                <i class="fa-regular fa-clock input-icon"></i>
+                <input type="time" id="modalInputJam" name="jam" class="form-control with-icon">
+              </div>
+            </div>
+          </div>
+
+          <!-- Sesi Waktu -->
+          <div class="form-group" style="margin-bottom: 6px;">
+            <label class="form-label">Sesi Waktu <span class="req">*</span></label>
+            <div class="sesi-radio-grid">
+              <label class="sesi-radio-card" id="cardSesiPagi">
+                <input type="radio" name="sesi_waktu" value="Pagi" onchange="onSesiRadioChange('Pagi')" checked>
+                <div class="sesi-content">
+                  <div class="sesi-icon morning"><i class="fa-solid fa-cloud-sun"></i></div>
+                  <div class="sesi-text">
+                    <span class="sesi-title">Sesi Pagi</span>
+                    <span class="sesi-time">08:00 - 12:00</span>
+                  </div>
+                </div>
+              </label>
+
+              <label class="sesi-radio-card" id="cardSesiSiang">
+                <input type="radio" name="sesi_waktu" value="Siang" onchange="onSesiRadioChange('Siang')">
+                <div class="sesi-content">
+                  <div class="sesi-icon noon"><i class="fa-solid fa-sun"></i></div>
+                  <div class="sesi-text">
+                    <span class="sesi-title">Sesi Siang</span>
+                    <span class="sesi-time">12:00 - 15:30</span>
+                  </div>
+                </div>
+              </label>
+
+              <label class="sesi-radio-card" id="cardSesiSore">
+                <input type="radio" name="sesi_waktu" value="Sore" onchange="onSesiRadioChange('Sore')">
+                <div class="sesi-content">
+                  <div class="sesi-icon evening"><i class="fa-solid fa-moon"></i></div>
+                  <div class="sesi-text">
+                    <span class="sesi-title">Sesi Sore</span>
+                    <span class="sesi-time">15:30 - Selesai</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 3: Detail Kegiatan -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-list-check"></i> 3. Detail Aktivitas &amp; Lokasi
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Tipe Aktivitas <span class="req">*</span></label>
+              <div class="custom-select-wrapper">
+                <i class="fa-solid fa-tag select-icon"></i>
+                <select id="modalInputTipe" name="tipe_aktivitas" class="form-control with-icon" required onchange="onTipeAktivitasChange()">
+                  <option value="Pameran (Exhibition / Booth)">🎪 Pameran (Exhibition / Booth Mall)</option>
+                  <option value="Canvassing Lapangan / Door to Door">🚶 Canvassing Lapangan / Door to Door</option>
+                  <option value="Follow Up Database CRM (Telepon/WA)">📞 Follow Up Database CRM (Telepon/WA)</option>
+                  <option value="Customer Gathering & Event Cabang">🎉 Customer Gathering &amp; Event Cabang</option>
+                  <option value="Test Drive Bersama Customer">🚗 Test Drive Bersama Customer</option>
+                  <option value="Digital Marketing / Live TikTok / Medsos">📱 Digital Marketing / Live TikTok / Medsos</option>
+                  <option value="Delivery Ceremony / Handover Unit">🔑 Delivery Ceremony / Handover Unit</option>
+                  <option value="Pertemuan Prospek / Kantor Customer">🏢 Pertemuan Prospek / Kantor Customer</option>
+                  <option value="Aktivitas Lainnya">📝 Aktivitas Lainnya</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Status Aktivitas <span class="req">*</span></label>
+              <div class="custom-select-wrapper">
+                <i class="fa-solid fa-circle-check select-icon"></i>
+                <select id="modalInputStatus" name="status" class="form-control with-icon" required>
+                  <option value="Selesai" selected>✅ Selesai (Hasil Kegiatan Tuntas)</option>
+                  <option value="Sedang Dilakukan">⏳ Sedang Dilakukan</option>
+                  <option value="Rencana">📋 Rencana (Jadwal Kegiatan)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lokasi Kegiatan</label>
+            <div class="custom-input-wrapper">
+              <i class="fa-solid fa-location-dot input-icon"></i>
+              <input type="text" id="modalInputLokasi" name="lokasi" class="form-control with-icon" placeholder="Contoh: Festival Citylink Bandung / Borma Cijerah / Showroom Kiara Condong">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Durasi Kegiatan</label>
+              <div class="custom-select-wrapper">
+                <i class="fa-solid fa-hourglass-half select-icon"></i>
+                <select id="modalInputDurasi" name="durasi" class="form-control with-icon">
+                  <option value="30 Menit">30 Menit</option>
+                  <option value="1 Jam" selected>1 Jam</option>
+                  <option value="2 Jam">2 Jam</option>
+                  <option value="3 Jam">3 Jam</option>
+                  <option value="Full Day (4+ Jam)">Full Day (4+ Jam)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Jumlah Prospek Didapat</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <div class="custom-input-wrapper" style="flex:1;">
+                  <i class="fa-solid fa-users-viewfinder input-icon"></i>
+                  <input type="number" id="modalInputProspek" name="jumlah_prospek" class="form-control with-icon" min="0" value="0">
+                </div>
+                <button type="button" class="btn-quick-prospek" onclick="addProspekCount(1)" title="Tambah 1 Prospek">+1</button>
+                <button type="button" class="btn-quick-prospek" onclick="addProspekCount(2)" title="Tambah 2 Prospek">+2</button>
+                <button type="button" class="btn-quick-prospek" onclick="addProspekCount(5)" title="Tambah 5 Prospek">+5</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Foto Bukti Aktivitas -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-camera"></i> 4. Dokumentasi Foto Kegiatan
+          </div>
+          
+          <div class="upload-dropzone" id="uploadDropZone" onclick="document.getElementById('modalInputFoto').click()">
+            <input type="file" id="modalInputFoto" name="foto[]" accept="image/*" multiple style="display:none;" onchange="handleFotoUploadChange(this)">
+            <div class="dropzone-inner">
+              <div class="dropzone-icon">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <div class="dropzone-text">
+                <strong style="color:#0f172a; font-size:13.5px;">Klik atau Ambil Foto Dokumentasi Aktivitas</strong>
+                <p style="margin:4px 0 0 0; color:#64748b; font-size:11.5px;">Mendukung multi-foto (JPG, PNG, WEBP). Foto pameran/event otomatis terekap ke Galeri Cabang.</p>
+              </div>
+              <button type="button" class="btn-browse-file">
+                <i class="fa-solid fa-folder-open"></i> Pilih File Foto
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview List Foto -->
+          <div id="fotoPreviewContainer" style="display:none; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:12px; font-weight:700; color:#1e293b;" id="fotoCountLabel">0 Foto Terpilih</span>
+              <button type="button" class="btn-clear-photos" onclick="clearSelectedPhotos()">
+                <i class="fa-solid fa-trash-can"></i> Hapus Semua Foto
+              </button>
+            </div>
+            <div id="fotoPreviewGrid" class="foto-preview-grid"></div>
+          </div>
+
+          <!-- Section 5: Keterangan / Laporan Hasil -->
+          <div class="form-section-title" style="margin-top:10px;">
+            <i class="fa-solid fa-clipboard-list"></i> 5. Catatan Keterangan &amp; Hasil Kegiatan
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Keterangan / Hasil Aktivitas <span class="req">*</span></label>
+            <textarea id="modalInputKeterangan" name="keterangan" rows="3" class="form-control" required placeholder="Tuliskan keterangan lengkap kegiatan, respon customer, unit yang diminati (Avanza/Veloz/Zenix), catatan prospek, dll..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="input-modal-footer">
+          <button type="button" class="btn-modal-cancel" onclick="closeInputAktivitasModal()">Batal</button>
+          <button type="submit" id="btnSubmitInputAktivitas" class="btn-modal-save">
+            <i class="fa-solid fa-check"></i>
+            <span>Simpan Aktivitas Sales</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal Sales Belum Lapor Hari Ini -->
   <div id="belumLaporModal" style="display:none; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:99999; backdrop-filter:blur(3px);">
     <div style="background:#ffffff; border-radius:18px; max-width:620px; width:92%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 45px rgba(0,0,0,0.3); border:1px solid #cbd5e1;">
@@ -336,7 +1123,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_aktivitas.js?v=20260923_pro_v1"></script>
+  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v1"></script>
   <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
 </body>
 

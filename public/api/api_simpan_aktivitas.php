@@ -213,6 +213,34 @@ try {
         $laporan_hasil = $_POST['laporan_hasil'] ?? '';
         $jumlah_prospek = isset($_POST['jumlah_prospek']) ? intval($_POST['jumlah_prospek']) : 0;
 
+        // Custom Tanggal dan Jam jika diinput oleh Kacab/SPV
+        $tanggal = trim($_POST['tanggal'] ?? $_POST['tanggal_aktivitas'] ?? '');
+        $jam = trim($_POST['jam'] ?? $_POST['waktu_pelaksanaan'] ?? '');
+
+        if (!empty($tanggal) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+            if (empty($jam) || !preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $jam)) {
+                if ($sesi_waktu === 'Pagi') $jam = '09:30:00';
+                elseif ($sesi_waktu === 'Siang') $jam = '13:30:00';
+                elseif ($sesi_waktu === 'Sore') $jam = '16:30:00';
+                else $jam = date('H:i:s');
+            }
+            if (strlen($jam) === 5) $jam .= ':00';
+            $created_at_val = "$tanggal $jam";
+            $waktu_pelaksanaan_val = substr($jam, 0, 5);
+        } else {
+            $created_at_val = date('Y-m-d H:i:s');
+            $waktu_pelaksanaan_val = !empty($jam) ? substr($jam, 0, 5) : date('H:i');
+        }
+
+        if ($status === 'Selesai') {
+            $waktu_selesai_val = date('Y-m-d H:i:s', strtotime($created_at_val . ' +1 hour'));
+            if (empty($laporan_hasil)) {
+                $laporan_hasil = $keterangan;
+            }
+        } else {
+            $waktu_selesai_val = null;
+        }
+
         // Cek apakah aktivitas ini termasuk kategori Pameran atau Event
         $isPameranOrEvent = checkIsPameranOrEvent($tipe, $keterangan, $status, $subJenis);
 
@@ -256,13 +284,21 @@ try {
         }
 
         $foto_string = implode(',', $uploaded_files);
+        $foto_laporan_val = (!empty($foto_string) && $status === 'Selesai') ? $foto_string : '';
 
-        // Sync ke public/uploads/lokasi dan direktori aktivitas jika kategori pameran/event
+        // Sync ke public/uploads/lokasi, uploads/laporan, dan direktori aktivitas jika kategori pameran/event
         if (!empty($uploaded_files)) {
+            $lapDir = $projectRoot . '/uploads/laporan/';
+            $pubLapDir = $projectRoot . '/public/uploads/laporan/';
+            if (!is_dir($lapDir)) @mkdir($lapDir, 0777, true);
+            if (!is_dir($pubLapDir)) @mkdir($pubLapDir, 0777, true);
+
             foreach ($uploaded_files as $uf) {
                 $src = $upload_dir . $uf;
                 if (file_exists($src)) {
                     if (is_dir($publicUploadDir)) @copy($src, $publicUploadDir . $uf);
+                    @copy($src, $lapDir . $uf);
+                    @copy($src, $pubLapDir . $uf);
                     if ($isPameranOrEvent) {
                         if (is_dir($galeriDir)) @copy($src, $galeriDir . $uf);
                         if (is_dir($publicGaleriDir)) @copy($src, $publicGaleriDir . $uf);
@@ -276,16 +312,14 @@ try {
         $sales_account_id = preg_replace('/[^0-9]/', '', $raw_sales_id);
         if (empty($sales_account_id)) $sales_account_id = '1';
 
-        $waktu_selesai_val = ($status === 'Selesai') ? date('Y-m-d H:i:s') : null;
-
-        $stmt = $conn->prepare("INSERT INTO aktivitas (sales_account_id, nama_sales, tipe_aktivitas, keterangan, lokasi, foto, status, sesi_waktu, durasi, laporan_hasil, jumlah_prospek, waktu_selesai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO aktivitas (sales_account_id, nama_sales, tipe_aktivitas, keterangan, lokasi, foto, status, sesi_waktu, durasi, laporan_hasil, jumlah_prospek, waktu_selesai, waktu_pelaksanaan, created_at, foto_laporan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             echo json_encode(["status" => "error", "message" => "Gagal prepare query insert: " . $conn->error]);
             exit();
         }
         
-        // Bind sales_account_id as string ("s") to safely support BIGINT (12 parameters = 10s + 1i + 1s)
-        $stmt->bind_param("ssssssssssis", $sales_account_id, $nama_sales, $tipe, $keterangan, $lokasi, $foto_string, $status, $sesi_waktu, $durasi, $laporan_hasil, $jumlah_prospek, $waktu_selesai_val);
+        // Bind sales_account_id as string ("s") to safely support BIGINT (15 parameters)
+        $stmt->bind_param("ssssssssssissss", $sales_account_id, $nama_sales, $tipe, $keterangan, $lokasi, $foto_string, $status, $sesi_waktu, $durasi, $laporan_hasil, $jumlah_prospek, $waktu_selesai_val, $waktu_pelaksanaan_val, $created_at_val, $foto_laporan_val);
 
         if ($stmt->execute()) {
             echo json_encode([

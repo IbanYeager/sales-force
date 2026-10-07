@@ -529,10 +529,13 @@ function openBelumLaporModal() {
               <div style="font-size:11px; color:#64748b;">SPV: <strong style="color:#1e293b;">${escapeHtml(spv)}</strong></div>
             </div>
           </div>
-          <div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" onclick="openInputAktivitasForSales('${escapeHtml(s.id)}', '${escapeHtml(name)}')" style="background:#cc1426; color:#ffffff; padding:6px 11px; border:none; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(204,20,38,0.25);">
+              <i class="fa-solid fa-plus"></i> Inputkan
+            </button>
             ${phone ? `
               <a href="${waLink}" target="_blank" style="background:#25D366; color:#ffffff; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(37,211,102,0.25);">
-                <i class="fa-brands fa-whatsapp"></i> Ingatkan WA
+                <i class="fa-brands fa-whatsapp"></i> WA
               </a>
             ` : `<span style="font-size:11px; color:#94a3b8; font-weight:600;">No HP -</span>`}
           </div>
@@ -551,6 +554,313 @@ function closeBelumLaporModal() {
 function broadcastTeguranSPV() {
   const text = encodeURIComponent(`*PEMBERITAHUAN KEPALA CABANG*\n\nBapak/Ibu SPV, mohon ingatkan anggota tim wiraniaga masing-masing yang belum mengisi aktivitas dan check-in harian hari ini agar segera melengkapi laporan di aplikasi Tunas Hub sebelum pukul 17:00 WIB.\n\nTerima kasih atas kerja samanya.\n*Kepala Cabang Tunas Toyota Kiara Condong*`);
   window.open(`https://web.whatsapp.com/send?text=${text}`, '_blank');
+}
+
+// ── Input Aktivitas Sales oleh Kacab ─────────────────────
+let selectedInputPhotos = [];
+
+function populateInputSalesDropdown() {
+  const sel = document.getElementById('modalInputSales');
+  if (!sel) return;
+  const currentVal = sel.value;
+  
+  let html = '<option value="">-- Pilih Sales yang Menjalankan Aktivitas --</option>';
+  const sorted = [...allWiraniagaList].sort((a, b) => (a.nama_lengkap || '').localeCompare(b.nama_lengkap || ''));
+  sorted.forEach(s => {
+    const spv = s.nama_spv ? ` (SPV: ${s.nama_spv})` : '';
+    html += `<option value="${escapeHtml(s.id)}" data-nama="${escapeHtml(s.nama_lengkap)}" data-spv="${escapeHtml(s.nama_spv || '-')}" data-tingkatan="${escapeHtml(s.tingkatan || 'Executive')}">${escapeHtml(s.nama_lengkap + spv)}</option>`;
+  });
+  sel.innerHTML = html;
+  if (currentVal) sel.value = currentVal;
+}
+
+function onInputSalesSelected() {
+  const sel = document.getElementById('modalInputSales');
+  const namaInput = document.getElementById('modalInputNamaSales');
+  const chipCard = document.getElementById('salesSelectedInfoCard');
+  if (!sel) return;
+  
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !sel.value) {
+    if (namaInput) namaInput.value = '';
+    if (chipCard) chipCard.style.display = 'none';
+    return;
+  }
+  
+  const nama = opt.getAttribute('data-nama') || '';
+  const spv = opt.getAttribute('data-spv') || '-';
+  const tingkatan = opt.getAttribute('data-tingkatan') || 'Executive';
+  
+  if (namaInput) namaInput.value = nama;
+  
+  if (chipCard) {
+    chipCard.style.display = 'flex';
+    const avatarEl = document.getElementById('salesCardAvatar');
+    if (avatarEl) avatarEl.textContent = (nama.charAt(0) || 'S').toUpperCase();
+    const namaEl = document.getElementById('salesCardNama');
+    if (namaEl) namaEl.textContent = nama;
+    const spvEl = document.getElementById('salesCardSpv');
+    if (spvEl) spvEl.textContent = spv;
+    const tingkatanEl = document.getElementById('salesCardTingkatan');
+    if (tingkatanEl) tingkatanEl.textContent = tingkatan;
+  }
+}
+
+function openInputAktivitasModal(preselectedSalesId = null) {
+  const modal = document.getElementById('inputAktivitasModal');
+  if (!modal) return;
+  
+  populateInputSalesDropdown();
+  
+  // Reset fields
+  const form = document.getElementById('formInputAktivitas');
+  if (form) form.reset();
+  selectedInputPhotos = [];
+  renderFotoPreviews();
+  
+  // Set default date to today
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  
+  const tglEl = document.getElementById('modalInputTanggal');
+  if (tglEl) tglEl.value = todayStr;
+  
+  const jamEl = document.getElementById('modalInputJam');
+  if (jamEl) jamEl.value = timeStr;
+  
+  // Auto determine session based on current time
+  const hour = now.getHours();
+  let defaultSesi = 'Pagi';
+  if (hour >= 12 && hour < 15.5) defaultSesi = 'Siang';
+  else if (hour >= 15.5) defaultSesi = 'Sore';
+  
+  const radio = document.querySelector(`input[name="sesi_waktu"][value="${defaultSesi}"]`);
+  if (radio) radio.checked = true;
+  onSesiRadioChange(defaultSesi);
+  
+  // If preselected sales ID provided
+  if (preselectedSalesId) {
+    const sel = document.getElementById('modalInputSales');
+    if (sel) {
+      sel.value = String(preselectedSalesId);
+      onInputSalesSelected();
+    }
+  } else {
+    onInputSalesSelected();
+  }
+  
+  modal.style.display = 'flex';
+}
+
+function closeInputAktivitasModal() {
+  const modal = document.getElementById('inputAktivitasModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openInputAktivitasForSales(salesId, salesName) {
+  closeBelumLaporModal();
+  openInputAktivitasModal(salesId);
+}
+
+function setInputDatePreset(preset) {
+  const tglEl = document.getElementById('modalInputTanggal');
+  if (!tglEl) return;
+  const now = new Date();
+  if (preset === 'yesterday') {
+    now.setDate(now.getDate() - 1);
+  }
+  const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  tglEl.value = dateStr;
+}
+
+function onSesiRadioChange(sesi) {
+  ['Pagi', 'Siang', 'Sore'].forEach(s => {
+    const card = document.getElementById(`cardSesi${s}`);
+    if (card) {
+      card.classList.toggle('active', s === sesi);
+    }
+  });
+}
+
+function onTipeAktivitasChange() {
+  const tipeSel = document.getElementById('modalInputTipe');
+  const lokasiInput = document.getElementById('modalInputLokasi');
+  if (!tipeSel || !lokasiInput) return;
+  const val = tipeSel.value.toLowerCase();
+  if (!lokasiInput.value || lokasiInput.value === 'Showroom Kiara Condong' || lokasiInput.value === 'Mall Festival Citylink Bandung') {
+    if (val.includes('pameran') || val.includes('mall') || val.includes('booth')) {
+      lokasiInput.placeholder = 'Misal: Festival Citylink / Kings Shopping Center / Ciwalk';
+    } else if (val.includes('follow up') || val.includes('crm')) {
+      lokasiInput.placeholder = 'Misal: Showroom Kiara Condong / Call Center CRM';
+    } else if (val.includes('canvassing') || val.includes('door')) {
+      lokasiInput.placeholder = 'Misal: Kawasan Perumahan / Pertokoan / Borma Cijerah';
+    }
+  }
+}
+
+function addProspekCount(delta) {
+  const pEl = document.getElementById('modalInputProspek');
+  if (!pEl) return;
+  const cur = parseInt(pEl.value, 10) || 0;
+  pEl.value = Math.max(0, cur + delta);
+}
+
+function handleFotoUploadChange(inputEl) {
+  if (!inputEl || !inputEl.files) return;
+  const files = Array.from(inputEl.files);
+  files.forEach(f => {
+    // Hindari duplikat file
+    if (!selectedInputPhotos.some(existing => existing.name === f.name && existing.size === f.size)) {
+      selectedInputPhotos.push(f);
+    }
+  });
+  renderFotoPreviews();
+  inputEl.value = ''; // Reset input agar bisa memilih file tambahan
+}
+
+function renderFotoPreviews() {
+  const container = document.getElementById('fotoPreviewContainer');
+  const grid = document.getElementById('fotoPreviewGrid');
+  const label = document.getElementById('fotoCountLabel');
+  if (!container || !grid) return;
+  
+  if (selectedInputPhotos.length === 0) {
+    container.style.display = 'none';
+    grid.innerHTML = '';
+    return;
+  }
+  
+  container.style.display = 'block';
+  if (label) label.textContent = `${selectedInputPhotos.length} Foto Terpilih`;
+  
+  grid.innerHTML = '';
+  selectedInputPhotos.forEach((file, idx) => {
+    const item = document.createElement('div');
+    item.className = 'foto-thumb-item';
+    
+    const img = document.createElement('img');
+    img.alt = file.name;
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; };
+    reader.readAsDataURL(file);
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'foto-remove-btn';
+    removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    removeBtn.title = 'Hapus foto ini';
+    removeBtn.onclick = (e) => {
+      e.stopPropagation();
+      removeSelectedPhoto(idx);
+    };
+    
+    item.appendChild(img);
+    item.appendChild(removeBtn);
+    grid.appendChild(item);
+  });
+}
+
+function removeSelectedPhoto(idx) {
+  selectedInputPhotos.splice(idx, 1);
+  renderFotoPreviews();
+}
+
+function clearSelectedPhotos() {
+  selectedInputPhotos = [];
+  renderFotoPreviews();
+}
+
+async function submitInputAktivitas(event) {
+  event.preventDefault();
+  
+  const selSales = document.getElementById('modalInputSales');
+  if (!selSales || !selSales.value) {
+    if (typeof customAlert === 'function') {
+      customAlert('Peringatan', 'Silakan pilih wiraniaga terlebih dahulu.', 'warning');
+    } else {
+      alert('Silakan pilih wiraniaga terlebih dahulu.');
+    }
+    return;
+  }
+  
+  const ketVal = document.getElementById('modalInputKeterangan')?.value.trim();
+  if (!ketVal) {
+    if (typeof customAlert === 'function') {
+      customAlert('Peringatan', 'Keterangan atau hasil aktivitas wajib diisi.', 'warning');
+    } else {
+      alert('Keterangan atau hasil aktivitas wajib diisi.');
+    }
+    return;
+  }
+  
+  const btnSubmit = document.getElementById('btnSubmitInputAktivitas');
+  const originalBtnHtml = btnSubmit ? btnSubmit.innerHTML : '';
+  if (btnSubmit) {
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan Aktivitas...';
+  }
+  
+  try {
+    const formData = new FormData();
+    formData.append('sales_account_id', selSales.value);
+    formData.append('nama_sales', document.getElementById('modalInputNamaSales')?.value || '');
+    formData.append('tanggal', document.getElementById('modalInputTanggal')?.value || '');
+    formData.append('jam', document.getElementById('modalInputJam')?.value || '');
+    
+    const sesiChecked = document.querySelector('input[name="sesi_waktu"]:checked');
+    formData.append('sesi_waktu', sesiChecked ? sesiChecked.value : 'Pagi');
+    
+    formData.append('tipe_aktivitas', document.getElementById('modalInputTipe')?.value || '');
+    formData.append('status', document.getElementById('modalInputStatus')?.value || 'Selesai');
+    formData.append('lokasi', document.getElementById('modalInputLokasi')?.value || '');
+    formData.append('durasi', document.getElementById('modalInputDurasi')?.value || '1 Jam');
+    formData.append('jumlah_prospek', document.getElementById('modalInputProspek')?.value || '0');
+    formData.append('keterangan', ketVal);
+    formData.append('laporan_hasil', ketVal);
+    
+    // Lampirkan multi-foto
+    selectedInputPhotos.forEach(file => {
+      formData.append('foto[]', file, file.name);
+    });
+    
+    const res = await fetch('../api/api_simpan_aktivitas.php', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const json = await res.json();
+    
+    if (json.status === 'success') {
+      closeInputAktivitasModal();
+      if (typeof customAlert === 'function') {
+        customAlert('Berhasil!', json.message || 'Aktivitas wiraniaga berhasil dicatat ke sistem.', 'success');
+      } else {
+        alert(json.message || 'Aktivitas wiraniaga berhasil disimpan!');
+      }
+      
+      // Muat ulang data timeline dan KPI cards
+      await loadTimeline();
+    } else {
+      if (typeof customAlert === 'function') {
+        customAlert('Gagal Menyimpan', json.message || 'Terjadi kendala saat menyimpan aktivitas.', 'error');
+      } else {
+        alert('Gagal: ' + (json.message || 'Error'));
+      }
+    }
+  } catch (err) {
+    console.error('Error submitting activity:', err);
+    if (typeof customAlert === 'function') {
+      customAlert('Error Sistem', 'Terjadi kesalahan server atau koneksi: ' + err.message, 'error');
+    } else {
+      alert('Error: ' + err.message);
+    }
+  } finally {
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = originalBtnHtml;
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
