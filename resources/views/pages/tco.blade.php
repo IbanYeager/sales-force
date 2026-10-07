@@ -995,6 +995,30 @@
         </div>
       </div>
 
+            <!-- ═══ KAIZEN EVOLVE 2026: TCO REVENUE BOOSTER ═══ -->
+      <div style="background: linear-gradient(135deg, #1e1014 0%, #3b141d 50%, #0f172a 100%); border-radius: 16px; padding: 18px 20px; color: white; margin-bottom: 22px; border: 1px solid rgba(243,201,106,0.3); box-shadow: 0 8px 25px rgba(30,16,20,0.25); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #ef4444; color: white; font-size: 9.5px; font-weight: 900; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.5px;">
+              EVOLVE 2026
+            </span>
+            <span style="font-size: 11.5px; font-weight: 800; color: #f3c96a;">
+              <i class="fa-solid fa-award"></i> TCO REVENUE ACCELERATOR
+            </span>
+          </div>
+          <h3 style="font-size: 16px; font-weight: 900; color: #ffffff; margin: 6px 0 2px;">
+            Target Tambahan Revenue Aksesoris: Rp 350.000 / Unit SPK
+          </h3>
+          <p style="font-size: 11.5px; color: #cbd5e1; margin: 0; line-height: 1.4;">
+            Tingkatkan kepuasan pelanggan dan profitabilitas dealer dengan penawaran paket TCO (Dashcam DVR, Air Purifier NanoeX, Karpet 3D, Talang Air) di setiap SPK mobil baru.
+          </p>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 8px 16px; text-align: center; flex-shrink: 0;">
+          <div style="font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Target per Unit</div>
+          <div style="font-size: 18px; font-weight: 900; color: #fbbf24;">Rp 350.000</div>
+        </div>
+      </div>
+
       <!-- ═══ Pilih Model Mobil ═══ -->
       <div class="model-selector-wrapper">
         <h3 class="tco-section-title" style="margin-bottom: 12px;">
