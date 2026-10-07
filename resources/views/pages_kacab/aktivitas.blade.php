@@ -105,6 +105,7 @@
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .input-modal-header {
+      flex-shrink: 0;
       background: linear-gradient(135deg, #1e1014, #3d121c);
       color: #ffffff;
       padding: 18px 24px;
@@ -162,13 +163,128 @@
       background: rgba(255, 255, 255, 0.25);
       transform: rotate(90deg);
     }
+    #formInputAktivitas {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
     .input-modal-body {
       padding: 20px 24px;
-      overflow-y: auto;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       gap: 12px;
+    }
+    .input-modal-body::-webkit-scrollbar {
+      width: 7px;
+    }
+    .input-modal-body::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .input-modal-body::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+    .input-modal-body::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .badge-24jam {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+    .btn-quick-now {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-quick-now:hover {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .time-picker-indo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+    .time-select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    .time-icon {
+      position: absolute;
+      left: 10px;
+      color: #94a3b8;
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .form-control-time {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #ffffff;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .time-select-wrapper:first-child .form-control-time {
+      padding-left: 32px;
+    }
+    .form-control-time:focus {
+      outline: none;
+      border-color: #cc1426;
+      box-shadow: 0 0 0 3px rgba(204, 20, 38, 0.12);
+    }
+    .time-separator {
+      font-weight: 800;
+      font-size: 16px;
+      color: #475569;
+    }
+    .wib-label {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 8px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+    .time-preview-text {
+      font-size: 11px;
+      color: #0369a1;
+      background: #f0f9ff;
+      border: 1px solid #e0f2fe;
+      border-radius: 6px;
+      padding: 4px 8px;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .kacab-action-banner {
       display: flex;
@@ -920,10 +1036,64 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Jam Pelaksanaan <span class="form-sublabel">(Waktu mulai)</span></label>
-              <div class="custom-input-wrapper">
-                <i class="fa-regular fa-clock input-icon"></i>
-                <input type="time" id="modalInputJam" name="jam" class="form-control with-icon">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label class="form-label" style="margin-bottom:0;">
+                  Jam Pelaksanaan <span class="badge-24jam">24 Jam WIB</span>
+                </label>
+                <button type="button" class="btn-quick-now" onclick="setCurrentTimeIndo()">Jam Sekarang</button>
+              </div>
+              <div class="time-picker-indo">
+                <div class="time-select-wrapper">
+                  <i class="fa-regular fa-clock time-icon"></i>
+                  <select id="modalSelectJam" class="form-control-time" onchange="onTimeIndoChange()">
+                    <option value="06">06:00 (Pagi)</option>
+                    <option value="07">07:00 (Pagi)</option>
+                    <option value="08">08:00 (Pagi)</option>
+                    <option value="09" selected>09:00 (Pagi)</option>
+                    <option value="10">10:00 (Pagi)</option>
+                    <option value="11">11:00 (Menjelang Siang)</option>
+                    <option value="12">12:00 (12 Siang)</option>
+                    <option value="13">13:00 (1 Siang)</option>
+                    <option value="14">14:00 (2 Siang)</option>
+                    <option value="15">15:00 (3 Sore)</option>
+                    <option value="16">16:00 (4 Sore)</option>
+                    <option value="17">17:00 (5 Sore)</option>
+                    <option value="18">18:00 (6 Petang / Maghrib)</option>
+                    <option value="19">19:00 (7 Malam)</option>
+                    <option value="20">20:00 (8 Malam)</option>
+                    <option value="21">21:00 (9 Malam)</option>
+                    <option value="22">22:00 (10 Malam)</option>
+                    <option value="23">23:00 (11 Malam)</option>
+                    <option value="00">00:00 (Tengah Malam)</option>
+                    <option value="01">01:00 (Dini Hari)</option>
+                    <option value="02">02:00 (Dini Hari)</option>
+                    <option value="03">03:00 (Dini Hari)</option>
+                    <option value="04">04:00 (Subuh)</option>
+                    <option value="05">05:00 (Subuh)</option>
+                  </select>
+                </div>
+                <span class="time-separator">:</span>
+                <div class="time-select-wrapper">
+                  <select id="modalSelectMenit" class="form-control-time" onchange="onTimeIndoChange()">
+                    <option value="00" selected>00</option>
+                    <option value="05">05</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                    <option value="35">35</option>
+                    <option value="40">40</option>
+                    <option value="45">45</option>
+                    <option value="50">50</option>
+                    <option value="55">55</option>
+                  </select>
+                </div>
+                <span class="wib-label">WIB</span>
+              </div>
+              <input type="hidden" id="modalInputJam" name="jam" value="09:00">
+              <div id="timePreviewIndo" class="time-preview-text">
+                <i class="fa-solid fa-circle-info"></i> Pukul <strong id="timePreviewIndoVal">09:00 WIB (Pagi)</strong>
               </div>
             </div>
           </div>

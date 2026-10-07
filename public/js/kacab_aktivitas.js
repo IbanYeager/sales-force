@@ -621,23 +621,12 @@ function openInputAktivitasModal(preselectedSalesId = null) {
   // Set default date to today
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   
   const tglEl = document.getElementById('modalInputTanggal');
   if (tglEl) tglEl.value = todayStr;
   
-  const jamEl = document.getElementById('modalInputJam');
-  if (jamEl) jamEl.value = timeStr;
-  
-  // Auto determine session based on current time
-  const hour = now.getHours();
-  let defaultSesi = 'Pagi';
-  if (hour >= 12 && hour < 15.5) defaultSesi = 'Siang';
-  else if (hour >= 15.5) defaultSesi = 'Sore';
-  
-  const radio = document.querySelector(`input[name="sesi_waktu"][value="${defaultSesi}"]`);
-  if (radio) radio.checked = true;
-  onSesiRadioChange(defaultSesi);
+  // Set Indonesian 24-hour time to current time
+  setCurrentTimeIndo();
   
   // If preselected sales ID provided
   if (preselectedSalesId) {
@@ -674,13 +663,72 @@ function setInputDatePreset(preset) {
   tglEl.value = dateStr;
 }
 
-function onSesiRadioChange(sesi) {
+function setCurrentTimeIndo() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = now.getMinutes();
+  const mRounded = String(Math.floor(m / 5) * 5).padStart(2, '0');
+  
+  const jamSel = document.getElementById('modalSelectJam');
+  const menSel = document.getElementById('modalSelectMenit');
+  if (jamSel) jamSel.value = h;
+  if (menSel) menSel.value = mRounded;
+  onTimeIndoChange(true);
+}
+
+function onTimeIndoChange(syncSesi = true) {
+  const jamSel = document.getElementById('modalSelectJam');
+  const menSel = document.getElementById('modalSelectMenit');
+  const hiddenJam = document.getElementById('modalInputJam');
+  const previewVal = document.getElementById('timePreviewIndoVal');
+  if (!jamSel || !menSel) return;
+  
+  const jam = jamSel.value;
+  const menit = menSel.value;
+  const timeStr = `${jam}:${menit}`;
+  if (hiddenJam) hiddenJam.value = timeStr;
+  
+  const optText = jamSel.options[jamSel.selectedIndex]?.text || '';
+  const match = optText.match(/\(([^)]+)\)/);
+  const contextLabel = match ? match[1] : '';
+  
+  if (previewVal) {
+    previewVal.textContent = `${timeStr} WIB (${contextLabel})`;
+  }
+  
+  if (syncSesi) {
+    const h = parseInt(jam, 10);
+    let autoSesi = 'Pagi';
+    if (h >= 12 && h < 15.5) autoSesi = 'Siang';
+    else if (h >= 15.5) autoSesi = 'Sore';
+    
+    const radio = document.querySelector(`input[name="sesi_waktu"][value="${autoSesi}"]`);
+    if (radio && !radio.checked) {
+      radio.checked = true;
+      onSesiRadioChange(autoSesi, false);
+    }
+  }
+}
+
+function onSesiRadioChange(sesi, updateTime = true) {
   ['Pagi', 'Siang', 'Sore'].forEach(s => {
     const card = document.getElementById(`cardSesi${s}`);
     if (card) {
       card.classList.toggle('active', s === sesi);
     }
   });
+
+  if (updateTime) {
+    const jamSel = document.getElementById('modalSelectJam');
+    const menSel = document.getElementById('modalSelectMenit');
+    if (jamSel && menSel) {
+      if (sesi === 'Pagi') jamSel.value = '09';
+      else if (sesi === 'Siang') jamSel.value = '13';
+      else if (sesi === 'Sore') jamSel.value = '16';
+      menSel.value = '00';
+      onTimeIndoChange(false);
+    }
+  }
 }
 
 function onTipeAktivitasChange() {
