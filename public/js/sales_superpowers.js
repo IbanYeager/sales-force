@@ -136,8 +136,11 @@ const SalesSuperpowers = {
           <button onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)" style="background:#38bdf8; color:#0f172a; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
             <i class="fa-solid fa-magnifying-glass"></i> Set Lokasi
           </button>
-          <button onclick="SalesSuperpowers.requestHighAccuracyGPS()" style="background:#10b981; color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Lacak ulang GPS Akurat HP">
+          <button onclick="SalesSuperpowers.requestHighAccuracyGPS()" style="background:#10b981; color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Lacak ulang GPS Satelit Akurat HP">
             <i class="fa-solid fa-location-arrow"></i> GPS Akurat
+          </button>
+          <button id="btnToggleLiveGps" onclick="SalesSuperpowers.toggleLiveTracking()" style="background:#334155; color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Ikuti pergerakan Anda secara otomatis & real-time di peta">
+            <i class="fa-solid fa-satellite"></i> Live Ikuti GPS
           </button>
           <span style="font-size:11px; color:#cbd5e1; font-weight:600;"><i class="fa-solid fa-hand-pointer" style="color:#f59e0b;"></i> Tip: Geser pin 📍 merah di peta ke posisi Anda</span>
         </div>
@@ -163,12 +166,13 @@ const SalesSuperpowers = {
     // If salesCoords already set manually or from localStorage, fetch data directly
     if (this.salesCoords) {
       const badge = document.getElementById('radarGpsStatus');
-      if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Set (${this.salesCoords.lat.toFixed(3)}, ${this.salesCoords.lng.toFixed(3)})`;
+      const accText = this.gpsAccuracy ? ` • Akurasi ±${Math.round(this.gpsAccuracy)}m` : '';
+      if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Set (${this.salesCoords.lat.toFixed(3)}, ${this.salesCoords.lng.toFixed(3)})${accText}`;
       this.fetchRadarData(this.salesCoords.lat, this.salesCoords.lng, this.currentRadius, district);
       return;
     }
 
-    // Otherwise fetch via browser Geolocation
+    // Otherwise fetch via browser Geolocation with high accuracy
     if (!navigator.geolocation) {
       this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
       return;
@@ -176,9 +180,12 @@ const SalesSuperpowers = {
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        const acc = Math.round(pos.coords.accuracy || 0);
         this.salesCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        this.gpsAccuracy = acc;
         const badge = document.getElementById('radarGpsStatus');
-        if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> GPS Terkunci (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
+        const accText = acc > 0 ? ` • Akurasi ±${acc}m` : '';
+        if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> GPS Terkunci (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})${accText}`;
         this.fetchRadarData(pos.coords.latitude, pos.coords.longitude, this.currentRadius, district);
       },
       (err) => {
@@ -187,25 +194,28 @@ const SalesSuperpowers = {
         if (badge) badge.innerHTML = `<i class="fa-solid fa-building"></i> Posisi: Kiara Condong`;
         this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
       },
-      { timeout: 12000, enableHighAccuracy: true, maximumAge: 0 }
+      { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
     );
   },
 
-  setManualSalesCoords(lat, lng, label = null) {
+  setManualSalesCoords(lat, lng, label = null, accuracy = null) {
     this.salesCoords = { lat: parseFloat(lat), lng: parseFloat(lng) };
+    if (accuracy !== null) this.gpsAccuracy = accuracy;
     localStorage.setItem('savedSalesLat', lat);
     localStorage.setItem('savedSalesLng', lng);
     if (label) localStorage.setItem('savedSalesLocLabel', label);
 
     const badge = document.getElementById('radarGpsStatus');
+    const accText = this.gpsAccuracy ? ` • Akurasi ±${Math.round(this.gpsAccuracy)}m` : '';
     if (badge) {
-      badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Set (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})`;
+      badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Terkunci (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})${accText}`;
     }
 
     this.fetchRadarData(lat, lng, this.currentRadius, this.currentDistrict);
 
     if (typeof showCustomAlert === 'function') {
-      showCustomAlert('Lokasi Diperbarui', `Posisi GPS Sales diset ke (${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})`, 'success');
+      const accDetail = this.gpsAccuracy ? ` (Akurasi Satelit ±${Math.round(this.gpsAccuracy)}m)` : '';
+      showCustomAlert('Lokasi Diperbarui', `Posisi GPS Sales diset ke (${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})${accDetail}`, 'success');
     }
   },
 
@@ -215,18 +225,86 @@ const SalesSuperpowers = {
       return;
     }
     const badge = document.getElementById('radarGpsStatus');
-    if (badge) badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Melacak GPS Presisi...`;
+    if (badge) badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Melacak GPS Satelit HP...`;
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        this.setManualSalesCoords(pos.coords.latitude, pos.coords.longitude, 'GPS HP Presisi');
+        const acc = Math.round(pos.coords.accuracy || 0);
+        this.gpsAccuracy = acc;
+        this.setManualSalesCoords(pos.coords.latitude, pos.coords.longitude, `GPS Satelit HP (±${acc}m)`, acc);
       },
       (err) => {
-        alert('Gagal mendapatkan GPS HP: ' + err.message + '. Silakan geser pin di peta atau ketik nama lokasi.');
+        alert('Gagal mendapatkan GPS HP: ' + err.message + '. Pastikan izin GPS aktif dan pilih opsi "Tepat / Precise Location". Anda juga bisa menggeser pin merah di peta.');
         if (badge) badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Gunakan Pin Geser`;
       },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
+  },
+
+  toggleLiveTracking() {
+    if (this.isLiveTracking) {
+      if (this.watchId) {
+        navigator.geolocation.clearWatch(this.watchId);
+        this.watchId = null;
+      }
+      this.isLiveTracking = false;
+      const btn = document.getElementById('btnToggleLiveGps');
+      if (btn) {
+        btn.style.background = '#334155';
+        btn.innerHTML = `<i class="fa-solid fa-satellite"></i> Live Ikuti GPS`;
+      }
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Live Tracking Dimatikan', 'Pelacakan real-time otomatis telah dinonaktifkan.', 'info');
+      }
+    } else {
+      if (!navigator.geolocation) {
+        alert('Browser tidak mendukung Geolocation.');
+        return;
+      }
+      this.isLiveTracking = true;
+      const btn = document.getElementById('btnToggleLiveGps');
+      if (btn) {
+        btn.style.background = '#ef4444';
+        btn.innerHTML = `<i class="fa-solid fa-circle-dot fa-fade" style="color:#fff;"></i> Live Aktif`;
+      }
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Live Tracking Aktif', 'Titik radar kini akan otomatis mengikuti pergerakan posisi Anda saat berpindah tempat!', 'success');
+      }
+
+      let lastLat = this.salesCoords ? this.salesCoords.lat : 0;
+      let lastLng = this.salesCoords ? this.salesCoords.lng : 0;
+
+      const calcDist = (lat1, lon1, lat2, lon2) => {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      };
+
+      this.watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const acc = Math.round(pos.coords.accuracy || 0);
+          this.gpsAccuracy = acc;
+          const newLat = pos.coords.latitude;
+          const newLng = pos.coords.longitude;
+
+          // Only refresh if moved more than 20 meters or first update
+          const distKm = lastLat ? calcDist(lastLat, lastLng, newLat, newLng) : 1;
+          if (distKm > 0.02 || !lastLat) {
+            lastLat = newLat;
+            lastLng = newLng;
+            this.setManualSalesCoords(newLat, newLng, `Live GPS (±${acc}m)`, acc);
+          }
+        },
+        (err) => {
+          console.warn('Watch GPS error', err);
+        },
+        { enableHighAccuracy: true, maximumAge: 3000, timeout: 15000 }
+      );
+    }
   },
 
   async searchAndSetLocation(query) {
@@ -396,12 +474,24 @@ const SalesSuperpowers = {
       draggable: true
     }).addTo(map);
 
+    // Draw precision accuracy radius aura (blue glow) if accuracy available (< 300m)
+    if (this.gpsAccuracy && this.gpsAccuracy > 0 && this.gpsAccuracy < 300) {
+      L.circle([salesLat, salesLng], {
+        color: '#38bdf8',
+        fillColor: '#38bdf8',
+        fillOpacity: 0.15,
+        weight: 1.5,
+        radius: this.gpsAccuracy
+      }).addTo(map);
+    }
+
+    const accPopupLabel = this.gpsAccuracy ? `Akurasi Satelit: ±${Math.round(this.gpsAccuracy)} meter` : 'Pusat Ring Radar GPS';
     salesMarker.bindPopup(`
       <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:12px; text-align:center; padding:4px;">
         <b style="color:#d7123a; font-size:13px;">📍 Lokasi Saya (Sales)</b><br>
-        <span style="color:#64748b; font-size:11px;">Pusat Ring Radar GPS</span><br>
+        <span style="color:#0369a1; font-weight:700; font-size:11px;"><i class="fa-solid fa-satellite-dish"></i> ${accPopupLabel}</span><br>
         <div style="margin-top:6px; background:#f0fdf4; border:1px solid #bbf7d0; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700; color:#15803d;">
-          💡 Geser (drag) pin ini jika posisi Anda kurang pas!
+          💡 Geser (drag) pin ini jika posisi Anda ingin diatur manual!
         </div>
       </div>
     `);
