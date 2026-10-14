@@ -186,7 +186,7 @@
             <i class="fa-solid fa-file-arrow-down" style="color:#0284c7; font-size:13px;"></i> Ekspor CSV
           </a>
 
-          <button class="btn-fu btn-fu-danger-outline" onclick="confirmResetDatabase()" title="Kosongkan seluruh data customer">
+          <button class="btn-fu btn-fu-danger-outline" onclick="confirmResetDatabase()" title="Kosongkan database customer (pilih Database Khusus Sales, Radar GPS, atau Semua)">
             <i class="fa-solid fa-trash-can" style="color:#ef4444; font-size:13px;"></i> Reset DB
           </button>
         </div>

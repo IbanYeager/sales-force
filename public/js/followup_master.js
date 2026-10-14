@@ -4762,23 +4762,172 @@ async function confirmBulkDelete() {
   }
 }
 
-async function confirmResetDatabase() {
+function openResetDatabaseModal() {
+  const currentSource = masterState.filters.db_source || 'sales';
+  document.getElementById('modalResetDb')?.remove();
+
+  const isSales = currentSource === 'sales';
+  const isRadar = currentSource === 'radar';
+  const isAll = currentSource === 'all';
+
+  const modalHtml = `
+    <div class="modal-overlay" id="modalResetDb" onclick="closeResetDbModal()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.65); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:16px;">
+      <div class="modal-content" style="max-width:540px; width:100%; border-radius:24px; padding:26px; box-shadow:0 30px 60px rgba(0,0,0,0.3); background:#ffffff; border:1px solid rgba(226,232,240,0.8); animation:alertModalSpring 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;" onclick="event.stopPropagation()">
+        
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; border-bottom:1.5px solid #f1f5f9; padding-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:44px; height:44px; border-radius:14px; background:#fee2e2; color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 12px rgba(239,68,68,0.2);">
+              <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div>
+              <h3 style="margin:0; font-size:17.5px; font-weight:900; color:#0f172a;">Reset Database Customer</h3>
+              <p style="margin:3px 0 0; font-size:12px; color:#64748b; font-weight:600;">Pilih sumber database yang ingin dikosongkan secara spesifik</p>
+            </div>
+          </div>
+          <button type="button" onclick="closeResetDbModal()" style="border:none; background:#f1f5f9; width:32px; height:32px; border-radius:50%; cursor:pointer; color:#64748b; font-size:14px; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Pilihan Sumber Database -->
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            
+            <!-- Opsi 1: Database Khusus Sales -->
+            <label style="display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-radius:14px; border:2px solid ${isSales ? '#d7123a' : '#e2e8f0'}; background:${isSales ? '#fff1f2' : '#ffffff'}; cursor:pointer; transition:all 0.2s;" id="labelResetSourceSales">
+              <input type="radio" name="reset_db_source_option" value="sales" ${isSales ? 'checked' : ''} onchange="updateResetDbOptionStyles()" style="margin-top:3px; accent-color:#d7123a; width:17px; height:17px; cursor:pointer;">
+              <div style="flex:1;">
+                <div style="font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <i class="fa-solid fa-user-tag" style="color:#d7123a;"></i> Hanya Database Khusus Sales
+                  <span style="font-size:10px; font-weight:800; background:#d7123a; color:#ffffff; padding:2px 7px; border-radius:6px;">Pilihan Aman</span>
+                </div>
+                <div style="font-size:11.5px; color:#64748b; margin-top:4px; line-height:1.45;">
+                  Hanya menghapus database customer sales reguler (penugasan wiraniaga).<br>
+                  <strong style="color:#0284c7;"><i class="fa-solid fa-shield-halved"></i> Data Database Radar GPS (PKB Excel) TETAP AMAN & TIDAK DIHAPUS.</strong>
+                </div>
+              </div>
+            </label>
+
+            <!-- Opsi 2: Database Radar GPS (PKB Excel) -->
+            <label style="display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-radius:14px; border:2px solid ${isRadar ? '#0284c7' : '#e2e8f0'}; background:${isRadar ? '#f0f9ff' : '#ffffff'}; cursor:pointer; transition:all 0.2s;" id="labelResetSourceRadar">
+              <input type="radio" name="reset_db_source_option" value="radar" ${isRadar ? 'checked' : ''} onchange="updateResetDbOptionStyles()" style="margin-top:3px; accent-color:#0284c7; width:17px; height:17px; cursor:pointer;">
+              <div style="flex:1;">
+                <div style="font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-satellite-dish" style="color:#0284c7;"></i> Hanya Database Radar GPS (PKB Excel)
+                </div>
+                <div style="font-size:11.5px; color:#64748b; margin-top:4px; line-height:1.45;">
+                  Hanya menghapus data customer dari impor Radar GPS / PKB Bengkel.<br>
+                  <strong style="color:#d7123a;"><i class="fa-solid fa-shield-halved"></i> Data Database Khusus Sales TETAP AMAN & TIDAK DIHAPUS.</strong>
+                </div>
+              </div>
+            </label>
+
+            <!-- Opsi 3: Semua Database (Gabungan) -->
+            <label style="display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-radius:14px; border:2px solid ${isAll ? '#ef4444' : '#e2e8f0'}; background:${isAll ? '#fef2f2' : '#ffffff'}; cursor:pointer; transition:all 0.2s;" id="labelResetSourceAll">
+              <input type="radio" name="reset_db_source_option" value="all" ${isAll ? 'checked' : ''} onchange="updateResetDbOptionStyles()" style="margin-top:3px; accent-color:#ef4444; width:17px; height:17px; cursor:pointer;">
+              <div style="flex:1;">
+                <div style="font-size:13.5px; font-weight:800; color:#991b1b; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> Seluruh Database (Gabungan)
+                </div>
+                <div style="font-size:11.5px; color:#b91c1c; margin-top:4px; line-height:1.45;">
+                  Mengosongkan total SELURUH data customer cabang (Sales + Radar GPS). Gunakan hanya jika Anda ingin mereset total dari nol.
+                </div>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; margin-bottom:18px; font-size:11.5px; color:#475569; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-circle-info" style="color:#3b82f6; font-size:14px; flex-shrink:0;"></i>
+          <span>Data yang telah dihapus tidak dapat dipulihkan kembali. Pastikan Anda telah mengunduh backup CSV jika diperlukan.</span>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+          <button type="button" class="btn-fu btn-fu-secondary" onclick="closeResetDbModal()" style="padding:9px 18px; border-radius:10px; font-weight:700;">
+            Batal
+          </button>
+          <button type="button" class="btn-fu" id="btnExecuteResetDb" onclick="executeResetDatabase()" style="background:#dc2626; color:#ffffff !important; border:none; padding:9px 20px; border-radius:10px; font-weight:800; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(220,38,38,0.35); cursor:pointer;">
+            <i class="fa-solid fa-trash-can"></i> Kosongkan Database Terpilih
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function updateResetDbOptionStyles() {
+  const selected = document.querySelector('input[name="reset_db_source_option"]:checked')?.value || 'sales';
+  
+  const lblSales = document.getElementById('labelResetSourceSales');
+  const lblRadar = document.getElementById('labelResetSourceRadar');
+  const lblAll = document.getElementById('labelResetSourceAll');
+
+  if (lblSales) {
+    const isAct = selected === 'sales';
+    lblSales.style.borderColor = isAct ? '#d7123a' : '#e2e8f0';
+    lblSales.style.background = isAct ? '#fff1f2' : '#ffffff';
+  }
+  if (lblRadar) {
+    const isAct = selected === 'radar';
+    lblRadar.style.borderColor = isAct ? '#0284c7' : '#e2e8f0';
+    lblRadar.style.background = isAct ? '#f0f9ff' : '#ffffff';
+  }
+  if (lblAll) {
+    const isAct = selected === 'all';
+    lblAll.style.borderColor = isAct ? '#ef4444' : '#e2e8f0';
+    lblAll.style.background = isAct ? '#fef2f2' : '#ffffff';
+  }
+}
+
+function closeResetDbModal() {
+  document.getElementById('modalResetDb')?.remove();
+}
+
+async function executeResetDatabase() {
+  const selectedOpt = document.querySelector('input[name="reset_db_source_option"]:checked')?.value || 'sales';
+  
+  let labelText = 'DATABASE KHUSUS SALES';
+  let safeNotice = '\n\n(Database Radar GPS tidak akan terhapus dan tetap aman)';
+  if (selectedOpt === 'radar') {
+    labelText = 'DATABASE RADAR GPS (PKB EXCEL)';
+    safeNotice = '\n\n(Database Khusus Sales tidak akan terhapus dan tetap aman)';
+  } else if (selectedOpt === 'all') {
+    labelText = 'SELURUH DATABASE GABUNGAN (Sales + Radar GPS)';
+    safeNotice = '\n\nPERINGATAN: Seluruh data customer akan hilang total!';
+  }
+
+  const confirmMsg = `Konfirmasi Terakhir:\nApakah Anda YAKIN ingin mengosongkan ${labelText}?${safeNotice}\n\nLanjutkan penghapusan?`;
+
   let isConfirmed = false;
   if (typeof customConfirm === 'function') {
-    isConfirmed = await customConfirm('PERINGATAN KRUSIAL:\nSeluruh data customer follow-up di database cabang akan dikosongkan secara total.\n\nGunakan opsi ini hanya jika Anda ingin mengimpor database baru dari nol. Apakah Anda yakin?');
+    isConfirmed = await customConfirm(confirmMsg);
   } else {
-    isConfirmed = confirm('Yakin ingin mengosongkan seluruh database customer?');
+    isConfirmed = confirm(confirmMsg);
   }
 
   if (!isConfirmed) return;
 
+  const btn = document.getElementById('btnExecuteResetDb');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghapus...';
+  }
+
   try {
     const res = await fetch('/api/api_followup.php?action=reset_database', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ db_source: selectedOpt })
     });
     const data = await res.json();
     if (data.success) {
+      closeResetDbModal();
       masterState.selectedIds = [];
       updateBulkActionBar();
 
@@ -4791,11 +4940,32 @@ async function confirmResetDatabase() {
         alert(data.message);
       }
       await initMasterDashboard();
+    } else {
+      if (typeof showCustomAlert === 'function') {
+        showCustomAlert('Gagal', data.message || 'Terjadi kesalahan saat mereset database', 'error');
+      } else {
+        alert(data.message || 'Terjadi kesalahan saat mereset database');
+      }
     }
   } catch (e) {
     console.error('Reset error', e);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Kosongkan Database Terpilih';
+    }
   }
 }
+
+function confirmResetDatabase() {
+  openResetDatabaseModal();
+}
+
+window.openResetDatabaseModal = openResetDatabaseModal;
+window.updateResetDbOptionStyles = updateResetDbOptionStyles;
+window.closeResetDbModal = closeResetDbModal;
+window.executeResetDatabase = executeResetDatabase;
+window.confirmResetDatabase = confirmResetDatabase;
 
 // -------------------------------------------------------------
 // SMART QUOTA LEADS DISTRIBUTION MATRIX (50 / 100 per Sales)

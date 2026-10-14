@@ -2129,11 +2129,39 @@ if ($action === 'bulk_delete') {
 // ROUTE: POST /api_followup.php?action=reset_database
 // -------------------------------------------------------------
 if ($action === 'reset_database') {
-    followup_execute("DELETE FROM followup_customers");
-    followup_execute("DELETE FROM followup_logs");
+    $input = get_json_input();
+    $db_source = trim($input['db_source'] ?? $_GET['db_source'] ?? 'sales');
 
-    echo json_encode(['success' => true, 'message' => 'Seluruh database customer berhasil dikosongkan.']);
-    exit;
+    if ($db_source === 'sales') {
+        $whereSales = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
+        followup_execute("DELETE FROM followup_customers WHERE $whereSales");
+        followup_execute("DELETE FROM followup_logs WHERE customer_id NOT IN (SELECT id FROM followup_customers)");
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Database Khusus Sales berhasil dikosongkan. Data Database Radar GPS (PKB Excel) tetap aman dan tidak terhapus.'
+        ]);
+        exit;
+    } elseif ($db_source === 'radar') {
+        $whereRadar = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
+        followup_execute("DELETE FROM followup_customers WHERE $whereRadar");
+        followup_execute("DELETE FROM followup_logs WHERE customer_id NOT IN (SELECT id FROM followup_customers)");
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Database Radar GPS (PKB Excel) berhasil dikosongkan. Data Database Khusus Sales tetap aman dan tidak terhapus.'
+        ]);
+        exit;
+    } else {
+        followup_execute("DELETE FROM followup_customers");
+        followup_execute("DELETE FROM followup_logs");
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Seluruh database customer (Sales & Radar GPS) berhasil dikosongkan.'
+        ]);
+        exit;
+    }
 }
 
 // -------------------------------------------------------------
