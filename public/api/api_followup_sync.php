@@ -487,6 +487,7 @@ function sync_google_sheet_data($sheetUrl = null) {
                     ELSE excluded.followup_status
                 END,
                 followup_category = excluded.followup_category,
+                sync_source = 'google_sheet',
                 vehicle_filter = excluded.vehicle_filter,
                 cust_type = excluded.cust_type,
                 priority_class = excluded.priority_class,
@@ -567,6 +568,7 @@ function sync_google_sheet_data($sheetUrl = null) {
                         ELSE VALUES(followup_status)
                     END,
                     followup_category = VALUES(followup_category),
+                    sync_source = VALUES(sync_source),
                     vehicle_filter = VALUES(vehicle_filter),
                     cust_type = VALUES(cust_type),
                     priority_class = VALUES(priority_class),

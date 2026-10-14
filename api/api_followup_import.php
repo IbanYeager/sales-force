@@ -56,6 +56,9 @@ $fileTmpPath = $_FILES['file']['tmp_name'];
 $fileName = $_FILES['file']['name'];
 $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
+// Target database passed from UI ('radar', 'sales', 'all', or 'auto')
+$targetDbSource = strtolower(trim($_POST['db_source'] ?? $_GET['db_source'] ?? 'auto'));
+
 // Temporary storage for processing
 $targetDir = __DIR__ . '/../uploads/';
 if (!is_dir($targetDir)) {
@@ -68,6 +71,7 @@ if (!@move_uploaded_file($fileTmpPath, $savedFilePath)) {
 
 $parsedCustomers = [];
 $sheetUsed = 'Data Utuh';
+$treatAsRadar = false;
 
 if ($fileExt === 'csv') {
     // CSV Parser with delimiter detection
@@ -78,9 +82,19 @@ if ($fileExt === 'csv') {
 
         $headerRow = [];
         $rIdx = 0;
+        $isRadarCsv = ($targetDbSource === 'radar');
+
         while (($row = fgetcsv($handle, 5000, $delim)) !== FALSE) {
             if ($rIdx === 0) {
                 $headerRow = array_map('strtolower', array_map('trim', $row));
+                if ($targetDbSource !== 'sales' && !$isRadarCsv) {
+                    foreach ($headerRow as $h) {
+                        if (strpos($h, 'pkb') !== false || strpos($h, 'no rangka') !== false || strpos($h, 'equipment no') !== false) {
+                            $isRadarCsv = true;
+                            break;
+                        }
+                    }
+                }
             } else {
                 $item = [];
                 foreach ($row as $colIdx => $val) {
@@ -90,31 +104,48 @@ if ($fileExt === 'csv') {
                 $name = $item['nama'] ?? $item['nama_customer'] ?? $item['customer'] ?? $item['nama lengkap'] ?? '';
                 $phone = clean_phone_number($item['no wa'] ?? $item['no_telepon_customer'] ?? $item['telepon'] ?? $item['no hp'] ?? $item['phone'] ?? '');
                 
-                if ($name && $name !== '-' && $phone) {
+                if ($name && $name !== '-' && ($phone || $isRadarCsv)) {
                     $carModel = $item['tipe mobil'] ?? $item['model'] ?? $item['mobil'] ?? $item['target upgrade'] ?? 'Toyota Unit';
                     $lastCar = $item['mobil saat ini'] ?? $item['unit saat ini'] ?? $item['tipe lama'] ?? '';
                     $carAge = $item['usia'] ?? $item['usia kendaraan'] ?? $item['tahun'] ?? '';
-                    $cluster = $item['klaster'] ?? $item['cluster'] ?? $item['cluster_name'] ?? '';
-                    $priority = $item['prioritas'] ?? $item['priority'] ?? '';
+                    $cluster = $item['klaster'] ?? $item['cluster'] ?? $item['cluster_name'] ?? ($isRadarCsv ? 'Radar Pelanggan Servis' : '');
+                    $priority = $item['prioritas'] ?? $item['priority'] ?? ($isRadarCsv ? 'Prioritas Radar GPS' : '');
                     $district = $item['kecamatan'] ?? $item['wilayah'] ?? $item['district'] ?? '';
+                    $vin = $item['vin'] ?? $item['no rangka'] ?? $item['equipment no'] ?? '';
 
-                    $category = $item['kategori'] ?? 'Trade-in / Repurchase (' . trim(str_replace('(Target Repurchase)', '', $carModel)) . ')';
+                    if ($isRadarCsv) {
+                        $custCode = 'RADAR-' . ($vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone . $rIdx), 0, 10)));
+                        $syncSrc = 'pkb_excel_radar';
+                        $category = $item['kategori'] ?? ('Database Radar GPS (' . trim(str_replace('(Target Repurchase)', '', $carModel)) . ')');
+                    } else {
+                        $custCode = 'SALES-' . ($vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone . $rIdx), 0, 10)));
+                        $syncSrc = 'excel_import';
+                        $category = $item['kategori'] ?? ('Trade-in / Repurchase (' . trim(str_replace('(Target Repurchase)', '', $carModel)) . ')');
+                    }
 
                     $parsedCustomers[] = [
+                        'customer_code' => $custCode,
                         'name' => $name,
                         'phone' => $phone,
                         'car_model' => trim(str_replace('(Target Repurchase)', '', $carModel)),
                         'last_car_model' => $lastCar,
                         'car_age' => $carAge,
                         'recommended_model' => trim(str_replace('(Target Repurchase)', '', $carModel)),
+                        'alt_model_2' => '',
+                        'alt_model_3' => '',
                         'cluster_name' => $cluster,
                         'priority' => $priority,
                         'district' => $district,
                         'plate_number' => $item['no polisi'] ?? $item['plat'] ?? '',
-                        'vin' => $item['vin'] ?? '',
-                        'purchase_date' => $item['tgl beli'] ?? '',
+                        'vin' => $vin,
+                        'customer_type' => 'RETAIL',
+                        'outlet_do' => 'TUNAS TOYOTA',
+                        'outlet_service' => 'TUNAS TOYOTA',
+                        'service_compliance' => 'Rutin Servis',
+                        'assigned_sales_id' => null,
                         'followup_category' => $category,
                         'followup_status' => 'Belum Dihubungi',
+                        'sync_source' => $syncSrc,
                         'notes' => $item['catatan'] ?? ''
                     ];
                 }
@@ -122,6 +153,7 @@ if ($fileExt === 'csv') {
             $rIdx++;
         }
         fclose($handle);
+        $treatAsRadar = $isRadarCsv;
     }
 } else {
     // 100% Pure PHP Native High-Performance XLSX Parser with XMLReader streaming
@@ -327,6 +359,18 @@ if ($fileExt === 'csv') {
                     }
                 }
 
+                // Strict Database Isolation:
+                // If user uploaded from Database Radar GPS tab, force radar.
+                // If user uploaded from Database Khusus Sales tab, force sales.
+                // If 'all' or 'auto', infer from format.
+                if ($targetDbSource === 'radar') {
+                    $treatAsRadar = true;
+                } elseif ($targetDbSource === 'sales') {
+                    $treatAsRadar = false;
+                } else {
+                    $treatAsRadar = $isPkbFormat;
+                }
+
                 if ($isPkbFormat) {
                     $sheetUsed .= ' (Format PKB Radar)';
                     $nameIdx = $findColIdx(['/customer name/i', '/nama/i', '/customer/i', '/pelanggan/i']);
@@ -398,8 +442,18 @@ if ($fileExt === 'csv') {
                             $phone = clean_phone_number($pm[0]);
                         }
 
-                        $custCode = $vin ? ('VIN-' . $vin) : ('PKB-' . abs(crc32($name . $r)));
                         $notes = 'PKB Date: ' . $pkbDate . ' | Deskripsi: ' . $opDesc . ' | Alamat: ' . substr($address, 0, 120);
+
+                        // Strict namespace isolation to avoid colliding with sales database
+                        if ($treatAsRadar) {
+                            $custCode = 'RADAR-' . ($vin ? ('VIN-' . $vin) : ('PKB-' . abs(crc32($name . $r))));
+                            $syncSrc = 'pkb_excel_radar';
+                            $fuCat = 'Trade-in & Service (>2.5 Thn)';
+                        } else {
+                            $custCode = 'SALES-' . ($vin ? ('VIN-' . $vin) : ('PKB-' . abs(crc32($name . $r))));
+                            $syncSrc = 'excel_import';
+                            $fuCat = 'Trade-in & Service (>2.5 Thn)';
+                        }
 
                         $parsedCustomers[] = [
                             'customer_code' => $custCode,
@@ -421,8 +475,8 @@ if ($fileExt === 'csv') {
                             'outlet_service' => 'TUNAS TOYOTA',
                             'service_compliance' => 'Rutin Servis',
                             'assigned_sales_id' => null,
-                            'followup_category' => 'Trade-in & Service (>2.5 Thn)',
-                            'sync_source' => 'pkb_excel_radar',
+                            'followup_category' => $fuCat,
+                            'sync_source' => $syncSrc,
                             'notes' => $notes
                         ];
                     }
@@ -503,14 +557,28 @@ if ($fileExt === 'csv') {
                         $targetCar = $rec1 ?: ($vFilter ?: ($lastCar ?: 'Toyota Unit'));
 
                         $assignedSalesId = null;
-                        if ($salesmanIdx !== -1) {
+                        if (!$treatAsRadar && $salesmanIdx !== -1) {
                             $salesNameRaw = strtolower(preg_replace('/[^a-z0-9]/', '', (string)($row[$salesmanIdx] ?? '')));
                             if ($salesNameRaw && isset($salesMap[$salesNameRaw])) {
                                 $assignedSalesId = $salesMap[$salesNameRaw];
                             }
                         }
 
+                        // Strict namespace isolation to avoid colliding across databases
+                        if ($treatAsRadar) {
+                            $custCode = 'RADAR-' . ($vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone . $r), 0, 10)));
+                            $syncSrc = 'pkb_excel_radar';
+                            $fuCat = 'Database Radar GPS (' . $targetCar . ')';
+                            $assignedSales = null;
+                        } else {
+                            $custCode = 'SALES-' . ($vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone . $r), 0, 10)));
+                            $syncSrc = 'excel_import';
+                            $fuCat = 'Trade-in / Repurchase (' . $targetCar . ')';
+                            $assignedSales = $assignedSalesId;
+                        }
+
                         $parsedCustomers[] = [
+                            'customer_code' => $custCode,
                             'name' => $name,
                             'phone' => $phone,
                             'car_model' => $targetCar,
@@ -519,8 +587,8 @@ if ($fileExt === 'csv') {
                             'recommended_model' => $targetCar,
                             'alt_model_2' => $rec2,
                             'alt_model_3' => $rec3,
-                            'cluster_name' => $cluster,
-                            'priority' => $priority,
+                            'cluster_name' => $cluster ?: ($treatAsRadar ? 'Radar Pelanggan Servis' : ''),
+                            'priority' => $priority ?: ($treatAsRadar ? 'Prioritas Radar GPS' : ''),
                             'district' => $district,
                             'plate_number' => $plate,
                             'vin' => $vin,
@@ -528,9 +596,9 @@ if ($fileExt === 'csv') {
                             'outlet_do' => $outletDo,
                             'outlet_service' => $outletSrv,
                             'service_compliance' => $srvComp,
-                            'assigned_sales_id' => $assignedSalesId,
-                            'followup_category' => 'Trade-in / Repurchase (' . $targetCar . ')',
-                            'sync_source' => 'excel_import'
+                            'assigned_sales_id' => $assignedSales,
+                            'followup_category' => $fuCat,
+                            'sync_source' => $syncSrc
                         ];
                     }
                 }
@@ -556,7 +624,7 @@ global $is_mysql, $conn;
 if ($is_mysql && $conn) {
     $batchRows = [];
     foreach ($parsedCustomers as $c) {
-        $code = $conn->real_escape_string($c['customer_code'] ?? ('CUST-' . substr(time(), -5) . '-' . ($inserted + count($batchRows) + 1)));
+        $code = $conn->real_escape_string($c['customer_code'] ?? (($treatAsRadar ? 'RADAR-CUST-' : 'SALES-CUST-') . substr(time(), -5) . '-' . ($inserted + count($batchRows) + 1)));
         $name = $conn->real_escape_string($c['name']);
         $phone = $conn->real_escape_string($c['phone']);
         $car = $conn->real_escape_string($c['car_model']);
@@ -575,7 +643,7 @@ if ($is_mysql && $conn) {
         $srvComp = $conn->real_escape_string($c['service_compliance']);
         $cat = $conn->real_escape_string($c['followup_category']);
         $salesVal = !empty($c['assigned_sales_id']) ? (int)$c['assigned_sales_id'] : "NULL";
-        $syncSrc = $conn->real_escape_string($c['sync_source'] ?? 'excel_import');
+        $syncSrc = $conn->real_escape_string($c['sync_source'] ?? ($treatAsRadar ? 'pkb_excel_radar' : 'excel_import'));
 
         $batchRows[] = "('$code', '$name', '$phone', '$car', '$lastCar', '$age', '$rec1', '$rec2', '$rec3', '$cluster', '$priority', '$dist', '$plate', '$vin', '$outletDo', '$outletSrv', '$srvComp', '$cat', $salesVal, 'Belum Dihubungi', '$syncSrc')";
     }
@@ -592,10 +660,21 @@ if ($is_mysql && $conn) {
             name = VALUES(name),
             phone = VALUES(phone),
             car_model = VALUES(car_model),
+            last_car_model = VALUES(last_car_model),
             car_age = VALUES(car_age),
+            recommended_model = VALUES(recommended_model),
+            alt_model_2 = VALUES(alt_model_2),
+            alt_model_3 = VALUES(alt_model_3),
+            cluster_name = VALUES(cluster_name),
+            priority = VALUES(priority),
             district = VALUES(district),
-            sync_source = VALUES(sync_source),
-            followup_category = VALUES(followup_category)";
+            plate_number = VALUES(plate_number),
+            vin = VALUES(vin),
+            outlet_do = VALUES(outlet_do),
+            outlet_service = VALUES(outlet_service),
+            service_compliance = VALUES(service_compliance),
+            followup_category = VALUES(followup_category),
+            sync_source = VALUES(sync_source)";
         
         if ($conn->query($sql)) {
             $aff = $conn->affected_rows;
@@ -607,9 +686,9 @@ if ($is_mysql && $conn) {
 } else {
     // SQLite insert
     foreach ($parsedCustomers as $c) {
-        $code = $c['customer_code'] ?? ('CUST-' . substr(time(), -5) . '-' . ($inserted + 1));
+        $code = $c['customer_code'] ?? (($treatAsRadar ? 'RADAR-CUST-' : 'SALES-CUST-') . substr(time(), -5) . '-' . ($inserted + 1));
         $salesId = !empty($c['assigned_sales_id']) ? (int)$c['assigned_sales_id'] : null;
-        $syncSrc = $c['sync_source'] ?? 'excel_import';
+        $syncSrc = $c['sync_source'] ?? ($treatAsRadar ? 'pkb_excel_radar' : 'excel_import');
 
         followup_execute("
             INSERT OR REPLACE INTO followup_customers (
@@ -633,9 +712,12 @@ if (file_exists($savedFilePath)) {
     @unlink($savedFilePath);
 }
 
+    $targetName = $treatAsRadar ? 'Database Radar GPS (PKB Excel)' : 'Database Khusus Sales';
     echo json_encode([
         'success' => true,
-        'message' => "Berhasil memproses file! $inserted data customer baru disimpan, $updated data diperbarui.",
+        'message' => "Berhasil memproses file untuk $targetName! $inserted data disimpan, $updated data diperbarui. (Data di database lain tetap aman)",
+        'target_db' => ($treatAsRadar ? 'radar' : 'sales'),
+        'target_name' => $targetName,
         'inserted' => $inserted,
         'updated' => $updated,
         'total' => count($parsedCustomers),

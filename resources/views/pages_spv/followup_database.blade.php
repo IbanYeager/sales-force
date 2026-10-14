@@ -151,7 +151,7 @@
           <!-- Hidden File Input for Excel Import -->
           <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display:none;" onchange="handleExcelUpload(this)">
 
-          <button class="btn-fu btn-fu-emerald" onclick="document.getElementById('excelFileInput').click()">
+          <button class="btn-fu btn-fu-emerald" id="btnImportExcel" onclick="document.getElementById('excelFileInput').click()" title="Impor data Excel/CSV ke database yang sedang aktif">
             <i class="fa-solid fa-file-excel"></i> Impor Excel / CSV
           </button>
 

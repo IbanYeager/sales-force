@@ -1180,6 +1180,17 @@ function switchMasterDbSource(source = 'sales') {
     }
   }
 
+  const btnImport = document.getElementById('btnImportExcel');
+  if (btnImport) {
+    if (source === 'radar') {
+      btnImport.title = 'Impor data Excel/CSV ke Database Radar GPS (PKB Excel)';
+    } else if (source === 'sales') {
+      btnImport.title = 'Impor data Excel/CSV ke Database Khusus Sales';
+    } else {
+      btnImport.title = 'Impor data Excel/CSV ke Database CRM';
+    }
+  }
+
   loadMasterStats();
   loadMasterCustomers(true);
 }
@@ -3592,12 +3603,17 @@ async function executeBatchUpdateMaster(e) {
 function handleExcelUpload(input) {
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
+  const currentSource = masterState.filters.db_source || 'sales';
 
-  // Show Animated Progress Modal
-  showImportProgressModal(file.name, file.size);
+  // Show Animated Progress Modal with targeted database
+  showImportProgressModal(file.name, file.size, currentSource);
 
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('db_source', currentSource);
+
+  // Clear input value so re-selecting same file works
+  input.value = '';
 
   const xhr = new XMLHttpRequest();
   xhr.open('POST', '/api/api_followup_import.php', true);
@@ -3610,9 +3626,9 @@ function handleExcelUpload(input) {
   };
 
   xhr.onload = async () => {
-    updateImportProgress(70, 'Memindai sheet & kolom 9-Clusters Repurchase...', 2);
+    updateImportProgress(70, 'Memindai sheet & kolom data...', 2);
     setTimeout(() => {
-      updateImportProgress(90, 'Mengekstrak data kendaraan & klaster...', 3);
+      updateImportProgress(90, 'Mengekstrak data kendaraan & validasi...', 3);
     }, 600);
 
     setTimeout(async () => {
@@ -3637,9 +3653,18 @@ function handleExcelUpload(input) {
   xhr.send(formData);
 }
 
-function showImportProgressModal(fileName, fileSize) {
+function showImportProgressModal(fileName, fileSize, targetSource = 'sales') {
   let modal = document.getElementById('importProgressModal');
   const sizeMb = fileSize ? (fileSize / (1024 * 1024)).toFixed(2) + ' MB' : '';
+
+  let targetBadge = '';
+  if (targetSource === 'radar') {
+    targetBadge = `<div style="display:inline-flex; align-items:center; gap:6px; background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; padding:4px 12px; border-radius:20px; font-size:11.5px; font-weight:800; margin-bottom:12px;"><i class="fa-solid fa-satellite-dish"></i> Target: Database Radar GPS (PKB Excel)</div>`;
+  } else if (targetSource === 'sales') {
+    targetBadge = `<div style="display:inline-flex; align-items:center; gap:6px; background:#fee2e2; color:#d7123a; border:1px solid #fecaca; padding:4px 12px; border-radius:20px; font-size:11.5px; font-weight:800; margin-bottom:12px;"><i class="fa-solid fa-user-tag"></i> Target: Database Khusus Sales</div>`;
+  } else {
+    targetBadge = `<div style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:4px 12px; border-radius:20px; font-size:11.5px; font-weight:800; margin-bottom:12px;"><i class="fa-solid fa-layer-group"></i> Target: Gabungan / Auto-Detect</div>`;
+  }
 
   if (!modal) {
     const html = `
@@ -3647,12 +3672,14 @@ function showImportProgressModal(fileName, fileSize) {
         <div class="import-progress-box" onclick="event.stopPropagation()">
 
           <!-- Animated Top Icon -->
-          <div style="position:relative; width:64px; height:64px; margin:0 auto 16px;">
+          <div style="position:relative; width:64px; height:64px; margin:0 auto 12px;">
             <div style="width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color:#d7123a; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 8px 20px rgba(215,18,58,0.15);">
               <i class="fa-solid fa-file-excel" id="importIconState"></i>
             </div>
             <div id="importSpinner" style="position:absolute; inset:-4px; border:2.5px solid transparent; border-top-color:#d7123a; border-right-color:#d7123a; border-radius:24px; animation:fuSpin 1.2s linear infinite;"></div>
           </div>
+
+          <div id="importTargetBadgeBox">${targetBadge}</div>
 
           <h3 style="font-size:18px; font-weight:900; color:#0d1b3e; margin:0 0 4px 0;" id="importTitle">Memproses File Data...</h3>
           <p style="font-size:12px; color:#64748b; margin:0 0 16px 0;" id="importSub">${fileName} ${sizeMb ? `(${sizeMb})` : ''}</p>
@@ -3668,9 +3695,9 @@ function showImportProgressModal(fileName, fileSize) {
 
           <div style="text-align:left; margin-bottom:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 14px;" id="importChecklist">
             <div class="import-step-item active" id="step1"><i class="fa-solid fa-cloud-arrow-up"></i> 1. Mengunggah File ke Server</div>
-            <div class="import-step-item" id="step2"><i class="fa-solid fa-table-list"></i> 2. Pindai Kolom & Klaster Repurchase</div>
-            <div class="import-step-item" id="step3"><i class="fa-solid fa-car"></i> 3. Ekstraksi Kontak & Model Kendaraan</div>
-            <div class="import-step-item" id="step4"><i class="fa-solid fa-database"></i> 4. Simpan ke Database CRM SFT</div>
+            <div class="import-step-item" id="step2"><i class="fa-solid fa-table-list"></i> 2. Pindai Kolom & Klaster Data</div>
+            <div class="import-step-item" id="step3"><i class="fa-solid fa-car"></i> 3. Ekstraksi Kontak & Validasi Database</div>
+            <div class="import-step-item" id="step4"><i class="fa-solid fa-database"></i> 4. Simpan ke Database CRM SFT (Isolasi Terjaga)</div>
           </div>
 
           <div id="importResultBox" style="display:none; background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:14px; font-size:12.5px; color:#15803d; margin-bottom:16px; text-align:left;">
@@ -3685,6 +3712,8 @@ function showImportProgressModal(fileName, fileSize) {
     document.body.insertAdjacentHTML('beforeend', html);
   } else {
     modal.classList.add('active');
+    const badgeBox = document.getElementById('importTargetBadgeBox');
+    if (badgeBox) badgeBox.innerHTML = targetBadge;
     document.getElementById('importTitle').textContent = 'Memproses File Data...';
     document.getElementById('importSub').textContent = `${fileName} ${sizeMb ? `(${sizeMb})` : ''}`;
     document.getElementById('importProgressBar').style.width = '15%';
@@ -3730,12 +3759,13 @@ function updateImportProgress(percent, statusText, stepNumber, resultData = null
     const resBox = document.getElementById('importResultBox');
     if (resBox) {
       resBox.style.display = 'block';
+      const targetLabel = resultData.target_name || (resultData.target_db === 'radar' ? 'Database Radar GPS' : 'Database Khusus Sales');
       resBox.innerHTML = `
         <div style="font-weight:800; font-size:13.5px; color:#14532d; display:flex; align-items:center; gap:6px;">
           <i class="fa-solid fa-circle-check" style="font-size:16px;"></i> ${resultData.message}
         </div>
         <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; font-size:11.5px; color:#334155;">
-          <span style="background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:3px 8px;">Sheet: <strong>${resultData.sheet_used || 'Utama'}</strong></span>
+          <span style="background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:3px 8px;">Target: <strong>${targetLabel}</strong></span>
           <span style="background:#ffffff; border:1px solid #86efac; color:#15803d; border-radius:6px; padding:3px 8px;">Baru: <strong>+${resultData.inserted || 0}</strong></span>
           <span style="background:#ffffff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:6px; padding:3px 8px;">Total: <strong>${resultData.total || resultData.inserted || 0} Data</strong></span>
         </div>
