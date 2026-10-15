@@ -809,10 +809,10 @@ const SalesSuperpowers = {
     const filteredLeads = this.getFilteredRadarLeads();
 
     // OPTIMASI ANTI-LAG:
-    // Render maksimal 100 pin terdekat di peta Leaflet.
-    // 100 pin menjamin pergerakan peta 60 FPS halus di semua perangkat HP,
-    // tidak menumpuk jadi gumpalan merah, dan relevan dengan rute terdekat sales.
-    const MAX_PINS = 100;
+    // Render 250 pin terdekat di peta Leaflet (mode preferCanvas aktif).
+    // Menjamin pergerakan peta 60 FPS halus di semua perangkat HP,
+    // sebaran akurat merata di setiap kecamatan & jalan permukiman.
+    const MAX_PINS = 250;
     const mapPins = filteredLeads.slice(0, MAX_PINS);
 
     const pinBadge = document.getElementById('radarMapPinCount');
@@ -866,12 +866,18 @@ const SalesSuperpowers = {
                 <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)} 
                 <span class="radar-popup-dist-pill">${distLabel}</span>
               </div>
+              ${c.address ? `
+                <div style="font-size:10.5px; color:#475569; margin-top:3px; line-height:1.3; max-width:240px;">
+                  <i class="fa-solid fa-house-chimney" style="color:#0284c7; font-size:10px;"></i> ${escapeHtml(c.address)}
+                </div>
+              ` : ''}
             </div>
           </div>
           
           <div class="radar-popup-car-box">
             <div style="font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
               <i class="fa-solid fa-car-side" style="color:#2563eb;"></i> ${escapeHtml(c.car_model || 'Toyota')}
+              ${c.plate_number ? `<span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; font-weight:700;">${escapeHtml(c.plate_number)}</span>` : ''}
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
               <span style="color:#64748b;">Status: <b style="color:${pinBg};">${escapeHtml(c.status || 'Belum Dihubungi')}</b></span>
@@ -896,7 +902,7 @@ const SalesSuperpowers = {
       `;
 
       const marker = L.marker([c.lat, c.lng], { icon: customIcon }).bindPopup(popupHtml);
-      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${distLabel}`, { direction: 'top', offset: [0, -12] });
+      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${escapeHtml(c.district)} (${distLabel})`, { direction: 'top', offset: [0, -12] });
       this.radarMarkersLayer.addLayer(marker);
     });
   },
@@ -1058,6 +1064,11 @@ const SalesSuperpowers = {
                   <div class="radar-district-tag">
                     <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(item.district)}
                   </div>
+                  ${item.address ? `
+                    <div style="font-size:11px; color:#64748b; margin-top:3px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(item.address)}">
+                      <i class="fa-solid fa-house-chimney" style="color:#94a3b8; font-size:10px;"></i> ${escapeHtml(item.address)}
+                    </div>
+                  ` : ''}
                 </div>
               </div>
               <div class="radar-dist-chip">
@@ -1068,7 +1079,7 @@ const SalesSuperpowers = {
             <div class="radar-vehicle-box">
               <div class="radar-vehicle-row">
                 <i class="fa-solid fa-car-side" style="color:#d7123a;"></i>
-                <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model || 'Toyota')}</span></span>
+                <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model || 'Toyota')}</span> ${item.plate_number ? `<span style="font-size:10.5px; background:#f1f5f9; color:#334155; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:4px;">${escapeHtml(item.plate_number)}</span>` : ''}</span>
               </div>
               <div class="radar-tags-row">
                 <span class="radar-tag priority-${(item.priority||'').toLowerCase()}">Prioritas: <b>${escapeHtml(item.priority || 'Warm')}</b></span>

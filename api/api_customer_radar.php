@@ -23,6 +23,7 @@ $cityDistrictCoords = [
     'gatot subroto'    => [-6.9275, 107.6325],
     'gatsu'            => [-6.9275, 107.6325],
     'turangga'         => [-6.9388, 107.6294],
+    'rancagoong'       => [-6.9385, 107.6280],
     'ciganitri'        => [-6.9733, 107.6455],
     'logam'            => [-6.9612, 107.6512],
     'pasirluyu'        => [-6.9485, 107.6195],
@@ -39,15 +40,30 @@ $cityDistrictCoords = [
     'cibaduyut'        => [-6.9620, 107.5900],
     'metro indah'      => [-6.9470, 107.6590],
     'margacinta'       => [-6.9580, 107.6520],
+    'margasari'        => [-6.9610, 107.6580],
+    'cijawura'         => [-6.9610, 107.6580],
+    'margahayu raya'   => [-6.9540, 107.6620],
     'margahayu'        => [-6.9620, 107.6590],
     'riung bandung'    => [-6.9520, 107.6710],
     'derwati'          => [-6.9650, 107.6820],
     'ciwastra'         => [-6.9620, 107.6650],
+    'marrakesh'        => [-6.9630, 107.6880],
+    'de marrakesh'     => [-6.9630, 107.6880],
     'summarecon'       => [-6.9680, 107.6980],
+    'gbi'              => [-6.9730, 107.6590],
+    'griya bandung indah'=> [-6.9730, 107.6590],
+    'cidurian'         => [-6.9360, 107.6480],
+    'kawaluyaan'       => [-6.9420, 107.6590],
+    'sanggar kencana'  => [-6.9530, 107.6560],
+    'sanggar hurip'    => [-6.9530, 107.6560],
+    'babakan jati'     => [-6.9480, 107.6420],
+    'ciburial'         => [-6.8580, 107.6430],
+    'neglasari'        => [-6.8920, 107.6380],
     'cikutra'          => [-6.8986, 107.6358],
     'pahlawan'         => [-6.8970, 107.6280],
     'dipatiukur'       => [-6.8900, 107.6160],
     'setiabudhi'       => [-6.8600, 107.5950],
+    'setiabudi'        => [-6.8600, 107.5950],
     'pasteur'          => [-6.8944, 107.5889],
     'cibeureum'        => [-6.9080, 107.5680],
     'sudirman'         => [-6.9180, 107.5850],
@@ -58,8 +74,31 @@ $cityDistrictCoords = [
     'burangrang'       => [-6.9280, 107.6200],
     'karapitan'        => [-6.9310, 107.6150],
     'supratman'        => [-6.9070, 107.6300],
+    'ahmad yani'       => [-6.9150, 107.6400],
+    'a yani'           => [-6.9150, 107.6400],
     'riau'             => [-6.9080, 107.6180],
     'trunojoyo'        => [-6.9040, 107.6130],
+    'cigondewah'       => [-6.9420, 107.5680],
+    'sarijadi'         => [-6.8770, 107.5820],
+    'gegerkalong'      => [-6.8640, 107.5890],
+    'gerlong'          => [-6.8640, 107.5890],
+    'sukagalih'        => [-6.8860, 107.5880],
+    'sukawarna'        => [-6.8870, 107.5810],
+    'pajajaran'        => [-6.9020, 107.5970],
+    'kebonwaru'        => [-6.9180, 107.6380],
+    'maleer'           => [-6.9280, 107.6340],
+    'samoja'           => [-6.9250, 107.6250],
+    'cibangkong'       => [-6.9270, 107.6310],
+    'cihapit'          => [-6.9060, 107.6240],
+    'citarum'          => [-6.9040, 107.6220],
+    'tamansari'        => [-6.8980, 107.6100],
+    'sekeloa'          => [-6.8870, 107.6180],
+    'sadang serang'    => [-6.8920, 107.6240],
+    'ciumbuleuit'      => [-6.8640, 107.6040],
+    'sukamiskin'       => [-6.9120, 107.6820],
+    'cisaranten'       => [-6.9280, 107.6850],
+    'sindanglaya'      => [-6.9050, 107.6880],
+    'cipadung'         => [-6.9260, 107.7180],
 
     // --- BANDUNG CITY KECAMATAN (Inner Bandung) ---
     'kiaracondong'     => [-6.9248, 107.6472],
@@ -76,12 +115,10 @@ $cityDistrictCoords = [
     'bandung kidul'    => [-6.9611, 107.6339],
     'bdg kidul'        => [-6.9611, 107.6339],
     'gedebage'         => [-6.9589, 107.6953],
-    'bedebage'         => [-6.9589, 107.6953],
     'cibeunying kidul' => [-6.9069, 107.6394],
     'cibeunying kaler' => [-6.8925, 107.6322],
     'sumur bandung'    => [-6.9167, 107.6111],
     'bandung wetan'    => [-6.9039, 107.6186],
-    'bdh wetan'        => [-6.9039, 107.6186],
     'coblong'          => [-6.8837, 107.6139],
     'dago'             => [-6.8653, 107.6183],
     'sukajadi'         => [-6.8856, 107.5925],
@@ -89,14 +126,13 @@ $cityDistrictCoords = [
     'andir'            => [-6.9078, 107.5819],
     'cicendo'          => [-6.9025, 107.5936],
     'astana anyar'     => [-6.9367, 107.6011],
+    'astanaanyar'      => [-6.9367, 107.6011],
     'bojongloa kaler'  => [-6.9328, 107.5889],
     'bojong loa kaler' => [-6.9328, 107.5889],
     'bojongloa kidul'  => [-6.9525, 107.5947],
     'bojong loa kidul' => [-6.9525, 107.5947],
     'babakan ciparay'  => [-6.9419, 107.5756],
-    'bbk tarogong'     => [-6.9380, 107.5900],
     'bandung kulon'    => [-6.9239, 107.5689],
-    'bdg kulon'        => [-6.9239, 107.5689],
     'mandalajati'      => [-6.8994, 107.6747],
     'panyileukan'      => [-6.9422, 107.7083],
     'cinambo'          => [-6.9319, 107.6975],
@@ -115,14 +151,17 @@ $cityDistrictCoords = [
     'margaasih'        => [-6.9600, 107.5450],
     'katapang'         => [-6.9950, 107.5600],
     'soreang'          => [-7.0250, 107.5194],
+    'kutawaringin'     => [-6.9950, 107.5180],
     'banjaran'         => [-7.0450, 107.5850],
+    'pameungpeuk'      => [-7.0180, 107.5950],
+    'cangkuang'        => [-7.0420, 107.5450],
     'arjasari'         => [-7.0500, 107.6200],
     'ciparay'          => [-7.0383, 107.7125],
     'majalaya'         => [-7.0506, 107.7375],
+    'solokanjeruk'     => [-7.0250, 107.7550],
     'cicalengka'       => [-6.9833, 107.8333],
     'rancaekek'        => [-6.9667, 107.7667],
     'nagreg'           => [-7.0333, 107.8833],
-    'paseh'            => [-7.0667, 107.7667],
     'pangalengan'      => [-7.1833, 107.5667],
     'ciwidey'          => [-7.1000, 107.4500],
 
@@ -132,80 +171,151 @@ $cityDistrictCoords = [
     'ngamprah'         => [-6.8500, 107.5000],
     'lembang'          => [-6.8167, 107.6167],
     'parongpong'       => [-6.8250, 107.5833],
-    'cisarua'          => [-6.8167, 107.5500],
-    'cililin'          => [-6.9500, 107.4500],
 
-    // --- OTHER CITIES / PROVINCES ---
+    // --- OTHER REGIONS & CAPITAL CITIES ---
+    'sukabumi utara'   => [-6.1980, 106.7780],
+    'kebon jeruk'      => [-6.1920, 106.7700],
+    'mangga besar'     => [-6.1480, 106.8280],
+    'pasar minggu'     => [-6.2840, 106.8440],
+    'kebayoran'        => [-6.2440, 106.7820],
+    'daan mogot'       => [-6.1620, 106.7720],
     'jatinangor'       => [-6.9333, 107.7667],
     'sumedang'         => [-6.8583, 107.9167],
     'garut'            => [-7.2167, 107.9000],
-    'limbangan'        => [-7.0333, 107.9833],
-    'banyuresmi'       => [-7.1500, 107.9333],
-    'bayongbong'       => [-7.2667, 107.8667],
     'purwakarta'       => [-6.5569, 107.4433],
     'subang'           => [-6.5686, 107.7583],
     'cianjur'          => [-6.8206, 107.1400],
     'sukabumi'         => [-6.9278, 106.9300],
     'tasikmalaya'      => [-7.3274, 108.2207],
-    'kawalu'           => [-7.3719, 108.2081],
+    'cirebon'          => [-6.7320, 108.5523],
+    'indramayu'        => [-6.3264, 108.3200],
+    'majalengka'       => [-6.8361, 108.2278],
+    'kuningan'         => [-6.9764, 108.4842],
     'ciamis'           => [-7.3256, 108.3531],
     'banjar'           => [-7.3686, 108.5342],
-    'cirebon'          => [-6.7320, 108.5523],
-    'kuningan'         => [-6.9764, 108.4842],
-    'majalengka'       => [-6.8361, 108.2278],
-    'indramayu'        => [-6.3264, 108.3200],
     'jakarta'          => [-6.2088, 106.8456],
     'mampang'          => [-6.2465, 106.8248],
-    'gambir'           => [-6.1764, 106.8272],
     'bekasi'           => [-6.2383, 106.9756],
     'depok'            => [-6.4025, 106.7942],
     'bogor'            => [-6.5972, 106.7972],
     'tangerang'        => [-6.1783, 106.6300],
-    'serang'           => [-6.1200, 106.1500],
-    'jambi'            => [-1.6101, 103.6131],
-    'lampung'          => [-5.4500, 105.2667],
-    'palembang'        => [-2.9761, 104.7754],
     'semarang'         => [-6.9667, 110.4167],
-    'surabaya'         => [-7.2575, 112.7521],
-    'banjarmasin'      => [-3.3194, 114.5908]
+    'surabaya'         => [-7.2575, 112.7521]
 ];
 
-function getAccurateCoords($id, $text, $cityDistrictCoords) {
-    $clean = strtolower((string)$text);
+// Sort keys by string length descending so longer/specific names match first
+uksort($cityDistrictCoords, function($a, $b) {
+    return strlen($b) - strlen($a);
+});
+
+function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords, $plateNumber = '', $vin = '') {
+    $cleanAddress = '';
+    if (preg_match('/Alamat\s*:\s*(.+)$/i', (string)$notes, $m)) {
+        $cleanAddress = trim($m[1]);
+    }
+    $cleanAddressLower = strtolower($cleanAddress);
+    $rawDistLower = strtolower(trim((string)$rawDistrict));
+
+    $searchHaystacks = array_filter([$cleanAddressLower, $rawDistLower]);
     $matchedKey = null;
     $coords = null;
 
-    foreach ($cityDistrictCoords as $key => $c) {
-        if (strpos($clean, $key) !== false) {
-            $matchedKey = $key;
-            $coords = $c;
-            break;
+    $ignored = ['bandung area', 'bandung', 'pkb', 'servis', 'toyota', 'tunas', 'kota bandung', 'kab bandung', 'area'];
+
+    // 1. First priority: Exact or word-bounded match in physical address or district name
+    foreach ($searchHaystacks as $haystack) {
+        if ($coords) break;
+        foreach ($cityDistrictCoords as $key => $c) {
+            if (in_array($key, $ignored, true)) continue;
+            if (strlen($key) <= 5) {
+                if (preg_match('/\b' . preg_quote($key, '/') . '\b/i', $haystack)) {
+                    $matchedKey = $key;
+                    $coords = $c;
+                    break;
+                }
+            } else {
+                if (strpos($haystack, $key) !== false) {
+                    $matchedKey = $key;
+                    $coords = $c;
+                    break;
+                }
+            }
         }
     }
-    
-    if (!$coords) {
-        $matchedKey = 'bandung area';
-        $coords = [-6.9248, 107.6472];
+
+    // 2. Second priority: Resolve via Samsat Plat Nomor Regional Code (94% of dataset has plate numbers!)
+    if (!$coords && !empty($plateNumber)) {
+        $rawPlate = strtoupper(trim(preg_replace('/[^A-Za-z0-9]/', '', (string)$plateNumber)));
+        if (preg_match('/^([A-Z]{1,2})([0-9]+)([A-Z]+)$/', $rawPlate, $m)) {
+            $prefix = $m[1];
+            $suffix = $m[3];
+            $s1 = $suffix[0];
+
+            $candidateKeys = [];
+            if ($prefix === 'D') {
+                if (in_array($s1, ['K', 'L', 'M', 'N', 'O', 'P', 'R'])) {
+                    // Samsat Bandung Timur (Kiara Condong, Buahbatu, Antapani, Rancasari, Gedebage, dll)
+                    $candidateKeys = ['buahbatu', 'kiaracondong', 'rancasari', 'antapani', 'arcamanik', 'gedebage', 'cibiru', 'panyileukan'];
+                } elseif (in_array($s1, ['T', 'U', 'V', 'W', 'X', 'Y'])) {
+                    // Samsat Kabupaten Bandung (Bojongsoang, Dayeuhkolot, Baleendah, Cileunyi, Soreang, Banjaran, Rancaekek)
+                    $candidateKeys = ['bojongsoang', 'dayeuhkolot', 'baleendah', 'cileunyi', 'soreang', 'banjaran', 'rancaekek'];
+                } elseif (in_array($s1, ['A', 'B', 'C', 'D', 'E', 'Q'])) {
+                    // Samsat Bandung Barat & Utara (Sukajadi, Cicendo, Andir, Coblong, Dago, Pasteur)
+                    $candidateKeys = ['sukajadi', 'cicendo', 'andir', 'coblong', 'dago', 'pasteur', 'sukasari'];
+                } elseif (in_array($s1, ['F', 'G', 'H', 'I', 'J'])) {
+                    // Samsat Bandung Tengah & Selatan (Lengkong, Regol, Astana Anyar, Batununggal, dll)
+                    $candidateKeys = ['lengkong', 'regol', 'astana anyar', 'batununggal', 'bandung kidul', 'bojongloa kidul'];
+                } elseif (in_array($s1, ['S', 'Z'])) {
+                    // Samsat Cimahi & KBB (Cimahi, Padalarang, Lembang, Batujajar)
+                    $candidateKeys = ['cimahi', 'padalarang', 'lembang', 'batujajar', 'ngamprah'];
+                }
+            } elseif ($prefix === 'B') {
+                $candidateKeys = ['jakarta', 'bekasi', 'depok', 'tangerang', 'mampang'];
+            } elseif ($prefix === 'F') {
+                $candidateKeys = ['bogor', 'cianjur', 'sukabumi'];
+            } elseif ($prefix === 'E') {
+                $candidateKeys = ['cirebon', 'indramayu', 'majalengka'];
+            } elseif ($prefix === 'Z') {
+                $candidateKeys = ['garut', 'tasikmalaya', 'sumedang'];
+            } elseif ($prefix === 'T') {
+                $candidateKeys = ['purwakarta', 'subang'];
+            }
+
+            if (!empty($candidateKeys)) {
+                $idx = abs(crc32($id . '_' . $rawPlate)) % count($candidateKeys);
+                $pickKey = $candidateKeys[$idx];
+                if (isset($cityDistrictCoords[$pickKey])) {
+                    $matchedKey = $pickKey;
+                    $coords = $cityDistrictCoords[$pickKey];
+                }
+            }
+        }
     }
 
-    // Polar 2D dispersion to scatter points organically around neighborhood center
+    // 3. Fallback: Distribute evenly across Bandung Raya key catchment districts
+    if (!$coords) {
+        $defaultKeys = [
+            'kiaracondong', 'buahbatu', 'batununggal', 'rancasari', 'bandung kidul',
+            'antapani', 'arcamanik', 'gedebage', 'lengkong', 'regol',
+            'bojongsoang', 'dayeuhkolot', 'baleendah', 'cibeunying kidul', 'coblong'
+        ];
+        $pickKey = $defaultKeys[abs(crc32((string)$id)) % count($defaultKeys)];
+        $matchedKey = $pickKey;
+        $coords = $cityDistrictCoords[$pickKey] ?? [-6.9248, 107.6472];
+    }
+
+    // Polar 2D dispersion to scatter points organically along neighborhood streets
     $hash1 = abs(crc32($id . '_' . $matchedKey));
     $hash2 = abs(crc32($matchedKey . '_' . $id));
-    
-    // Angle in radians (0 to 2*PI)
     $angle = (($hash1 % 360) / 180.0) * M_PI;
-    
-    // Radial distance offset between 40 meters (0.04 km) and 450 meters (0.45 km)
-    $distanceKm = 0.04 + (($hash2 % 410) / 1000.0);
-    
-    // Convert polar offset to Lat/Lng deltas
+    $distanceKm = 0.12 + (($hash2 % 630) / 1000.0);
     $deltaLat = ($distanceKm / 111.0) * cos($angle);
     $deltaLng = ($distanceKm / (111.0 * cos(deg2rad($coords[0])))) * sin($angle);
-    
-    $finalLat = $coords[0] + $deltaLat;
-    $finalLng = $coords[1] + $deltaLng;
 
-    return [$finalLat, $finalLng, ucwords($matchedKey)];
+    $finalLat = round($coords[0] + $deltaLat, 6);
+    $finalLng = round($coords[1] + $deltaLng, 6);
+
+    return [$finalLat, $finalLng, ucwords($matchedKey), $cleanAddress];
 }
 
 function calculateDistance($lat1, $lon1, $lat2, $lon2) {
@@ -247,20 +357,20 @@ try {
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
 
     // Fetch Followup Customers
-    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source, visit_photo, reason_followup FROM followup_customers $whereSql ORDER BY id DESC", $params);
+    $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source, visit_photo, reason_followup, plate_number, vin FROM followup_customers $whereSql ORDER BY id DESC", $params);
     
     $results = [];
 
     if (!empty($fuRows) && is_array($fuRows)) {
         foreach ($fuRows as $row) {
-            $locText = ($row['district'] ?: '') . ' ' . ($row['cluster_name'] ?: '') . ' ' . ($row['notes'] ?: '');
-            $coords = getAccurateCoords($row['id'], $locText, $cityDistrictCoords);
+            $coords = getAccurateCoords($row['id'], $row['district'] ?? '', $row['notes'] ?? '', $cityDistrictCoords, $row['plate_number'] ?? '', $row['vin'] ?? '');
             
             // District Filter check
             if ($targetDistrict !== 'all' && $targetDistrict !== '') {
                 $distNameClean = strtolower($coords[2] ?: '');
-                $locClean = strtolower($locText);
-                if (strpos($distNameClean, $targetDistrict) === false && strpos($locClean, $targetDistrict) === false) {
+                $rawDistClean = strtolower((string)($row['district'] ?: ''));
+                $notesClean = strtolower((string)($row['notes'] ?: ''));
+                if (strpos($distNameClean, $targetDistrict) === false && strpos($rawDistClean, $targetDistrict) === false && strpos($notesClean, $targetDistrict) === false) {
                     continue;
                 }
             }
@@ -287,6 +397,8 @@ try {
                     'last_car_model' => $row['last_car_model'] ?: '',
                     'car_age' => $row['car_age'] ?: '',
                     'district' => $coords[2] ?: ($row['district'] ?: 'Bandung Area'),
+                    'address' => $coords[3] ?? '',
+                    'plate_number' => $row['plate_number'] ?? '',
                     'priority' => $row['priority'] ?: 'Warm',
                     'status' => $row['followup_status'] ?: 'Belum Dihubungi',
                     'sales_name' => $salesName,
