@@ -74,12 +74,16 @@ const SalesSuperpowers = {
       .radar-micro-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #d7123a; background: #fff1f2; padding: 3px 9px; border-radius: 6px; margin-bottom: 4px; }
       .radar-header-title { font-size: 17.5px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.3px; }
       .radar-header-sub { font-size: 12px; color: #64748b; margin: 3px 0 0 0; }
-      .radar-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .radar-header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
       .radar-gps-live-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; padding: 7px 14px; border-radius: 20px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
       .live-dot-pulse { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); animation: live-pulse-dot 1.8s infinite; }
       @keyframes live-pulse-dot { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
-      .btn-radar-detect { padding: 7px 14px; font-size: 11.5px; font-weight: 800; background: #0f172a; color: #ffffff; border-radius: 10px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15); }
+      .btn-radar-dealer { padding: 7px 13px; font-size: 11.5px; font-weight: 800; background: #d7123a; color: #ffffff; border-radius: 10px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(215, 18, 58, 0.25); white-space: nowrap; }
+      .btn-radar-dealer:hover { background: #b91c1c; transform: translateY(-1px); }
+      .btn-radar-detect { padding: 7px 13px; font-size: 11.5px; font-weight: 800; background: #0f172a; color: #ffffff; border-radius: 10px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15); white-space: nowrap; }
       .btn-radar-detect:hover { background: #1e293b; transform: translateY(-1px); }
+      .radar-accuracy-alert-box { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+      .radar-accuracy-alert-text { font-size: 12px; color: #92400e; font-weight: 700; display: flex; align-items: center; gap: 8px; }
       .radar-controls-strip { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
       .radar-radius-section { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
       .radar-radius-label { font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; gap: 5px; }
@@ -97,12 +101,16 @@ const SalesSuperpowers = {
       .radar-quick-landmarks { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
       .radar-landmark-chip { font-size: 11px; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 4px; }
       .radar-landmark-chip:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-      .radar-map-outer { border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; height: 480px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); }
+      .radar-landmark-chip.dealer-chip { background: #fff1f2; color: #d7123a; border-color: #fecaca; }
+      .radar-landmark-chip.dealer-chip:hover { background: #fee2e2; }
+      .radar-map-outer { border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; height: 490px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); }
+      #radarLeafletMapContainer { cursor: crosshair !important; }
+      .radar-map-hint-banner { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 999; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); color: #ffffff; padding: 6px 16px; border-radius: 20px; font-size: 11.5px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; display: flex; align-items: center; gap: 8px; letter-spacing: 0.2px; }
       .radar-sales-beacon-icon { background: transparent !important; border: none !important; }
-      .radar-sales-beacon-wrap { position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: grab; }
+      .radar-sales-beacon-wrap { position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: grab; }
       .radar-beacon-aura { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(215, 18, 58, 0.35); animation: beacon-expand 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
       @keyframes beacon-expand { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
-      .radar-beacon-core { position: relative; z-index: 2; width: 24px; height: 24px; border-radius: 50%; background: #d7123a; border: 3px solid #ffffff; box-shadow: 0 0 12px rgba(215, 18, 58, 0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 11px; }
+      .radar-beacon-core { position: relative; z-index: 2; width: 26px; height: 26px; border-radius: 50%; background: #d7123a; border: 3px solid #ffffff; box-shadow: 0 0 14px rgba(215, 18, 58, 0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 11px; }
       .radar-leaflet-pin-wrap { background: transparent !important; border: none !important; }
       .radar-map-marker-pin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid #ffffff; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 10px; transition: transform 0.15s ease; cursor: pointer; position: relative; }
       .radar-map-marker-pin:hover { transform: scale(1.3); z-index: 9999 !important; }
@@ -152,20 +160,25 @@ const SalesSuperpowers = {
     document.head.appendChild(style);
   },
 
+  // Exact Coordinates Dictionary for Dealers and Major Bandung Districts
+  BANDUNG_PRESETS: {
+    'kircon': [-6.9448, 107.6452, 'Tunas Toyota Kiara Condong (Dealer)'],
+    'buahbatu': [-6.9554, 107.6468, 'Buah Batu'],
+    'antapani': [-6.9147, 107.6625, 'Antapani'],
+    'batununggal': [-6.9531, 107.6256, 'Batununggal'],
+    'gedebage': [-6.9589, 107.6953, 'Gedebage'],
+    'dago': [-6.8653, 107.6183, 'Dago'],
+    'ciwastra': [-6.9620, 107.6650, 'Ciwastra / Margacinta'],
+    'soekarno-hatta': [-6.9450, 107.6500, 'Soekarno Hatta']
+  },
+
   quickSetLocation(key) {
-    const landmarks = {
-      'kircon': [-6.9248, 107.6472, 'Kiara Condong (Dealer)'],
-      'buahbatu': [-6.9554, 107.6468, 'Buah Batu'],
-      'antapani': [-6.9147, 107.6625, 'Antapani'],
-      'batununggal': [-6.9531, 107.6256, 'Batununggal'],
-      'gedebage': [-6.9589, 107.6953, 'Gedebage'],
-      'dago': [-6.8653, 107.6183, 'Dago']
-    };
-    if (landmarks[key]) {
-      const [lat, lng, label] = landmarks[key];
+    const preset = this.BANDUNG_PRESETS[key];
+    if (preset) {
+      const [lat, lng, label] = preset;
       const searchInput = document.getElementById('salesLocationSearchInput');
       if (searchInput) searchInput.value = label;
-      this.setManualSalesCoords(lat, lng, label, 15);
+      this.setManualSalesCoords(lat, lng, label, 10, true);
     }
   },
 
@@ -176,15 +189,26 @@ const SalesSuperpowers = {
     // Ensure CSS styles are injected
     this.ensureRadarStyles();
 
-    // Restore saved sales coords if available
+    // Check saved coordinates
     const savedLat = localStorage.getItem('savedSalesLat');
     const savedLng = localStorage.getItem('savedSalesLng');
-    if (savedLat && savedLng) {
+    const isManual = localStorage.getItem('savedSalesIsManual') === 'true';
+
+    // If coordinates were saved as a manual pinpoint, restore them.
+    // Otherwise, if it was an inaccurate 25km IP (-6.919...), reset to Dealer Kircon!
+    if (savedLat && savedLng && isManual) {
       this.salesCoords = { lat: parseFloat(savedLat), lng: parseFloat(savedLng) };
+      this.gpsAccuracy = 10;
+    } else {
+      // Default to Tunas Toyota Kiara Condong Dealer (Jl. Soekarno-Hatta / Terusan Kircon)
+      this.salesCoords = { lat: -6.9448, lng: 107.6452 };
+      this.gpsAccuracy = 15;
     }
 
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    const currentLocLabel = localStorage.getItem('savedSalesLocLabel') || 'Tunas Toyota Kircon (Dealer)';
 
     // Render Cockpit Shell with Executive Tactical Radar Interface
     container.innerHTML = `
@@ -201,20 +225,23 @@ const SalesSuperpowers = {
             </div>
             <div>
               <div class="radar-micro-badge">
-                <i class="fa-solid fa-bolt"></i> Live Satellite Radar
+                <i class="fa-solid fa-bolt"></i> Live Radar Kanvasing
               </div>
               <h3 class="radar-header-title">Peta Radar Pelanggan &amp; Kanvasing</h3>
-              <p class="radar-header-sub">Cari, jangkau, &amp; kunjungi pelanggan Toyota terdekat dari titik lokasi lapangan Anda.</p>
+              <p class="radar-header-sub">Klik peta atau geser pin untuk menetapkan posisi Anda dengan akurat.</p>
             </div>
           </div>
           
           <div class="radar-header-right">
             <div class="radar-gps-live-badge" id="radarGpsStatus">
               <span class="live-dot-pulse"></span>
-              <span id="radarGpsStatusText">Mendeteksi GPS Satelit...</span>
+              <span id="radarGpsStatusText">📍 ${escapeHtml(currentLocLabel)}</span>
             </div>
-            <button type="button" class="btn-radar-detect" onclick="SalesSuperpowers.requestHighAccuracyGPS()" title="Perbarui koordinat GPS dari perangkat HP">
-              <i class="fa-solid fa-crosshairs"></i> Kalibrasi GPS
+            <button type="button" class="btn-radar-dealer" onclick="SalesSuperpowers.quickSetLocation('kircon')" title="Set posisi tepat ke Dealer Tunas Toyota Kiara Condong">
+              <i class="fa-solid fa-building-flag"></i> Dealer Kircon
+            </button>
+            <button type="button" class="btn-radar-detect" onclick="SalesSuperpowers.requestHighAccuracyGPS()" title="Deteksi koordinat GPS satelit perangkat HP">
+              <i class="fa-solid fa-location-crosshairs"></i> Deteksi Ulang GPS
             </button>
           </div>
         </div>
@@ -239,7 +266,7 @@ const SalesSuperpowers = {
           <div class="radar-search-wrap">
             <div class="radar-search-input-box">
               <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" id="salesLocationSearchInput" class="radar-search-input" placeholder="Ketik lokasi / patokan Anda..." onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
+              <input type="text" id="salesLocationSearchInput" class="radar-search-input" placeholder="Ketik jalan / kelurahan / area Anda..." onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
             </div>
             <button type="button" class="btn-radar-search" onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)">
               Cari Lokasi
@@ -252,16 +279,21 @@ const SalesSuperpowers = {
           <span style="font-size:11px; font-weight:800; color:#64748b; margin-right:4px;">
             <i class="fa-solid fa-map-pin" style="color:#2563eb;"></i> Akses Cepat Area:
           </span>
-          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('kircon')">📍 Kiara Condong (Dealer)</button>
+          <button type="button" class="radar-landmark-chip dealer-chip" onclick="SalesSuperpowers.quickSetLocation('kircon')">🏢 Kiara Condong (Dealer)</button>
           <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('buahbatu')">📍 Buah Batu</button>
           <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('antapani')">📍 Antapani</button>
           <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('batununggal')">📍 Batununggal</button>
+          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('ciwastra')">📍 Ciwastra / Margacinta</button>
           <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('gedebage')">📍 Gedebage</button>
           <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('dago')">📍 Dago</button>
         </div>
 
         <!-- Interactive Map Container -->
         <div class="radar-map-outer">
+          <div class="radar-map-hint-banner">
+            <i class="fa-solid fa-crosshairs" style="color:#f87171;"></i>
+            <span>Klik di mana saja pada peta atau geser pin merah untuk memindahkan posisi Anda</span>
+          </div>
           <div id="radarLeafletMapContainer" style="width:100%; height:100%;"></div>
         </div>
       </div>
@@ -281,59 +313,38 @@ const SalesSuperpowers = {
     // Ensure Leaflet JS is loaded
     await this.ensureLeafletLoaded();
 
-    // If salesCoords already set manually or from localStorage, fetch data directly
-    if (this.salesCoords) {
-      const badge = document.getElementById('radarGpsStatus');
-      const accText = this.gpsAccuracy ? ` • Akurasi ±${Math.round(this.gpsAccuracy)}m` : '';
-      if (badge) badge.innerHTML = `<span class="live-dot-pulse"></span> <span>Terkunci (${this.salesCoords.lat.toFixed(3)}, ${this.salesCoords.lng.toFixed(3)})${accText}</span>`;
-      this.fetchRadarData(this.salesCoords.lat, this.salesCoords.lng, this.currentRadius, district);
-      return;
-    }
-
-    // Otherwise fetch via browser Geolocation with high accuracy
-    if (!navigator.geolocation) {
-      this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const acc = Math.round(pos.coords.accuracy || 0);
-        this.salesCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        this.gpsAccuracy = acc;
-        const badge = document.getElementById('radarGpsStatus');
-        const accText = acc > 0 ? ` • Akurasi ±${acc}m` : '';
-        if (badge) badge.innerHTML = `<span class="live-dot-pulse"></span> <span>GPS Terkunci (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})${accText}</span>`;
-        this.fetchRadarData(pos.coords.latitude, pos.coords.longitude, this.currentRadius, district);
-      },
-      (err) => {
-        console.warn('GPS error, using fallback', err);
-        const badge = document.getElementById('radarGpsStatus');
-        if (badge) badge.innerHTML = `<span class="live-dot-pulse" style="background:#f59e0b;"></span> <span>Posisi: Kiara Condong</span>`;
-        this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
-      },
-      { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
-    );
+    // Fetch radar data for the initial sales coordinates
+    this.fetchRadarData(this.salesCoords.lat, this.salesCoords.lng, this.currentRadius, district);
   },
 
-  setManualSalesCoords(lat, lng, label = null, accuracy = null) {
+  setManualSalesCoords(lat, lng, label = null, accuracy = null, isExplicitManual = true) {
     this.salesCoords = { lat: parseFloat(lat), lng: parseFloat(lng) };
     if (accuracy !== null) this.gpsAccuracy = accuracy;
     localStorage.setItem('savedSalesLat', lat);
     localStorage.setItem('savedSalesLng', lng);
     if (label) localStorage.setItem('savedSalesLocLabel', label);
+    if (isExplicitManual) localStorage.setItem('savedSalesIsManual', 'true');
 
     const badge = document.getElementById('radarGpsStatus');
-    const accText = this.gpsAccuracy ? ` • Akurasi ±${Math.round(this.gpsAccuracy)}m` : '';
-    if (badge) {
-      badge.innerHTML = `<span class="live-dot-pulse"></span> <span>Terkunci (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})${accText}</span>`;
+    let badgeHtml = '';
+    
+    if (isExplicitManual || (accuracy !== null && accuracy <= 150)) {
+      const accText = accuracy && accuracy <= 150 ? ` • Akurasi ±${Math.round(accuracy)}m` : ' • Presisi Manual';
+      badgeHtml = `<span class="live-dot-pulse"></span> <span>${escapeHtml(label || 'Lokasi Terpilih')} (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})${accText}</span>`;
+    } else if (accuracy && accuracy > 1000) {
+      badgeHtml = `<span class="live-dot-pulse" style="background:#f59e0b; box-shadow:0 0 0 0 rgba(245,158,11,0.7);"></span> <span style="color:#b45309;">Perkiraan IP (±${Math.round(accuracy/1000)}km) • Klik peta untuk lokasi presisi</span>`;
+    } else {
+      const accText = accuracy ? ` • Akurasi ±${Math.round(accuracy)}m` : '';
+      badgeHtml = `<span class="live-dot-pulse"></span> <span>Terkunci (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})${accText}</span>`;
     }
+
+    if (badge) badge.innerHTML = badgeHtml;
 
     this.fetchRadarData(lat, lng, this.currentRadius, this.currentDistrict);
 
-    if (typeof showCustomAlert === 'function') {
-      const accDetail = this.gpsAccuracy ? ` (Akurasi Satelit ±${Math.round(this.gpsAccuracy)}m)` : '';
-      showCustomAlert('Lokasi Diperbarui', `Pusat Radar diset ke ${label || `(${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})`}${accDetail}`, 'success');
+    if (typeof showCustomAlert === 'function' && isExplicitManual) {
+      const locText = label ? label : ('(' + parseFloat(lat).toFixed(4) + ', ' + parseFloat(lng).toFixed(4) + ')');
+      showCustomAlert('Lokasi Diperbarui', 'Pusat Radar diset ke ' + locText + detail + '. Data customer terdekat telah diperbarui.', 'success');
     }
   },
 
@@ -349,11 +360,25 @@ const SalesSuperpowers = {
       (pos) => {
         const acc = Math.round(pos.coords.accuracy || 0);
         this.gpsAccuracy = acc;
-        this.setManualSalesCoords(pos.coords.latitude, pos.coords.longitude, `GPS Satelit HP (±${acc}m)`, acc);
+        
+        // If on PC/laptop with IP geolocation (> 1000m accuracy)
+        if (acc > 1000) {
+          if (typeof showCustomAlert === 'function') {
+            showCustomAlert(
+              'Akurasi GPS Browser Rendah (±' + Math.round(acc/1000) + ' km)',
+              'Browser PC/Laptop Anda tidak memiliki chip GPS dan menggunakan perkiraan jaringan IP. Silakan klik langsung titik Anda di peta atau gunakan tombol area/dealer untuk akurasi tepat 100%.',
+              'warning'
+            );
+          }
+          this.setManualSalesCoords(pos.coords.latitude, pos.coords.longitude, `Perkiraan IP (±${Math.round(acc/1000)}km)`, acc, false);
+        } else {
+          // Real GNSS / Satelit Mobile GPS
+          this.setManualSalesCoords(pos.coords.latitude, pos.coords.longitude, `GPS Satelit HP (±${acc}m)`, acc, true);
+        }
       },
       (err) => {
-        alert('Gagal mendapatkan GPS HP: ' + err.message + '. Pastikan izin GPS aktif dan pilih opsi "Tepat / Precise Location". Anda juga bisa menggeser pin merah di peta.');
-        if (badge) badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Gunakan Pin Geser`;
+        alert('Gagal membaca GPS: ' + err.message + '. Silakan klik langsung di peta untuk menetapkan posisi Anda.');
+        if (badge) badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Klik Peta untuk Set Posisi`;
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
@@ -414,7 +439,7 @@ const SalesSuperpowers = {
           if (distKm > 0.02 || !lastLat) {
             lastLat = newLat;
             lastLng = newLng;
-            this.setManualSalesCoords(newLat, newLng, `Live GPS (±${acc}m)`, acc);
+            this.setManualSalesCoords(newLat, newLng, `Live GPS (±${acc}m)`, acc, true);
           }
         },
         (err) => {
@@ -429,35 +454,80 @@ const SalesSuperpowers = {
     if (!query || query.trim() === '') return;
     const cleanQ = query.trim().toLowerCase();
     
-    // Quick local dictionary check
+    // Comprehensive Local Dictionary for Bandung & Greater Area
     const localDict = {
-      'pindad': [-6.9295, 107.6465],
-      'psm': [-6.9295, 107.6465],
-      'kpad pindad': [-6.9295, 107.6465],
-      'buahbatu': [-6.9554, 107.6468],
-      'buah batu': [-6.9554, 107.6468],
-      'kiaracondong': [-6.9248, 107.6472],
-      'kircon': [-6.9248, 107.6472],
-      'batununggal': [-6.9531, 107.6256],
-      'lengkong': [-6.9312, 107.6189],
-      'antapani': [-6.9147, 107.6625],
-      'arcamanik': [-6.9189, 107.6811],
-      'rancasari': [-6.9625, 107.6722],
-      'gedebage': [-6.9589, 107.6953],
-      'soekarno hatta': [-6.9450, 107.6500],
-      'margacinta': [-6.9580, 107.6520],
-      'ciganitri': [-6.9733, 107.6455],
-      'dayeuhkolot': [-6.9889, 107.6222],
-      'bojongsoang': [-6.9833, 107.6333],
-      'dago': [-6.8653, 107.6183],
-      'cimahi': [-6.8722, 107.5417]
+      'kircon': [-6.9448, 107.6452, 'Tunas Toyota Kiara Condong (Dealer)'],
+      'kiaracondong': [-6.9448, 107.6452, 'Kiara Condong (Dealer)'],
+      'tunas toyota': [-6.9448, 107.6452, 'Tunas Toyota Kiara Condong (Dealer)'],
+      'dealer': [-6.9448, 107.6452, 'Tunas Toyota Kiara Condong (Dealer)'],
+      'pindad': [-6.9295, 107.6465, 'Pindad'],
+      'psm': [-6.9295, 107.6465, 'PSM Kircon'],
+      'buahbatu': [-6.9554, 107.6468, 'Buah Batu'],
+      'buah batu': [-6.9554, 107.6468, 'Buah Batu'],
+      'terusan buahbatu': [-6.9635, 107.6398, 'Terusan Buah Batu'],
+      'terusan buah batu': [-6.9635, 107.6398, 'Terusan Buah Batu'],
+      'batununggal': [-6.9531, 107.6256, 'Batununggal'],
+      'lengkong': [-6.9312, 107.6189, 'Lengkong'],
+      'antapani': [-6.9147, 107.6625, 'Antapani'],
+      'arcamanik': [-6.9189, 107.6811, 'Arcamanik'],
+      'rancasari': [-6.9625, 107.6722, 'Rancasari'],
+      'gedebage': [-6.9589, 107.6953, 'Gedebage'],
+      'soekarno hatta': [-6.9450, 107.6500, 'Soekarno Hatta'],
+      'soetta': [-6.9450, 107.6500, 'Soekarno Hatta'],
+      'margacinta': [-6.9580, 107.6520, 'Margacinta'],
+      'ciwastra': [-6.9620, 107.6650, 'Ciwastra'],
+      'derwati': [-6.9650, 107.6820, 'Derwati'],
+      'riung bandung': [-6.9520, 107.6710, 'Riung Bandung'],
+      'ciganitri': [-6.9733, 107.6455, 'Ciganitri'],
+      'dayeuhkolot': [-6.9889, 107.6222, 'Dayeuhkolot'],
+      'bojongsoang': [-6.9833, 107.6333, 'Bojongsoang'],
+      'dago': [-6.8653, 107.6183, 'Dago'],
+      'dipatiukur': [-6.8900, 107.6160, 'Dipatiukur'],
+      'cikutra': [-6.8986, 107.6358, 'Cikutra'],
+      'pasteur': [-6.8944, 107.5889, 'Pasteur'],
+      'sukajadi': [-6.8856, 107.5925, 'Sukajadi'],
+      'setiabudhi': [-6.8600, 107.5950, 'Setiabudhi'],
+      'kopo': [-6.9550, 107.5920, 'Kopo'],
+      'cibaduyut': [-6.9620, 107.5900, 'Cibaduyut'],
+      'moch toha': [-6.9530, 107.6080, 'Moch Toha'],
+      'mohammad toha': [-6.9530, 107.6080, 'Moch Toha'],
+      'pasirluyu': [-6.9485, 107.6195, 'Pasirluyu'],
+      'cijagra': [-6.9515, 107.6288, 'Cijagra'],
+      'turangga': [-6.9388, 107.6294, 'Turangga'],
+      'gatot subroto': [-6.9275, 107.6325, 'Gatot Subroto'],
+      'gatsu': [-6.9275, 107.6325, 'Gatot Subroto'],
+      'ibrahim adjie': [-6.9290, 107.6440, 'Ibrahim Adjie'],
+      'asia afrika': [-6.9210, 107.6100, 'Asia Afrika'],
+      'braga': [-6.9175, 107.6090, 'Braga'],
+      'riau': [-6.9080, 107.6180, 'Jl. Riau'],
+      'supratman': [-6.9070, 107.6300, 'Supratman'],
+      'ujungberung': [-6.9140, 107.6980, 'Ujungberung'],
+      'cibiru': [-6.9260, 107.7120, 'Cibiru'],
+      'summarecon': [-6.9680, 107.6980, 'Summarecon Bandung'],
+      'metro indah': [-6.9470, 107.6590, 'Metro Indah Mall (MIM)']
     };
 
     for (let key in localDict) {
       if (cleanQ.includes(key)) {
-        this.setManualSalesCoords(localDict[key][0], localDict[key][1], query);
+        this.setManualSalesCoords(localDict[key][0], localDict[key][1], localDict[key][2] || query, 10, true);
         return;
       }
+    }
+
+    // Try Photon / Komoot OpenStreetMap Geocoder (Fast and unthrottled)
+    try {
+      const photonRes = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query + ' Bandung')}&limit=1`);
+      const photonData = await photonRes.json();
+      if (photonData && photonData.features && photonData.features.length > 0) {
+        const feat = photonData.features[0];
+        const lng = feat.geometry.coordinates[0];
+        const lat = feat.geometry.coordinates[1];
+        const label = feat.properties.name || feat.properties.street || query;
+        this.setManualSalesCoords(lat, lng, label, 10, true);
+        return;
+      }
+    } catch (err) {
+      console.warn("Photon lookup fallback to Nominatim", err);
     }
 
     try {
@@ -466,13 +536,13 @@ const SalesSuperpowers = {
       if (data && data.length > 0) {
         const lat = parseFloat(data[0].lat);
         const lng = parseFloat(data[0].lon);
-        this.setManualSalesCoords(lat, lng, data[0].display_name);
+        this.setManualSalesCoords(lat, lng, data[0].display_name, 10, true);
       } else {
-        alert('Lokasi "' + query + '" tidak ditemukan. Silakan klik atau geser pin langsung di peta.');
+        alert('Lokasi "' + query + '" tidak ditemukan. Silakan klik langsung titik yang Anda tuju di peta.');
       }
     } catch (e) {
       console.error(e);
-      alert('Gagal mencari lokasi. Silakan geser pin merah di peta.');
+      alert('Gagal mencari lokasi online. Silakan klik langsung titik Anda di peta.');
     }
   },
 
@@ -491,8 +561,8 @@ const SalesSuperpowers = {
     });
 
     this.fetchRadarData(
-      this.salesCoords ? this.salesCoords.lat : -6.9248,
-      this.salesCoords ? this.salesCoords.lng : 107.6472,
+      this.salesCoords ? this.salesCoords.lat : -6.9448,
+      this.salesCoords ? this.salesCoords.lng : 107.6452,
       this.currentRadius,
       this.currentDistrict
     );
@@ -501,8 +571,8 @@ const SalesSuperpowers = {
   handleDistrictChange(districtVal, containerId) {
     this.currentDistrict = districtVal;
     this.fetchRadarData(
-      this.salesCoords ? this.salesCoords.lat : -6.9248,
-      this.salesCoords ? this.salesCoords.lng : 107.6472,
+      this.salesCoords ? this.salesCoords.lat : -6.9448,
+      this.salesCoords ? this.salesCoords.lng : 107.6452,
       this.currentRadius,
       districtVal
     );
@@ -604,18 +674,20 @@ const SalesSuperpowers = {
           </div>
         </div>
       `,
-      iconSize: [36, 36],
-      iconAnchor: [18, 18],
-      popupAnchor: [0, -18]
+      iconSize: [38, 38],
+      iconAnchor: [19, 19],
+      popupAnchor: [0, -19]
     });
+
+    const currentLocLabel = localStorage.getItem('savedSalesLocLabel') || 'Pusat Radar Sales';
 
     const salesMarker = L.marker([salesLat, salesLng], {
       icon: salesIcon,
-      title: '📍 Posisi Saya (Geser Pin Ini ke posisi Anda)',
+      title: '📍 Posisi Saya (Klik di peta atau geser pin ini untuk ubah lokasi)',
       draggable: true
     }).addTo(map);
 
-    // Draw precision accuracy radius aura (blue glow) if accuracy available (< 500m)
+    // Draw precision accuracy radius aura if accuracy available (< 500m)
     if (this.gpsAccuracy && this.gpsAccuracy > 0 && this.gpsAccuracy < 500) {
       L.circle([salesLat, salesLng], {
         color: '#0284c7',
@@ -626,23 +698,34 @@ const SalesSuperpowers = {
       }).addTo(map);
     }
 
-    const accPopupLabel = this.gpsAccuracy ? `Akurasi Satelit: ±${Math.round(this.gpsAccuracy)} meter` : 'Pusat Ring Radar GPS';
+    const accPopupLabel = this.gpsAccuracy && this.gpsAccuracy <= 150 
+      ? `Akurasi Satelit: ±${Math.round(this.gpsAccuracy)} meter`
+      : 'Titik Presisi Terpilih';
+
     salesMarker.bindPopup(`
-      <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:12px; text-align:center; padding:6px; min-width:180px;">
+      <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:12px; text-align:center; padding:6px; min-width:190px;">
         <div style="font-size:10px; font-weight:800; color:#d7123a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
-          <i class="fa-solid fa-bullseye"></i> Titik Pusat Radar
+          <i class="fa-solid fa-crosshairs"></i> Pusat Jangkauan Radar
         </div>
-        <b style="color:#0f172a; font-size:13.5px;">📍 Lokasi Sales (Anda)</b><br>
+        <b style="color:#0f172a; font-size:13.5px;">📍 Posisi Anda: ${escapeHtml(currentLocLabel)}</b><br>
         <span style="color:#0369a1; font-weight:700; font-size:11px;"><i class="fa-solid fa-satellite-dish"></i> ${accPopupLabel}</span><br>
         <div style="margin-top:8px; background:#eff6ff; border:1px solid #bfdbfe; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; color:#1d4ed8;">
-          💡 Geser (drag) pin ini jika posisi Anda ingin diatur manual!
+          💡 Klik di mana saja pada peta atau geser pin ini untuk memindahkan lokasi Anda secara akurat!
         </div>
       </div>
     `);
 
+    // Drag pin handler
     salesMarker.on('dragend', (e) => {
       const newPos = e.target.getLatLng();
-      SalesSuperpowers.setManualSalesCoords(newPos.lat, newPos.lng, 'Pin Geser Peta');
+      SalesSuperpowers.setManualSalesCoords(newPos.lat, newPos.lng, 'Titik Pin Geser', 10, true);
+    });
+
+    // MAP CLICK HANDLER: Click anywhere on map to set sales location!
+    map.on('click', (e) => {
+      const clickLat = e.latlng.lat;
+      const clickLng = e.latlng.lng;
+      SalesSuperpowers.setManualSalesCoords(clickLat, clickLng, 'Titik Peta Terpilih', 10, true);
     });
 
     // DRAW VISUAL RADIUS CIRCLE (RING RADIUS)
