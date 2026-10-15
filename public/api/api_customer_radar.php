@@ -278,11 +278,6 @@ try {
                 $sid = (int)($row['assigned_sales_id'] ?? 0);
                 $salesName = isset($salesMap[$sid]) ? $salesMap[$sid] : 'Terbuka (Siapa Saja)';
                 
-                $waUrl = '';
-                if (!empty($phoneClean) && $phoneClean !== '-') {
-                    $waUrl = "https://wa.me/" . $phoneClean . "?text=" . urlencode("Halo Bapak/Ibu " . $row['name'] . ", saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda di sekitar area " . ($coords[2] ?: 'tempat Bapak/Ibu') . ". Apakah ada waktu luang sebentar jika saya mampir untuk update info promo/unit?");
-                }
-
                 $results[] = [
                     'id' => (int)$row['id'],
                     'source' => $row['sync_source'] ?: 'followup_db',
@@ -300,9 +295,7 @@ try {
                     'lat' => round($coords[0], 6),
                     'lng' => round($coords[1], 6),
                     'distance_km' => round($dist, 2),
-                    'formatted_distance' => $dist < 1 ? round($dist * 1000) . ' m' : round($dist, 1) . ' km',
-                    'maps_url' => "https://www.google.com/maps/dir/?api=1&destination=" . round($coords[0], 6) . "," . round($coords[1], 6),
-                    'wa_url' => $waUrl
+                    'formatted_distance' => $dist < 1 ? round($dist * 1000) . ' m' : round($dist, 1) . ' km'
                 ];
             }
         }

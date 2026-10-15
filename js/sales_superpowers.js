@@ -647,7 +647,8 @@ const SalesSuperpowers = {
 
     const map = L.map('radarLeafletMapContainer', {
       zoomControl: true,
-      attributionControl: true
+      attributionControl: true,
+      preferCanvas: true
     }).setView([salesLat, salesLng], 14);
     this.leafletMap = map;
 
@@ -751,6 +752,9 @@ const SalesSuperpowers = {
     const legendEl = document.createElement('div');
     legendEl.className = 'radar-map-legend-overlay';
     legendEl.innerHTML = `
+      <span class="radar-legend-item" style="font-weight:800; color:#0f172a; margin-right:4px;">
+        <i class="fa-solid fa-map-pin" style="color:#d7123a;"></i> <span id="radarMapPinCount">100 Pin Terdekat</span>
+      </span>
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#ef4444;"></span> Belum FU</span>
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f59e0b;"></span> Menunggu</span>
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#8b5cf6;"></span> Tertarik</span>
@@ -804,7 +808,21 @@ const SalesSuperpowers = {
 
     const filteredLeads = this.getFilteredRadarLeads();
 
-    filteredLeads.forEach(c => {
+    // OPTIMASI ANTI-LAG:
+    // Render maksimal 100 pin terdekat di peta Leaflet.
+    // 100 pin menjamin pergerakan peta 60 FPS halus di semua perangkat HP,
+    // tidak menumpuk jadi gumpalan merah, dan relevan dengan rute terdekat sales.
+    const MAX_PINS = 100;
+    const mapPins = filteredLeads.slice(0, MAX_PINS);
+
+    const pinBadge = document.getElementById('radarMapPinCount');
+    if (pinBadge) {
+      pinBadge.textContent = filteredLeads.length > MAX_PINS
+        ? `Menampilkan ${MAX_PINS} Terdekat dari ${filteredLeads.length.toLocaleString('id-ID')}`
+        : `${filteredLeads.length} Customer`;
+    }
+
+    mapPins.forEach(c => {
       let pinBg = '#ef4444'; // Belum Dihubungi
       let pinIcon = 'fa-car';
       if (c.status === 'Deal / Selesai') {
@@ -1066,7 +1084,7 @@ const SalesSuperpowers = {
           </div>
 
           <div class="radar-action-grid">
-            <a href="${item.maps_url}" target="_blank" class="btn-radar-map" title="Buka rute navigasi Google Maps">
+            <a href="${item.maps_url || ('https://www.google.com/maps/dir/?api=1&destination=' + item.lat + ',' + item.lng)}" target="_blank" class="btn-radar-map" title="Buka rute navigasi Google Maps">
               <i class="fa-solid fa-diamond-turn-right"></i> Rute Maps
             </a>
             ${waHref ? `
