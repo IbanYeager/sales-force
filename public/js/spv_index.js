@@ -827,7 +827,7 @@ Pantauan sistem mendeteksi ada sekitar *${r.hotCount} Hot Leads* yang belum mene
 💡 *TIPS CO-CLOSING:*
 • Hubungi konsumen via WhatsApp / Telpon pagi ini dengan kabar promo terbaru.
 • Jadwalkan Test Drive ke rumah atau kantor konsumen hari ini atau akhir pekan.
-• Buatkan format Surat Penawaran Harga (SPH) resmi dari menu *Studio SPH* agar penawaran terlihat profesional dan dipercaya konsumen.
+• Buatkan simulasi kredit resmi dari menu *Kalkulator Finansial* agar penawaran terlihat profesional dan dipercaya konsumen.
 
 Segera konfirmasi jika butuh pendampingan closing bersama saya! 💪`;
       } else if (topic === 'weekend_push') {

@@ -25,7 +25,10 @@ Route::get('/pages/panduan_alur_kerja_sales_app', [PageController::class, 'pandu
 // Portal SPV (Supervisor)
 Route::prefix('spv')->group(function () {
     Route::get('/', [PageController::class, 'showSpvPage'])->name('spv.dashboard');
-    Route::get('/sph', function() { return app(PageController::class)->showSpvPage('quotation'); });
+    Route::get('/sph', function() { return redirect('/pages_spv/index_spv.html'); });
+    Route::get('/sph.html', function() { return redirect('/pages_spv/index_spv.html'); });
+    Route::get('/quotation', function() { return redirect('/pages_spv/index_spv.html'); });
+    Route::get('/quotation.html', function() { return redirect('/pages_spv/index_spv.html'); });
     Route::get('/ao_report', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
     Route::get('/ao_report.html', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
     Route::get('/mtoyota_service', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
@@ -34,8 +37,10 @@ Route::prefix('spv')->group(function () {
     Route::get('/mtoyota.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
     Route::get('/{page}', [PageController::class, 'showSpvPage'])->name('spv.page');
 });
-Route::get('/pages_spv/sph.html', function() { return app(PageController::class)->showSpvPage('quotation'); });
-Route::get('/pages_spv/sph', function() { return app(PageController::class)->showSpvPage('quotation'); });
+Route::get('/pages_spv/sph.html', function() { return redirect('/pages_spv/index_spv.html'); });
+Route::get('/pages_spv/sph', function() { return redirect('/pages_spv/index_spv.html'); });
+Route::get('/pages_spv/quotation.html', function() { return redirect('/pages_spv/index_spv.html'); });
+Route::get('/pages_spv/quotation', function() { return redirect('/pages_spv/index_spv.html'); });
 Route::get('/pages_spv/ao_report.html', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
 Route::get('/pages_spv/ao_report', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
 Route::get('/pages_spv/mtoyota_service.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
@@ -81,9 +86,15 @@ Route::get('/pages_kacab/mtoyota.html', function() { return app(PageController::
 Route::get('/pages_kacab/mtoyota', function() { return app(PageController::class)->showKacabPage('mtoyota_service'); });
 Route::get('/pages_kacab/{page}', [PageController::class, 'showKacabPage']);
 
-// Direct SPH Aliases for Sales
-Route::get('/sph', function() { return app(PageController::class)->showSalesPage('quotation'); });
-Route::get('/sph.html', function() { return app(PageController::class)->showSalesPage('quotation'); });
+// Direct SPH & Quotation Redirects for Sales
+Route::get('/sph', function() { return redirect('/pages/kalkulator.html'); });
+Route::get('/sph.html', function() { return redirect('/pages/kalkulator.html'); });
+Route::get('/quotation', function() { return redirect('/pages/kalkulator.html'); });
+Route::get('/quotation.html', function() { return redirect('/pages/kalkulator.html'); });
+Route::get('/pages/sph', function() { return redirect('/pages/kalkulator.html'); });
+Route::get('/pages/sph.html', function() { return redirect('/pages/kalkulator.html'); });
+Route::get('/pages/quotation', function() { return redirect('/pages/kalkulator.html'); });
+Route::get('/pages/quotation.html', function() { return redirect('/pages/kalkulator.html'); });
 
 // Pages Sales (Legacy & Clean URL)
 Route::get('/pages/{page}', [PageController::class, 'showSalesPage'])->name('sales.page');
@@ -96,7 +107,7 @@ $salesPages = [
     'elibrary', 'game', 'hybrid_flow', 'inspeksi', 'inventory', 'jadwal_input',
     'kalkulator', 'kecamatan', 'komparasi', 'leasing_matrix', 'market_analysis',
     'merchandise', 'notifikasi', 'olx', 'order_tracker', 'penjualan_kircon', 'pitstop',
-    'polreg', 'polreg_detail', 'pricelist', 'promo', 'public_card', 'quotation', 'rental_testdrive', 'retention',
+    'polreg', 'polreg_detail', 'pricelist', 'promo', 'public_card', 'rental_testdrive', 'retention',
     'riwayat_foto_aktivitas', 'snake', 'target', 'tco', 'tebak', 'testdrive',
     'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'video_viral', 'wa_studio',
     'mtoyota_service', 'mtoyota', 'booking_service'

@@ -32,7 +32,6 @@
 
       <nav class="spv-nav">
         <a href="index_spv.html" id="navDash" class="active"><i class="fa-solid fa-gauge"></i>Dashboard</a>
-        <a href="quotation.html" id="navSph"><i class="fa-solid fa-file-invoice-dollar"></i>Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#0284c7; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span></a>
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up</a>
         <a href="ao_report_spv.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
         <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i>Trade-In &amp; OLX</a>
@@ -163,9 +162,6 @@
             </button>
             <button class="btn btn-sm" onclick="location.href='spv_coaching.html'" style="background:#ffffff; color:#0f172a; font-weight:700; font-size:12px; height:34px; padding:0 12px; border-radius:8px; border:1.5px solid #cbd5e1; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
               <i class="fa-solid fa-chalkboard-user"></i> Radar Coaching
-            </button>
-            <button class="btn btn-sm" onclick="location.href='../pages/quotation.html'" style="background:linear-gradient(135deg, #d71920, #b91c1c); color:white; font-weight:700; font-size:12px; height:34px; padding:0 12px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 6px rgba(215,25,32,0.25);">
-              <i class="fa-solid fa-file-invoice-dollar"></i> Studio SPH
             </button>
           </div>
         </div>

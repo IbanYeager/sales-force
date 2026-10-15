@@ -90,9 +90,6 @@
                 <a href="pages/kalkulator.html" class="sidebar-nav-link" data-tags="kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf">
                     <i class="fa-solid fa-calculator"></i> Kalkulator Finansial
                 </a>
-                <a href="pages/quotation.html" class="sidebar-nav-link" data-tags="sph quotation surat penawaran harga pdf resmi cetak tunai kredit leasing a4 kop surat">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Studio SPH &amp; Quotation
-                </a>
                 <a href="pages/inventory.html" class="sidebar-nav-link" data-tags="stok stock live inventory unit mobil t-stock">
                     <i class="fa-solid fa-warehouse"></i> Live Inventory (Stock)
                 </a>
@@ -900,10 +897,6 @@
                             <a href="pages/kalkulator.html" class="category-item modal-feature-item" data-tags="kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf">
                                 <div class="category-icon"><i class="fa-solid fa-calculator"></i></div>
                                 <span class="category-text">Kalkulator Kredit</span>
-                            </a>
-                            <a href="pages/quotation.html" class="category-item modal-feature-item" data-tags="sph quotation surat penawaran harga pdf resmi cetak tunai kredit leasing a4 kop surat">
-                                <div class="category-icon" style="color:#d71920;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                                <span class="category-text">Studio SPH</span>
                             </a>
                             <a href="pages/inventory.html" class="category-item modal-feature-item" data-tags="stok stock live inventory unit mobil t-stock ready">
                                 <div class="category-icon"><i class="fa-solid fa-warehouse"></i></div>

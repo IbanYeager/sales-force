@@ -111,7 +111,6 @@
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
                 ${(curPage === 'index_kacab') ? navLinkKacab('pages_kacab/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service <span class="sidebar-notif-badge" style="background:#d8a437; color:#1e1014; display:inline-block; margin-left:auto; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800;">LIVE</span>') : ''}
-                ${navLinkKacab('pages_kacab/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d8a437; color:#1e1014; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span>')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
@@ -197,7 +196,6 @@
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
                 ${(curPage === 'index_spv') ? navLinkSPV('pages_spv/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service <span class="sidebar-notif-badge" style="background:#e11d48; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800;">LIVE</span>') : ''}
-                ${navLinkSPV('pages_spv/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#0284c7; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">A4 PDF</span>')}
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
                 ${navLinkSPV('pages_spv/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
@@ -289,7 +287,6 @@
                 <p class="sidebar-nav-label">Tier 1: Closing, Pricing & Stock</p>
                 ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR', 'harga pricelist otr brosur daftar')}
                 ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Finansial', 'kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf')}
-                ${navLink('pages/quotation.html', 'fa-solid fa-file-invoice-dollar', 'Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#d71920; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">A4 PDF</span>', 'sph quotation surat penawaran harga pdf resmi cetak tunai kredit leasing a4 kop surat')}
                 ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)', 'stok stock live inventory unit mobil t-stock')}
                 ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar', 'customer crm radar prospek data database')}
                 ${navLink('pages/battle_card.html', 'fa-solid fa-shield-halved', 'Battle Card &amp; Objection', 'battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata')}

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -60,7 +60,6 @@
 
       <nav class="spv-nav">
         <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard</a>
-        <a href="quotation.html" id="navSph"><i class="fa-solid fa-file-invoice-dollar"></i>Studio SPH &amp; Quotation <span class="sidebar-notif-badge" style="background:#0284c7; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">A4 PDF</span></a>
         <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up</a>
         <a href="ao_report_spv.html" id="navAO" class="active"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
         <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i>Trade-In &amp; OLX</a>
@@ -114,8 +113,8 @@
             <option value="Semua">Semua Tim (Total Cabang - Tanpa Dobel)</option>
             <optgroup label="Tim Pak Ryan (Induk &amp; Coaching)">
               <option value="Ryan">Tim Pak Ryan (Total: 25 Sales)</option>
-              <option value="Rahma">&nbsp;&nbsp;↳ Coaching Bu Rahma - Calon SPV (5 Sales)</option>
-              <option value="Ryan_Direct">&nbsp;&nbsp;↳ Tim Langsung Pak Ryan (20 Sales)</option>
+              <option value="Rahma">&nbsp;&nbsp;â†³ Coaching Bu Rahma - Calon SPV (5 Sales)</option>
+              <option value="Ryan_Direct">&nbsp;&nbsp;â†³ Tim Langsung Pak Ryan (20 Sales)</option>
             </optgroup>
             <option value="Alvin">Tim Pak Alvin (20 Sales)</option>
             <option value="Riva">Tim Pak Riva (14 Sales)</option>

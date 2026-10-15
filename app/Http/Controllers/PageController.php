@@ -54,13 +54,14 @@ class PageController extends Controller
             return $this->panduan();
         }
 
-        if ($cleanPage === 'quotation') {
+        if ($cleanPage === 'quotation' || $cleanPage === 'sph') {
             $role = request()->query('role');
             if ($role === 'kacab') {
                 return redirect('/pages_kacab/index_kacab.html');
             } elseif ($role === 'spv') {
-                return $this->showSpvPage('quotation');
+                return redirect('/pages_spv/index_spv.html');
             }
+            return redirect('/pages/kalkulator.html');
         }
 
         if ($cleanPage === 'ao_report' || $cleanPage === 'ao_report_kacab' || $cleanPage === 'ao_report_spv') {
@@ -95,8 +96,8 @@ class PageController extends Controller
             return redirect('/pages_spv/index_spv.html');
         }
 
-        if ($cleanPage === 'sph') {
-            $cleanPage = 'quotation';
+        if ($cleanPage === 'sph' || $cleanPage === 'quotation') {
+            return redirect('/pages_spv/index_spv.html');
         }
 
         if ($cleanPage === 'ao_report' || $cleanPage === 'ao_report_cabang') {
