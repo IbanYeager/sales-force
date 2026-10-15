@@ -278,7 +278,6 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Utama</p>
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
-                ${navLink('panduan_alur_kerja_sales_app.html', 'fa-solid fa-book-bookmark', 'Panduan & SOP Sistem <span class="sidebar-sop-badge"><span class="sop-dot"></span>SOP</span>', 'panduan alur kerja sop pesan mobil order tahapan flow tutorial cara pakai')}
                 ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
                 ${navLink('pages/mtoyota_service.html', 'fa-solid fa-mobile-screen-button', 'Booking Service m-Toyota <span class="sidebar-notif-badge" style="background:#d7123a; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">LIVE</span>', 'mtoyota m-toyota booking service dec do fs1000 purna jual servis')}
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
@@ -849,26 +848,6 @@
 
                 const rightGroup = header.querySelector('.header-right-group');
                 otherNodes.forEach(node => rightGroup.appendChild(node));
-
-                // Append Cara Pakai Header Button if not already added
-                if (!rightGroup.querySelector('#btnHeaderCaraPakai') && !path.toLowerCase().includes('login')) {
-                    const headerTutBtn = document.createElement('button');
-                    headerTutBtn.id = 'btnHeaderCaraPakai';
-                    headerTutBtn.className = 'btn-feature-guide-header';
-                    headerTutBtn.type = 'button';
-                    headerTutBtn.setAttribute('title', 'Buka panduan cara pakai fitur di halaman ini');
-                    headerTutBtn.innerHTML = `
-                        <i class="fa-solid fa-lightbulb"></i>
-                        <span>Cara Pakai</span>
-                    `;
-                    headerTutBtn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        if (typeof window.sftOpenFeatureTutorial === 'function') {
-                            window.sftOpenFeatureTutorial();
-                        }
-                    });
-                    rightGroup.prepend(headerTutBtn);
-                }
             });
         })();
 
@@ -881,20 +860,6 @@
     } else {
         injectSidebar();
     }
-
-    // Automatically load Universal Feature Tutorial Script for ALL pages (Sales, SPV, Kacab)
-    (function loadFeatureTutorialScript() {
-        const pathLower = path.toLowerCase();
-        if (pathLower.includes('login')) {
-            return;
-        }
-        if (window.sftFeatureTutorialLoaded || document.querySelector('script[src*="feature_tutorial.js"]')) {
-            return;
-        }
-        const script = document.createElement('script');
-        script.src = prefix + 'js/feature_tutorial.js?v=20260912_comprehensive_v4';
-        (document.head || document.documentElement).appendChild(script);
-    })();
 
     // Automatically load AI Copilot Assistant Script for Sales pages only
     (function loadAiCopilotScript() {

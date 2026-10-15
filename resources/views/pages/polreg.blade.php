@@ -37,32 +37,6 @@
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
 
-  <style>
-    /* Cara Pakai Modal Styling */
-    .modal-overlay-polreg {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(5px);
-      z-index: 99999;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal-overlay-polreg.show {
-      display: flex;
-    }
-    .modal-card-polreg {
-      background: #ffffff;
-      border-radius: 20px;
-      max-width: 540px;
-      width: 100%;
-      padding: 24px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.25);
-      position: relative;
-    }
-  </style>
 </head>
 
 <body>
@@ -576,78 +550,6 @@
 
     </div>
   </div>
-
-  <!-- Modal Cara Pakai -->
-  <div class="modal-overlay-polreg" id="modalCaraPakai" onclick="closeCaraPakaiModal(event)">
-    <div class="modal-card-polreg" onclick="event.stopPropagation()">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h3 style="margin:0; font-size:16px; font-weight:800; color:#0d1b3e; display:flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-lightbulb" style="color:#f59e0b;"></i> Cara Menggunakan Peta Polreg
-        </h3>
-        <button type="button" onclick="closeCaraPakaiModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div style="display:flex; flex-direction:column; gap:12px; font-size:13px; color:#334155; line-height:1.5;">
-        <div style="display:flex; gap:10px; align-items:flex-start;">
-          <div style="background:#fee2e2; color:#cc1426; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:800;">1</div>
-          <div>
-            <strong>Peta Warna Wilayah:</strong><br>
-            Polygon di peta langsung menunjukkan performa pasar:
-            <div style="margin-top:4px; font-size:12px;">
-              🟢 <b>Hijau (Dominan &ge;35%)</b>: Basis kuat Toyota.<br>
-              🔵 <b>Biru (Solid 30-34.9%)</b>: Pertahankan &amp; rawat.<br>
-              🔴 <b>Merah (Prioritas EVOLVE &lt;30%)</b>: Potensi pertumbuhan &amp; prospek paling tinggi!
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex; gap:10px; align-items:flex-start;">
-          <div style="background:#eff6ff; color:#2563eb; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:800;">2</div>
-          <div>
-            <strong>Filter Cepat Area Potensial:</strong><br>
-            Klik tombol <b>Prioritas EVOLVE (Potensi 🔥)</b> untuk menyaring langsung kecamatan yang pasarnya besar tapi penguasaan Toyota masih perlu ditingkatkan.
-          </div>
-        </div>
-
-        <div style="display:flex; gap:10px; align-items:flex-start;">
-          <div style="background:#ecfdf5; color:#059669; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:800;">3</div>
-          <div>
-            <strong>Klik Wilayah di Peta:</strong><br>
-            Klik kecamatan mana pun langsung di peta untuk memunculkan analisis lengkap di panel samping (Model rekomendasi, lawan kompetitor, mobil terbanyak, demografi).
-          </div>
-        </div>
-
-        <div style="display:flex; gap:10px; align-items:flex-start;">
-          <div style="background:#fef3c7; color:#d97706; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:800;">4</div>
-          <div>
-            <strong>Direct Canvassing Check-In:</strong><br>
-            Tekan tombol merah <b>"Rute &amp; Check-in Canvassing Wilayah Ini"</b> untuk langsung memulai check-in canvassing di kecamatan tersebut!
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:20px; text-align:right;">
-        <button type="button" onclick="closeCaraPakaiModal()" style="background:#0d1b3e; color:#ffffff; border:none; padding:8px 18px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer;">
-          Mengerti, Siap Prospek!
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function openCaraPakaiModal() {
-      const modal = document.getElementById('modalCaraPakai');
-      if (modal) modal.classList.add('show');
-    }
-    function closeCaraPakaiModal(e) {
-      const modal = document.getElementById('modalCaraPakai');
-      if (modal) modal.classList.remove('show');
-    }
-    // Connect to executive header Cara Pakai button from sidebar_desktop.js
-    window.sftOpenFeatureTutorial = openCaraPakaiModal;
-  </script>
 
   <script src="../custom_alert.js"></script>
   <script src="../js/script.js"></script>

@@ -60,10 +60,6 @@
                 <a href="index.html" class="sidebar-nav-link active" data-tags="home beranda ringkasan">
                     <i class="fa-solid fa-house"></i> Dashboard
                 </a>
-                <a href="panduan_alur_kerja_sales_app.html" class="sidebar-nav-link" data-tags="panduan alur kerja sop pesan mobil order tahapan flow tutorial cara pakai" style="border-left: 3px solid #f59e0b;">
-                    <i class="fa-solid fa-book-bookmark" style="color: #f59e0b;"></i> Panduan &amp; SOP Sistem
-                    <span style="font-size: 9px; font-weight: 800; background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 2px 6px; border-radius: 6px; margin-left: auto; text-transform: uppercase;">SOP</span>
-                </a>
                 <a href="pages/ao_report.html" class="sidebar-nav-link" data-tags="ao report leasing finance">
                     <i class="fa-solid fa-chalkboard-user"></i> Papan AO Report
                 </a>
@@ -382,29 +378,6 @@
                         </div>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
-
-                    <!-- ═══ BANNER PANDUAN & SOP ALUR KERJA + TOMBOL TUTORIAL ═══ -->
-                    <div style="display:flex; gap:10px; margin-bottom:16px;">
-                        <a href="panduan_alur_kerja_sales_app.html" class="btn-sop-guide" style="flex:1; display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #1e293b, #0f172a); color:white; padding:12px 14px; border-radius:14px; text-decoration:none; border:1px solid rgba(245,158,11,0.3); box-shadow:0 4px 15px rgba(0,0,0,0.06); transition:transform 0.2s ease;">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; flex-shrink:0;">
-                                    <i class="fa-solid fa-book-bookmark"></i>
-                                </div>
-                                <div>
-                                    <div style="font-size:13px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:6px;">
-                                        Panduan &amp; SOP Sales
-                                        <span style="font-size:9px; background:#f59e0b; color:#fff; padding:1px 5px; border-radius:4px; font-weight:800;">SOP</span>
-                                    </div>
-                                    <div style="font-size:11px; color:#94a3b8;">Flow praktis cara pesan mobil</div>
-                                </div>
-                            </div>
-                            <i class="fa-solid fa-chevron-right" style="color:#64748b; font-size:12px;"></i>
-                        </a>
-                        <button type="button" onclick="if(window.startAppTour) window.startAppTour(true);" style="background:linear-gradient(135deg, #d71920, #a81016); color:white; border:none; border-radius:14px; padding:0 14px; font-size:12px; font-weight:800; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; box-shadow:0 4px 12px rgba(215,25,32,0.3); flex-shrink:0;" title="Mulai Tutorial Interaktif di Layar">
-                            <i class="fa-solid fa-play" style="font-size:14px;"></i>
-                            <span>Tutorial</span>
-                        </button>
-                    </div>
 
                     <!-- ═══ FITUR UTAMA (PERMANEN: 4 Fitur Paling Kritis & Penting untuk Sales Consultant) ═══ -->
                     <div class="section-header-row">
@@ -882,19 +855,6 @@
                         </div>
 
                         <div class="category-grid feature-modal-grid" style="overflow-y: auto; flex: 1; padding: 10px 14px 24px !important;">
-                            <!-- Panduan & SOP Alur Kerja -->
-                            <a href="panduan_alur_kerja_sales_app.html" class="category-item modal-feature-item" data-tags="sop panduan alur kerja flow pesan mobil" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(200,16,46,0.06)); border: 1.5px solid rgba(245,158,11,0.4); border-radius: 14px; padding: 12px; display: flex; flex-direction: row; align-items: center; gap: 12px; text-decoration: none;">
-                                <div class="category-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin: 0; flex-shrink: 0;"><i class="fa-solid fa-book-bookmark"></i></div>
-                                <div style="text-align: left;">
-                                    <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
-                                        Panduan &amp; SOP Alur Kerja Sales
-                                        <span style="font-size: 9px; background: #f59e0b; color: white; padding: 1px 5px; border-radius: 4px; font-weight: 800;">SOP</span>
-                                    </div>
-                                    <div style="font-size: 11px; color: #64748b;">Tahapan saat customer pesan mobil dari awal hingga DO</div>
-                                </div>
-                                <i class="fa-solid fa-chevron-right" style="margin-left: auto; color: #94a3b8; font-size: 12px;"></i>
-                            </a>
-
                             <!-- SECTION: MENU UTAMA & OPERASIONAL HARIAN -->
                             <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 10px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
                                 <i class="fa-solid fa-compass" style="color: var(--primary-red);"></i> Menu Utama &amp; Operasional Harian
@@ -1567,7 +1527,6 @@
 
     <script src="js/auto_location_tracker.js?v=20260908_v8"></script>
     <script src="./js/pwa-app.js?v=20260908_no_toast"></script>
-    <script src="js/app_tour.js?v=20260912_tour_v2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {

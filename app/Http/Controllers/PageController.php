@@ -28,9 +28,6 @@ class PageController extends Controller
             return redirect('/pages_spv/index_spv.html');
         }
 
-        if (View::exists('panduan_alur_kerja_sales_app')) {
-            return view('panduan_alur_kerja_sales_app');
-        }
         return redirect()->route('dashboard');
     }
 
