@@ -221,7 +221,7 @@ $salesLat = isset($_GET['lat']) ? floatval($_GET['lat']) : -6.9248; // default T
 $salesLng = isset($_GET['lng']) ? floatval($_GET['lng']) : 107.6472;
 $maxRadius = isset($_GET['radius']) ? floatval($_GET['radius']) : 50.0; // km (allow wide range for map)
 $salesId = isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0;
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 500;
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 0; // 0 = unlimited, return all matched database customers
 $targetDistrict = isset($_GET['district']) ? strtolower(trim($_GET['district'])) : 'all';
 $dbSource = isset($_GET['db_source']) ? strtolower(trim($_GET['db_source'])) : 'all';
 

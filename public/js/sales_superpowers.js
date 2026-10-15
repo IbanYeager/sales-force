@@ -59,6 +59,7 @@ const SalesSuperpowers = {
   radarStatusFilter: 'all',
   radarQuery: '',
   radarMarkersLayer: null,
+  radarRenderLimit: 48,
   selectedPhotoFile: null,
 
   ensureRadarStyles() {
@@ -556,6 +557,7 @@ const SalesSuperpowers = {
 
   handleRadiusChange(radiusVal, containerId) {
     this.currentRadius = parseFloat(radiusVal) || 5;
+    this.radarRenderLimit = 48;
     
     // Update active class on pills immediately for snappy responsiveness
     const pills = document.querySelectorAll('.radar-radius-pill');
@@ -603,7 +605,7 @@ const SalesSuperpowers = {
 
     try {
       const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
-      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&district=${encodeURIComponent(district)}&db_source=radar&sales_id=${salesId}`);
+      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&district=${encodeURIComponent(district)}&db_source=radar&sales_id=${salesId}&limit=0`);
       const result = await res.json();
 
       if (result.status !== 'success' || !result.data || result.data.length === 0) {
@@ -883,12 +885,19 @@ const SalesSuperpowers = {
 
   handleRadarStatusFilter(statusVal) {
     this.radarStatusFilter = statusVal || 'all';
+    this.radarRenderLimit = 48;
     this.applyRadarFilter();
   },
 
   filterRadarLeads(query) {
     this.radarQuery = (query || '').toLowerCase().trim();
+    this.radarRenderLimit = 48;
     this.applyRadarFilter();
+  },
+
+  loadMoreRadarCards() {
+    this.radarRenderLimit = (this.radarRenderLimit || 48) + 48;
+    this.renderRadarCardsGrid(this.getFilteredRadarLeads());
   },
 
   applyRadarFilter() {
@@ -906,7 +915,7 @@ const SalesSuperpowers = {
 
     // Update count badge & subtitle
     const badge = document.getElementById('radarCountBadge');
-    if (badge) badge.textContent = `${filtered.length} Customer`;
+    if (badge) badge.textContent = `${filtered.length.toLocaleString('id-ID')} Customer`;
 
     const sub = document.getElementById('radarRadiusSubtitle');
     if (sub) {
@@ -926,6 +935,7 @@ const SalesSuperpowers = {
     const listContainer = document.getElementById('radarLeadsContainer');
     if (!listContainer) return;
 
+    this.radarRenderLimit = 48;
     const currentRadiusKm = this.currentRadius || 5;
     const inRadius = (this.radarData || []).filter(c => {
       if (c.distance_km === undefined || c.distance_km === null) return true;
@@ -947,7 +957,7 @@ const SalesSuperpowers = {
           <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
             <i class="fa-solid fa-bullseye" style="color:#d7123a;"></i> 
             Daftar Pelanggan Terdekat 
-            <span class="radar-count-badge" id="radarCountBadge">${filtered.length} Customer</span>
+            <span class="radar-count-badge" id="radarCountBadge">${filtered.length.toLocaleString('id-ID')} Customer</span>
           </h4>
           <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;" id="radarRadiusSubtitle">
             Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${this.radarStatusFilter !== 'all' ? ' • Status: ' + this.radarStatusFilter : ''}).
@@ -962,19 +972,19 @@ const SalesSuperpowers = {
       <!-- Quick Status Filter Pills -->
       <div class="radar-status-filter-strip">
         <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'all' ? 'active' : ''}" data-status="all" onclick="SalesSuperpowers.handleRadarStatusFilter('all')">
-          Semua (${countAll})
+          Semua (${countAll.toLocaleString('id-ID')})
         </button>
         <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Belum Dihubungi' ? 'active' : ''}" data-status="Belum Dihubungi" onclick="SalesSuperpowers.handleRadarStatusFilter('Belum Dihubungi')">
-          <span class="status-dot dot-red"></span> Belum Dihubungi (${countBelum})
+          <span class="status-dot dot-red"></span> Belum Dihubungi (${countBelum.toLocaleString('id-ID')})
         </button>
         <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Menunggu Respon' ? 'active' : ''}" data-status="Menunggu Respon" onclick="SalesSuperpowers.handleRadarStatusFilter('Menunggu Respon')">
-          <span class="status-dot dot-yellow"></span> Menunggu Respon (${countMenunggu})
+          <span class="status-dot dot-yellow"></span> Menunggu Respon (${countMenunggu.toLocaleString('id-ID')})
         </button>
         <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Tertarik / Jadwal Servis' ? 'active' : ''}" data-status="Tertarik / Jadwal Servis" onclick="SalesSuperpowers.handleRadarStatusFilter('Tertarik / Jadwal Servis')">
-          <span class="status-dot dot-purple"></span> Tertarik / Servis (${countTertarik})
+          <span class="status-dot dot-purple"></span> Tertarik / Servis (${countTertarik.toLocaleString('id-ID')})
         </button>
         <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Deal / Selesai' ? 'active' : ''}" data-status="Deal / Selesai" onclick="SalesSuperpowers.handleRadarStatusFilter('Deal / Selesai')">
-          <span class="status-dot dot-green"></span> Deal / Selesai (${countDeal})
+          <span class="status-dot dot-green"></span> Deal / Selesai (${countDeal.toLocaleString('id-ID')})
         </button>
       </div>
 
@@ -1002,9 +1012,13 @@ const SalesSuperpowers = {
       return;
     }
 
+    const currentLimit = this.radarRenderLimit || 48;
+    const visibleLeads = leads.slice(0, currentLimit);
+    const hasMore = leads.length > currentLimit;
+
     let cardsHtml = `<div class="radar-leads-grid">`;
 
-    leads.forEach((item) => {
+    visibleLeads.forEach((item) => {
       const initials = (item.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
       let statusColor = '#ef4444';
       if (item.status === 'Deal / Selesai') statusColor = '#10b981';
@@ -1069,6 +1083,17 @@ const SalesSuperpowers = {
     });
 
     cardsHtml += `</div>`;
+
+    if (hasMore) {
+      cardsHtml += `
+        <div style="text-align:center; margin:22px 0 10px 0;">
+          <button type="button" class="btn-radar-detect" style="padding:10px 24px; font-size:12.5px; border-radius:12px; margin:0 auto; cursor:pointer; background:#0f172a; box-shadow:0 4px 14px rgba(15,23,42,0.2);" onclick="SalesSuperpowers.loadMoreRadarCards()">
+            <i class="fa-solid fa-chevron-down"></i> Tampilkan Lebih Banyak (Menampilkan ${visibleLeads.length} dari ${leads.length.toLocaleString('id-ID')} Customer)
+          </button>
+        </div>
+      `;
+    }
+
     gridContainer.innerHTML = cardsHtml;
   },
 
