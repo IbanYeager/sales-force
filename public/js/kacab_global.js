@@ -7,6 +7,14 @@ if (typeof window !== 'undefined') {
   }
   window.scrollTo(0, 0);
   window.addEventListener('pageshow', () => { window.scrollTo(0, 0); });
+
+  // Guard: Ensure Font Awesome is always loaded for sidebar icons
+  if (!document.querySelector('link[href*="font-awesome"]')) {
+    const faLink = document.createElement('link');
+    faLink.rel = 'stylesheet';
+    faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+    document.head.appendChild(faLink);
+  }
 }
 
 function logoutUser() {
@@ -372,12 +380,26 @@ function initKacabSidebarNav(sidebar) {
       <div class="kcb-search-box">
         <i class="fa-solid fa-magnifying-glass kcb-search-icon"></i>
         <input type="text" class="kcb-search-input" id="kcbSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+        <kbd class="kcb-search-kbd">Ctrl+K</kbd>
         <button type="button" class="kcb-search-clear" id="kcbSearchClear" style="display:none;" title="Bersihkan pencarian">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
     `;
     nav.parentNode.insertBefore(searchWrap, nav);
+  } else {
+    const box = searchWrap.querySelector('.kcb-search-box');
+    if (box && !box.querySelector('.kcb-search-kbd')) {
+      const kbd = document.createElement('kbd');
+      kbd.className = 'kcb-search-kbd';
+      kbd.textContent = 'Ctrl+K';
+      const clearBtn = box.querySelector('.kcb-search-clear');
+      if (clearBtn) {
+        box.insertBefore(kbd, clearBtn);
+      } else {
+        box.appendChild(kbd);
+      }
+    }
   }
 
   // 2. Structuring into Categories if not yet grouped
@@ -467,12 +489,16 @@ function initKacabSidebarNav(sidebar) {
   // 4. Real-time Search Logic
   const searchInput = sidebar.querySelector('#kcbSearchInput');
   const searchClear = sidebar.querySelector('#kcbSearchClear');
+  const searchKbd = sidebar.querySelector('.kcb-search-kbd');
 
   if (searchInput) {
     function filterKacabNav() {
       const q = searchInput.value.trim().toLowerCase();
       if (searchClear) {
         searchClear.style.display = q ? 'flex' : 'none';
+      }
+      if (searchKbd) {
+        searchKbd.style.display = q ? 'none' : 'inline-block';
       }
 
       const categories = nav.querySelectorAll('.kcb-nav-category');
@@ -514,6 +540,18 @@ function initKacabSidebarNav(sidebar) {
 
     searchInput.addEventListener('input', filterKacabNav);
 
+    searchInput.addEventListener('focus', () => {
+      if (searchKbd && !searchInput.value) {
+        searchKbd.textContent = 'Esc';
+      }
+    });
+
+    searchInput.addEventListener('blur', () => {
+      if (searchKbd && !searchInput.value) {
+        searchKbd.textContent = 'Ctrl+K';
+      }
+    });
+
     if (searchClear) {
       searchClear.addEventListener('click', () => {
         searchInput.value = '';
@@ -527,6 +565,15 @@ function initKacabSidebarNav(sidebar) {
         searchInput.value = '';
         filterKacabNav();
         searchInput.blur();
+      }
+    });
+
+    // Global hotkey: Ctrl+K or Cmd+K to focus search bar
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
       }
     });
   }

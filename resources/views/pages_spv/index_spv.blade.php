@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPV Desktop - Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_spv.css?v=20260917_pro_v1">
   <link rel="stylesheet" href="/css/style_spv.css?v=20260917_pro_v1">
 
@@ -34,6 +35,7 @@
         <div class="spv-search-box">
           <i class="fa-solid fa-magnifying-glass spv-search-icon"></i>
           <input type="text" class="spv-search-input" id="spvSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+          <kbd class="spv-search-kbd">Ctrl+K</kbd>
           <button type="button" class="spv-search-clear" id="spvSearchClear" style="display:none;" title="Bersihkan pencarian">
             <i class="fa-solid fa-xmark"></i>
           </button>

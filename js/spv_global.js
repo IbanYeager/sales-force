@@ -6,6 +6,14 @@ if (typeof window !== 'undefined') {
     }
     window.scrollTo(0, 0);
     window.addEventListener('pageshow', () => { window.scrollTo(0, 0); });
+
+    // Guard: Ensure Font Awesome is always loaded for sidebar icons
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+        const faLink = document.createElement('link');
+        faLink.rel = 'stylesheet';
+        faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(faLink);
+    }
 }
 
 // ── Global SPV Logout Function ──────────────────────────
@@ -194,12 +202,26 @@ function initSpvSidebarNav(sidebar) {
             <div class="spv-search-box">
                 <i class="fa-solid fa-magnifying-glass spv-search-icon"></i>
                 <input type="text" class="spv-search-input" id="spvSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+                <kbd class="spv-search-kbd">Ctrl+K</kbd>
                 <button type="button" class="spv-search-clear" id="spvSearchClear" style="display:none;" title="Bersihkan pencarian">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
         `;
         nav.parentNode.insertBefore(searchWrap, nav);
+    } else {
+        const box = searchWrap.querySelector('.spv-search-box');
+        if (box && !box.querySelector('.spv-search-kbd')) {
+            const kbd = document.createElement('kbd');
+            kbd.className = 'spv-search-kbd';
+            kbd.textContent = 'Ctrl+K';
+            const clearBtn = box.querySelector('.spv-search-clear');
+            if (clearBtn) {
+                box.insertBefore(kbd, clearBtn);
+            } else {
+                box.appendChild(kbd);
+            }
+        }
     }
 
     // 2. Structuring into Categories if not yet grouped
@@ -289,12 +311,16 @@ function initSpvSidebarNav(sidebar) {
     // 4. Real-time Search Logic
     const searchInput = sidebar.querySelector('#spvSearchInput');
     const searchClear = sidebar.querySelector('#spvSearchClear');
+    const searchKbd = sidebar.querySelector('.spv-search-kbd');
 
     if (searchInput) {
         function filterSpvNav() {
             const q = searchInput.value.trim().toLowerCase();
             if (searchClear) {
                 searchClear.style.display = q ? 'flex' : 'none';
+            }
+            if (searchKbd) {
+                searchKbd.style.display = q ? 'none' : 'inline-block';
             }
 
             const categories = nav.querySelectorAll('.spv-nav-category');
@@ -336,6 +362,18 @@ function initSpvSidebarNav(sidebar) {
 
         searchInput.addEventListener('input', filterSpvNav);
 
+        searchInput.addEventListener('focus', () => {
+            if (searchKbd && !searchInput.value) {
+                searchKbd.textContent = 'Esc';
+            }
+        });
+
+        searchInput.addEventListener('blur', () => {
+            if (searchKbd && !searchInput.value) {
+                searchKbd.textContent = 'Ctrl+K';
+            }
+        });
+
         if (searchClear) {
             searchClear.addEventListener('click', () => {
                 searchInput.value = '';
@@ -349,6 +387,15 @@ function initSpvSidebarNav(sidebar) {
                 searchInput.value = '';
                 filterSpvNav();
                 searchInput.blur();
+            }
+        });
+
+        // Global hotkey: Ctrl+K or Cmd+K to focus search bar
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
             }
         });
     }
