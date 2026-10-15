@@ -2747,6 +2747,7 @@ function switchFollowupSubTab(tab) {
 
   const btnMyTasks = document.getElementById('subBtnMyTasks');
   const btnRadar = document.getElementById('subBtnRadar');
+  const heroBanner = document.querySelector('.followup-hero-banner');
   const filterCard = document.getElementById('fuFilterCard');
   const dataContainer = document.getElementById('followupDataContainer');
   const radarContainer = document.getElementById('followupRadarContainer');
@@ -2755,6 +2756,7 @@ function switchFollowupSubTab(tab) {
   if (btnRadar) btnRadar.classList.toggle('active', tab === 'radar');
 
   if (tab === 'radar') {
+    if (heroBanner) heroBanner.style.display = 'none';
     if (filterCard) filterCard.style.display = 'none';
     if (dataContainer) dataContainer.style.display = 'none';
     if (radarContainer) {
@@ -2764,6 +2766,7 @@ function switchFollowupSubTab(tab) {
       }
     }
   } else {
+    if (heroBanner) heroBanner.style.display = 'block';
     if (filterCard) filterCard.style.display = 'block';
     if (dataContainer) dataContainer.style.display = 'block';
     if (radarContainer) radarContainer.style.display = 'none';

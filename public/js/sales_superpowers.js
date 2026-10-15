@@ -58,9 +58,123 @@ const SalesSuperpowers = {
   leafletMarkers: [],
   selectedPhotoFile: null,
 
+  ensureRadarStyles() {
+    if (document.getElementById('radarExecutiveStyles')) return;
+    const style = document.createElement('style');
+    style.id = 'radarExecutiveStyles';
+    style.textContent = `
+      .radar-cockpit-wrapper { background: #ffffff; border: 1px solid #e2e8f0; border-top: 3px solid #d7123a; border-radius: 20px; padding: 22px; margin-bottom: 22px; box-shadow: 0 10px 30px -5px rgba(15,23,42,0.05); }
+      .radar-cockpit-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; }
+      .radar-header-left { display: flex; align-items: center; gap: 14px; }
+      .radar-sonar-icon-wrapper { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+      .radar-sonar-wave { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(215, 18, 58, 0.2); animation: radar-sonar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+      .radar-sonar-wave.wave-2 { animation-delay: 1s; }
+      @keyframes radar-sonar-ping { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.9); opacity: 0; } }
+      .radar-sonar-center { position: relative; z-index: 2; width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #d7123a 0%, #b91c1c 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 17px; box-shadow: 0 4px 12px rgba(215, 18, 58, 0.35); }
+      .radar-micro-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #d7123a; background: #fff1f2; padding: 3px 9px; border-radius: 6px; margin-bottom: 4px; }
+      .radar-header-title { font-size: 17.5px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.3px; }
+      .radar-header-sub { font-size: 12px; color: #64748b; margin: 3px 0 0 0; }
+      .radar-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .radar-gps-live-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; padding: 7px 14px; border-radius: 20px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+      .live-dot-pulse { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); animation: live-pulse-dot 1.8s infinite; }
+      @keyframes live-pulse-dot { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+      .btn-radar-detect { padding: 7px 14px; font-size: 11.5px; font-weight: 800; background: #0f172a; color: #ffffff; border-radius: 10px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15); }
+      .btn-radar-detect:hover { background: #1e293b; transform: translateY(-1px); }
+      .radar-controls-strip { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+      .radar-radius-section { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .radar-radius-label { font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; gap: 5px; }
+      .radar-radius-pill-group { display: inline-flex; background: #f1f5f9; padding: 4px; border-radius: 12px; gap: 4px; border: 1px solid #e2e8f0; }
+      .radar-radius-pill { padding: 6px 14px; border-radius: 9px; font-size: 12px; font-weight: 700; border: none; background: transparent; color: #475569; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; }
+      .radar-radius-pill:hover { color: #0f172a; background: #ffffff; }
+      .radar-radius-pill.active { background: #0f172a !important; color: #ffffff !important; font-weight: 800; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2); }
+      .radar-search-wrap { display: flex; align-items: center; gap: 8px; flex: 1; max-width: 360px; min-width: 240px; }
+      .radar-search-input-box { position: relative; width: 100%; }
+      .radar-search-input-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #94a3b8; }
+      .radar-search-input { width: 100%; padding: 8px 12px 8px 34px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12px; outline: none; background: #f8fafc; transition: all 0.2s ease; }
+      .radar-search-input:focus { background: #ffffff; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+      .btn-radar-search { padding: 8px 16px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; border: none; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25); transition: all 0.15s ease; }
+      .btn-radar-search:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35); }
+      .radar-quick-landmarks { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+      .radar-landmark-chip { font-size: 11px; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 4px; }
+      .radar-landmark-chip:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+      .radar-map-outer { border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; height: 480px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); }
+      .radar-sales-beacon-icon { background: transparent !important; border: none !important; }
+      .radar-sales-beacon-wrap { position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: grab; }
+      .radar-beacon-aura { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(215, 18, 58, 0.35); animation: beacon-expand 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+      @keyframes beacon-expand { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
+      .radar-beacon-core { position: relative; z-index: 2; width: 24px; height: 24px; border-radius: 50%; background: #d7123a; border: 3px solid #ffffff; box-shadow: 0 0 12px rgba(215, 18, 58, 0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 11px; }
+      .radar-leaflet-pin-wrap { background: transparent !important; border: none !important; }
+      .radar-map-marker-pin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid #ffffff; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 10px; transition: transform 0.15s ease; cursor: pointer; position: relative; }
+      .radar-map-marker-pin:hover { transform: scale(1.3); z-index: 9999 !important; }
+      .radar-map-legend-overlay { position: absolute; bottom: 14px; left: 14px; z-index: 999; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px); border: 1px solid rgba(226, 232, 240, 0.9); padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 12px; font-size: 11px; font-weight: 700; color: #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+      .radar-legend-item { display: flex; align-items: center; gap: 5px; }
+      .radar-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+      .radar-popup-card { font-family: 'Plus Jakarta Sans', sans-serif; padding: 4px; min-width: 210px; }
+      .radar-popup-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+      .radar-popup-avatar { width: 32px; height: 32px; border-radius: 50%; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 11.5px; flex-shrink: 0; }
+      .radar-popup-name { font-size: 13.5px; font-weight: 800; color: #0f172a; margin: 0; line-height: 1.2; }
+      .radar-popup-dist { font-size: 11px; color: #64748b; margin-top: 2px; }
+      .radar-popup-dist-pill { font-weight: 800; color: #2563eb; background: #eff6ff; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+      .radar-popup-car-box { background: #f8fafc; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
+      .radar-popup-actions { display: flex; gap: 6px; }
+      .btn-popup-wa { flex: 1; background: #10b981; color: #ffffff !important; text-decoration: none; padding: 6px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+      .btn-popup-maps { flex: 1.2; background: #2563eb; color: #ffffff !important; text-decoration: none; padding: 6px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+      .btn-popup-fu { background: #0f172a; color: #ffffff; border: none; padding: 6px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer; }
+      .radar-leads-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 12px; }
+      .radar-count-badge { font-size: 11px; font-weight: 800; background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 12px; }
+      .radar-card-filter-input { width: 100%; padding: 7px 10px 7px 28px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 12px; outline: none; background: #ffffff; }
+      .radar-leads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+      .radar-lead-card-deluxe { background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 16px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; }
+      .radar-lead-card-deluxe:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); border-color: #cbd5e1; }
+      .radar-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+      .radar-customer-profile { display: flex; align-items: center; gap: 10px; }
+      .radar-avatar-circle { width: 40px; height: 40px; border-radius: 50%; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 13.5px; flex-shrink: 0; }
+      .radar-customer-name { font-size: 14.5px; font-weight: 800; margin: 0; color: #0f172a; }
+      .radar-district-tag { font-size: 11.5px; color: #64748b; margin-top: 2px; }
+      .radar-dist-chip { background: #eff6ff; color: #2563eb; font-weight: 800; font-size: 11px; padding: 4px 9px; border-radius: 6px; white-space: nowrap; }
+      .radar-vehicle-box { background: #f8fafc; padding: 10px 12px; border-radius: 10px; font-size: 12px; margin-bottom: 12px; border: 1px solid #f1f5f9; }
+      .radar-vehicle-row { display: flex; align-items: center; gap: 6px; }
+      .radar-tags-row { margin-top: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; }
+      .radar-tag { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
+      .radar-tag.status-tag { border: 1px solid transparent; }
+      .radar-action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
+      .btn-radar-map { background: #2563eb; color: #fff !important; text-align: center; padding: 8px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease; }
+      .btn-radar-map:hover { background: #1d4ed8; }
+      .btn-radar-wa-direct { background: #10b981; color: #fff !important; text-align: center; padding: 8px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease; }
+      .btn-radar-wa-direct:hover { background: #059669; }
+      .btn-radar-fu { background: #0f172a; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: all 0.15s ease; }
+      .btn-radar-fu:hover { background: #1e293b; }
+      .radar-empty-state { text-align: center; padding: 40px 20px; background: #ffffff; border-radius: 18px; border: 1.5px dashed #cbd5e1; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+      .radar-empty-icon { width: 58px; height: 58px; border-radius: 50%; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; }
+      .radar-empty-title { font-size: 15px; font-weight: 800; color: #0f172a; margin: 0 0 6px; }
+      .radar-empty-desc { font-size: 12.5px; color: #64748b; margin: 0; }
+    `;
+    document.head.appendChild(style);
+  },
+
+  quickSetLocation(key) {
+    const landmarks = {
+      'kircon': [-6.9248, 107.6472, 'Kiara Condong (Dealer)'],
+      'buahbatu': [-6.9554, 107.6468, 'Buah Batu'],
+      'antapani': [-6.9147, 107.6625, 'Antapani'],
+      'batununggal': [-6.9531, 107.6256, 'Batununggal'],
+      'gedebage': [-6.9589, 107.6953, 'Gedebage'],
+      'dago': [-6.8653, 107.6183, 'Dago']
+    };
+    if (landmarks[key]) {
+      const [lat, lng, label] = landmarks[key];
+      const searchInput = document.getElementById('salesLocationSearchInput');
+      if (searchInput) searchInput.value = label;
+      this.setManualSalesCoords(lat, lng, label, 15);
+    }
+  },
+
   async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 5) {
     this.currentRadius = parseFloat(radiusKm) || 5;
     this.currentDistrict = district;
+
+    // Ensure CSS styles are injected
+    this.ensureRadarStyles();
 
     // Restore saved sales coords if available
     const savedLat = localStorage.getItem('savedSalesLat');
@@ -72,69 +186,94 @@ const SalesSuperpowers = {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Render Cockpit Shell with Simplified Executive Radar Interface
+    // Render Cockpit Shell with Executive Tactical Radar Interface
     container.innerHTML = `
-      <div class="radar-clean-card" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:18px; padding:18px; margin-bottom:18px; box-shadow:0 4px 20px rgba(0,0,0,0.04);">
-        <!-- Top Row: Title & GPS Status -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:38px; height:38px; border-radius:12px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:18px;">
-              <i class="fa-solid fa-map-location-dot"></i>
+      <div class="radar-cockpit-wrapper">
+        <!-- Top Row: Title, Radar Sonar Ping & GPS Status -->
+        <div class="radar-cockpit-header">
+          <div class="radar-header-left">
+            <div class="radar-sonar-icon-wrapper">
+              <div class="radar-sonar-wave"></div>
+              <div class="radar-sonar-wave wave-2"></div>
+              <div class="radar-sonar-center">
+                <i class="fa-solid fa-satellite-dish"></i>
+              </div>
             </div>
             <div>
-              <h3 style="font-size:16px; font-weight:900; color:#0f172a; margin:0;">Peta Radar GPS Pelanggan</h3>
-              <p style="font-size:11.5px; color:#64748b; margin:2px 0 0 0;">Cari &amp; kunjungi pelanggan terdekat dari posisi Anda untuk kanvasing efisien.</p>
+              <div class="radar-micro-badge">
+                <i class="fa-solid fa-bolt"></i> Live Satellite Radar
+              </div>
+              <h3 class="radar-header-title">Peta Radar Pelanggan &amp; Kanvasing</h3>
+              <p class="radar-header-sub">Cari, jangkau, &amp; kunjungi pelanggan Toyota terdekat dari titik lokasi lapangan Anda.</p>
             </div>
           </div>
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span class="radar-gps-badge" id="radarGpsStatus" style="font-size:11px; font-weight:800; padding:6px 12px; border-radius:20px; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;">
-              <i class="fa-solid fa-satellite-dish"></i> Mendeteksi GPS...
-            </span>
-            <button type="button" class="btn-fu" style="padding:6px 14px; font-size:11.5px; font-weight:800; background:#0f172a; color:#fff; border-radius:10px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="SalesSuperpowers.requestHighAccuracyGPS()" title="Perbarui posisi GPS saat ini">
-              <i class="fa-solid fa-location-arrow"></i> Deteksi Ulang GPS
+          
+          <div class="radar-header-right">
+            <div class="radar-gps-live-badge" id="radarGpsStatus">
+              <span class="live-dot-pulse"></span>
+              <span id="radarGpsStatusText">Mendeteksi GPS Satelit...</span>
+            </div>
+            <button type="button" class="btn-radar-detect" onclick="SalesSuperpowers.requestHighAccuracyGPS()" title="Perbarui koordinat GPS dari perangkat HP">
+              <i class="fa-solid fa-crosshairs"></i> Kalibrasi GPS
             </button>
           </div>
         </div>
 
-        <!-- Controls: Radius Filter Pills & Location Search -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+        <!-- Controls Row: Radius Filter Pills & Location Search -->
+        <div class="radar-controls-strip">
           <!-- Radius Options -->
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span style="font-size:11.5px; font-weight:800; color:#64748b; text-transform:uppercase;">
-              <i class="fa-solid fa-bullseye" style="color:#2563eb;"></i> Ring Radius:
+          <div class="radar-radius-section">
+            <span class="radar-radius-label">
+              <i class="fa-solid fa-bullseye" style="color:#d7123a;"></i> Jangkauan Radius:
             </span>
             <div class="radar-radius-pill-group">
               <button type="button" class="radar-radius-pill ${this.currentRadius == 1 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(1, '${containerId}')">1 km</button>
               <button type="button" class="radar-radius-pill ${this.currentRadius == 3 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(3, '${containerId}')">3 km</button>
-              <button type="button" class="radar-radius-pill ${this.currentRadius == 5 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(5, '${containerId}')">5 km</button>
+              <button type="button" class="radar-radius-pill ${this.currentRadius == 5 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(5, '${containerId}')">5 km ★ Ideal</button>
               <button type="button" class="radar-radius-pill ${this.currentRadius == 10 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(10, '${containerId}')">10 km</button>
               <button type="button" class="radar-radius-pill ${this.currentRadius >= 999 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(999, '${containerId}')">Semua Wilayah</button>
             </div>
           </div>
 
           <!-- Location Search -->
-          <div style="display:flex; align-items:center; gap:6px; flex:1; max-width:320px; min-width:220px;">
-            <div style="position:relative; width:100%;">
-              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#94a3b8;"></i>
-              <input type="text" id="salesLocationSearchInput" placeholder="Ketik lokasi / patokan Anda..." style="width:100%; padding:7px 10px 7px 30px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:11.5px; outline:none; background:#f8fafc;" onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
+          <div class="radar-search-wrap">
+            <div class="radar-search-input-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="salesLocationSearchInput" class="radar-search-input" placeholder="Ketik lokasi / patokan Anda..." onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
             </div>
-            <button type="button" onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)" style="padding:7px 14px; background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap;">
-              Cari
+            <button type="button" class="btn-radar-search" onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)">
+              Cari Lokasi
             </button>
           </div>
         </div>
 
+        <!-- Quick Landmark Shortcut Chips for Bandung -->
+        <div class="radar-quick-landmarks">
+          <span style="font-size:11px; font-weight:800; color:#64748b; margin-right:4px;">
+            <i class="fa-solid fa-map-pin" style="color:#2563eb;"></i> Akses Cepat Area:
+          </span>
+          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('kircon')">📍 Kiara Condong (Dealer)</button>
+          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('buahbatu')">📍 Buah Batu</button>
+          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('antapani')">📍 Antapani</button>
+          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('batununggal')">📍 Batununggal</button>
+          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('gedebage')">📍 Gedebage</button>
+          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('dago')">📍 Dago</button>
+        </div>
+
         <!-- Interactive Map Container -->
-        <div style="border-radius:14px; overflow:hidden; border:1px solid #cbd5e1; position:relative; height:440px; box-shadow:0 4px 15px rgba(0,0,0,0.04);">
+        <div class="radar-map-outer">
           <div id="radarLeafletMapContainer" style="width:100%; height:100%;"></div>
         </div>
       </div>
 
       <!-- Radar Lead Cards Container -->
       <div id="radarLeadsContainer">
-        <div style="text-align:center; padding:40px 20px; background:#fff; border-radius:18px; border:1px solid #e2e8f0;">
-          <div style="width:40px; height:40px; border-radius:50%; border:3px solid #2563eb; border-top-color:transparent; animation:radar-spin 1s linear infinite; margin:0 auto 12px;"></div>
-          <p style="font-size:12.5px; font-weight:700; color:#334155; margin:0;">Memuat titik koordinat peta &amp; database customer...</p>
+        <div class="radar-empty-state">
+          <div class="radar-empty-icon" style="color:#2563eb;">
+            <i class="fa-solid fa-satellite fa-spin" style="animation-duration:3s;"></i>
+          </div>
+          <h4 class="radar-empty-title">Memuat Peta Radar &amp; Database Pelanggan...</h4>
+          <p class="radar-empty-desc">Mengalkulasi jarak titik koordinat posisi Anda ke seluruh pelanggan.</p>
         </div>
       </div>
     `;
@@ -146,7 +285,7 @@ const SalesSuperpowers = {
     if (this.salesCoords) {
       const badge = document.getElementById('radarGpsStatus');
       const accText = this.gpsAccuracy ? ` • Akurasi ±${Math.round(this.gpsAccuracy)}m` : '';
-      if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Set (${this.salesCoords.lat.toFixed(3)}, ${this.salesCoords.lng.toFixed(3)})${accText}`;
+      if (badge) badge.innerHTML = `<span class="live-dot-pulse"></span> <span>Terkunci (${this.salesCoords.lat.toFixed(3)}, ${this.salesCoords.lng.toFixed(3)})${accText}</span>`;
       this.fetchRadarData(this.salesCoords.lat, this.salesCoords.lng, this.currentRadius, district);
       return;
     }
@@ -164,13 +303,13 @@ const SalesSuperpowers = {
         this.gpsAccuracy = acc;
         const badge = document.getElementById('radarGpsStatus');
         const accText = acc > 0 ? ` • Akurasi ±${acc}m` : '';
-        if (badge) badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> GPS Terkunci (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})${accText}`;
+        if (badge) badge.innerHTML = `<span class="live-dot-pulse"></span> <span>GPS Terkunci (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})${accText}</span>`;
         this.fetchRadarData(pos.coords.latitude, pos.coords.longitude, this.currentRadius, district);
       },
       (err) => {
         console.warn('GPS error, using fallback', err);
         const badge = document.getElementById('radarGpsStatus');
-        if (badge) badge.innerHTML = `<i class="fa-solid fa-building"></i> Posisi: Kiara Condong`;
+        if (badge) badge.innerHTML = `<span class="live-dot-pulse" style="background:#f59e0b;"></span> <span>Posisi: Kiara Condong</span>`;
         this.fetchRadarData(-6.9248, 107.6472, this.currentRadius, district);
       },
       { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
@@ -187,14 +326,14 @@ const SalesSuperpowers = {
     const badge = document.getElementById('radarGpsStatus');
     const accText = this.gpsAccuracy ? ` • Akurasi ±${Math.round(this.gpsAccuracy)}m` : '';
     if (badge) {
-      badge.innerHTML = `<i class="fa-solid fa-location-dot" style="color:#4ade80;"></i> Lokasi Terkunci (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})${accText}`;
+      badge.innerHTML = `<span class="live-dot-pulse"></span> <span>Terkunci (${parseFloat(lat).toFixed(3)}, ${parseFloat(lng).toFixed(3)})${accText}</span>`;
     }
 
     this.fetchRadarData(lat, lng, this.currentRadius, this.currentDistrict);
 
     if (typeof showCustomAlert === 'function') {
       const accDetail = this.gpsAccuracy ? ` (Akurasi Satelit ±${Math.round(this.gpsAccuracy)}m)` : '';
-      showCustomAlert('Lokasi Diperbarui', `Posisi GPS Sales diset ke (${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})${accDetail}`, 'success');
+      showCustomAlert('Lokasi Diperbarui', `Pusat Radar diset ke ${label || `(${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})`}${accDetail}`, 'success');
     }
   },
 
@@ -339,6 +478,18 @@ const SalesSuperpowers = {
 
   handleRadiusChange(radiusVal, containerId) {
     this.currentRadius = parseFloat(radiusVal) || 5;
+    
+    // Update active class on pills immediately for snappy responsiveness
+    const pills = document.querySelectorAll('.radar-radius-pill');
+    pills.forEach(p => {
+      const val = p.getAttribute('onclick') || '';
+      if (val.includes(`(${radiusVal},`)) {
+        p.classList.add('active');
+      } else {
+        p.classList.remove('active');
+      }
+    });
+
     this.fetchRadarData(
       this.salesCoords ? this.salesCoords.lat : -6.9248,
       this.salesCoords ? this.salesCoords.lng : 107.6472,
@@ -379,12 +530,12 @@ const SalesSuperpowers = {
 
       if (result.status !== 'success' || !result.data || result.data.length === 0) {
         listContainer.innerHTML = `
-          <div style="text-align:center; padding:40px 20px; background:#fff; border-radius:18px; border:1.5px dashed #cbd5e1; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
-            <div style="width:60px; height:60px; border-radius:50%; background:#f1f5f9; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:24px;">
-              <i class="fa-solid fa-location-crosshairs"></i>
+          <div class="radar-empty-state">
+            <div class="radar-empty-icon">
+              <i class="fa-solid fa-satellite-dish"></i>
             </div>
-            <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Customer di Ring Radius ${radiusKm < 999 ? radiusKm + ' km' : ''}</h4>
-            <p style="font-size:12.5px; color:#64748b; margin:0;">Coba perbesar Ring Radius atau pilih wilayah lain di atas.</p>
+            <h4 class="radar-empty-title">Tidak Ada Customer di Ring Radius ${radiusKm < 999 ? radiusKm + ' km' : ''}</h4>
+            <p class="radar-empty-desc">Coba perluas Ring Radius (misal 5 km atau 10 km) atau pilih lokasi landmark lain di atas.</p>
           </div>
         `;
         this.radarData = [];
@@ -414,51 +565,62 @@ const SalesSuperpowers = {
     const salesLat = this.salesCoords ? this.salesCoords.lat : centerLat;
     const salesLng = this.salesCoords ? this.salesCoords.lng : centerLng;
 
-    const map = L.map('radarLeafletMapContainer').setView([salesLat, salesLng], 14);
+    const map = L.map('radarLeafletMapContainer', {
+      zoomControl: true,
+      attributionControl: true
+    }).setView([salesLat, salesLng], 14);
     this.leafletMap = map;
 
     // Google Maps Tile Layers
     const gmapsRoadmap = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-      attribution: '&copy; Google Maps & Tunas Toyota Kircon'
+      attribution: '&copy; Google Maps &amp; Tunas Toyota Kircon'
     });
 
     const gmapsHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-      attribution: '&copy; Google Maps & Tunas Toyota Kircon'
+      attribution: '&copy; Google Maps &amp; Tunas Toyota Kircon'
     });
 
-    // Add Google Maps Roadmap Layer as Default
+    // Default layer: Roadmap
     gmapsRoadmap.addTo(map);
 
     // Layer Switcher for Google Maps View
     L.control.layers({
-      "🗺️ Google Maps (Jalan)": gmapsRoadmap,
-      "🛰️ Google Maps (Satelit)": gmapsHybrid
-    }).addTo(map);
+      "🗺️ Google Roadmap": gmapsRoadmap,
+      "🛰️ Google Satelit": gmapsHybrid
+    }, null, { position: 'topright' }).addTo(map);
 
-    // Sales Location Pin (Center of Radar, Draggable!)
+    // Sales Location Pin (Center of Radar, Draggable Beacon)
     const salesIcon = L.divIcon({
-      className: 'sales-gps-pin',
-      html: `<div style="background:#d7123a; width:24px; height:24px; border-radius:50%; border:3px solid #ffffff; box-shadow:0 0 14px rgba(215,18,58,0.9); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; cursor:grab;"><i class="fa-solid fa-location-dot"></i></div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
+      className: 'radar-sales-beacon-icon',
+      html: `
+        <div class="radar-sales-beacon-wrap">
+          <div class="radar-beacon-aura"></div>
+          <div class="radar-beacon-core">
+            <i class="fa-solid fa-crosshairs"></i>
+          </div>
+        </div>
+      `,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
+      popupAnchor: [0, -18]
     });
 
     const salesMarker = L.marker([salesLat, salesLng], {
       icon: salesIcon,
-      title: '📍 Lokasi Saya (Geser Pin Ini ke posisi Anda)',
+      title: '📍 Posisi Saya (Geser Pin Ini ke posisi Anda)',
       draggable: true
     }).addTo(map);
 
-    // Draw precision accuracy radius aura (blue glow) if accuracy available (< 300m)
-    if (this.gpsAccuracy && this.gpsAccuracy > 0 && this.gpsAccuracy < 300) {
+    // Draw precision accuracy radius aura (blue glow) if accuracy available (< 500m)
+    if (this.gpsAccuracy && this.gpsAccuracy > 0 && this.gpsAccuracy < 500) {
       L.circle([salesLat, salesLng], {
-        color: '#38bdf8',
+        color: '#0284c7',
         fillColor: '#38bdf8',
-        fillOpacity: 0.15,
+        fillOpacity: 0.12,
         weight: 1.5,
         radius: this.gpsAccuracy
       }).addTo(map);
@@ -466,10 +628,13 @@ const SalesSuperpowers = {
 
     const accPopupLabel = this.gpsAccuracy ? `Akurasi Satelit: ±${Math.round(this.gpsAccuracy)} meter` : 'Pusat Ring Radar GPS';
     salesMarker.bindPopup(`
-      <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:12px; text-align:center; padding:4px;">
-        <b style="color:#d7123a; font-size:13px;">📍 Lokasi Saya (Sales)</b><br>
+      <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:12px; text-align:center; padding:6px; min-width:180px;">
+        <div style="font-size:10px; font-weight:800; color:#d7123a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
+          <i class="fa-solid fa-bullseye"></i> Titik Pusat Radar
+        </div>
+        <b style="color:#0f172a; font-size:13.5px;">📍 Lokasi Sales (Anda)</b><br>
         <span style="color:#0369a1; font-weight:700; font-size:11px;"><i class="fa-solid fa-satellite-dish"></i> ${accPopupLabel}</span><br>
-        <div style="margin-top:6px; background:#f0fdf4; border:1px solid #bbf7d0; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700; color:#15803d;">
+        <div style="margin-top:8px; background:#eff6ff; border:1px solid #bfdbfe; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; color:#1d4ed8;">
           💡 Geser (drag) pin ini jika posisi Anda ingin diatur manual!
         </div>
       </div>
@@ -477,27 +642,25 @@ const SalesSuperpowers = {
 
     salesMarker.on('dragend', (e) => {
       const newPos = e.target.getLatLng();
-      SalesSuperpowers.setManualSalesCoords(newPos.lat, newPos.lng, 'Pin Geser');
+      SalesSuperpowers.setManualSalesCoords(newPos.lat, newPos.lng, 'Pin Geser Peta');
     });
 
     // DRAW VISUAL RADIUS CIRCLE (RING RADIUS)
-    const radiusSelect = document.getElementById('radarRadiusSelect');
-    const currentRadiusKm = radiusSelect ? parseFloat(radiusSelect.value) : (this.currentRadius || 1);
-    this.currentRadius = currentRadiusKm;
+    const currentRadiusKm = this.currentRadius || 5;
 
     if (currentRadiusKm < 500) {
       const radiusMeters = currentRadiusKm * 1000;
       const radiusCircle = L.circle([salesLat, salesLng], {
-        color: '#d7123a',
-        fillColor: '#f43f5e',
-        fillOpacity: 0.12,
-        weight: 2.5,
-        dashArray: '8, 8',
+        color: '#2563eb',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.08,
+        weight: 2,
+        dashArray: '6, 6',
         radius: radiusMeters
       }).addTo(map);
 
       // Fit bounds to circle ring radius so user clearly sees the ring and all customer points inside
-      map.fitBounds(radiusCircle.getBounds(), { padding: [30, 30], maxZoom: 16 });
+      map.fitBounds(radiusCircle.getBounds(), { padding: [35, 35], maxZoom: 16 });
     }
 
     // STRICT CUSTOMER FILTER INSIDE RING RADIUS ONLY
@@ -509,37 +672,92 @@ const SalesSuperpowers = {
 
     // Customer Pins
     filteredLeads.forEach(c => {
-      let pinColor = '#3b82f6';
-      if (c.status === 'Belum Dihubungi') pinColor = '#d7123a';
-      else if (c.status === 'Menunggu Respon') pinColor = '#f59e0b';
-      else if (c.status === 'Tertarik / Jadwal Servis') pinColor = '#8b5cf6';
-      else if (c.status === 'Deal / Selesai') pinColor = '#10b981';
+      let pinBg = '#ef4444'; // Belum Dihubungi
+      let pinIcon = 'fa-car';
+      if (c.status === 'Deal / Selesai') {
+        pinBg = '#10b981';
+        pinIcon = 'fa-check';
+      } else if (c.status === 'Tertarik / Jadwal Servis') {
+        pinBg = '#8b5cf6';
+        pinIcon = 'fa-calendar';
+      } else if (c.status === 'Menunggu Respon') {
+        pinBg = '#f59e0b';
+        pinIcon = 'fa-clock';
+      }
 
       const customIcon = L.divIcon({
-        className: 'custom-leaflet-pin',
-        html: `<div style="background:${pinColor}; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 3px 8px rgba(0,0,0,0.4);"></div>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
+        className: 'radar-leaflet-pin-wrap',
+        html: `
+          <div class="radar-map-marker-pin" style="background:${pinBg};">
+            <i class="fa-solid ${pinIcon}"></i>
+          </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -14]
       });
 
       const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
+      const initials = (c.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+      const distLabel = c.formatted_distance || (c.distance_km + ' km');
+
+      const waHref = c.phone && c.phone !== '-'
+        ? `https://wa.me/${c.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + c.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda kanvasing di sekitar ' + (c.district || 'area Bapak/Ibu') + '. Apakah ada waktu luang sebentar jika saya mampir untuk update info promo atau konsultasi unit Toyota?')}`
+        : '';
 
       const popupHtml = `
-        <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size:12px; line-height:1.4; padding:4px;">
-          <b style="font-size:13.5px; color:#0f172a;">${escapeHtml(c.name)}</b>
-          <div style="color:#64748b; font-size:11px; margin-top:2px;"><i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)} (${c.formatted_distance || (c.distance_km + ' km')})</div>
-          <div style="margin-top:4px;">🚗 <b>${escapeHtml(c.car_model)}</b></div>
-          <div style="margin-top:4px;">Status: <b style="color:${pinColor};">${escapeHtml(c.status)}</b></div>
-          ${c.visit_photo ? `<div style="margin-top:6px;"><img src="${c.visit_photo}" style="width:100%; max-height:100px; object-fit:cover; border-radius:8px;"></div>` : ''}
-          <div style="margin-top:8px; display:flex; gap:6px;">
-            <button onclick="SalesSuperpowers.openRadarFollowupModal(${c.id})" style="background:#10b981; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11px; cursor:pointer;"><i class="fa-solid fa-clipboard-check"></i> Follow Up</button>
-            <a href="${navUrl}" target="_blank" style="background:#ea4335; color:#fff; text-decoration:none; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-map-location-dot"></i> G-Maps Navigasi</a>
+        <div class="radar-popup-card">
+          <div class="radar-popup-header">
+            <div class="radar-popup-avatar" style="background:${pinBg};">${escapeHtml(initials)}</div>
+            <div>
+              <h4 class="radar-popup-name">${escapeHtml(c.name)}</h4>
+              <div class="radar-popup-dist">
+                <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)} 
+                <span class="radar-popup-dist-pill">${distLabel}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="radar-popup-car-box">
+            <div style="font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-car-side" style="color:#2563eb;"></i> ${escapeHtml(c.car_model || 'Toyota')}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
+              <span style="color:#64748b;">Status: <b style="color:${pinBg};">${escapeHtml(c.status)}</b></span>
+              <span style="color:#d7123a; font-weight:800;">${escapeHtml(c.priority || 'Warm')}</span>
+            </div>
+          </div>
+
+          <div class="radar-popup-actions">
+            ${waHref ? `
+              <a href="${waHref}" target="_blank" class="btn-popup-wa">
+                <i class="fa-brands fa-whatsapp"></i> WA
+              </a>
+            ` : ''}
+            <a href="${navUrl}" target="_blank" class="btn-popup-maps">
+              <i class="fa-solid fa-diamond-turn-right"></i> Maps
+            </a>
+            <button onclick="SalesSuperpowers.openRadarFollowupModal(${c.id})" class="btn-popup-fu">
+              <i class="fa-solid fa-clipboard-check"></i> FU
+            </button>
           </div>
         </div>
       `;
 
-      L.marker([c.lat, c.lng], { icon: customIcon }).addTo(map).bindPopup(popupHtml);
+      const marker = L.marker([c.lat, c.lng], { icon: customIcon }).addTo(map).bindPopup(popupHtml);
+      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${distLabel}`, { direction: 'top', offset: [0, -12] });
     });
+
+    // Add Map Legend Overlay
+    const legendEl = document.createElement('div');
+    legendEl.className = 'radar-map-legend-overlay';
+    legendEl.innerHTML = `
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#ef4444;"></span> Belum FU</span>
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f59e0b;"></span> Menunggu</span>
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#8b5cf6;"></span> Tertarik</span>
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#10b981;"></span> Selesai</span>
+    `;
+    mapEl.appendChild(legendEl);
   },
 
   renderRadarLeadCards(leads) {
@@ -555,73 +773,95 @@ const SalesSuperpowers = {
 
     if (!filteredLeads || filteredLeads.length === 0) {
       listContainer.innerHTML = `
-        <div style="text-align:center; padding:35px 20px; background:#fff; border-radius:18px; border:1.5px dashed #cbd5e1; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
-          <div style="width:54px; height:54px; border-radius:50%; background:#fef2f2; color:#ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:22px;">
-            <i class="fa-solid fa-bullseye"></i>
+        <div class="radar-empty-state">
+          <div class="radar-empty-icon">
+            <i class="fa-solid fa-satellite-dish"></i>
           </div>
-          <h4 style="font-size:15px; font-weight:900; color:#0f172a; margin:0 0 6px;">Tidak Ada Customer di Ring Radius ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : ''}</h4>
-          <p style="font-size:12.5px; color:#64748b; margin:0;">Coba perbesar Ring Radius (misal 3km, 5km, 10km) atau ubah pilihan wilayah di atas.</p>
+          <h4 class="radar-empty-title">Tidak Ada Customer di Ring Radius ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : ''}</h4>
+          <p class="radar-empty-desc">Coba perluas Ring Radius (misal 5 km atau 10 km) atau pilih lokasi landmark lain di atas.</p>
         </div>
       `;
       return;
     }
 
     let html = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-        <span style="font-size:13px; font-weight:800; color:#334155;">
-          🎯 Ditemukan <b style="color:#d7123a;">${filteredLeads.length} Customer Radar</b> dalam Ring Radius ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : ''}
-        </span>
+      <div class="radar-leads-header-bar">
+        <div>
+          <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-bullseye" style="color:#d7123a;"></i> 
+            Daftar Pelanggan Terdekat 
+            <span class="radar-count-badge">${filteredLeads.length} Customer</span>
+          </h4>
+          <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
+            Diurutkan dari jarak terdekat ke posisi GPS Anda (Ring Radius: ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : 'Semua Wilayah'}).
+          </p>
+        </div>
+        <div style="position:relative; min-width:220px;">
+          <i class="fa-solid fa-filter" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#94a3b8;"></i>
+          <input type="text" placeholder="Cari nama / mobil / area..." class="radar-card-filter-input" oninput="SalesSuperpowers.filterRadarLeads(this.value)">
+        </div>
       </div>
       <div class="radar-leads-grid">
     `;
 
     filteredLeads.forEach((item) => {
       const initials = (item.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+      let statusColor = '#ef4444';
+      if (item.status === 'Deal / Selesai') statusColor = '#10b981';
+      else if (item.status === 'Tertarik / Jadwal Servis') statusColor = '#8b5cf6';
+      else if (item.status === 'Menunggu Respon') statusColor = '#f59e0b';
+
+      const waHref = item.phone && item.phone !== '-'
+        ? `https://wa.me/${item.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + item.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda kanvasing di sekitar ' + (item.district || 'area Bapak/Ibu') + '. Apakah ada waktu luang sebentar jika saya mampir untuk update info promo atau konsultasi unit Toyota?')}`
+        : '';
 
       html += `
-        <div class="radar-lead-card-deluxe" style="background:#fff; border-radius:16px; border:1px solid #e2e8f0; padding:16px; margin-bottom:14px; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+        <div class="radar-lead-card-deluxe" style="border-left: 4px solid ${statusColor};">
           <div>
-            <div class="radar-card-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-              <div class="radar-customer-profile" style="display:flex; align-items:center; gap:10px;">
-                <div class="radar-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#0d1b3e; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px;">${initials}</div>
+            <div class="radar-card-header">
+              <div class="radar-customer-profile">
+                <div class="radar-avatar-circle" style="background:#0f172a;">${initials}</div>
                 <div>
-                  <h4 class="radar-customer-name" style="font-size:14.5px; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(item.name)}</h4>
-                  <div class="radar-district-tag" style="font-size:11.5px; color:#64748b; margin-top:2px;">
+                  <h4 class="radar-customer-name">${escapeHtml(item.name)}</h4>
+                  <div class="radar-district-tag">
                     <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(item.district)}
                   </div>
                 </div>
               </div>
-              <div style="text-align:right;">
-                <span class="radar-dist-chip" style="background:#eff6ff; color:#2563eb; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px;">
-                  <i class="fa-solid fa-route"></i> ${item.formatted_distance}
-                </span>
+              <div class="radar-dist-chip">
+                <i class="fa-solid fa-route"></i> ${item.formatted_distance || (item.distance_km + ' km')}
               </div>
             </div>
 
-            <div class="radar-vehicle-box" style="background:#f8fafc; padding:10px 12px; border-radius:10px; font-size:12px; margin-bottom:12px;">
+            <div class="radar-vehicle-box">
               <div class="radar-vehicle-row">
-                <i class="fa-solid fa-car-side" style="color:#d7123a; margin-right:6px;"></i>
-                <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model)}</span></span>
+                <i class="fa-solid fa-car-side" style="color:#d7123a;"></i>
+                <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model || 'Toyota')}</span></span>
               </div>
-              <div style="margin-top:4px; font-size:11.5px; color:#64748b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
-                <span>Prioritas: <b style="color:#d7123a;">${escapeHtml(item.priority || 'Prioritas Trade-in')}</b></span>
-                <span>Status: <b style="color:#2563eb;">${escapeHtml(item.status || 'Belum Dihubungi')}</b></span>
+              <div class="radar-tags-row">
+                <span class="radar-tag priority-${(item.priority||'').toLowerCase()}">Prioritas: <b>${escapeHtml(item.priority || 'Warm')}</b></span>
+                <span class="radar-tag status-tag" style="color:${statusColor}; background:${statusColor}15; border-color:${statusColor}30;">${escapeHtml(item.status || 'Belum Dihubungi')}</span>
               </div>
               ${item.visit_photo ? `
                 <div style="margin-top:8px;">
                   <span style="font-size:11px; font-weight:800; color:#059669; display:block; margin-bottom:3px;"><i class="fa-solid fa-camera"></i> Bukti Kunjungan:</span>
-                  <img src="${item.visit_photo}" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px;">
+                  <img src="${item.visit_photo}" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;">
                 </div>
               ` : ''}
             </div>
           </div>
 
-          <div class="radar-action-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <a href="${item.maps_url}" target="_blank" class="btn-radar-map" style="background:#2563eb; color:#fff; text-align:center; padding:8px; border-radius:8px; text-decoration:none; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; justify-content:center; gap:4px;">
-              <i class="fa-solid fa-map-location-dot"></i> Rute Maps
+          <div class="radar-action-grid">
+            <a href="${item.maps_url}" target="_blank" class="btn-radar-map" title="Buka rute navigasi Google Maps">
+              <i class="fa-solid fa-diamond-turn-right"></i> Rute Maps
             </a>
-            <button type="button" class="btn-radar-wa" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border:none; padding:8px; border-radius:8px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; justify-content:center; gap:4px; cursor:pointer;" onclick="SalesSuperpowers.openRadarFollowupModal(${item.id})">
-              <i class="fa-solid fa-clipboard-check"></i> Follow Up &amp; Foto
+            ${waHref ? `
+              <a href="${waHref}" target="_blank" class="btn-radar-wa-direct" title="Chat WhatsApp Customer">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+              </a>
+            ` : ''}
+            <button type="button" class="btn-radar-fu" onclick="SalesSuperpowers.openRadarFollowupModal(${item.id})" title="Catat hasil follow-up & foto">
+              <i class="fa-solid fa-clipboard-check"></i> Catat FU
             </button>
           </div>
         </div>
