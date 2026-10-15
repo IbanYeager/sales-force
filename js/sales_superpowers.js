@@ -107,6 +107,28 @@ const SalesSuperpowers = {
       #radarLeafletMapContainer { cursor: default; }
       .radar-sales-beacon-icon { background: transparent !important; border: none !important; }
       .radar-sales-beacon-wrap { position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+      @media (max-width: 640px) {
+        .radar-cockpit-wrapper { padding: 14px 12px !important; border-radius: 16px !important; }
+        .radar-cockpit-header { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
+        .radar-header-left { gap: 10px !important; }
+        .radar-header-title { font-size: 15px !important; }
+        .radar-header-right { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 8px !important; }
+        .radar-gps-live-badge { width: 100% !important; justify-content: center !important; text-align: center !important; box-sizing: border-box !important; }
+        .radar-header-btn-row { display: grid !important; grid-template-columns: 1fr 1fr !important; width: 100% !important; gap: 8px !important; }
+        .btn-radar-dealer, .btn-radar-detect { width: 100% !important; justify-content: center !important; padding: 8px 10px !important; font-size: 11px !important; }
+        .radar-controls-strip { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
+        .radar-radius-section { width: 100% !important; }
+        .radar-radius-pill-group { display: flex !important; width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; }
+        .radar-radius-pill-group::-webkit-scrollbar { display: none !important; }
+        .radar-radius-pill { flex: 1 0 auto !important; padding: 6px 10px !important; text-align: center !important; font-size: 11px !important; }
+        .radar-search-wrap { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
+        .radar-quick-landmarks { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 6px !important; margin-bottom: 10px !important; scrollbar-width: none !important; }
+        .radar-quick-landmarks::-webkit-scrollbar { display: none !important; }
+        .radar-landmark-chip { flex-shrink: 0 !important; white-space: nowrap !important; font-size: 10.5px !important; padding: 4px 8px !important; }
+        .radar-map-outer { height: 380px !important; border-radius: 14px !important; }
+        .radar-leads-grid { grid-template-columns: 1fr !important; }
+      }
       .radar-beacon-aura { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(215, 18, 58, 0.35); animation: beacon-expand 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
       @keyframes beacon-expand { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
       .radar-beacon-core { position: relative; z-index: 2; width: 26px; height: 26px; border-radius: 50%; background: #d7123a; border: 3px solid #ffffff; box-shadow: 0 0 14px rgba(215, 18, 58, 0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 11px; }
@@ -236,12 +258,14 @@ const SalesSuperpowers = {
               <span class="live-dot-pulse"></span>
               <span id="radarGpsStatusText">📍 ${escapeHtml(currentLocLabel)}</span>
             </div>
-            <button type="button" class="btn-radar-dealer" onclick="SalesSuperpowers.quickSetLocation('kircon')" title="Set posisi tepat ke Dealer Tunas Toyota Kiara Condong">
-              <i class="fa-solid fa-building-flag"></i> Dealer Kircon
-            </button>
-            <button type="button" class="btn-radar-detect" onclick="SalesSuperpowers.requestHighAccuracyGPS()" title="Deteksi koordinat GPS satelit perangkat HP">
-              <i class="fa-solid fa-location-crosshairs"></i> Deteksi Ulang GPS
-            </button>
+            <div class="radar-header-btn-row" style="display:flex; gap:8px;">
+              <button type="button" class="btn-radar-dealer" onclick="SalesSuperpowers.quickSetLocation('kircon')" title="Set posisi tepat ke Dealer Tunas Toyota Kiara Condong">
+                <i class="fa-solid fa-building-flag"></i> Dealer Kircon
+              </button>
+              <button type="button" class="btn-radar-detect" onclick="SalesSuperpowers.requestHighAccuracyGPS()" title="Deteksi koordinat GPS satelit perangkat HP">
+                <i class="fa-solid fa-location-crosshairs"></i> Deteksi Ulang GPS
+              </button>
+            </div>
           </div>
         </div>
 

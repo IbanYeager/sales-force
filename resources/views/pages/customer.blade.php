@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -788,6 +788,134 @@
   font-size: 12.5px;
   color: #64748b;
   margin: 0;
+}
+
+/* --- MOBILE & IPHONE XR (≤ 640px) RESPONSIVE OPTIMIZATIONS --- */
+@media (max-width: 640px) {
+  .radar-cockpit-wrapper {
+    padding: 14px 12px !important;
+    border-radius: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  .radar-cockpit-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 12px !important;
+  }
+  .radar-header-left {
+    gap: 10px !important;
+  }
+  .radar-header-title {
+    font-size: 15px !important;
+  }
+  .radar-header-sub {
+    font-size: 11px !important;
+  }
+  .radar-header-right {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .radar-gps-live-badge {
+    width: 100% !important;
+    justify-content: center !important;
+    font-size: 11px !important;
+    padding: 6px 12px !important;
+  }
+  .radar-header-btn-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .radar-header-btn-row .btn-radar-detect {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 8px 10px !important;
+    font-size: 11px !important;
+  }
+  .radar-controls-strip {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .radar-radius-section {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+  .radar-radius-pill-group {
+    display: flex !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 3px !important;
+  }
+  .radar-radius-pill-group::-webkit-scrollbar {
+    display: none !important;
+  }
+  .radar-radius-pill {
+    flex: 1 0 auto !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    text-align: center !important;
+  }
+  .radar-search-wrap {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .radar-quick-landmarks {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 4px !important;
+    margin-bottom: 10px !important;
+    gap: 6px !important;
+  }
+  .radar-quick-landmarks::-webkit-scrollbar {
+    display: none !important;
+  }
+  .radar-landmark-chip {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 10.5px !important;
+    padding: 5px 9px !important;
+  }
+  .radar-map-outer {
+    height: 380px !important;
+    min-height: 380px !important;
+    max-height: 380px !important;
+    border-radius: 14px !important;
+  }
+  #radarMapCanvas {
+    height: 380px !important;
+    min-height: 380px !important;
+  }
+  .radar-map-legend-overlay {
+    bottom: 8px !important;
+    left: 8px !important;
+    padding: 4px 8px !important;
+    gap: 8px !important;
+    font-size: 9.5px !important;
+    max-width: calc(100% - 16px) !important;
+    overflow-x: auto !important;
+  }
+  .radar-leads-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .radar-lead-card-deluxe {
+    padding: 13px !important;
+    border-radius: 14px !important;
+  }
 }
 
 </style>

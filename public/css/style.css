@@ -169,11 +169,12 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     min-height: 100vh;
+    min-height: 100dvh;
     background: transparent;
     position: relative;
     overflow-x: hidden;
     overflow-y: visible;
-    padding-bottom: 130px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 24px));
     box-sizing: border-box;
 }
 

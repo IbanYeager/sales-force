@@ -70,11 +70,11 @@ function initFollowupTabs() {
     const tabsHtml = `
       <div class="followup-nav-tabs" id="followupNavTabs">
         <button class="followup-tab-btn active" id="tabBtnFollowup" onclick="switchCustomerTab('followup')">
-          <i class="fa-solid fa-bullhorn"></i> Database Follow-Up (Attack List)
+          <i class="fa-solid fa-bullhorn"></i> <span>Database Pelanggan</span>
           <span id="followupBadgeCount" style="display:none; font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; background:#d7123a; color:#fff; box-shadow:0 2px 6px rgba(215,18,58,0.4);">0</span>
         </button>
         <button class="followup-tab-btn" id="tabBtnKanban" onclick="switchCustomerTab('kanban')">
-          <i class="fa-solid fa-table-columns"></i> Pipeline Prospek
+          <i class="fa-solid fa-table-columns"></i> <span>Pipeline Prospek</span>
         </button>
       </div>
 
@@ -117,17 +117,17 @@ function initFollowupTabs() {
           </div>
         </div>
 
-        <!-- 1.5 SUB-NAVIGATION: DATABASE FOLLOW-UP vs RADAR GPS (POOL REBUTAN REMOVED) -->
-        <div class="sub-nav-fu-wrapper" id="fuSubNavWrapper" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:16px;">
+        <!-- 1.5 SUB-NAVIGATION: DATABASE FOLLOW-UP vs RADAR GPS -->
+        <div class="sub-nav-fu-wrapper" id="fuSubNavWrapper">
           <button type="button" class="sub-nav-fu-btn active" id="subBtnMyTasks" onclick="switchFollowupSubTab('my_tasks')">
             <i class="fa-solid fa-list-check" style="color:#2563eb;"></i>
-            <span>Database Follow-Up</span>
-            <span id="badgeMyTasksCount" style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:#eff6ff; color:#1d4ed8;">0</span>
+            <span>Database</span>
+            <span id="badgeMyTasksCount" style="font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; background:#eff6ff; color:#1d4ed8;">0</span>
           </button>
           <button type="button" class="sub-nav-fu-btn radar-tab" id="subBtnRadar" onclick="switchFollowupSubTab('radar')">
             <i class="fa-solid fa-map-location-dot" style="color:#dc2626;"></i>
-            <span>Peta Radar GPS Pelanggan</span>
-            <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:rgba(215,18,58,0.12); color:#dc2626; border:1px solid rgba(215,18,58,0.25);">Live Map</span>
+            <span>Radar GPS</span>
+            <span style="font-size:10px; font-weight:800; padding:2px 6px; border-radius:9999px; background:rgba(215,18,58,0.12); color:#dc2626; border:1px solid rgba(215,18,58,0.25);">Live</span>
           </button>
         </div>
 

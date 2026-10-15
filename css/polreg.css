@@ -2286,3 +2286,183 @@
     z-index: 850 !important;
   }
 }
+
+/* ==========================================================================
+   MOBILE & IPHONE XR (≤ 640px) POLREG RESPONSIVE OPTIMIZATIONS
+   ========================================================================== */
+@media (max-width: 640px) {
+  .polreg-hero-banner {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+    margin-bottom: 14px !important;
+  }
+  .polreg-hero-title {
+    font-size: 16px !important;
+    gap: 6px !important;
+  }
+  .polreg-hero-desc {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+  .polreg-hero-pills {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 6px !important;
+    margin-top: 10px !important;
+    padding-bottom: 3px !important;
+  }
+  .polreg-hero-pills::-webkit-scrollbar {
+    display: none !important;
+  }
+  .polreg-hero-pill {
+    flex-shrink: 0 !important;
+    padding: 4px 10px !important;
+    font-size: 10.5px !important;
+    border-radius: 8px !important;
+  }
+  .polreg-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+  }
+  .polreg-kpi-card {
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+  }
+  .polreg-kpi-info .lbl {
+    font-size: 9.5px !important;
+    margin-bottom: 2px !important;
+  }
+  .polreg-kpi-info .val {
+    font-size: 17px !important;
+  }
+  .polreg-kpi-info .sub {
+    font-size: 9px !important;
+  }
+  .polreg-kpi-icon {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+  }
+  .polreg-control-panel {
+    padding: 12px 10px !important;
+    border-radius: 14px !important;
+    margin-bottom: 14px !important;
+  }
+  .polreg-filter-pills {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    gap: 6px !important;
+    padding-bottom: 4px !important;
+  }
+  .polreg-filter-pills::-webkit-scrollbar {
+    display: none !important;
+  }
+  .polreg-pill-btn {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+  }
+  .polreg-select-group {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+  }
+  .polreg-select {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: 11.5px !important;
+    padding: 8px 10px !important;
+  }
+  .polreg-search-box {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .polreg-search-input {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 11.5px !important;
+    padding: 8px 28px 8px 32px !important;
+  }
+  .polreg-search-input:focus {
+    width: 100% !important;
+  }
+  .polreg-search-suggestions {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .polreg-btn-export {
+    width: 100% !important;
+    justify-content: center !important;
+    font-size: 11.5px !important;
+    padding: 8px 12px !important;
+  }
+  .polreg-map-workspace {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+  .polreg-map-card {
+    height: 380px !important;
+    min-height: 380px !important;
+    max-height: 380px !important;
+    border-radius: 14px !important;
+  }
+  #polregLeafletMap,
+  .polreg-map-canvas {
+    height: 380px !important;
+    min-height: 380px !important;
+    max-height: 380px !important;
+  }
+  .polreg-map-header {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: calc(100% - 16px) !important;
+    top: 8px !important;
+    left: 8px !important;
+    padding: 4px 6px !important;
+    gap: 4px !important;
+    border-radius: 10px !important;
+  }
+  .polreg-map-header::-webkit-scrollbar {
+    display: none !important;
+  }
+  .polreg-gmaps-title {
+    font-size: 10.5px !important;
+    padding-right: 5px !important;
+    flex-shrink: 0 !important;
+  }
+  .polreg-layer-btn,
+  .polreg-mode-btn,
+  .polreg-btn-all-poly,
+  .polreg-btn-office {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 10px !important;
+    padding: 3px 6px !important;
+    border-radius: 6px !important;
+  }
+  .polreg-inspector-card {
+    border-radius: 14px !important;
+    padding: 14px 12px !important;
+    max-height: none !important;
+    width: 100% !important;
+  }
+}
+
