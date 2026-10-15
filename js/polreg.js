@@ -1299,13 +1299,8 @@
       });
     }
 
-    // Search input
-    const searchInput = document.getElementById('polregSearchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', () => {
-        applyAllFilters();
-      });
-    }
+    // Initialize Search Autocomplete, Enter Key, Clear button, and Map Zoom
+    initSearchAutocomplete();
 
     // Filter pills
     document.querySelectorAll('.polreg-pill-btn').forEach(btn => {
@@ -1415,6 +1410,188 @@
   }
 
   /**
+   * Search Autocomplete & Instant Zoom to Kecamatan
+   */
+  function initSearchAutocomplete() {
+    const searchInput = document.getElementById('polregSearchInput');
+    const clearBtn = document.getElementById('btnPolregClearSearch');
+    const suggestionsEl = document.getElementById('polregSearchSuggestions');
+    if (!searchInput || !suggestionsEl) return;
+
+    let activeSuggestionIndex = -1;
+
+    function highlightMatch(text, query) {
+      if (!query) return escapeHtml(text);
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return escapeHtml(text);
+      const before = text.substring(0, idx);
+      const match = text.substring(idx, idx + query.length);
+      const after = text.substring(idx + query.length);
+      return `${escapeHtml(before)}<mark>${escapeHtml(match)}</mark>${escapeHtml(after)}`;
+    }
+
+    function renderSuggestions(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        suggestionsEl.innerHTML = '';
+        suggestionsEl.style.display = 'none';
+        if (clearBtn) clearBtn.style.display = 'none';
+        activeSuggestionIndex = -1;
+        return;
+      }
+
+      if (clearBtn) clearBtn.style.display = 'flex';
+
+      const matches = allDistricts.filter(d => {
+        return (
+          d.name.toLowerCase().includes(q) ||
+          (d.regency || '').toLowerCase().includes(q) ||
+          (d.recommendedModel || '').toLowerCase().includes(q) ||
+          (d.modelBadge || '').toLowerCase().includes(q) ||
+          (d.competitor || '').toLowerCase().includes(q) ||
+          (d.zone || '').toLowerCase().includes(q) ||
+          (d.housingKey || '').toLowerCase().includes(q)
+        );
+      });
+
+      // Sort: Name exact prefix comes first, then contains name
+      matches.sort((a, b) => {
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        const aStarts = aName.startsWith(q);
+        const bStarts = bName.startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return 0;
+      });
+
+      if (matches.length === 0) {
+        suggestionsEl.innerHTML = `
+          <div class="polreg-search-empty">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right:4px; color:#ef4444;"></i>
+            Kecamatan "<strong>${escapeHtml(query)}</strong>" tidak ditemukan di Bandung Raya
+          </div>
+        `;
+        suggestionsEl.style.display = 'block';
+        activeSuggestionIndex = -1;
+        return;
+      }
+
+      const displayList = matches.slice(0, 8);
+      let html = '';
+      displayList.forEach((d, idx) => {
+        const shareCls = getShareClass(d.marketShare);
+        const recModel = d.modelBadge || d.recommendedModel || 'Toyota';
+        html += `
+          <div class="polreg-search-suggestion-item" data-id="${d.id}" data-index="${idx}">
+            <div class="polreg-suggestion-main">
+              <span class="polreg-suggestion-name">
+                <i class="fa-solid fa-location-dot" style="color:#cc1426; margin-right:4px; font-size:11px;"></i>
+                ${highlightMatch(d.name, q)}
+              </span>
+              <span class="polreg-suggestion-meta">
+                ${escapeHtml(d.regency || 'Bandung Raya')}${d.zone ? ' • ' + escapeHtml(d.zone) : ''}
+              </span>
+            </div>
+            <div class="polreg-suggestion-badges">
+              <span class="polreg-suggestion-share ${shareCls}">${d.marketShare}%</span>
+              <span class="polreg-suggestion-model"><i class="fa-solid fa-car-side" style="margin-right:2px;"></i>${escapeHtml(recModel)}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      suggestionsEl.innerHTML = html;
+      suggestionsEl.style.display = 'block';
+      activeSuggestionIndex = -1;
+
+      // Item click listener
+      suggestionsEl.querySelectorAll('.polreg-search-suggestion-item').forEach(item => {
+        item.addEventListener('click', function () {
+          const distId = this.getAttribute('data-id');
+          if (distId) {
+            const target = allDistricts.find(d => d.id === distId);
+            if (target) {
+              searchInput.value = target.name;
+            }
+            suggestionsEl.style.display = 'none';
+            selectDistrict(distId, true);
+          }
+        });
+      });
+    }
+
+    searchInput.addEventListener('input', function () {
+      const q = this.value;
+      renderSuggestions(q);
+      applyAllFilters();
+    });
+
+    searchInput.addEventListener('focus', function () {
+      if (this.value.trim().length > 0) {
+        renderSuggestions(this.value);
+      }
+    });
+
+    // Keyboard navigation (ArrowDown, ArrowUp, Enter, Escape)
+    searchInput.addEventListener('keydown', function (e) {
+      const items = suggestionsEl.querySelectorAll('.polreg-search-suggestion-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (items.length > 0) {
+          activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
+          items.forEach((it, i) => it.classList.toggle('active', i === activeSuggestionIndex));
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (items.length > 0) {
+          activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
+          items.forEach((it, i) => it.classList.toggle('active', i === activeSuggestionIndex));
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (activeSuggestionIndex >= 0 && items[activeSuggestionIndex]) {
+          items[activeSuggestionIndex].click();
+        } else {
+          // If no item highlighted, find the first matching district
+          const q = this.value.trim().toLowerCase();
+          if (q) {
+            const firstMatch = allDistricts.find(d =>
+              d.name.toLowerCase().includes(q) ||
+              (d.regency || '').toLowerCase().includes(q)
+            );
+            if (firstMatch) {
+              this.value = firstMatch.name;
+              suggestionsEl.style.display = 'none';
+              selectDistrict(firstMatch.id, true);
+            }
+          }
+        }
+      } else if (e.key === 'Escape') {
+        suggestionsEl.style.display = 'none';
+      }
+    });
+
+    // Clear button
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        suggestionsEl.style.display = 'none';
+        this.style.display = 'none';
+        resetAllPolygonsView();
+        searchInput.focus();
+      });
+    }
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('#polregSearchBox')) {
+        suggestionsEl.style.display = 'none';
+      }
+    });
+  }
+
+  /**
    * Reset All Polygons & View (Show whole Bandung Raya)
    */
   function resetAllPolygonsView() {
@@ -1423,6 +1600,13 @@
     currentRegencyFilter = 'all';
     const searchInput = document.getElementById('polregSearchInput');
     if (searchInput) searchInput.value = '';
+    const clearBtn = document.getElementById('btnPolregClearSearch');
+    if (clearBtn) clearBtn.style.display = 'none';
+    const suggestionsEl = document.getElementById('polregSearchSuggestions');
+    if (suggestionsEl) {
+      suggestionsEl.innerHTML = '';
+      suggestionsEl.style.display = 'none';
+    }
     const selectEl = document.getElementById('polregDistrictSelect');
     if (selectEl) selectEl.value = '';
 
@@ -1450,6 +1634,22 @@
    * Helper: Match District with active Status, Regency, and Search filters
    */
   function isDistrictMatch(d) {
+    const searchQuery = (document.getElementById('polregSearchInput')?.value || '').toLowerCase().trim();
+
+    if (searchQuery) {
+      const matchesSearch =
+        d.name.toLowerCase().includes(searchQuery) ||
+        (d.regency || '').toLowerCase().includes(searchQuery) ||
+        (d.recommendedModel || '').toLowerCase().includes(searchQuery) ||
+        (d.modelBadge || '').toLowerCase().includes(searchQuery) ||
+        (d.competitor || '').toLowerCase().includes(searchQuery) ||
+        (d.zone || '').toLowerCase().includes(searchQuery) ||
+        (d.housingKey || '').toLowerCase().includes(searchQuery);
+
+      if (!matchesSearch) return false;
+      return true;
+    }
+
     if (currentRegencyFilter !== 'all' && d.regencyId !== currentRegencyFilter) {
       return false;
     }
@@ -1465,16 +1665,6 @@
       if (d.marketShare < 35.0) return false;
     }
 
-    const searchQuery = (document.getElementById('polregSearchInput')?.value || '').toLowerCase().trim();
-    if (searchQuery) {
-      const matchesSearch =
-        d.name.toLowerCase().includes(searchQuery) ||
-        (d.regency || '').toLowerCase().includes(searchQuery) ||
-        (d.recommendedModel || '').toLowerCase().includes(searchQuery) ||
-        (d.competitor || '').toLowerCase().includes(searchQuery) ||
-        (d.zone || '').toLowerCase().includes(searchQuery);
-      if (!matchesSearch) return false;
-    }
     return true;
   }
 

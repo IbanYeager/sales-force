@@ -181,9 +181,13 @@
                 <option value="">-- Pilih / Zoom ke Kecamatan (79 Wilayah) --</option>
               </select>
 
-              <div class="polreg-search-box">
+              <div class="polreg-search-box" id="polregSearchBox">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="polregSearchInput" class="polreg-search-input" placeholder="Cari kecamatan, kota, model...">
+                <input type="text" id="polregSearchInput" class="polreg-search-input" placeholder="Cari kecamatan, kota, model..." autocomplete="off">
+                <button type="button" id="btnPolregClearSearch" class="polreg-search-clear-btn" style="display:none;" title="Bersihkan pencarian">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div id="polregSearchSuggestions" class="polreg-search-suggestions" style="display:none;"></div>
               </div>
 
               <button type="button" class="polreg-btn-export" id="btnPolregExportCsv" style="background:#10b981; color:#ffffff; border:none; border-radius:10px; padding:8px 14px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(16,185,129,0.25); white-space:nowrap;" title="Unduh rekap data Polreg 79 kecamatan dalam format CSV">
