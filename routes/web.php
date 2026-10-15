@@ -96,20 +96,34 @@ Route::get('/pages/sph.html', function() { return redirect('/pages/kalkulator.ht
 Route::get('/pages/quotation', function() { return redirect('/pages/kalkulator.html'); });
 Route::get('/pages/quotation.html', function() { return redirect('/pages/kalkulator.html'); });
 
+// Redirect removed sales features to home/dashboard
+$removedSalesPages = [
+    'battle_card', 'order_tracker', 'ai_copilot', 'wa_studio', 'digital_card',
+    'retention', 'delivery_ceremony', 'approval', 'eco_calculator', 'komparasi',
+    'tss-simulator', 'pitstop', 'memory_match', 'game', 'hybrid_flow',
+    'valet_park', 'drag_race'
+];
+
+foreach ($removedSalesPages as $rmPage) {
+    Route::get("/{$rmPage}", function () { return redirect('/'); });
+    Route::get("/{$rmPage}.html", function () { return redirect('/'); });
+    Route::get("/pages/{$rmPage}", function () { return redirect('/'); });
+    Route::get("/pages/{$rmPage}.html", function () { return redirect('/'); });
+}
+
 // Pages Sales (Legacy & Clean URL)
 Route::get('/pages/{page}', [PageController::class, 'showSalesPage'])->name('sales.page');
 
 // Fallback direct route for common sales pages (e.g. /login, /input, /profil)
 $salesPages = [
     'login', 'input', 'spk', 'profil', 'customer', 'ao_report', 'deal', 'do',
-    'dokumen', 'ai_copilot', 'approval', 'balap', 'battle_card', 'brosur', 'catalog', 'catur',
-    'checkin', 'delivery_ceremony', 'digital_card', 'drag_race', 'eco_calculator',
-    'elibrary', 'game', 'hybrid_flow', 'inspeksi', 'inventory', 'jadwal_input',
-    'kalkulator', 'kecamatan', 'komparasi', 'leasing_matrix', 'market_analysis',
-    'merchandise', 'notifikasi', 'olx', 'order_tracker', 'penjualan_kircon', 'pitstop',
-    'polreg', 'polreg_detail', 'pricelist', 'promo', 'public_card', 'rental_testdrive', 'retention',
+    'dokumen', 'balap', 'brosur', 'catalog', 'catur',
+    'checkin', 'elibrary', 'inspeksi', 'inventory', 'jadwal_input',
+    'kalkulator', 'kecamatan', 'leasing_matrix', 'market_analysis',
+    'merchandise', 'notifikasi', 'olx', 'penjualan_kircon',
+    'polreg', 'polreg_detail', 'pricelist', 'promo', 'public_card', 'rental_testdrive',
     'riwayat_foto_aktivitas', 'snake', 'target', 'tco', 'tebak', 'testdrive',
-    'tradein', 'tss-simulator', 'tts', 'valet_park', 'velg', 'video_viral', 'wa_studio',
+    'tradein', 'tts', 'velg', 'video_viral',
     'mtoyota_service', 'mtoyota', 'booking_service'
 ];
 

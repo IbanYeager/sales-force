@@ -42,6 +42,16 @@ class PageController extends Controller
             return $this->index();
         }
 
+        $removedPages = [
+            'battle_card', 'order_tracker', 'ai_copilot', 'wa_studio', 'digital_card',
+            'retention', 'delivery_ceremony', 'approval', 'eco_calculator', 'komparasi',
+            'tss-simulator', 'pitstop', 'memory_match', 'game', 'hybrid_flow',
+            'valet_park', 'drag_race'
+        ];
+        if (in_array($cleanPage, $removedPages)) {
+            return redirect('/');
+        }
+
         if ($cleanPage === 'sph') {
             $cleanPage = 'quotation';
         }

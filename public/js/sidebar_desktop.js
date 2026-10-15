@@ -289,27 +289,17 @@
                 ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Finansial', 'kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf')}
                 ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)', 'stok stock live inventory unit mobil t-stock')}
                 ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar', 'customer crm radar prospek data database')}
-                ${navLink('pages/battle_card.html', 'fa-solid fa-shield-halved', 'Battle Card &amp; Objection', 'battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata')}
                 ${navLink('pages/spk.html', 'fa-solid fa-file-signature', 'Form SPK', 'spk pesanan form surat tanda jadi')}
                 ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor', 'promo diskon paket kredit tenor program')}
-                ${navLink('pages/order_tracker.html', 'fa-solid fa-truck-ramp-box', 'Live Delivery Tracker', 'tracking status mobil tracker delivery')}
 
-                <p class="sidebar-nav-label">Tier 2: AI Tools, Komunikasi & Delivery</p>
-                ${navLink('pages/wa_studio.html', 'fa-brands fa-whatsapp', 'WA Broadcast Studio', 'wa whatsapp broadcast blast pesan template')}
-                ${navLink('pages/ai_copilot.html', 'fa-solid fa-wand-magic-sparkles', 'AI Sales Copilot', 'ai copilot asisten chatbot tanya script closing')}
-                ${navLink('pages/digital_card.html', 'fa-solid fa-address-card', 'Kartu Nama Digital (vCard)', 'kartu nama digital vcard qr kontak profil')}
-                ${navLink('pages/retention.html', 'fa-solid fa-heart-pulse', 'After-Sales & Retention Hub', 'after sales servis stnk bpkb retention loyalitas')}
-                ${navLink('pages/delivery_ceremony.html', 'fa-solid fa-award', 'Digital Delivery Ceremony', 'handover ceremony serah terima piagam')}
+                <p class="sidebar-nav-label">Tier 2: Media, Delivery & Dokumen</p>
                 ${navLink('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio <span class="sidebar-notif-badge" style="background:#c8102e; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>', 'media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
                 ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Pusat Test Drive & Booking', 'test drive uji coba mobil showroom rental rekanan riwayat booking')}
-                ${navLink('pages/approval.html', 'fa-solid fa-check-to-slot', 'Approval Diskon <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>', 'approval diskon persetujuan spv')}
                 ${navLink('pages/dokumen.html', 'fa-solid fa-receipt', 'Manajemen Dokumen', 'dokumen berkas ktp kk berkas leasing')}
 
                 <p class="sidebar-nav-label">Tier 3: Product Knowledge & Pasar</p>
-                ${navLink('pages/eco_calculator.html', 'fa-solid fa-leaf', 'Toyota Eco Calc (Hybrid)', 'eco hybrid bbm hemat emisi')}
-                ${navLink('pages/komparasi.html', 'fa-solid fa-scale-balanced', 'Komparasi Competitor 360°', 'komparasi lawan rival competitor banding')}
                 ${navLink('pages/elibrary.html', 'fa-solid fa-book-open', 'E-Catalog', 'catalog ecatalog e-catalog library brosur pdf spesifikasi mobil')}
                 ${navLink('pages/market_analysis.html', 'fa-solid fa-chart-pie', 'Analisis Pasar & Kanvasing', 'pasar market analisis wilayah pangsa bbn plat kodepos kecamatan komplek')}
                 ${navLink('pages/penjualan_kircon.html', 'fa-solid fa-chart-line', 'Penjualan Kiara Condong', 'penjualan kircon kiara condong rekap cabang')}
@@ -320,19 +310,12 @@
                 ${navLink('pages/velg.html', 'fa-solid fa-compact-disc', 'Velg & Ban Customizer', 'velg ban wheel variasi')}
                 ${navLink('pages/merchandise.html', 'fa-solid fa-shirt', 'Merchandise Toyota', 'merch baju kaos topi gantungan payung jaket')}
 
-                <p class="sidebar-nav-label">Tier 5: Refreshment & Arcade Games</p>
-                ${navLink('pages/game.html', 'fa-solid fa-gamepad', 'Toyota Arcade Center', 'game arcade main santai')}
-                ${navLink('pages/drag_race.html', 'fa-solid fa-gauge-high', 'Toyota Drag Strip', 'drag race balap gr')}
-                ${navLink('pages/valet_park.html', 'fa-solid fa-square-parking', 'Valet Parking VIP', 'valet parkir park')}
-                ${navLink('pages/hybrid_flow.html', 'fa-solid fa-bolt', 'Hybrid Energy Flow', 'hybrid simulator baterai')}
-                ${navLink('pages/pitstop.html', 'fa-solid fa-wrench', 'GR Pit Stop Challenge', 'pit stop montir bengkel ban')}
-                ${navLink('pages/memory_match.html', 'fa-solid fa-clone', 'Toyota Memory Match', 'memory tebak kartu match')}
+                <p class="sidebar-nav-label">Tier 5: Refreshment & Games</p>
                 ${navLink('pages/catur.html', 'fa-solid fa-chess-knight', 'Toyota Catur Master', 'catur chess strategi')}
                 ${navLink('pages/balap.html', 'fa-solid fa-flag-checkered', 'Toyota GR Racing', 'racing balapan sirkuit')}
                 ${navLink('pages/snake.html', 'fa-solid fa-gas-pump', 'Parkir Drift & Fuel Rush', 'snake ular drift pom bensin')}
                 ${navLink('pages/tebak.html', 'fa-solid fa-brain', 'Tebak Otomotif', 'tebak kuis trivia')}
                 ${navLink('pages/tts.html', 'fa-solid fa-puzzle-piece', 'TTS Otomotif', 'tts teka teki silang')}
-                ${navLink('pages/tss-simulator.html', 'fa-solid fa-shield-halved', 'Simulator TSS 3.0', 'tss safety toyota safety sense radar')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -858,19 +841,6 @@
         injectSidebar();
     }
 
-    // Automatically load AI Copilot Assistant Script for Sales pages only
-    (function loadAiCopilotScript() {
-        const pathLower = path.toLowerCase();
-        if (pathLower.includes('login') || pathLower.includes('spv') || pathLower.includes('kacab') || pathLower.includes('pages_spv') || pathLower.includes('pages_kacab') || pathLower.includes('ai_copilot')) {
-            return;
-        }
-        if (window.aiCopilotLoaded || document.querySelector('script[src*="ai_copilot.js"]')) {
-            return;
-        }
-        const script = document.createElement('script');
-        script.src = prefix + 'js/ai_copilot.js?v=20260907_layout_fix';
-        (document.head || document.documentElement).appendChild(script);
-    })();
 
     // Safety fallback to ensure page is always visible
     setTimeout(() => {

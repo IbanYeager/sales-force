@@ -96,35 +96,14 @@
                 <a href="pages/customer.html" class="sidebar-nav-link" data-tags="customer crm radar prospek data database">
                     <i class="fa-solid fa-users"></i> Customer CRM &amp; Radar
                 </a>
-                <a href="pages/battle_card.html" class="sidebar-nav-link" data-tags="battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata">
-                    <i class="fa-solid fa-shield-halved"></i> Battle Card &amp; Objection
-                </a>
                 <a href="pages/spk.html" class="sidebar-nav-link" data-tags="spk pesanan form surat tanda jadi">
                     <i class="fa-solid fa-file-signature"></i> Form SPK
                 </a>
                 <a href="pages/promo.html" class="sidebar-nav-link" data-tags="promo diskon paket kredit tenor program">
                     <i class="fa-solid fa-percent"></i> Promo &amp; Tenor
                 </a>
-                <a href="pages/order_tracker.html" class="sidebar-nav-link" data-tags="tracking status mobil tracker delivery">
-                    <i class="fa-solid fa-truck-ramp-box"></i> Live Delivery Tracker
-                </a>
 
-                <p class="sidebar-nav-label">Tier 2: AI Tools, Komunikasi &amp; Delivery</p>
-                <a href="pages/wa_studio.html" class="sidebar-nav-link" data-tags="wa whatsapp broadcast blast pesan template">
-                    <i class="fa-brands fa-whatsapp"></i> WA Broadcast Studio
-                </a>
-                <a href="pages/ai_copilot.html" class="sidebar-nav-link" data-tags="ai copilot asisten chatbot tanya script closing">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Sales Copilot
-                </a>
-                <a href="pages/digital_card.html" class="sidebar-nav-link" data-tags="kartu nama digital vcard qr kontak profil">
-                    <i class="fa-solid fa-address-card"></i> Kartu Nama Digital (vCard)
-                </a>
-                <a href="pages/retention.html" class="sidebar-nav-link" data-tags="after sales servis stnk bpkb retention loyalitas">
-                    <i class="fa-solid fa-heart-pulse"></i> After-Sales &amp; Retention Hub
-                </a>
-                <a href="pages/delivery_ceremony.html" class="sidebar-nav-link" data-tags="handover ceremony serah terima piagam">
-                    <i class="fa-solid fa-award"></i> Digital Delivery Ceremony
-                </a>
+                <p class="sidebar-nav-label">Tier 2: Media, Delivery &amp; Dokumen</p>
                 <a href="pages/video_viral.html" class="sidebar-nav-link" data-tags="media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase">
                     <i class="fa-solid fa-photo-film" style="color:#c8102e;"></i> Kircon Media Studio <span class="sidebar-notif-badge" style="background:#c8102e; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>
                 </a>
@@ -137,20 +116,11 @@
                 <a href="pages/testdrive.html" class="sidebar-nav-link" data-tags="test drive uji coba mobil showroom rental rekanan riwayat booking">
                     <i class="fa-solid fa-car-side"></i> Pusat Test Drive &amp; Booking
                 </a>
-                <a href="pages/approval.html" class="sidebar-nav-link" data-tags="approval diskon persetujuan spv">
-                    <i class="fa-solid fa-check-to-slot"></i> Approval Diskon <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>
-                </a>
                 <a href="pages/dokumen.html" class="sidebar-nav-link" data-tags="dokumen berkas ktp kk berkas leasing">
                     <i class="fa-solid fa-receipt"></i> Manajemen Dokumen
                 </a>
 
                 <p class="sidebar-nav-label">Tier 3: Product Knowledge &amp; Pasar</p>
-                <a href="pages/eco_calculator.html" class="sidebar-nav-link" data-tags="eco hybrid bbm hemat emisi">
-                    <i class="fa-solid fa-leaf"></i> Toyota Eco Calc (Hybrid)
-                </a>
-                <a href="pages/komparasi.html" class="sidebar-nav-link" data-tags="komparasi lawan rival competitor banding">
-                    <i class="fa-solid fa-scale-balanced"></i> Komparasi Competitor 360°
-                </a>
                 <a href="pages/elibrary.html" class="sidebar-nav-link" data-tags="catalog ecatalog e-catalog library brosur pdf spesifikasi mobil">
                     <i class="fa-solid fa-book-open"></i> E-Catalog
                 </a>
@@ -175,25 +145,7 @@
                     <i class="fa-solid fa-shirt"></i> Merchandise Toyota
                 </a>
 
-                <p class="sidebar-nav-label">Tier 5: Refreshment &amp; Arcade Games</p>
-                <a href="pages/game.html" class="sidebar-nav-link" data-tags="game arcade main santai">
-                    <i class="fa-solid fa-gamepad"></i> Toyota Arcade Center
-                </a>
-                <a href="pages/drag_race.html" class="sidebar-nav-link" data-tags="drag race balap gr">
-                    <i class="fa-solid fa-gauge-high"></i> Toyota Drag Strip
-                </a>
-                <a href="pages/valet_park.html" class="sidebar-nav-link" data-tags="valet parkir park">
-                    <i class="fa-solid fa-square-parking"></i> Valet Parking VIP
-                </a>
-                <a href="pages/hybrid_flow.html" class="sidebar-nav-link" data-tags="hybrid simulator baterai">
-                    <i class="fa-solid fa-bolt"></i> Hybrid Energy Flow
-                </a>
-                <a href="pages/pitstop.html" class="sidebar-nav-link" data-tags="pit stop montir bengkel ban">
-                    <i class="fa-solid fa-wrench"></i> GR Pit Stop Challenge
-                </a>
-                <a href="pages/memory_match.html" class="sidebar-nav-link" data-tags="memory tebak kartu match">
-                    <i class="fa-solid fa-clone"></i> Toyota Memory Match
-                </a>
+                <p class="sidebar-nav-label">Tier 5: Refreshment &amp; Games</p>
                 <a href="pages/catur.html" class="sidebar-nav-link" data-tags="catur chess strategi">
                     <i class="fa-solid fa-chess-knight"></i> Toyota Catur Master
                 </a>
@@ -208,9 +160,6 @@
                 </a>
                 <a href="pages/tts.html" class="sidebar-nav-link" data-tags="tts teka teki silang">
                     <i class="fa-solid fa-puzzle-piece"></i> TTS Otomotif
-                </a>
-                <a href="pages/tss-simulator.html" class="sidebar-nav-link" data-tags="tss safety toyota safety sense radar">
-                    <i class="fa-solid fa-shield-halved"></i> Simulator TSS 3.0
                 </a>
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
@@ -906,10 +855,6 @@
                                 <div class="category-icon"><i class="fa-solid fa-users"></i></div>
                                 <span class="category-text">Customer CRM</span>
                             </a>
-                            <a href="pages/battle_card.html" class="category-item modal-feature-item" data-tags="battle card objection komparasi lawan kompetitor diskon keberatan closing kit senjata">
-                                <div class="category-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                                <span class="category-text">Battle Card</span>
-                            </a>
                             <a href="pages/spk.html" class="category-item modal-feature-item" data-tags="spk pesanan form surat tanda jadi">
                                 <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>
                                 <span class="category-text">Form SPK</span>
@@ -918,43 +863,19 @@
                                 <div class="category-icon"><i class="fa-solid fa-percent"></i></div>
                                 <span class="category-text">Promo &amp; Tenor</span>
                             </a>
-                            <a href="pages/order_tracker.html" class="category-item modal-feature-item" data-tags="tracking status mobil tracker delivery progres">
-                                <div class="category-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
-                                <span class="category-text">Live Tracker</span>
-                            </a>
                             <a href="pages/tradein.html" class="category-item modal-feature-item" data-tags="trade in tukar tambah over kredit mobil bekas inspeksi fisik jadwal appraisal olx riset pasar">
                                 <div class="category-icon"><i class="fa-solid fa-right-left"></i></div>
                                 <span class="category-text">Trade-In Center</span>
                             </a>
 
-                            <!-- SECTION: TIER 2 AI TOOLS, MEDIA HUB & DELIVERY -->
+                            <!-- SECTION: TIER 2 MEDIA HUB, DELIVERY & DOKUMEN -->
                             <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
-                                <i class="fa-solid fa-wand-magic-sparkles" style="color: #8b5cf6;"></i> Tier 2: AI Tools, Media Hub &amp; Delivery
+                                <i class="fa-solid fa-photo-film" style="color: #8b5cf6;"></i> Tier 2: Media, Delivery &amp; Dokumen
                             </div>
 
                             <a href="pages/video_viral.html" class="category-item modal-feature-item" data-tags="media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase viral">
                                 <div class="category-icon" style="background: linear-gradient(135deg, rgba(200,16,46,0.15), rgba(200,16,46,0.05)); color: #c8102e; border: 1px solid rgba(200,16,46,0.3);"><i class="fa-solid fa-photo-film"></i></div>
                                 <span class="category-text">Media Studio</span>
-                            </a>
-                            <a href="pages/wa_studio.html" class="category-item modal-feature-item" data-tags="wa whatsapp broadcast blast pesan template text closing">
-                                <div class="category-icon"><i class="fa-brands fa-whatsapp"></i></div>
-                                <span class="category-text">WA Studio</span>
-                            </a>
-                            <a href="pages/ai_copilot.html" class="category-item modal-feature-item" data-tags="ai copilot asisten chatbot tanya script closing pertanyaan">
-                                <div class="category-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                                <span class="category-text">AI Copilot</span>
-                            </a>
-                            <a href="pages/digital_card.html" class="category-item modal-feature-item" data-tags="kartu nama digital vcard qr kontak profil sales">
-                                <div class="category-icon"><i class="fa-solid fa-address-card"></i></div>
-                                <span class="category-text">Kartu Digital</span>
-                            </a>
-                            <a href="pages/retention.html" class="category-item modal-feature-item" data-tags="after sales servis stnk bpkb retention loyalitas purna jual">
-                                <div class="category-icon"><i class="fa-solid fa-heart-pulse"></i></div>
-                                <span class="category-text">After-Sales Hub</span>
-                            </a>
-                            <a href="pages/delivery_ceremony.html" class="category-item modal-feature-item" data-tags="handover ceremony serah terima piagam sertifikat">
-                                <div class="category-icon"><i class="fa-solid fa-award"></i></div>
-                                <span class="category-text">Delivery Ceremony</span>
                             </a>
                             <a href="pages/mtoyota_service.html" class="category-item modal-feature-item" data-tags="booking service mtoyota m-toyota dec do fs1000 purna jual servis berkala upload foto">
                                 <div class="category-icon" style="background:#ffe4e6; color:#d7123a;"><i class="fa-solid fa-mobile-screen-button"></i></div>
@@ -972,10 +893,6 @@
                                 <div class="category-icon"><i class="fa-solid fa-car-side"></i></div>
                                 <span class="category-text">Test Drive Center</span>
                             </a>
-                            <a href="pages/approval.html" class="category-item modal-feature-item" data-tags="approval diskon persetujuan spv otorisasi">
-                                <div class="category-icon"><i class="fa-solid fa-check-to-slot"></i></div>
-                                <span class="category-text">Approval Diskon</span>
-                            </a>
                             <a href="pages/dokumen.html" class="category-item modal-feature-item" data-tags="dokumen berkas ktp kk berkas leasing upload storage">
                                 <div class="category-icon"><i class="fa-solid fa-receipt"></i></div>
                                 <span class="category-text">Dokumen</span>
@@ -986,14 +903,6 @@
                                 <i class="fa-solid fa-chart-line" style="color: #10b981;"></i> Tier 3: Product Knowledge &amp; Analisis Pasar
                             </div>
 
-                            <a href="pages/eco_calculator.html" class="category-item modal-feature-item" data-tags="eco hybrid bbm hemat emisi efisiensi ev">
-                                <div class="category-icon"><i class="fa-solid fa-leaf"></i></div>
-                                <span class="category-text">Eco Calc (Hybrid)</span>
-                            </a>
-                            <a href="pages/komparasi.html" class="category-item modal-feature-item" data-tags="komparasi lawan rival competitor banding spesifikasi adu fitur">
-                                <div class="category-icon"><i class="fa-solid fa-scale-balanced"></i></div>
-                                <span class="category-text">Komparasi 360°</span>
-                            </a>
                             <a href="pages/elibrary.html" class="category-item modal-feature-item" data-tags="catalog ecatalog e-catalog library brosur pdf spesifikasi mobil">
                                 <div class="category-icon"><i class="fa-solid fa-book-open"></i></div>
                                 <span class="category-text">E-Catalog</span>
@@ -1027,33 +936,9 @@
 
                             <!-- SECTION: TIER 5 REFRESHMENT & ARCADE GAMES -->
                             <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
-                                <i class="fa-solid fa-gamepad" style="color: #ec4899;"></i> Tier 5: Refreshment &amp; Arcade Games (11 Games)
+                                <i class="fa-solid fa-gamepad" style="color: #ec4899;"></i> Tier 5: Refreshment &amp; Games (5 Games)
                             </div>
 
-                            <a href="pages/game.html" class="category-item modal-feature-item" data-tags="game arcade main santai hub">
-                                <div class="category-icon"><i class="fa-solid fa-gamepad"></i></div>
-                                <span class="category-text">Arcade Center</span>
-                            </a>
-                            <a href="pages/drag_race.html" class="category-item modal-feature-item" data-tags="drag race balap gr kecepatan">
-                                <div class="category-icon"><i class="fa-solid fa-gauge-high"></i></div>
-                                <span class="category-text">Toyota Drag Strip</span>
-                            </a>
-                            <a href="pages/valet_park.html" class="category-item modal-feature-item" data-tags="valet parkir park tebak parkir">
-                                <div class="category-icon"><i class="fa-solid fa-square-parking"></i></div>
-                                <span class="category-text">Valet Parking VIP</span>
-                            </a>
-                            <a href="pages/hybrid_flow.html" class="category-item modal-feature-item" data-tags="hybrid flow baterai simulator motor listrik">
-                                <div class="category-icon"><i class="fa-solid fa-bolt"></i></div>
-                                <span class="category-text">Hybrid Flow</span>
-                            </a>
-                            <a href="pages/pitstop.html" class="category-item modal-feature-item" data-tags="pit stop montir bengkel ban cepat">
-                                <div class="category-icon"><i class="fa-solid fa-wrench"></i></div>
-                                <span class="category-text">GR Pit Stop</span>
-                            </a>
-                            <a href="pages/memory_match.html" class="category-item modal-feature-item" data-tags="memory tebak kartu match pasang">
-                                <div class="category-icon"><i class="fa-solid fa-clone"></i></div>
-                                <span class="category-text">Memory Match</span>
-                            </a>
                             <a href="pages/catur.html" class="category-item modal-feature-item" data-tags="catur chess strategi knight pion raja">
                                 <div class="category-icon"><i class="fa-solid fa-chess-knight"></i></div>
                                 <span class="category-text">Catur Master</span>
@@ -1073,10 +958,6 @@
                             <a href="pages/tts.html" class="category-item modal-feature-item" data-tags="tts teka teki silang puzzle kata">
                                 <div class="category-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
                                 <span class="category-text">TTS Otomotif</span>
-                            </a>
-                            <a href="pages/tss-simulator.html" class="category-item modal-feature-item" data-tags="tss safety toyota safety sense radar pre-collision">
-                                <div class="category-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                                <span class="category-text">Simulator TSS</span>
                             </a>
 
                             <!-- SECTION: AKUN & NOTIFIKASI -->
@@ -1513,7 +1394,6 @@
     </div><!-- /desktop-shell -->
 
     <script src="js/sidebar_desktop.js?v={{ time() }}"></script>
-    <script src="js/ai_copilot.js?v=20260907_layout_fix"></script>
     <script src="js/script.js?v=20260908_rank_fix_v19"></script>
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
