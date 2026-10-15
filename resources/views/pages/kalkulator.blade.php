@@ -68,23 +68,88 @@
 
                     <!-- Pilih Model -->
                     <div class="form-group">
-                        <label class="form-label">Pilih Model Mobil Toyota</label>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                            <label class="form-label" style="margin-bottom:0;">Pilih Model Mobil Toyota</label>
+                            <span style="font-size:11px; font-weight:700; color:var(--primary-blue);" id="modelCountBadge"><i class="fa-solid fa-list-check"></i> Memuat katalog...</span>
+                        </div>
+
+                        <!-- Quick Search Box for Models -->
+                        <div style="position:relative; margin-bottom:8px;">
+                            <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:12px; color:#94a3b8; pointer-events:none;"></i>
+                            <input type="text" id="searchModelInput" placeholder="Ketik nama mobil (misal: Zenix, Veloz, Calya, Avanza, Fortuner)..." 
+                                   oninput="filterModelDropdown(this.value)"
+                                   style="width:100%; box-sizing:border-box; padding:9px 12px 9px 36px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:12.5px; font-weight:600; outline:none; background:#f8fafc; transition:all 0.2s;" />
+                        </div>
+
                         <select class="form-select-styled" id="selectModel" onchange="pilihModel()">
                             <option value="">-- Pilih Model Kendaraan --</option>
-                            <option value="263500000|All New Avanza 1.5 G CVT" selected>All New Avanza 1.5 G CVT (Rp 263.500.000)</option>
-                            <option value="304400000|All New Veloz 1.5 Q CVT TSS">All New Veloz 1.5 Q CVT TSS (Rp 304.400.000)</option>
-                            <option value="425000000|Innova Zenix 2.0 G CVT">Innova Zenix 2.0 G CVT (Rp 425.000.000)</option>
-                            <option value="473600000|Innova Zenix 2.0 G Hybrid CVT">Innova Zenix 2.0 G Hybrid CVT (Rp 473.600.000)</option>
-                            <option value="564200000|New Fortuner 2.8 VRZ 4x2 AT">New Fortuner 2.8 VRZ 4x2 AT (Rp 564.200.000)</option>
-                            <option value="360000000|Yaris Cross 1.5 G CVT">Yaris Cross 1.5 G CVT (Rp 360.000.000)</option>
-                            <option value="440600000|Yaris Cross 1.5 S Hybrid CVT">Yaris Cross 1.5 S Hybrid CVT (Rp 440.600.000)</option>
-                            <option value="175000000|New Calya 1.2 G MT">New Calya 1.2 G MT (Rp 175.000.000)</option>
-                            <option value="190000000|All New Agya 1.2 G CVT">All New Agya 1.2 G CVT (Rp 190.000.000)</option>
-                            <option value="252000000|All New Raize 1.0T G CVT">All New Raize 1.0T G CVT (Rp 252.000.000)</option>
-                            <option value="305000000|All New Rush 1.5 S GR Sport AT">All New Rush 1.5 S GR Sport AT (Rp 305.000.000)</option>
-                            <option value="315000000|Hilux Single Cabin 2.4 DSL">Hilux Single Cabin 2.4 DSL (Rp 315.000.000)</option>
-                            <option value="530000000|Hilux Double Cabin 2.4 V AT">Hilux Double Cabin 2.4 V AT (Rp 530.000.000)</option>
-                            <option value="750000000|All New Alphard 2.5 X CVT">All New Alphard 2.5 X CVT (Rp 750.000.000)</option>
+                            <optgroup label="TOYOTA AVANZA">
+                                <option value="263500000|AVANZA 1.5 G CVT" selected>AVANZA 1.5 G CVT (Rp 263.500.000)</option>
+                                <option value="239700000|AVANZA 1.3 E M/T">AVANZA 1.3 E M/T (Rp 239.700.000)</option>
+                                <option value="254300000|AVANZA 1.3 E CVT">AVANZA 1.3 E CVT (Rp 254.300.000)</option>
+                                <option value="259800000|AVANZA 1.5 G M/T">AVANZA 1.5 G M/T (Rp 259.800.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA VELOZ">
+                                <option value="292900000|VELOZ 1.5 M/T">VELOZ 1.5 M/T (Rp 292.900.000)</option>
+                                <option value="308700000|VELOZ 1.5 Q CVT">VELOZ 1.5 Q CVT (Rp 308.700.000)</option>
+                                <option value="335300000|VELOZ 1.5 Q CVT TSS">VELOZ 1.5 Q CVT TSS (Rp 335.300.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA INNOVA ZENIX">
+                                <option value="439900000|ZENIX 2.0 G CVT">ZENIX 2.0 G CVT (Rp 439.900.000)</option>
+                                <option value="477500000|ZENIX 2.0 G HV CVT">ZENIX 2.0 G Hybrid CVT (Rp 477.500.000)</option>
+                                <option value="485200000|ZENIX 2.0 V CVT">ZENIX 2.0 V CVT (Rp 485.200.000)</option>
+                                <option value="552800000|ZENIX 2.0 V HV CVT">ZENIX 2.0 V Hybrid CVT (Rp 552.800.000)</option>
+                                <option value="628200000|ZENIX 2.0 Q HV TSS CVT">ZENIX 2.0 Q Hybrid TSS CVT (Rp 628.200.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA CALYA">
+                                <option value="173900000|CALYA 1.2 E STD M/T">CALYA 1.2 E STD M/T (Rp 173.900.000)</option>
+                                <option value="177200000|CALYA 1.2 E M/T">CALYA 1.2 E M/T (Rp 177.200.000)</option>
+                                <option value="182700000|CALYA 1.2 G M/T">CALYA 1.2 G M/T (Rp 182.700.000)</option>
+                                <option value="195600000|CALYA 1.2 G A/T">CALYA 1.2 G A/T (Rp 195.600.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA AGYA">
+                                <option value="185100000|AGYA 1.2 G M/T">AGYA 1.2 G M/T (Rp 185.100.000)</option>
+                                <option value="201300000|AGYA 1.2 G A/T">AGYA 1.2 G A/T (Rp 201.300.000)</option>
+                                <option value="206000000|AGYA 1.2 STYLIX A/T">AGYA 1.2 STYLIX A/T (Rp 206.000.000)</option>
+                                <option value="241400000|AGYA 1.2 GR SPORT M/T">AGYA 1.2 GR SPORT M/T (Rp 241.400.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA YARIS CROSS">
+                                <option value="360000000|YARIS CROSS 1.5 G M/T">YARIS CROSS 1.5 G M/T (Rp 360.000.000)</option>
+                                <option value="375000000|YARIS CROSS 1.5 G CVT">YARIS CROSS 1.5 G CVT (Rp 375.000.000)</option>
+                                <option value="416000000|YARIS CROSS 1.5 S CVT">YARIS CROSS 1.5 S CVT (Rp 416.000.000)</option>
+                                <option value="440600000|YARIS CROSS 1.5 S HV CVT">YARIS CROSS 1.5 S Hybrid CVT (Rp 440.600.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA FORTUNER">
+                                <option value="564200000|FORTUNER 2.8 VRZ 4X2 A/T">FORTUNER 2.8 VRZ 4x2 A/T (Rp 564.200.000)</option>
+                                <option value="618000000|FORTUNER 2.8 GR SPORT 4X2 A/T">FORTUNER 2.8 GR Sport 4x2 A/T (Rp 618.000.000)</option>
+                                <option value="726000000|FORTUNER 2.8 GR SPORT 4X4 A/T">FORTUNER 2.8 GR Sport 4x4 A/T (Rp 726.000.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA RAIZE">
+                                <option value="241000000|RAIZE 1.2 G M/T">RAIZE 1.2 G M/T (Rp 241.000.000)</option>
+                                <option value="256000000|RAIZE 1.2 G CVT">RAIZE 1.2 G CVT (Rp 256.000.000)</option>
+                                <option value="265000000|RAIZE 1.0T G CVT">RAIZE 1.0T G CVT (Rp 265.000.000)</option>
+                                <option value="290000000|RAIZE 1.0T GR SPORT CVT">RAIZE 1.0T GR Sport CVT (Rp 290.000.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA RUSH">
+                                <option value="284400000|RUSH 1.5 G M/T">RUSH 1.5 G M/T (Rp 284.400.000)</option>
+                                <option value="295200000|RUSH 1.5 G A/T">RUSH 1.5 G A/T (Rp 295.200.000)</option>
+                                <option value="299000000|RUSH 1.5 S GR SPORT M/T">RUSH 1.5 S GR SPORT M/T (Rp 299.000.000)</option>
+                                <option value="310400000|RUSH 1.5 S GR SPORT A/T">RUSH 1.5 S GR SPORT A/T (Rp 310.400.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA HILUX &amp; RANGGA">
+                                <option value="210000000|HILUX RANGGA CAB CHASSIS">HILUX RANGGA Cab Chassis (Rp 210.000.000)</option>
+                                <option value="245000000|HILUX RANGGA PICK UP DSL">HILUX RANGGA Pick Up Diesel (Rp 245.000.000)</option>
+                                <option value="283700000|HILUX SINGLE CABIN 2.0 GAS">HILUX Single Cabin 2.0 Bensin (Rp 283.700.000)</option>
+                                <option value="305800000|HILUX SINGLE CABIN 2.4 DSL">HILUX Single Cabin 2.4 Diesel (Rp 305.800.000)</option>
+                                <option value="442200000|HILUX DOUBLE CABIN 2.4 E 4X4">HILUX Double Cabin 2.4 E 4x4 (Rp 442.200.000)</option>
+                                <option value="526500000|HILUX DOUBLE CABIN 2.4 V 4X4">HILUX Double Cabin 2.4 V 4x4 (Rp 526.500.000)</option>
+                            </optgroup>
+                            <optgroup label="TOYOTA ALPHARD &amp; VOXY">
+                                <option value="621800000|VOXY 2.0 CVT">VOXY 2.0 CVT (Rp 621.800.000)</option>
+                                <option value="1288000000|ALPHARD 2.5 X CVT">ALPHARD 2.5 X CVT (Rp 1.288.000.000)</option>
+                                <option value="1652100000|ALPHARD 2.5 G CVT">ALPHARD 2.5 G CVT (Rp 1.652.100.000)</option>
+                                <option value="1737400000|ALPHARD 2.5 G HYBRID">ALPHARD 2.5 G Hybrid CVT (Rp 1.737.400.000)</option>
+                            </optgroup>
                         </select>
                     </div>
 

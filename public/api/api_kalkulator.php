@@ -15,10 +15,31 @@ try {
         while($row = $resP->fetch_assoc()) $provinsi[] = $row;
     }
 
+    $mobil = [];
+    $resM = $conn->query("SELECT id, model, type, transmission, pricelist FROM pricelist_mobil WHERE pricelist > 0 ORDER BY model ASC, pricelist ASC");
+    if ($resM) {
+        while($row = $resM->fetch_assoc()) {
+            $model = trim($row['model']);
+            $type = trim($row['type']);
+            $trans = trim($row['transmission']);
+            $otr = (int)$row['pricelist'];
+            $mobil[] = [
+                'id' => (int)$row['id'],
+                'model' => $model,
+                'type' => $type,
+                'trans' => $trans,
+                'otr' => $otr,
+                'value' => $otr . '|' . $model . ' ' . $type . ' ' . $trans,
+                'label' => $model . ' ' . $type . ' ' . $trans . ' (Rp ' . number_format($otr, 0, ',', '.') . ')'
+            ];
+        }
+    }
+
     echo json_encode([
         'status' => 'success',
         'leasing' => $leasing,
-        'provinsi' => $provinsi
+        'provinsi' => $provinsi,
+        'mobil' => $mobil
     ]);
 } catch (Exception $e) {
     echo json_encode([

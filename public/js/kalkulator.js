@@ -8,6 +8,7 @@
 let currentTenor = 3;
 let currentMetode = 'flat';
 let compareData = [];
+let allVehicleData = [];
 
 const formatRp = (n) => 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
 
@@ -36,10 +37,9 @@ function escapeHtml(text) {
 function updateHarga(val) {
     const num = Number(val);
     document.getElementById('inputHarga').value = numToFormatted(num);
-    // Auto adjust TDP slider max
     const rangeTdp = document.getElementById('rangeTdp');
     if (rangeTdp) rangeTdp.max = num;
-    // Auto sync TDP with currently active DP Chip
+    
     const activeChip = document.querySelector('.dp-chip-btn.active');
     const pct = activeChip ? parseInt(activeChip.getAttribute('data-pct'), 10) || 20 : 20;
     const tdpVal = Math.round(num * (pct / 100));
@@ -106,7 +106,7 @@ function setMetode(mode, el) {
     hitung();
 }
 
-// ── MODEL PICKER ──
+// ── MODEL PICKER & DYNAMIC RENDER ──
 function pilihModel() {
     const sel = document.getElementById('selectModel');
     if (!sel || !sel.value) return;
@@ -118,6 +118,57 @@ function pilihModel() {
         const activeChip = document.querySelector('.dp-chip-btn.active');
         const pct = activeChip ? parseInt(activeChip.getAttribute('data-pct'), 10) || 20 : 20;
         setDpPersen(pct);
+        hitung();
+    }
+}
+
+function renderModelOptions(items) {
+    const sel = document.getElementById('selectModel');
+    if (!sel) return;
+    if (!items || items.length === 0) {
+        sel.innerHTML = '<option value="">-- Tidak ada model yang cocok --</option>';
+        return;
+    }
+
+    const groups = {};
+    items.forEach(m => {
+        const groupName = (m.model || 'TOYOTA').toUpperCase();
+        if (!groups[groupName]) groups[groupName] = [];
+        groups[groupName].push(m);
+    });
+
+    let optionsHtml = '<option value="">-- Pilih Model Kendaraan --</option>';
+    for (const groupName in groups) {
+        optionsHtml += `<optgroup label="TOYOTA ${groupName}">`;
+        groups[groupName].forEach(m => {
+            optionsHtml += `<option value="${m.value}">${m.label}</option>`;
+        });
+        optionsHtml += `</optgroup>`;
+    }
+    sel.innerHTML = optionsHtml;
+}
+
+function filterModelDropdown(keyword) {
+    const sel = document.getElementById('selectModel');
+    if (!sel || !allVehicleData || allVehicleData.length === 0) return;
+    const query = (keyword || '').toLowerCase().trim();
+
+    if (!query) {
+        renderModelOptions(allVehicleData);
+        return;
+    }
+
+    const filtered = allVehicleData.filter(m => {
+        return (m.model && m.model.toLowerCase().includes(query)) ||
+               (m.type && m.type.toLowerCase().includes(query)) ||
+               (m.trans && m.trans.toLowerCase().includes(query)) ||
+               (m.label && m.label.toLowerCase().includes(query));
+    });
+
+    renderModelOptions(filtered);
+    if (filtered.length > 0) {
+        sel.selectedIndex = 1;
+        pilihModel();
     }
 }
 
@@ -472,6 +523,26 @@ async function loadKalkulatorData() {
                 });
             }
 
+            // Populate all 260+ vehicle models from database
+            if (Array.isArray(data.mobil) && data.mobil.length > 0) {
+                allVehicleData = data.mobil;
+                const currentVal = document.getElementById('selectModel') ? document.getElementById('selectModel').value : '';
+                renderModelOptions(allVehicleData);
+                const badge = document.getElementById('modelCountBadge');
+                if (badge) badge.innerHTML = `<i class="fa-solid fa-car"></i> ${allVehicleData.length} Varian Siap Dihitung`;
+                
+                if (currentVal) {
+                    const sel = document.getElementById('selectModel');
+                    if (sel) sel.value = currentVal;
+                } else {
+                    const sel = document.getElementById('selectModel');
+                    if (sel && sel.options.length > 1) {
+                        sel.selectedIndex = 1;
+                        pilihModel();
+                    }
+                }
+            }
+
             updateBunga();
         }
     } catch (e) {
@@ -515,6 +586,7 @@ async function loadKalkulatorData() {
                 for (let i = 0; i < sel.options.length; i++) {
                     if (sel.options[i].text.toLowerCase().includes(pMobil.toLowerCase())) {
                         sel.selectedIndex = i;
+                        pilihModel();
                         break;
                     }
                 }
