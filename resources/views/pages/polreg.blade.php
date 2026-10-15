@@ -233,7 +233,7 @@
             </div>
 
             <!-- Leaflet Map Canvas -->
-            <div id="polregLeafletMap" style="min-height:580px; width:100%;"></div>
+            <div id="polregLeafletMap" class="polreg-map-canvas"></div>
 
             <!-- Bottom Legend Strip -->
             <div class="polreg-map-legend">

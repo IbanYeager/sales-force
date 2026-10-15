@@ -1909,7 +1909,41 @@
     display: grid !important;
     grid-template-columns: 1.35fr 1fr !important;
     gap: 20px !important;
-    align-items: start !important;
+    align-items: stretch !important; /* Stretches map and inspector to EXACT equal height */
+  }
+  .polreg-map-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.05) !important;
+  }
+  #polregLeafletMap,
+  .polreg-map-canvas {
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 680px !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  #polregLeafletMap .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+  }
+  .polreg-inspector-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding-bottom: 36px !important;
   }
 }
 
@@ -1919,12 +1953,22 @@
     flex-direction: column !important;
     gap: 16px !important;
   }
-  #polregLeafletMap {
-    min-height: 440px !important;
-    height: 440px !important;
+  .polreg-map-card {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-height: 520px !important;
+    height: 520px !important;
+  }
+  #polregLeafletMap,
+  .polreg-map-canvas {
+    width: 100% !important;
+    min-height: 520px !important;
+    height: 520px !important;
   }
   .polreg-inspector-card {
     max-height: none !important;
+    height: auto !important;
   }
 }
 
@@ -1958,7 +2002,6 @@
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
-
 /* --- POLREG BUGFIXES & RESPONSIVE POLISH 2026 --- */
 .polreg-badge-pill {
   position: static !important;
@@ -1974,23 +2017,6 @@
   box-shadow: none !important;
   animation: none !important;
   border: none !important;
-}
-
-.polreg-map-card {
-  position: relative !important;
-  overflow: hidden !important;
-  border-radius: 18px !important;
-}
-
-#polregLeafletMap {
-  position: relative !important;
-  overflow: hidden !important;
-  width: 100% !important;
-}
-
-#polregLeafletMap .leaflet-container {
-  overflow: hidden !important;
-  border-radius: 18px !important;
 }
 
 .polreg-map-header {
@@ -2055,11 +2081,6 @@
 
 .polreg-btn-export {
   flex-shrink: 0 !important;
-}
-
-.polreg-inspector-card {
-  padding-bottom: 40px !important;
-  position: relative !important;
 }
 
 @media (min-width: 769px) {

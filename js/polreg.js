@@ -205,6 +205,28 @@
       polregMap.invalidateSize();
       updateMapZoomClasses();
     }, 300);
+
+    // Auto-adjust leaflet canvas when map container or inspector card height changes
+    if (window.ResizeObserver && mapContainer) {
+      let resizeTimer = null;
+      const ro = new ResizeObserver(() => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (polregMap) {
+            polregMap.invalidateSize({ pan: false });
+          }
+        }, 100);
+      });
+      ro.observe(mapContainer);
+      const inspectorEl = document.getElementById('polregInspectorCard');
+      if (inspectorEl) ro.observe(inspectorEl);
+    }
+
+    window.addEventListener('resize', () => {
+      if (polregMap) {
+        polregMap.invalidateSize({ pan: false });
+      }
+    });
   }
 
   /**
