@@ -138,11 +138,20 @@
       return;
     }
 
+    // Bandung Raya coordinate bounds
+    const BANDUNG_RAYA_BOUNDS = L.latLngBounds(
+      L.latLng(-7.38, 107.15), // South-West
+      L.latLng(-6.62, 108.00)  // North-East
+    );
+
     // Centered around Kota Bandung
     polregMap = L.map('polregLeafletMap', {
       zoomControl: false,
-      attributionControl: false
-    }).setView([-6.9175, 107.6350], 12);
+      attributionControl: false,
+      maxBounds: BANDUNG_RAYA_BOUNDS.pad(0.08),
+      maxBoundsViscosity: 0.9,
+      minZoom: 10
+    }).setView([-6.9200, 107.6350], 11);
 
     // Zoom control top-right
     L.control.zoom({ position: 'topright' }).addTo(polregMap);
@@ -774,7 +783,7 @@
       series: [{ name: 'Volume Unit', data: seriesData }],
       chart: {
         type: 'bar',
-        height: 220,
+        height: 170,
         toolbar: { show: false },
         fontFamily: 'inherit',
         animations: { enabled: true, easing: 'easeinout', speed: 350 }
@@ -1403,6 +1412,38 @@
         }
       });
     }
+  }
+
+  /**
+   * Reset All Polygons & View (Show whole Bandung Raya)
+   */
+  function resetAllPolygonsView() {
+    selectedDistrictId = null;
+    currentFilter = 'all';
+    currentRegencyFilter = 'all';
+    const searchInput = document.getElementById('polregSearchInput');
+    if (searchInput) searchInput.value = '';
+    const selectEl = document.getElementById('polregDistrictSelect');
+    if (selectEl) selectEl.value = '';
+
+    document.querySelectorAll('.polreg-pill-btn').forEach(b => {
+      b.classList.remove('active');
+      if (b.getAttribute('data-filter') === 'all') b.classList.add('active');
+    });
+
+    document.querySelectorAll('.polreg-regency-btn').forEach(b => {
+      b.classList.remove('active');
+      if (b.getAttribute('data-regency') === 'all') {
+        b.classList.add('active');
+        b.style.background = '#0f172a';
+        b.style.color = '#ffffff';
+      } else {
+        b.style.background = '#ffffff';
+        b.style.color = '#334155';
+      }
+    });
+
+    applyAllFilters();
   }
 
   /**

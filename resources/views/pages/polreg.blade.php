@@ -329,7 +329,7 @@
               </div>
 
               <!-- ApexCharts Canvas -->
-              <div id="piCarApexChart" style="min-height:210px; margin-bottom:8px;"></div>
+              <div id="piCarApexChart" style="min-height:170px; height:170px; margin-bottom:6px;"></div>
 
               <!-- Mini Car Ranking List -->
               <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0 4px 0;">
