@@ -110,7 +110,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Kepala Cabang</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
-                ${(curPage === 'index_kacab') ? navLinkKacab('pages_kacab/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service <span class="sidebar-notif-badge" style="background:#d8a437; color:#1e1014; display:inline-block; margin-left:auto; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800;">LIVE</span>') : ''}
+                ${(curPage === 'index_kacab') ? navLinkKacab('pages_kacab/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service') : ''}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
@@ -195,7 +195,7 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Supervisor</p>
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
-                ${(curPage === 'index_spv') ? navLinkSPV('pages_spv/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service <span class="sidebar-notif-badge" style="background:#e11d48; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800;">LIVE</span>') : ''}
+                ${(curPage === 'index_spv') ? navLinkSPV('pages_spv/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service') : ''}
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
                 ${navLinkSPV('pages_spv/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
@@ -277,7 +277,7 @@
                 <p class="sidebar-nav-label">Menu Utama</p>
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
                 ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
-                ${navLink('pages/mtoyota_service.html', 'fa-solid fa-mobile-screen-button', 'Booking Service m-Toyota <span class="sidebar-notif-badge" style="background:#d7123a; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:800;">LIVE</span>', 'mtoyota m-toyota booking service dec do fs1000 purna jual servis')}
+                ${navLink('pages/mtoyota_service.html', 'fa-solid fa-mobile-screen-button', 'Booking Service m-Toyota', 'mtoyota m-toyota booking service dec do fs1000 purna jual servis')}
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}
                 ${navLink('pages/target.html', 'fa-solid fa-bullseye', 'Target & Pencapaian', 'target spk do pencapaian kuota')}
@@ -293,7 +293,7 @@
                 ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor', 'promo diskon paket kredit tenor program')}
 
                 <p class="sidebar-nav-label">Tier 2: Media, Delivery & Dokumen</p>
-                ${navLink('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio <span class="sidebar-notif-badge" style="background:#c8102e; color:#fff; display:inline-block; margin-left:auto; font-size:9px; padding:1px 5px; border-radius:4px;">NEW</span>', 'media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase')}
+                ${navLink('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio', 'media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
                 ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Pusat Test Drive & Booking', 'test drive uji coba mobil showroom rental rekanan riwayat booking')}
