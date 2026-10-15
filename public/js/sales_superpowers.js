@@ -72,90 +72,69 @@ const SalesSuperpowers = {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Render Cockpit Shell with Interactive Leaflet Map, District & Ring Radius Selectors, and Location Search Bar
+    // Render Cockpit Shell with Simplified Executive Radar Interface
     container.innerHTML = `
-      <div class="radar-cockpit-hero" style="background: linear-gradient(135deg, #0d1b3e 0%, #162a52 100%); padding: 18px; border-radius: 18px; color: #fff; margin-bottom: 18px;">
-        <div class="radar-top-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div class="radar-title-wrap" style="display:flex; align-items:center; gap:12px;">
-            <div class="radar-sonar-mini">
-              <div class="center-blip"></div>
+      <div class="radar-clean-card" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:18px; padding:18px; margin-bottom:18px; box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+        <!-- Top Row: Title & GPS Status -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:38px; height:38px; border-radius:12px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:18px;">
+              <i class="fa-solid fa-map-location-dot"></i>
             </div>
             <div>
-              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <h3 style="font-size:16px; font-weight:900; margin:0; color:#ffffff;">Peta Radar GPS Prospek (Google Maps)</h3>
-                <span class="radar-gps-badge" id="radarGpsStatus"><i class="fa-solid fa-satellite-dish"></i> Mendeteksi GPS...</span>
-              </div>
-              <p style="font-size:12px; color:rgba(255,255,255,0.75); margin:3px 0 0 0;" id="radarSubtitleText">
-                Memetakan titik lokasi customer se-akurat mungkin di dalam ring radius pilihan agenda kunjungan sales.
-              </p>
+              <h3 style="font-size:16px; font-weight:900; color:#0f172a; margin:0;">Peta Radar GPS Pelanggan</h3>
+              <p style="font-size:11.5px; color:#64748b; margin:2px 0 0 0;">Cari &amp; kunjungi pelanggan terdekat dari posisi Anda untuk kanvasing efisien.</p>
             </div>
           </div>
-
-          <!-- Controls: Ring Radius & District Selector -->
-          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <!-- Ring Radius Dropdown Selector -->
-            <div style="display:flex; align-items:center; gap:6px;">
-              <label style="font-size:12px; font-weight:800; color:#94a3b8;"><i class="fa-solid fa-bullseye" style="color:#38bdf8;"></i> Ring Radius:</label>
-              <select id="radarRadiusSelect" onchange="SalesSuperpowers.handleRadiusChange(this.value, '${containerId}')" style="padding:7px 12px; border-radius:10px; font-size:12px; font-weight:800; border:1px solid rgba(255,255,255,0.2); background:#1e293b; color:#ffffff; cursor:pointer;">
-                <option value="1" ${this.currentRadius == 1 ? 'selected' : ''}>⭕ Ring 1 km</option>
-                <option value="3" ${this.currentRadius == 3 ? 'selected' : ''}>⭕ Ring 3 km</option>
-                <option value="5" ${this.currentRadius == 5 ? 'selected' : ''}>⭕ Ring 5 km</option>
-                <option value="10" ${this.currentRadius == 10 ? 'selected' : ''}>⭕ Ring 10 km</option>
-                <option value="25" ${this.currentRadius == 25 ? 'selected' : ''}>⭕ Ring 25 km</option>
-                <option value="999" ${this.currentRadius >= 999 ? 'selected' : ''}>🌐 Semua (> 25 km)</option>
-              </select>
-            </div>
-
-            <!-- District Filter Dropdown -->
-            <div style="display:flex; align-items:center; gap:6px;">
-              <label style="font-size:12px; font-weight:800; color:#94a3b8;"><i class="fa-solid fa-filter" style="color:#f43f5e;"></i> Wilayah:</label>
-              <select id="radarDistrictSelect" onchange="SalesSuperpowers.handleDistrictChange(this.value, '${containerId}')" style="padding:7px 12px; border-radius:10px; font-size:12px; font-weight:800; border:1px solid rgba(255,255,255,0.2); background:#1e293b; color:#ffffff; cursor:pointer;">
-                <option value="all" ${district === 'all' ? 'selected' : ''}>🌐 Semua Wilayah / Kecamatan</option>
-                <option value="buahbatu" ${district === 'buahbatu' ? 'selected' : ''}>📍 Buahbatu / Buah Batu</option>
-                <option value="kiara" ${district === 'kiara' ? 'selected' : ''}>📍 Kiara Condong</option>
-                <option value="batununggal" ${district === 'batununggal' ? 'selected' : ''}>📍 Batununggal</option>
-                <option value="lengkong" ${district === 'lengkong' ? 'selected' : ''}>📍 Lengkong</option>
-                <option value="antapani" ${district === 'antapani' ? 'selected' : ''}>📍 Antapani</option>
-                <option value="arcamanik" ${district === 'arcamanik' ? 'selected' : ''}>📍 Arcamanik</option>
-                <option value="rancasari" ${district === 'rancasari' ? 'selected' : ''}>📍 Rancasari</option>
-                <option value="gedebage" ${district === 'gedebage' ? 'selected' : ''}>📍 Gedebage</option>
-                <option value="cibeunying" ${district === 'cibeunying' ? 'selected' : ''}>📍 Cibeunying</option>
-                <option value="sukajadi" ${district === 'sukajadi' ? 'selected' : ''}>📍 Sukajadi</option>
-                <option value="dago" ${district === 'dago' ? 'selected' : ''}>📍 Dago / Coblong</option>
-                <option value="cimahi" ${district === 'cimahi' ? 'selected' : ''}>📍 Cimahi</option>
-                <option value="sumedang" ${district === 'sumedang' ? 'selected' : ''}>📍 Sumedang / Jatinangor</option>
-              </select>
-            </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span class="radar-gps-badge" id="radarGpsStatus" style="font-size:11px; font-weight:800; padding:6px 12px; border-radius:20px; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;">
+              <i class="fa-solid fa-satellite-dish"></i> Mendeteksi GPS...
+            </span>
+            <button type="button" class="btn-fu" style="padding:6px 14px; font-size:11.5px; font-weight:800; background:#0f172a; color:#fff; border-radius:10px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="SalesSuperpowers.requestHighAccuracyGPS()" title="Perbarui posisi GPS saat ini">
+              <i class="fa-solid fa-location-arrow"></i> Deteksi Ulang GPS
+            </button>
           </div>
         </div>
 
-        <!-- Sales GPS Address Search & Precision Controls Bar -->
-        <div style="display:flex; align-items:center; gap:8px; margin-top:12px; background:rgba(255,255,255,0.08); padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); flex-wrap:wrap;">
-          <i class="fa-solid fa-location-crosshairs" style="color:#38bdf8; font-size:14px;"></i>
-          <input type="text" id="salesLocationSearchInput" placeholder="Ketik lokasi Anda (misal: PSM Pindad, Buahbatu, Terusan Buahbatu)..." style="flex:1; min-width:200px; background:transparent; border:none; color:#ffffff; font-size:12px; font-weight:700; outline:none;" onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
-          <button onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)" style="background:#38bdf8; color:#0f172a; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-            <i class="fa-solid fa-magnifying-glass"></i> Set Lokasi
-          </button>
-          <button onclick="SalesSuperpowers.requestHighAccuracyGPS()" style="background:#10b981; color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Lacak ulang GPS Satelit Akurat HP">
-            <i class="fa-solid fa-location-arrow"></i> GPS Akurat
-          </button>
-          <button id="btnToggleLiveGps" onclick="SalesSuperpowers.toggleLiveTracking()" style="background:#334155; color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Ikuti pergerakan Anda secara otomatis & real-time di peta">
-            <i class="fa-solid fa-satellite"></i> Live Ikuti GPS
-          </button>
-          <span style="font-size:11px; color:#cbd5e1; font-weight:600;"><i class="fa-solid fa-hand-pointer" style="color:#f59e0b;"></i> Tip: Geser pin 📍 merah di peta ke posisi Anda</span>
+        <!-- Controls: Radius Filter Pills & Location Search -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+          <!-- Radius Options -->
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:11.5px; font-weight:800; color:#64748b; text-transform:uppercase;">
+              <i class="fa-solid fa-bullseye" style="color:#2563eb;"></i> Ring Radius:
+            </span>
+            <div class="radar-radius-pill-group">
+              <button type="button" class="radar-radius-pill ${this.currentRadius == 1 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(1, '${containerId}')">1 km</button>
+              <button type="button" class="radar-radius-pill ${this.currentRadius == 3 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(3, '${containerId}')">3 km</button>
+              <button type="button" class="radar-radius-pill ${this.currentRadius == 5 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(5, '${containerId}')">5 km</button>
+              <button type="button" class="radar-radius-pill ${this.currentRadius == 10 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(10, '${containerId}')">10 km</button>
+              <button type="button" class="radar-radius-pill ${this.currentRadius >= 999 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(999, '${containerId}')">Semua Wilayah</button>
+            </div>
+          </div>
+
+          <!-- Location Search -->
+          <div style="display:flex; align-items:center; gap:6px; flex:1; max-width:320px; min-width:220px;">
+            <div style="position:relative; width:100%;">
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#94a3b8;"></i>
+              <input type="text" id="salesLocationSearchInput" placeholder="Ketik lokasi / patokan Anda..." style="width:100%; padding:7px 10px 7px 30px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:11.5px; outline:none; background:#f8fafc;" onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
+            </div>
+            <button type="button" onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)" style="padding:7px 14px; background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap;">
+              Cari
+            </button>
+          </div>
         </div>
 
-        <!-- Interactive Leaflet Map Container -->
-        <div style="margin-top: 14px; border-radius: 14px; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); position: relative; background: #0f172a; height: 380px;">
-          <div id="radarLeafletMapContainer" style="width: 100%; height: 100%;"></div>
+        <!-- Interactive Map Container -->
+        <div style="border-radius:14px; overflow:hidden; border:1px solid #cbd5e1; position:relative; height:440px; box-shadow:0 4px 15px rgba(0,0,0,0.04);">
+          <div id="radarLeafletMapContainer" style="width:100%; height:100%;"></div>
         </div>
       </div>
 
       <!-- Radar Lead Cards Container -->
       <div id="radarLeadsContainer">
         <div style="text-align:center; padding:40px 20px; background:#fff; border-radius:18px; border:1px solid #e2e8f0;">
-          <div style="width:50px; height:50px; border-radius:50%; border:3px solid #d7123a; border-top-color:transparent; animation:radar-spin 1s linear infinite; margin:0 auto 12px;"></div>
-          <p style="font-size:13px; font-weight:700; color:#334155; margin:0;">Memuat titik koordinat peta &amp; database customer...</p>
+          <div style="width:40px; height:40px; border-radius:50%; border:3px solid #2563eb; border-top-color:transparent; animation:radar-spin 1s linear infinite; margin:0 auto 12px;"></div>
+          <p style="font-size:12.5px; font-weight:700; color:#334155; margin:0;">Memuat titik koordinat peta &amp; database customer...</p>
         </div>
       </div>
     `;

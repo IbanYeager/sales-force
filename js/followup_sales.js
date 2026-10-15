@@ -98,111 +98,80 @@ function initFollowupTabs() {
 
           <!-- Hero KPI Mini Chips (Interactive Click to Filter) -->
           <div class="hero-kpi-grid">
-            <div class="hero-kpi-chip" style="cursor:pointer;" onclick="handleStatusFilter('all')" title="Klik untuk menampilkan semua database">
+            <div class="hero-kpi-chip active-kpi" id="kpiChipAll" style="cursor:pointer;" onclick="handleStatusFilter('all')" title="Klik untuk menampilkan semua database">
               <div class="num" id="heroTotalCount">0</div>
               <div class="lbl">Semua Database</div>
             </div>
-            <div class="hero-kpi-chip" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); cursor:pointer;" onclick="handleStatusFilter('belum_fu')" title="Klik untuk melihat database yang belum di-follow up">
+            <div class="hero-kpi-chip" id="kpiChipBelum" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); cursor:pointer;" onclick="handleStatusFilter('belum_fu')" title="Klik untuk melihat database yang belum di-follow up">
               <div class="num" style="color:#fbbf24;" id="heroPendingCount">0</div>
               <div class="lbl">Belum Di-Follow Up</div>
             </div>
-            <div class="hero-kpi-chip" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3); cursor:pointer;" onclick="handleStatusFilter('sudah_fu')" title="Klik untuk melihat database yang sudah di-follow up">
+            <div class="hero-kpi-chip" id="kpiChipSudah" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3); cursor:pointer;" onclick="handleStatusFilter('sudah_fu')" title="Klik untuk melihat database yang sudah di-follow up">
               <div class="num" style="color:#6ee7b7;" id="heroFollowedCount">0</div>
               <div class="lbl">Sudah Di-Follow Up</div>
             </div>
-            <div class="hero-kpi-chip" style="background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3); cursor:pointer;" onclick="handleStatusFilter('Tertarik / Jadwal Servis')" title="Klik untuk melihat prospek tertarik">
+            <div class="hero-kpi-chip" id="kpiChipInterested" style="background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3); cursor:pointer;" onclick="handleStatusFilter('Tertarik / Jadwal Servis')" title="Klik untuk melihat prospek tertarik">
               <div class="num" style="color:#93c5fd;" id="heroInterestedCount">0</div>
               <div class="lbl">Tertarik / Servis</div>
             </div>
           </div>
         </div>
 
-        <!-- 1.5 SUB-NAVIGATION: DATABASE TUGAS SAYA vs POOL REBUTAN PROSPEK vs RADAR GPS -->
-        <div class="sub-nav-fu-wrapper" id="fuSubNavWrapper">
+        <!-- 1.5 SUB-NAVIGATION: DATABASE FOLLOW-UP vs RADAR GPS (POOL REBUTAN REMOVED) -->
+        <div class="sub-nav-fu-wrapper" id="fuSubNavWrapper" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:16px;">
           <button type="button" class="sub-nav-fu-btn active" id="subBtnMyTasks" onclick="switchFollowupSubTab('my_tasks')">
-            <i class="fa-solid fa-bullseye" style="color:#2563eb;"></i>
-            <span>Database Tugas Saya</span>
+            <i class="fa-solid fa-list-check" style="color:#2563eb;"></i>
+            <span>Database Follow-Up</span>
             <span id="badgeMyTasksCount" style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:#eff6ff; color:#1d4ed8;">0</span>
           </button>
-          <button type="button" class="sub-nav-fu-btn pool-tab" id="subBtnOrphanPool" onclick="switchFollowupSubTab('orphan_pool')">
-            <i class="fa-solid fa-fire" style="color:#ea580c;"></i>
-            <span>Pool Rebutan Prospek</span>
-            <span id="badgeOrphanPoolCount" class="badge-pulse-fire">0 Siap Rebut</span>
-          </button>
           <button type="button" class="sub-nav-fu-btn radar-tab" id="subBtnRadar" onclick="switchFollowupSubTab('radar')">
-            <i class="fa-solid fa-map-location-dot" style="color:#3b82f6;"></i>
-            <span>Peta Radar GPS</span>
+            <i class="fa-solid fa-map-location-dot" style="color:#dc2626;"></i>
+            <span>Peta Radar GPS Pelanggan</span>
             <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:9999px; background:rgba(215,18,58,0.12); color:#dc2626; border:1px solid rgba(215,18,58,0.25);">Live Map</span>
           </button>
         </div>
 
-        <!-- 2. SEARCH, FILTER & VIEW TOGGLE BAR -->
-        <div class="card" id="fuFilterCard" style="padding:16px; margin-bottom:16px; border-radius:var(--fu-radius-lg);">
-          <!-- Top Row: Search & View Mode Switcher -->
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-            <div class="fu-input-with-icon" style="flex:1; min-width:240px; margin-bottom:0;">
+        <!-- 2. SEARCH & COMPACT FILTER TOOLBAR (SIMPLIFIED & UNIFIED) -->
+        <div class="card" id="fuFilterCard" style="padding:14px; margin-bottom:16px; border-radius:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <!-- Search Input with Live Filter -->
+            <div class="fu-input-with-icon" style="flex:1; min-width:240px; margin-bottom:0; position:relative;">
               <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" class="fu-input" id="followupSearchInput" placeholder="Cari nama pelanggan, nomor WA, plat nomor, atau model mobil..." oninput="handleFollowupSearch(this.value)">
+              <input type="text" class="fu-input" id="followupSearchInput" placeholder="Cari nama pelanggan, nomor WA, plat nomor, model mobil..." oninput="handleFollowupSearch(this.value)">
             </div>
+
+            <!-- Compact Dropdown Filters & Actions -->
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-              <button type="button" class="btn-fu" id="btnOpenAutoBlast" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%) !important; color:#ffffff !important; border:none !important; padding:8px 16px !important; font-size:12px !important; font-weight:800 !important; border-radius:10px !important; box-shadow:0 4px 14px rgba(16,185,129,0.35) !important; display:inline-flex !important; align-items:center !important; gap:6px !important; cursor:pointer !important;" onclick="openAutoBlastModal()">
+              <!-- Category Filter Dropdown -->
+              <select id="followupCategorySelect" class="fu-select-clean" onchange="handleCategoryFilter(this.value)" style="padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; border:1.5px solid #cbd5e1; background:#f8fafc; color:#0f172a; cursor:pointer;" title="Filter kategori mobil">
+                <option value="all">Semua Kategori Mobil</option>
+              </select>
+
+              <!-- Status Filter Dropdown -->
+              <select id="followupStatusSelect" class="fu-select-clean" onchange="handleStatusFilter(this.value)" style="padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; border:1.5px solid #cbd5e1; background:#f8fafc; color:#0f172a; cursor:pointer;" title="Filter status follow-up">
+                <option value="all">Semua Status Follow-Up</option>
+                <option value="belum_fu">Belum Di-Follow Up</option>
+                <option value="sudah_fu">Sudah Di-Follow Up</option>
+                <option value="Menunggu Respon">Menunggu Respon</option>
+                <option value="Tertarik / Jadwal Servis">Tertarik / Servis</option>
+                <option value="Deal / Selesai">Deal / Selesai</option>
+                <option value="Tidak Tertarik">Tidak Tertarik</option>
+              </select>
+
+              <!-- Auto-Blast Button -->
+              <button type="button" class="btn-fu" id="btnOpenAutoBlast" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%) !important; color:#ffffff !important; border:none !important; padding:8px 14px !important; font-size:12px !important; font-weight:800 !important; border-radius:10px !important; box-shadow:0 4px 14px rgba(16,185,129,0.3) !important; display:inline-flex !important; align-items:center !important; gap:6px !important; cursor:pointer !important;" onclick="openAutoBlastModal()">
                 <i class="fa-solid fa-bolt-lightning" style="color:#fef08a;"></i> Auto-Blast Cepat
               </button>
-              <button class="view-toggle-btn active" id="btnViewCards" onclick="switchViewMode('cards')">
-                <i class="fa-solid fa-grip"></i> Kartu Prospek
-              </button>
-              <button class="view-toggle-btn" id="btnViewTable" onclick="switchViewMode('table')">
-                <i class="fa-solid fa-table-list"></i> Tabel Database
-              </button>
-            </div>
-          </div>
 
-          <!-- Category Chips Horizontal Scroll -->
-          <div style="margin-bottom:12px;">
-            <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; margin-bottom:6px; letter-spacing:0.5px;">
-              <i class="fa-solid fa-filter" style="color:#d7123a;"></i> Kategori Repurchase &amp; Layanan:
-            </div>
-            <div class="category-chips-scroll" id="followupCategoryPills">
-              <button class="category-pill-btn active" onclick="handleCategoryFilter('all', this)">
-                <i class="fa-solid fa-grid-2"></i> Semua Kategori
-              </button>
-            </div>
-          </div>
-
-          <!-- Status Filter Tabs: Dedicated Sudah FU vs Belum FU with live count badges -->
-          <div>
-            <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; margin-bottom:6px; letter-spacing:0.5px;">
-              <i class="fa-solid fa-list-check" style="color:#d7123a;"></i> Filter Progres Follow-Up:
-            </div>
-            <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;" id="followupStatusTabs">
-              <button type="button" class="status-fu-tab-btn active" id="btnStatusAll" onclick="handleStatusFilter('all', this)">
-                <i class="fa-solid fa-layer-group"></i> Semua Database
-                <span class="fu-filter-count-badge" id="countBadgeAll">0</span>
-              </button>
-              <button type="button" class="status-fu-tab-btn tab-belum" id="btnStatusBelum" onclick="handleStatusFilter('belum_fu', this)">
-                <i class="fa-solid fa-hourglass-half"></i> Belum Di-Follow Up
-                <span class="fu-filter-count-badge badge-amber" id="countBadgeBelum">0</span>
-              </button>
-              <button type="button" class="status-fu-tab-btn tab-sudah" id="btnStatusSudah" onclick="handleStatusFilter('sudah_fu', this)">
-                <i class="fa-solid fa-circle-check"></i> Sudah Di-Follow Up
-                <span class="fu-filter-count-badge badge-green" id="countBadgeSudah">0</span>
-              </button>
-              <button type="button" class="status-fu-tab-btn" id="btnStatusWaiting" onclick="handleStatusFilter('Menunggu Respon', this)">
-                Menunggu Respon
-                <span class="fu-filter-count-badge badge-yellow" id="countBadgeWaiting">0</span>
-              </button>
-              <button type="button" class="status-fu-tab-btn" id="btnStatusInterested" onclick="handleStatusFilter('Tertarik / Jadwal Servis', this)">
-                Tertarik / Servis
-                <span class="fu-filter-count-badge badge-blue" id="countBadgeInterested">0</span>
-              </button>
-              <button type="button" class="status-fu-tab-btn" id="btnStatusDeal" onclick="handleStatusFilter('Deal / Selesai', this)">
-                Deal / Selesai
-                <span class="fu-filter-count-badge badge-emerald" id="countBadgeDeal">0</span>
-              </button>
-              <button type="button" class="status-fu-tab-btn" id="btnStatusRejected" onclick="handleStatusFilter('Tidak Tertarik', this)">
-                <i class="fa-solid fa-ban" style="color:#ef4444;"></i> Tidak Tertarik
-                <span class="fu-filter-count-badge badge-rose" id="countBadgeRejected">0</span>
-              </button>
+              <!-- View Switcher -->
+              <div class="view-toggle-group" style="display:inline-flex; background:#e2e8f0; padding:3px; border-radius:10px; gap:2px;">
+                <button class="view-toggle-btn active" id="btnViewCards" onclick="switchViewMode('cards')" title="Tampilan Kartu">
+                  <i class="fa-solid fa-grip"></i> Kartu
+                </button>
+                <button class="view-toggle-btn" id="btnViewTable" onclick="switchViewMode('table')" title="Tampilan Tabel">
+                  <i class="fa-solid fa-table-list"></i> Tabel
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -732,28 +701,19 @@ function updateHeroStats() {
 }
 
 function renderCategoryPills() {
-  const container = document.getElementById('followupCategoryPills');
-  if (!container) return;
+  const select = document.getElementById('followupCategorySelect');
+  if (!select) return;
 
   const categories = Array.from(new Set(followupState.customers.map(c => c.followup_category).filter(Boolean)));
-
-  let html = `
-    <button class="category-pill-btn ${followupState.activeCategory === 'all' ? 'active' : ''}" onclick="handleCategoryFilter('all', this)">
-      <i class="fa-solid fa-grid-2"></i> Semua Kategori (${followupState.customers.length})
-    </button>
-  `;
+  let html = `<option value="all">Semua Kategori Mobil (${followupState.customers.length})</option>`;
 
   categories.forEach(cat => {
     const count = followupState.customers.filter(c => c.followup_category === cat).length;
-    const isActive = followupState.activeCategory === cat;
-    html += `
-      <button class="category-pill-btn ${isActive ? 'active' : ''}" onclick="handleCategoryFilter('${cat}', this)">
-        ${cat} <span style="font-size:10px; opacity:0.8;">(${count})</span>
-      </button>
-    `;
+    html += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)} (${count})</option>`;
   });
 
-  container.innerHTML = html;
+  select.innerHTML = html;
+  select.value = followupState.activeCategory || 'all';
 }
 
 function handleFollowupSearch(query) {
@@ -767,29 +727,27 @@ function handleFollowupSearch(query) {
 
 function handleCategoryFilter(cat, btn) {
   followupState.activeCategory = cat;
-  document.querySelectorAll('#followupCategoryPills .category-pill-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  if (followupState.subTab === 'orphan_pool') {
-    loadOrphanLeads();
-  } else {
-    renderCustomerCards();
+  const select = document.getElementById('followupCategorySelect');
+  if (select && select.value !== cat) {
+    select.value = cat;
   }
+  renderCustomerCards();
 }
 
 function handleStatusFilter(status, btn) {
   followupState.activeStatus = status;
-  document.querySelectorAll('#followupStatusTabs .status-fu-tab-btn, #followupStatusTabs button').forEach(b => b.classList.remove('active'));
 
-  if (btn) {
-    btn.classList.add('active');
-  } else {
-    if (status === 'all') document.getElementById('btnStatusAll')?.classList.add('active');
-    else if (status === 'belum_fu' || status === 'Belum Dihubungi') document.getElementById('btnStatusBelum')?.classList.add('active');
-    else if (status === 'sudah_fu') document.getElementById('btnStatusSudah')?.classList.add('active');
-    else if (status === 'Menunggu Respon') document.getElementById('btnStatusWaiting')?.classList.add('active');
-    else if (status === 'Tertarik / Jadwal Servis') document.getElementById('btnStatusInterested')?.classList.add('active');
-    else if (status === 'Deal / Selesai') document.getElementById('btnStatusDeal')?.classList.add('active');
-    else if (status === 'Tidak Tertarik') document.getElementById('btnStatusRejected')?.classList.add('active');
+  // Sync Hero KPI chips visual active state
+  document.querySelectorAll('.hero-kpi-chip').forEach(c => c.classList.remove('active-kpi'));
+  if (status === 'all') document.getElementById('kpiChipAll')?.classList.add('active-kpi');
+  else if (status === 'belum_fu' || status === 'Belum Dihubungi') document.getElementById('kpiChipBelum')?.classList.add('active-kpi');
+  else if (status === 'sudah_fu') document.getElementById('kpiChipSudah')?.classList.add('active-kpi');
+  else if (status === 'Tertarik / Jadwal Servis') document.getElementById('kpiChipInterested')?.classList.add('active-kpi');
+
+  // Sync Status Select dropdown
+  const statusSelect = document.getElementById('followupStatusSelect');
+  if (statusSelect && statusSelect.value !== status) {
+    statusSelect.value = status;
   }
 
   renderCustomerCards(false);
@@ -2788,14 +2746,12 @@ function switchFollowupSubTab(tab) {
   followupState.subTab = tab;
 
   const btnMyTasks = document.getElementById('subBtnMyTasks');
-  const btnOrphan = document.getElementById('subBtnOrphanPool');
   const btnRadar = document.getElementById('subBtnRadar');
   const filterCard = document.getElementById('fuFilterCard');
   const dataContainer = document.getElementById('followupDataContainer');
   const radarContainer = document.getElementById('followupRadarContainer');
 
   if (btnMyTasks) btnMyTasks.classList.toggle('active', tab === 'my_tasks');
-  if (btnOrphan) btnOrphan.classList.toggle('active', tab === 'orphan_pool');
   if (btnRadar) btnRadar.classList.toggle('active', tab === 'radar');
 
   if (tab === 'radar') {
@@ -2804,19 +2760,14 @@ function switchFollowupSubTab(tab) {
     if (radarContainer) {
       radarContainer.style.display = 'block';
       if (window.SalesSuperpowers) {
-        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 1);
+        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 5);
       }
     }
   } else {
     if (filterCard) filterCard.style.display = 'block';
     if (dataContainer) dataContainer.style.display = 'block';
     if (radarContainer) radarContainer.style.display = 'none';
-
-    if (tab === 'orphan_pool') {
-      loadOrphanLeads();
-    } else {
-      renderCustomerCards();
-    }
+    renderCustomerCards();
   }
 }
 
