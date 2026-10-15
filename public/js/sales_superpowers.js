@@ -104,10 +104,9 @@ const SalesSuperpowers = {
       .radar-landmark-chip.dealer-chip { background: #fff1f2; color: #d7123a; border-color: #fecaca; }
       .radar-landmark-chip.dealer-chip:hover { background: #fee2e2; }
       .radar-map-outer { border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; height: 490px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); }
-      #radarLeafletMapContainer { cursor: crosshair !important; }
-      .radar-map-hint-banner { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 999; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); color: #ffffff; padding: 6px 16px; border-radius: 20px; font-size: 11.5px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; display: flex; align-items: center; gap: 8px; letter-spacing: 0.2px; }
+      #radarLeafletMapContainer { cursor: default; }
       .radar-sales-beacon-icon { background: transparent !important; border: none !important; }
-      .radar-sales-beacon-wrap { position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: grab; }
+      .radar-sales-beacon-wrap { position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
       .radar-beacon-aura { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(215, 18, 58, 0.35); animation: beacon-expand 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
       @keyframes beacon-expand { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
       .radar-beacon-core { position: relative; z-index: 2; width: 26px; height: 26px; border-radius: 50%; background: #d7123a; border: 3px solid #ffffff; box-shadow: 0 0 14px rgba(215, 18, 58, 0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 11px; }
@@ -228,7 +227,7 @@ const SalesSuperpowers = {
                 <i class="fa-solid fa-bolt"></i> Live Radar Kanvasing
               </div>
               <h3 class="radar-header-title">Peta Radar Pelanggan &amp; Kanvasing</h3>
-              <p class="radar-header-sub">Klik peta atau geser pin untuk menetapkan posisi Anda dengan akurat.</p>
+              <p class="radar-header-sub">Memetakan database pelanggan terdekat berdasarkan radius dari posisi Anda.</p>
             </div>
           </div>
           
@@ -290,10 +289,6 @@ const SalesSuperpowers = {
 
         <!-- Interactive Map Container -->
         <div class="radar-map-outer">
-          <div class="radar-map-hint-banner">
-            <i class="fa-solid fa-crosshairs" style="color:#f87171;"></i>
-            <span>Klik di mana saja pada peta atau geser pin merah untuk memindahkan posisi Anda</span>
-          </div>
           <div id="radarLeafletMapContainer" style="width:100%; height:100%;"></div>
         </div>
       </div>
@@ -683,8 +678,8 @@ const SalesSuperpowers = {
 
     const salesMarker = L.marker([salesLat, salesLng], {
       icon: salesIcon,
-      title: '📍 Posisi Saya (Klik di peta atau geser pin ini untuk ubah lokasi)',
-      draggable: true
+      title: '📍 Posisi Saya (Terkunci)',
+      draggable: false
     }).addTo(map);
 
     // Draw precision accuracy radius aura if accuracy available (< 500m)
@@ -700,7 +695,7 @@ const SalesSuperpowers = {
 
     const accPopupLabel = this.gpsAccuracy && this.gpsAccuracy <= 150 
       ? `Akurasi Satelit: ±${Math.round(this.gpsAccuracy)} meter`
-      : 'Titik Presisi Terpilih';
+      : 'Titik Presisi Terdeteksi';
 
     salesMarker.bindPopup(`
       <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:12px; text-align:center; padding:6px; min-width:190px;">
@@ -708,25 +703,9 @@ const SalesSuperpowers = {
           <i class="fa-solid fa-crosshairs"></i> Pusat Jangkauan Radar
         </div>
         <b style="color:#0f172a; font-size:13.5px;">📍 Posisi Anda: ${escapeHtml(currentLocLabel)}</b><br>
-        <span style="color:#0369a1; font-weight:700; font-size:11px;"><i class="fa-solid fa-satellite-dish"></i> ${accPopupLabel}</span><br>
-        <div style="margin-top:8px; background:#eff6ff; border:1px solid #bfdbfe; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; color:#1d4ed8;">
-          💡 Klik di mana saja pada peta atau geser pin ini untuk memindahkan lokasi Anda secara akurat!
-        </div>
+        <span style="color:#0369a1; font-weight:700; font-size:11px;"><i class="fa-solid fa-satellite-dish"></i> ${accPopupLabel}</span>
       </div>
     `);
-
-    // Drag pin handler
-    salesMarker.on('dragend', (e) => {
-      const newPos = e.target.getLatLng();
-      SalesSuperpowers.setManualSalesCoords(newPos.lat, newPos.lng, 'Titik Pin Geser', 10, true);
-    });
-
-    // MAP CLICK HANDLER: Click anywhere on map to set sales location!
-    map.on('click', (e) => {
-      const clickLat = e.latlng.lat;
-      const clickLng = e.latlng.lng;
-      SalesSuperpowers.setManualSalesCoords(clickLat, clickLng, 'Titik Peta Terpilih', 10, true);
-    });
 
     // DRAW VISUAL RADIUS CIRCLE (RING RADIUS)
     const currentRadiusKm = this.currentRadius || 5;
