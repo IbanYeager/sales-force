@@ -52,10 +52,13 @@ const SalesSuperpowers = {
   // 1. RADAR PROSPEK TERDEKAT (EXECUTIVE RADAR COCKPIT)
   // =========================================================================
   radarData: [],
-  currentRadius: 50,
+  currentRadius: 5,
   currentDistrict: 'all',
   leafletMap: null,
   leafletMarkers: [],
+  radarStatusFilter: 'all',
+  radarQuery: '',
+  radarMarkersLayer: null,
   selectedPhotoFile: null,
 
   ensureRadarStyles() {
@@ -63,6 +66,17 @@ const SalesSuperpowers = {
     const style = document.createElement('style');
     style.id = 'radarExecutiveStyles';
     style.textContent = `
+      .radar-status-filter-strip { display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 4px 0 10px 0; margin-bottom: 12px; width: 100%; }
+      .radar-status-filter-strip::-webkit-scrollbar { display: none; }
+      .radar-status-pill { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid #cbd5e1; background: #ffffff; color: #334155; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; font-family: inherit; }
+      .radar-status-pill:hover { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
+      .radar-status-pill.active { background: #0f172a !important; color: #ffffff !important; border-color: #0f172a !important; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25); }
+      .radar-status-pill .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+      .radar-status-pill .dot-red { background: #ef4444; }
+      .radar-status-pill .dot-yellow { background: #f59e0b; }
+      .radar-status-pill .dot-purple { background: #8b5cf6; }
+      .radar-status-pill .dot-green { background: #10b981; }
+      .radar-status-pill.active .status-dot { box-shadow: 0 0 6px rgba(255,255,255,0.8); }
       .radar-cockpit-wrapper { background: #ffffff; border: 1px solid #e2e8f0; border-top: 3px solid #d7123a; border-radius: 20px; padding: 22px; margin-bottom: 22px; box-shadow: 0 10px 30px -5px rgba(15,23,42,0.05); }
       .radar-cockpit-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; }
       .radar-header-left { display: flex; align-items: center; gap: 14px; }
@@ -724,14 +738,70 @@ const SalesSuperpowers = {
       map.fitBounds(radiusCircle.getBounds(), { padding: [35, 35], maxZoom: 16 });
     }
 
-    // STRICT CUSTOMER FILTER INSIDE RING RADIUS ONLY
-    const filteredLeads = (leads || []).filter(c => {
-      if (c.distance_km === undefined || c.distance_km === null) return true;
-      if (currentRadiusKm >= 999) return true;
-      return c.distance_km <= currentRadiusKm;
-    });
+    // Initialize or Clear Marker Layer Group
+    if (this.radarMarkersLayer) {
+      this.radarMarkersLayer.clearLayers();
+    }
+    this.radarMarkersLayer = L.layerGroup().addTo(map);
+    this.updateRadarMapPins();
 
-    // Customer Pins
+    // Add Map Legend Overlay
+    const legendEl = document.createElement('div');
+    legendEl.className = 'radar-map-legend-overlay';
+    legendEl.innerHTML = `
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#ef4444;"></span> Belum FU</span>
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f59e0b;"></span> Menunggu</span>
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#8b5cf6;"></span> Tertarik</span>
+      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#10b981;"></span> Selesai</span>
+    `;
+    mapEl.appendChild(legendEl);
+  },
+
+  getFilteredRadarLeads() {
+    const currentRadiusKm = this.currentRadius || 5;
+    const status = this.radarStatusFilter || 'all';
+    const query = (this.radarQuery || '').toLowerCase().trim();
+
+    return (this.radarData || []).filter(c => {
+      // 1. Radius filter
+      if (currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
+        if (c.distance_km > currentRadiusKm) return false;
+      }
+      // 2. Status filter
+      if (status !== 'all') {
+        const itemStatus = (c.status || 'Belum Dihubungi').trim();
+        if (status === 'Belum Dihubungi') {
+          if (itemStatus !== 'Belum Dihubungi' && itemStatus !== 'belum_fu' && itemStatus !== '') return false;
+        } else if (status === 'Menunggu Respon') {
+          if (!itemStatus.toLowerCase().includes('menunggu')) return false;
+        } else if (status === 'Tertarik / Jadwal Servis') {
+          if (!itemStatus.toLowerCase().includes('tertarik') && !itemStatus.toLowerCase().includes('servis')) return false;
+        } else if (status === 'Deal / Selesai') {
+          if (!itemStatus.toLowerCase().includes('deal') && !itemStatus.toLowerCase().includes('selesai') && !itemStatus.toLowerCase().includes('spk')) return false;
+        } else if (status === 'Tidak Tertarik') {
+          if (!itemStatus.toLowerCase().includes('tidak') && !itemStatus.toLowerCase().includes('batal') && !itemStatus.toLowerCase().includes('menolak')) return false;
+        } else {
+          if (itemStatus !== status) return false;
+        }
+      }
+      // 3. Query filter
+      if (query) {
+        const matchName = (c.name || '').toLowerCase().includes(query);
+        const matchCar = (c.car_model || '').toLowerCase().includes(query);
+        const matchDistrict = (c.district || '').toLowerCase().includes(query);
+        const matchPhone = (c.phone || '').includes(query);
+        if (!matchName && !matchCar && !matchDistrict && !matchPhone) return false;
+      }
+      return true;
+    });
+  },
+
+  updateRadarMapPins() {
+    if (!this.leafletMap || !this.radarMarkersLayer) return;
+    this.radarMarkersLayer.clearLayers();
+
+    const filteredLeads = this.getFilteredRadarLeads();
+
     filteredLeads.forEach(c => {
       let pinBg = '#ef4444'; // Belum Dihubungi
       let pinIcon = 'fa-car';
@@ -784,7 +854,7 @@ const SalesSuperpowers = {
               <i class="fa-solid fa-car-side" style="color:#2563eb;"></i> ${escapeHtml(c.car_model || 'Toyota')}
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
-              <span style="color:#64748b;">Status: <b style="color:${pinBg};">${escapeHtml(c.status)}</b></span>
+              <span style="color:#64748b;">Status: <b style="color:${pinBg};">${escapeHtml(c.status || 'Belum Dihubungi')}</b></span>
               <span style="color:#d7123a; font-weight:800;">${escapeHtml(c.priority || 'Warm')}</span>
             </div>
           </div>
@@ -805,20 +875,51 @@ const SalesSuperpowers = {
         </div>
       `;
 
-      const marker = L.marker([c.lat, c.lng], { icon: customIcon }).addTo(map).bindPopup(popupHtml);
+      const marker = L.marker([c.lat, c.lng], { icon: customIcon }).bindPopup(popupHtml);
       marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${distLabel}`, { direction: 'top', offset: [0, -12] });
+      this.radarMarkersLayer.addLayer(marker);
+    });
+  },
+
+  handleRadarStatusFilter(statusVal) {
+    this.radarStatusFilter = statusVal || 'all';
+    this.applyRadarFilter();
+  },
+
+  filterRadarLeads(query) {
+    this.radarQuery = (query || '').toLowerCase().trim();
+    this.applyRadarFilter();
+  },
+
+  applyRadarFilter() {
+    // Update active class on status pills
+    document.querySelectorAll('.radar-status-pill').forEach(pill => {
+      const val = pill.getAttribute('data-status') || '';
+      if (val === this.radarStatusFilter) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
     });
 
-    // Add Map Legend Overlay
-    const legendEl = document.createElement('div');
-    legendEl.className = 'radar-map-legend-overlay';
-    legendEl.innerHTML = `
-      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#ef4444;"></span> Belum FU</span>
-      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f59e0b;"></span> Menunggu</span>
-      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#8b5cf6;"></span> Tertarik</span>
-      <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#10b981;"></span> Selesai</span>
-    `;
-    mapEl.appendChild(legendEl);
+    const filtered = this.getFilteredRadarLeads();
+
+    // Update count badge & subtitle
+    const badge = document.getElementById('radarCountBadge');
+    if (badge) badge.textContent = `${filtered.length} Customer`;
+
+    const sub = document.getElementById('radarRadiusSubtitle');
+    if (sub) {
+      const currentRadiusKm = this.currentRadius || 5;
+      const statusLabel = this.radarStatusFilter === 'all' ? '' : ` • Status: ${this.radarStatusFilter}`;
+      sub.textContent = `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${statusLabel}).`;
+    }
+
+    // Update cards grid only
+    this.renderRadarCardsGrid(filtered);
+
+    // Update map pins
+    this.updateRadarMapPins();
   },
 
   renderRadarLeadCards(leads) {
@@ -826,24 +927,19 @@ const SalesSuperpowers = {
     if (!listContainer) return;
 
     const currentRadiusKm = this.currentRadius || 5;
-    const filteredLeads = (leads || []).filter(c => {
+    const inRadius = (this.radarData || []).filter(c => {
       if (c.distance_km === undefined || c.distance_km === null) return true;
       if (currentRadiusKm >= 999) return true;
       return c.distance_km <= currentRadiusKm;
     });
 
-    if (!filteredLeads || filteredLeads.length === 0) {
-      listContainer.innerHTML = `
-        <div class="radar-empty-state">
-          <div class="radar-empty-icon">
-            <i class="fa-solid fa-satellite-dish"></i>
-          </div>
-          <h4 class="radar-empty-title">Tidak Ada Customer di Ring Radius ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : ''}</h4>
-          <p class="radar-empty-desc">Coba perluas Ring Radius (misal 5 km atau 10 km) atau pilih lokasi landmark lain di atas.</p>
-        </div>
-      `;
-      return;
-    }
+    const countAll = inRadius.length;
+    const countBelum = inRadius.filter(c => !c.status || c.status === 'Belum Dihubungi' || c.status === 'belum_fu').length;
+    const countMenunggu = inRadius.filter(c => c.status === 'Menunggu Respon' || (c.status && c.status.toLowerCase().includes('menunggu'))).length;
+    const countTertarik = inRadius.filter(c => c.status === 'Tertarik / Jadwal Servis' || (c.status && c.status.toLowerCase().includes('tertarik'))).length;
+    const countDeal = inRadius.filter(c => c.status === 'Deal / Selesai' || (c.status && c.status.toLowerCase().includes('deal'))).length;
+
+    const filtered = this.getFilteredRadarLeads();
 
     let html = `
       <div class="radar-leads-header-bar">
@@ -851,21 +947,64 @@ const SalesSuperpowers = {
           <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
             <i class="fa-solid fa-bullseye" style="color:#d7123a;"></i> 
             Daftar Pelanggan Terdekat 
-            <span class="radar-count-badge">${filteredLeads.length} Customer</span>
+            <span class="radar-count-badge" id="radarCountBadge">${filtered.length} Customer</span>
           </h4>
-          <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
-            Diurutkan dari jarak terdekat ke posisi GPS Anda (Ring Radius: ${currentRadiusKm < 999 ? currentRadiusKm + ' km' : 'Semua Wilayah'}).
+          <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;" id="radarRadiusSubtitle">
+            Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${this.radarStatusFilter !== 'all' ? ' • Status: ' + this.radarStatusFilter : ''}).
           </p>
         </div>
-        <div style="position:relative; min-width:220px;">
+        <div style="position:relative; min-width:200px; flex:1; max-width:280px;">
           <i class="fa-solid fa-filter" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#94a3b8;"></i>
-          <input type="text" placeholder="Cari nama / mobil / area..." class="radar-card-filter-input" oninput="SalesSuperpowers.filterRadarLeads(this.value)">
+          <input type="text" id="radarCardFilterInput" placeholder="Cari nama / mobil / area..." class="radar-card-filter-input" value="${escapeHtml(this.radarQuery || '')}" oninput="SalesSuperpowers.filterRadarLeads(this.value)">
         </div>
       </div>
-      <div class="radar-leads-grid">
+
+      <!-- Quick Status Filter Pills -->
+      <div class="radar-status-filter-strip">
+        <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'all' ? 'active' : ''}" data-status="all" onclick="SalesSuperpowers.handleRadarStatusFilter('all')">
+          Semua (${countAll})
+        </button>
+        <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Belum Dihubungi' ? 'active' : ''}" data-status="Belum Dihubungi" onclick="SalesSuperpowers.handleRadarStatusFilter('Belum Dihubungi')">
+          <span class="status-dot dot-red"></span> Belum Dihubungi (${countBelum})
+        </button>
+        <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Menunggu Respon' ? 'active' : ''}" data-status="Menunggu Respon" onclick="SalesSuperpowers.handleRadarStatusFilter('Menunggu Respon')">
+          <span class="status-dot dot-yellow"></span> Menunggu Respon (${countMenunggu})
+        </button>
+        <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Tertarik / Jadwal Servis' ? 'active' : ''}" data-status="Tertarik / Jadwal Servis" onclick="SalesSuperpowers.handleRadarStatusFilter('Tertarik / Jadwal Servis')">
+          <span class="status-dot dot-purple"></span> Tertarik / Servis (${countTertarik})
+        </button>
+        <button type="button" class="radar-status-pill ${this.radarStatusFilter === 'Deal / Selesai' ? 'active' : ''}" data-status="Deal / Selesai" onclick="SalesSuperpowers.handleRadarStatusFilter('Deal / Selesai')">
+          <span class="status-dot dot-green"></span> Deal / Selesai (${countDeal})
+        </button>
+      </div>
+
+      <div id="radarCardsGridContainer"></div>
     `;
 
-    filteredLeads.forEach((item) => {
+    listContainer.innerHTML = html;
+    this.renderRadarCardsGrid(filtered);
+  },
+
+  renderRadarCardsGrid(leads) {
+    const gridContainer = document.getElementById('radarCardsGridContainer');
+    if (!gridContainer) return;
+
+    if (!leads || leads.length === 0) {
+      gridContainer.innerHTML = `
+        <div class="radar-empty-state" style="padding:30px 16px;">
+          <div class="radar-empty-icon" style="width:46px; height:46px; font-size:20px;">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+          </div>
+          <h4 class="radar-empty-title" style="font-size:14px;">Tidak Ada Customer dengan Status Terpilih</h4>
+          <p class="radar-empty-desc" style="font-size:11.5px;">Coba pilih status lain (misal "Semua" atau "Belum Dihubungi") atau sesuaikan radius jangkauan.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let cardsHtml = `<div class="radar-leads-grid">`;
+
+    leads.forEach((item) => {
       const initials = (item.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
       let statusColor = '#ef4444';
       if (item.status === 'Deal / Selesai') statusColor = '#10b981';
@@ -876,7 +1015,7 @@ const SalesSuperpowers = {
         ? `https://wa.me/${item.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + item.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda kanvasing di sekitar ' + (item.district || 'area Bapak/Ibu') + '. Apakah ada waktu luang sebentar jika saya mampir untuk update info promo atau konsultasi unit Toyota?')}`
         : '';
 
-      html += `
+      cardsHtml += `
         <div class="radar-lead-card-deluxe" style="border-left: 4px solid ${statusColor};">
           <div>
             <div class="radar-card-header">
@@ -929,8 +1068,8 @@ const SalesSuperpowers = {
       `;
     });
 
-    html += `</div>`;
-    listContainer.innerHTML = html;
+    cardsHtml += `</div>`;
+    gridContainer.innerHTML = cardsHtml;
   },
 
   openRadarFollowupModal(customerId) {

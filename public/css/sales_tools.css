@@ -2152,3 +2152,80 @@
   color: #64748b;
   margin: 0;
 }
+
+/* Quick Status Filter Pills for Radar */
+.radar-status-filter-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 12px 2px;
+  margin-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.radar-status-filter-strip::-webkit-scrollbar {
+  height: 4px;
+}
+
+.radar-status-filter-strip::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.radar-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.radar-status-pill:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.radar-status-pill.active {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
+.radar-status-pill.active .status-dot {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.dot-red {
+  background: #ef4444;
+}
+
+.status-dot.dot-yellow {
+  background: #f59e0b;
+}
+
+.status-dot.dot-purple {
+  background: #8b5cf6;
+}
+
+.status-dot.dot-green {
+  background: #10b981;
+}
+

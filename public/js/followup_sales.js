@@ -102,13 +102,13 @@ function initFollowupTabs() {
               <div class="num" id="heroTotalCount">0</div>
               <div class="lbl">Semua Database</div>
             </div>
-            <div class="hero-kpi-chip" id="kpiChipBelum" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); cursor:pointer;" onclick="handleStatusFilter('belum_fu')" title="Klik untuk melihat database yang belum di-follow up">
-              <div class="num" style="color:#fbbf24;" id="heroPendingCount">0</div>
-              <div class="lbl">Belum Di-Follow Up</div>
+            <div class="hero-kpi-chip" id="kpiChipBelum" style="background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.3); cursor:pointer;" onclick="handleStatusFilter('Belum Dihubungi')" title="Klik untuk melihat database belum dihubungi">
+              <div class="num" style="color:#ef4444;" id="heroPendingCount">0</div>
+              <div class="lbl">Belum Dihubungi</div>
             </div>
-            <div class="hero-kpi-chip" id="kpiChipSudah" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3); cursor:pointer;" onclick="handleStatusFilter('sudah_fu')" title="Klik untuk melihat database yang sudah di-follow up">
-              <div class="num" style="color:#6ee7b7;" id="heroFollowedCount">0</div>
-              <div class="lbl">Sudah Di-Follow Up</div>
+            <div class="hero-kpi-chip" id="kpiChipWaiting" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); cursor:pointer;" onclick="handleStatusFilter('Menunggu Respon')" title="Klik untuk melihat database menunggu respon">
+              <div class="num" style="color:#fbbf24;" id="heroWaitingCount">0</div>
+              <div class="lbl">Menunggu Respon</div>
             </div>
             <div class="hero-kpi-chip" id="kpiChipInterested" style="background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3); cursor:pointer;" onclick="handleStatusFilter('Tertarik / Jadwal Servis')" title="Klik untuk melihat prospek tertarik">
               <div class="num" style="color:#93c5fd;" id="heroInterestedCount">0</div>
@@ -150,12 +150,12 @@ function initFollowupTabs() {
               <!-- Status Filter Dropdown -->
               <select id="followupStatusSelect" class="fu-select-clean" onchange="handleStatusFilter(this.value)" style="padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; border:1.5px solid #cbd5e1; background:#f8fafc; color:#0f172a; cursor:pointer;" title="Filter status follow-up">
                 <option value="all">Semua Status Follow-Up</option>
-                <option value="belum_fu">Belum Di-Follow Up</option>
-                <option value="sudah_fu">Sudah Di-Follow Up</option>
-                <option value="Menunggu Respon">Menunggu Respon</option>
-                <option value="Tertarik / Jadwal Servis">Tertarik / Servis</option>
-                <option value="Deal / Selesai">Deal / Selesai</option>
-                <option value="Tidak Tertarik">Tidak Tertarik</option>
+                <option value="Belum Dihubungi">🔴 Belum Dihubungi</option>
+                <option value="Menunggu Respon">🟡 Menunggu Respon</option>
+                <option value="Tertarik / Jadwal Servis">🟣 Tertarik / Servis</option>
+                <option value="Deal / Selesai">🟢 Deal / Selesai</option>
+                <option value="Tidak Tertarik">⚪ Tidak Tertarik</option>
+                <option value="sudah_fu">Sudah Di-Follow Up (Semua)</option>
               </select>
 
               <!-- Auto-Blast Button -->
@@ -672,12 +672,14 @@ function updateHeroStats() {
 
   const elTotal = document.getElementById('heroTotalCount');
   const elPending = document.getElementById('heroPendingCount');
+  const elWaiting = document.getElementById('heroWaitingCount');
   const elFollowed = document.getElementById('heroFollowedCount');
   const elInterested = document.getElementById('heroInterestedCount');
   const badgeMyTasks = document.getElementById('badgeMyTasksCount');
 
   if (elTotal) elTotal.textContent = total;
   if (elPending) elPending.textContent = pending;
+  if (elWaiting) elWaiting.textContent = waiting;
   if (elFollowed) elFollowed.textContent = followedUp;
   if (elInterested) elInterested.textContent = interested;
   if (badgeMyTasks) badgeMyTasks.textContent = total;
@@ -741,6 +743,7 @@ function handleStatusFilter(status, btn) {
   document.querySelectorAll('.hero-kpi-chip').forEach(c => c.classList.remove('active-kpi'));
   if (status === 'all') document.getElementById('kpiChipAll')?.classList.add('active-kpi');
   else if (status === 'belum_fu' || status === 'Belum Dihubungi') document.getElementById('kpiChipBelum')?.classList.add('active-kpi');
+  else if (status === 'Menunggu Respon') document.getElementById('kpiChipWaiting')?.classList.add('active-kpi');
   else if (status === 'sudah_fu') document.getElementById('kpiChipSudah')?.classList.add('active-kpi');
   else if (status === 'Tertarik / Jadwal Servis') document.getElementById('kpiChipInterested')?.classList.add('active-kpi');
 
@@ -775,12 +778,14 @@ function renderCustomerCards(preserveRenderLimit = false) {
     list = list.filter(c => c.followup_category === followupState.activeCategory);
   }
 
-  // Filter Status (All, Belum FU, Sudah FU, or specific status)
+  // Filter Status (All, Belum Dihubungi, Menunggu Respon, Sudah FU, or specific status)
   if (followupState.activeStatus !== 'all') {
     if (followupState.activeStatus === 'belum_fu' || followupState.activeStatus === 'Belum Dihubungi') {
-      list = list.filter(c => !c.followup_status || c.followup_status === 'Belum Dihubungi');
+      list = list.filter(c => !c.followup_status || c.followup_status === 'Belum Dihubungi' || c.followup_status === 'belum_fu');
+    } else if (followupState.activeStatus === 'Menunggu Respon') {
+      list = list.filter(c => c.followup_status === 'Menunggu Respon' || (c.remarks && c.remarks.toLowerCase().includes('menunggu')));
     } else if (followupState.activeStatus === 'sudah_fu') {
-      list = list.filter(c => c.followup_status && c.followup_status !== 'Belum Dihubungi');
+      list = list.filter(c => c.followup_status && c.followup_status !== 'Belum Dihubungi' && c.followup_status !== 'belum_fu');
     } else if (followupState.activeStatus === 'Tidak Tertarik') {
       list = list.filter(c => c.followup_status === 'Tidak Tertarik' || c.remarks === 'Customer menolak');
     } else {
