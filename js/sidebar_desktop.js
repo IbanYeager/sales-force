@@ -108,25 +108,31 @@
             </div>
 
             <div class="sidebar-nav">
-                <p class="sidebar-nav-label">Menu Kepala Cabang</p>
+                <p class="sidebar-nav-label"><i class="fa-solid fa-chart-line"></i> Eksekutif &amp; Dashboard</p>
                 ${navLinkKacab('pages_kacab/index_kacab.html', 'fa-solid fa-gauge-high', 'Dashboard Cabang')}
-                ${(curPage === 'index_kacab') ? navLinkKacab('pages_kacab/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service') : ''}
+                ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}
+                ${navLinkKacab('pages_kacab/performa_regional.html', 'fa-solid fa-earth-asia', 'Performa Regional Jabar')}
+
+                <p class="sidebar-nav-label"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Sales CRM</p>
+                ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
-                ${navLinkKacab('pages_kacab/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
-                ${navLinkKacab('pages_kacab/after_sales.html', 'fa-solid fa-wrench', 'After Sales')}
+                ${navLinkKacab('pages_kacab/approval_kacab.html', 'fa-solid fa-clipboard-check', 'Otorisasi & Approval')}
+
+                <p class="sidebar-nav-label"><i class="fa-solid fa-users-gear"></i> Monitoring Tim &amp; Sales</p>
                 ${navLinkKacab('pages_kacab/monitoring_spv.html', 'fa-solid fa-sitemap', 'Monitoring Tim SPV')}
                 ${navLinkKacab('pages_kacab/wiraniaga.html', 'fa-solid fa-users', 'Data ' + (localStorage.getItem('total_sales_count') || 50) + ' Wiraniaga')}
-                ${navLinkKacab('pages_kacab/approval_kacab.html', 'fa-solid fa-clipboard-check', 'Otorisasi & Approval')}
                 ${navLinkKacab('pages_kacab/target_kacab.html', 'fa-solid fa-bullseye', 'Target & Produktivitas')}
-                ${navLinkKacab('pages_kacab/laporan_kacab.html', 'fa-solid fa-chart-pie', 'Laporan Eksekutif')}
                 ${navLinkKacab('pages_kacab/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas & Riwayat Sales')}
                 ${navLinkKacab('pages_kacab/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas')}
                 ${navLinkKacab('pages_kacab/peta_kunjungan.html', 'fa-solid fa-map-location-dot', 'Peta GPS Kunjungan')}
-                ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
+
+                <p class="sidebar-nav-label"><i class="fa-solid fa-warehouse"></i> Stok &amp; Operasional</p>
                 ${navLinkKacab('pages_kacab/inventory.html', 'fa-solid fa-warehouse', 'Live Stok (1.638 Unit)')}
-                ${navLinkKacab('pages_kacab/performa_regional.html', 'fa-solid fa-earth-asia', 'Performa Regional Jabar')}
-                ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkKacab('pages_kacab/after_sales.html', 'fa-solid fa-wrench', 'After Sales')}
+                ${navLinkKacab('pages_kacab/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service')}
+                ${navLinkKacab('pages_kacab/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
+                ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkKacab('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
@@ -193,24 +199,30 @@
             </div>
 
             <div class="sidebar-nav">
-                <p class="sidebar-nav-label">Menu Supervisor</p>
-                ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard')}
-                ${(curPage === 'index_spv') ? navLinkSPV('pages_spv/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service') : ''}
+                <p class="sidebar-nav-label"><i class="fa-solid fa-chart-line"></i> Overview &amp; Target</p>
+                ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard SPV')}
+                ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target &amp; Pencapaian')}
+                ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+
+                <p class="sidebar-nav-label"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Approval</p>
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
+                ${navLinkSPV('pages_spv/approval.html', 'fa-solid fa-check-to-slot', 'Otorisasi & Approval <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
                 ${navLinkSPV('pages_spv/ao_report_spv.html', 'fa-solid fa-chalkboard-user', 'AO Report Cabang')}
-                ${navLinkSPV('pages_spv/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
-                ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target')}
-                ${navLinkSPV('pages_spv/wiraniaga.html', 'fa-solid fa-users', 'Wiraniaga')}
-                ${navLinkSPV('pages_spv/approval.html', 'fa-solid fa-check-to-slot', 'Approval <span class="sidebar-notif-badge" id="sidebarApprovalBadge" style="display:none; margin-left:auto;">0</span>')}
-                ${navLinkSPV('pages_spv/aktivitas.html', 'fa-solid fa-list-check', 'Aktivitas <span class="sidebar-notif-badge" id="sidebarAktivitasBadge" style="display:none; margin-left:auto; background:#2563eb;">0</span>')}
+
+                <p class="sidebar-nav-label"><i class="fa-solid fa-users-gear"></i> Supervisi Tim Sales</p>
+                ${navLinkSPV('pages_spv/wiraniaga.html', 'fa-solid fa-users', 'Tim Wiraniaga')}
+                ${navLinkSPV('pages_spv/aktivitas.html', 'fa-solid fa-list-check', 'Monitoring Aktivitas <span class="sidebar-notif-badge" id="sidebarAktivitasBadge" style="display:none; margin-left:auto; background:#2563eb;">0</span>')}
+                ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
                 ${navLinkSPV('pages_spv/briefing_generator.html', 'fa-solid fa-wand-magic-sparkles', 'Briefing Auto-Gen')}
                 ${navLinkSPV('pages_spv/peta_canvassing.html', 'fa-solid fa-map-location-dot', 'Canvassing Heatmap')}
+
+                <p class="sidebar-nav-label"><i class="fa-solid fa-warehouse"></i> Stok &amp; Operasional</p>
+                ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stok Unit')}
+                ${navLinkSPV('pages_spv/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
+                ${navLinkSPV('pages_spv/mtoyota_service.html', 'fa-solid fa-car-on', 'm-Toyota &amp; Service')}
+                ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data Cabang')}
                 ${navLinkSPV('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
-                ${navLinkSPV('pages_spv/spv_coaching.html', 'fa-solid fa-chalkboard-user', 'Coaching Radar')}
-                ${navLinkSPV('pages_spv/inventory.html', 'fa-solid fa-warehouse', 'Live Stock')}
-                ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
                 ${navLinkSPV('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
-                ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
                     <i class="fa-solid fa-magnifying-glass"></i>

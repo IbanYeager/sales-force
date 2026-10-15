@@ -58,21 +58,57 @@
         </div>
       </div>
 
+            <div class="spv-search-wrap">
+        <div class="spv-search-box">
+          <i class="fa-solid fa-magnifying-glass spv-search-icon"></i>
+          <input type="text" class="spv-search-input" id="spvSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+          <button type="button" class="spv-search-clear" id="spvSearchClear" style="display:none;" title="Bersihkan pencarian">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
       <nav class="spv-nav">
-        <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard</a>
-        <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up</a>
-        <a href="ao_report_spv.html" id="navAO" class="active"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
-        <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i>Trade-In &amp; OLX</a>
-        <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target</a>
-        <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Wiraniaga</a>
-        <a href="approval.html" id="navApproval"><i class="fa-solid fa-check-to-slot"></i>Approval<span class="nav-badge" id="navApprovalBadge" style="display:none;">0</span></a>
-        <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
-        <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-wand-magic-sparkles"></i>Briefing Auto-Gen</a>
-        <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
-        <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
-        <a href="inventory.html" id="navInventory"><i class="fa-solid fa-warehouse"></i>Live Stok Unit</a>
-        <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
-        <a href="kelola_data.html" id="navKelola"><i class="fa-solid fa-database"></i>Kelola Data</a>
+        <!-- Kategori 1: Overview & Target -->
+        <div class="spv-nav-category">
+          <span class="spv-category-title"><i class="fa-solid fa-chart-line"></i> Overview &amp; Target</span>
+          <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard SPV</a>
+          <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target &amp; Pencapaian</a>
+          <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
+        </div>
+
+        <!-- Kategori 2: Pipeline & Approval -->
+        <div class="spv-nav-category">
+          <span class="spv-category-title"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Approval</span>
+          <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
+          <a href="approval.html" id="navApproval"><i class="fa-solid fa-check-to-slot"></i>Otorisasi &amp; Approval<span class="nav-badge" id="navApprovalBadge" style="display:none;">0</span></a>
+          <a href="ao_report_spv.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
+        </div>
+
+        <!-- Kategori 3: Supervisi Tim Sales -->
+        <div class="spv-nav-category">
+          <span class="spv-category-title"><i class="fa-solid fa-users-gear"></i> Supervisi Tim Sales</span>
+          <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Tim Wiraniaga</a>
+          <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Monitoring Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+          <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
+          <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-wand-magic-sparkles"></i>Briefing Auto-Gen</a>
+          <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
+        </div>
+
+        <!-- Kategori 4: Stok & Operasional -->
+        <div class="spv-nav-category">
+          <span class="spv-category-title"><i class="fa-solid fa-warehouse"></i> Stok &amp; Operasional</span>
+          <a href="inventory.html" id="navInventory"><i class="fa-solid fa-warehouse"></i>Live Stok Unit</a>
+          <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i>Trade-In &amp; OLX</a>
+          <a href="mtoyota_service.html" id="navMtoyota"><i class="fa-solid fa-car-on"></i>m-Toyota &amp; Service</a>
+          <a href="kelola_data.html" id="navKelola"><i class="fa-solid fa-database"></i>Kelola Data Cabang</a>
+        </div>
+
+        <div class="spv-search-empty" id="spvSearchEmpty" style="display:none;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <p>Menu tidak ditemukan</p>
+          <span>Coba gunakan kata kunci lain</span>
+        </div>
       </nav>
 
       <div class="sidebar-footer">

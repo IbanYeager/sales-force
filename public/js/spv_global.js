@@ -147,6 +147,8 @@ if (typeof window.spvDrawerInit === 'undefined') {
             if (e.key === 'Escape') closeDrawer();
         });
 
+        initSpvSidebarNav(sidebar);
+
         // Tutup drawer saat link nav diklik (navigasi halaman)
         sidebar.querySelectorAll('.spv-nav a').forEach(a => {
             a.addEventListener('click', closeDrawer);
@@ -175,6 +177,181 @@ if (typeof window.spvDrawerInit === 'undefined') {
             }
         });
     });
+}
+
+// ── Sidebar Categories & Real-Time Search Handler (SPV) ──────────────
+function initSpvSidebarNav(sidebar) {
+    if (!sidebar) return;
+    const nav = sidebar.querySelector('.spv-nav');
+    if (!nav) return;
+
+    // 1. Search Bar Injection
+    let searchWrap = sidebar.querySelector('.spv-search-wrap');
+    if (!searchWrap) {
+        searchWrap = document.createElement('div');
+        searchWrap.className = 'spv-search-wrap';
+        searchWrap.innerHTML = `
+            <div class="spv-search-box">
+                <i class="fa-solid fa-magnifying-glass spv-search-icon"></i>
+                <input type="text" class="spv-search-input" id="spvSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+                <button type="button" class="spv-search-clear" id="spvSearchClear" style="display:none;" title="Bersihkan pencarian">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        `;
+        nav.parentNode.insertBefore(searchWrap, nav);
+    }
+
+    // 2. Structuring into Categories if not yet grouped
+    if (!nav.querySelector('.spv-nav-category')) {
+        const categoryDefs = [
+            {
+                title: 'Overview & Target',
+                icon: 'fa-solid fa-chart-line',
+                ids: ['navDash', 'navTarget', 'navPenjualan'],
+                hrefs: ['index_spv', 'target', 'penjualan_kircon']
+            },
+            {
+                title: 'Pipeline & Approval',
+                icon: 'fa-solid fa-funnel-dollar',
+                ids: ['navFollowup', 'navApproval', 'navAO'],
+                hrefs: ['followup_database', 'approval', 'ao_report_spv', 'ao_report']
+            },
+            {
+                title: 'Supervisi Tim Sales',
+                icon: 'fa-solid fa-users-gear',
+                ids: ['navWiraniaga', 'navAktivitas', 'navCoaching', 'navBriefing', 'navCanvassing'],
+                hrefs: ['wiraniaga', 'aktivitas', 'spv_coaching', 'briefing_generator', 'peta_canvassing', 'peta_kunjungan']
+            },
+            {
+                title: 'Stok & Operasional',
+                icon: 'fa-solid fa-warehouse',
+                ids: ['navInventory', 'navOlx', 'navMtoyota', 'navKelola'],
+                hrefs: ['inventory', 'olx', 'mtoyota_service', 'mtoyota', 'kelola_data', 'jadwal_input', 'video_viral']
+            }
+        ];
+
+        const links = Array.from(nav.querySelectorAll('a'));
+        if (links.length > 0) {
+            const fragment = document.createDocumentFragment();
+            const allocatedLinks = new Set();
+
+            categoryDefs.forEach(cat => {
+                const catBox = document.createElement('div');
+                catBox.className = 'spv-nav-category';
+                catBox.innerHTML = `<span class="spv-category-title"><i class="${cat.icon}"></i> ${cat.title}</span>`;
+
+                links.forEach(a => {
+                    const aId = a.id;
+                    const aHref = a.getAttribute('href') || '';
+                    const matchesId = cat.ids.includes(aId);
+                    const matchesHref = cat.hrefs.some(h => aHref.includes(h));
+
+                    if (!allocatedLinks.has(a) && (matchesId || matchesHref)) {
+                        allocatedLinks.add(a);
+                        catBox.appendChild(a);
+                    }
+                });
+
+                if (catBox.children.length > 1) {
+                    fragment.appendChild(catBox);
+                }
+            });
+
+            // Any remaining links get added to last category
+            links.forEach(a => {
+                if (!allocatedLinks.has(a)) {
+                    let lastCat = fragment.querySelector('.spv-nav-category:last-child');
+                    if (lastCat) lastCat.appendChild(a);
+                }
+            });
+
+            nav.innerHTML = '';
+            nav.appendChild(fragment);
+        }
+    }
+
+    // 3. Empty Search State
+    let emptyState = nav.querySelector('#spvSearchEmpty');
+    if (!emptyState) {
+        emptyState = document.createElement('div');
+        emptyState.className = 'spv-search-empty';
+        emptyState.id = 'spvSearchEmpty';
+        emptyState.style.display = 'none';
+        emptyState.innerHTML = `
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>Menu tidak ditemukan</p>
+            <span>Coba gunakan kata kunci lain</span>
+        `;
+        nav.appendChild(emptyState);
+    }
+
+    // 4. Real-time Search Logic
+    const searchInput = sidebar.querySelector('#spvSearchInput');
+    const searchClear = sidebar.querySelector('#spvSearchClear');
+
+    if (searchInput) {
+        function filterSpvNav() {
+            const q = searchInput.value.trim().toLowerCase();
+            if (searchClear) {
+                searchClear.style.display = q ? 'flex' : 'none';
+            }
+
+            const categories = nav.querySelectorAll('.spv-nav-category');
+            let totalVisible = 0;
+
+            categories.forEach(cat => {
+                const links = cat.querySelectorAll('a');
+                let catVisibleCount = 0;
+
+                links.forEach(link => {
+                    if (!q) {
+                        link.style.display = '';
+                        catVisibleCount++;
+                        totalVisible++;
+                        return;
+                    }
+                    const text = link.textContent.toLowerCase();
+                    const href = (link.getAttribute('href') || '').toLowerCase();
+                    if (text.includes(q) || href.includes(q)) {
+                        link.style.display = '';
+                        catVisibleCount++;
+                        totalVisible++;
+                    } else {
+                        link.style.display = 'none';
+                    }
+                });
+
+                if (!q) {
+                    cat.style.display = '';
+                } else {
+                    cat.style.display = (catVisibleCount > 0) ? '' : 'none';
+                }
+            });
+
+            if (emptyState) {
+                emptyState.style.display = (totalVisible === 0 && q) ? 'block' : 'none';
+            }
+        }
+
+        searchInput.addEventListener('input', filterSpvNav);
+
+        if (searchClear) {
+            searchClear.addEventListener('click', () => {
+                searchInput.value = '';
+                filterSpvNav();
+                searchInput.focus();
+            });
+        }
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                filterSpvNav();
+                searchInput.blur();
+            }
+        });
+    }
 }
 
 // ── Visual Notification Toast ──────────────────────────

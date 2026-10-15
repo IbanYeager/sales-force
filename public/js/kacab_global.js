@@ -327,6 +327,8 @@ if (typeof window.kcbDrawerInit === 'undefined') {
       if (e.key === 'Escape') closeDrawer();
     });
 
+    initKacabSidebarNav(sidebar);
+
     sidebar.querySelectorAll('.kcb-nav a').forEach(a => {
       a.addEventListener('click', closeDrawer);
     });
@@ -353,6 +355,181 @@ if (typeof window.kcbDrawerInit === 'undefined') {
       }
     });
   });
+}
+
+// ── Sidebar Categories & Real-Time Search Handler (Kacab) ────────────
+function initKacabSidebarNav(sidebar) {
+  if (!sidebar) return;
+  const nav = sidebar.querySelector('.kcb-nav');
+  if (!nav) return;
+
+  // 1. Search Bar Injection
+  let searchWrap = sidebar.querySelector('.kcb-search-wrap');
+  if (!searchWrap) {
+    searchWrap = document.createElement('div');
+    searchWrap.className = 'kcb-search-wrap';
+    searchWrap.innerHTML = `
+      <div class="kcb-search-box">
+        <i class="fa-solid fa-magnifying-glass kcb-search-icon"></i>
+        <input type="text" class="kcb-search-input" id="kcbSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+        <button type="button" class="kcb-search-clear" id="kcbSearchClear" style="display:none;" title="Bersihkan pencarian">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    `;
+    nav.parentNode.insertBefore(searchWrap, nav);
+  }
+
+  // 2. Structuring into Categories if not yet grouped
+  if (!nav.querySelector('.kcb-nav-category')) {
+    const categoryDefs = [
+      {
+        title: 'Eksekutif & Dashboard',
+        icon: 'fa-solid fa-chart-line',
+        ids: ['navDash', 'navLaporan', 'navRegional'],
+        hrefs: ['index_kacab', 'laporan_kacab', 'performa_regional']
+      },
+      {
+        title: 'Pipeline & Sales CRM',
+        icon: 'fa-solid fa-funnel-dollar',
+        ids: ['navPenjualan', 'navFollowup', 'navAO', 'navApproval'],
+        hrefs: ['penjualan_kircon', 'followup_database', 'ao_report_kacab', 'ao_report', 'approval_kacab', 'approval']
+      },
+      {
+        title: 'Monitoring Tim & Sales',
+        icon: 'fa-solid fa-users-gear',
+        ids: ['navMonitoring', 'navWiraniaga', 'navTarget', 'navAktivitas', 'navFotoAktivitas', 'navPeta'],
+        hrefs: ['monitoring_spv', 'wiraniaga', 'target_kacab', 'target', 'aktivitas', 'riwayat_foto_aktivitas', 'peta_kunjungan']
+      },
+      {
+        title: 'Stok & Operasional',
+        icon: 'fa-solid fa-warehouse',
+        ids: ['navStock', 'navAfterSales', 'navMtoyota', 'navOlx'],
+        hrefs: ['inventory', 'after_sales', 'mtoyota_service', 'mtoyota', 'olx', 'jadwal_input', 'video_viral']
+      }
+    ];
+
+    const links = Array.from(nav.querySelectorAll('a'));
+    if (links.length > 0) {
+      const fragment = document.createDocumentFragment();
+      const allocatedLinks = new Set();
+
+      categoryDefs.forEach(cat => {
+        const catBox = document.createElement('div');
+        catBox.className = 'kcb-nav-category';
+        catBox.innerHTML = `<span class="kcb-category-title"><i class="${cat.icon}"></i> ${cat.title}</span>`;
+
+        links.forEach(a => {
+          const aId = a.id;
+          const aHref = a.getAttribute('href') || '';
+          const matchesId = cat.ids.includes(aId);
+          const matchesHref = cat.hrefs.some(h => aHref.includes(h));
+
+          if (!allocatedLinks.has(a) && (matchesId || matchesHref)) {
+            allocatedLinks.add(a);
+            catBox.appendChild(a);
+          }
+        });
+
+        if (catBox.children.length > 1) {
+          fragment.appendChild(catBox);
+        }
+      });
+
+      // Any remaining links get added to last category
+      links.forEach(a => {
+        if (!allocatedLinks.has(a)) {
+          let lastCat = fragment.querySelector('.kcb-nav-category:last-child');
+          if (lastCat) lastCat.appendChild(a);
+        }
+      });
+
+      nav.innerHTML = '';
+      nav.appendChild(fragment);
+    }
+  }
+
+  // 3. Empty Search State
+  let emptyState = nav.querySelector('#kcbSearchEmpty');
+  if (!emptyState) {
+    emptyState = document.createElement('div');
+    emptyState.className = 'kcb-search-empty';
+    emptyState.id = 'kcbSearchEmpty';
+    emptyState.style.display = 'none';
+    emptyState.innerHTML = `
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <p>Menu tidak ditemukan</p>
+      <span>Coba gunakan kata kunci lain</span>
+    `;
+    nav.appendChild(emptyState);
+  }
+
+  // 4. Real-time Search Logic
+  const searchInput = sidebar.querySelector('#kcbSearchInput');
+  const searchClear = sidebar.querySelector('#kcbSearchClear');
+
+  if (searchInput) {
+    function filterKacabNav() {
+      const q = searchInput.value.trim().toLowerCase();
+      if (searchClear) {
+        searchClear.style.display = q ? 'flex' : 'none';
+      }
+
+      const categories = nav.querySelectorAll('.kcb-nav-category');
+      let totalVisible = 0;
+
+      categories.forEach(cat => {
+        const links = cat.querySelectorAll('a');
+        let catVisibleCount = 0;
+
+        links.forEach(link => {
+          if (!q) {
+            link.style.display = '';
+            catVisibleCount++;
+            totalVisible++;
+            return;
+          }
+          const text = link.textContent.toLowerCase();
+          const href = (link.getAttribute('href') || '').toLowerCase();
+          if (text.includes(q) || href.includes(q)) {
+            link.style.display = '';
+            catVisibleCount++;
+            totalVisible++;
+          } else {
+            link.style.display = 'none';
+          }
+        });
+
+        if (!q) {
+          cat.style.display = '';
+        } else {
+          cat.style.display = (catVisibleCount > 0) ? '' : 'none';
+        }
+      });
+
+      if (emptyState) {
+        emptyState.style.display = (totalVisible === 0 && q) ? 'block' : 'none';
+      }
+    }
+
+    searchInput.addEventListener('input', filterKacabNav);
+
+    if (searchClear) {
+      searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        filterKacabNav();
+        searchInput.focus();
+      });
+    }
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchInput.value = '';
+        filterKacabNav();
+        searchInput.blur();
+      }
+    });
+  }
 }
 
 // ── Dynamic Sales Count Sync across Kacab Sidebar & Headers ──────────
