@@ -1646,6 +1646,7 @@
       if (tabAnalisis) tabAnalisis.classList.remove('active');
       if (tabDaftar) tabDaftar.classList.add('active');
       renderDistrictTable();
+      renderDistrictCards();
     } else {
       if (viewAnalisis) viewAnalisis.style.display = 'block';
       if (viewDaftar) viewDaftar.style.display = 'none';

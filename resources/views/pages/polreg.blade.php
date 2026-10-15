@@ -67,17 +67,9 @@
 
 <body>
   <div class="mobile-app polreg-fullwidth-page">
-    <header class="header-page" style="display:flex; justify-content:space-between; align-items:center;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
-        <div>
-          <h2 style="margin:0; font-size:16.5px; font-weight:800; color:#ffffff;">Peta Polreg Wilayah Bandung Raya</h2>
-          <span style="font-size:11px; opacity:0.88; display:block; margin-top:2px; color:#ffffff;">Territory Intelligence &amp; Analisis 79 Kecamatan</span>
-        </div>
-      </div>
-      <button type="button" onclick="openCaraPakaiModal()" style="background:#ffd700; color:#0d1b3e; border:none; padding:6px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
-        <i class="fa-solid fa-lightbulb"></i> Cara Pakai
-      </button>
+    <header class="header-page">
+      <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
+      <h2>Peta Polreg Wilayah Bandung Raya</h2>
     </header>
 
     <div class="container" style="margin-top: 0; padding-bottom: 40px;">
@@ -405,9 +397,9 @@
               </div>
             </div>
             <div class="polreg-car-panel-badges">
-              <span class="badge" style="background:#fee2e2; color:#991b1b; padding:5px 10px; border-radius:8px; font-weight:800;" id="cpBadgeTotalUnits"><i class="fa-solid fa-car"></i> Memuat...</span>
-              <span class="badge" style="background:#eff6ff; color:#1e40af; padding:5px 10px; border-radius:8px; font-weight:800;" id="cpBadgeTotalMerks"><i class="fa-solid fa-tags"></i> - Merk</span>
-              <span class="badge" style="background:#ecfdf5; color:#065f46; padding:5px 10px; border-radius:8px; font-weight:800;" id="cpBadgeToyotaUnits"><i class="fa-solid fa-crown"></i> Toyota: - Unit</span>
+              <span class="polreg-badge-pill" style="background:#fee2e2; color:#991b1b; padding:6px 12px; border-radius:8px; font-weight:800;" id="cpBadgeTotalUnits"><i class="fa-solid fa-car"></i> Memuat...</span>
+              <span class="polreg-badge-pill" style="background:#eff6ff; color:#1e40af; padding:6px 12px; border-radius:8px; font-weight:800;" id="cpBadgeTotalMerks"><i class="fa-solid fa-tags"></i> - Merk</span>
+              <span class="polreg-badge-pill" style="background:#ecfdf5; color:#065f46; padding:6px 12px; border-radius:8px; font-weight:800;" id="cpBadgeToyotaUnits"><i class="fa-solid fa-crown"></i> Toyota: - Unit</span>
             </div>
           </div>
 
@@ -649,6 +641,8 @@
       const modal = document.getElementById('modalCaraPakai');
       if (modal) modal.classList.remove('show');
     }
+    // Connect to executive header Cara Pakai button from sidebar_desktop.js
+    window.sftOpenFeatureTutorial = openCaraPakaiModal;
   </script>
 
   <script src="../custom_alert.js"></script>
