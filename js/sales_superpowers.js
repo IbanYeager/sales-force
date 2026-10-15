@@ -269,10 +269,10 @@ const SalesSuperpowers = {
           </div>
         </div>
 
-        <!-- Controls Row: Radius Filter Pills & Location Search -->
-        <div class="radar-controls-strip">
+        <!-- Controls Row: Radius Filter Pills -->
+        <div class="radar-controls-strip" style="margin-bottom: 14px;">
           <!-- Radius Options -->
-          <div class="radar-radius-section">
+          <div class="radar-radius-section" style="width: 100%;">
             <span class="radar-radius-label">
               <i class="fa-solid fa-bullseye" style="color:#d7123a;"></i> Jangkauan Radius:
             </span>
@@ -284,31 +284,6 @@ const SalesSuperpowers = {
               <button type="button" class="radar-radius-pill ${this.currentRadius >= 999 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(999, '${containerId}')">Semua Wilayah</button>
             </div>
           </div>
-
-          <!-- Location Search -->
-          <div class="radar-search-wrap">
-            <div class="radar-search-input-box">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" id="salesLocationSearchInput" class="radar-search-input" placeholder="Ketik jalan / kelurahan / area Anda..." onkeypress="if(event.key==='Enter') SalesSuperpowers.searchAndSetLocation(this.value)">
-            </div>
-            <button type="button" class="btn-radar-search" onclick="SalesSuperpowers.searchAndSetLocation(document.getElementById('salesLocationSearchInput').value)">
-              Cari Lokasi
-            </button>
-          </div>
-        </div>
-
-        <!-- Quick Landmark Shortcut Chips for Bandung -->
-        <div class="radar-quick-landmarks">
-          <span style="font-size:11px; font-weight:800; color:#64748b; margin-right:4px;">
-            <i class="fa-solid fa-map-pin" style="color:#2563eb;"></i> Akses Cepat Area:
-          </span>
-          <button type="button" class="radar-landmark-chip dealer-chip" onclick="SalesSuperpowers.quickSetLocation('kircon')">🏢 Kiara Condong (Dealer)</button>
-          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('buahbatu')">📍 Buah Batu</button>
-          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('antapani')">📍 Antapani</button>
-          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('batununggal')">📍 Batununggal</button>
-          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('ciwastra')">📍 Ciwastra / Margacinta</button>
-          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('gedebage')">📍 Gedebage</button>
-          <button type="button" class="radar-landmark-chip" onclick="SalesSuperpowers.quickSetLocation('dago')">📍 Dago</button>
         </div>
 
         <!-- Interactive Map Container -->
