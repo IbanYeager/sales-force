@@ -13,7 +13,7 @@ let pwaRefreshing = false;
 
 // 1. SMART AUTO-UPDATING SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
-    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20260918_v8' : 'sw.js?v=20260918_v8';
+    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20261016_v7' : 'sw.js?v=20261016_v7';
 
     navigator.serviceWorker.register(swPath)
         .then(registration => {

@@ -1,5 +1,6 @@
 /.phpunit.cache
 /node_modules
+/vendor
 /public/build
 /public/hot
 /public/storage
@@ -94,10 +95,12 @@ public/uploads/dokumen/*
 # Aktivitas & Event Galeri uploads (Tracked for documentation gallery)
 !aktivitas/*.jpg
 !aktivitas/*.jpeg
+!aktivitas/*.jfif
 !aktivitas/*.png
 !aktivitas/*.webp
 !public/aktivitas/*.jpg
 !public/aktivitas/*.jpeg
+!public/aktivitas/*.jfif
 !public/aktivitas/*.png
 !public/aktivitas/*.webp
 

@@ -3,9 +3,10 @@
 
 let activitiesList = [];
 let allWiraniagaList = [];
-let salesSpvMap = {}; // nama_sales → nama_spv
+let salesSpvMap = {}; // nama_sales -> nama_spv
 let currentPhotoList = [];
 let currentPhotoIndex = 0;
+let currentDetailIndex = -1;
 
 function escapeHtml(str) {
   if (!str && str !== 0) return '';
@@ -24,16 +25,35 @@ function getImageUrl(photoStr) {
   if (first.startsWith('http://') || first.startsWith('https://') || first.startsWith('/')) {
     return first;
   }
-  if (first.startsWith('uploads/') || first.startsWith('aktivitas/')) {
-    return '../' + first;
+  const clean = first.replace(/^(\.\.\/)+/, '');
+  if (clean.startsWith('uploads/') || clean.startsWith('aktivitas/')) {
+    return '../' + clean;
   }
-  if (first.startsWith('../uploads/') || first.startsWith('../aktivitas/')) {
-    return first;
+  if (clean.includes('_lap_')) {
+    return '../uploads/laporan/' + clean;
   }
-  if (first.includes('_lap_')) {
-    return '../uploads/laporan/' + first;
+  return '../aktivitas/' + clean;
+}
+
+function handlePhotoError(img) {
+  if (!img) return;
+  const step = parseInt(img.dataset.fbStep || '0', 10);
+  img.dataset.fbStep = String(step + 1);
+  if (step === 0) {
+    if (img.src.includes('/uploads/lokasi/')) {
+      img.src = img.src.replace('/uploads/lokasi/', '/aktivitas/');
+      return;
+    } else if (img.src.includes('/aktivitas/')) {
+      img.src = img.src.replace('/aktivitas/', '/uploads/lokasi/');
+      return;
+    }
+  } else if (step === 1) {
+    if (img.src.endsWith('.jfif')) {
+      img.src = img.src.replace(/\.jfif$/, '.jpg');
+      return;
+    }
   }
-  return '../uploads/lokasi/' + first;
+  img.style.display = 'none';
 }
 
 function activityIcon(tipe) {
@@ -329,7 +349,7 @@ function applyTimelineFilters() {
         const imgUrl = getImageUrl(act.foto);
         if (imgUrl) {
           photoHtml = `<img src="${imgUrl}" class="tl-photo" alt="Foto aktivitas"
-            loading="lazy" onerror="this.style.display='none'" onclick="zoomImage(event, '${imgUrl}')">`;
+            loading="lazy" onerror="handlePhotoError(this)" onclick="zoomImage(event, '${imgUrl}')">`;
         }
       }
 
@@ -346,6 +366,7 @@ function applyTimelineFilters() {
               ${spvName ? `<span class="tl-chip spv"><i class="fa-solid fa-user-tie"></i> ${escapeHtml(spvName)}</span>` : ''}
               ${isPameran ? `<span class="tl-chip gallery-link" onclick="event.stopPropagation(); location.href='riwayat_foto_aktivitas.html';" title="Buka Galeri Foto"><i class="fa-solid fa-images"></i> Galeri Foto</span>` : ''}
               <span class="tl-status ${statusClass(act.status)}">${escapeHtml(act.status)}</span>
+              <button type="button" class="tl-chip-edit-btn" onclick="event.stopPropagation(); openEditAktivitas(${index});" title="Edit Informasi Aktivitas"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
             </div>
             <div class="tl-desc">${escapeHtml(act.keterangan || '')}</div>
 
@@ -369,8 +390,9 @@ function applyTimelineFilters() {
   }).join('');
 }
 
-// ── Detail modal ───────────────────────────────────────
+// -- Detail modal ---------------------------------------
 function showActivityDetails(index) {
+  currentDetailIndex = index;
   const act = activitiesList[index];
   if (!act) return;
 
@@ -498,7 +520,10 @@ function showActivityDetails(index) {
     currentPhotoIndex = 0;
     
     const mainImg = document.getElementById('detMainPhoto');
-    if (mainImg) mainImg.src = currentPhotoList[0];
+    if (mainImg) {
+      mainImg.src = currentPhotoList[0];
+      mainImg.onerror = function() { handlePhotoError(this); };
+    }
 
     if (photoCounter) {
       photoCounter.textContent = `Foto 1 dari ${currentPhotoList.length}`;
@@ -508,7 +533,7 @@ function showActivityDetails(index) {
       if (currentPhotoList.length > 1) {
         thumbs.innerHTML = currentPhotoList.map((url, i) => `
           <div class="detail-thumb-item ${i === 0 ? 'active' : ''}" onclick="switchDetailPhoto(${i})">
-            <img src="${url}" alt="Foto ${i + 1}">
+            <img src="${url}" alt="Foto ${i + 1}" onerror="handlePhotoError(this)">
           </div>
         `).join('');
         thumbs.style.display = 'flex';
@@ -549,6 +574,199 @@ function closeActivityDetail() {
   if (modal) {
     modal.classList.remove('open');
     modal.style.display = 'none';
+  }
+}
+
+// -- Fitur Edit Informasi Aktivitas oleh Kepala Cabang --
+function openEditAktivitasFromDetail() {
+  if (currentDetailIndex >= 0) {
+    closeActivityDetail();
+    openEditAktivitas(currentDetailIndex);
+  }
+}
+
+function openEditAktivitas(index) {
+  const act = activitiesList[index];
+  if (!act) return;
+
+  const modal = document.getElementById('editAktivitasModal');
+  if (!modal) return;
+
+  // Set hidden inputs
+  const idInput = document.getElementById('editAktivitasId');
+  const salesIdInput = document.getElementById('editSalesAccountId');
+  if (idInput) idInput.value = act.id || '';
+  if (salesIdInput) salesIdInput.value = act.sales_account_id || '';
+
+  // Populate Sales dropdown
+  const salesSelect = document.getElementById('editSelectSales');
+  if (salesSelect) {
+    let salesOptions = '<option value="">Pilih Wiraniaga...</option>';
+    const sortedSales = [...allWiraniagaList].sort((a, b) => (a.nama_lengkap || '').localeCompare(b.nama_lengkap || ''));
+    sortedSales.forEach(s => {
+      const sId = s.id || '';
+      const sName = s.nama_lengkap || '';
+      const sSpv = s.nama_spv ? ` (SPV: ${s.nama_spv})` : '';
+      const isSelected = (String(sId) === String(act.sales_account_id) || sName.trim().toLowerCase() === (act.nama_sales || '').trim().toLowerCase()) ? 'selected' : '';
+      salesOptions += `<option value="${escapeHtml(sName)}" data-id="${sId}" ${isSelected}>${escapeHtml(sName + sSpv)}</option>`;
+    });
+    salesSelect.innerHTML = salesOptions;
+  }
+
+  // Set Tipe Aktivitas
+  const tipeSelect = document.getElementById('editTipeAktivitas');
+  if (tipeSelect) {
+    let matched = false;
+    for (let i = 0; i < tipeSelect.options.length; i++) {
+      if (tipeSelect.options[i].value === act.tipe_aktivitas) {
+        tipeSelect.selectedIndex = i;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched && act.tipe_aktivitas) {
+      const opt = new Option(act.tipe_aktivitas, act.tipe_aktivitas, true, true);
+      tipeSelect.add(opt);
+    }
+  }
+
+  // Set Lokasi / Tempat
+  const lokasiInput = document.getElementById('editLokasi');
+  if (lokasiInput) lokasiInput.value = act.lokasi || '';
+
+  // Set Status
+  const statusSelect = document.getElementById('editStatus');
+  if (statusSelect) statusSelect.value = act.status || 'Selesai';
+
+  // Set Sesi Waktu
+  const sesiSelect = document.getElementById('editSesiWaktu');
+  if (sesiSelect) sesiSelect.value = act.sesi_waktu || 'Pagi';
+
+  // Set Durasi
+  const durasiSelect = document.getElementById('editDurasi');
+  if (durasiSelect) durasiSelect.value = act.durasi || '1 Jam';
+
+  // Parse Tanggal & Jam
+  const createdDate = new Date(String(act.created_at || '').replace(/-/g, '/'));
+  if (!isNaN(createdDate.getTime())) {
+    const yyyy = createdDate.getFullYear();
+    const mm = String(createdDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(createdDate.getDate()).padStart(2, '0');
+    const tglInput = document.getElementById('editTanggal');
+    if (tglInput) tglInput.value = `${yyyy}-${mm}-${dd}`;
+
+    const hh = String(createdDate.getHours()).padStart(2, '0');
+    const min = String(createdDate.getMinutes()).padStart(2, '0');
+    const jamInput = document.getElementById('editJam');
+    if (jamInput) jamInput.value = `${hh}:${min}`;
+  } else {
+    const tglInput = document.getElementById('editTanggal');
+    const jamInput = document.getElementById('editJam');
+    if (tglInput) tglInput.value = new Date().toISOString().slice(0, 10);
+    if (jamInput) jamInput.value = '09:00';
+  }
+
+  // Set Keterangan & Laporan
+  const ketInput = document.getElementById('editKeterangan');
+  const lapInput = document.getElementById('editLaporanHasil');
+  const prospekInput = document.getElementById('editJumlahProspek');
+  if (ketInput) ketInput.value = act.keterangan || '';
+  if (lapInput) lapInput.value = act.laporan_hasil || '';
+  if (prospekInput) prospekInput.value = act.jumlah_prospek || 0;
+
+  // Photo Preview
+  const photoThumb = document.getElementById('editFotoCurrentThumb');
+  const photoName = document.getElementById('editFotoCurrentName');
+  const photoInput = document.getElementById('editFotoInput');
+  if (photoInput) photoInput.value = '';
+
+  if (act.foto && String(act.foto).trim() !== '') {
+    const imgUrl = getImageUrl(act.foto);
+    if (photoThumb) {
+      photoThumb.src = imgUrl;
+      photoThumb.style.display = 'block';
+    }
+    if (photoName) photoName.textContent = act.foto;
+  } else {
+    if (photoThumb) photoThumb.style.display = 'none';
+    if (photoName) photoName.textContent = 'Tidak ada foto terlampir';
+  }
+
+  modal.style.display = 'flex';
+  modal.classList.add('open');
+}
+
+function onEditSalesChange(select) {
+  const selectedOpt = select.options[select.selectedIndex];
+  if (selectedOpt) {
+    const salesId = selectedOpt.dataset.id || '';
+    const salesIdInput = document.getElementById('editSalesAccountId');
+    if (salesIdInput) salesIdInput.value = salesId;
+  }
+}
+
+function closeEditAktivitasModal() {
+  const modal = document.getElementById('editAktivitasModal');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('open');
+  }
+}
+
+async function submitEditAktivitas(event) {
+  event.preventDefault();
+  const form = document.getElementById('formEditAktivitas');
+  const btn = document.getElementById('btnSaveEditAktivitas');
+  if (!form || !btn) return;
+
+  const id = document.getElementById('editAktivitasId').value;
+  if (!id) {
+    alert('ID Aktivitas tidak ditemukan!');
+    return;
+  }
+
+  const originalBtnHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan...';
+
+  try {
+    const fd = new FormData(form);
+    const res = await fetch('../api/api_edit_aktivitas.php', {
+      method: 'POST',
+      body: fd
+    });
+    const json = await res.json();
+
+    if (json.status === 'success') {
+      if (typeof customAlert !== 'undefined' && customAlert.success) {
+        customAlert.success('Aktivitas Berhasil Diperbarui', json.message);
+      } else {
+        alert(json.message);
+      }
+
+      // Update in memory activitiesList
+      const updatedItem = json.data;
+      const idx = activitiesList.findIndex(a => String(a.id) === String(id));
+      if (idx !== -1 && updatedItem) {
+        activitiesList[idx] = { ...activitiesList[idx], ...updatedItem };
+      }
+
+      updateKpiCards();
+      applyTimelineFilters();
+      closeEditAktivitasModal();
+    } else {
+      if (typeof customAlert !== 'undefined' && customAlert.error) {
+        customAlert.error('Gagal Memperbarui Aktivitas', json.message || 'Terjadi kesalahan sistem.');
+      } else {
+        alert(json.message || 'Gagal memperbarui aktivitas.');
+      }
+    }
+  } catch (err) {
+    console.error('Error submitting edit activity:', err);
+    alert('Terjadi kendala koneksi ke server saat menyimpan perubahan aktivitas.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalBtnHtml;
   }
 }
 

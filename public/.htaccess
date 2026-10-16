@@ -29,6 +29,11 @@ Options -Indexes -MultiViews +FollowSymLinks
     Require all denied
 </FilesMatch>
 
+# Proper MIME types for images
+AddType image/jpeg .jfif .jpg .jpeg
+AddType image/png .png
+AddType image/webp .webp
+
 # Security HTTP Headers
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
@@ -43,4 +48,5 @@ Options -Indexes -MultiViews +FollowSymLinks
         Header set Expires "0"
     </FilesMatch>
 </IfModule>
+
 

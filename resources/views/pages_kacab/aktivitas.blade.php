@@ -31,6 +31,50 @@
       color: #ffffff;
     }
 
+    .tl-chip-edit-btn {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      margin-left: 4px;
+    }
+    .tl-chip-edit-btn:hover {
+      background: #d8a437;
+      color: #1e1014;
+      border-color: #d8a437;
+      transform: translateY(-1px);
+    }
+    .btn-detail-edit-btn:hover {
+      background: linear-gradient(135deg, #e5b349, #c99525) !important;
+      transform: translateY(-1px);
+    }
+
+    .tl-photo {
+      width: 68px !important;
+      height: 68px !important;
+      border-radius: 10px !important;
+      object-fit: cover !important;
+      border: 1px solid #e2e8f0 !important;
+      flex-shrink: 0 !important;
+      cursor: zoom-in !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+      display: block !important;
+      background: #f8fafc;
+    }
+    .tl-photo:hover {
+      transform: scale(1.05) !important;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15) !important;
+    }
+
     /* Kacab Input Aktivitas Button & Modal Styling */
     .btn-input-kacab-primary {
       display: inline-flex;
@@ -1370,11 +1414,210 @@
         </div>
       </div>
 
-      <div class="detail-modal-footer">
+      <div class="detail-modal-footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <button type="button" class="btn-detail-edit-btn" onclick="openEditAktivitasFromDetail()" style="background:linear-gradient(135deg, #d8a437, #b8861b); color:#1e1014; font-weight:800; border:none; padding:9px 18px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 8px rgba(216,164,55,0.3); transition:all 0.2s;">
+          <i class="fa-solid fa-pen-to-square"></i> Edit Aktivitas
+        </button>
         <button type="button" class="btn-detail-close-btn" onclick="closeActivityDetail()">
           <i class="fa-solid fa-xmark"></i> Tutup Detail
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Aktivitas oleh Kacab -->
+  <div id="editAktivitasModal" class="input-modal-overlay">
+    <div class="input-modal-card">
+      <div class="input-modal-header">
+        <div class="input-modal-header-left">
+          <div class="input-modal-icon" style="background: rgba(216,164,55,0.2); color: #d8a437;">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+          <div>
+            <h3>Edit Informasi Aktivitas Sales</h3>
+            <span class="input-modal-sub">Perbarui nama sales, lokasi tempat, keterangan, atau dokumentasi</span>
+          </div>
+        </div>
+        <button type="button" class="input-modal-close" onclick="closeEditAktivitasModal()" aria-label="Tutup modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="formEditAktivitas" onsubmit="submitEditAktivitas(event)" enctype="multipart/form-data">
+        <input type="hidden" id="editAktivitasId" name="aktivitas_id">
+        <input type="hidden" id="editSalesAccountId" name="sales_account_id">
+
+        <div class="input-modal-body">
+          
+          <!-- Banner info otorisasi edit kacab -->
+          <div class="kacab-action-banner" style="background:#fffbeb; border-color:#fef3c7; color:#92400e;">
+            <i class="fa-solid fa-shield-halved" style="font-size:16px; margin-top:2px; color:#d97706;"></i>
+            <div>
+              <strong>Mode Edit Kepala Cabang:</strong> Anda memiliki otorisasi penuh untuk mengubah nama wiraniaga, tipe kegiatan, tempat lokasi, tanggal/jam, maupun catatan keterangan aktivitas.
+            </div>
+          </div>
+
+          <!-- Section 1: Sales / Wiraniaga -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-user-check"></i> 1. Wiraniaga Pelaksana
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama Wiraniaga / Sales <span class="req">*</span></label>
+            <div class="custom-select-wrapper">
+              <i class="fa-solid fa-user select-icon"></i>
+              <select id="editSelectSales" name="nama_sales" class="form-control with-icon" required onchange="onEditSalesChange(this)">
+                <!-- Generated dynamically via JS -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Section 2: Waktu Pelaksanaan -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-calendar-day"></i> 2. Tanggal, Jam &amp; Sesi Pelaksanaan
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Tanggal Kegiatan <span class="req">*</span></label>
+              <div class="custom-input-wrapper">
+                <i class="fa-solid fa-calendar-days input-icon"></i>
+                <input type="date" id="editTanggal" name="tanggal" class="form-control with-icon" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Jam Pelaksanaan (WIB)</label>
+              <div class="custom-input-wrapper">
+                <i class="fa-regular fa-clock input-icon"></i>
+                <input type="time" id="editJam" name="jam" class="form-control with-icon" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Sesi Waktu <span class="req">*</span></label>
+              <div class="custom-select-wrapper">
+                <i class="fa-solid fa-sun select-icon"></i>
+                <select id="editSesiWaktu" name="sesi_waktu" class="form-control with-icon" required>
+                  <option value="Pagi">Pagi (08:00 - 12:00)</option>
+                  <option value="Siang">Siang (12:00 - 15:30)</option>
+                  <option value="Sore">Sore (15:30 - 18:30)</option>
+                  <option value="Malam">Malam (18:30 - Selesai)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Durasi Kegiatan</label>
+              <div class="custom-select-wrapper">
+                <i class="fa-solid fa-hourglass-half select-icon"></i>
+                <select id="editDurasi" name="durasi" class="form-control with-icon">
+                  <option value="30 Menit">30 Menit</option>
+                  <option value="1 Jam">1 Jam</option>
+                  <option value="90 Menit">90 Menit</option>
+                  <option value="2 Jam">2 Jam</option>
+                  <option value="3 Jam">3 Jam</option>
+                  <option value="Full Day (4+ Jam)">Full Day (4+ Jam)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Detail Kegiatan & Lokasi -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-list-check"></i> 3. Tipe Kegiatan, Lokasi &amp; Status
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Tipe Aktivitas <span class="req">*</span></label>
+              <div class="custom-select-wrapper">
+                <i class="fa-solid fa-tag select-icon"></i>
+                <select id="editTipeAktivitas" name="tipe_aktivitas" class="form-control with-icon" required>
+                  <option value="Pameran (Exhibition / Booth)">🎪 Pameran (Exhibition / Booth Mall)</option>
+                  <option value="Canvassing Lapangan / Door to Door">🚶 Canvassing Lapangan / Door to Door</option>
+                  <option value="Pertemuan Prospek / Kantor Customer">🏢 Pertemuan Prospek / Kantor Customer</option>
+                  <option value="Flyering & Prospecting">📄 Flyering &amp; Prospecting</option>
+                  <option value="Customer Gathering & Event Cabang">🎉 Customer Gathering &amp; Event Cabang</option>
+                  <option value="Test Drive Bersama Customer">🚗 Test Drive Bersama Customer</option>
+                  <option value="Follow Up Database CRM (Telepon/WA)">📞 Follow Up Database CRM (Telepon/WA)</option>
+                  <option value="Digital Marketing / Live TikTok / Medsos">📱 Digital Marketing / Live TikTok / Medsos</option>
+                  <option value="Delivery Ceremony / Handover Unit">🔑 Delivery Ceremony / Handover Unit</option>
+                  <option value="Aktivitas Lainnya">📝 Aktivitas Lainnya</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Status Aktivitas <span class="req">*</span></label>
+              <div class="custom-select-wrapper">
+                <i class="fa-solid fa-circle-check select-icon"></i>
+                <select id="editStatus" name="status" class="form-control with-icon" required>
+                  <option value="Selesai">✅ Selesai (Hasil Kegiatan Tuntas)</option>
+                  <option value="Sedang Dilakukan">⏳ Sedang Dilakukan</option>
+                  <option value="Rencana">📋 Rencana (Jadwal Kegiatan)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Tempat / Lokasi Kegiatan <span class="req">*</span></label>
+              <div class="custom-input-wrapper">
+                <i class="fa-solid fa-location-dot input-icon"></i>
+                <input type="text" id="editLokasi" name="lokasi" class="form-control with-icon" placeholder="Contoh: Trans Studio Mall Bandung / Borma / Showroom" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Jumlah Prospek Didapat</label>
+              <div class="custom-input-wrapper">
+                <i class="fa-solid fa-users-viewfinder input-icon"></i>
+                <input type="number" id="editJumlahProspek" name="jumlah_prospek" min="0" class="form-control with-icon" placeholder="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Foto Dokumentasi -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-camera"></i> 4. Dokumentasi Foto
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 16px; margin-bottom:12px;">
+            <div style="font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Foto Saat Ini:</div>
+            <div id="editFotoCurrentBox" style="display:flex; align-items:center; gap:12px;">
+              <img id="editFotoCurrentThumb" src="" alt="Foto saat ini" style="width:54px; height:54px; border-radius:8px; object-fit:cover; border:1px solid #cbd5e1; display:none;">
+              <span id="editFotoCurrentName" style="font-size:12px; color:#64748b; word-break:break-all;">Tidak ada foto terlampir</span>
+            </div>
+            <div style="margin-top:10px;">
+              <label class="form-label" style="font-size:11.5px; color:#475569;">Ganti Foto (Opsional):</label>
+              <input type="file" id="editFotoInput" name="foto" accept="image/*" class="form-control" style="font-size:12px; padding:6px 10px;">
+            </div>
+          </div>
+
+          <!-- Section 5: Keterangan & Laporan -->
+          <div class="form-section-title">
+            <i class="fa-solid fa-clipboard-list"></i> 5. Catatan Keterangan &amp; Laporan Hasil
+          </div>
+          <div class="form-group">
+            <label class="form-label">Keterangan Aktivitas <span class="req">*</span></label>
+            <textarea id="editKeterangan" name="keterangan" rows="3" class="form-control" required placeholder="Tuliskan catatan atau keterangan kegiatan sales..."></textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Laporan Hasil / Catatan Tambahan</label>
+            <textarea id="editLaporanHasil" name="laporan_hasil" rows="2" class="form-control" placeholder="Catatan hasil tindak lanjut, komitmen customer, dll..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="input-modal-footer">
+          <button type="button" class="btn-modal-cancel" onclick="closeEditAktivitasModal()">Batal</button>
+          <button type="submit" id="btnSaveEditAktivitas" class="btn-modal-save" style="background:linear-gradient(135deg, #d8a437, #b8861b); color:#1e1014; font-weight:800;">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Simpan Perubahan</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1732,8 +1975,8 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
-  <script src="../js/kacab_aktivitas.js?v=20261007_kacab_input_v5"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/kacab_aktivitas.js?v=20261016_v7"></script>
+  <script src="../js/pwa-app.js?v=20261016_v7"></script>
 </body>
 
 </html>
