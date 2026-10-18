@@ -43,7 +43,7 @@
   <div class="mobile-app polreg-fullwidth-page">
     <header class="header-page">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
-      <h2>Peta Polreg Wilayah Bandung Raya</h2>
+      <h2>Peta Polreg Bandung Raya</h2>
     </header>
 
     <div class="container" style="margin-top: 0; padding-bottom: 40px;">
@@ -51,10 +51,14 @@
       <!-- Segment Control Tabs: Peta Interaktif vs Matriks / Daftar -->
       <div class="polreg-tab-bar">
         <button type="button" class="polreg-tab-btn active" id="tabAnalisis" onclick="switchPolregTab('analisis')">
-          <i class="fa-solid fa-earth-asia"></i> Peta Interaktif &amp; Analisis Wilayah
+          <i class="fa-solid fa-earth-asia"></i>
+          <span class="tab-txt-desktop">Peta Interaktif &amp; Analisis Wilayah</span>
+          <span class="tab-txt-mobile">Peta &amp; Analisis</span>
         </button>
         <button type="button" class="polreg-tab-btn" id="tabDaftar" onclick="switchPolregTab('daftar')">
-          <i class="fa-solid fa-table-list"></i> Matriks &amp; Rekap 79 Kecamatan
+          <i class="fa-solid fa-table-list"></i>
+          <span class="tab-txt-desktop">Matriks &amp; Rekap 79 Kecamatan</span>
+          <span class="tab-txt-mobile">Matriks 79 Wilayah</span>
         </button>
       </div>
 
@@ -111,21 +115,21 @@
         <!-- Filter & Control Toolbar -->
         <div class="polreg-control-panel">
           <!-- Regency Selector Pills -->
-          <div class="polreg-regency-filters" style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-            <button type="button" class="polreg-regency-btn active" data-regency="all" style="padding:7px 15px; border-radius:10px; font-size:12px; font-weight:800; border:1px solid #cbd5e1; background:#0f172a; color:#ffffff; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-              <i class="fa-solid fa-earth-asia"></i> Semua Wilayah <span style="background:rgba(255,255,255,0.2); padding:2px 6px; border-radius:6px; font-size:10.5px;">79</span>
+          <div class="polreg-regency-filters">
+            <button type="button" class="polreg-regency-btn active" data-regency="all">
+              <i class="fa-solid fa-earth-asia"></i> Semua Wilayah <span class="pill-counter">79</span>
             </button>
-            <button type="button" class="polreg-regency-btn" data-regency="kota_bandung" style="padding:7px 15px; border-radius:10px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; background:#ffffff; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-              <i class="fa-solid fa-city" style="color:#2563eb;"></i> Kota Bandung <span style="background:#f1f5f9; padding:2px 6px; border-radius:6px; font-size:10.5px;">30</span>
+            <button type="button" class="polreg-regency-btn" data-regency="kota_bandung">
+              <i class="fa-solid fa-city" style="color:#2563eb;"></i> Kota Bandung <span class="pill-counter">30</span>
             </button>
-            <button type="button" class="polreg-regency-btn" data-regency="kota_cimahi" style="padding:7px 15px; border-radius:10px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; background:#ffffff; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-              <i class="fa-solid fa-tree-city" style="color:#16a34a;"></i> Kota Cimahi <span style="background:#f1f5f9; padding:2px 6px; border-radius:6px; font-size:10.5px;">3</span>
+            <button type="button" class="polreg-regency-btn" data-regency="kota_cimahi">
+              <i class="fa-solid fa-tree-city" style="color:#16a34a;"></i> Kota Cimahi <span class="pill-counter">3</span>
             </button>
-            <button type="button" class="polreg-regency-btn" data-regency="kab_bandung" style="padding:7px 15px; border-radius:10px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; background:#ffffff; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-              <i class="fa-solid fa-mountain-city" style="color:#d97706;"></i> Kab. Bandung <span style="background:#f1f5f9; padding:2px 6px; border-radius:6px; font-size:10.5px;">31</span>
+            <button type="button" class="polreg-regency-btn" data-regency="kab_bandung">
+              <i class="fa-solid fa-mountain-city" style="color:#d97706;"></i> Kab. Bandung <span class="pill-counter">31</span>
             </button>
-            <button type="button" class="polreg-regency-btn" data-regency="kab_bandung_barat" style="padding:7px 15px; border-radius:10px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; background:#ffffff; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-              <i class="fa-solid fa-compass" style="color:#7c3aed;"></i> Kab. Bandung Barat <span style="background:#f1f5f9; padding:2px 6px; border-radius:6px; font-size:10.5px;">15</span>
+            <button type="button" class="polreg-regency-btn" data-regency="kab_bandung_barat">
+              <i class="fa-solid fa-compass" style="color:#7c3aed;"></i> Kab. Bandung Barat <span class="pill-counter">15</span>
             </button>
           </div>
 

@@ -9,7 +9,7 @@ if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
-define('LARAVEL_START', microtime(true));
+defined('LARAVEL_START') || define('LARAVEL_START', microtime(true));
 
 /*
 |--------------------------------------------------------------------------
