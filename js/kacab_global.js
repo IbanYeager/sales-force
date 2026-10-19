@@ -577,6 +577,56 @@ function initKacabSidebarNav(sidebar) {
       }
     });
   }
+
+  // 5. Enhance Nav Link Badges for Stock and Wiraniaga
+  const stockLink = sidebar.querySelector('#navStock, a[href*="inventory"]');
+  if (stockLink && !stockLink.querySelector('.kcb-nav-badge')) {
+    const rawText = stockLink.textContent.trim();
+    const countMatch = rawText.match(/\(([\d\.\,]+\s*Unit)\)/i);
+    const countStr = countMatch ? countMatch[1] : '1.638 Unit';
+    const icon = stockLink.querySelector('i');
+    const iconClass = icon ? icon.className : 'fa-solid fa-warehouse';
+    stockLink.innerHTML = `<span class="kcb-nav-label"><i class="${iconClass}"></i> Live Stok</span><span class="kcb-nav-badge badge-gold">${countStr}</span>`;
+  }
+
+  const wiraniagaLink = sidebar.querySelector('#navWiraniaga, a[href*="wiraniaga"]');
+  if (wiraniagaLink && !wiraniagaLink.querySelector('.kcb-nav-badge')) {
+    const totalCount = localStorage.getItem('total_sales_count') || 57;
+    const icon = wiraniagaLink.querySelector('i');
+    const iconClass = icon ? icon.className : 'fa-solid fa-users';
+    wiraniagaLink.innerHTML = `<span class="kcb-nav-label"><i class="${iconClass}"></i> Data Wiraniaga</span><span class="kcb-nav-badge badge-gold">${totalCount} Sales</span>`;
+  }
+
+  // 6. Enhance Sidebar Footer with Executive Profile Card
+  const footer = sidebar.querySelector('.sidebar-footer');
+  if (footer && !footer.querySelector('.kcb-footer-profile')) {
+    const rawName = localStorage.getItem('namaSales') || 'Dendi Holius';
+    const rawFoto = localStorage.getItem('fotoSales') || '';
+    const avatarSrc = (rawFoto && rawFoto.trim() !== '')
+      ? rawFoto
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(rawName)}&background=1e1014&color=d8a437&bold=true`;
+
+    const profileCard = document.createElement('div');
+    profileCard.className = 'kcb-footer-profile';
+    profileCard.innerHTML = `
+      <div class="kcb-footer-avatar-wrap">
+        <img src="${avatarSrc}" alt="${rawName}" class="kcb-footer-avatar" id="kcbFooterAvatar">
+        <span class="kcb-footer-dot" title="Sistem Aktif & Terhubung"></span>
+      </div>
+      <div class="kcb-footer-meta">
+        <span class="kcb-footer-name" id="kcbFooterName">${rawName}</span>
+        <span class="kcb-footer-role"><i class="fa-solid fa-crown" style="font-size:9px;"></i> Kepala Cabang</span>
+      </div>
+    `;
+
+    footer.insertBefore(profileCard, footer.firstChild);
+
+    const logoutBtn = footer.querySelector('button');
+    if (logoutBtn) {
+      logoutBtn.className = 'kcb-logout-btn';
+      logoutBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> <span>Keluar</span>';
+    }
+  }
 }
 
 // ── Dynamic Sales Count Sync across Kacab Sidebar & Headers ──────────
@@ -591,9 +641,14 @@ function updateSidebarSalesCount(total) {
   const navLinks = document.querySelectorAll('#navWiraniaga, a[href*="wiraniaga.html"], a[href*="wiraniaga"]');
   navLinks.forEach(link => {
     if (link.closest('.kcb-nav') || link.closest('.desktop-sidebar') || link.classList.contains('sidebar-nav-link')) {
-      const icon = link.querySelector('i');
-      const iconHtml = icon ? icon.outerHTML : '<i class="fa-solid fa-users"></i>';
-      link.innerHTML = `${iconHtml} Data ${count} Wiraniaga`;
+      const badge = link.querySelector('.kcb-nav-badge');
+      if (badge) {
+        badge.textContent = `${count} Sales`;
+      } else {
+        const icon = link.querySelector('i');
+        const iconHtml = icon ? icon.outerHTML : '<i class="fa-solid fa-users"></i>';
+        link.innerHTML = `<span class="kcb-nav-label">${iconHtml} Data Wiraniaga</span><span class="kcb-nav-badge badge-gold">${count} Sales</span>`;
+      }
     }
   });
 

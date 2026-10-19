@@ -13,8 +13,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Kacab Theme & 2026 Sales Dashboard Styles -->
-  <link rel="stylesheet" href="../css/style_kacab.css?v=20260915_layout_perfect">
-  <link rel="stylesheet" href="../css/sales_dashboard.css?v=20260915_layout_perfect">
+  <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
+  <link rel="stylesheet" href="/css/style_kacab.css?v=20261019_executive_sidebar_lux">
+  <link rel="stylesheet" href="../css/sales_dashboard.css?v=20261019_executive_sidebar_lux">
+  <link rel="stylesheet" href="/css/sales_dashboard.css?v=20261019_executive_sidebar_lux">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1e1014">
@@ -31,15 +33,16 @@
             alt="Tunas Toyota Logo" class="tunas-logo">
         </div>
         <div class="kcb-brand-title">
-          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
-          <p class="panel-sub">Kepala Cabang</p>
+          <span class="panel-tag"><i class="fa-solid fa-crown"></i> KACAB PANEL</span>
+          <p class="panel-sub"><span class="panel-sub-dot"></span> Cabang Kiara Condong</p>
         </div>
       </div>
 
       <div class="kcb-search-wrap">
         <div class="kcb-search-box">
           <i class="fa-solid fa-magnifying-glass kcb-search-icon"></i>
-          <input type="text" class="kcb-search-input" id="kcbSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+          <input type="text" class="kcb-search-input" id="kcbSearchInput" placeholder="Cari menu &amp; fitur..." autocomplete="off" spellcheck="false">
+          <kbd class="kcb-search-kbd">Ctrl+K</kbd>
           <button type="button" class="kcb-search-clear" id="kcbSearchClear" style="display:none;" title="Bersihkan pencarian">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -50,38 +53,38 @@
         <!-- Kategori 1: Eksekutif & Dashboard -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-chart-line"></i> Eksekutif &amp; Dashboard</span>
-          <a href="index_kacab.html" id="navDash" class="active"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
-          <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
-          <a href="performa_regional.html" id="navRegional"><i class="fa-solid fa-earth-asia"></i>Performa Regional Jabar</a>
+          <a href="index_kacab.html" id="navDash" class="active"><i class="fa-solid fa-gauge-high"></i> Dashboard Cabang</a>
+          <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i> Laporan Eksekutif</a>
+          <a href="performa_regional.html" id="navRegional"><i class="fa-solid fa-earth-asia"></i> Performa Regional Jabar</a>
         </div>
 
         <!-- Kategori 2: Pipeline & Sales CRM -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Sales CRM</span>
-          <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
-          <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
-          <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
-          <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi &amp; Approval</a>
+          <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i> Penjualan Kircon</a>
+          <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i> Database Follow-Up (CRM)</a>
+          <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i> AO Report Cabang</a>
+          <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i> Otorisasi &amp; Approval</a>
         </div>
 
         <!-- Kategori 3: Monitoring Tim & Sales -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-users-gear"></i> Monitoring Tim &amp; Sales</span>
-          <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
-          <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data 50 Wiraniaga</a>
-          <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target &amp; Produktivitas</a>
-          <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas &amp; Riwayat Sales</a>
-          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i>Riwayat Foto Aktivitas</a>
-          <a href="peta_kunjungan.html" id="navPeta"><i class="fa-solid fa-map-location-dot"></i>Peta GPS Kunjungan</a>
+          <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i> Monitoring Tim SPV</a>
+          <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i> Data 57 Wiraniaga <span class="kcb-nav-badge badge-gold">57 Sales</span></a>
+          <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i> Target &amp; Produktivitas</a>
+          <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i> Aktivitas &amp; Riwayat Sales</a>
+          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i> Riwayat Foto Aktivitas</a>
+          <a href="peta_kunjungan.html" id="navPeta"><i class="fa-solid fa-map-location-dot"></i> Peta GPS Kunjungan</a>
         </div>
 
         <!-- Kategori 4: Stok & Operasional -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-warehouse"></i> Stok &amp; Operasional</span>
-          <a href="inventory.html" id="navStock"><i class="fa-solid fa-warehouse"></i>Live Stok (1.638 Unit)</a>
-          <a href="after_sales.html" id="navAfterSales"><i class="fa-solid fa-wrench"></i>After Sales</a>
-          <a href="mtoyota_service.html" id="navMtoyota"><i class="fa-solid fa-car-on"></i>m-Toyota &amp; Service</a>
-          <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i>Trade-In &amp; OLX</a>
+          <a href="inventory.html" id="navStock"><i class="fa-solid fa-warehouse"></i> Live Stok <span class="kcb-nav-badge badge-gold">1.638 Unit</span></a>
+          <a href="after_sales.html" id="navAfterSales"><i class="fa-solid fa-wrench"></i> After Sales</a>
+          <a href="mtoyota_service.html" id="navMtoyota"><i class="fa-solid fa-car-on"></i> m-Toyota &amp; Service</a>
+          <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i> Trade-In &amp; OLX</a>
         </div>
 
         <div class="kcb-search-empty" id="kcbSearchEmpty" style="display:none;">
@@ -92,8 +95,18 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
-          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        <div class="kcb-footer-profile">
+          <div class="kcb-footer-avatar-wrap">
+            <img src="https://ui-avatars.com/api/?name=Dendi+Holius&background=1e1014&color=d8a437&bold=true" alt="Dendi Holius" class="kcb-footer-avatar" id="kcbFooterAvatar">
+            <span class="kcb-footer-dot" title="Sistem Aktif &amp; Terhubung"></span>
+          </div>
+          <div class="kcb-footer-meta">
+            <span class="kcb-footer-name" id="kcbFooterName">Dendi Holius</span>
+            <span class="kcb-footer-role"><i class="fa-solid fa-crown" style="font-size:9px;"></i> Kepala Cabang</span>
+          </div>
+        </div>
+        <button type="button" class="kcb-logout-btn" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> <span>Keluar</span>
         </button>
       </div>
     </aside>

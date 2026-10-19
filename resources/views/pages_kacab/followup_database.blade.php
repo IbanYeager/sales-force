@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Database Follow-Up (CRM)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/css/style_kacab.css?v=20260915_layout_perfect">
+  <link rel="stylesheet" href="/css/style_kacab.css?v=20261019_executive_sidebar_lux">
   <link rel="stylesheet" href="/css/followup.css?v=20260922_searchable_filter">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
