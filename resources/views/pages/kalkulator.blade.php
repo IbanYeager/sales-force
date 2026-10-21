@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="../css/kalkulator.css?v={{ time() }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#090e18">
@@ -44,6 +45,19 @@
         <div id="simCustBanner" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:14px; padding:12px 16px; margin-bottom:20px; font-size:12.5px; color:#1e40af; align-items:center; gap:10px; font-weight:700;">
             <i class="fa-solid fa-user-check" style="font-size:16px; color:#2563eb;"></i>
             <span>Simulasi untuk Konsumen Prospek: <u id="simCustName">-</u> (Hasil simulasi otomatis terisi saat transfer ke Form SPK)</span>
+        </div>
+
+        <!-- ── SEGMENTED TAB BAR (FEATURE 2: KALKULATOR VS MATCHMAKER) ── -->
+        <div class="calc-mode-segmented-tabs">
+            <button type="button" class="calc-mode-tab-btn active" id="tabModeKalkulator" onclick="switchCalcMainMode('kalkulator')">
+                <i class="fa-solid fa-calculator"></i>
+                <span>Kalkulator Simulasi Cicilan</span>
+            </button>
+            <button type="button" class="calc-mode-tab-btn" id="tabModeMatchmaker" onclick="switchCalcMainMode('matchmaker')">
+                <i class="fa-solid fa-bullseye"></i>
+                <span>🎯 Budget Matchmaker (Pencari Mobil)</span>
+                <span class="calc-tab-badge">Baru</span>
+            </button>
         </div>
 
         <!-- ── 2-COLUMN RESPONSIVE LAYOUT ── -->
@@ -243,6 +257,135 @@
                     </div>
                 </div>
 
+                <!-- ══════════════════════════════════════════════════════════════════
+                     FEATURE 3: TUKAR TAMBAH / TRADE-IN MOBIL LAMA (AUTO-BRIDGE DP)
+                ══════════════════════════════════════════════════════════════════ -->
+                <div class="tradein-box-card">
+                    <div class="tradein-head-row">
+                        <h4 class="tradein-head-title">
+                            <i class="fa-solid fa-arrows-rotate" style="color:#d97706;"></i>
+                            <span>Tukar Tambah Mobil Lama (Trade-In)</span>
+                        </h4>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="tradein-badge-pill"><i class="fa-solid fa-bolt"></i> Auto-Bridge DP</span>
+                            <label style="position:relative; display:inline-block; width:44px; height:24px; margin:0;">
+                                <input type="checkbox" id="checkTradeInEnable" onchange="toggleTradeInBox(this.checked)" style="opacity:0; width:0; height:0;">
+                                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#cbd5e1; transition:.3s; border-radius:24px;" id="tradeInToggleSlider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <p style="font-size:12px; color:#64748b; margin:0 0 14px;">Taksir nilai pasar mobil lama konsumen &amp; potongkan langsung ke DP mobil Toyota baru.</p>
+
+                    <div id="tradeInFormContent" style="display:none;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                            <div>
+                                <label class="form-label" style="font-size:11px;">Merk Mobil Lama</label>
+                                <select id="tiMerk" class="form-select-styled" onchange="updateTradeInModels(); calcTradeInAppraisal();">
+                                    <option value="Toyota" selected>Toyota</option>
+                                    <option value="Daihatsu">Daihatsu</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Suzuki">Suzuki</option>
+                                    <option value="Mitsubishi">Mitsubishi</option>
+                                    <option value="Nissan">Nissan</option>
+                                    <option value="Hyundai">Hyundai</option>
+                                    <option value="Wuling">Wuling</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:11px;">Model / Varian Lama</label>
+                                <input type="text" id="tiModel" class="form-input-styled" placeholder="Misal: Avanza G, Brio E, Xpander..." value="Avanza 1.3 G M/T" oninput="calcTradeInAppraisal()" style="font-size:12.5px; padding:10px 12px;">
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+                            <div>
+                                <label class="form-label" style="font-size:11px;">Tahun</label>
+                                <select id="tiTahun" class="form-select-styled" onchange="calcTradeInAppraisal()">
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2018" selected>2018</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2015">2015</option>
+                                    <option value="2014">2014</option>
+                                    <option value="2013">2013</option>
+                                    <option value="2012">2012</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:11px;">Transmisi</label>
+                                <select id="tiTrans" class="form-select-styled" onchange="calcTradeInAppraisal()">
+                                    <option value="Manual" selected>Manual</option>
+                                    <option value="Matic">Matic (AT/CVT)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:11px;">Kondisi Fisik</label>
+                                <select id="tiKondisi" class="form-select-styled" onchange="calcTradeInAppraisal()">
+                                    <option value="1.0" selected>Istimewa (Mulus)</option>
+                                    <option value="0.94">Standar Pakai</option>
+                                    <option value="0.87">Perlu Rekondisi</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Status Kredit Mobil Lama -->
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 14px; margin-bottom:12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label class="form-label" style="margin:0; font-size:11.5px; cursor:pointer;" for="tiIsOverKredit">
+                                    <input type="checkbox" id="tiIsOverKredit" onchange="toggleOverKreditInputs(this.checked); calcTradeInAppraisal();" style="margin-right:6px;">
+                                    Mobil Masih Dalam Masa Kredit (Over-Kredit)
+                                </label>
+                            </div>
+                            <div id="overKreditRow" style="display:none; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                                <div>
+                                    <label class="form-label" style="font-size:10.5px;">Sisa Cicilan (Bulan)</label>
+                                    <input type="number" id="tiSisaBulan" class="form-input-styled" value="12" min="1" max="72" oninput="calcTradeInAppraisal()" style="font-size:12px; padding:6px 10px;">
+                                </div>
+                                <div>
+                                    <label class="form-label" style="font-size:10.5px;">Angsuran / Bln (Rp)</label>
+                                    <input type="text" id="tiAngsuranLama" class="form-input-styled" value="3.500.000" oninput="formatInput(this); calcTradeInAppraisal();" style="font-size:12px; padding:6px 10px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Valuation Result Box -->
+                        <div class="tradein-result-highlight">
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#94a3b8;">
+                                <span>Estimasi Taksiran Pasar Wajar:</span>
+                                <span style="background:rgba(255,255,255,0.15); color:#fde047; padding:2px 8px; border-radius:6px; font-weight:800;">Appraisal Instan</span>
+                            </div>
+                            <div class="tradein-val-amount" id="tiNilaiPasarText">Rp 145.000.000</div>
+                            <div style="font-size:11px; color:#38bdf8;" id="tiSubInfoText">Avanza 1.3 G M/T (2018) + Subsidi Tunas Rp 3.000.000</div>
+
+                            <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:12px; line-height:1.5;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <span style="color:#cbd5e1;">Nilai Bersih Mobil Lama:</span>
+                                    <strong style="color:#4ade80;" id="tiNilaiBersihText">Rp 148.000.000</strong>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; margin-top:4px;">
+                                    <span style="color:#cbd5e1;">DP Toyota Baru yang Dibutuhkan:</span>
+                                    <strong style="color:#ffffff;" id="tiDpBaruDibutuhkanText">Rp 52.700.000</strong>
+                                </div>
+                                <div style="border-top:1px dashed rgba(255,255,255,0.2); margin:8px 0;"></div>
+                                <div id="tiStatusSolusiText" style="color:#fde047; font-weight:800; font-size:12px;">
+                                    🎉 Nilai mobil lama menutup 100% DP baru! Sisa uang tunai kembali ke konsumen: Rp 95.300.000
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-bridge-dp" onclick="applyTradeInToKalkulator()">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>Terapkan Nilai Mobil Lama Jadi DP Unit Baru</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- CARD 3: LEMBAGA LEASING & METODE BUNGA -->
                 <div class="calc-card">
                     <div class="calc-card-header">
@@ -408,6 +551,13 @@
                             <i class="fa-solid fa-arrow-right" style="font-size:11px; opacity:0.8; margin-left:auto;"></i>
                         </button>
 
+                        <!-- ACTION: BUAT FLYER PROMO (FITUR 1) -->
+                        <button type="button" class="btn-action-flyer" onclick="openFlyerStudioModal()" title="Buat poster promosi visual beresolusi tinggi untuk WhatsApp Status & Instagram Story">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Buat Poster / Flyer Promo WA</span>
+                            <span class="badge-hot"><i class="fa-solid fa-fire"></i> Viral</span>
+                        </button>
+
                         <!-- ACTION 2: BAGIKAN KE WHATSAPP -->
                         <button type="button" class="btn-action-wa" onclick="shareToWhatsApp()" title="Kirim ringkasan penawaran resmi ke nomor WhatsApp calon konsumen">
                             <i class="fa-brands fa-whatsapp" style="font-size:17px;"></i>
@@ -454,6 +604,231 @@
             </div>
 
         </div>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             FEATURE 2: BUDGET MATCHMAKER VIEW (CARI MOBIL SESUAI ANGGARAN)
+        ══════════════════════════════════════════════════════════════════ -->
+        <div id="sectionMatchmaker" style="display:none;">
+            <!-- Hero Card -->
+            <div class="matchmaker-hero-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <span style="background:rgba(255,255,255,0.18); color:#fde047; font-size:11px; font-weight:800; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <i class="fa-solid fa-bullseye"></i> Smart Buyer Matchmaker
+                        </span>
+                        <h2 style="font-family:'Outfit', sans-serif; font-size:22px; font-weight:800; margin:8px 0 4px; color:#ffffff;">
+                            Pencari Mobil Toyota Berdasarkan Anggaran Konsumen
+                        </h2>
+                        <p style="font-size:12.5px; color:rgba(255,255,255,0.85); margin:0; max-width:650px;">
+                            Masukkan batas maksimal uang muka (DP) dan kemampuan cicilan bulanan calon konsumen. Sistem otomatis memfilter mobil Toyota yang paling pas dan merekomendasikan leasing terbaik!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Form Card -->
+            <div class="matchmaker-filter-card">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
+                    <!-- Filter 1: Budget DP -->
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <label class="form-label" style="margin:0;"><i class="fa-solid fa-wallet" style="color:#0284c7;"></i> Budget DP Maksimal</label>
+                            <span style="font-size:12px; font-weight:800; color:#0284c7;" id="lblMmDpVal">Rp 35.000.000</span>
+                        </div>
+                        <input type="text" class="form-input-styled" id="mmInputDp" value="35.000.000" oninput="formatInput(this); runBudgetMatchmaker();" style="font-size:15px; font-weight:800; padding:10px 14px;">
+                        <div class="matchmaker-quick-chips">
+                            <span class="chip-quick" onclick="setMmDp(15000000)">15 Jt</span>
+                            <span class="chip-quick" onclick="setMmDp(25000000)">25 Jt</span>
+                            <span class="chip-quick active" onclick="setMmDp(35000000)">35 Jt</span>
+                            <span class="chip-quick" onclick="setMmDp(50000000)">50 Jt</span>
+                            <span class="chip-quick" onclick="setMmDp(75000000)">75 Jt</span>
+                            <span class="chip-quick" onclick="setMmDp(100000000)">100 Jt+</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter 2: Budget Angsuran -->
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <label class="form-label" style="margin:0;"><i class="fa-solid fa-coins" style="color:#d97706;"></i> Cicilan Maksimal / Bulan</label>
+                            <span style="font-size:12px; font-weight:800; color:#d97706;" id="lblMmCicilanVal">Rp 4.500.000</span>
+                        </div>
+                        <input type="text" class="form-input-styled" id="mmInputCicilan" value="4.500.000" oninput="formatInput(this); runBudgetMatchmaker();" style="font-size:15px; font-weight:800; padding:10px 14px;">
+                        <div class="matchmaker-quick-chips">
+                            <span class="chip-quick" onclick="setMmCicilan(3000000)">3 Jt</span>
+                            <span class="chip-quick" onclick="setMmCicilan(4000000)">4 Jt</span>
+                            <span class="chip-quick active" onclick="setMmCicilan(4500000)">4.5 Jt</span>
+                            <span class="chip-quick" onclick="setMmCicilan(6000000)">6 Jt</span>
+                            <span class="chip-quick" onclick="setMmCicilan(8000000)">8 Jt</span>
+                            <span class="chip-quick" onclick="setMmCicilan(12000000)">12 Jt+</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter 3: Kategori & Tenor -->
+                    <div>
+                        <label class="form-label"><i class="fa-solid fa-car" style="color:#7c3aed;"></i> Preferensi Kategori</label>
+                        <select id="mmSelectKategori" class="form-select-styled" onchange="runBudgetMatchmaker()">
+                            <option value="ALL" selected>Semua Model Toyota</option>
+                            <option value="MPV">MPV Keluarga (Calya, Avanza, Veloz, Zenix)</option>
+                            <option value="SUV">SUV Tangguh (Raize, Rush, Yaris Cross, Fortuner)</option>
+                            <option value="HATCHBACK">Hatchback / City Car (Agya, Yaris)</option>
+                            <option value="COMMERCIAL">Komersial / Usaha (Rangga, Hilux, HiAce)</option>
+                        </select>
+                        <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:#64748b;">
+                            <span>Tenor Acuan:</span>
+                            <select id="mmSelectTenor" class="form-select-styled" onchange="runBudgetMatchmaker()" style="width:auto; padding:4px 10px; font-size:11.5px;">
+                                <option value="5" selected>5 Tahun (60 Bulan)</option>
+                                <option value="4">4 Tahun (48 Bulan)</option>
+                                <option value="3">3 Tahun (36 Bulan)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matchmaker Results Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                <div style="font-size:14px; font-weight:800; color:#0f172a;" id="mmResultCountText">
+                    Ditemukan 0 Model yang Masuk Kualifikasi Anggaran
+                </div>
+                <button type="button" class="btn-refresh-pill" onclick="runBudgetMatchmaker()">
+                    <i class="fa-solid fa-rotate-right"></i> Segarkan Pencocokan
+                </button>
+            </div>
+
+            <!-- Results Grid -->
+            <div class="matchmaker-results-grid" id="mmResultsGrid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             FEATURE 1: STUDIO FLYER PROMO TOYOTA (MODAL POPUP)
+        ══════════════════════════════════════════════════════════════════ -->
+        <div id="flyerStudioModal" class="flyer-modal-overlay" style="display:none;" onclick="closeFlyerStudioModal(event)">
+            <div class="flyer-modal-shell" onclick="event.stopPropagation()">
+                <!-- Modal Head -->
+                <div class="flyer-modal-head">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); display:flex; align-items:center; justify-content:center; color:#fde047; font-size:16px;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin:0; font-size:16px; font-weight:800; font-family:'Outfit', sans-serif;">Studio Poster / Flyer Promo WhatsApp</h3>
+                            <p style="margin:2px 0 0; font-size:11.5px; color:#94a3b8;">Render flyer estetik resolusi tinggi dalam 1 klik untuk Story &amp; Chat</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeFlyerStudioModal()" style="background:rgba(255,255,255,0.12); border:none; width:34px; height:34px; border-radius:50%; color:white; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="flyer-modal-body">
+                    <!-- Left: Live Preview Canvas -->
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div class="flyer-canvas-container">
+                            <canvas id="flyerCanvas" width="1080" height="1920" style="display:none;"></canvas>
+                            <img id="flyerCanvasPreviewImg" class="flyer-canvas-preview" alt="Flyer Promo Preview">
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button type="button" class="btn" style="flex:1; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:white; border:none; border-radius:12px; padding:12px 14px; font-weight:800; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 12px rgba(16,185,129,0.3);" onclick="downloadFlyerImage()">
+                                <i class="fa-solid fa-download"></i> Unduh Gambar (PNG)
+                            </button>
+                            <button type="button" class="btn" style="background:#25D366; color:white; border:none; border-radius:12px; padding:12px 16px; font-weight:800; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 12px rgba(37,211,102,0.3);" onclick="shareFlyerCaptionWA()">
+                                <i class="fa-brands fa-whatsapp"></i> Bagikan WA
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Customizer Controls -->
+                    <div style="display:flex; flex-direction:column; gap:14px;">
+                        <!-- Format Ratio Switcher -->
+                        <div>
+                            <label class="form-label" style="font-size:11.5px;"><i class="fa-solid fa-crop"></i> Ukuran Format Poster</label>
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" class="chip-quick active" id="btnRatioStory" onclick="setFlyerRatio('9:16', this)" style="flex:1; padding:8px 12px; border-radius:10px; font-size:12px;">
+                                    <i class="fa-solid fa-mobile-screen"></i> WA / IG Story (9:16)
+                                </button>
+                                <button type="button" class="chip-quick" id="btnRatioSquare" onclick="setFlyerRatio('1:1', this)" style="flex:1; padding:8px 12px; border-radius:10px; font-size:12px;">
+                                    <i class="fa-solid fa-square"></i> Feed / Chat (1:1)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Theme Picker -->
+                        <div>
+                            <label class="form-label" style="font-size:11.5px;"><i class="fa-solid fa-palette"></i> Tema Warna Poster</label>
+                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                                <div onclick="setFlyerTheme('crimson', this)" class="theme-box-picker active" id="themeCrimson" style="cursor:pointer; border:2px solid #c8102e; border-radius:12px; padding:8px; text-align:center; background:#fff1f2;">
+                                    <div style="height:20px; border-radius:6px; background:linear-gradient(135deg, #c8102e 0%, #7f1d1d 100%); margin-bottom:4px;"></div>
+                                    <span style="font-size:10.5px; font-weight:800; color:#991b1b;">Toyota Red</span>
+                                </div>
+                                <div onclick="setFlyerTheme('navy', this)" class="theme-box-picker" id="themeNavy" style="cursor:pointer; border:2px solid #e2e8f0; border-radius:12px; padding:8px; text-align:center; background:#ffffff;">
+                                    <div style="height:20px; border-radius:6px; background:linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 100%); margin-bottom:4px;"></div>
+                                    <span style="font-size:10.5px; font-weight:800; color:#1e293b;">Executive Navy</span>
+                                </div>
+                                <div onclick="setFlyerTheme('gold', this)" class="theme-box-picker" id="themeGold" style="cursor:pointer; border:2px solid #e2e8f0; border-radius:12px; padding:8px; text-align:center; background:#ffffff;">
+                                    <div style="height:20px; border-radius:6px; background:linear-gradient(135deg, #1e293b 0%, #d97706 100%); margin-bottom:4px;"></div>
+                                    <span style="font-size:10.5px; font-weight:800; color:#1e293b;">Luxury Gold</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Headline & Tagline -->
+                        <div>
+                            <label class="form-label" style="font-size:11.5px;">Tag Promo Headline</label>
+                            <input type="text" id="flyerHeadlineInput" class="form-input-styled" value="SPECIAL PROMO BULAN INI" oninput="renderFlyerCanvas()" style="font-size:12.5px; padding:8px 12px;">
+                        </div>
+
+                        <!-- Highlight Promosi TDP & Angsuran -->
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div>
+                                <label class="form-label" style="font-size:11px;">TDP Sorotan</label>
+                                <input type="text" id="flyerTdpInput" class="form-input-styled" value="" oninput="renderFlyerCanvas()" style="font-size:12px; padding:8px 10px; font-weight:700;">
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:11px;">Angsuran Sorotan</label>
+                                <input type="text" id="flyerCicilanInput" class="form-input-styled" value="" oninput="renderFlyerCanvas()" style="font-size:12px; padding:8px 10px; font-weight:700;">
+                            </div>
+                        </div>
+
+                        <!-- Bonus Paket Tambahan -->
+                        <div>
+                            <label class="form-label" style="font-size:11.5px;">Bonus &amp; Benefit Pembelian</label>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:11.5px; color:#334155;">
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                                    <input type="checkbox" id="chkBonusTcare" checked onchange="renderFlyerCanvas()"> Free Servis 3 Thn (T-Care)
+                                </label>
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                                    <input type="checkbox" id="chkBonusKaca" checked onchange="renderFlyerCanvas()"> Kaca Film Lumar
+                                </label>
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                                    <input type="checkbox" id="chkBonusKarpet" checked onchange="renderFlyerCanvas()"> Karpet &amp; Talang Air
+                                </label>
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                                    <input type="checkbox" id="chkBonusApar" checked onchange="renderFlyerCanvas()"> APAR &amp; P3K Resmi
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Sales Contact Details -->
+                        <div style="background:#f1f5f9; border-radius:12px; padding:12px; border:1px solid #e2e8f0;">
+                            <div style="font-size:11px; font-weight:800; color:#334155; margin-bottom:6px;">PROFIL SALES DI POSTER:</div>
+                            <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:8px;">
+                                <input type="text" id="flyerSalesName" class="form-input-styled" placeholder="Nama Sales" value="Official Sales Consultant" oninput="renderFlyerCanvas()" style="font-size:12px; padding:6px 10px;">
+                                <input type="text" id="flyerSalesPhone" class="form-input-styled" placeholder="No WhatsApp (08...)" value="081234567890" oninput="renderFlyerCanvas()" style="font-size:12px; padding:6px 10px;">
+                            </div>
+                        </div>
+
+                        <!-- Copy Caption Button -->
+                        <button type="button" class="btn" style="background:#f1f5f9; color:#1e293b; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px;" onclick="copyFlyerPromoCaption()">
+                            <i class="fa-solid fa-copy"></i> Salin Caption WhatsApp &amp; Medsos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="hiddenFlyerQrCode" style="display:none;"></div>
     </div>
 
     <!-- Scripts -->
