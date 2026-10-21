@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sales App - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=20261021_mobile_fix_v7">
-    <link rel="stylesheet" href="css/index_dashboard.css?v=6.1">
+    <link rel="stylesheet" href="css/style.css?v=20261021_mobile_fix_v9">
+    <link rel="stylesheet" href="css/index_dashboard.css?v=6.2">
     <link rel="stylesheet" href="css/sales_tools.css?v=1.0">
 
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -106,6 +106,10 @@
                 <p class="sidebar-nav-label">Tier 2: Media, Delivery &amp; Dokumen</p>
                 <a href="pages/video_viral.html" class="sidebar-nav-link" data-tags="media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase">
                     <i class="fa-solid fa-photo-film"></i> Kircon Media Studio
+                </a>
+                <a href="pages/flyer.html" class="sidebar-nav-link" data-tags="flyer poster promo wa whatsapp story feed instagram pamflet studio gambar kustom">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Studio Flyer Promo WA
+                    <span style="background:linear-gradient(135deg,#ff385c,#c8102e); color:#fff; font-size:9px; font-weight:800; padding:1px 6px; border-radius:99px; margin-left:auto;">Baru</span>
                 </a>
                 <a href="pages/do.html" class="sidebar-nav-link" data-tags="do delivery order surat jalan kirim">
                     <i class="fa-solid fa-truck"></i> Surat Jalan (DO)
@@ -380,6 +384,28 @@
                             </div>
                             <div class="kircon-banner-btn">
                                 <span>Buka Media Hub</span>
+                                <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- ═══ STUDIO POSTER & FLYER PROMO WA BANNER ═══ -->
+                    <a href="pages/flyer.html" class="card kircon-studio-banner" style="background: linear-gradient(135deg, #1e1136 0%, #150d2a 100%); border-color: rgba(168, 85, 247, 0.28); margin-bottom: 16px;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div class="kircon-banner-row">
+                            <div class="kircon-banner-left">
+                                <div class="kircon-banner-icon" style="background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(99,102,241,0.15)); color: #c084fc; border: 1px solid rgba(168,85,247,0.4);">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </div>
+                                <div class="kircon-banner-text">
+                                    <div class="kircon-banner-title-wrap">
+                                        <h4 class="kircon-banner-title">Studio Poster &amp; Flyer Promo WA</h4>
+                                        <span class="kircon-banner-tag" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff;">FITUR BARU</span>
+                                    </div>
+                                    <p class="kircon-banner-sub">Buat poster promosi instan kustom: ganti background, multi-mobil, teks cicilan/DP, dan foto diri Anda</p>
+                                </div>
+                            </div>
+                            <div class="kircon-banner-btn" style="background: linear-gradient(135deg, #9333ea, #6366f1); color: #fff; box-shadow: 0 4px 14px rgba(147, 51, 234, 0.4);">
+                                <span>Buka Studio</span>
                                 <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
                             </div>
                         </div>
@@ -880,6 +906,10 @@
                             <a href="pages/video_viral.html" class="category-item modal-feature-item" data-tags="media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase viral">
                                 <div class="category-icon" style="background: linear-gradient(135deg, rgba(200,16,46,0.15), rgba(200,16,46,0.05)); color: #c8102e; border: 1px solid rgba(200,16,46,0.3);"><i class="fa-solid fa-photo-film"></i></div>
                                 <span class="category-text">Media Studio</span>
+                            </a>
+                            <a href="pages/flyer.html" class="category-item modal-feature-item" data-tags="flyer poster promo wa studio banner gambar brosur promosi wa story feed template sales kustom">
+                                <div class="category-icon" style="background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(99,102,241,0.1)); color: #7c3aed; border: 1px solid rgba(139,92,246,0.3);"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <span class="category-text">Studio Flyer WA</span>
                             </a>
                             <a href="pages/mtoyota_service.html" class="category-item modal-feature-item" data-tags="booking service mtoyota m-toyota dec do fs1000 purna jual servis berkala upload foto">
                                 <div class="category-icon" style="background:#ffe4e6; color:#d7123a;"><i class="fa-solid fa-mobile-screen-button"></i></div>
@@ -1402,7 +1432,7 @@
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
-    <script src="js/auto_location_tracker.js?v=20261021_v9"></script>
+    <script src="js/auto_location_tracker.js?v=20261021_v11"></script>
     <script src="./js/pwa-app.js?v=20260908_no_toast"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

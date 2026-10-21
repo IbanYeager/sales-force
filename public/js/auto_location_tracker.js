@@ -194,17 +194,18 @@
             <div id="modalGpsPermission" style="
                 position: fixed;
                 top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(15, 23, 42, 0.75);
-                backdrop-filter: blur(8px);
+                background: rgba(15, 23, 42, 0.35);
                 z-index: 99999;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 padding: 16px;
+                pointer-events: none !important;
                 font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
                 animation: fadeInGpsModal 0.3s ease-out;
             ">
-                <div style="
+                <div id="modalGpsCard" style="
+                    pointer-events: auto !important;
                     background: #ffffff;
                     border-radius: 20px;
                     max-width: 400px;
@@ -311,17 +312,16 @@
         div.innerHTML = modalHtml;
         document.body.appendChild(div);
 
-        document.getElementById('btnCloseGpsModal')?.addEventListener('click', () => {
-            try { sessionStorage.setItem('sales_gps_dismissed_session', 'true'); } catch (e) {}
+        const dismissGps = () => {
+            try { 
+                sessionStorage.setItem('sales_gps_dismissed_session', 'true'); 
+                localStorage.setItem('sales_gps_dismissed_session', 'true');
+            } catch (e) {}
             hidePermissionModal();
-        });
+        };
 
-        document.getElementById('modalGpsPermission')?.addEventListener('click', (e) => {
-            if (e.target && e.target.id === 'modalGpsPermission') {
-                try { sessionStorage.setItem('sales_gps_dismissed_session', 'true'); } catch (err) {}
-                hidePermissionModal();
-            }
-        });
+        document.getElementById('btnCloseGpsModal')?.addEventListener('click', dismissGps);
+        document.getElementById('btnNantiGps')?.addEventListener('click', dismissGps);
 
         document.getElementById('btnAktifkanGps')?.addEventListener('click', () => {
             const btn = document.getElementById('btnAktifkanGps');
@@ -331,15 +331,12 @@
                 btn.disabled = true;
             }
 
-            // SIMPAN SEGERA KE LOCALSTORAGE & COOKIE: Sekali user menekan izin, modal tidak boleh muncul lagi!
             setGpsPermission();
 
-            // Sembunyikan modal dengan segera agar pengguna leluasa beraktivitas
             setTimeout(() => {
                 hidePermissionModal();
             }, 350);
 
-            // Minta posisi awal ke browser dan aktifkan live tracker
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
@@ -348,7 +345,6 @@
                     },
                     (err) => {
                         console.warn('[GPS] Initial position lock notice:', err.message);
-                        // Walau initial lock timeout/indoor, tetap start watchPosition di latar belakang
                         startLiveWatch();
                     },
                     { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
@@ -356,13 +352,13 @@
             }
         });
 
-        document.getElementById('btnNantiGps')?.addEventListener('click', () => {
-            // Sembunyikan untuk sisa sesi kerja ini agar tidak mengganggu saat refresh / berpindah halaman
-            try {
-                sessionStorage.setItem('sales_gps_dismissed_session', 'true');
-            } catch (e) {}
-            hidePermissionModal();
-        });
+        // Jika user mengklik link atau tombol apapun di halaman, otomatis sembunyikan modal agar tidak menghalangi
+        const autoDismissOnPageNav = (e) => {
+            if (e.target && !e.target.closest('#modalGpsCard')) {
+                hidePermissionModal();
+            }
+        };
+        document.addEventListener('click', autoDismissOnPageNav, { passive: true });
     }
 
     function hidePermissionModal() {
