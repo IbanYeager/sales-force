@@ -1058,28 +1058,18 @@ function runBudgetMatchmaker() {
 }
 
 function openFlyerFromMatchmaker(carVal, title, dp, angs) {
-    const sel = document.getElementById('selectModel');
-    if (sel) {
-        let found = false;
-        for (let i = 0; i < sel.options.length; i++) {
-            if (sel.options[i].value === carVal || (carVal.split('|')[1] && sel.options[i].value.includes(carVal.split('|')[1]))) {
-                sel.selectedIndex = i;
-                found = true;
-                break;
-            }
-        }
-        if (!found && sel.options.length > 0) {
-            sel.value = carVal;
-        }
-        pilihModel();
+    let otr = 0;
+    if (carVal && carVal.includes('|')) {
+        otr = parseInt(carVal.split('|')[0], 10) || 0;
     }
-    
-    const inputTdp = document.getElementById('flyerTdpInput');
-    const inputCic = document.getElementById('flyerCicilanInput');
-    if (inputTdp) inputTdp.value = `DP Mulai ${formatRp(dp)}`;
-    if (inputCic) inputCic.value = `${formatRp(angs)} / Bln`;
-    
-    openFlyerStudioModal();
+    const modelName = title || (carVal && carVal.includes('|') ? carVal.split('|')[1] : carVal) || '';
+    const query = new URLSearchParams({
+        model: modelName,
+        harga: otr || '',
+        dp: dp || '',
+        cicilan: angs || ''
+    });
+    window.location.href = 'flyer.html?' + query.toString();
 }
 
 function selectMatchmakerModel(carVal, reqDp, tenor) {
@@ -1150,42 +1140,31 @@ function shareMatchmakerRecommendation(name, otr, dp, angs, thn) {
 }
 
 
-// ── 3. FITUR 1: STUDIO FLYER PROMO TOYOTA (WA STORY & IG SQUARE) ──
-
-let flyerCurrentRatio = '9:16';
-let flyerCurrentTheme = 'crimson';
+// ── 3. FITUR: STUDIO FLYER PROMO TOYOTA (DEDICATED PAGE LINK) ──
 
 function openFlyerStudioModal() {
-    const modal = document.getElementById('flyerStudioModal');
-    if (!modal) return;
-    
-    // Ambil data kalkulasi aktif saat ini
-    const harga = getHarga();
+    openFlyerStudioPage();
+}
+
+function openFlyerStudioPage() {
+    const sel = document.getElementById('selectModel');
+    let modelName = '';
+    let otr = getHarga() || 0;
+    if (sel && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
+        modelName = sel.options[sel.selectedIndex].text.replace(/\s*\(Rp[^)]*\)/i, '').trim();
+    }
     const tdp = parseNum(document.getElementById('inputTdp') ? document.getElementById('inputTdp').value : '0');
     const resAmount = document.getElementById('resultAmount');
-    const cicilanStr = resAmount ? resAmount.textContent.trim() : 'Rp 4.500.000';
-    
-    // Isi field input flyer dengan data realtime
-    const inputTdp = document.getElementById('flyerTdpInput');
-    const inputCic = document.getElementById('flyerCicilanInput');
-    if (inputTdp) inputTdp.value = `DP Mulai ${formatRp(tdp)}`;
-    if (inputCic) inputCic.value = `${cicilanStr} / Bln`;
-    
-    // Coba ambil nama sales dari session/localStorage jika ada
-    try {
-        const storedSales = localStorage.getItem('sales_name') || localStorage.getItem('userName');
-        const storedPhone = localStorage.getItem('sales_phone') || localStorage.getItem('userPhone');
-        if (storedSales && document.getElementById('flyerSalesName')) document.getElementById('flyerSalesName').value = storedSales;
-        if (storedPhone && document.getElementById('flyerSalesPhone')) document.getElementById('flyerSalesPhone').value = storedPhone;
-    } catch(e) {}
-    
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // Render awal
-    setTimeout(() => {
-        renderFlyerCanvas();
-    }, 100);
+    const cicilanStr = resAmount ? resAmount.textContent.replace(/[^0-9]/g, '') : '';
+    const cicilanNum = parseInt(cicilanStr, 10) || 0;
+
+    const query = new URLSearchParams({
+        model: modelName,
+        harga: otr,
+        dp: tdp,
+        cicilan: cicilanNum
+    });
+    window.location.href = 'flyer.html?' + query.toString();
 }
 
 function closeFlyerStudioModal(e) {

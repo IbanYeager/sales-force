@@ -60,6 +60,10 @@ class PageController extends Controller
             $cleanPage = 'mtoyota_service';
         }
 
+        if ($cleanPage === 'studio_flyer' || $cleanPage === 'poster') {
+            $cleanPage = 'flyer';
+        }
+
         if ($cleanPage === 'panduan' || $cleanPage === 'panduan_alur_kerja_sales_app') {
             return $this->panduan();
         }

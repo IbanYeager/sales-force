@@ -134,6 +134,7 @@
                 ${navLinkKacab('pages_kacab/olx.html', 'fa-solid fa-repeat', 'Trade-In &amp; OLX')}
                 ${navLinkKacab('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkKacab('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
+                ${navLinkKacab('pages/flyer.html', 'fa-solid fa-wand-magic-sparkles', 'Studio Flyer Promo WA')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -223,6 +224,7 @@
                 ${navLinkSPV('pages_spv/kelola_data.html', 'fa-solid fa-database', 'Kelola Data Cabang')}
                 ${navLinkSPV('pages/jadwal_input.html', 'fa-solid fa-calendar-days', 'Kalender & Reminder Jadwal')}
                 ${navLinkSPV('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio')}
+                ${navLinkSPV('pages/flyer.html', 'fa-solid fa-wand-magic-sparkles', 'Studio Flyer Promo WA')}
 
                 <div class="sidebar-search-empty" id="sidebarSearchEmpty" style="display:none;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -306,6 +308,7 @@
 
                 <p class="sidebar-nav-label">Tier 2: Media, Delivery & Dokumen</p>
                 ${navLink('pages/video_viral.html', 'fa-solid fa-photo-film', 'Kircon Media Studio', 'media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase')}
+                ${navLink('pages/flyer.html', 'fa-solid fa-wand-magic-sparkles', 'Studio Flyer Promo WA <span style="background:linear-gradient(135deg,#ff385c,#c8102e); color:#fff; font-size:9px; font-weight:800; padding:1px 6px; border-radius:99px; margin-left:auto;">Baru</span>', 'flyer poster promo wa whatsapp story feed instagram pamflet')}
                 ${navLink('pages/do.html', 'fa-solid fa-truck', 'Surat Jalan (DO)', 'do delivery order surat jalan kirim')}
                 ${navLink('pages/deal.html', 'fa-solid fa-handshake', 'Deal Pipeline', 'deal pipeline closing tahap prospek')}
                 ${navLink('pages/testdrive.html', 'fa-solid fa-car-side', 'Pusat Test Drive & Booking', 'test drive uji coba mobil showroom rental rekanan riwayat booking')}

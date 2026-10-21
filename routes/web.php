@@ -124,7 +124,8 @@ $salesPages = [
     'polreg', 'polreg_detail', 'pricelist', 'promo', 'public_card', 'rental_testdrive',
     'riwayat_foto_aktivitas', 'snake', 'target', 'tco', 'tebak', 'testdrive',
     'tradein', 'tts', 'velg', 'video_viral',
-    'mtoyota_service', 'mtoyota', 'booking_service'
+    'mtoyota_service', 'mtoyota', 'booking_service',
+    'flyer', 'studio_flyer'
 ];
 
 Route::get('/e-catalog', function () {

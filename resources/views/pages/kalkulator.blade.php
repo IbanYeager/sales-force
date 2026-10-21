@@ -35,11 +35,11 @@
                 </div>
             </div>
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <button type="button" class="btn-top-flyer" onclick="openFlyerStudioModal()" title="Buka Studio Pembuat Flyer Promo">
+                <a href="flyer.html" class="btn-top-flyer" title="Buka Studio Pembuat Flyer Promo">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <span>Studio Flyer Promo</span>
                     <span class="badge-hot" style="font-size:9px; padding:1px 6px;">Baru</span>
-                </button>
+                </a>
                 <span class="calc-badge-live">
                     <i class="fa-solid fa-circle"></i> Live Rate Simulator
                 </span>
@@ -557,7 +557,7 @@
                         </button>
 
                         <!-- ACTION: BUAT FLYER PROMO (FITUR 1) -->
-                        <button type="button" class="btn-action-flyer" onclick="openFlyerStudioModal()" title="Buat poster promosi visual beresolusi tinggi untuk WhatsApp Status & Instagram Story">
+                        <button type="button" class="btn-action-flyer" onclick="openFlyerStudioPage()" title="Buat poster promosi visual beresolusi tinggi di Studio Flyer Baru">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                             <span>Buat Poster / Flyer Promo WA</span>
                             <span class="badge-hot"><i class="fa-solid fa-fire"></i> Viral</span>
@@ -709,135 +709,6 @@
                 <!-- Dynamically populated -->
             </div>
         </div>
-
-        <!-- ══════════════════════════════════════════════════════════════════
-             FEATURE 1: STUDIO FLYER PROMO TOYOTA (MODAL POPUP)
-        ══════════════════════════════════════════════════════════════════ -->
-        <div id="flyerStudioModal" class="flyer-modal-overlay" style="display:none;" onclick="closeFlyerStudioModal(event)">
-            <div class="flyer-modal-shell" onclick="event.stopPropagation()">
-                <!-- Modal Head -->
-                <div class="flyer-modal-head">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); display:flex; align-items:center; justify-content:center; color:#fde047; font-size:16px;">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </div>
-                        <div>
-                            <h3 style="margin:0; font-size:16px; font-weight:800; font-family:'Outfit', sans-serif;">Studio Poster / Flyer Promo WhatsApp</h3>
-                            <p style="margin:2px 0 0; font-size:11.5px; color:#94a3b8;">Render flyer estetik resolusi tinggi dalam 1 klik untuk Story &amp; Chat</p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="closeFlyerStudioModal()" style="background:rgba(255,255,255,0.12); border:none; width:34px; height:34px; border-radius:50%; color:white; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="flyer-modal-body">
-                    <!-- Left: Live Preview Canvas -->
-                    <div style="display:flex; flex-direction:column; gap:12px;">
-                        <div class="flyer-canvas-container">
-                            <canvas id="flyerCanvas" width="1080" height="1920" style="display:none;"></canvas>
-                            <img id="flyerCanvasPreviewImg" class="flyer-canvas-preview" alt="Flyer Promo Preview">
-                        </div>
-                        <div style="display:flex; gap:8px;">
-                            <button type="button" class="btn" style="flex:1; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:white; border:none; border-radius:12px; padding:12px 14px; font-weight:800; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 12px rgba(16,185,129,0.3);" onclick="downloadFlyerImage()">
-                                <i class="fa-solid fa-download"></i> Unduh Gambar (PNG)
-                            </button>
-                            <button type="button" class="btn" style="background:#25D366; color:white; border:none; border-radius:12px; padding:12px 16px; font-weight:800; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 12px rgba(37,211,102,0.3);" onclick="shareFlyerCaptionWA()">
-                                <i class="fa-brands fa-whatsapp"></i> Bagikan WA
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right: Customizer Controls -->
-                    <div style="display:flex; flex-direction:column; gap:14px;">
-                        <!-- Format Ratio Switcher -->
-                        <div>
-                            <label class="form-label" style="font-size:11.5px;"><i class="fa-solid fa-crop"></i> Ukuran Format Poster</label>
-                            <div style="display:flex; gap:8px;">
-                                <button type="button" class="chip-quick active" id="btnRatioStory" onclick="setFlyerRatio('9:16', this)" style="flex:1; padding:8px 12px; border-radius:10px; font-size:12px;">
-                                    <i class="fa-solid fa-mobile-screen"></i> WA / IG Story (9:16)
-                                </button>
-                                <button type="button" class="chip-quick" id="btnRatioSquare" onclick="setFlyerRatio('1:1', this)" style="flex:1; padding:8px 12px; border-radius:10px; font-size:12px;">
-                                    <i class="fa-solid fa-square"></i> Feed / Chat (1:1)
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Theme Picker -->
-                        <div>
-                            <label class="form-label" style="font-size:11.5px;"><i class="fa-solid fa-palette"></i> Tema Warna Poster</label>
-                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
-                                <div onclick="setFlyerTheme('crimson', this)" class="theme-box-picker active" id="themeCrimson" style="cursor:pointer; border:2px solid #c8102e; border-radius:12px; padding:8px; text-align:center; background:#fff1f2;">
-                                    <div style="height:20px; border-radius:6px; background:linear-gradient(135deg, #c8102e 0%, #7f1d1d 100%); margin-bottom:4px;"></div>
-                                    <span style="font-size:10.5px; font-weight:800; color:#991b1b;">Toyota Red</span>
-                                </div>
-                                <div onclick="setFlyerTheme('navy', this)" class="theme-box-picker" id="themeNavy" style="cursor:pointer; border:2px solid #e2e8f0; border-radius:12px; padding:8px; text-align:center; background:#ffffff;">
-                                    <div style="height:20px; border-radius:6px; background:linear-gradient(135deg, #0d1b3e 0%, #1e3a8a 100%); margin-bottom:4px;"></div>
-                                    <span style="font-size:10.5px; font-weight:800; color:#1e293b;">Executive Navy</span>
-                                </div>
-                                <div onclick="setFlyerTheme('gold', this)" class="theme-box-picker" id="themeGold" style="cursor:pointer; border:2px solid #e2e8f0; border-radius:12px; padding:8px; text-align:center; background:#ffffff;">
-                                    <div style="height:20px; border-radius:6px; background:linear-gradient(135deg, #1e293b 0%, #d97706 100%); margin-bottom:4px;"></div>
-                                    <span style="font-size:10.5px; font-weight:800; color:#1e293b;">Luxury Gold</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Headline & Tagline -->
-                        <div>
-                            <label class="form-label" style="font-size:11.5px;">Tag Promo Headline</label>
-                            <input type="text" id="flyerHeadlineInput" class="form-input-styled" value="SPECIAL PROMO BULAN INI" oninput="renderFlyerCanvas()" style="font-size:12.5px; padding:8px 12px;">
-                        </div>
-
-                        <!-- Highlight Promosi TDP & Angsuran -->
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <div>
-                                <label class="form-label" style="font-size:11px;">TDP Sorotan</label>
-                                <input type="text" id="flyerTdpInput" class="form-input-styled" value="" oninput="renderFlyerCanvas()" style="font-size:12px; padding:8px 10px; font-weight:700;">
-                            </div>
-                            <div>
-                                <label class="form-label" style="font-size:11px;">Angsuran Sorotan</label>
-                                <input type="text" id="flyerCicilanInput" class="form-input-styled" value="" oninput="renderFlyerCanvas()" style="font-size:12px; padding:8px 10px; font-weight:700;">
-                            </div>
-                        </div>
-
-                        <!-- Bonus Paket Tambahan -->
-                        <div>
-                            <label class="form-label" style="font-size:11.5px;">Bonus &amp; Benefit Pembelian</label>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:11.5px; color:#334155;">
-                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                                    <input type="checkbox" id="chkBonusTcare" checked onchange="renderFlyerCanvas()"> Free Servis 3 Thn (T-Care)
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                                    <input type="checkbox" id="chkBonusKaca" checked onchange="renderFlyerCanvas()"> Kaca Film Lumar
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                                    <input type="checkbox" id="chkBonusKarpet" checked onchange="renderFlyerCanvas()"> Karpet &amp; Talang Air
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                                    <input type="checkbox" id="chkBonusApar" checked onchange="renderFlyerCanvas()"> APAR &amp; P3K Resmi
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Sales Contact Details -->
-                        <div style="background:#f1f5f9; border-radius:12px; padding:12px; border:1px solid #e2e8f0;">
-                            <div style="font-size:11px; font-weight:800; color:#334155; margin-bottom:6px;">PROFIL SALES DI POSTER:</div>
-                            <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:8px;">
-                                <input type="text" id="flyerSalesName" class="form-input-styled" placeholder="Nama Sales" value="Official Sales Consultant" oninput="renderFlyerCanvas()" style="font-size:12px; padding:6px 10px;">
-                                <input type="text" id="flyerSalesPhone" class="form-input-styled" placeholder="No WhatsApp (08...)" value="081234567890" oninput="renderFlyerCanvas()" style="font-size:12px; padding:6px 10px;">
-                            </div>
-                        </div>
-
-                        <!-- Copy Caption Button -->
-                        <button type="button" class="btn" style="background:#f1f5f9; color:#1e293b; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px;" onclick="copyFlyerPromoCaption()">
-                            <i class="fa-solid fa-copy"></i> Salin Caption WhatsApp &amp; Medsos
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="hiddenFlyerQrCode" style="display:none;"></div>
     </div>
 
     <!-- Scripts -->

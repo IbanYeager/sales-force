@@ -1,0 +1,498 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   TUNAS TOYOTA - STUDIO FLYER & POSTER PENAWARAN (DEDICATED PAGE)
+   Aesthetics: Executive Obsidian, Precision Typography, High-DPI Canvas
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --flyer-bg-body: #f4f6fb;
+    --flyer-primary: #7c3aed;
+    --flyer-primary-dark: #5b21b6;
+    --flyer-toyota-red: #c8102e;
+    --flyer-card-bg: #ffffff;
+    --flyer-border: #e2e8f0;
+    --flyer-text-main: #0f172a;
+    --flyer-text-muted: #64748b;
+    --flyer-shadow-card: 0 4px 20px rgba(15, 23, 42, 0.06);
+    --flyer-shadow-hover: 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+
+/* ── HEADER BANNER ── */
+.flyer-header-banner {
+    background: linear-gradient(135deg, #090e18 0%, #111827 50%, #1e1b4b 100%);
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 22px 28px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(9, 14, 24, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.flyer-header-banner::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.22) 0%, rgba(124, 58, 237, 0) 70%);
+    pointer-events: none;
+}
+
+.flyer-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 2;
+}
+
+.flyer-back-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.flyer-back-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(-3px);
+    color: #ffffff;
+}
+
+.flyer-header-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    margin: 0;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.flyer-header-subtitle {
+    font-size: 12.5px;
+    color: #94a3b8;
+    margin: 4px 0 0;
+}
+
+.flyer-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    z-index: 2;
+}
+
+/* ── 2-COLUMN STUDIO WORKSPACE ── */
+.flyer-studio-layout {
+    display: grid;
+    grid-template-columns: 460px 1fr;
+    gap: 26px;
+    align-items: start;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 1100px) {
+    .flyer-studio-layout {
+        grid-template-columns: 400px 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .flyer-studio-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LEFT COLUMN: ARTBOARD CANVAS & PREVIEW
+   ══════════════════════════════════════════════════════════════════ */
+.flyer-artboard-column {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+@media (max-width: 900px) {
+    .flyer-artboard-column {
+        position: static;
+    }
+}
+
+.flyer-artboard-card {
+    background: #090e18;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.flyer-artboard-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+/* Format Switcher Pills inside Artboard */
+.flyer-ratio-switch {
+    display: flex;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 99px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 380px;
+    z-index: 2;
+}
+
+.ratio-btn {
+    flex: 1;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 99px;
+    color: #cbd5e1;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.ratio-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Device Mockup Shell */
+.flyer-canvas-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    min-height: 480px;
+}
+
+.flyer-preview-img {
+    max-width: 100%;
+    max-height: 520px;
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    object-fit: contain;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.flyer-res-info-tag {
+    margin-top: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2;
+}
+
+/* Action Buttons under Canvas */
+.flyer-main-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-flyer-download {
+    width: 100%;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+    transition: all 0.2s ease;
+}
+
+.btn-flyer-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+}
+
+.btn-flyer-wa {
+    width: 100%;
+    padding: 13px 18px;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+    transition: all 0.2s ease;
+}
+
+.btn-flyer-wa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RIGHT COLUMN: STUDIO CONTROLS INSPECTOR
+   ══════════════════════════════════════════════════════════════════ */
+.flyer-inspector-column {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.flyer-section-card {
+    background: var(--flyer-card-bg);
+    border-radius: 20px;
+    border: 1.5px solid var(--flyer-border);
+    box-shadow: var(--flyer-shadow-card);
+    padding: 20px 24px;
+    transition: all 0.2s ease;
+}
+
+.flyer-section-card:hover {
+    border-color: #cbd5e1;
+}
+
+.flyer-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.flyer-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.flyer-card-icon.red { background: #fee2e2; color: #dc2626; }
+.flyer-card-icon.blue { background: #e0f2fe; color: #0284c7; }
+.flyer-card-icon.purple { background: #f3e8ff; color: #7c3aed; }
+.flyer-card-icon.amber { background: #fef3c7; color: #d97706; }
+.flyer-card-icon.green { background: #dcfce7; color: #16a34a; }
+
+.flyer-card-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--flyer-text-main);
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Theme Color Pickers */
+.flyer-theme-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 600px) {
+    .flyer-theme-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.theme-pill-box {
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.theme-pill-box:hover {
+    border-color: #94a3b8;
+    transform: translateY(-2px);
+}
+
+.theme-pill-box.active {
+    border-color: #7c3aed;
+    background: #faf5ff;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+.theme-preview-strip {
+    height: 22px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.theme-pill-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: #1e293b;
+    display: block;
+}
+
+/* Headline Presets */
+.flyer-quick-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.tag-btn-preset {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tag-btn-preset:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Bonus Checkboxes Styled as Toggle Pills */
+.bonus-chips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+@media (max-width: 600px) {
+    .bonus-chips-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.bonus-pill-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.bonus-pill-check:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.bonus-pill-check input[type="checkbox"] {
+    accent-color: #7c3aed;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* QR Code Live Box */
+.qr-preview-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-top: 10px;
+}
+
+.qr-thumb-box {
+    width: 72px;
+    height: 72px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.qr-thumb-box canvas,
+.qr-thumb-box img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Copy Caption Block */
+.caption-preview-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 12px;
+    color: #334155;
+    line-height: 1.6;
+    max-height: 130px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: inherit;
+    margin-bottom: 10px;
+}
