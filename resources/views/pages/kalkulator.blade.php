@@ -34,7 +34,12 @@
                     <p class="calc-header-subtitle">Simulasi kredit akurat, komparasi multi-leasing rekanan &amp; pengajuan SPK instan.</p>
                 </div>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <button type="button" class="btn-top-flyer" onclick="openFlyerStudioModal()" title="Buka Studio Pembuat Flyer Promo">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Studio Flyer Promo</span>
+                    <span class="badge-hot" style="font-size:9px; padding:1px 6px;">Baru</span>
+                </button>
                 <span class="calc-badge-live">
                     <i class="fa-solid fa-circle"></i> Live Rate Simulator
                 </span>

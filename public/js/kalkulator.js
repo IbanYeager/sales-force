@@ -1041,7 +1041,10 @@ function runBudgetMatchmaker() {
                 
                 <div class="mm-btn-group">
                     <button type="button" class="btn-mm-select" onclick="selectMatchmakerModel('${carValEscaped}', ${m.dpMin}, ${m.tenor})">
-                        <i class="fa-solid fa-calculator"></i> Buka Simulasi Lengkap
+                        <i class="fa-solid fa-calculator"></i> Simulasi
+                    </button>
+                    <button type="button" class="btn-mm-flyer" onclick="openFlyerFromMatchmaker('${carValEscaped}', '${carTitleEscaped}', ${m.dpMin}, ${m.angsuran})" title="Buat Poster / Flyer Promo WA untuk unit ini">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Flyer
                     </button>
                     <button type="button" class="btn-mm-wa" onclick="shareMatchmakerRecommendation('${carTitleEscaped}', ${m.otr}, ${m.dpMin}, ${m.angsuran}, ${m.tenor})" title="Bagikan rekomendasi ini ke WA Konsumen">
                         <i class="fa-brands fa-whatsapp"></i> WA
@@ -1052,6 +1055,31 @@ function runBudgetMatchmaker() {
     });
     
     grid.innerHTML = html;
+}
+
+function openFlyerFromMatchmaker(carVal, title, dp, angs) {
+    const sel = document.getElementById('selectModel');
+    if (sel) {
+        let found = false;
+        for (let i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value === carVal || (carVal.split('|')[1] && sel.options[i].value.includes(carVal.split('|')[1]))) {
+                sel.selectedIndex = i;
+                found = true;
+                break;
+            }
+        }
+        if (!found && sel.options.length > 0) {
+            sel.value = carVal;
+        }
+        pilihModel();
+    }
+    
+    const inputTdp = document.getElementById('flyerTdpInput');
+    const inputCic = document.getElementById('flyerCicilanInput');
+    if (inputTdp) inputTdp.value = `DP Mulai ${formatRp(dp)}`;
+    if (inputCic) inputCic.value = `${formatRp(angs)} / Bln`;
+    
+    openFlyerStudioModal();
 }
 
 function selectMatchmakerModel(carVal, reqDp, tenor) {
