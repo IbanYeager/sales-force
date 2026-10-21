@@ -977,6 +977,8 @@ function runBudgetMatchmaker() {
     if (countText) {
         countText.innerHTML = `Ditemukan <strong>${matches.length} Model Toyota</strong> yang Masuk Kualifikasi Anggaran:`;
     }
+    const heroCount = document.getElementById('mmHeroCountNumber');
+    if (heroCount) heroCount.textContent = matches.length;
     
     if (matches.length === 0) {
         grid.innerHTML = `
@@ -1001,16 +1003,19 @@ function runBudgetMatchmaker() {
         const isExact = m.matchType === 'EXACT';
         const badgeBg = isExact ? '#dcfce7' : '#fef3c7';
         const badgeColor = isExact ? '#15803d' : '#b45309';
-        const badgeText = isExact ? '✓ Sesuai Budget Konsumen' : '⭐ Rekomendasi Upgrade (Sedikit di Atas)';
-        const cardBorder = isExact ? '2px solid #22c55e' : '1px solid #e2e8f0';
+        const badgeIcon = isExact ? '<i class="fa-solid fa-circle-check" style="color:#16a34a;"></i>' : '<i class="fa-solid fa-star" style="color:#d97706;"></i>';
+        const badgeText = isExact ? 'Sesuai Budget' : 'Rekomendasi Upgrade';
         
         const carValEscaped = (m.item.value || `${m.otr}|${m.title}`).replace(/"/g, '&quot;');
         const carTitleEscaped = m.title.replace(/"/g, '&quot;');
         
         html += `
-            <div class="matchmaker-car-card" style="border:${cardBorder};">
+            <div class="matchmaker-car-card ${isExact ? 'exact-match' : 'upgrade-match'}">
                 <div class="mm-card-head">
-                    <span class="mm-badge" style="background:${badgeBg}; color:${badgeColor}; font-weight:800;">${badgeText}</span>
+                    <span class="mm-badge" style="background:${badgeBg}; color:${badgeColor}; font-weight:800;">
+                        ${badgeIcon}
+                        <span>${badgeText}</span>
+                    </span>
                     <span class="mm-category-tag">${m.category}</span>
                 </div>
                 

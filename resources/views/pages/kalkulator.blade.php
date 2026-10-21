@@ -611,17 +611,21 @@
         <div id="sectionMatchmaker" style="display:none;">
             <!-- Hero Card -->
             <div class="matchmaker-hero-card">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
                     <div>
-                        <span style="background:rgba(255,255,255,0.18); color:#fde047; font-size:11px; font-weight:800; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">
+                        <span style="background:rgba(255,255,255,0.18); color:#fde047; font-size:11px; font-weight:800; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; display:inline-flex; align-items:center; gap:6px;">
                             <i class="fa-solid fa-bullseye"></i> Smart Buyer Matchmaker
                         </span>
                         <h2 style="font-family:'Outfit', sans-serif; font-size:22px; font-weight:800; margin:8px 0 4px; color:#ffffff;">
                             Pencari Mobil Toyota Berdasarkan Anggaran Konsumen
                         </h2>
-                        <p style="font-size:12.5px; color:rgba(255,255,255,0.85); margin:0; max-width:650px;">
-                            Masukkan batas maksimal uang muka (DP) dan kemampuan cicilan bulanan calon konsumen. Sistem otomatis memfilter mobil Toyota yang paling pas dan merekomendasikan leasing terbaik!
+                        <p style="font-size:12.5px; color:rgba(255,255,255,0.85); margin:0; max-width:620px;">
+                            Masukkan batas maksimal uang muka (DP) dan kemampuan cicilan bulanan calon konsumen. Sistem otomatis memfilter mobil Toyota yang paling pas dan merekomendasikan opsi terbaik!
                         </p>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:16px; padding:12px 20px; text-align:center; min-width:96px; backdrop-filter:blur(6px);">
+                        <div style="font-size:26px; font-weight:900; color:#fde047; font-family:'Outfit', sans-serif; line-height:1;" id="mmHeroCountNumber">0</div>
+                        <div style="font-size:10px; font-weight:800; color:#cbd5e1; text-transform:uppercase; letter-spacing:0.5px; margin-top:4px;">Pilihan Unit</div>
                     </div>
                 </div>
             </div>
@@ -673,12 +677,12 @@
                             <option value="HATCHBACK">Hatchback / City Car (Agya, Yaris)</option>
                             <option value="COMMERCIAL">Komersial / Usaha (Rangga, Hilux, HiAce)</option>
                         </select>
-                        <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:#64748b;">
-                            <span>Tenor Acuan:</span>
-                            <select id="mmSelectTenor" class="form-select-styled" onchange="runBudgetMatchmaker()" style="width:auto; padding:4px 10px; font-size:11.5px;">
-                                <option value="5" selected>5 Tahun (60 Bulan)</option>
-                                <option value="4">4 Tahun (48 Bulan)</option>
-                                <option value="3">3 Tahun (36 Bulan)</option>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:6px 12px;">
+                            <span style="font-size:11.5px; font-weight:700; color:#64748b;"><i class="fa-regular fa-clock" style="color:#0284c7; margin-right:4px;"></i> Tenor:</span>
+                            <select id="mmSelectTenor" class="form-select-styled" onchange="runBudgetMatchmaker()" style="width:auto; padding:4px 8px; font-size:11.5px; font-weight:700; border:none; background:transparent;">
+                                <option value="5" selected>5 Tahun (60 Bln)</option>
+                                <option value="4">4 Tahun (48 Bln)</option>
+                                <option value="3">3 Tahun (36 Bln)</option>
                             </select>
                         </div>
                     </div>
