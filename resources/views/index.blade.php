@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sales App - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=20261021_fluid_v6">
-    <link rel="stylesheet" href="css/index_dashboard.css?v=6.0">
+    <link rel="stylesheet" href="css/style.css?v=20261021_mobile_fix_v7">
+    <link rel="stylesheet" href="css/index_dashboard.css?v=6.1">
     <link rel="stylesheet" href="css/sales_tools.css?v=1.0">
 
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -1402,7 +1402,7 @@
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
-    <script src="js/auto_location_tracker.js?v=20260908_v8"></script>
+    <script src="js/auto_location_tracker.js?v=20261021_v9"></script>
     <script src="./js/pwa-app.js?v=20260908_no_toast"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

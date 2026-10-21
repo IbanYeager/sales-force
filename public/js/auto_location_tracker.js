@@ -300,6 +300,9 @@
                     ">
                         Nanti Saja
                     </button>
+                    <button type="button" id="btnCloseGpsModal" style="position: absolute; top: 12px; right: 12px; border: none; background: #f1f5f9; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 14px; cursor: pointer;" aria-label="Tutup">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
             </div>
         `;
@@ -307,6 +310,18 @@
         const div = document.createElement('div');
         div.innerHTML = modalHtml;
         document.body.appendChild(div);
+
+        document.getElementById('btnCloseGpsModal')?.addEventListener('click', () => {
+            try { sessionStorage.setItem('sales_gps_dismissed_session', 'true'); } catch (e) {}
+            hidePermissionModal();
+        });
+
+        document.getElementById('modalGpsPermission')?.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'modalGpsPermission') {
+                try { sessionStorage.setItem('sales_gps_dismissed_session', 'true'); } catch (err) {}
+                hidePermissionModal();
+            }
+        });
 
         document.getElementById('btnAktifkanGps')?.addEventListener('click', () => {
             const btn = document.getElementById('btnAktifkanGps');
@@ -352,7 +367,13 @@
 
     function hidePermissionModal() {
         const modal = document.getElementById('modalGpsPermission');
-        if (modal) modal.remove();
+        if (modal) {
+            const parent = modal.parentElement;
+            modal.remove();
+            if (parent && parent !== document.body && parent.children.length === 0) {
+                parent.remove();
+            }
+        }
     }
 
     // Bersihkan seluruh elemen teks/pill/banner live GPS agar sales tidak tahu
