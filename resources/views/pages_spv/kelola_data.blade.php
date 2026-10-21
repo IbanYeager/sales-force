@@ -1133,7 +1133,7 @@
 
   <script src="../custom_alert.js"></script>
   <script src="../js/spv_kelola.js?v=2"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 <script src="../js/spv_global.js"></script>
 </body>
 

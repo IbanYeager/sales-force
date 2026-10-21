@@ -405,6 +405,6 @@
   <script src="../custom_alert.js?v=25"></script>
   <script src="/js/spv_global.js"></script>
   <script src="/js/followup_master.js?v=20260924_strict_manual_sync"></script>
-  <script src="/js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="/js/pwa-app.js?v=20261021_v20"></script>
 </body>
 </html>

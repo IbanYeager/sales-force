@@ -484,7 +484,7 @@
   <script src="../js/kacab_global.js?v=20260915_layout_executive_v34"></script>
   <script src="../js/kacab_target.js?v=20260915_layout_executive_v34"></script>
 
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

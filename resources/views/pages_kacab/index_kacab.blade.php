@@ -793,7 +793,7 @@
   <script src="../js/kacab_global.js?v=20260904_sheet_sync_fix"></script>
   <script src="../js/kacab_index.js?v=20260904_sheet_sync_fix"></script>
 
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

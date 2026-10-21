@@ -301,7 +301,7 @@
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js?v=20260824_dendi"></script>
   <script src="../js/spv_wiraniaga.js?v=20260824_v2"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

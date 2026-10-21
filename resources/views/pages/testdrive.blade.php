@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10" />
     <link rel="stylesheet" href="../css/testdrive.css?v=20260908_v11">
     <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
 
@@ -204,15 +204,15 @@
 
         <!-- ═══════════════ FLOATING BOTTOM NAVIGATION (MOBILE) ═══════════════ -->
         <nav class="bottom-nav">
-            <a href="../index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
-            <a href="pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
-            <a href="input.html" class="nav-item center-btn">
+            <a href="/index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
+            <a href="/pages/pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
+            <a href="/pages/input.html" class="nav-item center-btn">
                 <div class="center-btn-inner">
                     <i class="fa-solid fa-camera"></i>
                 </div>
             </a>
-            <a href="testdrive.html" class="nav-item active"><i class="fa-solid fa-car-side"></i><span class="nav-text">Tes Drive</span></a>
-            <a href="profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
+            <a href="/pages/testdrive.html" class="nav-item active"><i class="fa-solid fa-car-side"></i><span class="nav-text">Tes Drive</span></a>
+            <a href="/pages/profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
         </nav>
     </div>
 

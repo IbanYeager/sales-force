@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sales App - E-Catalog</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style.css?v=20260908_v24" />
+  <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10" />
   <link rel="stylesheet" href="../css/animations-premium.css?v=20260908_v24">
   <link rel="stylesheet" href="../css/brosur.css?v=20260908_v24">
   <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
@@ -98,15 +98,15 @@
 
     <!-- ═══ FLOATING BOTTOM NAVIGATION (MOBILE) ═══ -->
     <nav class="bottom-nav">
-      <a href="../index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
-      <a href="pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
-      <a href="input.html" class="nav-item center-btn">
+      <a href="/index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
+      <a href="/pages/pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
+      <a href="/pages/input.html" class="nav-item center-btn">
         <div class="center-btn-inner">
           <i class="fa-solid fa-camera"></i>
         </div>
       </a>
-      <a href="elibrary.html" class="nav-item active"><i class="fa-solid fa-book-open"></i><span class="nav-text">Katalog</span></a>
-      <a href="profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
+      <a href="/pages/elibrary.html" class="nav-item active"><i class="fa-solid fa-book-open"></i><span class="nav-text">Katalog</span></a>
+      <a href="/pages/profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
     </nav>
   </div>
 
@@ -770,7 +770,7 @@
   <script src="../js/brosur.js?v={{ time() }}"></script>
   <script src="../js/elibrary_data.js?v=4"></script>
   <script src="../js/elibrary.js?v={{ time() }}"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

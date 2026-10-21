@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- App Styles -->
-  <link rel="stylesheet" href="../css/style.css?v=20260908_v24" />
+  <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10" />
   <link rel="stylesheet" href="../css/animations-premium.css?v=20260908_v24">
   <link rel="stylesheet" href="../css/flyer.css?v={{ time() }}">
   
@@ -30,7 +30,7 @@
     <!-- HEADER STUDIO BANNER -->
     <header class="flyer-header-banner">
       <div class="flyer-header-left">
-        <a href="kalkulator.html" class="flyer-back-btn" title="Kembali ke Kalkulator">
+        <a href="/pages/kalkulator.html" class="flyer-back-btn" title="Kembali ke Kalkulator">
           <i class="fa-solid fa-arrow-left"></i>
         </a>
         <div>
@@ -824,7 +824,7 @@
   <!-- QR Code Library & Studio Engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="../js/flyer.js?v={{ time() }}"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

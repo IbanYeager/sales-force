@@ -301,7 +301,7 @@
   <script src="../js/elibrary_data.js"></script>
   <script src="../js/inventory.js?v=20260912_hold_lock_realtime"></script>
   <script src="../js/spv_global.js"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

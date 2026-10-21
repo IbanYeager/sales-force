@@ -60,7 +60,7 @@
     <script src="../custom_alert.js"></script>
     <script src="../js/approval.js"></script>
 
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

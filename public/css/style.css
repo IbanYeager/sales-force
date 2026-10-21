@@ -1802,6 +1802,15 @@ select.form-control {
     pointer-events: auto !important;
 }
 
+/* Non-blocking GPS Permission Modal container so it never blocks mobile bottom-nav */
+#modalGpsPermission {
+    pointer-events: none !important;
+    z-index: 9990 !important;
+}
+#modalGpsCard {
+    pointer-events: auto !important;
+}
+
 .modal-content {
     box-sizing: border-box;
     background: var(--card-bg);

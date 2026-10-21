@@ -49,6 +49,11 @@
                 window.location.pathname.includes('/pages_kacab/')) ? '../' : '';
     }
 
+    function isSubPage() {
+        const p = (window.location.pathname || '').toLowerCase();
+        return p.includes('/pages/') || p.includes('/pages_spv/') || p.includes('/pages_kacab/');
+    }
+
     function isSalesRole() {
         const loggedIn = localStorage.getItem('loggedIn') === 'true';
         const hasId = !!(localStorage.getItem('idSales') || localStorage.getItem('salesId') || localStorage.getItem('namaSales'));
@@ -178,14 +183,21 @@
         }, 15000);
     }
 
-    // Modal UI untuk meminta izin lokasi sekali saja
+    // Modal UI untuk meminta izin lokasi sekali saja (Hanya di Dashboard Home)
     function showPermissionModal() {
+        // Jangan pernah munculkan modal jika user berada di subpage!
+        if (isSubPage()) {
+            hidePermissionModal();
+            return;
+        }
+
         // Jangan pernah munculkan modal jika sudah pernah diizinkan!
         if (hasGpsPermission()) return;
 
         // Jangan munculkan lagi jika user telah menolak / dismiss di sesi browser ini
         try {
-            if (sessionStorage.getItem('sales_gps_dismissed_session') === 'true') return;
+            if (sessionStorage.getItem('sales_gps_dismissed_session') === 'true' ||
+                localStorage.getItem('sales_gps_dismissed_session') === 'true') return;
         } catch (e) {}
 
         if (document.getElementById('modalGpsPermission')) return;
@@ -195,7 +207,7 @@
                 position: fixed;
                 top: 0; left: 0; width: 100%; height: 100%;
                 background: rgba(15, 23, 42, 0.35);
-                z-index: 99999;
+                z-index: 9990;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -422,12 +434,21 @@
             }
         }
 
-        // 4. Jika benar-benar belum diizinkan, baru tampilkan modal permintaan izin
+        // Subpages tidak boleh memunculkan modal izin GPS yang mengganggu alur kerja sales
+        if (isSubPage()) {
+            hidePermissionModal();
+            return;
+        }
+
+        // 4. Jika benar-benar belum diizinkan dan di Dashboard Utama, baru tampilkan modal permintaan izin
         showPermissionModal();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         cleanAllGpsUi();
+        if (isSubPage()) {
+            hidePermissionModal();
+        }
         if (isSalesRole()) {
             setTimeout(checkPermissionAndInit, 700);
         }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales App - Profil</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10">
     <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
 
   <link rel="manifest" href="../manifest.json">
@@ -168,15 +168,15 @@
         </div>
 
         <nav class="bottom-nav">
-            <a href="../index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
-            <a href="pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
-            <a href="input.html" class="nav-item center-btn">
+            <a href="/index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
+            <a href="/pages/pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
+            <a href="/pages/input.html" class="nav-item center-btn">
                 <div class="center-btn-inner">
                     <i class="fa-solid fa-camera"></i>
                 </div>
             </a>
-            <a href="testdrive.html" class="nav-item"><i class="fa-solid fa-car-side"></i><span class="nav-text">Tes Drive</span></a>
-            <a href="profil.html" class="nav-item active"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
+            <a href="/pages/testdrive.html" class="nav-item"><i class="fa-solid fa-car-side"></i><span class="nav-text">Tes Drive</span></a>
+            <a href="/pages/profil.html" class="nav-item active"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
         </nav>
     </div>
 
@@ -692,7 +692,7 @@
             window.location.href = 'login.html';
         };
     </script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

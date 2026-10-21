@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sales App - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=20261021_mobile_fix_v9">
+    <link rel="stylesheet" href="css/style.css?v=20261021_mobile_fix_v10">
     <link rel="stylesheet" href="css/index_dashboard.css?v=6.2">
     <link rel="stylesheet" href="css/sales_tools.css?v=1.0">
 
@@ -786,18 +786,18 @@
 
                 <!-- ═══ BOTTOM NAV — Floating Glass Dock (mobile) ═══ -->
                 <nav class="bottom-nav">
-                    <a href="index.html" class="nav-item active"><i class="fa-solid fa-house"></i><span
+                    <a href="/index.html" class="nav-item active"><i class="fa-solid fa-house"></i><span
                             class="nav-text">Home</span></a>
-                    <a href="pages/pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span
+                    <a href="/pages/pricelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span
                             class="nav-text">Harga</span></a>
-                    <a href="pages/input.html" class="nav-item center-btn">
+                    <a href="/pages/input.html" class="nav-item center-btn">
                         <div class="center-btn-inner">
                             <i class="fa-solid fa-camera"></i>
                         </div>
                     </a>
-                    <a href="pages/testdrive.html" class="nav-item"><i class="fa-solid fa-car-side"></i><span
+                    <a href="/pages/testdrive.html" class="nav-item"><i class="fa-solid fa-car-side"></i><span
                             class="nav-text">Tes Drive</span></a>
-                    <a href="pages/profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span
+                    <a href="/pages/profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span
                             class="nav-text">Profil</span></a>
                 </nav>
 
@@ -1432,8 +1432,8 @@
     <script src="js/sales_superpowers.js?v=1.0"></script>
     <script src="js/index_dashboard.js?v=20260808_07"></script>
 
-    <script src="js/auto_location_tracker.js?v=20261021_v11"></script>
-    <script src="./js/pwa-app.js?v=20260908_no_toast"></script>
+    <script src="js/auto_location_tracker.js?v=20261021_v20"></script>
+    <script src="./js/pwa-app.js?v=20261021_v20"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SalesSuperpowers) {

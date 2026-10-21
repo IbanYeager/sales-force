@@ -1,8 +1,16 @@
 // Auto-load location tracker untuk Sales aktif
 (function() {
+    // Bersihkan modal GPS jika muncul di subpages
+    if (window.location.pathname.includes('/pages/') || 
+        window.location.pathname.includes('/pages_spv/') || 
+        window.location.pathname.includes('/pages_kacab/')) {
+        const staleModal = document.getElementById('modalGpsPermission');
+        if (staleModal) staleModal.remove();
+    }
+
     if (!document.querySelector('script[src*="auto_location_tracker.js"]')) {
         const script = document.createElement('script');
-        const scriptPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../js/auto_location_tracker.js?v=20260909_v10' : 'js/auto_location_tracker.js?v=20260909_v10';
+        const scriptPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../js/auto_location_tracker.js?v=20261021_v20' : 'js/auto_location_tracker.js?v=20261021_v20';
         script.src = scriptPath;
         document.head.appendChild(script);
     }
@@ -13,7 +21,7 @@ let pwaRefreshing = false;
 
 // 1. SMART AUTO-UPDATING SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
-    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20261016_v7' : 'sw.js?v=20261016_v7';
+    const swPath = (window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/')) ? '../sw.js?v=20261021_v20' : 'sw.js?v=20261021_v20';
 
     navigator.serviceWorker.register(swPath)
         .then(registration => {

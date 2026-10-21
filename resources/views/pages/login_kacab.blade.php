@@ -125,7 +125,7 @@
     <script src="../js/script.js"></script>
     <script src="../js/login_kacab.js"></script>
 
-    <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+    <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

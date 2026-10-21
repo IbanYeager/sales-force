@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10" />
     <link rel="stylesheet" href="../css/kalkulator.css?v={{ time() }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
@@ -23,7 +23,7 @@
         <!-- ── HEADER BANNER ── -->
         <header class="calc-header-banner">
             <div class="calc-header-left">
-                <a href="../index.html" class="calc-back-btn" title="Kembali ke Dashboard">
+                <a href="/index.html" class="calc-back-btn" title="Kembali ke Dashboard">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <div>
@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <a href="flyer.html" class="btn-top-flyer" title="Buka Studio Pembuat Flyer Promo">
+                <a href="/pages/flyer.html" class="btn-top-flyer" title="Buka Studio Pembuat Flyer Promo">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <span>Studio Flyer Promo</span>
                     <span class="badge-hot" style="font-size:9px; padding:1px 6px;">Baru</span>
@@ -715,6 +715,7 @@
     <script src="../custom_alert.js"></script>
     <script src="../js/sales_signature.js"></script>
     <script src="../js/kalkulator.js?v={{ time() }}"></script>
+    <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

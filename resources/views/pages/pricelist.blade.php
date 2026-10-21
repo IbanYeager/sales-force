@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -7,7 +7,7 @@
   <title>Sales App - PriceList OTR</title>
   <meta name="description" content="Daftar harga OTR Toyota Jawa Barat terlengkap per model dan tipe">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style.css?v=20260907_layout_fix" />
+  <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10" />
   <link rel="stylesheet" href="../css/pricelist.css?v=20260907_layout_fix">
   <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
   <link rel="manifest" href="../manifest.json">
@@ -88,16 +88,16 @@
     </div>
 
     <nav class="bottom-nav">
-    <a href="../index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
-    <a href="pricelist.html" class="nav-item active"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
-    <a href="input.html" class="nav-item center-btn">
+      <a href="/index.html" class="nav-item"><i class="fa-solid fa-house"></i><span class="nav-text">Home</span></a>
+      <a href="/pages/pricelist.html" class="nav-item active"><i class="fa-solid fa-clipboard-list"></i><span class="nav-text">Harga</span></a>
+      <a href="/pages/input.html" class="nav-item center-btn">
         <div class="center-btn-inner">
-            <i class="fa-solid fa-camera"></i>
+          <i class="fa-solid fa-camera"></i>
         </div>
-    </a>
-    <a href="testdrive.html" class="nav-item"><i class="fa-solid fa-car-side"></i><span class="nav-text">Tes Drive</span></a>
-    <a href="profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
-</nav>
+      </a>
+      <a href="/pages/testdrive.html" class="nav-item"><i class="fa-solid fa-car-side"></i><span class="nav-text">Tes Drive</span></a>
+      <a href="/pages/profil.html" class="nav-item"><i class="fa-solid fa-user"></i><span class="nav-text">Profil</span></a>
+    </nav>
   </div>
 
   <!-- Modal Penjelasan Paket Pricelist -->
@@ -190,7 +190,7 @@
   </div>
 
 
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

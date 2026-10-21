@@ -1720,7 +1720,7 @@
   <script src="../js/kacab_global.js"></script>
   <script src="../js/kacab_peta.js?v=20260909_live_v10"></script>
 
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 
   <!-- EVOLVE BATTLE CARD MODAL -->
   <div class="evolve-modal-overlay" id="evolveBattleModal">

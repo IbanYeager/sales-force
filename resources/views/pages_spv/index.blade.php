@@ -178,7 +178,7 @@
   </div>
 
   <script src="../js/spv_dashboard.js"></script>
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
   <script src="../js/spv_global.js"></script>
 </body>
 

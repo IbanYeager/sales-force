@@ -1129,7 +1129,7 @@
   <script src="../js/spk.js?v=20260912_doc_print_wa"></script>
   <script src="../js/spk_arcade_game.js?v=1"></script>
 
-  <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+  <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 
 </html>

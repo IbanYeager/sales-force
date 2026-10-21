@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10">
     <link rel="stylesheet" href="../css/input.css">
     <link rel="stylesheet" href="../css/sales_tools.css?v=1.0">
     <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
@@ -22,7 +22,7 @@
 
     <div class="mobile-app" style="padding-bottom: 45px;">
         <header class="header-page">
-            <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
+            <a href="/index.html"><i class="fa-solid fa-arrow-left"></i></a>
             <h2>Input & Laporan Aktivitas</h2>
         </header>
 
@@ -320,7 +320,7 @@
 
     <script src="../custom_alert.js"></script>
     <script src="../js/input.js"></script>
-    <script src="../js/pwa-app.js?v=20260908_no_toast"></script>
+    <script src="../js/pwa-app.js?v=20261021_v20"></script>
 
     <script>
       // ==========================================
