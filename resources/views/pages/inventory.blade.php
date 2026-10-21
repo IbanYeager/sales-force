@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales App - Live Inventory</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/inventory.css?v=20260819_3">
+    <link rel="stylesheet" href="../css/style.css?v={{ time() }}" />
+    <link rel="stylesheet" href="../css/inventory.css?v={{ time() }}&v_layout=20261021_fluid_v1">
     <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#CC0000">

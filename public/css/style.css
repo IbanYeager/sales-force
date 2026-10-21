@@ -585,6 +585,10 @@ a {
     margin-top: -52px;
     position: relative;
     z-index: 2;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3610,8 +3614,11 @@ tbody tr:last-child td {
     }
 
     .greeting-meta {
-        gap: 2px;
-        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        margin-top: 4px;
     }
 
     .greeting-meta .spv-label,
@@ -3620,6 +3627,10 @@ tbody tr:last-child td {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        max-width: 100%;
     }
 
     .header-home .bell-icon {
@@ -3643,9 +3654,42 @@ tbody tr:last-child td {
     }
 
     .card {
-        padding: 16px;
+        padding: 16px 14px;
         border-radius: 18px;
         margin-bottom: 16px;
+    }
+
+    /* Summary Card Grid Mobile Refinement */
+    .grid-2 {
+        gap: 10px !important;
+        margin-bottom: 18px !important;
+    }
+
+    .summary-card {
+        padding: 12px 10px !important;
+        border-radius: 15px !important;
+        gap: 10px !important;
+    }
+
+    .icon-circle {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    .summary-info .summary-label {
+        font-size: 10px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .summary-info h4 {
+        font-size: 18px !important;
+        line-height: 1.15 !important;
+    }
+
+    .summary-info .summary-sub {
+        font-size: 9px !important;
     }
 
     /* CTA Buttons */
@@ -3685,8 +3729,8 @@ tbody tr:last-child td {
 
     /* Bottom Floating Dock */
     .bottom-nav {
-        width: calc(100% - 24px) !important;
-        max-width: 380px !important;
+        width: min(calc(100% - 24px), 430px) !important;
+        max-width: 430px !important;
         padding: 7px 8px !important;
         border-radius: 26px !important;
         bottom: max(14px, calc(10px + env(safe-area-inset-bottom, 0px))) !important;
@@ -3721,6 +3765,18 @@ tbody tr:last-child td {
     }
 }
 
+/* Tablet & iPad Reflow (641px - 1023px) */
+@media (min-width: 641px) and (max-width: 1023px) {
+    .grid-2 {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .summary-card {
+        padding: 14px 12px !important;
+    }
+}
+
 /* Extra Small & Compact Phones (<= 380px: Samsung Galaxy 360px, iPhone SE, Galaxy Z Flip cover) */
 @media (max-width: 380px) {
     .header-home {
@@ -3748,9 +3804,13 @@ tbody tr:last-child td {
         padding: 2px 7px;
     }
 
+    .greeting-meta {
+        gap: 3px 6px;
+    }
+
     .greeting-meta .spv-label,
     .greeting-meta .location {
-        font-size: 9.5px;
+        font-size: 9px;
     }
 
     .header-home .bell-icon {
@@ -3773,9 +3833,40 @@ tbody tr:last-child td {
     }
 
     .card {
-        padding: 13px 10px;
-        border-radius: 16px;
+        padding: 12px 10px;
+        border-radius: 15px;
         margin-bottom: 12px;
+    }
+
+    .grid-2 {
+        gap: 8px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .summary-card {
+        padding: 10px 8px !important;
+        border-radius: 13px !important;
+        gap: 8px !important;
+    }
+
+    .icon-circle {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 13px !important;
+        border-radius: 10px !important;
+    }
+
+    .summary-info .summary-label {
+        font-size: 9px !important;
+        margin-bottom: 1px !important;
+    }
+
+    .summary-info h4 {
+        font-size: 16px !important;
+    }
+
+    .summary-info .summary-sub {
+        font-size: 8px !important;
     }
 
     .btn-input-aktivitas,
@@ -3848,8 +3939,40 @@ tbody tr:last-child td {
     }
 }
 
-/* Ultra Compact Devices (<= 340px) */
+/* Ultra Compact Devices (<= 340px: 320px screens) */
 @media (max-width: 340px) {
+    .container {
+        padding: 0 8px;
+    }
+
+    .edge-pad {
+        padding: 0 8px;
+    }
+
+    .card {
+        padding: 10px 8px;
+        border-radius: 13px;
+    }
+
+    .grid-2 {
+        gap: 6px !important;
+    }
+
+    .summary-card {
+        padding: 8px 6px !important;
+        gap: 6px !important;
+    }
+
+    .icon-circle {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 12px !important;
+    }
+
+    .summary-info h4 {
+        font-size: 14.5px !important;
+    }
+
     .bottom-nav {
         width: calc(100% - 10px) !important;
         padding: 4px 4px !important;
@@ -3962,14 +4085,20 @@ tbody tr:last-child td {
     display: flex;
     justify-content: center;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .desktop-content {
     display: flex;
     justify-content: center;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow: visible;
     background: transparent;
+    box-sizing: border-box;
 }
 
 /* ═══════════════════════════════════════════════════════════════
