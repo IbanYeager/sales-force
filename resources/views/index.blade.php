@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sales App - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=20260914_mobile_fluid">
-    <link rel="stylesheet" href="css/index_dashboard.css?v=5.1">
+    <link rel="stylesheet" href="css/style.css?v=20261021_fluid_v6">
+    <link rel="stylesheet" href="css/index_dashboard.css?v=6.0">
     <link rel="stylesheet" href="css/sales_tools.css?v=1.0">
 
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -364,21 +364,21 @@
                     </div>
 
                     <!-- ═══ KIRCON MEDIA STUDIO BANNER ═══ -->
-                    <a href="pages/video_viral.html" class="card" style="display:block; text-decoration:none; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2a111a 100%); color: white; border: 1.5px solid rgba(200,16,46,0.35); border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(15,23,42,0.15); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #c8102e, #99001c); display:flex; align-items:center; justify-content:center; font-size:19px; color:#ffffff; box-shadow:0 4px 15px rgba(200,16,46,0.4);">
+                    <a href="pages/video_viral.html" class="card kircon-studio-banner" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div class="kircon-banner-row">
+                            <div class="kircon-banner-left">
+                                <div class="kircon-banner-icon">
                                     <i class="fa-solid fa-photo-film"></i>
                                 </div>
-                                <div>
-                                    <div style="display:flex; align-items:center; gap:8px;">
-                                        <h4 style="margin:0; font-size:15px; font-weight:800; color:#ffffff;">Kircon Media Studio</h4>
-                                        <span style="font-size:10px; background:#c8102e; color:white; padding:2px 7px; border-radius:10px; font-weight:800; letter-spacing:0.5px;">SHOWCASE</span>
+                                <div class="kircon-banner-text">
+                                    <div class="kircon-banner-title-wrap">
+                                        <h4 class="kircon-banner-title">Kircon Media Studio</h4>
+                                        <span class="kircon-banner-tag">SHOWCASE</span>
                                     </div>
-                                    <p style="margin:3px 0 0 0; font-size:12px; color:#cbd5e1;">Pusat video showcase &amp; inspirasi serah terima, review fitur Toyota, serta materi promosi WhatsApp</p>
+                                    <p class="kircon-banner-sub">Pusat video showcase &amp; inspirasi serah terima, review fitur Toyota, serta materi promosi WhatsApp</p>
                                 </div>
                             </div>
-                            <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:10px; font-size:12px; font-weight:700; color:white;">
+                            <div class="kircon-banner-btn">
                                 <span>Buka Media Hub</span>
                                 <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
                             </div>
@@ -386,21 +386,21 @@
                     </a>
 
                     <!-- ═══ AREA OPERATION (AO) REPORT BANNER & METRICS ═══ -->
-                    <div class="card ao-preview-card" style="background: linear-gradient(135deg, #0b132b 0%, #1c2541 100%); color: white; border: 1.5px solid #3a506b; border-radius: 16px; padding: 18px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(11,19,43,0.3);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <div style="width:40px; height:40px; border-radius:12px; background:rgba(200,16,46,0.2); border:1px solid #c8102e; display:flex; align-items:center; justify-content:center; font-size:18px; color:#ff4d6d;">
+                    <div class="card ao-preview-card">
+                        <div class="ao-preview-header">
+                            <div class="ao-preview-title-wrap">
+                                <div class="ao-preview-icon">
                                     <i class="fa-solid fa-chalkboard-user"></i>
                                 </div>
                                 <div>
-                                    <h4 style="margin:0; font-size:15px; font-weight:800; color:#ffffff; display:flex; align-items:center; gap:6px;">
+                                    <h4 class="ao-preview-title">
                                         Area Operation (AO) Report Live
-                                        <span style="font-size:10px; background:#10b981; color:#064e3b; padding:2px 7px; border-radius:10px; font-weight:800;">86% MATCH</span>
+                                        <span class="ao-preview-match-badge">86% MATCH</span>
                                     </h4>
-                                    <p style="margin:2px 0 0 0; font-size:11.5px; color:#94a3b8;">Tunas Toyota Kiara Condong &middot; 10 Agustus 2026</p>
+                                    <p class="ao-preview-sub">Tunas Toyota Kiara Condong &middot; 10 Agustus 2026</p>
                                 </div>
                             </div>
-                            <a href="pages/ao_report.html" class="btn" style="background:linear-gradient(135deg, #c8102e, #9e0c22); color:white; font-size:12px; font-weight:800; padding:8px 14px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(200,16,46,0.3);">
+                            <a href="pages/ao_report.html" class="ao-preview-btn">
                                 <span>Buka Papan AO Report</span>
                                 <i class="fa-solid fa-arrow-right"></i>
                             </a>
@@ -640,24 +640,28 @@
                     </div>
 
                     <!-- Quick Access: Inspeksi Customer & Jadwal Showroom -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+                    <div class="quick-access-grid">
                         <a href="pages/tradein.html?tab=inspeksi" style="text-decoration: none;">
-                            <div class="card" style="padding: 16px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; border-radius: 16px; height: 100%; box-shadow: 0 6px 20px rgba(15,23,42,0.2);">
-                                <div style="width: 40px; height: 40px; border-radius: 12px; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px;">
+                            <div class="card quick-access-card qa-card-inspect">
+                                <div class="qa-icon-wrap bg-red-icon">
                                     <i class="fa-solid fa-car-rear"></i>
                                 </div>
-                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Checklist Inspeksi Mobil</h4>
-                                <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Upload data &amp; taksiran Trade-in</p>
+                                <div class="qa-text-wrap">
+                                    <h4>Checklist Inspeksi Mobil</h4>
+                                    <p>Upload data &amp; taksiran Trade-in</p>
+                                </div>
                             </div>
                         </a>
 
                         <a href="pages/tradein.html?tab=jadwal" style="text-decoration: none;">
-                            <div class="card" style="padding: 16px; background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%); color: #fff; border-radius: 16px; height: 100%; box-shadow: 0 6px 20px rgba(49,46,129,0.2);">
-                                <div style="width: 40px; height: 40px; border-radius: 12px; background: #6366f1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px;">
+                            <div class="card quick-access-card qa-card-sched">
+                                <div class="qa-icon-wrap bg-indigo-icon">
                                     <i class="fa-solid fa-calendar-check"></i>
                                 </div>
-                                <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0 0 4px 0; color: #fff;">Jadwal Janji Temu Showroom</h4>
-                                <p style="font-size: 0.75rem; color: #a5b4fc; margin: 0;">Monitoring booking appraisal</p>
+                                <div class="qa-text-wrap">
+                                    <h4>Jadwal Janji Temu Showroom</h4>
+                                    <p>Monitoring booking appraisal</p>
+                                </div>
                             </div>
                         </a>
                     </div>
@@ -674,8 +678,8 @@
                                     <p class="olx-achieve-subtitle">Rekap Trade-In unit per Supervisor &amp; Hasil Deal</p>
                                 </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label for="olxAchievementMonthSelect" style="font-size: 11px; font-weight: 700; color: #64748b;"><i class="fa-regular fa-calendar"></i> Periode:</label>
+                            <div class="olx-month-wrap">
+                                <label for="olxAchievementMonthSelect" class="olx-month-label"><i class="fa-regular fa-calendar"></i> Periode:</label>
                                 <select id="olxAchievementMonthSelect" class="olx-month-select" onchange="loadOlxAchievementData()">
                                     <option value="all" selected>Semua Periode (Total 33 Deal)</option>
                                     <option value="Januari 2026">Januari 2026</option>
@@ -774,7 +778,7 @@
 
                 <!-- ═══ MODAL: SEMUA FITUR (Lengkap & Terorganisir) ═══ -->
                 <div class="modal-overlay" id="featureModal" onclick="closeFeatureModal()">
-                    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 88vh; display: flex; flex-direction: column;">
+                    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 88dvh; max-height: 88vh; display: flex; flex-direction: column;">
                         <div class="modal-drag-handle"></div>
                         <div class="modal-header" style="flex-shrink: 0; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
                             <div>
@@ -791,7 +795,7 @@
                             <div style="position: relative; display: flex; align-items: center;">
                                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: #94a3b8; font-size: 13px;"></i>
                                 <input type="text" id="featureModalSearchInput" placeholder="Cari nama fitur (contoh: STNK, Stok, Kalender, Media, SPK)..." 
-                                       style="width: 100%; box-sizing: border-box; padding: 10px 38px 10px 38px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: #f8fafc; font-size: 13px; outline: none; font-family: inherit; transition: all 0.2s;"
+                                       style="width: 100%; box-sizing: border-box; padding: 10px 38px 10px 38px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: #f8fafc; font-size: 14px; outline: none; font-family: inherit; transition: all 0.2s;"
                                        oninput="filterModalFeatures(this.value)">
                                 <button type="button" id="featureModalSearchClear" onclick="clearFeatureModalSearch()" 
                                         style="display:none; position: absolute; right: 12px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 14px;">

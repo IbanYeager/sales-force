@@ -2462,3 +2462,487 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* ════════════════════════════════════════════════════════════════
+   SFT FLUID MOBILE RESPONSIVE ENGINE (V6.0)
+   Designed for all smartphones: Compact (320-360px),
+   Standard (375-414px), Large/Phablet (428-480px), & Tablets
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Kircon Media Studio Responsive Banner ── */
+.kircon-studio-banner {
+    display: block;
+    text-decoration: none;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2a111a 100%);
+    color: #ffffff;
+    border: 1.5px solid rgba(200, 16, 46, 0.35);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kircon-banner-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.kircon-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.kircon-banner-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #c8102e, #99001c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(200, 16, 46, 0.4);
+    flex-shrink: 0;
+}
+
+.kircon-banner-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.kircon-banner-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.kircon-banner-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+.kircon-banner-tag {
+    font-size: 10px;
+    background: #c8102e;
+    color: white;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.kircon-banner-sub {
+    margin: 3px 0 0 0;
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.35;
+}
+
+.kircon-banner-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+@media (max-width: 540px) {
+    .kircon-studio-banner {
+        padding: 14px 14px !important;
+        border-radius: 15px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .kircon-banner-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 12px;
+        background: rgba(255, 255, 255, 0.12);
+        box-sizing: border-box;
+    }
+}
+
+/* ── AO Report Live Banner & Header ── */
+.ao-preview-card {
+    background: linear-gradient(135deg, #0b132b 0%, #1c2541 100%);
+    color: white;
+    border: 1.5px solid #3a506b;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(11, 19, 43, 0.3);
+}
+
+.ao-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.ao-preview-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.ao-preview-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(200, 16, 46, 0.2);
+    border: 1px solid #c8102e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #ff4d6d;
+    flex-shrink: 0;
+}
+
+.ao-preview-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    line-height: 1.25;
+}
+
+.ao-preview-match-badge {
+    font-size: 10px;
+    background: #10b981;
+    color: #064e3b;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+.ao-preview-sub {
+    margin: 2px 0 0 0;
+    font-size: 11.5px;
+    color: #94a3b8;
+}
+
+.ao-preview-btn {
+    background: linear-gradient(135deg, #c8102e, #9e0c22);
+    color: white !important;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 8px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+@media (max-width: 540px) {
+    .ao-preview-card {
+        padding: 14px 12px !important;
+        border-radius: 15px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .ao-preview-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 12px;
+        box-sizing: border-box;
+    }
+}
+
+/* ── Quick Access: Checklist Inspeksi & Jadwal ── */
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.quick-access-card {
+    padding: 16px;
+    border-radius: 16px;
+    height: 100%;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.quick-access-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
+}
+
+.qa-card-inspect {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.qa-card-sched {
+    background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
+}
+
+.qa-icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.bg-red-icon {
+    background: #ef4444;
+}
+
+.bg-indigo-icon {
+    background: #6366f1;
+}
+
+.qa-text-wrap h4 {
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+    color: #fff;
+    line-height: 1.25;
+}
+
+.qa-text-wrap p {
+    font-size: 0.75rem;
+    margin: 0;
+}
+
+.qa-card-inspect p {
+    color: #94a3b8;
+}
+
+.qa-card-sched p {
+    color: #a5b4fc;
+}
+
+@media (max-width: 480px) {
+    .quick-access-grid {
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .quick-access-card {
+        padding: 14px 12px !important;
+        border-radius: 14px !important;
+    }
+
+    .qa-text-wrap h4 {
+        font-size: 0.82rem !important;
+    }
+
+    .qa-text-wrap p {
+        font-size: 0.7rem !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .quick-access-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .quick-access-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px !important;
+    }
+
+    .qa-icon-wrap {
+        margin-bottom: 0 !important;
+        flex-shrink: 0;
+    }
+}
+
+/* ── OLX Achievement Header & Select Mobile Refinement ── */
+.olx-month-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+}
+
+.olx-month-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .olx-achieve-card {
+        padding: 16px 14px !important;
+        border-radius: 16px !important;
+    }
+
+    .olx-achieve-header {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+    }
+
+    .olx-month-wrap {
+        width: 100%;
+    }
+
+    .olx-month-select {
+        flex: 1;
+        width: 100%;
+        max-width: 100%;
+        font-size: 11.5px !important;
+        padding: 8px 10px !important;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 380px) {
+    .olx-achieve-card {
+        padding: 12px 10px !important;
+    }
+
+    .olx-achieve-title {
+        font-size: 14px !important;
+    }
+
+    .olx-overview-grid {
+        gap: 8px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .olx-ov-card {
+        padding: 10px 8px !important;
+        gap: 8px !important;
+        border-radius: 12px !important;
+    }
+
+    .olx-ov-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+    }
+
+    .olx-ov-val {
+        font-size: 13px !important;
+    }
+
+    .olx-spv-card {
+        padding: 12px 10px !important;
+        border-radius: 14px !important;
+    }
+}
+
+/* ── Market Research Demografi Mobile Polish ── */
+@media (max-width: 480px) {
+    .mr-card {
+        padding: 14px 12px !important;
+        border-radius: 16px !important;
+    }
+
+    .mr-title {
+        font-size: 12px !important;
+    }
+
+    .mr-ring-box {
+        padding: 10px 10px !important;
+        border-radius: 12px !important;
+    }
+
+    .mr-ring-head {
+        font-size: 9.5px !important;
+    }
+
+    .mr-ring-tag {
+        font-size: 9.5px !important;
+        padding: 2.5px 7px !important;
+    }
+
+    .cp-item {
+        padding: 9px 10px !important;
+        gap: 8px !important;
+    }
+
+    .cp-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 13px !important;
+    }
+
+    .cp-val {
+        font-size: 13px !important;
+    }
+
+    .cp-sub {
+        font-size: 10px !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .mr-ring-tags {
+        gap: 4px !important;
+    }
+
+    .mr-ring-tag {
+        font-size: 8.5px !important;
+        padding: 2px 6px !important;
+    }
+}
+
+/* ── Feature Modal Adaptive Columns ── */
+@media (max-width: 360px) {
+    .feature-modal-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px 6px !important;
+    }
+
+    .feature-modal-grid .category-icon {
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 16px !important;
+    }
+
+    .feature-modal-grid .category-text {
+        font-size: 9px !important;
+    }
+}
+
