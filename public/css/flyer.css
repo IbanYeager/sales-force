@@ -933,16 +933,30 @@
     }
 }
 
-/* ── MOBILE BREAKPOINT (<= 768px) ── */
+/* ── MOBILE BREAKPOINT (<= 768px, including iPhone XR & Android) ── */
 @media (max-width: 768px) {
+    /* Prevent iOS Safari 16px input auto-zoom */
+    .flyer-input-text,
+    .flyer-input-textarea,
+    select.flyer-input-text,
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"] {
+        font-size: 16px !important;
+    }
+
     .flyer-studio-container {
-        padding: 12px 10px 110px;
+        padding: 10px 12px;
+        padding-top: max(10px, env(safe-area-inset-top));
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+        padding-bottom: calc(105px + env(safe-area-inset-bottom, 24px));
     }
 
     .flyer-header-banner {
-        padding: 16px 14px;
+        padding: 14px 14px;
         border-radius: 16px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
         gap: 12px;
     }
 
@@ -960,13 +974,13 @@
     }
 
     .flyer-header-title {
-        font-size: 16.5px;
+        font-size: 16px;
         line-height: 1.25;
     }
 
     .flyer-header-subtitle {
         font-size: 11px;
-        line-height: 1.4;
+        line-height: 1.35;
     }
 
     .flyer-header-actions {
@@ -981,6 +995,7 @@
         padding: 10px 8px !important;
         font-size: 11.5px !important;
         justify-content: center;
+        min-height: 42px;
     }
 
     .flyer-artboard-card {
@@ -990,32 +1005,40 @@
 
     .flyer-ratio-switch {
         max-width: 100%;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+        padding: 3px;
+    }
+
+    .ratio-btn {
+        padding: 7px 10px;
+        font-size: 11px;
     }
 
     .flyer-canvas-wrapper {
         min-height: auto;
     }
 
+    /* iPhone XR (414px) and Mobile Preview: balanced height leaving room for controls */
     .flyer-preview-img {
-        max-height: 380px;
+        max-height: 320px;
         width: auto;
         max-width: 100%;
     }
 
     .flyer-res-info-tag {
-        font-size: 10px;
+        font-size: 9.5px;
         text-align: center;
         justify-content: center;
         flex-wrap: wrap;
+        margin-top: 8px;
     }
 
     /* Sticky Mobile Navigation Tabs Bar */
     .flyer-tabs-nav {
         position: sticky;
-        top: 8px;
+        top: max(6px, env(safe-area-inset-top));
         z-index: 60;
-        background: rgba(255, 255, 255, 0.94);
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
         border-radius: 14px;
@@ -1029,11 +1052,11 @@
         scroll-snap-align: center;
         min-width: max-content;
         padding: 8px 12px;
-        font-size: 11.5px;
+        font-size: 11px;
         flex: 0 0 auto;
     }
 
-    /* Floating Action Bar at screen bottom */
+    /* Floating Action Bar with iPhone XR Home Bar Indicator Clearance */
     .flyer-mobile-bottom-bar {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1042,13 +1065,13 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(9, 14, 24, 0.95);
+        background: rgba(9, 14, 24, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         padding: 10px 14px;
-        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 24px));
         border-top: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
         z-index: 999;
     }
 
@@ -1063,8 +1086,10 @@
         justify-content: center;
         gap: 6px;
         cursor: pointer;
+        min-height: 44px; /* iOS 44px tap target */
         transition: transform 0.15s ease, opacity 0.15s ease;
         text-decoration: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .btn-mobile-action:active {
@@ -1082,6 +1107,28 @@
         color: #ffffff;
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
     }
+
+    /* Native touch-friendly range sliders on iOS */
+    .flyer-slider-input {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 7px;
+        border-radius: 99px;
+        background: #e2e8f0;
+        outline: none;
+    }
+
+    .flyer-slider-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #7c3aed;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(124, 58, 237, 0.45);
+        border: 2px solid #ffffff;
+    }
 }
 
 /* ── PHONE BREAKPOINT (<= 640px) ── */
@@ -1092,51 +1139,65 @@
     }
 
     .flyer-section-card {
-        padding: 16px 14px;
+        padding: 14px 12px;
         border-radius: 16px;
     }
 
     .flyer-card-header {
         gap: 10px;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
         padding-bottom: 10px;
     }
 
     .flyer-card-title {
-        font-size: 14px;
+        font-size: 13.5px;
     }
 
     .flyer-card-sub {
-        font-size: 11px;
+        font-size: 10.5px;
     }
 
     .flyer-pill-selector {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 4px;
-        padding: 4px;
+        padding: 3px;
     }
 
     .pill-opt-btn {
         min-width: 0;
         padding: 7px 4px;
-        font-size: 11px;
+        font-size: 10.5px;
         text-align: center;
+        border-radius: 8px;
+    }
+
+    #tonePillSelector {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #carLayoutPills {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
-/* ── NARROW MOBILE / SAMSUNG GALAXY (<= 480px) ── */
-@media (max-width: 480px) {
+/* ── NARROW MOBILE / IPHONE XR / SE / SAMSUNG GALAXY (<= 430px) ── */
+@media (max-width: 430px) {
     .flyer-studio-container {
-        padding: 8px 8px 110px;
+        padding: 8px 8px;
+        padding-top: max(8px, env(safe-area-inset-top));
+        padding-left: max(8px, env(safe-area-inset-left));
+        padding-right: max(8px, env(safe-area-inset-right));
+        padding-bottom: calc(105px + env(safe-area-inset-bottom, 30px));
     }
 
     .flyer-artboard-card {
-        padding: 12px 8px;
+        padding: 10px 8px;
     }
 
+    /* iPhone XR 414px: compact canvas preview height leaving 350px+ for controls */
     .flyer-preview-img {
-        max-height: 310px;
+        max-height: 290px;
     }
 
     .ratio-btn {
@@ -1158,13 +1219,14 @@
     .btn-reset-pos {
         width: 100%;
         justify-content: center;
+        min-height: 40px;
     }
 
     .sales-avatar-upload-wrap {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        padding: 14px 10px;
+        padding: 12px 10px;
     }
 
     .sales-avatar-upload-wrap > div {
@@ -1184,11 +1246,19 @@
         text-align: center;
         padding: 12px 10px;
     }
+
+    .color-input-circle {
+        width: 38px;
+        height: 38px;
+    }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 375px) {
     .flyer-pill-selector {
         grid-template-columns: repeat(2, 1fr);
+    }
+    .flyer-preview-img {
+        max-height: 260px;
     }
 }
 
