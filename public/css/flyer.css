@@ -858,3 +858,337 @@
     font-family: inherit;
     margin-bottom: 10px;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   RESPONSIVE GRID UTILITIES & MOBILE STUDIO OPTIMIZATIONS
+   ══════════════════════════════════════════════════════════════════ */
+.flyer-studio-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f4f6fb;
+    padding: 16px 18px 100px;
+    box-sizing: border-box;
+}
+
+.flyer-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.flyer-grid-sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.flyer-scale-reset-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.flyer-scale-reset-wrap .flyer-slider-wrap {
+    flex: 1;
+    margin-top: 0;
+}
+
+.btn-reset-pos {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 38px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.btn-reset-pos:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Mobile Quick Floating Action Bar */
+.flyer-mobile-bottom-bar {
+    display: none;
+}
+
+/* ── TABLET BREAKPOINT (<= 950px) ── */
+@media (max-width: 950px) {
+    .flyer-studio-layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+}
+
+/* ── MOBILE BREAKPOINT (<= 768px) ── */
+@media (max-width: 768px) {
+    .flyer-studio-container {
+        padding: 12px 10px 110px;
+    }
+
+    .flyer-header-banner {
+        padding: 16px 14px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+
+    .flyer-header-left {
+        gap: 10px;
+        width: 100%;
+    }
+
+    .flyer-back-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .flyer-header-title {
+        font-size: 16.5px;
+        line-height: 1.25;
+    }
+
+    .flyer-header-subtitle {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .flyer-header-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .btn-header-action {
+        width: 100% !important;
+        padding: 10px 8px !important;
+        font-size: 11.5px !important;
+        justify-content: center;
+    }
+
+    .flyer-artboard-card {
+        padding: 14px 12px;
+        border-radius: 18px;
+    }
+
+    .flyer-ratio-switch {
+        max-width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .flyer-canvas-wrapper {
+        min-height: auto;
+    }
+
+    .flyer-preview-img {
+        max-height: 380px;
+        width: auto;
+        max-width: 100%;
+    }
+
+    .flyer-res-info-tag {
+        font-size: 10px;
+        text-align: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Sticky Mobile Navigation Tabs Bar */
+    .flyer-tabs-nav {
+        position: sticky;
+        top: 8px;
+        z-index: 60;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-radius: 14px;
+        padding: 4px;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.1);
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+    }
+
+    .flyer-tab-btn {
+        scroll-snap-align: center;
+        min-width: max-content;
+        padding: 8px 12px;
+        font-size: 11.5px;
+        flex: 0 0 auto;
+    }
+
+    /* Floating Action Bar at screen bottom */
+    .flyer-mobile-bottom-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(9, 14, 24, 0.95);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 10px 14px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+        z-index: 999;
+    }
+
+    .btn-mobile-action {
+        padding: 12px 10px;
+        border-radius: 12px;
+        border: none;
+        font-size: 12.5px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: transform 0.15s ease, opacity 0.15s ease;
+        text-decoration: none;
+    }
+
+    .btn-mobile-action:active {
+        transform: scale(0.97);
+    }
+
+    .btn-mobile-action.wa {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn-mobile-action.download {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+}
+
+/* ── PHONE BREAKPOINT (<= 640px) ── */
+@media (max-width: 640px) {
+    .flyer-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .flyer-section-card {
+        padding: 16px 14px;
+        border-radius: 16px;
+    }
+
+    .flyer-card-header {
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+    }
+
+    .flyer-card-title {
+        font-size: 14px;
+    }
+
+    .flyer-card-sub {
+        font-size: 11px;
+    }
+
+    .flyer-pill-selector {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        padding: 4px;
+    }
+
+    .pill-opt-btn {
+        min-width: 0;
+        padding: 7px 4px;
+        font-size: 11px;
+        text-align: center;
+    }
+}
+
+/* ── NARROW MOBILE / SAMSUNG GALAXY (<= 480px) ── */
+@media (max-width: 480px) {
+    .flyer-studio-container {
+        padding: 8px 8px 110px;
+    }
+
+    .flyer-artboard-card {
+        padding: 12px 8px;
+    }
+
+    .flyer-preview-img {
+        max-height: 310px;
+    }
+
+    .ratio-btn {
+        padding: 6px 8px;
+        font-size: 10.5px;
+    }
+
+    .flyer-grid-sliders {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .flyer-scale-reset-wrap {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .btn-reset-pos {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .sales-avatar-upload-wrap {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 14px 10px;
+    }
+
+    .sales-avatar-upload-wrap > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .sales-avatar-upload-wrap div[style*="display:flex"] {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .qr-preview-box {
+        flex-direction: column;
+        text-align: center;
+        padding: 12px 10px;
+    }
+}
+
+@media (max-width: 380px) {
+    .flyer-pill-selector {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+

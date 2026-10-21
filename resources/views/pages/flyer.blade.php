@@ -25,7 +25,7 @@
 </head>
 
 <body style="background: #f4f6fb; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif;">
-  <div class="mobile-app" style="max-width: 1320px; margin: 0 auto; min-height: 100vh; background: #f4f6fb; padding: 16px 18px 100px;">
+  <div class="mobile-app flyer-studio-container">
     
     <!-- HEADER STUDIO BANNER -->
     <header class="flyer-header-banner">
@@ -45,10 +45,10 @@
       </div>
 
       <div class="flyer-header-actions">
-        <button type="button" class="btn-flyer-download" onclick="downloadFlyerImage('png')" style="width: auto; padding: 10px 18px; font-size: 12.5px;">
-          <i class="fa-solid fa-cloud-arrow-down"></i> Unduh Poster (PNG)
+        <button type="button" class="btn-flyer-download btn-header-action" onclick="downloadFlyerImage('png')">
+          <i class="fa-solid fa-cloud-arrow-down"></i> Unduh Poster
         </button>
-        <button type="button" class="btn-flyer-wa" onclick="shareFlyerToWhatsApp()" style="width: auto; padding: 10px 18px; font-size: 12.5px;">
+        <button type="button" class="btn-flyer-wa btn-header-action" onclick="shareFlyerToWhatsApp()">
           <i class="fa-brands fa-whatsapp"></i> Bagikan WA
         </button>
       </div>
@@ -202,7 +202,7 @@
 
             <!-- SUB-BOX 3: CUSTOM 2-COLOR GRADIENT -->
             <div id="bgGradBox" style="display:none;">
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="flyer-grid-2">
                 <div class="flyer-color-picker-row">
                   <input type="color" id="inputBgGrad1" class="color-input-circle" value="#090e18" oninput="onCustomColorChange()">
                   <div>
@@ -270,7 +270,7 @@
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div class="flyer-grid-2">
               <div>
                 <label class="flyer-field-label">Warna Aksen / Highlight</label>
                 <div class="flyer-color-picker-row">
@@ -373,7 +373,7 @@
               </div>
 
               <!-- Scale & Position Sliders 1 -->
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+              <div class="flyer-grid-sliders" style="margin-top:10px;">
                 <div class="flyer-slider-wrap" style="margin-top:0;">
                   <div class="flyer-slider-header">
                     <span>Geser Kiri/Kanan</span>
@@ -389,15 +389,15 @@
                   <input type="range" id="carSlot0OffsetYInput" class="flyer-slider-input" min="-150" max="150" step="5" value="0" oninput="updateCarSlotOffsetY(0, this.value)">
                 </div>
               </div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                <div class="flyer-slider-wrap" style="margin-top:0; flex:1; max-width:65%;">
+              <div class="flyer-scale-reset-wrap">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
                   <div class="flyer-slider-header">
                     <span>Ukuran Skala Mobil 1</span>
                     <span id="carSlot0ScaleBadge">100%</span>
                   </div>
                   <input type="range" id="carSlot0ScaleInput" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="1.0" oninput="updateCarSlotScale(0, this.value)">
                 </div>
-                <button type="button" class="btn" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="resetCarSlotPosition(0)">
+                <button type="button" class="btn-reset-pos" onclick="resetCarSlotPosition(0)">
                   <i class="fa-solid fa-arrows-rotate"></i> Reset Posisi
                 </button>
               </div>
@@ -441,7 +441,7 @@
               </div>
 
               <!-- Scale & Position Sliders 2 -->
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+              <div class="flyer-grid-sliders" style="margin-top:10px;">
                 <div class="flyer-slider-wrap" style="margin-top:0;">
                   <div class="flyer-slider-header">
                     <span>Geser Kiri/Kanan</span>
@@ -457,15 +457,15 @@
                   <input type="range" id="carSlot1OffsetYInput" class="flyer-slider-input" min="-150" max="150" step="5" value="0" oninput="updateCarSlotOffsetY(1, this.value)">
                 </div>
               </div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                <div class="flyer-slider-wrap" style="margin-top:0; flex:1; max-width:65%;">
+              <div class="flyer-scale-reset-wrap">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
                   <div class="flyer-slider-header">
                     <span>Ukuran Skala Mobil 2</span>
                     <span id="carSlot1ScaleBadge">90%</span>
                   </div>
                   <input type="range" id="carSlot1ScaleInput" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="0.9" oninput="updateCarSlotScale(1, this.value)">
                 </div>
-                <button type="button" class="btn" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="resetCarSlotPosition(1)">
+                <button type="button" class="btn-reset-pos" onclick="resetCarSlotPosition(1)">
                   <i class="fa-solid fa-arrows-rotate"></i> Reset Posisi
                 </button>
               </div>
@@ -508,7 +508,7 @@
               </div>
 
               <!-- Scale & Position Sliders 3 -->
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+              <div class="flyer-grid-sliders" style="margin-top:10px;">
                 <div class="flyer-slider-wrap" style="margin-top:0;">
                   <div class="flyer-slider-header">
                     <span>Geser Kiri/Kanan</span>
@@ -524,15 +524,15 @@
                   <input type="range" id="carSlot2OffsetYInput" class="flyer-slider-input" min="-150" max="150" step="5" value="0" oninput="updateCarSlotOffsetY(2, this.value)">
                 </div>
               </div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                <div class="flyer-slider-wrap" style="margin-top:0; flex:1; max-width:65%;">
+              <div class="flyer-scale-reset-wrap">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
                   <div class="flyer-slider-header">
                     <span>Ukuran Skala Mobil 3</span>
                     <span id="carSlot2ScaleBadge">85%</span>
                   </div>
                   <input type="range" id="carSlot2ScaleInput" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="0.85" oninput="updateCarSlotScale(2, this.value)">
                 </div>
-                <button type="button" class="btn" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="resetCarSlotPosition(2)">
+                <button type="button" class="btn-reset-pos" onclick="resetCarSlotPosition(2)">
                   <i class="fa-solid fa-arrows-rotate"></i> Reset Posisi
                 </button>
               </div>
@@ -559,7 +559,7 @@
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="flyer-grid-2" style="margin-bottom:12px;">
               <div>
                 <label class="flyer-field-label">Nama Dealer Utama</label>
                 <input type="text" id="flyerDealerName" class="flyer-input-text" value="TUNAS TOYOTA" oninput="renderFlyerCanvas()">
@@ -599,7 +599,7 @@
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="flyer-grid-2">
               <div>
                 <label class="flyer-field-label">Judul Teks Mobil di Poster</label>
                 <input type="text" id="flyerCarTitleInput" class="flyer-input-text" value="ALL NEW AVANZA 1.5 G CVT" oninput="renderFlyerCanvas()">
@@ -623,7 +623,7 @@
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="flyer-grid-2" style="margin-bottom:12px;">
               <div>
                 <label class="flyer-field-label">Label Finansial Kiri</label>
                 <input type="text" id="flyerFinLabelLeft" class="flyer-input-text" value="TOTAL UANG MUKA / TDP" oninput="renderFlyerCanvas()">
@@ -634,7 +634,7 @@
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="flyer-grid-2" style="margin-bottom:12px;">
               <div>
                 <label class="flyer-field-label">Label Finansial Kanan</label>
                 <input type="text" id="flyerFinLabelRight" class="flyer-input-text" value="ANGSURAN BULANAN" oninput="renderFlyerCanvas()">
@@ -737,7 +737,7 @@
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="flyer-grid-2" style="margin-bottom:12px;">
               <div>
                 <label class="flyer-field-label">Nama Lengkap Sales</label>
                 <input type="text" id="flyerSalesName" class="flyer-input-text" value="Official Sales Consultant" oninput="renderFlyerCanvas()">
@@ -748,7 +748,7 @@
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="flyer-grid-2" style="margin-bottom:12px;">
               <div>
                 <label class="flyer-field-label">Dealer / Cabang</label>
                 <input type="text" id="flyerSalesBranch" class="flyer-input-text" value="Tunas Toyota Kiara Condong" oninput="renderFlyerCanvas()">
@@ -808,6 +808,16 @@
 
       </section>
     </main>
+
+    <!-- FLOATING MOBILE BOTTOM ACTION BAR -->
+    <div class="flyer-mobile-bottom-bar">
+      <button type="button" class="btn-mobile-action wa" onclick="shareFlyerToWhatsApp()">
+        <i class="fa-brands fa-whatsapp"></i> Bagikan WA
+      </button>
+      <button type="button" class="btn-mobile-action download" onclick="downloadFlyerImage('png')">
+        <i class="fa-solid fa-cloud-arrow-down"></i> Unduh HD
+      </button>
+    </div>
 
   </div>
 

@@ -142,7 +142,12 @@ function switchFlyerTab(tabId, btn) {
     document.querySelectorAll('.flyer-tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.flyer-tab-pane').forEach(p => p.classList.remove('active'));
     
-    if (btn) btn.classList.add('active');
+    if (btn) {
+        btn.classList.add('active');
+        if (typeof btn.scrollIntoView === 'function') {
+            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    }
     const pane = document.getElementById(tabId);
     if (pane) pane.classList.add('active');
 }
