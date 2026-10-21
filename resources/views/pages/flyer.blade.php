@@ -372,13 +372,34 @@
                 </div>
               </div>
 
-              <!-- Scale Slider 1 -->
-              <div class="flyer-slider-wrap">
-                <div class="flyer-slider-header">
-                  <span>Ukuran Skala Mobil 1</span>
-                  <span id="carSlot0ScaleBadge">100%</span>
+              <!-- Scale & Position Sliders 1 -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
+                  <div class="flyer-slider-header">
+                    <span>Geser Kiri/Kanan</span>
+                    <span id="carSlot0OffsetXBadge">0px</span>
+                  </div>
+                  <input type="range" id="carSlot0OffsetXInput" class="flyer-slider-input" min="-200" max="200" step="5" value="0" oninput="updateCarSlotOffsetX(0, this.value)">
                 </div>
-                <input type="range" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="1.0" oninput="updateCarSlotScale(0, this.value)">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
+                  <div class="flyer-slider-header">
+                    <span>Geser Atas/Bawah</span>
+                    <span id="carSlot0OffsetYBadge">0px</span>
+                  </div>
+                  <input type="range" id="carSlot0OffsetYInput" class="flyer-slider-input" min="-150" max="150" step="5" value="0" oninput="updateCarSlotOffsetY(0, this.value)">
+                </div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div class="flyer-slider-wrap" style="margin-top:0; flex:1; max-width:65%;">
+                  <div class="flyer-slider-header">
+                    <span>Ukuran Skala Mobil 1</span>
+                    <span id="carSlot0ScaleBadge">100%</span>
+                  </div>
+                  <input type="range" id="carSlot0ScaleInput" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="1.0" oninput="updateCarSlotScale(0, this.value)">
+                </div>
+                <button type="button" class="btn" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="resetCarSlotPosition(0)">
+                  <i class="fa-solid fa-arrows-rotate"></i> Reset Posisi
+                </button>
               </div>
             </div>
 
@@ -419,13 +440,34 @@
                 </div>
               </div>
 
-              <!-- Scale Slider 2 -->
-              <div class="flyer-slider-wrap">
-                <div class="flyer-slider-header">
-                  <span>Ukuran Skala Mobil 2</span>
-                  <span id="carSlot1ScaleBadge">90%</span>
+              <!-- Scale & Position Sliders 2 -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
+                  <div class="flyer-slider-header">
+                    <span>Geser Kiri/Kanan</span>
+                    <span id="carSlot1OffsetXBadge">0px</span>
+                  </div>
+                  <input type="range" id="carSlot1OffsetXInput" class="flyer-slider-input" min="-200" max="200" step="5" value="0" oninput="updateCarSlotOffsetX(1, this.value)">
                 </div>
-                <input type="range" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="0.9" oninput="updateCarSlotScale(1, this.value)">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
+                  <div class="flyer-slider-header">
+                    <span>Geser Atas/Bawah</span>
+                    <span id="carSlot1OffsetYBadge">0px</span>
+                  </div>
+                  <input type="range" id="carSlot1OffsetYInput" class="flyer-slider-input" min="-150" max="150" step="5" value="0" oninput="updateCarSlotOffsetY(1, this.value)">
+                </div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div class="flyer-slider-wrap" style="margin-top:0; flex:1; max-width:65%;">
+                  <div class="flyer-slider-header">
+                    <span>Ukuran Skala Mobil 2</span>
+                    <span id="carSlot1ScaleBadge">90%</span>
+                  </div>
+                  <input type="range" id="carSlot1ScaleInput" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="0.9" oninput="updateCarSlotScale(1, this.value)">
+                </div>
+                <button type="button" class="btn" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="resetCarSlotPosition(1)">
+                  <i class="fa-solid fa-arrows-rotate"></i> Reset Posisi
+                </button>
               </div>
             </div>
 
@@ -465,13 +507,34 @@
                 </div>
               </div>
 
-              <!-- Scale Slider 3 -->
-              <div class="flyer-slider-wrap">
-                <div class="flyer-slider-header">
-                  <span>Ukuran Skala Mobil 3</span>
-                  <span id="carSlot2ScaleBadge">85%</span>
+              <!-- Scale & Position Sliders 3 -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
+                  <div class="flyer-slider-header">
+                    <span>Geser Kiri/Kanan</span>
+                    <span id="carSlot2OffsetXBadge">0px</span>
+                  </div>
+                  <input type="range" id="carSlot2OffsetXInput" class="flyer-slider-input" min="-200" max="200" step="5" value="0" oninput="updateCarSlotOffsetX(2, this.value)">
                 </div>
-                <input type="range" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="0.85" oninput="updateCarSlotScale(2, this.value)">
+                <div class="flyer-slider-wrap" style="margin-top:0;">
+                  <div class="flyer-slider-header">
+                    <span>Geser Atas/Bawah</span>
+                    <span id="carSlot2OffsetYBadge">0px</span>
+                  </div>
+                  <input type="range" id="carSlot2OffsetYInput" class="flyer-slider-input" min="-150" max="150" step="5" value="0" oninput="updateCarSlotOffsetY(2, this.value)">
+                </div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div class="flyer-slider-wrap" style="margin-top:0; flex:1; max-width:65%;">
+                  <div class="flyer-slider-header">
+                    <span>Ukuran Skala Mobil 3</span>
+                    <span id="carSlot2ScaleBadge">85%</span>
+                  </div>
+                  <input type="range" id="carSlot2ScaleInput" class="flyer-slider-input" min="0.6" max="1.4" step="0.05" value="0.85" oninput="updateCarSlotScale(2, this.value)">
+                </div>
+                <button type="button" class="btn" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="resetCarSlotPosition(2)">
+                  <i class="fa-solid fa-arrows-rotate"></i> Reset Posisi
+                </button>
               </div>
             </div>
 

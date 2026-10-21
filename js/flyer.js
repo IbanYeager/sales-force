@@ -366,8 +366,40 @@ function updateCarSlotScale(slotIdx, val) {
     renderFlyerCanvas();
 }
 
-function updateCarSlotOffset(slotIdx, xVal) {
+function updateCarSlotOffsetX(slotIdx, xVal) {
     studioState.cars[slotIdx].offsetX = parseInt(xVal, 10) || 0;
+    const badge = document.getElementById(`carSlot${slotIdx}OffsetXBadge`);
+    if (badge) badge.textContent = (studioState.cars[slotIdx].offsetX > 0 ? '+' : '') + studioState.cars[slotIdx].offsetX + 'px';
+    renderFlyerCanvas();
+}
+
+function updateCarSlotOffsetY(slotIdx, yVal) {
+    studioState.cars[slotIdx].offsetY = parseInt(yVal, 10) || 0;
+    const badge = document.getElementById(`carSlot${slotIdx}OffsetYBadge`);
+    if (badge) badge.textContent = (studioState.cars[slotIdx].offsetY > 0 ? '+' : '') + studioState.cars[slotIdx].offsetY + 'px';
+    renderFlyerCanvas();
+}
+
+function resetCarSlotPosition(slotIdx) {
+    studioState.cars[slotIdx].offsetX = 0;
+    studioState.cars[slotIdx].offsetY = 0;
+    studioState.cars[slotIdx].scale = (slotIdx === 0 ? 1.0 : (slotIdx === 1 ? 0.9 : 0.85));
+    
+    const scaleInp = document.getElementById(`carSlot${slotIdx}ScaleInput`);
+    const scaleBadge = document.getElementById(`carSlot${slotIdx}ScaleBadge`);
+    if (scaleInp) scaleInp.value = studioState.cars[slotIdx].scale;
+    if (scaleBadge) scaleBadge.textContent = Math.round(studioState.cars[slotIdx].scale * 100) + '%';
+
+    const xInp = document.getElementById(`carSlot${slotIdx}OffsetXInput`);
+    const xBadge = document.getElementById(`carSlot${slotIdx}OffsetXBadge`);
+    if (xInp) xInp.value = 0;
+    if (xBadge) xBadge.textContent = '0px';
+
+    const yInp = document.getElementById(`carSlot${slotIdx}OffsetYInput`);
+    const yBadge = document.getElementById(`carSlot${slotIdx}OffsetYBadge`);
+    if (yInp) yInp.value = 0;
+    if (yBadge) yBadge.textContent = '0px';
+
     renderFlyerCanvas();
 }
 
@@ -744,72 +776,48 @@ async function renderFlyerCanvas() {
     ctx.fillText(studioState.carSubtitle, W / 2, titleY + 45);
 
     // ── 5. CAR PHOTO RENDERING (MULTI-CAR LAYOUT) ──
-    const carBaseY = isStory ? 430 : 295;
+    const carBaseY = isStory ? 440 : 305;
 
     if (studioState.carLayoutMode === '1') {
-        // Single Car Centered
+        // Single Car: Perfectly Centered
         const carImg = loadedCars[0];
         if (carImg) {
             const scale = studioState.cars[0].scale;
-            const imgW = (isStory ? 760 : 540) * scale;
-            const imgH = (isStory ? 440 : 310) * scale;
+            const imgW = (isStory ? 780 : 550) * scale;
+            const imgH = (isStory ? 450 : 315) * scale;
             const imgX = (W - imgW) / 2 + studioState.cars[0].offsetX;
             const imgY = carBaseY + studioState.cars[0].offsetY;
-
-            // Ground Shadow
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
-            ctx.beginPath();
-            ctx.ellipse(W / 2 + studioState.cars[0].offsetX, imgY + imgH - 30, imgW * 0.42, 22 * scale, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
 
             ctx.drawImage(carImg, imgX, imgY, imgW, imgH);
         }
     } else if (studioState.carLayoutMode === '2') {
-        // 2 Cars (Duo: Car 2 rear-right, Car 1 front-left)
+        // 2 Cars (Duo Promo: Car 2 Rear Right, Car 1 Front Left - Balanced & Inset)
         const car1 = loadedCars[0];
         const car2 = loadedCars[1];
 
-        // Draw Car 2 (Behind)
+        // Draw Car 2 (Behind on Right, insetting safely from right edge)
         if (car2) {
             const scale2 = studioState.cars[1].scale;
-            const w2 = (isStory ? 620 : 440) * scale2;
-            const h2 = (isStory ? 360 : 255) * scale2;
-            const x2 = (W * 0.52) + studioState.cars[1].offsetX;
+            const w2 = (isStory ? 600 : 430) * scale2;
+            const h2 = (isStory ? 350 : 250) * scale2;
+            const x2 = (W - w2 - 50) + studioState.cars[1].offsetX;
             const y2 = carBaseY - 20 + studioState.cars[1].offsetY;
-
-            // Shadow 2
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.beginPath();
-            ctx.ellipse(x2 + w2 / 2, y2 + h2 - 25, w2 * 0.4, 18 * scale2, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
 
             ctx.drawImage(car2, x2, y2, w2, h2);
         }
 
-        // Draw Car 1 (Front)
+        // Draw Car 1 (Front on Left, insetting safely from left edge)
         if (car1) {
             const scale1 = studioState.cars[0].scale;
-            const w1 = (isStory ? 660 : 480) * scale1;
-            const h1 = (isStory ? 380 : 275) * scale1;
-            const x1 = (W * 0.05) + studioState.cars[0].offsetX;
-            const y1 = carBaseY + 30 + studioState.cars[0].offsetY;
-
-            // Shadow 1
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.65)';
-            ctx.beginPath();
-            ctx.ellipse(x1 + w1 / 2, y1 + h1 - 25, w1 * 0.42, 22 * scale1, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
+            const w1 = (isStory ? 670 : 480) * scale1;
+            const h1 = (isStory ? 390 : 275) * scale1;
+            const x1 = 50 + studioState.cars[0].offsetX;
+            const y1 = carBaseY + 45 + studioState.cars[0].offsetY;
 
             ctx.drawImage(car1, x1, y1, w1, h1);
         }
     } else if (studioState.carLayoutMode === '3') {
-        // 3 Cars (Trio: Left rear, Right rear, Center front)
+        // 3 Cars (Trio Showcase: Balanced Podium V-Formation)
         const car1 = loadedCars[0];
         const car2 = loadedCars[1];
         const car3 = loadedCars[2];
@@ -817,17 +825,10 @@ async function renderFlyerCanvas() {
         // Car 3 (Left Rear)
         if (car3) {
             const s3 = studioState.cars[2].scale;
-            const w3 = (isStory ? 540 : 380) * s3;
-            const h3 = (isStory ? 310 : 220) * s3;
-            const x3 = 20 + studioState.cars[2].offsetX;
+            const w3 = (isStory ? 510 : 365) * s3;
+            const h3 = (isStory ? 295 : 210) * s3;
+            const x3 = 35 + studioState.cars[2].offsetX;
             const y3 = carBaseY - 30 + studioState.cars[2].offsetY;
-
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.beginPath();
-            ctx.ellipse(x3 + w3 / 2, y3 + h3 - 20, w3 * 0.4, 16 * s3, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
 
             ctx.drawImage(car3, x3, y3, w3, h3);
         }
@@ -835,17 +836,10 @@ async function renderFlyerCanvas() {
         // Car 2 (Right Rear)
         if (car2) {
             const s2 = studioState.cars[1].scale;
-            const w2 = (isStory ? 540 : 380) * s2;
-            const h2 = (isStory ? 310 : 220) * s2;
-            const x2 = W - w2 - 20 + studioState.cars[1].offsetX;
+            const w2 = (isStory ? 510 : 365) * s2;
+            const h2 = (isStory ? 295 : 210) * s2;
+            const x2 = (W - w2 - 35) + studioState.cars[1].offsetX;
             const y2 = carBaseY - 30 + studioState.cars[1].offsetY;
-
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.beginPath();
-            ctx.ellipse(x2 + w2 / 2, y2 + h2 - 20, w2 * 0.4, 16 * s2, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
 
             ctx.drawImage(car2, x2, y2, w2, h2);
         }
@@ -853,17 +847,10 @@ async function renderFlyerCanvas() {
         // Car 1 (Center Front)
         if (car1) {
             const s1 = studioState.cars[0].scale;
-            const w1 = (isStory ? 680 : 490) * s1;
-            const h1 = (isStory ? 390 : 280) * s1;
+            const w1 = (isStory ? 670 : 480) * s1;
+            const h1 = (isStory ? 390 : 275) * s1;
             const x1 = (W - w1) / 2 + studioState.cars[0].offsetX;
-            const y1 = carBaseY + 35 + studioState.cars[0].offsetY;
-
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
-            ctx.beginPath();
-            ctx.ellipse(W / 2 + studioState.cars[0].offsetX, y1 + h1 - 25, w1 * 0.42, 22 * s1, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
+            const y1 = carBaseY + 45 + studioState.cars[0].offsetY;
 
             ctx.drawImage(car1, x1, y1, w1, h1);
         }
