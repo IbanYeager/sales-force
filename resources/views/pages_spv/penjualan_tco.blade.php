@@ -247,28 +247,52 @@
               <div class="tco-map-title">
                 <i class="fa-solid fa-map-location-dot" style="color: #d7123a; font-size: 20px;"></i>
                 <div>
-                  <h3>Peta Sebaran &amp; Konsentrasi Pembeli TCO (Mapping Polreg)</h3>
-                  <span>Visualisasi densitas pembelian aksesoris per kecamatan &amp; wilayah registrasi pelat nomor</span>
+                  <h3>Peta Poligon Wilayah &amp; Pemetaan Kecamatan TCO (Polreg)</h3>
+                  <span>Choropleth 79 kecamatan Bandung Raya, status penetrasi &amp; ranking produk terbanyak</span>
                 </div>
               </div>
               <div class="tco-map-controls">
-                <button type="button" class="tco-map-btn active" data-mode="both" onclick="setMapMode('both')">
-                  <i class="fa-solid fa-layer-group"></i> Semua Layer
-                </button>
-                <button type="button" class="tco-map-btn" data-mode="pins" onclick="setMapMode('pins')">
-                  <i class="fa-solid fa-location-dot"></i> Pin Titik
-                </button>
-                <button type="button" class="tco-map-btn" data-mode="heatmap" onclick="setMapMode('heatmap')">
-                  <i class="fa-solid fa-fire"></i> Hotspot Radius
-                </button>
-                <span style="width:1px; height:20px; background:#cbd5e1; margin:0 4px;"></span>
+                <select id="mapFilterStatus" class="tco-select-map-filter" onchange="filterMapByStatus(this.value)">
+                  <option value="all">Semua Status Penetrasi</option>
+                  <option value="Tinggi">🟢 Penetrasi Tinggi (Dominan)</option>
+                  <option value="Sedang">🔵 Penetrasi Sedang (Potensial)</option>
+                  <option value="Rendah">🔴 Penetrasi Baru</option>
+                  <option value="Belum Ada">⚪ Belum Ada SPK TCO</option>
+                </select>
+
                 <button type="button" class="tco-map-btn active" id="btnTileRoadmap" onclick="setBaseLayer('roadmap')">
-                  <i class="fa-solid fa-map"></i> Jalan
+                  <i class="fa-solid fa-map"></i> Google Maps
                 </button>
                 <button type="button" class="tco-map-btn" id="btnTileSatellite" onclick="setBaseLayer('satellite')">
                   <i class="fa-solid fa-satellite"></i> Satelit
                 </button>
+
+                <button type="button" class="tco-map-btn" onclick="recenterToDealerHQ()" title="Pusatkan ke Kantor Tunas Toyota Kiara Condong">
+                  <i class="fa-solid fa-building-flag" style="color:#d8a437;"></i> Kantor KC
+                </button>
               </div>
+            </div>
+
+            <!-- Quick Regency Filter Pills (Bandung Raya 79 Districts) -->
+            <div class="tco-quick-area-bar">
+              <span style="font-size:11px; font-weight:800; color:#64748b; white-space:nowrap;">
+                <i class="fa-solid fa-layer-group"></i> Wilayah:
+              </span>
+              <button type="button" class="tco-area-pill active" data-regency="all" onclick="filterMapByRegency('all')">
+                Semua Wilayah (79)
+              </button>
+              <button type="button" class="tco-area-pill" data-regency="kota_bandung" onclick="filterMapByRegency('kota_bandung')">
+                Kota Bandung (30)
+              </button>
+              <button type="button" class="tco-area-pill" data-regency="kota_cimahi" onclick="filterMapByRegency('kota_cimahi')">
+                Kota Cimahi (3)
+              </button>
+              <button type="button" class="tco-area-pill" data-regency="kab_bandung" onclick="filterMapByRegency('kab_bandung')">
+                Kab. Bandung (31)
+              </button>
+              <button type="button" class="tco-area-pill" data-regency="kab_bandung_barat" onclick="filterMapByRegency('kab_bandung_barat')">
+                Kab. Bandung Barat (15)
+              </button>
             </div>
 
             <!-- Leaflet Map Container -->
@@ -276,40 +300,87 @@
               <div id="tcoPolregMap"></div>
             </div>
 
-            <!-- Quick Area Zoom Bar -->
-            <div class="tco-quick-area-bar">
-              <span style="font-size:11px; font-weight:800; color:#64748b; white-space:nowrap;">
-                <i class="fa-solid fa-crosshairs"></i> Fokus Wilayah:
-              </span>
-              <button type="button" class="tco-area-pill active" data-area="all" onclick="jumpToArea('all')">
-                Bandung Raya (Semua)
-              </button>
-              <button type="button" class="tco-area-pill" data-area="bandung_kota" onclick="jumpToArea('bandung_kota')">
-                Kota Bandung (Plat D)
-              </button>
-              <button type="button" class="tco-area-pill" data-area="kab_bandung" onclick="jumpToArea('kab_bandung')">
-                Kab. Bandung (Soreang/Baleendah)
-              </button>
-              <button type="button" class="tco-area-pill" data-area="cimahi" onclick="jumpToArea('cimahi')">
-                Kota Cimahi (Plat D)
-              </button>
-              <button type="button" class="tco-area-pill" data-area="bandung_barat" onclick="jumpToArea('bandung_barat')">
-                Bandung Barat (Padalarang/Lembang)
-              </button>
-              <button type="button" class="tco-area-pill" data-area="plat_z" onclick="jumpToArea('plat_z')">
-                Priangan Timur (Plat Z - Sumedang/Garut)
-              </button>
-              <button type="button" class="tco-area-pill" data-area="plat_e" onclick="jumpToArea('plat_e')">
-                Cirebon (Plat E)
-              </button>
-              <button type="button" class="tco-area-pill" data-area="plat_f" onclick="jumpToArea('plat_f')">
-                Cianjur / Sukabumi (Plat F)
-              </button>
+            <!-- Map Legend Strip -->
+            <div class="tco-map-legend">
+              <div class="legend-item">
+                <span class="legend-color-dot high"></span>
+                <span>Penetrasi Tinggi (&ge;12 Unit / &ge;Rp 25Jt)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color-dot mid"></span>
+                <span>Moderat (5 - 11 Unit)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color-dot low"></span>
+                <span>Penetrasi Baru (1 - 4 Unit)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color-dot zero"></span>
+                <span>Belum Ada SPK (Peluang Pasar)</span>
+              </div>
             </div>
           </div>
 
-          <!-- Polreg Leaderboard Side Panel -->
+          <!-- Polreg Leaderboard & District Inspector Side Panel -->
           <div class="tco-polreg-panel">
+            <!-- District Inspector HUD -->
+            <div class="tco-inspector-hud" id="tcoInspectorHud">
+              <div class="tco-hud-header">
+                <span class="tco-hud-tag" id="hudZoneTag">KOTA BANDUNG • PLAT D</span>
+                <div class="tco-hud-title-row">
+                  <h3 id="hudDistrictTitle">Kiaracondong</h3>
+                  <span class="tco-hud-status-badge high" id="hudStatusBadge">
+                    <i class="fa-solid fa-circle-check"></i> Penetrasi Tinggi
+                  </span>
+                </div>
+              </div>
+
+              <!-- Quick Stats Grid -->
+              <div class="tco-hud-stats-grid">
+                <div class="tco-hud-stat-box">
+                  <span class="lbl">Omset Penjualan TCO</span>
+                  <div class="val text-crimson" id="hudOmsetVal">Rp 0</div>
+                  <span class="sub" id="hudSpkCount">0 SPK Terpasang</span>
+                </div>
+                <div class="tco-hud-stat-box">
+                  <span class="lbl">Total Aksesoris</span>
+                  <div class="val text-blue" id="hudTotalQtyVal">0 Unit</div>
+                  <span class="sub" id="hudAvgVal">Rp 0 / SPK</span>
+                </div>
+              </div>
+
+              <!-- Highlights: Yang Terbanyak Apa -->
+              <div class="tco-hud-champions-box">
+                <!-- Top Accessory Callout -->
+                <div class="tco-champion-row">
+                  <div class="tco-champ-icon icon-gold"><i class="fa-solid fa-trophy"></i></div>
+                  <div class="tco-champ-info">
+                    <span class="lbl">Aksesoris #1 Terbanyak:</span>
+                    <strong class="title" id="hudTopItemName">Memuat data...</strong>
+                    <span class="meta" id="hudTopItemQty">0 Unit Terjual</span>
+                  </div>
+                </div>
+
+                <!-- Top Vehicle Callout -->
+                <div class="tco-champion-row" style="margin-top: 8px;">
+                  <div class="tco-champ-icon icon-blue"><i class="fa-solid fa-car"></i></div>
+                  <div class="tco-champ-info">
+                    <span class="lbl">Model Mobil #1 Terbanyak:</span>
+                    <strong class="title" id="hudTopModelName">Memuat data...</strong>
+                    <span class="meta" id="hudTopModelQty">0 Kendaraan</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Button to filter transaction table -->
+              <div style="margin-top: 12px;">
+                <button type="button" class="tco-hud-filter-btn" id="hudFilterBtn" onclick="filterTransactionsFromHud()">
+                  <i class="fa-solid fa-filter"></i> Saring Transaksi Kecamatan Ini
+                </button>
+              </div>
+            </div>
+
+            <!-- Regional Leaderboard -->
             <div class="tco-panel-header">
               <h3>
                 <i class="fa-solid fa-ranking-star" style="color: #d8a437;"></i>
@@ -320,7 +391,7 @@
               </button>
             </div>
             <div class="tco-polreg-list" id="polregLeaderboardList">
-              <div style="text-align:center; padding:30px; color:#94a3b8; font-size:12px;">
+              <div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">
                 <i class="fa-solid fa-circle-notch fa-spin"></i> Memuat data ranking polreg...
               </div>
             </div>

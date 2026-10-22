@@ -470,29 +470,130 @@ if ($action === 'get_overview') {
     $modelsStmt->execute();
     $models = $modelsStmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    // 4. Polreg & District Mapping Heatmap
-    $polregMapSql = "
+    // 4. Polreg & District Mapping Heatmap & Intelligence (For Choropleth Polygons)
+    $distSql = "
         SELECT 
+            TRIM(kecamatan) as kecamatan,
+            kota,
             wilayah_polreg,
             polreg_code,
-            kota,
-            kecamatan,
             AVG(latitude) as lat,
             AVG(longitude) as lng,
             SUM(qty) as total_qty,
             SUM(total_harga) as total_revenue,
             COUNT(DISTINCT spk_no) as total_spk
         FROM `tabel_penjualan_tco`
-        WHERE {$whereSql} AND latitude IS NOT NULL AND longitude IS NOT NULL
-        GROUP BY wilayah_polreg, polreg_code, kota, kecamatan
+        WHERE {$whereSql} AND kecamatan IS NOT NULL AND TRIM(kecamatan) != ''
+        GROUP BY TRIM(kecamatan), kota, wilayah_polreg, polreg_code
         ORDER BY total_qty DESC
     ";
-    $polregMapStmt = $conn->prepare($polregMapSql);
+    $distStmt = $conn->prepare($distSql);
     if (!empty($params)) {
-        $polregMapStmt->bind_param($types, ...$params);
+        $distStmt->bind_param($types, ...$params);
     }
-    $polregMapStmt->execute();
-    $districtHotspots = $polregMapStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $distStmt->execute();
+    $distRows = $distStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    $districtsData = [];
+    foreach ($distRows as $r) {
+        $k = strtolower(str_replace([' ', '-', '.'], '', $r['kecamatan']));
+        $qty = (int)$r['total_qty'];
+        $rev = (float)$r['total_revenue'];
+
+        $status = 'Rendah';
+        if ($qty >= 12 || $rev >= 25000000) {
+            $status = 'Tinggi';
+        } elseif ($qty >= 5) {
+            $status = 'Sedang';
+        }
+
+        $districtsData[$k] = [
+            'kecamatan' => $r['kecamatan'],
+            'kota' => $r['kota'],
+            'wilayah_polreg' => $r['wilayah_polreg'],
+            'polreg_code' => $r['polreg_code'],
+            'lat' => (float)$r['lat'],
+            'lng' => (float)$r['lng'],
+            'total_qty' => $qty,
+            'total_revenue' => $rev,
+            'total_spk' => (int)$r['total_spk'],
+            'top_item_name' => '-',
+            'top_item_qty' => 0,
+            'top_model_name' => '-',
+            'top_model_qty' => 0,
+            'status' => $status,
+            'top_items' => [],
+            'top_models' => []
+        ];
+    }
+
+    // Top item accessory per kecamatan
+    $itemSql = "
+        SELECT 
+            TRIM(kecamatan) as kecamatan,
+            item_tco_name,
+            SUM(qty) as item_qty,
+            SUM(total_harga) as item_rev
+        FROM `tabel_penjualan_tco`
+        WHERE {$whereSql} AND kecamatan IS NOT NULL AND TRIM(kecamatan) != ''
+        GROUP BY TRIM(kecamatan), item_tco_name
+        ORDER BY TRIM(kecamatan), item_qty DESC, item_rev DESC
+    ";
+    $itemStmt = $conn->prepare($itemSql);
+    if (!empty($params)) {
+        $itemStmt->bind_param($types, ...$params);
+    }
+    $itemStmt->execute();
+    $itemRows = $itemStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    foreach ($itemRows as $ir) {
+        $k = strtolower(str_replace([' ', '-', '.'], '', $ir['kecamatan']));
+        if (isset($districtsData[$k])) {
+            if ($districtsData[$k]['top_item_name'] === '-') {
+                $districtsData[$k]['top_item_name'] = $ir['item_tco_name'];
+                $districtsData[$k]['top_item_qty'] = (int)$ir['item_qty'];
+            }
+            if (count($districtsData[$k]['top_items']) < 4) {
+                $districtsData[$k]['top_items'][] = [
+                    'name' => $ir['item_tco_name'],
+                    'qty' => (int)$ir['item_qty'],
+                    'rev' => (float)$ir['item_rev']
+                ];
+            }
+        }
+    }
+
+    // Top vehicle model per kecamatan
+    $modelDistSql = "
+        SELECT 
+            TRIM(kecamatan) as kecamatan,
+            model_kendaraan,
+            SUM(qty) as model_qty
+        FROM `tabel_penjualan_tco`
+        WHERE {$whereSql} AND kecamatan IS NOT NULL AND TRIM(kecamatan) != ''
+        GROUP BY TRIM(kecamatan), model_kendaraan
+        ORDER BY TRIM(kecamatan), model_qty DESC
+    ";
+    $modelDistStmt = $conn->prepare($modelDistSql);
+    if (!empty($params)) {
+        $modelDistStmt->bind_param($types, ...$params);
+    }
+    $modelDistStmt->execute();
+    $modelRows = $modelDistStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    foreach ($modelRows as $mr) {
+        $k = strtolower(str_replace([' ', '-', '.'], '', $mr['kecamatan']));
+        if (isset($districtsData[$k])) {
+            if ($districtsData[$k]['top_model_name'] === '-') {
+                $districtsData[$k]['top_model_name'] = $mr['model_kendaraan'];
+                $districtsData[$k]['top_model_qty'] = (int)$mr['model_qty'];
+            }
+            if (count($districtsData[$k]['top_models']) < 4) {
+                $districtsData[$k]['top_models'][] = [
+                    'model' => $mr['model_kendaraan'],
+                    'qty' => (int)$mr['model_qty']
+                ];
+            }
+        }
+    }
 
     // 5. Polreg Regional Ranking (Plat D, Plat Z, Plat E, Plat F, etc.)
     $polregRankingSql = "
@@ -569,7 +670,8 @@ if ($action === 'get_overview') {
         ],
         'top_items' => $topItems,
         'model_distribution' => $models,
-        'district_hotspots' => $districtHotspots,
+        'district_hotspots' => array_values($districtsData),
+        'districts_dict' => $districtsData,
         'polreg_ranking' => $polregRanking,
         'top_sales' => $topSales,
         'recent_transactions' => $recentTransactions

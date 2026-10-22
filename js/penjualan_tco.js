@@ -1,34 +1,44 @@
-// js/penjualan_tco.js - Interactive Dashboard Controller for TCO Sales & Polreg Mapping
+// js/penjualan_tco.js - Interactive Dashboard Controller for TCO Sales & Polygon Polreg Mapping
+
 let tcoMap = null;
-let tcoMarkersGroup = null;
-let tcoCirclesGroup = null;
-let tcoOverviewData = null;
-let currentPolregFilter = 'all';
 let tcoTileLayers = {};
 let currentBaseLayer = 'roadmap';
+
+// GeoJSON & Layer Containers for 79 Districts
+let allDistrictsGeo = [];
+let tcoPolygonLayers = {};
+let tcoMarkerLayers = {};
+let districtsDataDict = {};
+let selectedDistrictId = 'kiaracondong'; // Default focus: Dealer HQ
+
+// Filter states
+let currentRegencyFilter = 'all';
+let currentStatusFilter = 'all';
+let currentPolregFilter = 'all';
+let tcoOverviewData = null;
 
 const OFFICE_LAT = -6.944425;
 const OFFICE_LNG = 107.642250;
 
-// Preset Coordinates for Fast Zoom
-const REGION_ZOOM_COORDS = {
+// Regency coordinate boundaries for fast zooming
+const REGENCY_BOUNDS = {
   all: { center: [-6.9250, 107.6350], zoom: 11 },
-  bandung_kota: { center: [-6.9200, 107.6250], zoom: 12.5 },
-  kab_bandung: { center: [-7.0150, 107.6200], zoom: 11 },
-  cimahi: { center: [-6.8850, 107.5450], zoom: 13 },
-  bandung_barat: { center: [-6.8350, 107.5150], zoom: 11.5 },
-  plat_z: { center: [-7.0500, 107.8800], zoom: 10 },
-  plat_e: { center: [-6.7120, 108.5550], zoom: 11 },
-  plat_f: { center: [-6.8800, 107.0500], zoom: 10 }
+  kota_bandung: { center: [-6.9147, 107.6098], zoom: 12 },
+  kota_cimahi: { center: [-6.8722, 107.5420], zoom: 13 },
+  kab_bandung: { center: [-7.0250, 107.6200], zoom: 10.5 },
+  kab_bandung_barat: { center: [-6.8450, 107.4900], zoom: 11 }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initMap();
   setupEventListeners();
-  loadTcoOverview();
+  await loadPolregGeoJson();
+  await loadTcoOverview();
 });
 
-// 1. Initialize Leaflet Map with Google Maps Tiles (No API key needed)
+/**
+ * 1. Initialize Leaflet Map with Google Maps Roadmap & Satellite
+ */
 function initMap() {
   const mapElement = document.getElementById('tcoPolregMap');
   if (!mapElement) return;
@@ -38,13 +48,15 @@ function initMap() {
     center: [-6.9250, 107.6350],
     zoom: 11,
     zoomControl: false,
-    attributionControl: false
+    attributionControl: false,
+    minZoom: 9,
+    maxZoom: 18
   });
 
   // Zoom control top-right
   L.control.zoom({ position: 'topright' }).addTo(tcoMap);
 
-  // 1. Google Maps Roadmap Layer (High precision, clear roads & POIs in West Java)
+  // 1. Google Maps Roadmap Layer
   tcoTileLayers.roadmap = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
     maxZoom: 20,
     subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
@@ -58,35 +70,21 @@ function initMap() {
     attribution: '&copy; Google Maps'
   });
 
-  // 3. OpenStreetMap Fallback Layer
-  tcoTileLayers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  });
-
-  // Set default base layer to Google Roadmap
+  // Default base layer
   tcoTileLayers.roadmap.addTo(tcoMap);
 
-  tcoCirclesGroup = L.layerGroup().addTo(tcoMap);
-  tcoMarkersGroup = L.layerGroup().addTo(tcoMap);
-
-  // Add Dealer HQ permanent marker
+  // Add Permanent Dealer HQ Marker
   addOfficeMarker();
 
-  // Invalidate map size after rendering to avoid tile cutoffs
-  setTimeout(() => {
-    if (tcoMap) tcoMap.invalidateSize();
-  }, 200);
-  setTimeout(() => {
-    if (tcoMap) tcoMap.invalidateSize();
-  }, 600);
-
-  window.addEventListener('resize', () => {
-    if (tcoMap) tcoMap.invalidateSize();
-  });
+  // Resize handling
+  setTimeout(() => { if (tcoMap) tcoMap.invalidateSize(); }, 200);
+  setTimeout(() => { if (tcoMap) tcoMap.invalidateSize(); }, 600);
+  window.addEventListener('resize', () => { if (tcoMap) tcoMap.invalidateSize(); });
 }
 
-// 1.1 Switch Basemap Layer (Roadmap / Satellite)
+/**
+ * 1.1 Switch Basemap Layer (Roadmap / Satellite)
+ */
 function setBaseLayer(layerName) {
   if (!tcoMap || !tcoTileLayers[layerName]) return;
 
@@ -106,7 +104,9 @@ function setBaseLayer(layerName) {
 }
 window.setBaseLayer = setBaseLayer;
 
-// 1.2 Permanent Office / Dealer Marker
+/**
+ * 1.2 Permanent Office Marker (Tunas Toyota Kiara Condong)
+ */
 function addOfficeMarker() {
   if (!tcoMap) return;
 
@@ -134,29 +134,55 @@ function addOfficeMarker() {
       <h4 style="margin:0 0 4px; font-size:13.5px; font-weight:800; color:#0f172a;">Tunas Toyota Kiara Condong</h4>
       <p style="margin:0 0 6px; font-size:11px; color:#64748b;">Jl. Ibrahim Adjie No. 154, Kiara Condong, Bandung</p>
       <div style="font-size:11px; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #e2e8f0; color:#0f172a; font-weight:600;">
-        <i class="fa-solid fa-gem" style="color:#d7123a;"></i> Pusat Pemasangan &amp; Distribusi TCO
+        <i class="fa-solid fa-gem" style="color:#d7123a;"></i> Pusat Instalasi &amp; Distribusi TCO Bandung Raya
       </div>
     </div>
   `, { maxWidth: 280 });
 }
 
-// 1.3 Jump to Selected Regional Area
-function jumpToArea(areaKey) {
-  document.querySelectorAll('.tco-area-pill').forEach(pill => {
-    pill.classList.toggle('active', pill.dataset.area === areaKey);
-  });
-
-  const target = REGION_ZOOM_COORDS[areaKey] || REGION_ZOOM_COORDS.all;
-  if (tcoMap && target) {
-    tcoMap.flyTo(target.center, target.zoom, {
-      duration: 1.0,
-      easeLinearity: 0.25
-    });
-  }
+/**
+ * 1.3 Recenter Map to Dealer HQ
+ */
+function recenterToDealerHQ() {
+  if (!tcoMap) return;
+  tcoMap.flyTo([OFFICE_LAT, OFFICE_LNG], 13, { duration: 1.0 });
+  selectDistrict('kiaracondong', false);
 }
-window.jumpToArea = jumpToArea;
+window.recenterToDealerHQ = recenterToDealerHQ;
 
-// 2. Setup Event Listeners
+/**
+ * 2. Multi-Path GeoJSON Loader for 79 Bandung Raya Districts
+ */
+async function loadPolregGeoJson() {
+  const possiblePaths = [
+    '../data/polreg_districts.json',
+    'data/polreg_districts.json',
+    '/data/polreg_districts.json',
+    '/public/data/polreg_districts.json',
+    '../../data/polreg_districts.json'
+  ];
+
+  for (const path of possiblePaths) {
+    try {
+      const res = await fetch(path + '?v=' + Date.now());
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.districts && json.districts.length > 0) {
+          allDistrictsGeo = json.districts;
+          return;
+        }
+      }
+    } catch (e) {
+      // Continue to next path
+    }
+  }
+  console.warn('Gagal memuat polreg_districts.json dari semua path.');
+  allDistrictsGeo = [];
+}
+
+/**
+ * 3. Setup Filter & Search Event Listeners
+ */
 function setupEventListeners() {
   const filterPeriode = document.getElementById('filterPeriode');
   if (filterPeriode) {
@@ -188,7 +214,57 @@ function setupEventListeners() {
   }
 }
 
-// 3. Load TCO Overview from API
+/**
+ * 4. Helper: Normalisasi Key Nama Kecamatan
+ */
+function normalizeDistrictKey(str) {
+  if (!str) return '';
+  return str.toLowerCase().replace(/[\s\-\.]/g, '');
+}
+
+/**
+ * 5. Helper Status Penetrasi & Pewarnaan Choropleth
+ */
+function getStatusMeta(status) {
+  switch (status) {
+    case 'Tinggi':
+      return {
+        label: 'Penetrasi Tinggi (Dominan)',
+        color: '#10b981', // Emerald
+        badgeClass: 'high',
+        icon: 'fa-circle-check',
+        opacity: 0.42
+      };
+    case 'Sedang':
+      return {
+        label: 'Penetrasi Sedang (Potensial)',
+        color: '#3b82f6', // Blue
+        badgeClass: 'mid',
+        icon: 'fa-circle-dot',
+        opacity: 0.38
+      };
+    case 'Rendah':
+      return {
+        label: 'Penetrasi Baru',
+        color: '#ef4444', // Red/Rose
+        badgeClass: 'low',
+        icon: 'fa-triangle-exclamation',
+        opacity: 0.35
+      };
+    default:
+      return {
+        label: 'Belum Ada SPK TCO',
+        color: '#94a3b8', // Gray
+        badgeClass: 'zero',
+        icon: 'fa-circle-notch',
+        opacity: 0.16
+      };
+  }
+}
+
+/**
+ * 6. Load TCO Overview from Backend API
+ */
 async function loadTcoOverview(searchQuery = '') {
   const filterPeriode = document.getElementById('filterPeriode')?.value || 'all';
   const filterModel = document.getElementById('filterModel')?.value || 'all';
@@ -208,20 +284,377 @@ async function loadTcoOverview(searchQuery = '') {
 
     if (data.status === 'success') {
       tcoOverviewData = data;
+      districtsDataDict = data.districts_dict || {};
+
       renderKPI(data.kpi);
-      renderMapHotspots(data.district_hotspots);
+      renderDistrictPolygons();
       renderPolregLeaderboard(data.polreg_ranking);
       renderTopAccessories(data.top_items);
       renderModelDistribution(data.model_distribution);
       renderTopSales(data.top_sales);
       renderTransactionsTable(data.recent_transactions);
+
+      // Default select active district (Kiaracondong or first with data)
+      if (selectedDistrictId) {
+        selectDistrict(selectedDistrictId, false);
+      }
     }
   } catch (err) {
     console.error('Error loading TCO overview:', err);
   }
 }
 
-// 4. Render KPI Cards
+/**
+ * 7. Render 79 Official District Polygons on Leaflet Map
+ */
+function renderDistrictPolygons() {
+  if (!tcoMap || allDistrictsGeo.length === 0) return;
+
+  // Clear previous layers
+  Object.values(tcoPolygonLayers).forEach(p => tcoMap.removeLayer(p));
+  Object.values(tcoMarkerLayers).forEach(m => tcoMap.removeLayer(m));
+  tcoPolygonLayers = {};
+  tcoMarkerLayers = {};
+
+  allDistrictsGeo.forEach(dist => {
+    // Match data from DB using normalized key
+    const rawKey = normalizeDistrictKey(dist.id);
+    const altKey = normalizeDistrictKey(dist.name);
+    const data = districtsDataDict[rawKey] || districtsDataDict[altKey] || null;
+
+    const hasData = !!data;
+    const status = hasData ? (data.status || 'Rendah') : 'Belum Ada';
+    const statusMeta = getStatusMeta(status);
+
+    const totalQty = hasData ? (parseInt(data.total_qty) || 0) : 0;
+    const totalRev = hasData ? (parseFloat(data.total_revenue) || 0) : 0;
+    const totalSpk = hasData ? (parseInt(data.total_spk) || 0) : 0;
+    const topItemName = hasData ? (data.top_item_name || '-') : '-';
+    const topItemQty = hasData ? (data.top_item_qty || 0) : 0;
+    const topModelName = hasData ? (data.top_model_name || '-') : '-';
+    const topModelQty = hasData ? (data.top_model_qty || 0) : 0;
+
+    // Check filter match
+    const matchRegency = (currentRegencyFilter === 'all') || (dist.regencyId === currentRegencyFilter);
+    const matchStatus = (currentStatusFilter === 'all') || (status === currentStatusFilter);
+    const isVisible = matchRegency && matchStatus;
+
+    // Construct Leaflet Polygon
+    const isCurrentSelected = (dist.id === selectedDistrictId);
+    const polygon = L.polygon(dist.polygon, {
+      color: isCurrentSelected ? '#d7123a' : statusMeta.color,
+      weight: isCurrentSelected ? 3.5 : (hasData ? 2 : 1.2),
+      fillColor: statusMeta.color,
+      fillOpacity: isCurrentSelected ? 0.6 : (hasData ? statusMeta.opacity : 0.14),
+      smoothFactor: 1
+    });
+
+    if (isVisible) {
+      polygon.addTo(tcoMap);
+    }
+
+    // Hover interactions
+    polygon.on('mouseover', function () {
+      if (selectedDistrictId !== dist.id) {
+        this.setStyle({
+          weight: 3.5,
+          color: '#d7123a',
+          fillOpacity: 0.58
+        });
+      }
+      const marker = tcoMarkerLayers[dist.id];
+      if (marker) {
+        marker.setZIndexOffset(9000);
+        const el = marker.getElement();
+        if (el) el.querySelector('.tco-district-label')?.classList.add('hovered');
+      }
+    });
+
+    polygon.on('mouseout', function () {
+      if (selectedDistrictId !== dist.id) {
+        this.setStyle({
+          weight: hasData ? 2 : 1.2,
+          color: statusMeta.color,
+          fillOpacity: hasData ? statusMeta.opacity : 0.14
+        });
+      }
+      const marker = tcoMarkerLayers[dist.id];
+      if (marker && selectedDistrictId !== dist.id) {
+        marker.setZIndexOffset(0);
+        const el = marker.getElement();
+        if (el) el.querySelector('.tco-district-label')?.classList.remove('hovered');
+      }
+    });
+
+    // Click event -> Select District & Update Inspector HUD
+    polygon.on('click', function () {
+      selectDistrict(dist.id, true);
+    });
+
+    // Modern Glassmorphic Tooltip
+    polygon.bindTooltip(`
+      <div class="polreg-glass-tooltip">
+        <div class="tooltip-header">
+          <span class="tooltip-title">${escapeHtml(dist.name)}</span>
+          <span class="tooltip-badge ${statusMeta.badgeClass}">
+            <i class="fa-solid ${statusMeta.icon}"></i> ${status}
+          </span>
+        </div>
+        <div class="tooltip-regency">${escapeHtml(dist.regency || 'Bandung Raya')}${dist.zone ? ' • ' + escapeHtml(dist.zone) : ''}</div>
+        <div class="tooltip-divider"></div>
+        <div class="tooltip-row">
+          <span>Omset TCO:</span>
+          <b style="color:#d7123a;">Rp ${Math.round(totalRev).toLocaleString('id-ID')}</b>
+        </div>
+        <div class="tooltip-row">
+          <span>Total Terjual:</span>
+          <b>${totalQty} Unit (${totalSpk} SPK)</b>
+        </div>
+        <div class="tooltip-divider"></div>
+        <div class="tooltip-row">
+          <span>#1 Aksesoris:</span>
+          <b style="color:#0f172a;">${escapeHtml(topItemName)} ${topItemQty > 0 ? `(${topItemQty} U)` : ''}</b>
+        </div>
+        <div class="tooltip-row">
+          <span>#1 Model Mobil:</span>
+          <b style="color:#2563eb;">${escapeHtml(topModelName)} ${topModelQty > 0 ? `(${topModelQty} SPK)` : ''}</b>
+        </div>
+        <div class="tooltip-hint"><i class="fa-solid fa-arrow-pointer"></i> Klik untuk analisis kecamatan</div>
+      </div>
+    `, {
+      sticky: true,
+      className: 'polreg-modern-tooltip-wrap',
+      direction: 'top',
+      offset: [0, -10]
+    });
+
+    tcoPolygonLayers[dist.id] = polygon;
+
+    // Centroid Label Marker
+    const labelIcon = L.divIcon({
+      className: 'tco-district-label-wrap',
+      html: `
+        <div class="tco-district-label ${statusMeta.badgeClass}${isCurrentSelected ? ' active' : ''}" data-id="${dist.id}">
+          <span class="tco-label-dot ${statusMeta.badgeClass}"></span>
+          <span class="tco-label-text">${escapeHtml(dist.name)}</span>
+          ${totalQty > 0 ? `<span class="tco-label-val">${totalQty}U</span>` : ''}
+        </div>
+      `,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0]
+    });
+
+    const labelMarker = L.marker(dist.center, {
+      icon: labelIcon,
+      interactive: false
+    });
+
+    if (isVisible) {
+      labelMarker.addTo(tcoMap);
+    }
+
+    tcoMarkerLayers[dist.id] = labelMarker;
+  });
+}
+
+/**
+ * 8. Select District & Update Inspector HUD
+ */
+function selectDistrict(districtId, flyTo = true) {
+  selectedDistrictId = districtId;
+  const dist = allDistrictsGeo.find(d => d.id === districtId);
+  if (!dist) return;
+
+  const rawKey = normalizeDistrictKey(dist.id);
+  const altKey = normalizeDistrictKey(dist.name);
+  const data = districtsDataDict[rawKey] || districtsDataDict[altKey] || null;
+
+  const hasData = !!data;
+  const status = hasData ? (data.status || 'Rendah') : 'Belum Ada';
+  const statusMeta = getStatusMeta(status);
+
+  const totalQty = hasData ? (parseInt(data.total_qty) || 0) : 0;
+  const totalRev = hasData ? (parseFloat(data.total_revenue) || 0) : 0;
+  const totalSpk = hasData ? (parseInt(data.total_spk) || 0) : 0;
+  const topItemName = hasData ? (data.top_item_name || 'Belum ada data') : 'Belum ada data TCO';
+  const topItemQty = hasData ? (data.top_item_qty || 0) : 0;
+  const topModelName = hasData ? (data.top_model_name || 'Belum ada data') : 'Belum ada data unit';
+  const topModelQty = hasData ? (data.top_model_qty || 0) : 0;
+  const avgPerSpk = totalSpk > 0 ? Math.round(totalRev / totalSpk) : 0;
+
+  // 1. Update Inspector HUD Elements
+  const elTag = document.getElementById('hudZoneTag');
+  if (elTag) {
+    const regencyName = (dist.regency || 'KOTA BANDUNG').toUpperCase();
+    const platCode = (data && data.polreg_code) ? `PLAT ${data.polreg_code}` : 'PLAT D';
+    elTag.innerText = `${regencyName} • ${platCode}`;
+  }
+
+  const elTitle = document.getElementById('hudDistrictTitle');
+  if (elTitle) elTitle.innerText = dist.name;
+
+  const elBadge = document.getElementById('hudStatusBadge');
+  if (elBadge) {
+    elBadge.className = `tco-hud-status-badge ${statusMeta.badgeClass}`;
+    elBadge.innerHTML = `<i class="fa-solid ${statusMeta.icon}"></i> ${statusMeta.label}`;
+  }
+
+  const elOmset = document.getElementById('hudOmsetVal');
+  if (elOmset) elOmset.innerText = 'Rp ' + Math.round(totalRev).toLocaleString('id-ID');
+
+  const elSpk = document.getElementById('hudSpkCount');
+  if (elSpk) elSpk.innerText = `${totalSpk} SPK Terpasang`;
+
+  const elQty = document.getElementById('hudTotalQtyVal');
+  if (elQty) elQty.innerText = `${totalQty} Unit`;
+
+  const elAvg = document.getElementById('hudAvgVal');
+  if (elAvg) elAvg.innerText = `Rp ${avgPerSpk.toLocaleString('id-ID')} / SPK`;
+
+  const elTopItem = document.getElementById('hudTopItemName');
+  if (elTopItem) elTopItem.innerText = topItemName;
+
+  const elTopItemQty = document.getElementById('hudTopItemQty');
+  if (elTopItemQty) elTopItemQty.innerText = `${topItemQty} Unit Terjual di Wilayah Ini`;
+
+  const elTopModel = document.getElementById('hudTopModelName');
+  if (elTopModel) elTopModel.innerText = topModelName;
+
+  const elTopModelQty = document.getElementById('hudTopModelQty');
+  if (elTopModelQty) elTopModelQty.innerText = `${topModelQty} Kendaraan Terpasang TCO`;
+
+  // 2. Highlight Polygon & Label
+  Object.keys(tcoPolygonLayers).forEach(id => {
+    const poly = tcoPolygonLayers[id];
+    const dGeo = allDistrictsGeo.find(d => d.id === id);
+    const dData = dGeo ? (districtsDataDict[normalizeDistrictKey(dGeo.id)] || districtsDataDict[normalizeDistrictKey(dGeo.name)]) : null;
+    const dStatus = dData ? (dData.status || 'Rendah') : 'Belum Ada';
+    const dMeta = getStatusMeta(dStatus);
+
+    if (id === districtId) {
+      poly.setStyle({
+        weight: 4,
+        color: '#d7123a',
+        fillOpacity: 0.65
+      });
+      poly.bringToFront();
+    } else {
+      poly.setStyle({
+        weight: dData ? 2 : 1.2,
+        color: dMeta.color,
+        fillOpacity: dData ? dMeta.opacity : 0.14
+      });
+    }
+  });
+
+  // Update label markers active class
+  document.querySelectorAll('.tco-district-label').forEach(label => {
+    label.classList.toggle('active', label.dataset.id === districtId);
+  });
+
+  // 3. Optional Smooth Fly-to
+  if (flyTo && tcoMap && dist.center) {
+    tcoMap.flyTo(dist.center, Math.max(tcoMap.getZoom(), 12.5), {
+      duration: 0.8,
+      easeLinearity: 0.3
+    });
+  }
+}
+window.selectDistrict = selectDistrict;
+
+/**
+ * 9. Filter Map by Regency (Kota Bandung, Cimahi, Kab. Bandung, KBB)
+ */
+function filterMapByRegency(regencyKey) {
+  currentRegencyFilter = regencyKey;
+
+  // Update active pill button
+  document.querySelectorAll('.tco-area-pill').forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.regency === regencyKey);
+  });
+
+  // Re-apply visibility to polygons
+  allDistrictsGeo.forEach(dist => {
+    const rawKey = normalizeDistrictKey(dist.id);
+    const altKey = normalizeDistrictKey(dist.name);
+    const data = districtsDataDict[rawKey] || districtsDataDict[altKey] || null;
+    const status = data ? (data.status || 'Rendah') : 'Belum Ada';
+
+    const matchRegency = (regencyKey === 'all') || (dist.regencyId === regencyKey);
+    const matchStatus = (currentStatusFilter === 'all') || (status === currentStatusFilter);
+    const isVisible = matchRegency && matchStatus;
+
+    const poly = tcoPolygonLayers[dist.id];
+    const marker = tcoMarkerLayers[dist.id];
+
+    if (poly) {
+      if (isVisible && !tcoMap.hasLayer(poly)) tcoMap.addLayer(poly);
+      else if (!isVisible && tcoMap.hasLayer(poly)) tcoMap.removeLayer(poly);
+    }
+    if (marker) {
+      if (isVisible && !tcoMap.hasLayer(marker)) tcoMap.addLayer(marker);
+      else if (!isVisible && tcoMap.hasLayer(marker)) tcoMap.removeLayer(marker);
+    }
+  });
+
+  // Fly to regency bounds
+  const boundsInfo = REGENCY_BOUNDS[regencyKey] || REGENCY_BOUNDS.all;
+  if (tcoMap && boundsInfo) {
+    tcoMap.flyTo(boundsInfo.center, boundsInfo.zoom, { duration: 1.0 });
+  }
+}
+window.filterMapByRegency = filterMapByRegency;
+
+/**
+ * 10. Filter Map by Penetrasi Status
+ */
+function filterMapByStatus(statusVal) {
+  currentStatusFilter = statusVal;
+
+  allDistrictsGeo.forEach(dist => {
+    const rawKey = normalizeDistrictKey(dist.id);
+    const altKey = normalizeDistrictKey(dist.name);
+    const data = districtsDataDict[rawKey] || districtsDataDict[altKey] || null;
+    const status = data ? (data.status || 'Rendah') : 'Belum Ada';
+
+    const matchRegency = (currentRegencyFilter === 'all') || (dist.regencyId === currentRegencyFilter);
+    const matchStatus = (statusVal === 'all') || (status === statusVal);
+    const isVisible = matchRegency && matchStatus;
+
+    const poly = tcoPolygonLayers[dist.id];
+    const marker = tcoMarkerLayers[dist.id];
+
+    if (poly) {
+      if (isVisible && !tcoMap.hasLayer(poly)) tcoMap.addLayer(poly);
+      else if (!isVisible && tcoMap.hasLayer(poly)) tcoMap.removeLayer(poly);
+    }
+    if (marker) {
+      if (isVisible && !tcoMap.hasLayer(marker)) tcoMap.addLayer(marker);
+      else if (!isVisible && tcoMap.hasLayer(marker)) tcoMap.removeLayer(marker);
+    }
+  });
+}
+window.filterMapByStatus = filterMapByStatus;
+
+/**
+ * 11. Filter Transaction Table from HUD Button
+ */
+function filterTransactionsFromHud() {
+  const dist = allDistrictsGeo.find(d => d.id === selectedDistrictId);
+  if (!dist) return;
+
+  const searchInput = document.getElementById('tableSearchInput');
+  if (searchInput) {
+    searchInput.value = dist.name;
+    loadTcoOverview(dist.name);
+    searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+window.filterTransactionsFromHud = filterTransactionsFromHud;
+
+/**
+ * 12. Render KPI Summary Cards
+ */
 function renderKPI(kpi) {
   if (!kpi) return;
 
@@ -251,96 +684,9 @@ function renderKPI(kpi) {
   }
 }
 
-// 5. Render Map Pins & Hotspots
-function renderMapHotspots(hotspots) {
-  if (!tcoMap || !tcoMarkersGroup || !tcoCirclesGroup) return;
-
-  tcoMarkersGroup.clearLayers();
-  tcoCirclesGroup.clearLayers();
-
-  if (!hotspots || hotspots.length === 0) return;
-
-  // Find max qty for scaling
-  let maxQty = 1;
-  hotspots.forEach(h => {
-    const q = parseInt(h.total_qty) || 1;
-    if (q > maxQty) maxQty = q;
-  });
-
-  hotspots.forEach(h => {
-    const lat = parseFloat(h.lat);
-    const lng = parseFloat(h.lng);
-    const qty = parseInt(h.total_qty) || 1;
-    const rev = parseFloat(h.total_revenue) || 0;
-    const polreg = h.wilayah_polreg;
-    const district = h.kecamatan || h.kota;
-
-    if (isNaN(lat) || isNaN(lng)) return;
-
-    // Radius between 150m and 900m depending on sales intensity
-    const radius = Math.min(1200, Math.max(300, (qty / maxQty) * 1100));
-
-    // Semi-transparent heatmap circle
-    const circle = L.circle([lat, lng], {
-      radius: radius,
-      color: '#d7123a',
-      weight: 1.5,
-      fillColor: '#f43f5e',
-      fillOpacity: 0.28
-    });
-    tcoCirclesGroup.addLayer(circle);
-
-    // Custom pulsing marker pin with unit badge
-    const customIcon = L.divIcon({
-      className: 'custom-tco-div-icon',
-      html: `
-        <div class="tco-pulsing-marker">
-          <div class="tco-marker-pulse"></div>
-          <div class="tco-marker-pin" title="${district}: ${qty} Unit">${qty}</div>
-        </div>
-      `,
-      iconSize: [32, 32],
-      iconAnchor: [16, 16]
-    });
-
-    const marker = L.marker([lat, lng], { icon: customIcon });
-
-    // Sleek Popup
-    const popupContent = `
-      <div style="font-family:'Inter', sans-serif; padding:4px; min-width:210px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="font-size:10px; font-weight:800; background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:6px; text-transform:uppercase;">
-            ${h.polreg_code ? 'Plat ' + h.polreg_code : 'Polreg'}
-          </span>
-          <span style="font-size:11px; font-weight:700; color:#64748b;">${h.kota}</span>
-        </div>
-        <h4 style="margin:0 0 6px 0; font-size:14px; font-weight:800; color:#0f172a;">Kecamatan ${district}</h4>
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:8px 10px; margin-bottom:8px;">
-          <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-            <span style="color:#64748b;">Aksesoris Terjual:</span>
-            <strong style="color:#0f172a;">${qty} Unit</strong>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-            <span style="color:#64748b;">Total SPK:</span>
-            <strong style="color:#0f172a;">${h.total_spk} Kendaraan</strong>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:11.5px;">
-            <span style="color:#64748b;">Total Omset TCO:</span>
-            <strong style="color:#d7123a;">Rp ${Math.round(rev).toLocaleString('id-ID')}</strong>
-          </div>
-        </div>
-        <button type="button" onclick="filterByDistrict('${district}')" style="width:100%; background:#0d1b3e; color:#ffffff; border:none; padding:7px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">
-          <i class="fa-solid fa-filter"></i> Saring Transaksi Daerah Ini
-        </button>
-      </div>
-    `;
-
-    marker.bindPopup(popupContent, { maxWidth: 280 });
-    tcoMarkersGroup.addLayer(marker);
-  });
-}
-
-// 6. Render Polreg Leaderboard
+/**
+ * 13. Render Polreg Leaderboard Side Panel
+ */
 function renderPolregLeaderboard(ranking) {
   const container = document.getElementById('polregLeaderboardList');
   if (!container) return;
@@ -350,7 +696,6 @@ function renderPolregLeaderboard(ranking) {
     return;
   }
 
-  // Find max qty for progress bars
   const maxQty = Math.max(...ranking.map(r => parseInt(r.total_qty) || 1), 1);
 
   container.innerHTML = ranking.map((r, i) => {
@@ -369,11 +714,11 @@ function renderPolregLeaderboard(ranking) {
     const isActive = (currentPolregFilter === r.wilayah_polreg) ? ' active' : '';
 
     return `
-      <div class="tco-polreg-item${isActive}" onclick="selectPolregFilter('${r.wilayah_polreg}')" title="Klik untuk fokus wilayah ini">
+      <div class="tco-polreg-item${isActive}" onclick="selectPolregFilter('${escapeHtml(r.wilayah_polreg)}')" title="Klik untuk fokus wilayah ini">
         <div class="tco-polreg-head">
           <div class="tco-polreg-name">
             <span style="color:#64748b; font-size:11px;">#${i + 1}</span>
-            <span>${r.wilayah_polreg}</span>
+            <span>${escapeHtml(r.wilayah_polreg)}</span>
           </div>
           <span class="tco-polreg-badge ${badgeClass}">Plat ${code}</span>
         </div>
@@ -389,7 +734,9 @@ function renderPolregLeaderboard(ranking) {
   }).join('');
 }
 
-// 7. Render Top Accessories Leaderboard
+/**
+ * 14. Render Top Accessories Leaderboard
+ */
 function renderTopAccessories(items) {
   const container = document.getElementById('topAccessoriesList');
   if (!container) return;
@@ -405,8 +752,8 @@ function renderTopAccessories(items) {
       <div class="tco-top-item-row">
         <div class="tco-item-rank ${rankClass}">${i + 1}</div>
         <div class="tco-item-info">
-          <div class="tco-item-name" title="${it.item_tco_name}">${it.item_tco_name}</div>
-          <div class="tco-item-cat">${it.kategori_tco} • P/N: ${it.part_number || 'TAM'}</div>
+          <div class="tco-item-name" title="${escapeHtml(it.item_tco_name)}">${escapeHtml(it.item_tco_name)}</div>
+          <div class="tco-item-cat">${escapeHtml(it.kategori_tco)} • P/N: ${escapeHtml(it.part_number || 'TAM')}</div>
         </div>
         <div class="tco-item-stat">
           <div class="tco-item-qty">${it.qty_terjual} Unit</div>
@@ -417,7 +764,9 @@ function renderTopAccessories(items) {
   }).join('');
 }
 
-// 8. Render Model Distribution
+/**
+ * 15. Render Vehicle Model Distribution
+ */
 function renderModelDistribution(models) {
   const container = document.getElementById('modelDistributionList');
   if (!container) return;
@@ -429,7 +778,7 @@ function renderModelDistribution(models) {
 
   const maxQty = Math.max(...models.map(m => parseInt(m.qty_terjual) || 1), 1);
 
-  container.innerHTML = models.map((m, i) => {
+  container.innerHTML = models.map((m) => {
     const qty = parseInt(m.qty_terjual) || 0;
     const rev = parseFloat(m.revenue) || 0;
     const pct = Math.round((qty / maxQty) * 100);
@@ -437,7 +786,7 @@ function renderModelDistribution(models) {
     return `
       <div style="margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; margin-bottom:4px;">
-          <strong style="color:#0f172a;"><i class="fa-solid fa-car" style="color:#94a3b8; margin-right:5px;"></i> ${m.model_kendaraan}</strong>
+          <strong style="color:#0f172a;"><i class="fa-solid fa-car" style="color:#94a3b8; margin-right:5px;"></i> ${escapeHtml(m.model_kendaraan)}</strong>
           <span style="font-weight:700; color:#d7123a;">${qty} Unit</span>
         </div>
         <div class="tco-progress-bg">
@@ -452,7 +801,9 @@ function renderModelDistribution(models) {
   }).join('');
 }
 
-// 9. Render Top Sales Champions
+/**
+ * 16. Render Top Sales Champions
+ */
 function renderTopSales(salesList) {
   const container = document.getElementById('topSalesList');
   if (!container) return;
@@ -468,8 +819,8 @@ function renderTopSales(salesList) {
       <div class="tco-top-item-row">
         <div style="font-size:16px; width:28px; text-align:center; font-weight:800;">${medalIcon}</div>
         <div class="tco-item-info">
-          <div class="tco-item-name" style="font-weight:800;">${s.nama_sales || 'Wiraniaga'}</div>
-          <div class="tco-item-cat">SPV: ${s.nama_spv || '-'}</div>
+          <div class="tco-item-name" style="font-weight:800;">${escapeHtml(s.nama_sales || 'Wiraniaga')}</div>
+          <div class="tco-item-cat">SPV: ${escapeHtml(s.nama_spv || '-')}</div>
         </div>
         <div class="tco-item-stat">
           <div class="tco-item-qty" style="color:#16a34a;">${s.total_qty} Unit</div>
@@ -480,7 +831,9 @@ function renderTopSales(salesList) {
   }).join('');
 }
 
-// 10. Render Transactions Table
+/**
+ * 17. Render Transactions Table
+ */
 function renderTransactionsTable(transactions) {
   const tbody = document.getElementById('tcoTransactionsTbody');
   if (!tbody) return;
@@ -490,33 +843,33 @@ function renderTransactionsTable(transactions) {
     return;
   }
 
-  tbody.innerHTML = transactions.map((t, idx) => {
+  tbody.innerHTML = transactions.map((t) => {
     const dateFormatted = t.tanggal_transaksi ? new Date(t.tanggal_transaksi).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
     const totalRp = 'Rp ' + Number(t.total_harga).toLocaleString('id-ID');
 
     return `
       <tr>
-        <td style="font-weight:800; font-family:monospace; color:#0f172a;">${t.spk_no || '-'}</td>
+        <td style="font-weight:800; font-family:monospace; color:#0f172a;">${escapeHtml(t.spk_no || '-')}</td>
         <td style="white-space:nowrap; font-size:11.5px; color:#64748b;">${dateFormatted}</td>
         <td>
-          <div style="font-weight:700; color:#0f172a;">${t.customer_name}</div>
-          <div style="font-size:11px; color:#64748b;">${t.customer_phone || '-'}</div>
+          <div style="font-weight:700; color:#0f172a;">${escapeHtml(t.customer_name)}</div>
+          <div style="font-size:11px; color:#64748b;">${escapeHtml(t.customer_phone || '-')}</div>
         </td>
         <td>
-          <div style="font-weight:700; color:#0d1b3e;">${t.model_kendaraan}</div>
-          <div style="font-size:11px; color:#64748b;">${t.tipe_kendaraan || '-'}</div>
+          <div style="font-weight:700; color:#0d1b3e;">${escapeHtml(t.model_kendaraan)}</div>
+          <div style="font-size:11px; color:#64748b;">${escapeHtml(t.tipe_kendaraan || '-')}</div>
         </td>
         <td>
-          <div style="font-weight:700; color:#d7123a;">${t.item_tco_name}</div>
-          <div style="font-size:11px; color:#64748b;">${t.kategori_tco} • ${t.skema_harga}</div>
+          <div style="font-weight:700; color:#d7123a;">${escapeHtml(t.item_tco_name)}</div>
+          <div style="font-size:11px; color:#64748b;">${escapeHtml(t.kategori_tco)} • ${escapeHtml(t.skema_harga)}</div>
         </td>
         <td>
-          <div style="font-weight:700; color:#0f172a;">${t.kecamatan || t.kota}</div>
-          <div style="font-size:10.5px; color:#64748b;">${t.wilayah_polreg}</div>
+          <div style="font-weight:700; color:#0f172a;">${escapeHtml(t.kecamatan || t.kota)}</div>
+          <div style="font-size:10.5px; color:#64748b;">${escapeHtml(t.wilayah_polreg)}</div>
         </td>
         <td style="white-space:nowrap;">
-          <div style="font-weight:700; color:#0f172a;">${t.nama_sales}</div>
-          <div style="font-size:10.5px; color:#64748b;">SPV: ${t.nama_spv || '-'}</div>
+          <div style="font-weight:700; color:#0f172a;">${escapeHtml(t.nama_sales)}</div>
+          <div style="font-size:10.5px; color:#64748b;">SPV: ${escapeHtml(t.nama_spv || '-')}</div>
         </td>
         <td style="text-align:right; font-weight:800; color:#0f172a; white-space:nowrap;">${totalRp}</td>
       </tr>
@@ -524,41 +877,9 @@ function renderTransactionsTable(transactions) {
   }).join('');
 }
 
-// 11. Quick Region Jump
-function jumpToArea(areaKey) {
-  // Update active pill button
-  document.querySelectorAll('.tco-area-pill').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.area === areaKey);
-  });
-
-  const target = REGION_ZOOM_COORDS[areaKey] || REGION_ZOOM_COORDS.all;
-  if (tcoMap) {
-    tcoMap.flyTo(target.center, target.zoom, { duration: 1.2 });
-  }
-}
-
-// 12. Switch Map Modes (Hotspot / Pin)
-function setMapMode(mode) {
-  document.querySelectorAll('.tco-map-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.mode === mode);
-  });
-
-  if (!tcoMap || !tcoCirclesGroup || !tcoMarkersGroup) return;
-
-  if (mode === 'heatmap') {
-    tcoMap.addLayer(tcoCirclesGroup);
-    tcoMap.removeLayer(tcoMarkersGroup);
-  } else if (mode === 'pins') {
-    tcoMap.addLayer(tcoMarkersGroup);
-    tcoMap.removeLayer(tcoCirclesGroup);
-  } else {
-    // Both
-    tcoMap.addLayer(tcoCirclesGroup);
-    tcoMap.addLayer(tcoMarkersGroup);
-  }
-}
-
-// 13. Select Polreg Filter
+/**
+ * 18. Polreg Sidebar Item Selection
+ */
 function selectPolregFilter(polregName) {
   if (currentPolregFilter === polregName) {
     currentPolregFilter = 'all'; // Toggle off
@@ -573,34 +894,43 @@ function selectPolregFilter(polregName) {
 
   loadTcoOverview();
 }
+window.selectPolregFilter = selectPolregFilter;
 
-function filterByDistrict(districtName) {
-  const searchInput = document.getElementById('tableSearchInput');
-  if (searchInput) {
-    searchInput.value = districtName;
-    loadTcoOverview(districtName);
-    searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}
-
-// 14. Reset All Filters
+/**
+ * 19. Reset All Filters
+ */
 function resetFilters() {
   currentPolregFilter = 'all';
+  currentRegencyFilter = 'all';
+  currentStatusFilter = 'all';
+
   const filterPeriode = document.getElementById('filterPeriode');
   const filterModel = document.getElementById('filterModel');
   const filterPolreg = document.getElementById('filterPolreg');
   const searchInput = document.getElementById('tableSearchInput');
+  const mapFilterStatus = document.getElementById('mapFilterStatus');
 
   if (filterPeriode) filterPeriode.value = 'all';
   if (filterModel) filterModel.value = 'all';
   if (filterPolreg) filterPolreg.value = 'all';
   if (searchInput) searchInput.value = '';
+  if (mapFilterStatus) mapFilterStatus.value = 'all';
 
-  jumpToArea('all');
+  document.querySelectorAll('.tco-area-pill').forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.regency === 'all');
+  });
+
+  if (tcoMap) {
+    tcoMap.flyTo(REGENCY_BOUNDS.all.center, REGENCY_BOUNDS.all.zoom, { duration: 1.0 });
+  }
+
   loadTcoOverview();
 }
+window.resetFilters = resetFilters;
 
-// 15. Export CSV
+/**
+ * 20. Export CSV Report
+ */
 function exportTcoCsv() {
   if (!tcoOverviewData || !tcoOverviewData.recent_transactions) {
     alert('Data transaksi belum siap untuk diekspor.');
@@ -637,17 +967,22 @@ function exportTcoCsv() {
   link.click();
   document.body.removeChild(link);
 }
+window.exportTcoCsv = exportTcoCsv;
 
-// 16. Modal Dialog Handlers
+/**
+ * 21. Modal Dialog & New Transaction Submission
+ */
 function openInputModal() {
   const modal = document.getElementById('inputTcoModal');
   if (modal) modal.classList.add('show');
 }
+window.openInputModal = openInputModal;
 
 function closeInputModal() {
   const modal = document.getElementById('inputTcoModal');
   if (modal) modal.classList.remove('show');
 }
+window.closeInputModal = closeInputModal;
 
 async function submitNewTransactionForm(event) {
   event.preventDefault();
@@ -688,7 +1023,7 @@ async function submitNewTransactionForm(event) {
     polreg_code,
     wilayah_polreg,
     kota,
-    kecamatan: kecamatan || 'Lengkong',
+    kecamatan: kecamatan || 'Kiaracondong',
     tanggal_transaksi: new Date().toISOString().slice(0, 10)
   };
 
@@ -710,16 +1045,17 @@ async function submitNewTransactionForm(event) {
     alert('Terjadi error jaringan: ' + err.message);
   }
 }
-
-// Global window exports for HTML event bindings
-window.jumpToArea = jumpToArea;
-window.setMapMode = setMapMode;
-window.setBaseLayer = setBaseLayer;
-window.selectPolregFilter = selectPolregFilter;
-window.filterByDistrict = filterByDistrict;
-window.resetFilters = resetFilters;
-window.exportTcoCsv = exportTcoCsv;
-window.openInputModal = openInputModal;
-window.closeInputModal = closeInputModal;
 window.submitNewTransactionForm = submitNewTransactionForm;
-window.loadTcoOverview = loadTcoOverview;
+
+/**
+ * 22. Helper: Escape HTML string
+ */
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
