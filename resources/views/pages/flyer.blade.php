@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- App Styles -->
-  <link rel="stylesheet" href="../css/style.css?v=20261021_mobile_fix_v10" />
+  <link rel="stylesheet" href="../css/style.css?v=20261022_v1" />
   <link rel="stylesheet" href="../css/animations-premium.css?v=20260908_v24">
   <link rel="stylesheet" href="../css/flyer.css?v={{ time() }}">
   
@@ -98,7 +98,7 @@
           </button>
         </div>
 
-        <div style="font-size: 11px; color: #64748b; text-align: center; line-height: 1.5; padding: 0 10px;">
+        <div class="flyer-render-note" style="font-size: 11px; color: #64748b; text-align: center; line-height: 1.5; padding: 0 10px;">
           <i class="fa-solid fa-shield-check" style="color:#10b981;"></i>
           Hasil render berstandar 1080p tajam dan jernih tanpa blur saat diunggah ke WhatsApp Status, Instagram Story, atau dikirim langsung ke calon pelanggan.
         </div>

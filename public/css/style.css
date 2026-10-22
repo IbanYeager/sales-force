@@ -3653,10 +3653,12 @@ tbody tr:last-child td {
 
     .greeting-meta {
         display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 4px 8px;
+        flex-direction: column;
+        align-items: flex-start !important;
+        text-align: left !important;
+        gap: 3px;
         margin-top: 4px;
+        width: 100%;
     }
 
     .greeting-meta .spv-label,
@@ -3667,6 +3669,8 @@ tbody tr:last-child td {
         text-overflow: ellipsis;
         display: inline-flex;
         align-items: center;
+        justify-content: flex-start !important;
+        text-align: left !important;
         gap: 4px;
         max-width: 100%;
     }
@@ -3843,12 +3847,19 @@ tbody tr:last-child td {
     }
 
     .greeting-meta {
-        gap: 3px 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start !important;
+        text-align: left !important;
+        gap: 2px;
+        width: 100%;
     }
 
     .greeting-meta .spv-label,
     .greeting-meta .location {
         font-size: 9px;
+        justify-content: flex-start !important;
+        text-align: left !important;
     }
 
     .header-home .bell-icon {

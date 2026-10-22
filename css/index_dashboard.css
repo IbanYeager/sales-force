@@ -8,8 +8,11 @@
 .greeting-meta {
     display: flex;
     flex-direction: column;
+    align-items: flex-start !important;
+    text-align: left !important;
     gap: 4px;
     margin-top: 6px;
+    width: 100%;
 }
 
 .greeting-meta .spv-label {
@@ -17,11 +20,14 @@
     font-size: 11px;
     font-weight: 500;
     opacity: 0.9;
+    text-align: left !important;
 }
 
 .greeting-meta .location {
     display: flex;
     align-items: center;
+    justify-content: flex-start !important;
+    text-align: left !important;
     gap: 5px;
     font-size: 11px;
     opacity: 0.9;
