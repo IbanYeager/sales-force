@@ -35,6 +35,8 @@ Route::prefix('spv')->group(function () {
     Route::get('/mtoyota_service.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
     Route::get('/mtoyota', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
     Route::get('/mtoyota.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
+    Route::get('/penjualan_merchandise', function() { return app(PageController::class)->showSpvPage('penjualan_merchandise'); });
+    Route::get('/penjualan_merchandise.html', function() { return app(PageController::class)->showSpvPage('penjualan_merchandise'); });
     Route::get('/{page}', [PageController::class, 'showSpvPage'])->name('spv.page');
 });
 Route::get('/pages_spv/sph.html', function() { return redirect('/pages_spv/index_spv.html'); });
@@ -47,6 +49,8 @@ Route::get('/pages_spv/mtoyota_service.html', function() { return app(PageContro
 Route::get('/pages_spv/mtoyota_service', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
 Route::get('/pages_spv/mtoyota.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
 Route::get('/pages_spv/mtoyota', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
+Route::get('/pages_spv/penjualan_merchandise.html', function() { return app(PageController::class)->showSpvPage('penjualan_merchandise'); });
+Route::get('/pages_spv/penjualan_merchandise', function() { return app(PageController::class)->showSpvPage('penjualan_merchandise'); });
 Route::get('/pages_spv/{page}', [PageController::class, 'showSpvPage']);
 
 // Portal Kacab (Kepala Cabang)
@@ -66,6 +70,8 @@ Route::prefix('kacab')->group(function () {
     Route::get('/mtoyota_service.html', function() { return app(PageController::class)->showKacabPage('mtoyota_service'); });
     Route::get('/mtoyota', function() { return app(PageController::class)->showKacabPage('mtoyota_service'); });
     Route::get('/mtoyota.html', function() { return app(PageController::class)->showKacabPage('mtoyota_service'); });
+    Route::get('/penjualan_merchandise', function() { return app(PageController::class)->showKacabPage('penjualan_merchandise'); });
+    Route::get('/penjualan_merchandise.html', function() { return app(PageController::class)->showKacabPage('penjualan_merchandise'); });
     Route::get('/{page}', [PageController::class, 'showKacabPage'])->name('kacab.page');
 });
 Route::get('/pages_kacab/sph.html', function() { return redirect('/pages_kacab/index_kacab.html'); });
@@ -84,6 +90,8 @@ Route::get('/pages_kacab/mtoyota_service.html', function() { return app(PageCont
 Route::get('/pages_kacab/mtoyota_service', function() { return app(PageController::class)->showKacabPage('mtoyota_service'); });
 Route::get('/pages_kacab/mtoyota.html', function() { return app(PageController::class)->showKacabPage('mtoyota_service'); });
 Route::get('/pages_kacab/mtoyota', function() { return app(PageController::class)->showKacabPage('mtoyota_service'); });
+Route::get('/pages_kacab/penjualan_merchandise.html', function() { return app(PageController::class)->showKacabPage('penjualan_merchandise'); });
+Route::get('/pages_kacab/penjualan_merchandise', function() { return app(PageController::class)->showKacabPage('penjualan_merchandise'); });
 Route::get('/pages_kacab/{page}', [PageController::class, 'showKacabPage']);
 
 // Direct SPH & Quotation Redirects for Sales

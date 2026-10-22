@@ -283,6 +283,7 @@
           <span class="kcb-category-title"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Sales CRM</span>
           <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
           <a href="penjualan_tco.html" id="navTco"><i class="fa-solid fa-gem"></i> Penjualan &amp; Polreg TCO</a>
+          <a href="penjualan_merchandise.html" id="navMerchandise"><i class="fa-solid fa-shirt"></i> Penjualan Merchandise</a>
           <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
           <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>AO Report Cabang</a>
           <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi &amp; Approval</a>

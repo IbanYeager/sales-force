@@ -48,6 +48,7 @@
           <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target &amp; Pencapaian</a>
           <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
           <a href="penjualan_tco.html" id="navTco"><i class="fa-solid fa-gem"></i>Penjualan &amp; Polreg TCO</a>
+          <a href="penjualan_merchandise.html" id="navMerchandise"><i class="fa-solid fa-shirt"></i>Penjualan Merchandise</a>
         </div>
 
         <!-- Kategori 2: Pipeline & Approval -->

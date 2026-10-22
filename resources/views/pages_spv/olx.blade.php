@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -395,6 +395,7 @@
           <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target &amp; Pencapaian</a>
           <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
           <a href="penjualan_tco.html" id="navTco"><i class="fa-solid fa-gem"></i>Penjualan &amp; Polreg TCO</a>
+          <a href="penjualan_merchandise.html" id="navMerchandise"><i class="fa-solid fa-shirt"></i>Penjualan Merchandise</a>
         </div>
 
         <!-- Kategori 2: Pipeline & Approval -->
@@ -551,12 +552,146 @@
         </div>
       </section>
 
+      <!-- 3. DAILY BOARD MONITORING PROGRESS - BULAN OKTOBER 2026 -->
+      <section class="olx-matrix-card" id="sectionDailyBoard">
+        <div class="olx-matrix-header" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span class="olx-matrix-badge-tag" style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 3px 10px rgba(245, 158, 11, 0.35);">
+              <i class="fa-solid fa-clipboard-list"></i> DAILY BOARD
+            </span>
+            <div>
+              <h3 style="font-size:16px; font-weight:900; margin:0; color:#ffffff; display:flex; align-items:center; gap:8px;">
+                DAILY BOARD MONITORING PROGRESS &mdash; OKTOBER 2026
+                <span style="font-size:11px; font-weight:800; background:rgba(255,255,255,0.18); padding:3px 9px; border-radius:20px; color:#fef08a;">BRANCH: KIARACONDONG</span>
+              </h3>
+              <p style="font-size:12px; color:#cbd5e1; margin:3px 0 0;">Monitoring harian unit trade-in OLX masuk: Sales, Konsumen, Tipe Unit, Harga, KM, Pajak, dan Status Negosiasi</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-check-double" style="color:#34d399;"></i> 17 Unit Terdata &bull; 2 Closing Deal
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI SUMMARY CARDS -->
+        <div style="padding: 20px 24px 10px; background: #fafafa; border-bottom: 1px solid #e2e8f0;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px;">
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+              <div style="width:40px; height:40px; border-radius:10px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:17px;">
+                <i class="fa-solid fa-car-side"></i>
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">TOTAL UNIT</div>
+                <div style="font-size:18px; font-weight:900; color:#0f172a;" id="dbKpiTotal">17 Unit</div>
+              </div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #a7f3d0; border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; box-shadow: 0 2px 8px rgba(16,185,129,0.08);">
+              <div style="width:40px; height:40px; border-radius:10px; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:17px;">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:700; color:#059669; text-transform:uppercase;">CLOSING DEAL</div>
+                <div style="font-size:18px; font-weight:900; color:#065f46;" id="dbKpiDeal">2 Unit (Rp 327 Jt)</div>
+              </div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #fde68a; border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; box-shadow: 0 2px 8px rgba(245,158,11,0.08);">
+              <div style="width:40px; height:40px; border-radius:10px; background:#fffbeb; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:17px;">
+                <i class="fa-solid fa-magnifying-glass-dollar"></i>
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:700; color:#d97706; text-transform:uppercase;">CEK HARGA</div>
+                <div style="font-size:18px; font-weight:900; color:#92400e;" id="dbKpiCekHarga">9 Unit</div>
+              </div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; box-shadow: 0 2px 8px rgba(37,99,235,0.08);">
+              <div style="width:40px; height:40px; border-radius:10px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:17px;">
+                <i class="fa-solid fa-clipboard-check"></i>
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:700; color:#2563eb; text-transform:uppercase;">CEK INSPEKSI</div>
+                <div style="font-size:18px; font-weight:900; color:#1e40af;" id="dbKpiInspeksi">4 Unit</div>
+              </div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #e9d5ff; border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; box-shadow: 0 2px 8px rgba(124,58,237,0.08);">
+              <div style="width:40px; height:40px; border-radius:10px; background:#faf5ff; color:#7c3aed; display:flex; align-items:center; justify-content:center; font-size:17px;">
+                <i class="fa-solid fa-calendar-check"></i>
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase;">JADWAL CEK</div>
+                <div style="font-size:18px; font-weight:900; color:#5b21b6;" id="dbKpiJadwal">2 Unit</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTER & SEARCH TOOLBAR -->
+        <div style="padding: 14px 24px; background: #ffffff; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div style="position:relative;">
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
+              <input type="text" id="dbSearchInput" placeholder="Cari Sales, Konsumen, Model..." onkeyup="filterDailyBoard()" style="padding: 8px 14px 8px 32px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; font-weight: 600; color: #1e293b; background: #f8fafc; outline: none; width: 230px;" />
+            </div>
+
+            <select id="dbFilterSpv" onchange="filterDailyBoard()" style="padding: 8px 14px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; font-weight: 700; color: #1e293b; background: #f8fafc; outline: none;">
+              <option value="all">Semua Tim SPV</option>
+              <option value="RYAN">Tim Ryan (10 Unit)</option>
+              <option value="ALVIN">Tim Alvin (6 Unit)</option>
+              <option value="RIVA">Tim Riva (1 Unit)</option>
+            </select>
+
+            <select id="dbFilterStatus" onchange="filterDailyBoard()" style="padding: 8px 14px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; font-weight: 700; color: #1e293b; background: #f8fafc; outline: none;">
+              <option value="all">Semua Keterangan / Status</option>
+              <option value="Deal">Deal (Closing)</option>
+              <option value="Cek Harga">Cek Harga</option>
+              <option value="Cek Inspeksi">Cek Inspeksi</option>
+              <option value="Jadwal">Jadwal Cek / Liat</option>
+            </select>
+          </div>
+
+          <div style="font-size:12.5px; font-weight:700; color:#64748b;" id="dbCounterLabel">
+            Menampilkan <span style="color:#0f172a; font-weight:900;" id="dbShowingCount">17</span> dari 17 unit
+          </div>
+        </div>
+
+        <!-- TABLE OF 17 DAILY BOARD UNITS -->
+        <div class="olx-matrix-table-wrap">
+          <table class="olx-matrix-table" style="text-align: left;">
+            <thead>
+              <tr style="background:#0f172a;">
+                <th style="width: 50px; text-align: center;">NO</th>
+                <th style="width: 140px;">SALES</th>
+                <th style="width: 120px;">SPV</th>
+                <th style="width: 150px;">NAMA KONSUMEN</th>
+                <th style="width: 220px;">MERK &amp; TYPE</th>
+                <th style="width: 80px; text-align: center;">TAHUN</th>
+                <th style="width: 90px; text-align: center;">WARNA</th>
+                <th style="width: 140px; text-align: right;">HARGA</th>
+                <th style="width: 100px; text-align: center;">KM</th>
+                <th style="width: 100px; text-align: center;">PAJAK</th>
+                <th style="width: 150px; text-align: center;">KETERANGAN</th>
+              </tr>
+            </thead>
+            <tbody id="dailyBoardTableBody">
+              <!-- Rendered dynamically via JS -->
+            </tbody>
+            <tfoot id="dailyBoardTableFoot">
+              <!-- Rendered dynamically via JS -->
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
     </main>
   </div>
 
   <script src="../custom_alert.js"></script>
   <script src="../js/spv_global.js"></script>
-  <script src="../js/spv_olx.js?v=20260918_v8_lux"></script>
+  <script src="../js/spv_olx.js?v=20261022_okt_v1"></script>
   <script src="../js/pwa-app.js?v=20260918_v8_lux"></script>
 </body>
 
