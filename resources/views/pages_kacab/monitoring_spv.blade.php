@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>

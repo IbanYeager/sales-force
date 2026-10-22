@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/spv_wiraniaga.css">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -172,7 +172,7 @@
             <button class="btn btn-outline-success" style="border: 1.5px solid #16a34a; color: #16a34a; font-weight:700; padding:10px 16px; border-radius:10px; background: #f0fdf4; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;" onclick="syncSpreadsheetNow(this)" title="Sinkronkan data akun wiraniaga langsung dari Google Spreadsheet live">
               <i class="fa-solid fa-arrows-rotate"></i> Sinkron Spreadsheet
             </button>
-            <button class="btn btn-primary" style="background: linear-gradient(135deg, #1e1014, #3d1c24); color: #d8a437; border: 1px solid #d8a437; font-weight:700; padding:10px 16px; border-radius:10px;" onclick="openModalCreate()">
+            <button class="btn btn-primary" style="background: #eb0a1e; color: #ffffff; border: none; font-weight:600; padding:9px 15px; border-radius:8px;" onclick="openModalCreate()">
               <i class="fa-solid fa-user-plus"></i> Tambah Wiraniaga
             </button>
           </div>

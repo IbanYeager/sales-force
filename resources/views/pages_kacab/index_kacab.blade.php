@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="/css/sales_dashboard.css?v=20261019_executive_sidebar_lux">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -33,7 +33,7 @@
             alt="Tunas Toyota Logo" class="tunas-logo">
         </div>
         <div class="kcb-brand-title">
-          <span class="panel-tag"><i class="fa-solid fa-crown"></i> KACAB PANEL</span>
+          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
           <p class="panel-sub"><span class="panel-sub-dot"></span> Cabang Kiara Condong</p>
         </div>
       </div>
@@ -98,12 +98,12 @@
       <div class="sidebar-footer">
         <div class="kcb-footer-profile">
           <div class="kcb-footer-avatar-wrap">
-            <img src="https://ui-avatars.com/api/?name=Dendi+Holius&background=1e1014&color=d8a437&bold=true" alt="Dendi Holius" class="kcb-footer-avatar" id="kcbFooterAvatar">
+            <img src="https://ui-avatars.com/api/?name=Dendi+Holius&background=0f172a&color=ffffff&bold=true" alt="Dendi Holius" class="kcb-footer-avatar" id="kcbFooterAvatar">
             <span class="kcb-footer-dot" title="Sistem Aktif &amp; Terhubung"></span>
           </div>
           <div class="kcb-footer-meta">
             <span class="kcb-footer-name" id="kcbFooterName">Dendi Holius</span>
-            <span class="kcb-footer-role"><i class="fa-solid fa-crown" style="font-size:9px;"></i> Kepala Cabang</span>
+            <span class="kcb-footer-role"><i class="fa-solid fa-user-tie" style="font-size:10px; color:#94a3b8;"></i> Kepala Cabang</span>
           </div>
         </div>
         <button type="button" class="kcb-logout-btn" onclick="logoutUser()">
@@ -184,122 +184,122 @@
           </div>
         </div>
 
-                <!-- ===== KAIZEN EVOLVE 2026 STRATEGIC ACCELERATION COCKPIT ===== -->
-        <section class="kcb-card" style="background: linear-gradient(135deg, #1e1014 0%, #3b141d 50%, #1e1b4b 100%); border-radius:18px; padding:22px 26px; color:#ffffff; margin-bottom:22px; box-shadow:0 12px 35px rgba(30,16,20,0.35); border:1px solid rgba(255,255,255,0.18); position:relative; overflow:hidden;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; position:relative; z-index:2; border-bottom:1px solid rgba(255,255,255,0.14); padding-bottom:16px; margin-bottom:16px;">
+                <!-- ===== KAIZEN EVOLVE 2026 STRATEGIC COCKPIT ===== -->
+        <section class="kcb-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:20px 22px; margin-bottom:20px; box-shadow:0 1px 3px rgba(15,23,42,0.05); position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; border-bottom:1px solid #f1f5f9; padding-bottom:14px; margin-bottom:16px;">
             <div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#ffffff; font-size:10px; font-weight:900; padding:3px 9px; border-radius:6px; letter-spacing:0.5px;">
-                  <i class="fa-solid fa-crown"></i> KAIZEN EVOLVE 2026
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="background:rgba(235,10,30,0.08); border:1px solid rgba(235,10,30,0.2); color:#eb0a1e; font-size:10.5px; font-weight:700; padding:2.5px 8px; border-radius:4px;">
+                  <i class="fa-solid fa-bullseye"></i> KAIZEN EVOLVE 2026
                 </span>
-                <span style="font-size:12px; color:#f3c96a; font-weight:800;">
-                  <i class="fa-solid fa-bolt-lightning"></i> Toyota Kircon Sales Activity &amp; Retention Acceleration
+                <span style="font-size:12px; color:#64748b; font-weight:600;">
+                  Program Strategis Cabang Kiaracondong
                 </span>
               </div>
-              <h2 style="font-size:20px; font-weight:900; margin:6px 0 2px; color:#ffffff;">
-                Papan Strategis Implementasi EVOLVE Cabang Kiaracondong
+              <h2 style="font-size:18px; font-weight:800; margin:4px 0 2px; color:#0f172a;">
+                Implementasi 4 Pilar Kaizen EVOLVE
               </h2>
-              <p style="font-size:12px; color:#fecdd3; margin:0; line-height:1.45;">
-                Eksekusi terarah 4 pilar Kaizen 2026: Penetrasi 8 Kecamatan Low Share, ReDrive Trade-In SA ke OLXmobbi, Win-Back 719 Unit Servis (CARE-X), dan Funneling Pameran.
+              <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.45;">
+                Eksekusi terarah 4 pilar: Penetrasi 8 Kecamatan Low Share, ReDrive Trade-In ke OLXmobbi, Win-Back 719 Unit Servis (CARE-X), dan Funneling Pameran.
               </p>
             </div>
 
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <button onclick="location.href='peta_kunjungan.html'" style="padding:8px 14px; border-radius:10px; border:1px solid rgba(243,201,106,0.4); background:rgba(30,16,20,0.7); color:#f3c96a; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-                <i class="fa-solid fa-brain"></i> AI Polreg 8 Kecamatan
+              <button onclick="location.href='peta_kunjungan.html'" style="padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s;">
+                <i class="fa-solid fa-map-location-dot" style="color:#d97706;"></i> Polreg 8 Kecamatan
               </button>
-              <button onclick="location.href='olx.html'" style="padding:8px 14px; border-radius:10px; border:1px solid rgba(56,189,248,0.4); background:rgba(2,132,199,0.25); color:#7dd3fc; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-                <i class="fa-solid fa-repeat"></i> ReDrive Pipeline
+              <button onclick="location.href='olx.html'" style="padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s;">
+                <i class="fa-solid fa-repeat" style="color:#2563eb;"></i> ReDrive Pipeline
               </button>
-              <button onclick="location.href='after_sales.html'" style="padding:8px 14px; border-radius:10px; border:1px solid rgba(52,211,153,0.4); background:rgba(16,185,129,0.25); color:#a7f3d0; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
-                <i class="fa-solid fa-shield-halved"></i> Win-Back 719 Unit
+              <button onclick="location.href='after_sales.html'" style="padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s;">
+                <i class="fa-solid fa-wrench" style="color:#10b981;"></i> Win-Back 719 Unit
               </button>
             </div>
           </div>
 
           <!-- 4 STRATEGIC SUMMARY CARDS -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; position:relative; z-index:2;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
             <!-- CARD 1: 8 KECAMATAN -->
-            <div style="background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:14px; cursor:pointer; transition:all 0.2s;" onclick="location.href='peta_kunjungan.html'" title="Buka AI Market Matrix">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='peta_kunjungan.html'" title="Buka Market Matrix">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:800; color:#fbbf24; text-transform:uppercase;">1. PENETRASI WILAYAH</span>
-                <i class="fa-solid fa-location-crosshairs" style="color:#fbbf24;"></i>
+                <span style="font-size:10.5px; font-weight:700; color:#b45309; text-transform:uppercase;">1. PENETRASI WILAYAH</span>
+                <i class="fa-solid fa-location-crosshairs" style="color:#d97706;"></i>
               </div>
-              <div style="font-size:22px; font-weight:900; color:#ffffff;">8 Kecamatan</div>
-              <div style="font-size:11px; color:#fecdd3; margin-top:2px;">Bojongloa, Antapani, Buah Batu, dll.</div>
-              <div style="margin-top:8px; font-size:10px; background:rgba(239,68,68,0.25); color:#fca5a5; padding:3px 8px; border-radius:6px; font-weight:800; display:inline-block;">
+              <div style="font-size:20px; font-weight:800; color:#0f172a;">8 Kecamatan</div>
+              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">Bojongloa, Antapani, Buahbatu, dll.</div>
+              <div style="margin-top:8px; font-size:10px; background:#fee2e2; color:#b91c1c; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
                 Fokus: Veloz HEV &bull; Yaris Cross &bull; Rangga
               </div>
             </div>
 
             <!-- CARD 2: REDRIVE TRADE-IN -->
-            <div style="background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:14px; cursor:pointer; transition:all 0.2s;" onclick="location.href='olx.html'" title="Buka ReDrive Trade-In">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='olx.html'" title="Buka ReDrive Trade-In">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:800; color:#38bdf8; text-transform:uppercase;">2. REDRIVE TRADE-IN</span>
-                <i class="fa-solid fa-repeat" style="color:#38bdf8;"></i>
+                <span style="font-size:10.5px; font-weight:700; color:#1d4ed8; text-transform:uppercase;">2. REDRIVE TRADE-IN</span>
+                <i class="fa-solid fa-repeat" style="color:#2563eb;"></i>
               </div>
-              <div style="font-size:22px; font-weight:900; color:#ffffff;">5 SPK Deal</div>
-              <div style="font-size:11px; color:#bae6fd; margin-top:2px;">dari 14 Unit Servis &gt;2.5 Thn (35.7%)</div>
-              <div style="margin-top:8px; font-size:10px; background:rgba(56,189,248,0.2); color:#7dd3fc; padding:3px 8px; border-radius:6px; font-weight:800; display:inline-block;">
+              <div style="font-size:20px; font-weight:800; color:#0f172a;">5 SPK Deal</div>
+              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">dari 14 Unit Servis &gt;2.5 Thn (35.7%)</div>
+              <div style="margin-top:8px; font-size:10px; background:#dbeafe; color:#1e40af; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
                 SA Brand Ambassador &bull; OLX Spot
               </div>
             </div>
 
             <!-- CARD 3: WIN-BACK 719 -->
-            <div style="background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:14px; cursor:pointer; transition:all 0.2s;" onclick="location.href='after_sales.html'" title="Buka Win-Back 719 Unit">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='after_sales.html'" title="Buka Win-Back 719 Unit">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:800; color:#34d399; text-transform:uppercase;">3. AFTER SALES WIN-BACK</span>
-                <i class="fa-solid fa-shield-halved" style="color:#34d399;"></i>
+                <span style="font-size:10.5px; font-weight:700; color:#047857; text-transform:uppercase;">3. AFTER SALES WIN-BACK</span>
+                <i class="fa-solid fa-wrench" style="color:#10b981;"></i>
               </div>
-              <div style="font-size:22px; font-weight:900; color:#ffffff;">719 Unit</div>
-              <div style="font-size:11px; color:#a7f3d0; margin-top:2px;">P1: 110 Unit &bull; P2: 463 Unit</div>
-              <div style="margin-top:8px; font-size:10px; background:rgba(52,211,153,0.2); color:#6ee7b7; padding:3px 8px; border-radius:6px; font-weight:800; display:inline-block;">
+              <div style="font-size:20px; font-weight:800; color:#0f172a;">719 Unit</div>
+              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">P1: 110 Unit &bull; P2: 463 Unit</div>
+              <div style="margin-top:8px; font-size:10px; background:#d1fae5; color:#065f46; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
                 Voucher THS On-Call &bull; CARE-X
               </div>
             </div>
 
             <!-- CARD 4: FUNNELING ACCELERATOR -->
-            <div style="background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:14px; cursor:pointer; transition:all 0.2s;" onclick="location.href='peta_kunjungan.html'" title="Buka Funneling Accelerator">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='peta_kunjungan.html'" title="Buka Funneling Target">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:800; color:#f472b6; text-transform:uppercase;">4. FUNNELING TARGET</span>
-                <i class="fa-solid fa-filter-circle-dollar" style="color:#f472b6;"></i>
+                <span style="font-size:10.5px; font-weight:700; color:#4338ca; text-transform:uppercase;">4. FUNNELING TARGET</span>
+                <i class="fa-solid fa-filter-circle-dollar" style="color:#6366f1;"></i>
               </div>
-              <div style="font-size:22px; font-weight:900; color:#ffffff;">83 DO Final</div>
-              <div style="font-size:11px; color:#fbcfe8; margin-top:2px;">456 Prospek &rarr; 275 Hot &rarr; 110 SPK</div>
-              <div style="margin-top:8px; font-size:10px; background:rgba(244,114,182,0.2); color:#f9a8d4; padding:3px 8px; border-radius:6px; font-weight:800; display:inline-block;">
+              <div style="font-size:20px; font-weight:800; color:#0f172a;">83 DO Final</div>
+              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">456 Prospek &rarr; 275 Hot &rarr; 110 SPK</div>
+              <div style="margin-top:8px; font-size:10px; background:#e0e7ff; color:#3730a3; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
                 Target Kontribusi 25% (Now 14%)
               </div>
             </div>
           </div>
         </section>
 
-        <!-- ===== EXECUTIVE COCKPIT: MONITORING AKTIVITAS LAPANGAN & GALERI PAMERAN HARI INI ===== -->
-        <section class="kcb-card" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:16px; padding:18px 20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">
+        <!-- ===== MONITORING AKTIVITAS LAPANGAN & DOKUMENTASI PAMERAN ===== -->
+        <section class="kcb-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(15,23,42,0.05); margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, #1e1014, #3b1d28); color:#d8a437; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 12px rgba(30,16,20,0.2);">
+              <div style="width:38px; height:38px; border-radius:8px; background:rgba(235,10,30,0.08); color:#eb0a1e; display:flex; align-items:center; justify-content:center; font-size:16px;">
                 <i class="fa-solid fa-person-walking-luggage"></i>
               </div>
               <div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                  <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
-                    Monitoring Aktivitas Lapangan &amp; Dokumentasi Pameran Cabang
+                  <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">
+                    Monitoring Aktivitas Lapangan &amp; Dokumentasi Pameran
                   </h3>
-                  <span id="badgeLiveOpsStatus" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; font-weight:800; padding:3px 10px; border-radius:20px; font-size:11px;">
-                    <i class="fa-solid fa-circle" style="font-size:7px; color:#10b981;"></i> Pantauan Real-Time
+                  <span id="badgeLiveOpsStatus" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:700; padding:2px 8px; border-radius:6px; font-size:10.5px;">
+                    <i class="fa-solid fa-circle" style="font-size:6px; color:#10b981;"></i> Pantauan Real-Time
                   </span>
                 </div>
-                <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">
-                  Pantau kepatuhan input aktivitas seluruh wiraniaga hari ini, rekap foto pameran otomatis, serta tindakan teguran terarah ke SPV.
+                <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
+                  Pantau kepatuhan input aktivitas seluruh wiraniaga hari ini, rekap foto pameran, serta koordinasi SPV.
                 </p>
               </div>
             </div>
 
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <button class="btn btn-sm" onclick="location.href='aktivitas.html'" style="background:linear-gradient(135deg, #1e1014, #4a1525); color:#d8a437; border:1px solid rgba(216,164,55,0.4); font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(30,16,20,0.2);">
-                <i class="fa-solid fa-timeline"></i> Timeline Aktivitas
+              <button type="button" onclick="location.href='aktivitas.html'" style="background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; font-weight:600; font-size:12px; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                <i class="fa-solid fa-timeline" style="color:#64748b;"></i> Timeline Aktivitas
               </button>
-              <button class="btn btn-sm" onclick="location.href='riwayat_foto_aktivitas.html'" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:white; border:none; font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(37,99,235,0.25);">
+              <button type="button" onclick="location.href='riwayat_foto_aktivitas.html'" style="background:#0f172a; color:#ffffff; border:none; font-weight:600; font-size:12px; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
                 <i class="fa-solid fa-images"></i> Galeri Foto Pameran
               </button>
             </div>
@@ -358,101 +358,101 @@
         </section>
 
         <!-- ===== AREA OPERATION (AO) REPORT EXECUTIVE COCKPIT ===== -->
-        <section class="kcb-card" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:16px; padding:20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">
+        <section class="kcb-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(15,23,42,0.05); margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, #1e1014, #3b1d28); color:#d8a437; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 12px rgba(30,16,20,0.2);">
+              <div style="width:38px; height:38px; border-radius:8px; background:rgba(235,10,30,0.08); color:#eb0a1e; display:flex; align-items:center; justify-content:center; font-size:16px;">
                 <i class="fa-solid fa-chalkboard-user"></i>
               </div>
               <div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                  <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
+                  <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">
                     Papan Area Operation (AO) Report Cabang
                   </h3>
-                  <span style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; font-weight:800; padding:3px 10px; border-radius:20px; font-size:11px;">
+                  <span style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:700; padding:2px 8px; border-radius:6px; font-size:10.5px;">
                     <i class="fa-solid fa-circle-check"></i> Matching Ratio: 86%
                   </span>
                 </div>
-                <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">
+                <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
                   Tunas Toyota Kiara Condong &middot; Sinkronisasi Stock Matching, Ritme SPK 5-Harian, dan Estimasi Closing 104 Unit.
                 </p>
               </div>
             </div>
 
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <button class="btn btn-sm" onclick="openWhatIfSimulatorModal()" style="background:linear-gradient(135deg, #d97706, #b45309); color:white; border:none; font-weight:800; font-size:12px; padding:9px 15px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(217,119,6,0.3);">
-                <i class="fa-solid fa-sliders"></i> What-If Simulator Closing
+              <button type="button" onclick="openWhatIfSimulatorModal()" style="background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; font-weight:600; font-size:12px; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                <i class="fa-solid fa-sliders" style="color:#d97706;"></i> What-If Simulator Closing
               </button>
-              <button class="btn btn-sm" onclick="location.href='ao_report_kacab.html'" style="background:linear-gradient(135deg, #1e1014, #4a1525); color:#d8a437; border:1px solid rgba(216,164,55,0.4); font-weight:800; font-size:12px; padding:9px 16px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 4px 14px rgba(30,16,20,0.25);">
+              <button type="button" onclick="location.href='ao_report_kacab.html'" style="background:#0f172a; color:#ffffff; border:none; font-weight:600; font-size:12px; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
                 <i class="fa-solid fa-expand"></i> Papan AO Report
               </button>
             </div>
           </div>
 
           <div class="kpi-mini-grid">
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 10px;">
               <div style="font-size:11px; font-weight:700; color:#64748b;">Full Stock Cabang</div>
-              <div style="font-size:22px; font-weight:900; color:#0f172a; margin:3px 0;">124</div>
-              <div style="font-size:10.5px; font-weight:700; color:#0284c7;">Free: 82 | Match: 42</div>
+              <div style="font-size:20px; font-weight:800; color:#0f172a; margin:3px 0;">124</div>
+              <div style="font-size:10.5px; font-weight:600; color:#0284c7;">Free: 82 | Match: 42</div>
             </div>
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 10px;">
               <div style="font-size:11px; font-weight:700; color:#64748b;">OS Order &lt;30d</div>
-              <div style="font-size:22px; font-weight:900; color:#2563eb; margin:3px 0;">48</div>
-              <div style="font-size:10.5px; font-weight:700; color:#1d4ed8;">Firmed: 18 | Match: 30</div>
+              <div style="font-size:20px; font-weight:800; color:#2563eb; margin:3px 0;">48</div>
+              <div style="font-size:10.5px; font-weight:600; color:#1d4ed8;">Firmed: 18 | Match: 30</div>
             </div>
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 10px;">
               <div style="font-size:11px; font-weight:700; color:#64748b;">SPK Gross Actual</div>
-              <div style="font-size:22px; font-weight:900; color:#d97706; margin:3px 0;">54</div>
-              <div style="font-size:10.5px; font-weight:700; color:#b45309;">Ritme 1-10: +14 Gap</div>
+              <div style="font-size:20px; font-weight:800; color:#d97706; margin:3px 0;">54</div>
+              <div style="font-size:10.5px; font-weight:600; color:#b45309;">Ritme 1-10: +14 Gap</div>
             </div>
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 10px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 10px;">
               <div style="font-size:11px; font-weight:700; color:#64748b;">DO Target Cabang</div>
-              <div style="font-size:22px; font-weight:900; color:#059669; margin:3px 0;">92</div>
-              <div style="font-size:10.5px; font-weight:700; color:#047857;">Potensi fr OS: 52 (Gap 40)</div>
+              <div style="font-size:20px; font-weight:800; color:#059669; margin:3px 0;">92</div>
+              <div style="font-size:10.5px; font-weight:600; color:#047857;">Potensi fr OS: 52 (Gap 40)</div>
             </div>
-            <div style="background:linear-gradient(135deg, #fef3c7, #fde68a); border:1.5px solid #f59e0b; border-radius:12px; padding:12px 10px;">
-              <div style="font-size:11px; font-weight:800; color:#92400e;">Est. Closing Bulan</div>
-              <div style="font-size:24px; font-weight:900; color:#78350f; margin:2px 0;">104</div>
-              <div style="font-size:10.5px; font-weight:800; color:#b45309;">+12 Over Target (113%) 🎉</div>
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 10px;">
+              <div style="font-size:11px; font-weight:700; color:#92400e;">Est. Closing Bulan</div>
+              <div style="font-size:22px; font-weight:800; color:#78350f; margin:2px 0;">104</div>
+              <div style="font-size:10.5px; font-weight:700; color:#b45309;">+12 Over Target (113%)</div>
             </div>
           </div>
         </section>
 
-        <!-- ===== AI SENTINEL EARLY WARNING (STANDAR 5-HARIAN SPK) ===== -->
-        <section class="kcb-card" id="aiSentinelContainer" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:20px; box-shadow:0 4px 18px rgba(0,0,0,0.04); margin-bottom:20px;">
+        <!-- ===== MONITORING & EVALUASI TARGET HARIAN KACAB ===== -->
+        <section class="kcb-card" id="aiSentinelContainer" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(15,23,42,0.05); margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">
-                  <i class="fa-solid fa-robot" style="color:#6366f1; margin-right:6px;"></i>AI Sentinel: Pengawas Target Harian Kacab (3x Kirim WA)
+                <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">
+                  <i class="fa-solid fa-chart-line" style="color:#eb0a1e; margin-right:6px;"></i>Monitoring Ritme Target SPK &amp; DO Harian (Otomasi Laporan WA)
                 </h3>
-                <span id="sentinelStatusBadge" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; font-weight:800; padding:4px 10px; border-radius:20px; font-size:11px;">
+                <span id="sentinelStatusBadge" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; font-weight:700; padding:2px 8px; border-radius:6px; font-size:10.5px;">
                   <i class="fa-solid fa-spinner fa-spin"></i> Menganalisis Ritme...
                 </span>
               </div>
-              <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">
-                Sistem AI mengevaluasi target minimal <strong>SPK</strong> per interval 5 hari (Hari 1-5: Min 1 | Hari 6-10: Min 2 | dst) &amp; laporan DO harian. Otomasi WhatsApp 3x: 🌅 <strong id="scheduleTextPagi">07:00 Pagi</strong> (Briefing), ☀️ <strong id="scheduleTextSiang">12:00 Siang</strong> (Progress SPK &amp; DO), 🌆 <strong id="scheduleTextSore">17:00 Sore</strong> (Closing Harian).
+              <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
+                Evaluasi target minimal <strong>SPK</strong> per interval 5 hari &amp; laporan DO harian. Jadwal update WhatsApp: 🌅 <strong id="scheduleTextPagi">07:00 Pagi</strong>, ☀️ <strong id="scheduleTextSiang">12:00 Siang</strong>, 🌆 <strong id="scheduleTextSore">17:00 Sore</strong>.
               </p>
             </div>
 
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <div style="display:flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #e2e8f0; padding:4px 10px; border-radius:10px; font-size:12px;">
-                <span style="font-weight:700; color:#475569;"><i class="fa-solid fa-calendar-day" style="color:#6366f1;"></i> Ritme / Periode:</span>
-                <select id="selectSimulasiHari" onchange="changeSentinelDay(this.value)" style="border:none; background:transparent; font-weight:800; color:#0f172a; outline:none; cursor:pointer;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #e2e8f0; padding:4px 10px; border-radius:8px; font-size:12px;">
+                <span style="font-weight:600; color:#475569;"><i class="fa-solid fa-calendar-day" style="color:#64748b;"></i> Periode:</span>
+                <select id="selectSimulasiHari" onchange="changeSentinelDay(this.value)" style="border:none; background:transparent; font-weight:700; color:#0f172a; outline:none; cursor:pointer;">
                   <option value="">Memuat tanggal hari ini...</option>
                 </select>
               </div>
 
-              <button class="btn btn-sm" onclick="syncGoogleSheetNow()" id="btnSyncGoogleSheet" style="background:#0f9d58; color:white; font-weight:800; font-size:12px; border:none; padding:8px 12px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 3px 10px rgba(15,157,88,0.25);">
+              <button type="button" onclick="syncGoogleSheetNow()" id="btnSyncGoogleSheet" style="background:#059669; color:white; font-weight:600; font-size:12px; border:none; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
                 <i class="fa-solid fa-file-excel"></i> Tarik Google Sheet
               </button>
 
-              <button class="btn btn-sm" onclick="toggleSentinelSettings()" style="background:#e0e7ff; color:#4338ca; font-weight:800; font-size:12px; border:1px solid #c7d2fe; padding:8px 12px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
-                <i class="fa-solid fa-clock"></i> Atur 3 Jadwal Otomasi
+              <button type="button" onclick="toggleSentinelSettings()" style="background:#f1f5f9; color:#0f172a; font-weight:600; font-size:12px; border:1px solid #cbd5e1; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                <i class="fa-solid fa-clock" style="color:#64748b;"></i> Atur Jadwal
               </button>
 
-              <button class="btn btn-sm" onclick="sendKacabAiReportWA()" style="background:linear-gradient(135deg, #25D366, #128C7E); color:white; font-weight:800; font-size:12px; border:none; padding:8px 14px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(37,211,102,0.25); cursor:pointer;">
-                <i class="fa-brands fa-whatsapp" style="font-size:15px;"></i> Kirim WA Manual
+              <button type="button" onclick="sendKacabAiReportWA()" style="background:#16a34a; color:white; font-weight:600; font-size:12px; border:none; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                <i class="fa-brands fa-whatsapp" style="font-size:14px;"></i> Kirim WA Manual
               </button>
             </div>
           </div>
@@ -658,11 +658,11 @@
         <div style="background:white; border-radius:22px; max-width:820px; width:94%; padding:26px; box-shadow:0 25px 60px rgba(0,0,0,0.3); max-height:92vh; overflow-y:auto; border:1px solid #cbd5e1;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1.5px solid #f1f5f9; padding-bottom:14px;">
             <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, #d97706, #78350f); color:white; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 14px rgba(217,119,6,0.35);">
+              <div style="width:40px; height:40px; border-radius:8px; background:rgba(217,119,6,0.1); color:#d97706; display:flex; align-items:center; justify-content:center; font-size:18px;">
                 <i class="fa-solid fa-sliders"></i>
               </div>
               <div>
-                <h3 style="font-size:18px; font-weight:900; color:#0f172a; margin:0;">
+                <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin:0;">
                   What-If Simulator: Skenario Closing Akhir Bulan
                 </h3>
                 <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;">
@@ -675,9 +675,9 @@
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:22px;">
             <!-- Left: Simulation Controls -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:18px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:18px;">
               <h4 style="font-size:13px; font-weight:800; color:#1e293b; margin:0 0 14px 0; text-transform:uppercase; letter-spacing:0.5px;">
-                <i class="fa-solid fa-gears" style="color:#d97706; margin-right:6px;"></i> Variabel Kebijakan Kacab
+                <i class="fa-solid fa-gears" style="color:#d97706; margin-right:6px;"></i> Variabel Kebijakan Cabang
               </h4>
 
               <!-- Variable 1: Extra Discount Subsidy -->
@@ -695,7 +695,7 @@
               </div>
 
               <!-- Variable 2: Leasing Acceleration -->
-              <div style="margin-bottom:16px; background:white; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between;">
+              <div style="margin-bottom:16px; background:white; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between;">
                 <div>
                   <div style="font-size:12px; font-weight:700; color:#0f172a;">Akselerasi Approval F&amp;I Leasing</div>
                   <div style="font-size:10.5px; color:#64748b;">Eskalasi prioritas SPK tertahan &gt; 5 hari ke AO Leasing</div>
@@ -731,13 +731,13 @@
             <div style="display:flex; flex-direction:column; justify-content:space-between;">
               <div style="display:flex; flex-direction:column; gap:12px;">
                 <!-- Main KPI Card -->
-                <div style="background:linear-gradient(135deg, #fef3c7, #fde68a); border:1.5px solid #f59e0b; border-radius:16px; padding:16px;">
+                <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:16px;">
                   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                      <span style="font-size:11px; font-weight:800; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">Proyeksi Total Closing Bulan Ini</span>
-                      <h3 style="font-size:32px; font-weight:900; color:#78350f; margin:4px 0;" id="simResultTotalUnits">118 <small style="font-size:16px; font-weight:700;">Unit</small></h3>
+                      <span style="font-size:11px; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">Proyeksi Total Closing Bulan Ini</span>
+                      <h3 style="font-size:30px; font-weight:900; color:#78350f; margin:4px 0;" id="simResultTotalUnits">118 <small style="font-size:15px; font-weight:700;">Unit</small></h3>
                     </div>
-                    <span id="simAchievementPct" style="font-size:12px; font-weight:900; background:#d97706; color:white; padding:4px 10px; border-radius:20px;">
+                    <span id="simAchievementPct" style="font-size:12px; font-weight:700; background:#d97706; color:white; padding:3px 9px; border-radius:6px;">
                       113.4% Target
                     </span>
                   </div>
@@ -748,25 +748,25 @@
 
                 <!-- Secondary Metric Grid -->
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
                     <div style="font-size:11px; font-weight:700; color:#64748b;">Est. Tambahan Omset</div>
-                    <div style="font-size:18px; font-weight:900; color:#0284c7; margin-top:2px;" id="simResultRevenueDelta">+Rp 4.90 M</div>
+                    <div style="font-size:18px; font-weight:800; color:#0284c7; margin-top:2px;" id="simResultRevenueDelta">+Rp 4.90 M</div>
                     <div style="font-size:10px; color:#0369a1; margin-top:2px;">Gross Sales Inflow</div>
                   </div>
 
-                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
                     <div style="font-size:11px; font-weight:700; color:#64748b;">Margin Retention</div>
-                    <div style="font-size:18px; font-weight:900; color:#15803d; margin-top:2px;" id="simResultMarginRetention">93.8%</div>
+                    <div style="font-size:18px; font-weight:800; color:#15803d; margin-top:2px;" id="simResultMarginRetention">93.8%</div>
                     <div style="font-size:10px; color:#166534; margin-top:2px;">Status: Sangat Sehat</div>
                   </div>
                 </div>
 
                 <!-- Strategic Summary Box -->
-                <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px 14px;">
-                  <div style="font-size:12px; font-weight:800; color:#166534; margin-bottom:4px;">
-                    <i class="fa-solid fa-lightbulb" style="color:#16a34a;"></i> Kesimpulan Analisis Strategis Kacab:
+                <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px;">
+                  <div style="font-size:12px; font-weight:700; color:#166534; margin-bottom:4px;">
+                    <i class="fa-solid fa-lightbulb" style="color:#16a34a;"></i> Kesimpulan Analisis Strategis Cabang:
                   </div>
-                  <p style="font-size:11px; color:#14532d; margin:0; line-height:1.4;" id="simStrategyRecommendation">
+                  <p style="font-size:11.5px; color:#14532d; margin:0; line-height:1.4;" id="simStrategyRecommendation">
                     Dengan alokasi subsidi diskon terkontrol dan akselerasi F&amp;I leasing, cabang diproyeksikan mengamankan closing hingga 118 Unit, melampaui target 104 unit dengan margin cabang tetap aman.
                   </p>
                 </div>
@@ -774,9 +774,9 @@
 
               <!-- Bottom Actions -->
               <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
-                <button class="btn" style="background:#f1f5f9; color:#475569; font-weight:700; border:1px solid #cbd5e1; padding:10px 16px; border-radius:10px; cursor:pointer;" onclick="closeWhatIfSimulatorModal()">Tutup</button>
-                <button class="btn" style="background:linear-gradient(135deg, #25D366, #128C7E); color:white; font-weight:800; border:none; padding:10px 18px; border-radius:10px; cursor:pointer; box-shadow:0 3px 12px rgba(37,211,102,0.3); display:inline-flex; align-items:center; gap:6px;" onclick="broadcastWhatIfStrategyToSPV()">
-                  <i class="fa-brands fa-whatsapp"></i> Broadcast Arahan Strategis ke SPV
+                <button type="button" class="btn" style="background:#f1f5f9; color:#475569; font-weight:600; border:1px solid #cbd5e1; padding:8px 14px; border-radius:8px; cursor:pointer;" onclick="closeWhatIfSimulatorModal()">Tutup</button>
+                <button type="button" class="btn" style="background:#16a34a; color:white; font-weight:600; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="broadcastWhatIfStrategyToSPV()">
+                  <i class="fa-brands fa-whatsapp"></i> Broadcast Arahan ke SPV
                 </button>
               </div>
             </div>

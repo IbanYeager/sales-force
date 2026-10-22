@@ -389,9 +389,9 @@
     }
 
     .olx-tab-btn.active {
-      background: linear-gradient(135deg, #1e1014 0%, #3b141d 100%);
+      background: #0f172a;
       color: #f3c96a;
-      border-color: #1e1014;
+      border-color: #0f172a;
       box-shadow: 0 4px 14px rgba(30, 16, 20, 0.25);
     }
 
@@ -628,7 +628,7 @@
   </style>
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -642,7 +642,7 @@
             alt="Tunas Toyota Logo" class="tunas-logo">
         </div>
         <div class="kcb-brand-title">
-          <span class="panel-tag"><i class="fa-solid fa-crown"></i> KACAB PANEL</span>
+          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
           <p class="panel-sub">Kepala Cabang</p>
         </div>
       </div>
@@ -715,14 +715,14 @@
       <div class="kcb-topbar">
         <div>
           <h2 id="pageTitle" style="display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-repeat" style="color:#d8a437;"></i> Pusat Hasil Trade-In &amp; OLX Mobbi
+            <i class="fa-solid fa-repeat" style="color:#eb0a1e;"></i> Pusat Hasil Trade-In &amp; OLX Mobbi
           </h2>
           <p class="page-sub">Monitoring rekapitulasi prestasi trade-in cabang Kiaracondong terverifikasi per tim supervisor</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
             <img id="kacabAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Avatar">
-            <span class="dot" style="background:#d8a437;"></span>
+            <span class="dot" style="background:#eb0a1e;"></span>
           </div>
           <div class="meta">
             <span class="name" id="kacabNama">Memuat...</span>
@@ -733,7 +733,7 @@
       <!-- STRATEGIC TAB NAVIGATION -->
       <div class="olx-view-tab-bar">
         <button class="olx-tab-btn active" id="tabBtnOlxRekap" onclick="switchOlxTab('rekap')">
-          <i class="fa-solid fa-trophy" style="color:#d8a437;"></i> Rekap Closing Deal Tim SPV (2026)
+          <i class="fa-solid fa-trophy" style="color:#eb0a1e;"></i> Rekap Closing Deal Tim SPV (2026)
         </button>
         <button class="olx-tab-btn" id="tabBtnOlxRedrive" onclick="switchOlxTab('redrive')">
           <i class="fa-solid fa-repeat" style="color:#0284c7;"></i> ReDrive Trade-In Pipeline: SA &rarr; Sales &rarr; OLXmobbi
@@ -749,7 +749,7 @@
         <div class="olx-board-header">
           <div class="olx-board-title-group">
             <h2>
-              <i class="fa-solid fa-crown" style="color:#fbbf24; filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.5));"></i>
+              <i class="fa-solid fa-award" style="color:#f59e0b;"></i>
               TUNAS TOYOTA KIARACONDONG
             </h2>
             <div style="font-size:12.5px; color:#fecdd3; margin-top:4px; font-weight:600; display:flex; align-items:center; gap:6px;">

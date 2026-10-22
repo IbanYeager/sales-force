@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/performa_regional.css?v=20260901_1">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -101,7 +101,7 @@
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
-            <img id="kcbAvatar" src="https://ui-avatars.com/api/?name=KC&background=1e1014&color=d8a437&bold=true" alt="Avatar">
+            <img id="kcbAvatar" src="https://ui-avatars.com/api/?name=KC&background=0f172a&color=ffffff&bold=true" alt="Avatar">
             <span class="dot"></span>
           </div>
           <div class="meta">

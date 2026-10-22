@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="../css/penjualan_tco.css?v={{ time() }}">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -35,7 +35,7 @@
             alt="Tunas Toyota Logo" class="tunas-logo">
         </div>
         <div class="kcb-brand-title">
-          <span class="panel-tag"><i class="fa-solid fa-crown"></i> KACAB PANEL</span>
+          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
           <p class="panel-sub"><span class="panel-sub-dot"></span> Cabang Kiara Condong</p>
         </div>
       </div>
@@ -100,12 +100,12 @@
       <div class="sidebar-footer">
         <div class="kcb-footer-profile">
           <div class="kcb-footer-avatar-wrap">
-            <img src="https://ui-avatars.com/api/?name=Dendi+Holius&background=1e1014&color=d8a437&bold=true" alt="Dendi Holius" class="kcb-footer-avatar" id="kcbFooterAvatar">
+            <img src="https://ui-avatars.com/api/?name=Dendi+Holius&background=0f172a&color=ffffff&bold=true" alt="Dendi Holius" class="kcb-footer-avatar" id="kcbFooterAvatar">
             <span class="kcb-footer-dot" title="Sistem Aktif &amp; Terhubung"></span>
           </div>
           <div class="kcb-footer-meta">
             <span class="kcb-footer-name" id="kcbFooterName">Dendi Holius</span>
-            <span class="kcb-footer-role"><i class="fa-solid fa-crown" style="font-size:9px;"></i> Kepala Cabang</span>
+            <span class="kcb-footer-role"><i class="fa-solid fa-user-tie" style="font-size:10px; color:#94a3b8;"></i> Kepala Cabang</span>
           </div>
         </div>
         <button type="button" class="kcb-logout-btn" onclick="logoutUser()">
@@ -135,16 +135,16 @@
       </div>
 
       <div style="margin-top: 14px;">
-        <!-- Executive Banner with Filters -->
-        <div class="tco-dashboard-banner" style="background: linear-gradient(135deg, #14080c 0%, #2b111a 45%, #0f172a 100%); border-color: rgba(216, 164, 55, 0.35);">
+        <!-- Executive Control Bar with Filters -->
+        <div class="tco-dashboard-banner">
           <div class="tco-banner-content">
             <div class="tco-banner-title">
-              <span class="tco-banner-badge" style="background:rgba(216, 164, 55, 0.2); border-color:#d8a437; color:#fde68a;">
-                <i class="fa-solid fa-crown"></i> EKSEKUTIF KACAB · STRATEGIC TCO INTELLIGENCE
+              <span class="tco-banner-badge">
+                <i class="fa-solid fa-layer-group"></i> Modul Aksesoris Resmi TAM
               </span>
-              <h1><i class="fa-solid fa-gem" style="color: #fde68a;"></i> Penjualan &amp; Pemetaan Polreg TCO</h1>
+              <h1>Penjualan &amp; Pemetaan Polreg TCO</h1>
               <p class="tco-banner-desc">
-                Pantau akselerasi penetrasi aksesoris TCO (Target Rp 350.000 / unit SPK) dan petakan sebaran pelanggan berdasarkan wilayah registrasi pelat nomor (Plat D, Plat Z, Plat E, Plat F) di Bandung Raya &amp; Jawa Barat.
+                Monitoring penetrasi aksesoris Toyota Customization Option dan pemetaan wilayah registrasi customer (Plat D, Plat Z, Plat E, Plat F) di Bandung Raya.
               </p>
             </div>
 
@@ -182,7 +182,7 @@
                 <option value="Plat F - Cianjur">Plat F - Cianjur / Sukabumi</option>
               </select>
 
-              <button type="button" class="tco-btn-input-new" onclick="openInputModal()" style="background:linear-gradient(135deg, #d8a437 0%, #b45309 100%);">
+              <button type="button" class="tco-btn-input-new" onclick="openInputModal()">
                 <i class="fa-solid fa-plus"></i> Input Penjualan
               </button>
             </div>
@@ -195,15 +195,14 @@
           <div class="tco-kpi-card">
             <div class="tco-kpi-top">
               <span class="tco-kpi-label">Total Omset Penjualan TCO</span>
-              <div class="tco-kpi-icon icon-gold">
+              <div class="tco-kpi-icon icon-crimson">
                 <i class="fa-solid fa-sack-dollar"></i>
               </div>
             </div>
             <div>
               <div class="tco-kpi-val" id="kpiTotalRevenue">Rp 0</div>
               <div class="tco-kpi-sub">
-                <span class="badge-trend-up" style="background:#fef3c7; color:#92400e;"><i class="fa-solid fa-arrow-trend-up"></i> +14.8%</span>
-                <span>vs bulan lalu</span>
+                <span class="badge-trend-up"><i class="fa-solid fa-arrow-trend-up"></i> Performa Bulanan</span>
               </div>
             </div>
           </div>
@@ -293,7 +292,7 @@
                 </button>
 
                 <button type="button" class="tco-map-btn" onclick="recenterToDealerHQ()" title="Pusatkan ke Kantor Tunas Toyota Kiara Condong">
-                  <i class="fa-solid fa-building-flag" style="color:#d8a437;"></i> Kantor KC
+                  <i class="fa-solid fa-building-flag" style="color:#eb0a1e;"></i> Kantor KC
                 </button>
               </div>
             </div>
@@ -408,7 +407,7 @@
             <!-- Regional Leaderboard -->
             <div class="tco-panel-header">
               <h3>
-                <i class="fa-solid fa-ranking-star" style="color: #d8a437;"></i>
+                <i class="fa-solid fa-ranking-star" style="color: #f59e0b;"></i>
                 Ranking Asal Wilayah Polreg
               </h3>
               <button type="button" onclick="resetFilters()" style="background:none; border:none; font-size:11px; font-weight:700; color:#2563eb; cursor:pointer;">
@@ -450,7 +449,7 @@
           <!-- Top Salesman TCO Champions -->
           <div class="tco-widget-card">
             <div class="tco-widget-title">
-              <span><i class="fa-solid fa-trophy" style="color: #d8a437; margin-right:6px;"></i> Wiraniaga TCO Champions</span>
+              <span><i class="fa-solid fa-trophy" style="color: #f59e0b; margin-right:6px;"></i> Wiraniaga TCO Champions</span>
               <span style="font-size:11px; color:#64748b; font-weight:600;">Top 6 Sales</span>
             </div>
             <div class="tco-top-items-list" id="topSalesList">
@@ -506,8 +505,8 @@
       <!-- Modal Input Penjualan TCO Baru -->
       <div class="tco-modal-overlay" id="inputTcoModal">
         <div class="tco-modal-box">
-          <div class="tco-modal-header" style="background:#1e1014;">
-            <h3><i class="fa-solid fa-plus-circle" style="color:#d8a437;"></i> Input Transaksi Penjualan TCO</h3>
+          <div class="tco-modal-header" style="background:#0f172a;">
+            <h3><i class="fa-solid fa-plus-circle" style="color:#eb0a1e;"></i> Input Transaksi Penjualan TCO</h3>
             <button type="button" class="tco-modal-close" onclick="closeInputModal()"><i class="fa-solid fa-xmark"></i></button>
           </div>
           <form onsubmit="submitNewTransactionForm(event)">
@@ -583,7 +582,7 @@
             </div>
             <div class="tco-modal-footer">
               <button type="button" class="btn btn-outline" onclick="closeInputModal()">Batal</button>
-              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #d8a437 0%, #b45309 100%); border:none; color:#ffffff;">
+              <button type="submit" class="btn btn-primary" style="background:#eb0a1e; border:none; color:#ffffff;">
                 <i class="fa-solid fa-save"></i> Simpan Transaksi
               </button>
             </div>

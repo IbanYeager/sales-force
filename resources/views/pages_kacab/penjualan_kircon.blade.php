@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../css/sales_dashboard.css">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>

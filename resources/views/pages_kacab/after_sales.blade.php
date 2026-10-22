@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
   <style>
     @media (min-width: 901px) {
       html, body.kacab-theme {
@@ -119,7 +119,7 @@
     }
 
     .afs-btn-gold {
-      background: linear-gradient(135deg, #d8a437 0%, #b45309 100%);
+      background: #eb0a1e;
       color: #ffffff;
       box-shadow: 0 3px 10px rgba(180, 83, 9, 0.2);
     }
@@ -185,7 +185,7 @@
       width: 36px;
       height: 36px;
       border: 3.5px solid #e2e8f0;
-      border-top-color: #d8a437;
+      border-top-color: #eb0a1e;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -228,9 +228,9 @@
     }
 
     .as-tab-btn.active {
-      background: linear-gradient(135deg, #1e1014 0%, #3b141d 100%);
+      background: #0f172a;
       color: #f3c96a;
-      border-color: #1e1014;
+      border-color: #0f172a;
       box-shadow: 0 4px 14px rgba(30, 16, 20, 0.25);
     }
 
@@ -246,7 +246,7 @@
 
     /* Win-Back Hero */
     .winback-hero-banner {
-      background: linear-gradient(135deg, #1e1014 0%, #450a0a 50%, #1e1b4b 100%);
+      background: #0f172a;
       border-radius: 18px;
       padding: 22px 26px;
       color: #ffffff;
@@ -577,14 +577,14 @@
       <div class="kcb-topbar">
         <div>
           <h2 id="pageTitle" style="display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-wrench" style="color:#d8a437;"></i> After Sales Intelligence &amp; Performance
+            <i class="fa-solid fa-wrench" style="color:#eb0a1e;"></i> After Sales Intelligence &amp; Performance
           </h2>
           <p class="page-sub">Monitoring terpadu operasional bengkel: realisasi CPUS, Unit Entry, Revenue Jasa &amp; Part, T-Care, serta produktivitas Service Advisor</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
             <img id="kacabAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Avatar">
-            <span class="dot" style="background:#d8a437;"></span>
+            <span class="dot" style="background:#eb0a1e;"></span>
           </div>
           <div class="meta">
             <span class="name" id="kacabNama">Memuat...</span>
@@ -595,7 +595,7 @@
       <!-- EVOLVE 2026 AFTER SALES STRATEGIC TAB NAVIGATION -->
       <div class="as-view-tab-bar">
         <button class="as-tab-btn active" id="tabBtnAsIframe" onclick="switchAfterSalesTab('iframe')">
-          <i class="fa-solid fa-chart-line" style="color:#d8a437;"></i> Dashboard Realisasi Bengkel (Live Vercel)
+          <i class="fa-solid fa-chart-line" style="color:#eb0a1e;"></i> Dashboard Realisasi Bengkel (Live Vercel)
         </button>
         <button class="as-tab-btn" id="tabBtnAsWinback" onclick="switchAfterSalesTab('winback')">
           <i class="fa-solid fa-shield-halved" style="color:#cc1426;"></i> Kircon Win-Back Attacklist &amp; CARE-X (719 Unit)
@@ -836,7 +836,7 @@
 
             <div style="display:flex; justify-content:flex-end; gap:8px;">
               <button type="button" onclick="closeWinbackModal('winbackEditModal')" style="padding:9px 16px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; font-weight:700; cursor:pointer;">Batal</button>
-              <button type="submit" style="padding:9px 18px; border-radius:10px; border:none; background:linear-gradient(135deg, #1e1014, #cc1426); color:#f3c96a; font-weight:800; cursor:pointer;">
+              <button type="submit" style="padding:9px 18px; border-radius:10px; border:none; background:#eb0a1e; color:#ffffff; font-weight:600; cursor:pointer;">
                 <i class="fa-solid fa-save"></i> Simpan Status
               </button>
             </div>

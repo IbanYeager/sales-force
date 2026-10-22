@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
   <style>
     .kpi-card.clickable {
       cursor: pointer;
@@ -47,13 +47,13 @@
       margin-left: 4px;
     }
     .tl-chip-edit-btn:hover {
-      background: #d8a437;
-      color: #1e1014;
-      border-color: #d8a437;
+      background: #eb0a1e;
+      color: #0f172a;
+      border-color: #eb0a1e;
       transform: translateY(-1px);
     }
     .btn-detail-edit-btn:hover {
-      background: linear-gradient(135deg, #e5b349, #c99525) !important;
+      background: #d97706 !important;
       transform: translateY(-1px);
     }
 
@@ -150,7 +150,7 @@
     }
     .input-modal-header {
       flex-shrink: 0;
-      background: linear-gradient(135deg, #1e1014, #3d121c);
+      background: #0f172a;
       color: #ffffff;
       padding: 18px 24px;
       display: flex;
@@ -1192,7 +1192,7 @@
 
       <!-- KPI Executive Summary Cards -->
       <div class="grid-4" style="margin-bottom: 18px;">
-        <div class="kpi-card" style="border-left: 4px solid #d8a437;">
+        <div class="kpi-card" style="border-left: 4px solid #eb0a1e;">
           <div class="kpi-head">
             <span class="kpi-title">Total Aktivitas Terpantau</span>
             <div class="kpi-icon gold"><i class="fa-solid fa-list-check"></i></div>
@@ -1416,7 +1416,7 @@
       </div>
 
       <div class="detail-modal-footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-        <button type="button" class="btn-detail-edit-btn" onclick="openEditAktivitasFromDetail()" style="background:linear-gradient(135deg, #d8a437, #b8861b); color:#1e1014; font-weight:800; border:none; padding:9px 18px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 8px rgba(216,164,55,0.3); transition:all 0.2s;">
+        <button type="button" class="btn-detail-edit-btn" onclick="openEditAktivitasFromDetail()" style="background:#0f172a; color:#ffffff; color:#ffffff; font-weight:800; border:none; padding:9px 18px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 8px rgba(216,164,55,0.3); transition:all 0.2s;">
           <i class="fa-solid fa-pen-to-square"></i> Edit Aktivitas
         </button>
         <button type="button" class="btn-detail-close-btn" onclick="closeActivityDetail()">
@@ -1431,7 +1431,7 @@
     <div class="input-modal-card">
       <div class="input-modal-header">
         <div class="input-modal-header-left">
-          <div class="input-modal-icon" style="background: rgba(216,164,55,0.2); color: #d8a437;">
+          <div class="input-modal-icon" style="background: rgba(235,10,30,0.1); color: #eb0a1e;">
             <i class="fa-solid fa-pen-to-square"></i>
           </div>
           <div>
@@ -1613,7 +1613,7 @@
 
         <div class="input-modal-footer">
           <button type="button" class="btn-modal-cancel" onclick="closeEditAktivitasModal()">Batal</button>
-          <button type="submit" id="btnSaveEditAktivitas" class="btn-modal-save" style="background:linear-gradient(135deg, #d8a437, #b8861b); color:#1e1014; font-weight:800;">
+          <button type="submit" id="btnSaveEditAktivitas" class="btn-modal-save" style="background:#0f172a; color:#ffffff; color:#ffffff; font-weight:800;">
             <i class="fa-solid fa-floppy-disk"></i>
             <span>Simpan Perubahan</span>
           </button>
@@ -1950,7 +1950,7 @@
   <!-- Modal Sales Belum Lapor Hari Ini -->
   <div id="belumLaporModal" style="display:none; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:99999; backdrop-filter:blur(3px);">
     <div style="background:#ffffff; border-radius:18px; max-width:620px; width:92%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 45px rgba(0,0,0,0.3); border:1px solid #cbd5e1;">
-      <div style="padding:16px 20px; background:linear-gradient(135deg, #1e1014, #3d121c); color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(216,164,55,0.3);">
+      <div style="padding:16px 20px; background:#0f172a; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(216,164,55,0.3);">
         <div>
           <h3 style="margin:0; font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
             <i class="fa-solid fa-user-clock" style="color:#ef4444;"></i>

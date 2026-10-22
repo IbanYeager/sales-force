@@ -146,7 +146,7 @@
 
     .lr-fill {
       height: 100%;
-      background: linear-gradient(135deg, #d8a437, #a97a15);
+      background: #eb0a1e;
       border-radius: 3px;
     }
 
@@ -187,7 +187,7 @@
   </style>
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>

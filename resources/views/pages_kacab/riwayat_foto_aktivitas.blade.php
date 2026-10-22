@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/riwayat_foto_aktivitas.css?v=20260923_kacab_sync">
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
   <style>
     .kcb-gallery-card {
       background: #ffffff;
@@ -20,13 +20,13 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
     }
     .gallery-top-hero {
-      background: linear-gradient(135deg, #1e1014 0%, #3d121c 50%, #1e293b 100%) !important;
-      border: 1px solid rgba(216, 164, 55, 0.25);
+      background: #0f172a !important;
+      border: 1px solid #1e293b;
     }
     .view-mode-btn:hover, .view-mode-btn.active {
-      background: #d8a437 !important;
-      color: #1e1014 !important;
-      border-color: #d8a437 !important;
+      background: #eb0a1e !important;
+      color: #ffffff !important;
+      border-color: #eb0a1e !important;
     }
     @media print {
       .kcb-sidebar, .kcb-topbar, .gallery-filter-toolbar, .view-mode-btn, .hero-right-actions, #galleryLightbox, .gallery-toast-notification {
@@ -45,7 +45,7 @@
         padding: 0 !important;
       }
       .gallery-top-hero {
-        background: #1e1014 !important;
+        background: #0f172a !important;
         color: #ffffff !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -167,7 +167,7 @@
         <div class="gallery-top-hero">
           <div class="hero-left">
             <h1>
-              <i class="fa-solid fa-images" style="color: #d8a437;"></i>
+              <i class="fa-solid fa-images" style="color: #eb0a1e;"></i>
               Galeri Dokumentasi Foto Cabang
             </h1>
             <p>Khusus dokumentasi foto kegiatan pameran &amp; event cabang Kiaracondong</p>
@@ -232,14 +232,14 @@
             </select>
           </div>
 
-          <button type="button" onclick="printGalleryReport()" style="background: linear-gradient(135deg, #1e1014, #3d121c); color: #d8a437; border: 1px solid rgba(216,164,55,0.4); font-weight: 800; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); margin-left: auto;">
+          <button type="button" onclick="printGalleryReport()" style="background: #0f172a; color: #ffffff; border: 1px solid #334155; font-weight: 600; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; margin-left: auto;">
             <i class="fa-solid fa-print"></i> Cetak Rekap PDF
           </button>
         </div>
 
         <!-- Loading State -->
         <div id="galleryLoading" style="text-align:center; padding: 50px 20px; font-size: 13px; color: var(--text-muted);">
-          <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 30px; margin-bottom: 12px; color: #d8a437;"></i><br>
+          <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 30px; margin-bottom: 12px; color: #eb0a1e;"></i><br>
           Memuat seluruh foto aktivitas cabang...
         </div>
 

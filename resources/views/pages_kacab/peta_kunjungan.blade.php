@@ -102,7 +102,7 @@
     .gmaps-title {
       font-size: 12px;
       font-weight: 800;
-      color: #1e1014;
+      color: #0f172a;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -128,7 +128,7 @@
     }
 
     .map-layer-btn.active {
-      background: #1e1014;
+      background: #0f172a;
       color: #f3c96a;
       box-shadow: 0 2px 8px rgba(30, 16, 20, 0.2);
     }
@@ -170,7 +170,7 @@
       width: 40px;
       height: 40px;
       margin: -20px 0 0 -20px;
-      background: linear-gradient(135deg, #1e1014, #cc1426);
+      background: #eb0a1e;
       border: 2.5px solid #ffffff;
       box-shadow: 0 8px 22px rgba(204, 20, 38, 0.55);
     }
@@ -305,7 +305,7 @@
     .gpu-name {
       font-size: 14px;
       font-weight: 800;
-      color: #1e1014;
+      color: #0f172a;
       margin: 0 0 2px 0;
     }
 
@@ -318,7 +318,7 @@
     .gpu-loc {
       font-size: 12px;
       font-weight: 700;
-      color: #1e1014;
+      color: #0f172a;
       margin-bottom: 8px;
       line-height: 1.4;
     }
@@ -376,7 +376,7 @@
     .filter-section-title {
       font-size: 14px;
       font-weight: 800;
-      color: #1e1014;
+      color: #0f172a;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
@@ -397,7 +397,7 @@
       height: 28px;
       border-radius: 8px;
       background: #fdf6e9;
-      color: #d8a437;
+      color: #eb0a1e;
       border: 1px solid #fef08a;
       display: inline-flex;
       align-items: center;
@@ -472,7 +472,7 @@
       left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      color: #d8a437;
+      color: #eb0a1e;
       font-size: 14px;
       pointer-events: none;
       z-index: 2;
@@ -505,7 +505,7 @@
 
     .input-search-styled:focus {
       background: #ffffff;
-      border-color: #d8a437;
+      border-color: #eb0a1e;
       box-shadow: 0 0 0 3.5px rgba(216, 164, 55, 0.18), 0 4px 12px rgba(0, 0, 0, 0.03);
     }
 
@@ -520,12 +520,12 @@
     .select-dropdown-styled {
       width: 100%;
       padding: 10px 30px 10px 12px;
-      background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d8a437'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 10px center / 13px 13px;
+      background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23eb0a1e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 10px center / 13px 13px;
       border: 1.5px solid #e2e8f0;
       border-radius: 12px;
       font-size: 11.5px;
       font-weight: 700;
-      color: #1e1014;
+      color: #0f172a;
       outline: none;
       cursor: pointer;
       appearance: none;
@@ -543,7 +543,7 @@
 
     .select-dropdown-styled:focus {
       background-color: #ffffff;
-      border-color: #d8a437;
+      border-color: #eb0a1e;
       box-shadow: 0 0 0 3.5px rgba(216, 164, 55, 0.18);
     }
 
@@ -609,7 +609,7 @@
       width: 36px;
       height: 36px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #1e1014, #3b141d);
+      background: #0f172a;
       color: var(--gold);
       display: flex;
       align-items: center;
@@ -817,9 +817,9 @@
     }
 
     .pv-tab.active {
-      background: linear-gradient(135deg, #1e1014 0%, #3b141d 100%);
+      background: #0f172a;
       color: #f3c96a;
-      border-color: #1e1014;
+      border-color: #0f172a;
       box-shadow: 0 4px 14px rgba(30, 16, 20, 0.25);
     }
 
@@ -1063,7 +1063,7 @@
     .edc-share-badge .share-val {
       font-size: 17px;
       font-weight: 900;
-      color: #1e1014;
+      color: #0f172a;
       display: block;
       line-height: 1;
     }
@@ -1095,7 +1095,7 @@
 
     .edc-progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #d8a437, #cc1426);
+      background: #eb0a1e;
       border-radius: 10px;
     }
 
@@ -1160,7 +1160,7 @@
 
     .edc-toyota-sub {
       font-size: 10px;
-      color: #d8a437;
+      color: #eb0a1e;
       font-weight: 700;
     }
 
@@ -1182,7 +1182,7 @@
     }
 
     .edc-insight-row i {
-      color: #d8a437;
+      color: #eb0a1e;
       margin-top: 2px;
       font-size: 11px;
     }
@@ -1217,8 +1217,8 @@
 
     .btn-assign-exhibition {
       padding: 7px 10px;
-      background: linear-gradient(135deg, #1e1014 0%, #3b141d 100%);
-      border: 1px solid #1e1014;
+      background: #0f172a;
+      border: 1px solid #0f172a;
       border-radius: 8px;
       font-size: 11.5px;
       font-weight: 800;
@@ -1303,7 +1303,7 @@
   </style>
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -1655,7 +1655,7 @@
           <!-- 4 Pillars of Evolve -->
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; margin-top:20px;">
             <h4 style="font-size:13px; font-weight:900; color:#1e293b; margin:0 0 12px 0;">
-              <i class="fa-solid fa-shield-halved" style="color:#d8a437;"></i> 4 Pilar Solusi EVOLVE 2026 Mencegah Drop Funneling:
+              <i class="fa-solid fa-shield-halved" style="color:#eb0a1e;"></i> 4 Pilar Solusi EVOLVE 2026 Mencegah Drop Funneling:
             </h4>
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
               <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
@@ -1791,7 +1791,7 @@
 
         <div style="display:flex; justify-content:flex-end; gap:8px;">
           <button type="button" onclick="closeEvolveModal('evolveAssignModal')" style="padding:9px 16px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; font-weight:700; cursor:pointer;">Batal</button>
-          <button type="submit" style="padding:9px 18px; border-radius:10px; border:none; background:linear-gradient(135deg, #1e1014, #cc1426); color:#f3c96a; font-weight:800; cursor:pointer;">
+          <button type="submit" style="padding:9px 18px; border-radius:10px; border:none; background:#eb0a1e; color:#f3c96a; font-weight:800; cursor:pointer;">
             <i class="fa-solid fa-paper-plane"></i> Terbitkan Penugasan
           </button>
         </div>

@@ -6,7 +6,7 @@
   <script>window.location.replace("index_kacab.html");</script>
   <title>Dialihkan ke Dashboard Cabang...</title>
 </head>
-<body style="background:#1e1014; color:#d8a437; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">
+<body style="background:#f8fafc; color:#0f172a; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">
   <p>Mengalihkan ke Dashboard Kepala Cabang...</p>
 </body>
 </html>

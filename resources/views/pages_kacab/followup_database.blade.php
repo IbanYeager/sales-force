@@ -13,7 +13,7 @@
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
@@ -104,7 +104,7 @@
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
-            <img id="kacabAvatar" src="/image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Kepala+Cabang&background=1E1014&color=fff'">
+            <img id="kacabAvatar" src="/image/default-avatar.png" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=Kepala+Cabang&background=0f172a&color=fff'">
             <span class="dot"></span>
           </div>
           <div class="meta">
@@ -589,7 +589,7 @@
         </div>
 
         <!-- BULK ACTION FLOATING BAR -->
-        <div id="bulkActionBar" style="display:none; background:linear-gradient(135deg, #1e1014 0%, #3f121d 100%); color:#ffffff; padding:14px 20px; border-radius:16px; margin-bottom:18px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 10px 30px rgba(215,18,58,0.25);">
+        <div id="bulkActionBar" style="display:none; background:#0f172a; color:#ffffff; padding:14px 20px; border-radius:16px; margin-bottom:18px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 10px 30px rgba(215,18,58,0.25);">
           <div style="display:flex; align-items:center; gap:10px;">
             <div style="width:32px; height:32px; border-radius:50%; background:rgba(16,185,129,0.2); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:16px;">
               <i class="fa-solid fa-check"></i>
@@ -613,11 +613,11 @@
               <i class="fa-solid fa-scale-balanced" style="color:#ffffff;"></i> Bagi Rata
             </button>
 
-            <button class="btn-fu" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(245,158,11,0.35);" onclick="executeBulkUnassign()" title="Batalkan pembagian customer terpilih dari sales (kembalikan ke pool)">
+            <button class="btn-fu" style="background:#d97706; color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(245,158,11,0.35);" onclick="executeBulkUnassign()" title="Batalkan pembagian customer terpilih dari sales (kembalikan ke pool)">
               <i class="fa-solid fa-user-xmark"></i> Batalkan Penugasan
             </button>
 
-            <button class="btn-fu" style="background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(234,88,12,0.35);" onclick="executeReleaseToPool()" title="Lepas data customer ini ke Pool Rebutan Prospek">
+            <button class="btn-fu" style="background:#ea580c; color:#ffffff !important; border:none; box-shadow:0 4px 12px rgba(234,88,12,0.35);" onclick="executeReleaseToPool()" title="Lepas data customer ini ke Pool Rebutan Prospek">
               <i class="fa-solid fa-fire"></i> Lepas ke Pool Rebutan
             </button>
 

@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
   <style>
     .kcb-mtoyota-card {
       background: #ffffff;
@@ -165,7 +165,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #1e1014;
+      background: #0f172a;
       color: #ffffff;
       border-radius: 16px 16px 0 0;
     }
@@ -199,7 +199,7 @@
 
     /* ── SOP Alur Kerja After-Sales & Onboarding Banner ── */
     .sop-banner-card {
-      background: linear-gradient(135deg, #1b0e12 0%, #29141b 50%, #150a0d 100%);
+      background: #0f172a;
       border: 1px solid rgba(216, 164, 55, 0.4);
       border-radius: 16px;
       padding: 22px 24px;
@@ -231,7 +231,7 @@
     .sop-badge-pill {
       background: rgba(216, 164, 55, 0.18);
       border: 1px solid rgba(216, 164, 55, 0.4);
-      color: #d8a437;
+      color: #eb0a1e;
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 11px;
@@ -257,7 +257,7 @@
     }
     .sop-toggle-btn:hover {
       background: rgba(216, 164, 55, 0.25);
-      border-color: #d8a437;
+      border-color: #eb0a1e;
       color: #ffd67a;
     }
     .sop-steps-grid {
@@ -312,8 +312,8 @@
     }
     .sop-step-node.active-step .sop-step-num,
     .sop-step-node:hover .sop-step-num {
-      background: #d8a437;
-      color: #1e1014;
+      background: #eb0a1e;
+      color: #0f172a;
     }
     .sop-step-icon {
       font-size: 17px;
@@ -421,7 +421,7 @@
       font-size: 11.5px;
     }
     .sop-info-label {
-      color: #d8a437;
+      color: #eb0a1e;
       font-weight: 800;
       text-transform: uppercase;
       font-size: 10px;
@@ -516,14 +516,14 @@
       <div class="kcb-topbar">
         <div>
           <h2 id="pageTitle" style="display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-car-on" style="color:#d8a437;"></i> Monitoring Input Serah Terima &amp; m-Toyota Cabang
+            <i class="fa-solid fa-car-on" style="color:#eb0a1e;"></i> Monitoring Input Serah Terima &amp; m-Toyota Cabang
           </h2>
           <p class="page-sub">Pantau realisasi serah terima unit (DO), edukasi aktivasi DEC m-Toyota, dan booking servis berkala 1.000 KM s/d 20.000 KM seluruh wiraniaga</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
             <img id="kacabAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Avatar">
-            <span class="dot" style="background:#d8a437;"></span>
+            <span class="dot" style="background:#eb0a1e;"></span>
           </div>
           <div class="meta">
             <span class="name" id="kacabNama">Kepala Cabang</span>
@@ -545,7 +545,7 @@
           </div>
           <div style="display:flex; align-items:center; gap:10px; margin-left:auto;">
             <span style="font-size:11px; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-hand-pointer" style="color:#d8a437;"></i> Klik tiap tahapan untuk melihat checklist detail
+              <i class="fa-solid fa-hand-pointer" style="color:#eb0a1e;"></i> Klik tiap tahapan untuk melihat checklist detail
             </span>
             <button type="button" class="sop-toggle-btn" id="btnToggleSop" onclick="toggleSopDetail()">
               <i class="fa-solid fa-chevron-up" id="sopToggleIcon"></i> <span id="sopToggleText">Tutup Detail</span>
@@ -622,7 +622,7 @@
         <div class="sop-detail-panel" id="sopDetailContainer">
           <div class="sop-detail-header">
             <div class="sop-detail-title" id="sopDetailTitle">
-              <i class="fa-solid fa-file-signature" style="color:#d8a437;"></i>
+              <i class="fa-solid fa-file-signature" style="color:#eb0a1e;"></i>
               <span>TAHAP 1: SPK (SURAT PESANAN KENDARAAN)</span>
             </div>
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
@@ -749,7 +749,7 @@
       <div class="kcb-mtoyota-card" style="padding:0; overflow:hidden;">
         <div style="padding:14px 20px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#fafafa;">
           <h4 style="margin:0; font-size:13.5px; font-weight:800; color:#0f172a;">
-            <i class="fa-solid fa-clipboard-list" style="color:#d8a437; margin-right:6px;"></i> Rekap Input m-Toyota &amp; Service Seluruh Cabang
+            <i class="fa-solid fa-clipboard-list" style="color:#eb0a1e; margin-right:6px;"></i> Rekap Input m-Toyota &amp; Service Seluruh Cabang
           </h4>
           <span style="font-size:11.5px; color:#64748b; font-weight:700;" id="totalRecordLabel">Menampilkan 0 data</span>
         </div>
@@ -814,7 +814,7 @@
         </div>
 
         <h5 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0f172a;">
-          <i class="fa-solid fa-images" style="color:#d8a437; margin-right:5px;"></i> Lampiran Bukti Foto Fisik &amp; m-Toyota:
+          <i class="fa-solid fa-images" style="color:#eb0a1e; margin-right:5px;"></i> Lampiran Bukti Foto Fisik &amp; m-Toyota:
         </h5>
         
         <div class="photo-preview-grid" id="modalPhotosContainer">
@@ -962,7 +962,7 @@
 
       const titleEl = document.getElementById('sopDetailTitle');
       if (titleEl) {
-        titleEl.innerHTML = `<i class="${data.icon}" style="color:#d8a437;"></i> <span>${data.title}</span>`;
+        titleEl.innerHTML = `<i class="${data.icon}" style="color:#eb0a1e;"></i> <span>${data.title}</span>`;
       }
 
       const picEl = document.getElementById('sopPicBadge');

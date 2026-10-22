@@ -81,7 +81,7 @@
       width: 44px;
       height: 44px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #1e1014, #3b141d);
+      background: #0f172a;
       color: var(--gold);
       display: flex;
       align-items: center;
@@ -184,7 +184,7 @@
 
     .ac-kacab-note {
       font-size: 12px;
-      color: #1e1014;
+      color: #0f172a;
       background: #fdf0f1;
       border: 1px solid #f5c6cb;
       border-radius: 10px;
@@ -240,7 +240,7 @@
   </style>
 
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#1e1014">
+  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>

@@ -116,14 +116,14 @@
       </div>
 
       <div style="margin-top: 14px;">
-        <!-- Executive Banner with Filters -->
+        <!-- Executive Control Bar with Filters -->
         <div class="tco-dashboard-banner">
           <div class="tco-banner-content">
             <div class="tco-banner-title">
-              <span class="tco-banner-badge"><i class="fa-solid fa-shield-halved"></i> Official Toyota Accessories</span>
-              <h1><i class="fa-solid fa-gem" style="color: #f87171;"></i> Penjualan &amp; Sebaran Polreg TCO</h1>
+              <span class="tco-banner-badge"><i class="fa-solid fa-layer-group"></i> Modul Aksesoris Resmi TAM</span>
+              <h1>Penjualan &amp; Pemetaan Polreg TCO</h1>
               <p class="tco-banner-desc">
-                Pantau akselerasi pendapatan aksesoris TCO (Target Rp 350.000 / unit SPK) dan petakan asal wilayah registrasi pembeli (Plat D, Plat Z, Plat E, Plat F) di wilayah Bandung Raya &amp; Jawa Barat.
+                Monitoring penetrasi aksesoris Toyota Customization Option dan pemetaan wilayah registrasi customer di Bandung Raya.
               </p>
             </div>
 
