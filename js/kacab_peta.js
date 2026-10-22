@@ -684,7 +684,7 @@ function renderCheckinList(dataList) {
                 <div class="es-icon" style="font-size: 38px; color: #10b981; margin-bottom: 12px;">
                     <i class="fa-solid fa-satellite-dish fa-fade"></i>
                 </div>
-                <div class="es-title" style="font-size: 14px; font-weight: 800; color: #1e1014; margin-bottom: 6px;">
+                <div class="es-title" style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
                     Tidak Ada Sales yang Sedang Online
                 </div>
                 <div class="es-text" style="font-size: 11.5px; color: #64748b; line-height: 1.5;">
@@ -760,7 +760,7 @@ function notifyNoGps(salesName) {
             icon: 'info',
             title: 'Sinyal GPS Belum Tersedia',
             text: `Sales "${salesName}" sedang online tetapi belum mengaktifkan izin GPS pada perangkatnya.`,
-            confirmButtonColor: '#1e1014'
+            confirmButtonColor: '#eb0a1e'
         });
     } else {
         alert(`Sales "${salesName}" sedang online tetapi belum mengaktifkan izin GPS pada perangkatnya.`);

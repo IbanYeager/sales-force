@@ -340,10 +340,10 @@ function openBattleCardModal(districtId) {
   const body = document.getElementById('battleModalBody');
   if (!modal || !title || !body) return;
 
-  title.innerHTML = `<i class="fa-solid fa-shield-halved" style="color:#d8a437;"></i> Battle-Card Strategi: ${dist.recommendedModel} vs ${dist.competitor}`;
+  title.innerHTML = `<i class="fa-solid fa-shield-halved" style="color:#eb0a1e;"></i> Battle-Card Strategi: ${dist.recommendedModel} vs ${dist.competitor}`;
 
   body.innerHTML = `
-    <div style="background: linear-gradient(135deg, #1e1014 0%, #3b141d 100%); color:white; padding:18px 20px; border-radius:14px; margin-bottom:18px;">
+    <div style="background: #0f172a; color:white; padding:18px 20px; border-radius:14px; margin-bottom:18px;">
       <div style="font-size:12px; font-weight:700; color:#f3c96a; text-transform:uppercase; letter-spacing:0.8px;">Wilayah Analisis: Kecamatan ${dist.name}</div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:10px;">
         <div>
@@ -476,7 +476,7 @@ function renderAssignedList() {
     <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
       <div>
         <div style="font-size:13px; font-weight:800; color:#0f172a;">
-          <i class="fa-solid fa-location-dot" style="color:#cc1426;"></i> ${item.district} &bull; <span style="color:#d8a437;">${item.model}</span>
+          <i class="fa-solid fa-location-dot" style="color:#cc1426;"></i> ${item.district} &bull; <span style="color:#eb0a1e;">${item.model}</span>
         </div>
         <div style="font-size:11px; color:#64748b; margin-top:2px;">
           SPV: <strong>${item.spv}</strong> | Tanggal: <strong>${item.date}</strong> | Target: <strong>${item.targetLead} Prospek</strong>

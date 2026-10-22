@@ -162,7 +162,7 @@ function showPwaInstallGuideModal() {
                         <i class="fa-solid fa-download"></i>
                     </div>
 
-                    <h3 style="margin: 0 0 6px; font-size: 18px; font-weight: 800; color: #1e1014;">
+                    <h3 style="margin: 0 0 6px; font-size: 18px; font-weight: 800; color: #0f172a;">
                         Install Aplikasi SFT Mobile
                     </h3>
                     <p style="margin: 0 0 16px; font-size: 12.5px; color: #64748b; line-height: 1.45;">

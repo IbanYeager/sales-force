@@ -151,11 +151,11 @@ function renderTable(data) {
         <td>
           <div style="font-weight:800; color:#0f172a; font-size:13px;">${item.customer_name}</div>
           <div style="font-size:11px; color:#475569; margin-top:2px;">
-            <i class="fa-solid fa-car" style="color:#d8a437; margin-right:4px;"></i>${item.model_kendaraan}
+            <i class="fa-solid fa-car" style="color:#eb0a1e; margin-right:4px;"></i>${item.model_kendaraan}
             ${item.no_polisi ? `<span style="font-weight:700; background:#f1f5f9; padding:1px 5px; border-radius:4px; margin-left:4px;">${item.no_polisi}</span>` : ''}
           </div>
           ${item.no_rangka ? `<div style="font-size:10px; color:#94a3b8; font-family:monospace;">VIN: ${item.no_rangka}</div>` : ''}
-          ${item.one_account_id ? `<div style="font-size:10px; color:#b45309; font-weight:700; margin-top:2px;"><i class="fa-solid fa-id-badge" style="color:#d8a437;"></i> OA: ${item.one_account_id}</div>` : '<div style="font-size:10px; color:#94a3b8; font-style:italic;">Belum Ada One Account</div>'}
+          ${item.one_account_id ? `<div style="font-size:10px; color:#b45309; font-weight:700; margin-top:2px;"><i class="fa-solid fa-id-badge" style="color:#eb0a1e;"></i> OA: ${item.one_account_id}</div>` : '<div style="font-size:10px; color:#94a3b8; font-style:italic;">Belum Ada One Account</div>'}
         </td>
         <td>
           <div style="font-weight:700; color:#0f172a;">${item.sales_name || 'Wiraniaga'}</div>

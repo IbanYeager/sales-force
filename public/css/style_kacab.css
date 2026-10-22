@@ -17,19 +17,19 @@
   --brand-grad: linear-gradient(135deg, #eb0a1e, #b91c1c);
 
   /* Executive Accents */
-  --gold: #d97706;
-  --gold-deep: #b45309;
-  --gold-soft: #fef3c7;
-  --gold-border: #fde68a;
-  --gold-grad: linear-gradient(135deg, #f59e0b, #d97706);
+  --gold: #eb0a1e;
+  --gold-deep: #cc0000;
+  --gold-soft: #fef2f2;
+  --gold-border: #fee2e2;
+  --gold-grad: linear-gradient(135deg, #eb0a1e, #b91c1c);
 
   /* Clean Enterprise Surfaces */
   --bg: #f8fafc;
   --surface: #ffffff;
   --surface-2: #f1f5f9;
-  --sidebar-bg: #0f172a;
-  --sidebar-bg-2: #0b1120;
-  --sidebar-border: #1e293b;
+  --sidebar-bg: #ffffff;
+  --sidebar-bg-2: #f8fafc;
+  --sidebar-border: #e2e8f0;
 
   /* Typography & Ink (Slate Scale) */
   --text: #0f172a;
@@ -159,7 +159,7 @@ button {
     z-index: 900 !important;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.38) !important;
     scrollbar-width: thin;
-    scrollbar-color: rgba(216, 164, 55, 0.35) rgba(255, 255, 255, 0.05);
+    scrollbar-color: #cbd5e1 rgba(255, 255, 255, 0.05);
   }
 
   .kcb-sidebar::-webkit-scrollbar {
@@ -169,11 +169,11 @@ button {
     background: transparent;
   }
   .kcb-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(216, 164, 55, 0.35);
+    background: #cbd5e1;
     border-radius: 6px;
   }
   .kcb-sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(216, 164, 55, 0.55);
+    background: #cbd5e1;
   }
 
   .kcb-main {
@@ -203,12 +203,12 @@ button {
   }
 }
 
-/* ---------------- SIDEBAR (Clean Modern Enterprise) ---------------- */
+/* ---------------- SIDEBAR (Clean Light Modern Enterprise) ---------------- */
 .kcb-sidebar {
   width: var(--sidebar-w);
-  background: var(--sidebar-bg) !important;
-  border-right: 1px solid var(--sidebar-border) !important;
-  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.05) !important;
+  background: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 1px 0 4px rgba(15, 23, 42, 0.03) !important;
   padding: 16px 12px 16px;
   display: flex;
   flex-direction: column;
@@ -217,6 +217,20 @@ button {
   flex-shrink: 0;
   z-index: 900;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.kcb-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.kcb-sidebar::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+.kcb-sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.kcb-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .kcb-brand-container {
@@ -233,10 +247,10 @@ button {
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .tunas-logo {
@@ -259,9 +273,9 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(235, 10, 30, 0.12);
-  border: 1px solid rgba(235, 10, 30, 0.25);
-  color: #f87171;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #dc2626;
   font-size: 10px;
   font-weight: 800;
   padding: 3px 8px;
@@ -271,7 +285,7 @@ button {
 }
 
 .panel-tag i {
-  color: #f87171;
+  color: #eb0a1e;
   font-size: 10px;
 }
 
@@ -302,18 +316,18 @@ button {
 .kcb-search-box {
   display: flex !important;
   align-items: center !important;
-  background: var(--sidebar-bg-2) !important;
-  border: 1px solid var(--sidebar-border) !important;
-  border-radius: var(--radius-sm) !important;
-  padding: 7px 10px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding: 8px 11px !important;
   gap: 8px !important;
-  transition: border-color 0.15s ease, background-color 0.15s ease !important;
+  transition: all 0.15s ease !important;
 }
 
 .kcb-search-box:focus-within {
-  border-color: var(--brand) !important;
-  background: #0f172a !important;
-  box-shadow: 0 0 0 2px rgba(235, 10, 30, 0.15) !important;
+  border-color: #eb0a1e !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(235, 10, 30, 0.08) !important;
 }
 
 .kcb-search-icon {
@@ -333,8 +347,8 @@ input.kcb-search-input,
   background: transparent !important;
   border: none !important;
   outline: none !important;
-  color: #ffffff !important;
-  font-size: 12px !important;
+  color: #0f172a !important;
+  font-size: 12.5px !important;
   font-weight: 500 !important;
   width: 100% !important;
   padding: 0 !important;
@@ -345,7 +359,7 @@ input.kcb-search-input,
 
 .kcb-search-input::placeholder,
 .kcb-search-box input::placeholder {
-  color: #64748b !important;
+  color: #94a3b8 !important;
   font-weight: 500 !important;
 }
 
@@ -451,9 +465,9 @@ input.kcb-search-input,
 /* Nav Menu Links (Clean Enterprise Standard) */
 .kcb-nav a {
   text-decoration: none;
-  color: #94a3b8 !important;
-  padding: 7px 10px;
-  border-radius: var(--radius-sm);
+  color: #475569 !important;
+  padding: 8px 11px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -483,35 +497,36 @@ input.kcb-search-input,
 }
 
 .kcb-nav a:hover {
-  background: #1e293b !important;
-  color: #ffffff !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
 .kcb-nav a:hover i {
-  color: #ffffff;
+  color: #0f172a !important;
 }
 
 /* Active State: Clean indicator, Toyota Red accent */
 .kcb-nav a.active {
-  background: #1e293b !important;
-  color: #ffffff !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
   font-weight: 700 !important;
-  border-left: 3px solid var(--brand) !important;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+  border-left: 3.5px solid #eb0a1e !important;
+  border-radius: 0 8px 8px 0 !important;
 }
 
 .kcb-nav a.active i {
-  color: #ef4444 !important;
+  color: #eb0a1e !important;
 }
 
 /* Menu Counter Badges */
 .kcb-nav-badge {
   font-size: 10px;
   font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
+  padding: 1.5px 6.5px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
   white-space: nowrap;
   flex-shrink: 0;
   margin-left: auto;
@@ -523,8 +538,9 @@ input.kcb-search-input,
 }
 
 .kcb-nav a.active .kcb-nav-badge {
-  background: rgba(235, 10, 30, 0.18);
-  color: #fca5a5;
+  background: rgba(235, 10, 30, 0.12) !important;
+  border-color: rgba(235, 10, 30, 0.2) !important;
+  color: #dc2626 !important;
 }
 
 .kcb-nav-badge.badge-gold {
@@ -541,7 +557,7 @@ input.kcb-search-input,
 .sidebar-footer {
   padding-top: 12px;
   margin-top: auto;
-  border-top: 1px solid var(--sidebar-border);
+  border-top: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -552,9 +568,9 @@ input.kcb-search-input,
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  background: var(--sidebar-bg-2);
-  border: 1px solid var(--sidebar-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
 .kcb-footer-avatar-wrap {
@@ -594,7 +610,7 @@ input.kcb-search-input,
 .kcb-footer-name {
   font-size: 12px;
   font-weight: 700;
-  color: #f8fafc;
+  color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -612,12 +628,12 @@ input.kcb-search-input,
 .kcb-logout-btn,
 .sidebar-footer .btn-danger,
 .sidebar-footer .btn {
-  background: transparent !important;
-  border: 1px solid var(--sidebar-border) !important;
-  color: #94a3b8 !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
   width: 100% !important;
   padding: 7px 12px !important;
-  border-radius: var(--radius-sm) !important;
+  border-radius: 8px !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   display: inline-flex !important;
@@ -632,9 +648,9 @@ input.kcb-search-input,
 .kcb-logout-btn:hover,
 .sidebar-footer .btn-danger:hover,
 .sidebar-footer .btn:hover {
-  background: rgba(239, 68, 68, 0.12) !important;
-  color: #f87171 !important;
-  border-color: rgba(239, 68, 68, 0.3) !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border-color: #fecaca !important;
 }
 
 /* ---------------- MAIN ---------------- */
@@ -2501,7 +2517,7 @@ input.kcb-search-input,
     height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(216, 164, 55, 0.6);
+    border: 2px solid #cbd5e1;
   }
 
   /* Sidebar jadi drawer */

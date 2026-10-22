@@ -258,7 +258,7 @@ function renderTestDriveKacab() {
   }
 
   container.innerHTML = `
-    <div style="background:#1e1014; border:1px solid #38101a; border-radius:16px; padding:16px 20px; color:white; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+    <div style="background:#0f172a; border:1px solid #1e293b; border-radius:16px; padding:16px 20px; color:white; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
       <div>
         <h4 style="font-size:15px; font-weight:800; color:var(--gold); margin:0 0 4px;"><i class="fa-solid fa-car-tunnel"></i> Executive Fleet Monitoring Test Drive Cabang</h4>
         <p style="font-size:12px; color:#d1d5db; margin:0;">Kapasitas Unit Test Drive Dealer: Innova Zenix, Yaris Cross, Fortuner VRZ (Total ${kacabTestDriveData.length} Pengajuan)</p>

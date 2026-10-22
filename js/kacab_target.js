@@ -176,7 +176,7 @@ function renderTargetMatrix() {
                   <td style="text-align:center; font-weight:700; color:#94a3b8; font-size:12px;">${idx + 1}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, #1e1014, #3b141d); color:#d8a437; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0;">
+                      <div style="width:34px; height:34px; border-radius:10px; background:#0f172a; color:#eb0a1e; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0;">
                         <i class="fa-solid fa-user-tie"></i>
                       </div>
                       <div>
@@ -254,7 +254,7 @@ function renderTargetMatrix() {
               <div>
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
                   <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #1e1014, #3b141d); color:#d8a437; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:#0f172a; color:#eb0a1e; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">
                       <i class="fa-solid fa-user-tie"></i>
                     </div>
                     <div>

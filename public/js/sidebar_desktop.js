@@ -82,19 +82,19 @@
                 <a href="${prefix}pages_kacab/index_kacab" class="sidebar-brand-logo" title="Tunas Toyota">
                     <img src="${prefix}image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sidebar-brand-img">
                 </a>
-                <div style="font-size:10px; font-weight:800; color:#d8a437; background:rgba(216,164,55,0.15); padding:2px 8px; border-radius:6px; margin-top:6px; display:inline-block; border:1px solid rgba(216,164,55,0.3);">
+                <div style="font-size:10px; font-weight:800; color:#eb0a1e; background:rgba(235,10,30,0.15); padding:2px 8px; border-radius:6px; margin-top:6px; display:inline-block; border:1px solid rgba(235,10,30,0.3);">
                     <i class="fa-solid fa-building-user"></i> KACAB PANEL
                 </div>
             </div>
 
             <a href="${prefix}pages_kacab/index_kacab" class="sidebar-user-card">
-                <img src="https://ui-avatars.com/api/?name=KC&background=1e1014&color=d8a437&bold=true"
+                <img src="https://ui-avatars.com/api/?name=KC&background=0f172a&color=ffffff&bold=true"
                     alt="Profile" class="sidebar-user-avatar" id="sidebarAvatar">
                 <div class="sidebar-user-info">
                     <span class="sidebar-user-name" id="sidebarNama">Kepala Cabang</span>
-                    <span class="sidebar-user-role" id="sidebarRole" style="color:#d8a437;">Kepala Cabang</span>
+                    <span class="sidebar-user-role" id="sidebarRole" style="color:#eb0a1e;">Kepala Cabang</span>
                 </div>
-                <div class="sidebar-user-dot" style="background:#d8a437;"></div>
+                <div class="sidebar-user-dot" style="background:#eb0a1e;"></div>
             </a>
 
             <div class="sidebar-search-wrap">
@@ -417,8 +417,8 @@
                 elAvatar.src = foto;
             } else {
                 const initials = namaSales.split(' ').slice(0, 2).map(w => w[0]).join('');
-                const bg = roleSales === 'Kepala Cabang' ? '1e1014' : (roleSales === 'Supervisor' ? '1c2740' : 'f4f7f6');
-                const fg = roleSales === 'Kepala Cabang' ? 'd8a437' : (roleSales === 'Supervisor' ? 'ffffff' : 'c8102e');
+                const bg = roleSales === 'Kepala Cabang' ? '0f172a' : (roleSales === 'Supervisor' ? '1c2740' : 'f4f7f6');
+                const fg = roleSales === 'Kepala Cabang' ? 'eb0a1e' : (roleSales === 'Supervisor' ? 'ffffff' : 'c8102e');
                 elAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials || namaSales)}&background=${bg}&color=${fg}&bold=true`;
             }
         }

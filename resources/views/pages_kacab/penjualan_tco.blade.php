@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Kacab Core & TCO Styles -->
-  <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
+  <link rel="stylesheet" href="/css/style_kacab.css?v={{ time() }}">
   <link rel="stylesheet" href="../css/penjualan_tco.css?v={{ time() }}">
 
   <link rel="manifest" href="../manifest.json">

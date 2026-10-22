@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kacab Desktop - Rekapitulasi Hasil Trade-In &amp; OLX</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
+  <link rel="stylesheet" href="/css/style_kacab.css?v={{ time() }}">
   <link rel="stylesheet" href="../css/spv_olx.css?v=20260918_v8_lux">
 
   <style>

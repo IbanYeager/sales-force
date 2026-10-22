@@ -244,7 +244,7 @@
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
 
-                    <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #1e1014;">
+                    <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #0f172a;">
                         Aktifkan Izin Lokasi (GPS)
                     </h3>
                     

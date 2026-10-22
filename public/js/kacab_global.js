@@ -68,7 +68,7 @@ function renderKacabUser() {
     if (el) el.textContent = peran;
   });
 
-  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=1e1014&color=d8a437&bold=true`;
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0f172a&color=ffffff&bold=true`;
 
   const avatarEls = document.querySelectorAll('#kcbAvatar, #kacabAvatar, #mhAvatar, .kcb-user img, .kcb-topbar img, .avatar-status img');
   avatarEls.forEach(img => {
@@ -304,7 +304,7 @@ if (typeof window.kcbDrawerInit === 'undefined') {
     const mhAvatar = document.getElementById('mhAvatar');
     mhAvatar.src = (foto && foto.trim() !== '')
       ? foto
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=1e1014&color=d8a437`;
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0f172a&color=ffffff`;
 
     const burger = document.getElementById('mhBurger');
 
@@ -604,7 +604,7 @@ function initKacabSidebarNav(sidebar) {
     const rawFoto = localStorage.getItem('fotoSales') || '';
     const avatarSrc = (rawFoto && rawFoto.trim() !== '')
       ? rawFoto
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(rawName)}&background=1e1014&color=d8a437&bold=true`;
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(rawName)}&background=0f172a&color=ffffff&bold=true`;
 
     const profileCard = document.createElement('div');
     profileCard.className = 'kcb-footer-profile';

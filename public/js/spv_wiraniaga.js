@@ -51,11 +51,11 @@ let listDataWiraniaga = [];
       if (avatarEl) {
         avatarEl.onerror = function() {
           this.onerror = null;
-          this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${peran === 'Kepala Cabang' ? '1e1014' : 'f4f7f6'}&color=${peran === 'Kepala Cabang' ? 'd8a437' : 'c8102e'}`;
+          this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${peran === 'Kepala Cabang' ? '0f172a' : 'f4f7f6'}&color=${peran === 'Kepala Cabang' ? 'ffffff' : 'c8102e'}`;
         };
         avatarEl.src = (avatar && avatar.trim() !== '')
           ? avatar
-          : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${peran === 'Kepala Cabang' ? '1e1014' : 'f4f7f6'}&color=${peran === 'Kepala Cabang' ? 'd8a437' : 'c8102e'}`;
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${peran === 'Kepala Cabang' ? '0f172a' : 'f4f7f6'}&color=${peran === 'Kepala Cabang' ? 'ffffff' : 'c8102e'}`;
       }
     }
 

@@ -13,10 +13,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Kacab Theme & 2026 Sales Dashboard Styles -->
-  <link rel="stylesheet" href="../css/style_kacab.css?v=20261019_executive_sidebar_lux">
-  <link rel="stylesheet" href="/css/style_kacab.css?v=20261019_executive_sidebar_lux">
-  <link rel="stylesheet" href="../css/sales_dashboard.css?v=20261019_executive_sidebar_lux">
-  <link rel="stylesheet" href="/css/sales_dashboard.css?v=20261019_executive_sidebar_lux">
+  <link rel="stylesheet" href="/css/style_kacab.css?v={{ time() }}">
+  <link rel="stylesheet" href="/css/sales_dashboard.css?v={{ time() }}">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#0f172a">
