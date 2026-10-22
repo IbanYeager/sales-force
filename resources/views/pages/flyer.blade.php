@@ -22,6 +22,86 @@
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#090e18">
+
+  <style>
+    /* Critical Mobile Strict Confinement */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    @media (max-width: 768px) {
+      html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .desktop-shell, .desktop-content, .mobile-app, .flyer-studio-container {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+      .flyer-studio-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        margin-bottom: 20px !important;
+      }
+      .flyer-artboard-column,
+      .flyer-artboard-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        overflow: hidden !important;
+        margin: 0 auto !important;
+      }
+      .flyer-canvas-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 0 auto !important;
+        text-align: center !important;
+      }
+      .flyer-preview-img {
+        display: block !important;
+        margin: 0 auto !important;
+        max-height: 235px !important;
+        width: auto !important;
+        max-width: 85% !important;
+        object-fit: contain !important;
+      }
+      .flyer-ratio-switch {
+        width: 100% !important;
+        max-width: 250px !important;
+        margin: 0 auto 8px !important;
+        display: flex !important;
+        justify-content: center !important;
+      }
+      .flyer-zoom-hint, .flyer-res-info-tag {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        text-align: center !important;
+      }
+      .flyer-inspector-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        min-width: 0 !important;
+      }
+    }
+  </style>
 </head>
 
 <body style="background: #f4f6fb; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif;">

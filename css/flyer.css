@@ -1041,9 +1041,28 @@
 /* ── TABLET BREAKPOINT (<= 950px) ── */
 @media (max-width: 950px) {
     .flyer-studio-layout {
-        grid-template-columns: 1fr;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
         gap: 16px;
         margin-bottom: 24px;
+    }
+
+    .flyer-artboard-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        position: static !important;
+    }
+
+    .flyer-inspector-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        min-width: 0 !important;
     }
 }
 
@@ -1059,19 +1078,46 @@
         font-size: 16px !important;
     }
 
+    /* STRICT GLOBAL VIEWPORT LOCKDOWN - ZERO HORIZONTAL SPILL */
+    html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .desktop-shell,
+    .desktop-content {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+
+    .mobile-app,
     .flyer-studio-container {
-        padding: 10px 10px;
-        padding-top: max(8px, env(safe-area-inset-top));
-        padding-left: max(10px, env(safe-area-inset-left));
-        padding-right: max(10px, env(safe-area-inset-right));
-        padding-bottom: calc(105px + env(safe-area-inset-bottom, 24px));
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+        padding: 8px 8px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+        padding-left: max(8px, env(safe-area-inset-left)) !important;
+        padding-right: max(8px, env(safe-area-inset-right)) !important;
+        padding-bottom: calc(105px + env(safe-area-inset-bottom, 24px)) !important;
     }
 
     .flyer-header-banner {
-        padding: 12px 14px;
-        border-radius: 16px;
-        margin-bottom: 12px;
-        gap: 8px;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 14px !important;
+        border-radius: 16px !important;
+        margin-bottom: 10px !important;
+        gap: 8px !important;
     }
 
     .flyer-header-left {
@@ -1088,12 +1134,12 @@
     }
 
     .flyer-header-title {
-        font-size: 15px;
+        font-size: 14.5px;
         line-height: 1.25;
     }
 
     .flyer-header-subtitle {
-        display: none;
+        display: none !important;
     }
 
     /* Hide redundant header action buttons on mobile — sticky bottom bar handles downloads & share */
@@ -1101,79 +1147,125 @@
         display: none !important;
     }
 
-    /* Proportional Mobile Artboard Studio Stage */
+    .flyer-studio-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        gap: 10px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .flyer-artboard-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        margin: 0 auto !important;
+    }
+
+    /* THE ARTBOARD CARD - PERFECTLY CONFINED & CENTERED ON ALL SCREENS */
     .flyer-artboard-card {
-        padding: 10px 10px 8px;
-        border-radius: 18px;
-        background: radial-gradient(circle at 50% 15%, #181f38 0%, #090e18 80%);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-        margin-bottom: 12px;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 10px 8px 10px !important;
+        border-radius: 18px !important;
+        background: radial-gradient(circle at 50% 15%, #181f38 0%, #090e18 80%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) !important;
+        margin: 0 auto 10px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        overflow: hidden !important;
     }
 
     .flyer-ratio-switch {
-        max-width: 250px;
-        margin: 0 auto 6px;
-        padding: 2px;
-        gap: 3px;
+        width: 100% !important;
+        max-width: 250px !important;
+        margin: 0 auto 8px !important;
+        padding: 2px !important;
+        gap: 3px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        justify-content: center !important;
     }
 
     .ratio-btn {
-        padding: 6px 8px;
-        font-size: 11px;
+        flex: 1 1 50% !important;
+        padding: 6px 8px !important;
+        font-size: 11px !important;
+        text-align: center !important;
+        justify-content: center !important;
     }
 
     .flyer-canvas-wrapper {
         min-height: auto !important;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 2px 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 0 auto !important;
+        padding: 2px 0 !important;
+        text-align: center !important;
     }
 
-    /* Compact, proportional preview so editing controls remain visible above the fold */
+    /* Compact, perfectly centered preview image */
     .flyer-preview-img {
-        max-height: 240px !important;
-        width: auto;
-        max-width: 85%;
-        border-radius: 12px;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.75), 0 0 0 2px #334155, 0 0 0 3px rgba(255, 255, 255, 0.12);
-        cursor: pointer;
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: block !important;
+        margin: 0 auto !important;
+        max-height: 235px !important;
+        width: auto !important;
+        max-width: 85% !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.75), 0 0 0 2px #334155, 0 0 0 3px rgba(255, 255, 255, 0.12) !important;
+        cursor: pointer !important;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        box-sizing: border-box !important;
+        object-fit: contain !important;
     }
 
     .flyer-preview-img:active {
-        transform: scale(0.97);
+        transform: scale(0.97) !important;
     }
 
     .flyer-zoom-hint {
         display: inline-flex !important;
-        align-items: center;
-        gap: 5px;
-        margin-top: 6px;
-        font-size: 10px;
-        font-weight: 700;
-        color: #38bdf8;
-        background: rgba(56, 189, 248, 0.1);
-        border: 1px solid rgba(56, 189, 248, 0.25);
-        padding: 3px 10px;
-        border-radius: 99px;
-        cursor: pointer;
-        transition: all 0.15s ease;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 5px !important;
+        margin: 6px auto 0 !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        color: #38bdf8 !important;
+        background: rgba(56, 189, 248, 0.1) !important;
+        border: 1px solid rgba(56, 189, 248, 0.25) !important;
+        padding: 3px 10px !important;
+        border-radius: 99px !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
     }
 
     .flyer-zoom-hint:active {
-        background: rgba(56, 189, 248, 0.2);
-        transform: scale(0.96);
+        background: rgba(56, 189, 248, 0.2) !important;
+        transform: scale(0.96) !important;
     }
 
     .flyer-res-info-tag {
-        font-size: 9px;
-        color: #64748b;
-        margin-top: 4px;
-        text-align: center;
-        justify-content: center;
+        font-size: 9px !important;
+        color: #64748b !important;
+        margin: 4px auto 0 !important;
+        text-align: center !important;
+        justify-content: center !important;
+        width: 100% !important;
     }
 
     /* Hide duplicate middle action block on mobile */
@@ -1194,96 +1286,135 @@
         display: inline !important;
     }
 
+    /* INSPECTOR CONTROLS COLUMN */
+    .flyer-inspector-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        min-width: 0 !important;
+    }
+
     /* Sticky Mobile Navigation Tabs Bar */
     .flyer-tabs-nav {
-        position: sticky;
-        top: max(6px, env(safe-area-inset-top));
-        z-index: 60;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-radius: 14px;
-        padding: 4px;
-        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.1);
-        display: flex;
-        gap: 4px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        position: sticky !important;
+        top: max(6px, env(safe-area-inset-top)) !important;
+        z-index: 60 !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        backdrop-filter: blur(14px) !important;
+        -webkit-backdrop-filter: blur(14px) !important;
+        border-radius: 14px !important;
+        padding: 4px !important;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.1) !important;
+        display: flex !important;
+        gap: 4px !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .flyer-tabs-nav::-webkit-scrollbar {
-        display: none;
+        display: none !important;
     }
 
     .flyer-tab-btn {
-        flex: 1 1 0;
-        min-width: 0;
-        padding: 8px 4px;
-        font-size: 11px;
-        font-weight: 700;
-        gap: 4px;
-        border-radius: 10px;
-        text-align: center;
-        justify-content: center;
-        white-space: nowrap;
-        text-overflow: clip;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        padding: 8px 3px !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        gap: 3px !important;
+        border-radius: 10px !important;
+        text-align: center !important;
+        justify-content: center !important;
+        white-space: nowrap !important;
+        text-overflow: clip !important;
     }
 
     .flyer-tab-btn i {
-        font-size: 12px;
+        font-size: 12px !important;
     }
 
-    /* Floating Action Bar with iPhone Home Bar Indicator Clearance */
+    .flyer-tab-pane {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .flyer-section-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        padding: 14px 12px !important;
+        border-radius: 16px !important;
+    }
+
+    .flyer-theme-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Fixed Sticky Mobile Bottom Bar - Stretched edge to edge with exact safe area */
     .flyer-mobile-bottom-bar {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(9, 14, 24, 0.96);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        padding: 10px 14px;
-        padding-bottom: calc(10px + env(safe-area-inset-bottom, 24px));
-        border-top: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
-        z-index: 999;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        background: rgba(9, 14, 24, 0.96) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        padding: 10px 12px !important;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 24px)) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4) !important;
+        z-index: 9999 !important;
+        box-sizing: border-box !important;
     }
 
     .btn-mobile-action {
-        padding: 12px 10px;
-        border-radius: 12px;
-        border: none;
-        font-size: 12.5px;
-        font-weight: 800;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        cursor: pointer;
-        min-height: 44px;
-        transition: transform 0.15s ease, opacity 0.15s ease;
-        text-decoration: none;
-        -webkit-tap-highlight-color: transparent;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        padding: 12px 8px !important;
+        border-radius: 12px !important;
+        border: none !important;
+        font-size: 12.5px !important;
+        font-weight: 800 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+        min-height: 44px !important;
+        transition: transform 0.15s ease, opacity 0.15s ease !important;
+        text-decoration: none !important;
+        -webkit-tap-highlight-color: transparent !important;
     }
 
     .btn-mobile-action:active {
-        transform: scale(0.97);
+        transform: scale(0.97) !important;
     }
 
     .btn-mobile-action.wa {
-        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3) !important;
     }
 
     .btn-mobile-action.download {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35) !important;
     }
 
     /* Native touch-friendly range sliders on iOS */
@@ -1312,8 +1443,10 @@
 /* ── PHONE BREAKPOINT (<= 640px) ── */
 @media (max-width: 640px) {
     .flyer-grid-2 {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 10px;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .flyer-section-card {
@@ -1346,6 +1479,8 @@
         padding: 4px !important;
         background: #f1f5f9;
         border-radius: 12px;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .flyer-pill-selector::-webkit-scrollbar {
@@ -1353,7 +1488,7 @@
     }
 
     .pill-opt-btn {
-        flex: 1 0 auto !important;
+        flex: 0 0 auto !important;
         min-width: max-content !important;
         padding: 8px 12px !important;
         font-size: 11px !important;
@@ -1364,50 +1499,75 @@
     #tonePillSelector {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     #carLayoutPills {
         display: grid !important;
         grid-template-columns: repeat(3, 1fr) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 }
 
 /* ── NARROW MOBILE / IPHONE XR / SE / SAMSUNG GALAXY (<= 430px) ── */
 @media (max-width: 430px) {
     .flyer-studio-container {
-        padding: 8px 8px;
-        padding-top: max(8px, env(safe-area-inset-top));
-        padding-left: max(8px, env(safe-area-inset-left));
-        padding-right: max(8px, env(safe-area-inset-right));
-        padding-bottom: calc(105px + env(safe-area-inset-bottom, 30px));
+        padding: 6px 6px !important;
+        padding-top: max(6px, env(safe-area-inset-top)) !important;
+        padding-left: max(6px, env(safe-area-inset-left)) !important;
+        padding-right: max(6px, env(safe-area-inset-right)) !important;
+        padding-bottom: calc(105px + env(safe-area-inset-bottom, 30px)) !important;
+    }
+
+    .flyer-header-banner {
+        padding: 10px 12px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .flyer-header-title {
+        font-size: 13.5px !important;
     }
 
     .flyer-artboard-card {
-        padding: 8px 8px 6px;
+        padding: 8px 6px 6px !important;
+        border-radius: 14px !important;
+        margin-bottom: 8px !important;
     }
 
     .flyer-preview-img {
-        max-height: 235px !important;
+        max-height: 220px !important;
+    }
+
+    .flyer-ratio-switch {
+        max-width: 230px !important;
+        margin: 0 auto 6px !important;
+        padding: 2px !important;
     }
 
     .ratio-btn {
-        padding: 5px 6px;
-        font-size: 10.5px;
+        padding: 5px 6px !important;
+        font-size: 10.5px !important;
     }
 
     .flyer-grid-sliders {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 8px;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .flyer-scale-reset-wrap {
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .btn-reset-pos {
-        width: 100%;
+        width: 100% !important;
         justify-content: center;
         min-height: 40px;
     }
@@ -1417,6 +1577,8 @@
         align-items: center;
         text-align: center;
         padding: 12px 10px;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .sales-avatar-upload-wrap > div {
@@ -1424,32 +1586,40 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+        width: 100% !important;
     }
 
     .sales-avatar-upload-wrap div[style*="display:flex"] {
         justify-content: center;
-        width: 100%;
+        width: 100% !important;
     }
 
     .qr-preview-box {
         flex-direction: column;
         text-align: center;
         padding: 12px 10px;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .color-input-circle {
         width: 38px;
         height: 38px;
     }
+
+    .flyer-tab-btn {
+        padding: 7px 2px !important;
+        font-size: 10.5px !important;
+    }
 }
 
 @media (max-width: 375px) {
     .flyer-preview-img {
-        max-height: 215px !important;
+        max-height: 205px !important;
     }
     .flyer-tab-btn {
-        padding: 7px 2px;
-        font-size: 10px;
+        padding: 6px 1px !important;
+        font-size: 10px !important;
     }
 }
 
