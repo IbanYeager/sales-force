@@ -5,8 +5,8 @@
 
 :root {
     --flyer-bg-body: #f4f6fb;
-    --flyer-primary: #7c3aed;
-    --flyer-primary-dark: #5b21b6;
+    --flyer-primary: #c8102e;
+    --flyer-primary-dark: #99001c;
     --flyer-toyota-red: #c8102e;
     --flyer-card-bg: #ffffff;
     --flyer-border: #e2e8f0;
@@ -18,7 +18,7 @@
 
 /* ── HEADER BANNER ── */
 .flyer-header-banner {
-    background: linear-gradient(135deg, #090e18 0%, #111827 50%, #1e1b4b 100%);
+    background: linear-gradient(135deg, #090e18 0%, #111827 50%, #2a111a 100%);
     color: #ffffff;
     border-radius: 20px;
     padding: 22px 28px;
@@ -41,7 +41,7 @@
     top: -40px;
     width: 240px;
     height: 240px;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.22) 0%, rgba(124, 58, 237, 0) 70%);
+    background: radial-gradient(circle, rgba(200, 16, 46, 0.22) 0%, rgba(200, 16, 46, 0) 70%);
     pointer-events: none;
 }
 
@@ -1174,7 +1174,7 @@
         box-sizing: border-box !important;
         padding: 10px 8px 10px !important;
         border-radius: 18px !important;
-        background: radial-gradient(circle at 50% 15%, #181f38 0%, #090e18 80%) !important;
+        background: radial-gradient(circle at 50% 15%, #2a111a 0%, #090e18 80%) !important;
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) !important;
         margin: 0 auto 10px !important;
@@ -1245,9 +1245,9 @@
         margin: 6px auto 0 !important;
         font-size: 10px !important;
         font-weight: 700 !important;
-        color: #38bdf8 !important;
-        background: rgba(56, 189, 248, 0.1) !important;
-        border: 1px solid rgba(56, 189, 248, 0.25) !important;
+        color: #ef4444 !important;
+        background: rgba(239, 68, 68, 0.12) !important;
+        border: 1px solid rgba(239, 68, 68, 0.28) !important;
         padding: 3px 10px !important;
         border-radius: 99px !important;
         cursor: pointer !important;
@@ -1255,7 +1255,7 @@
     }
 
     .flyer-zoom-hint:active {
-        background: rgba(56, 189, 248, 0.2) !important;
+        background: rgba(239, 68, 68, 0.22) !important;
         transform: scale(0.96) !important;
     }
 
@@ -1433,9 +1433,9 @@
         width: 24px;
         height: 24px;
         border-radius: 50%;
-        background: #7c3aed;
+        background: #c8102e;
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(124, 58, 237, 0.45);
+        box-shadow: 0 2px 8px rgba(200, 16, 46, 0.45);
         border: 2px solid #ffffff;
     }
 }

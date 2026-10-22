@@ -115,7 +115,7 @@
         </a>
         <div>
           <h1 class="flyer-header-title">
-            <i class="fa-solid fa-wand-magic-sparkles" style="color:#a855f7;"></i>
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--flyer-primary, #c8102e);"></i>
             Studio Poster Promo WhatsApp Pro
           </h1>
           <p class="flyer-header-subtitle">

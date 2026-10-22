@@ -390,21 +390,21 @@
                     </a>
 
                     <!-- ═══ STUDIO POSTER & FLYER PROMO WA BANNER ═══ -->
-                    <a href="pages/flyer.html" class="card kircon-studio-banner" style="background: linear-gradient(135deg, #1e1136 0%, #150d2a 100%); border-color: rgba(168, 85, 247, 0.28); margin-bottom: 16px;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                    <a href="pages/flyer.html" class="card kircon-studio-banner" style="margin-bottom: 16px;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
                         <div class="kircon-banner-row">
                             <div class="kircon-banner-left">
-                                <div class="kircon-banner-icon" style="background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(99,102,241,0.15)); color: #c084fc; border: 1px solid rgba(168,85,247,0.4);">
+                                <div class="kircon-banner-icon">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                                 </div>
                                 <div class="kircon-banner-text">
                                     <div class="kircon-banner-title-wrap">
                                         <h4 class="kircon-banner-title">Studio Poster &amp; Flyer Promo WA</h4>
-                                        <span class="kircon-banner-tag" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff;">FITUR BARU</span>
+                                        <span class="kircon-banner-tag">FITUR BARU</span>
                                     </div>
                                     <p class="kircon-banner-sub">Buat poster promosi instan kustom: ganti background, multi-mobil, teks cicilan/DP, dan foto diri Anda</p>
                                 </div>
                             </div>
-                            <div class="kircon-banner-btn" style="background: linear-gradient(135deg, #9333ea, #6366f1); color: #fff; box-shadow: 0 4px 14px rgba(147, 51, 234, 0.4);">
+                            <div class="kircon-banner-btn">
                                 <span>Buka Studio</span>
                                 <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
                             </div>
@@ -900,15 +900,15 @@
 
                             <!-- SECTION: TIER 2 MEDIA HUB, DELIVERY & DOKUMEN -->
                             <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 14px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
-                                <i class="fa-solid fa-photo-film" style="color: #8b5cf6;"></i> Tier 2: Media, Delivery &amp; Dokumen
+                                <i class="fa-solid fa-photo-film" style="color: #c8102e;"></i> Tier 2: Media, Delivery &amp; Dokumen
                             </div>
 
                             <a href="pages/video_viral.html" class="category-item modal-feature-item" data-tags="media studio video reels tiktok shorts kircon konten instagram serah terima review promo showcase viral">
-                                <div class="category-icon" style="background: linear-gradient(135deg, rgba(200,16,46,0.15), rgba(200,16,46,0.05)); color: #c8102e; border: 1px solid rgba(200,16,46,0.3);"><i class="fa-solid fa-photo-film"></i></div>
+                                <div class="category-icon"><i class="fa-solid fa-photo-film"></i></div>
                                 <span class="category-text">Media Studio</span>
                             </a>
                             <a href="pages/flyer.html" class="category-item modal-feature-item" data-tags="flyer poster promo wa studio banner gambar brosur promosi wa story feed template sales kustom">
-                                <div class="category-icon" style="background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(99,102,241,0.1)); color: #7c3aed; border: 1px solid rgba(139,92,246,0.3);"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <div class="category-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                                 <span class="category-text">Studio Flyer WA</span>
                             </a>
                             <a href="pages/mtoyota_service.html" class="category-item modal-feature-item" data-tags="booking service mtoyota m-toyota dec do fs1000 purna jual servis berkala upload foto">
