@@ -116,12 +116,43 @@ function simulatePayment() {
     if (orderDataRaw) {
         try {
             const orderData = JSON.parse(orderDataRaw);
-            if (orderData.orderItem) {
                 fetch('../api/api_spv_manage_tco.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'order_item', name: orderData.orderItem })
                 }).catch(e => console.error("Error reducing TCO stock:", e));
+
+                // Catat transaksi ke tabel_penjualan_tco untuk monitoring SPV & Kacab
+                try {
+                    const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+                    const cleanPrice = parseInt((orderData.orderPrice || '0').replace(/[^\d]/g, '')) || 0;
+                    fetch('../api/api_penjualan_tco.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'add_transaction',
+                            spk_no: 'KC-26-' + Math.floor(100000 + Math.random() * 900000),
+                            nama_sales: userObj.nama || userObj.username || 'Sales Tunas',
+                            nama_spv: userObj.spv_name || 'FERYANTO',
+                            customer_name: orderData.customerName || 'Pelanggan Tunas',
+                            customer_phone: orderData.customerPhone || '',
+                            model_kendaraan: orderData.orderModel || 'Toyota',
+                            tipe_kendaraan: orderData.carDetails || orderData.orderModel || 'Toyota',
+                            item_tco_name: orderData.orderItem || 'Aksesoris TCO',
+                            part_number: orderData.partNumber || '',
+                            skema_harga: orderData.priceType || 'RTCO',
+                            harga_satuan: cleanPrice,
+                            qty: 1,
+                            total_harga: cleanPrice,
+                            wilayah_polreg: 'Plat D - Kota Bandung',
+                            kota: 'KOTA BANDUNG',
+                            kecamatan: 'Lengkong',
+                            latitude: -6.9315,
+                            longitude: 107.6250,
+                            status_order: 'Terpasang & Lunas'
+                        })
+                    }).catch(e => console.error("Error recording TCO sale:", e));
+                } catch(e) {}
             }
         } catch(e) {}
     }

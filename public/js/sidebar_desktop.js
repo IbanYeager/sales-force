@@ -115,6 +115,7 @@
 
                 <p class="sidebar-nav-label"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Sales CRM</p>
                 ${navLinkKacab('pages_kacab/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkKacab('pages_kacab/penjualan_tco.html', 'fa-solid fa-gem', 'Penjualan &amp; Polreg TCO')}
                 ${navLinkKacab('pages_kacab/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
                 ${navLinkKacab('pages_kacab/ao_report_kacab.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report')}
                 ${navLinkKacab('pages_kacab/approval_kacab.html', 'fa-solid fa-clipboard-check', 'Otorisasi & Approval')}
@@ -204,6 +205,7 @@
                 ${navLinkSPV('pages_spv/index_spv.html', 'fa-solid fa-gauge', 'Dashboard SPV')}
                 ${navLinkSPV('pages_spv/target.html', 'fa-solid fa-bullseye', 'Target &amp; Pencapaian')}
                 ${navLinkSPV('pages_spv/penjualan_kircon.html', 'fa-solid fa-table-list', 'Penjualan Kircon')}
+                ${navLinkSPV('pages_spv/penjualan_tco.html', 'fa-solid fa-gem', 'Penjualan &amp; Polreg TCO')}
 
                 <p class="sidebar-nav-label"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Approval</p>
                 ${navLinkSPV('pages_spv/followup_database.html', 'fa-solid fa-bullhorn', 'Database Follow-Up (CRM)')}
