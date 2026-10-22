@@ -647,142 +647,275 @@ async function renderFlyerCanvas() {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
     } else {
-        // Preset Gradients
+        // Preset Gradients with deep obsidian vignettes
         let grad;
         if (studioState.bgPreset === 'navy') {
             grad = ctx.createLinearGradient(0, 0, 0, H);
             grad.addColorStop(0, '#020617');
-            grad.addColorStop(0.35, '#0f172a');
-            grad.addColorStop(0.7, '#1e3a8a');
+            grad.addColorStop(0.25, '#0a152e');
+            grad.addColorStop(0.55, '#1e3a8a');
+            grad.addColorStop(0.85, '#0c1b3d');
             grad.addColorStop(1, '#020617');
         } else if (studioState.bgPreset === 'gold') {
             grad = ctx.createLinearGradient(0, 0, 0, H);
             grad.addColorStop(0, '#09090b');
-            grad.addColorStop(0.35, '#1c1917');
-            grad.addColorStop(0.75, '#451a03');
+            grad.addColorStop(0.25, '#1c150c');
+            grad.addColorStop(0.55, '#5c2d0c');
+            grad.addColorStop(0.85, '#291406');
             grad.addColorStop(1, '#09090b');
         } else if (studioState.bgPreset === 'emerald') {
             grad = ctx.createLinearGradient(0, 0, 0, H);
-            grad.addColorStop(0, '#022c22');
-            grad.addColorStop(0.35, '#064e3b');
-            grad.addColorStop(0.7, '#047857');
-            grad.addColorStop(1, '#022c22');
+            grad.addColorStop(0, '#021a14');
+            grad.addColorStop(0.25, '#043527');
+            grad.addColorStop(0.55, '#065f46');
+            grad.addColorStop(0.85, '#022c22');
+            grad.addColorStop(1, '#01140f');
         } else if (studioState.bgPreset === 'purple') {
             grad = ctx.createLinearGradient(0, 0, 0, H);
-            grad.addColorStop(0, '#0f051d');
-            grad.addColorStop(0.35, '#2e1065');
-            grad.addColorStop(0.75, '#581c87');
-            grad.addColorStop(1, '#0f051d');
+            grad.addColorStop(0, '#0a0314');
+            grad.addColorStop(0.25, '#1e0a38');
+            grad.addColorStop(0.55, '#581c87');
+            grad.addColorStop(0.85, '#2e1065');
+            grad.addColorStop(1, '#0a0314');
         } else if (studioState.bgPreset === 'sunset') {
             grad = ctx.createLinearGradient(0, 0, 0, H);
-            grad.addColorStop(0, '#1c0a00');
-            grad.addColorStop(0.4, '#7c2d12');
-            grad.addColorStop(0.8, '#c2410c');
-            grad.addColorStop(1, '#1c0a00');
+            grad.addColorStop(0, '#140600');
+            grad.addColorStop(0.25, '#431407');
+            grad.addColorStop(0.55, '#c2410c');
+            grad.addColorStop(0.85, '#7c2d12');
+            grad.addColorStop(1, '#140600');
         } else if (studioState.bgPreset === 'pearl') {
             grad = ctx.createLinearGradient(0, 0, 0, H);
-            grad.addColorStop(0, '#f1f5f9');
-            grad.addColorStop(0.5, '#e2e8f0');
+            grad.addColorStop(0, '#f8fafc');
+            grad.addColorStop(0.3, '#f1f5f9');
+            grad.addColorStop(0.7, '#e2e8f0');
             grad.addColorStop(1, '#cbd5e1');
         } else {
-            // Crimson Toyota Red (Default)
+            // Crimson Toyota Red (Signature Showroom Look)
             grad = ctx.createLinearGradient(0, 0, 0, H);
-            grad.addColorStop(0, '#090e18');
-            grad.addColorStop(0.3, '#7f1d1d');
-            grad.addColorStop(0.7, '#991b1b');
+            grad.addColorStop(0, '#06080e');
+            grad.addColorStop(0.22, '#180508');
+            grad.addColorStop(0.52, '#7f1d1d');
+            grad.addColorStop(0.82, '#991b1b');
             grad.addColorStop(1, '#090e18');
         }
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
     }
 
-    // Dynamic Geometry Mesh Pattern
+    // Dynamic Motorsport Carbon & Tech Accents
     ctx.save();
-    ctx.globalAlpha = isLightText ? 0.06 : 0.04;
+    // Modern corner HUD brackets
+    ctx.strokeStyle = isLightText ? 'rgba(255, 255, 255, 0.22)' : 'rgba(15, 23, 42, 0.15)';
+    ctx.lineWidth = 2.5;
+    const bLen = 35;
+    // Top-left
+    ctx.beginPath(); ctx.moveTo(40, 40 + bLen); ctx.lineTo(40, 40); ctx.lineTo(40 + bLen, 40); ctx.stroke();
+    // Top-right
+    ctx.beginPath(); ctx.moveTo(W - 40 - bLen, 40); ctx.lineTo(W - 40, 40); ctx.lineTo(W - 40, 40 + bLen); ctx.stroke();
+    // Bottom-left
+    ctx.beginPath(); ctx.moveTo(40, H - 40 - bLen); ctx.lineTo(40, H - 40); ctx.lineTo(40 + bLen, H - 40); ctx.stroke();
+    // Bottom-right
+    ctx.beginPath(); ctx.moveTo(W - 40 - bLen, H - 40); ctx.lineTo(W - 40, H - 40); ctx.lineTo(W - 40, H - 40 - bLen); ctx.stroke();
+
+    // Subtle angled speed lines in top corners
+    ctx.globalAlpha = isLightText ? 0.05 : 0.03;
     ctx.strokeStyle = isLightText ? '#ffffff' : '#0f172a';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 60) {
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 6; i++) {
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, H);
-        ctx.stroke();
-    }
-    for (let y = 0; y < H; y += 60) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
+        ctx.moveTo(W - 240 + i * 25, 0);
+        ctx.lineTo(W - 320 + i * 25, 200);
         ctx.stroke();
     }
     ctx.restore();
 
     // ── 2. TOP DEALER BRANDING BAR ──
-    const topMargin = isStory ? 80 : 50;
+    const topMargin = isStory ? 75 : 45;
     const primaryTextColor = isLightText ? '#ffffff' : '#0f172a';
-    const secondaryTextColor = isLightText ? '#94a3b8' : '#475569';
+    const secondaryTextColor = isLightText ? '#cbd5e1' : '#475569';
+
+    // Gazoo Racing Signature Tricolor Angled Bars beside Dealer Name
+    ctx.save();
+    const slashX = 65;
+    const slashY = topMargin + 12;
+    const drawSlash = (x, col) => {
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.moveTo(x + 7, slashY);
+        ctx.lineTo(x + 14, slashY);
+        ctx.lineTo(x + 7, slashY + 34);
+        ctx.lineTo(x, slashY + 34);
+        ctx.closePath();
+        ctx.fill();
+    };
+    drawSlash(slashX, '#ffffff');
+    drawSlash(slashX + 9, '#c8102e');
+    drawSlash(slashX + 18, '#111827');
+    ctx.restore();
 
     // Dealer Name
     ctx.fillStyle = primaryTextColor;
-    ctx.font = '900 38px "Outfit", "Inter", sans-serif';
+    ctx.font = '900 36px "Outfit", "Inter", sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(studioState.dealerName.toUpperCase(), 70, topMargin + 40);
+    ctx.fillText(studioState.dealerName.toUpperCase(), 105, topMargin + 38);
 
     // Dealer City Subtitle
     ctx.fillStyle = secondaryTextColor;
-    ctx.font = '600 17px "Inter", sans-serif';
-    ctx.fillText(studioState.dealerCity.toUpperCase(), 70, topMargin + 70);
+    ctx.font = '600 15px "Inter", sans-serif';
+    ctx.fillText('◆  ' + studioState.dealerCity.toUpperCase(), 105, topMargin + 66);
 
-    // Right Badge
+    // Right Badge: Dealer Resmi Glass Capsule
     ctx.save();
-    ctx.fillStyle = isLightText ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)';
+    const bWidth = 270;
+    const bHeight = 44;
+    const bX = W - bWidth - 65;
+    const bY = topMargin + 14;
+    ctx.fillStyle = isLightText ? 'rgba(15, 23, 42, 0.72)' : 'rgba(255, 255, 255, 0.9)';
     ctx.beginPath();
-    ctx.roundRect(W - 340, topMargin + 10, 270, 48, 24);
+    ctx.roundRect(bX, bY, bWidth, bHeight, 22);
     ctx.fill();
-    ctx.strokeStyle = isLightText ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.12)';
+    ctx.strokeStyle = studioState.themeAccent;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-    
-    ctx.fillStyle = studioState.themeAccent;
-    ctx.font = '800 15px "Inter", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(studioState.badgeTop.toUpperCase(), W - 205, topMargin + 40);
+
+    // Glowing verified live dot
+    ctx.fillStyle = '#22c55e';
+    ctx.beginPath();
+    ctx.arc(bX + 24, bY + bHeight / 2, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = isLightText ? '#f8fafc' : '#0f172a';
+    ctx.font = '800 13.5px "Inter", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(studioState.badgeTop.toUpperCase(), bX + 38, bY + bHeight / 2 + 5);
     ctx.restore();
 
-    // ── 3. PROMO HEADLINE PILL ──
-    const headY = isStory ? 230 : 155;
+    // ── 3. PROMO HEADLINE 3D METALLIC RIBBON ──
+    const headY = isStory ? 220 : 148;
     ctx.save();
     ctx.textAlign = 'center';
 
-    // Glow effect behind headline
+    const ribW = Math.min(680, W - 140);
+    const ribH = 52;
+    const ribX = (W - ribW) / 2;
+
+    // Glowing ambient shadow behind headline
     ctx.shadowColor = studioState.themeAccent;
-    ctx.shadowBlur = 24;
-    ctx.fillStyle = studioState.themeAccent;
+    ctx.shadowBlur = 28;
+
+    // Metallic gradient fill
+    const ribGrad = ctx.createLinearGradient(ribX, headY, ribX + ribW, headY + ribH);
+    ribGrad.addColorStop(0, studioState.themeAccent);
+    ribGrad.addColorStop(0.5, '#e11d48');
+    ribGrad.addColorStop(1, studioState.themeAccent);
+    ctx.fillStyle = ribGrad;
     ctx.beginPath();
-    ctx.roundRect(W / 2 - 300, headY, 600, 52, 26);
+    ctx.roundRect(ribX, headY, ribW, ribH, 26);
     ctx.fill();
     ctx.restore();
+
+    // Upper glossy sheen
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.beginPath();
+    ctx.roundRect(ribX + 2, headY + 2, ribW - 4, ribH / 2 - 2, [24, 24, 0, 0]);
+    ctx.fill();
+    ctx.restore();
+
+    // Ribbon border stroke
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(ribX, headY, ribW, ribH, 26);
+    ctx.stroke();
 
     ctx.fillStyle = '#ffffff';
     ctx.font = '900 20px "Outfit", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`★  ${studioState.promoHeadline.toUpperCase()}  ★`, W / 2, headY + 34);
+    ctx.fillText(`★   ${studioState.promoHeadline.toUpperCase()}   ★`, W / 2, headY + 34);
 
     // ── 4. CAR MODEL TITLE & SUBTITLE ──
-    const titleY = isStory ? 355 : 255;
+    const titleY = isStory ? 340 : 245;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+    ctx.shadowBlur = 16;
     ctx.fillStyle = primaryTextColor;
     ctx.font = '900 46px "Outfit", sans-serif';
     ctx.textAlign = 'center';
-
     if (studioState.carTitle.length > 25) {
         ctx.font = '900 36px "Outfit", sans-serif';
     }
     ctx.fillText(studioState.carTitle.toUpperCase(), W / 2, titleY);
+    ctx.restore();
+
+    // Car Subtitle Pill (Harga OTR)
+    ctx.save();
+    const subW = Math.max(340, ctx.measureText(studioState.carSubtitle).width + 60);
+    const subH = 38;
+    const subX = (W - subW) / 2;
+    const subY = titleY + 14;
+    ctx.fillStyle = isLightText ? 'rgba(0, 0, 0, 0.65)' : 'rgba(255, 255, 255, 0.9)';
+    ctx.beginPath();
+    ctx.roundRect(subX, subY, subW, subH, 19);
+    ctx.fill();
+    ctx.strokeStyle = studioState.themeAccent;
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
 
     ctx.fillStyle = studioState.themeAccent;
-    ctx.font = '800 28px "Inter", sans-serif';
-    ctx.fillText(studioState.carSubtitle, W / 2, titleY + 45);
+    ctx.font = '800 19px "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(studioState.carSubtitle, W / 2, subY + 26);
+    ctx.restore();
+
+    // ── 5. SHOWROOM SPOTLIGHT, STAGE & GROUND REFLECTION ──
+    const carBaseY = isStory ? 440 : 305;
+    const carGroundY = carBaseY + (isStory ? 385 : 270);
+
+    // Dramatic Radial Backlight Spotlight directly behind the car
+    ctx.save();
+    const spotG = ctx.createRadialGradient(W / 2, carBaseY + (isStory ? 190 : 135), 20, W / 2, carBaseY + (isStory ? 190 : 135), isStory ? 540 : 380);
+    spotG.addColorStop(0, studioState.themeAccent + (isLightText ? '99' : '55'));
+    spotG.addColorStop(0.35, studioState.themeAccent + '44');
+    spotG.addColorStop(0.75, studioState.themeAccent + '12');
+    spotG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = spotG;
+    ctx.beginPath();
+    ctx.arc(W / 2, carBaseY + (isStory ? 190 : 135), isStory ? 540 : 380, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Ambient Floor Elliptical Light Pool
+    ctx.save();
+    const floorLight = ctx.createRadialGradient(W / 2, carGroundY, 40, W / 2, carGroundY, isStory ? 480 : 360);
+    floorLight.addColorStop(0, isLightText ? 'rgba(255, 255, 255, 0.16)' : 'rgba(0, 0, 0, 0.05)');
+    floorLight.addColorStop(0.5, studioState.themeAccent + '30');
+    floorLight.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = floorLight;
+    ctx.beginPath();
+    ctx.ellipse(W / 2, carGroundY, isStory ? 480 : 360, isStory ? 65 : 46, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Realistic Multi-Layer Tire Contact Shadows
+    // 1) Soft ambient ground shadow
+    const diffuseShadow = ctx.createRadialGradient(W / 2, carGroundY + 12, 50, W / 2, carGroundY + 12, isStory ? 440 : 330);
+    diffuseShadow.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+    diffuseShadow.addColorStop(0.65, 'rgba(0, 0, 0, 0.35)');
+    diffuseShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = diffuseShadow;
+    ctx.beginPath();
+    ctx.ellipse(W / 2, carGroundY + 12, isStory ? 440 : 330, isStory ? 34 : 24, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2) Deep black tire contact shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+    ctx.beginPath();
+    ctx.ellipse(W / 2, carGroundY + 18, isStory ? 370 : 280, isStory ? 14 : 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
 
     // ── 5. CAR PHOTO RENDERING (MULTI-CAR LAYOUT) ──
-    const carBaseY = isStory ? 440 : 305;
-
     if (studioState.carLayoutMode === '1') {
         // Single Car: Perfectly Centered
         const carImg = loadedCars[0];
@@ -796,11 +929,11 @@ async function renderFlyerCanvas() {
             ctx.drawImage(carImg, imgX, imgY, imgW, imgH);
         }
     } else if (studioState.carLayoutMode === '2') {
-        // 2 Cars (Duo Promo: Car 2 Rear Right, Car 1 Front Left - Balanced & Inset)
+        // 2 Cars (Duo Promo: Car 2 Rear Right, Car 1 Front Left)
         const car1 = loadedCars[0];
         const car2 = loadedCars[1];
 
-        // Draw Car 2 (Behind on Right, insetting safely from right edge)
+        // Draw Car 2 (Behind on Right)
         if (car2) {
             const scale2 = studioState.cars[1].scale;
             const w2 = (isStory ? 600 : 430) * scale2;
@@ -811,7 +944,7 @@ async function renderFlyerCanvas() {
             ctx.drawImage(car2, x2, y2, w2, h2);
         }
 
-        // Draw Car 1 (Front on Left, insetting safely from left edge)
+        // Draw Car 1 (Front on Left)
         if (car1) {
             const scale1 = studioState.cars[0].scale;
             const w1 = (isStory ? 670 : 480) * scale1;
@@ -861,102 +994,238 @@ async function renderFlyerCanvas() {
         }
     }
 
-    // ── 6. FINANCIAL HIGHLIGHT BADGE (TDP & CICILAN) ──
+    // ── 6. LUXURY GLASSMORPHIC FINANCIAL CARD (TDP & CICILAN) ──
     const finY = isStory ? 940 : 640;
     const finW = W - 140;
-    const finH = isStory ? 140 : 120;
+    const finH = isStory ? 148 : 124;
     const finX = 70;
 
+    // Main Card Glassmorphism
     ctx.save();
-    ctx.fillStyle = isLightText ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.92)';
+    ctx.fillStyle = isLightText ? 'rgba(9, 14, 24, 0.92)' : 'rgba(255, 255, 255, 0.97)';
     ctx.beginPath();
-    ctx.roundRect(finX, finY, finW, finH, 20);
+    ctx.roundRect(finX, finY, finW, finH, 24);
     ctx.fill();
-    ctx.strokeStyle = studioState.themeAccent;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    ctx.shadowBlur = 32;
+
+    // Gradient Metallic Border
+    const borderGrad = ctx.createLinearGradient(finX, finY, finX + finW, finY + finH);
+    borderGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+    borderGrad.addColorStop(0.5, studioState.themeAccent);
+    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
+    ctx.strokeStyle = borderGrad;
     ctx.lineWidth = 2.5;
     ctx.stroke();
+    ctx.restore();
 
-    // Split Columns
-    ctx.textAlign = 'center';
-    ctx.fillStyle = isLightText ? '#cbd5e1' : '#64748b';
-    ctx.font = '700 13px "Inter", sans-serif';
-    ctx.fillText(studioState.finLabelLeft.toUpperCase(), finX + finW * 0.25, finY + 38);
-
+    // Perched Top Badge: "PENAWARAN TERBAIK BULAN INI"
+    ctx.save();
+    const topTagW = 320;
+    const topTagH = 32;
+    const topTagX = finX + (finW - topTagW) / 2;
+    const topTagY = finY - 16;
     ctx.fillStyle = studioState.themeAccent;
-    ctx.font = `900 ${isStory ? 28 : 24}px "Outfit", sans-serif`;
-    ctx.fillText(studioState.finValLeft, finX + finW * 0.25, finY + (isStory ? 80 : 75));
-
-    // Divider Line
-    ctx.strokeStyle = isLightText ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.1)';
-    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(finX + finW * 0.5, finY + 20);
-    ctx.lineTo(finX + finW * 0.5, finY + finH - 20);
+    ctx.roundRect(topTagX, topTagY, topTagW, topTagH, 16);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Right Column: Angsuran
-    ctx.fillStyle = isLightText ? '#cbd5e1' : '#64748b';
-    ctx.font = '700 13px "Inter", sans-serif';
-    ctx.fillText(studioState.finLabelRight.toUpperCase(), finX + finW * 0.75, finY + 38);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 13px "Outfit", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🔥 PENAWARAN TERBAIK BULAN INI', finX + finW / 2, topTagY + 21);
+    ctx.restore();
+
+    // Split Columns
+    // Left: TDP
+    ctx.save();
+    ctx.textAlign = 'center';
+    const tdpPillW = 195;
+    const tdpPillH = 26;
+    const tdpPillX = finX + finW * 0.25 - tdpPillW / 2;
+    const tdpPillY = finY + 26;
+    ctx.fillStyle = isLightText ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    ctx.beginPath();
+    ctx.roundRect(tdpPillX, tdpPillY, tdpPillW, tdpPillH, 13);
+    ctx.fill();
+    ctx.fillStyle = isLightText ? '#94a3b8' : '#64748b';
+    ctx.font = '800 12px "Inter", sans-serif';
+    ctx.fillText(studioState.finLabelLeft.toUpperCase(), finX + finW * 0.25, tdpPillY + 18);
+
+    ctx.fillStyle = studioState.themeAccent;
+    ctx.font = `900 ${isStory ? 30 : 26}px "Outfit", sans-serif`;
+    ctx.fillText(studioState.finValLeft, finX + finW * 0.25, finY + (isStory ? 84 : 78));
+
+    // Center Vertical Laser Line with Diamond Node
+    const divX = finX + finW * 0.5;
+    const divGrad = ctx.createLinearGradient(divX, finY + 20, divX, finY + finH - 35);
+    divGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    divGrad.addColorStop(0.5, studioState.themeAccent);
+    divGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.strokeStyle = divGrad;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(divX, finY + 20);
+    ctx.lineTo(divX, finY + finH - 35);
+    ctx.stroke();
+
+    ctx.fillStyle = studioState.themeAccent;
+    ctx.beginPath();
+    ctx.arc(divX, finY + finH * 0.44, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Right: Angsuran
+    const angPillW = 185;
+    const angPillH = 26;
+    const angPillX = finX + finW * 0.75 - angPillW / 2;
+    const angPillY = finY + 26;
+    ctx.fillStyle = isLightText ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    ctx.beginPath();
+    ctx.roundRect(angPillX, angPillY, angPillW, angPillH, 13);
+    ctx.fill();
+    ctx.fillStyle = isLightText ? '#94a3b8' : '#64748b';
+    ctx.font = '800 12px "Inter", sans-serif';
+    ctx.fillText(studioState.finLabelRight.toUpperCase(), finX + finW * 0.75, angPillY + 18);
 
     ctx.fillStyle = isLightText ? '#ffffff' : '#0f172a';
-    ctx.font = `900 ${isStory ? 28 : 24}px "Outfit", sans-serif`;
-    ctx.fillText(studioState.finValRight, finX + finW * 0.75, finY + (isStory ? 80 : 75));
+    ctx.font = `900 ${isStory ? 30 : 26}px "Outfit", sans-serif`;
+    ctx.fillText(studioState.finValRight, finX + finW * 0.75, finY + (isStory ? 84 : 78));
 
-    // Subtext at bottom of badge
-    ctx.fillStyle = isLightText ? '#94a3b8' : '#64748b';
-    ctx.font = '600 11px "Inter", sans-serif';
-    ctx.fillText(studioState.finSubtext, finX + finW / 2, finY + finH - 14);
+    // Bottom Feature Subtext Ribbon
+    const subBarH = 28;
+    const subBarY = finY + finH - subBarH - 8;
+    ctx.fillStyle = isLightText ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)';
+    ctx.beginPath();
+    ctx.roundRect(finX + 16, subBarY, finW - 32, subBarH, 14);
+    ctx.fill();
+    ctx.fillStyle = isLightText ? '#cbd5e1' : '#475569';
+    ctx.font = '700 12px "Inter", sans-serif';
+    ctx.fillText(studioState.finSubtext, finX + finW / 2, subBarY + 19);
     ctx.restore();
 
     // ── 7. BONUS & BENEFIT CHECKLIST (STORY 9:16 ONLY) ──
     if (isStory && studioState.bonusItems.length > 0) {
         const bonusY = 1130;
-        ctx.textAlign = 'left';
+        ctx.save();
         ctx.fillStyle = studioState.themeAccent;
-        ctx.font = '800 15px "Inter", sans-serif';
-        ctx.fillText(studioState.bonusHeading.toUpperCase(), 80, bonusY);
+        ctx.font = '900 17px "Outfit", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`🎁  ${studioState.bonusHeading.toUpperCase()}`, 80, bonusY);
 
-        let curY = bonusY + 45;
+        // Decorative accent underline
+        const underGrad = ctx.createLinearGradient(80, bonusY + 8, 480, bonusY + 8);
+        underGrad.addColorStop(0, studioState.themeAccent);
+        underGrad.addColorStop(1, 'rgba(200, 16, 46, 0)');
+        ctx.strokeStyle = underGrad;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(80, bonusY + 8);
+        ctx.lineTo(480, bonusY + 8);
+        ctx.stroke();
+
+        let curY = bonusY + 42;
         studioState.bonusItems.slice(0, 5).forEach((b) => {
+            const itemX = 80;
+            const itemW = W - 160;
+            const itemH = 46;
+            const itemY = curY - 28;
+
+            // Glassmorphic card fill
             ctx.save();
-            ctx.fillStyle = isLightText ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.05)';
+            const itemGrad = ctx.createLinearGradient(itemX, itemY, itemX + itemW, itemY);
+            itemGrad.addColorStop(0, isLightText ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)');
+            itemGrad.addColorStop(1, isLightText ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)');
+            ctx.fillStyle = itemGrad;
             ctx.beginPath();
-            ctx.roundRect(80, curY - 26, W - 160, 42, 10);
+            ctx.roundRect(itemX, itemY, itemW, itemH, 12);
             ctx.fill();
-            ctx.strokeStyle = isLightText ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+
+            // Glowing border
+            ctx.strokeStyle = isLightText ? 'rgba(255, 255, 255, 0.16)' : 'rgba(0, 0, 0, 0.08)';
+            ctx.lineWidth = 1.2;
             ctx.stroke();
 
-            ctx.fillStyle = isLightText ? '#f8fafc' : '#1e293b';
+            // Left Accent Bar
+            ctx.fillStyle = studioState.themeAccent;
+            ctx.beginPath();
+            ctx.roundRect(itemX, itemY, 5, itemH, [12, 0, 0, 12]);
+            ctx.fill();
+
+            // Checkmark Icon Circle
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.arc(itemX + 28, itemY + itemH / 2, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 13px "Inter", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('✓', itemX + 28, itemY + itemH / 2 + 5);
+
+            // Clean text
+            const cleanText = b.replace(/^[✓✔•\s-]+/, '').trim();
+            ctx.textAlign = 'left';
+            ctx.fillStyle = isLightText ? '#f8fafc' : '#0f172a';
             ctx.font = '700 16px "Inter", sans-serif';
-            ctx.fillText(b, 100, curY);
+            ctx.fillText(cleanText, itemX + 50, itemY + itemH / 2 + 6);
             ctx.restore();
-            curY += 54;
+
+            curY += 56;
         });
+        ctx.restore();
     }
 
-    // ── 8. FOOTER SALES CARD (WITH USER'S OWN PHOTO AVATAR) ──
-    const footH = isStory ? 240 : 180;
-    const footY = H - footH - (isStory ? 60 : 35);
+    // ── 8. FOOTER SALES CARD (VIP DEALER CREDENTIAL CARD) ──
+    const footH = isStory ? 245 : 185;
+    const footY = H - footH - (isStory ? 55 : 30);
     const footW = W - 140;
     const footX = 70;
 
     ctx.save();
+    // Card background with luxury shadow
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.roundRect(footX, footY, footW, footH, 24);
     ctx.fill();
-    ctx.shadowColor = 'rgba(0,0,0,0.45)';
-    ctx.shadowBlur = 22;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 28;
+
+    // Top highlight multi-color accent line
+    const topCardGrad = ctx.createLinearGradient(footX, footY, footX + footW, footY);
+    topCardGrad.addColorStop(0, studioState.themeAccent);
+    topCardGrad.addColorStop(0.5, '#f59e0b');
+    topCardGrad.addColorStop(1, '#22c55e');
+    ctx.strokeStyle = topCardGrad;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(footX, footY, footW, 4, [24, 24, 0, 0]);
+    ctx.stroke();
+    ctx.restore();
+
+    // Verified Official Badge Tag
+    ctx.save();
+    const vTagX = footX + 24;
+    const vTagY = footY + 16;
+    ctx.fillStyle = 'rgba(34, 197, 94, 0.12)';
+    ctx.beginPath();
+    ctx.roundRect(vTagX, vTagY, 215, 24, 12);
+    ctx.fill();
+    ctx.fillStyle = '#16a34a';
+    ctx.font = '800 11px "Inter", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('✔ OFFICIAL SALES CONSULTANT', vTagX + 10, vTagY + 16);
+    ctx.restore();
 
     // Sales Avatar Geometry
     const hasPhoto = Boolean(loadedSalesPhoto);
-    const avRadius = isStory ? 52 : 40;
+    const avRadius = isStory ? 54 : 42;
     const avX = footX + 24 + avRadius;
-    const avY = footY + (footH / 2) - (isStory ? 10 : 0);
+    const avY = footY + (footH / 2) + 6;
 
     if (hasPhoto) {
-        // Draw Circular Clipped Sales Photo
+        // Photo inside circular clip
         ctx.save();
         ctx.beginPath();
         ctx.arc(avX, avY, avRadius, 0, Math.PI * 2);
@@ -965,73 +1234,120 @@ async function renderFlyerCanvas() {
         ctx.drawImage(loadedSalesPhoto, avX - avRadius, avY - avRadius, avRadius * 2, avRadius * 2);
         ctx.restore();
 
-        // Outer Ring for Avatar
+        // Outer Ring
         ctx.beginPath();
         ctx.arc(avX, avY, avRadius, 0, Math.PI * 2);
         ctx.strokeStyle = studioState.themeAccent;
         ctx.lineWidth = 3.5;
         ctx.stroke();
+
+        // Live Online Indicator Dot
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath();
+        ctx.arc(avX + avRadius * 0.7, avY + avRadius * 0.7, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
     } else {
-        // Default Avatar Circle with Initial
+        // Default Initial Avatar
         ctx.beginPath();
         ctx.arc(avX, avY, avRadius, 0, Math.PI * 2);
-        ctx.fillStyle = '#f1f5f9';
+        ctx.fillStyle = '#f8fafc';
         ctx.fill();
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = studioState.themeAccent;
+        ctx.lineWidth = 3;
         ctx.stroke();
 
         ctx.textAlign = 'center';
         ctx.fillStyle = '#0f172a';
-        ctx.font = `900 ${isStory ? 36 : 28}px "Outfit", sans-serif`;
+        ctx.font = `900 ${isStory ? 38 : 30}px "Outfit", sans-serif`;
         const initial = (studioState.salesName || 'S').trim().charAt(0).toUpperCase();
-        ctx.fillText(initial, avX, avY + (isStory ? 13 : 10));
+        ctx.fillText(initial, avX, avY + (isStory ? 14 : 11));
+
+        // Live Online Dot
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath();
+        ctx.arc(avX + avRadius * 0.7, avY + avRadius * 0.7, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
     }
 
-    // Text Alignment (shifts right to accommodate the avatar)
-    const textStartX = avX + avRadius + 20;
-
+    // Text Details
+    const textStartX = avX + avRadius + 22;
     ctx.textAlign = 'left';
+    // Sales Name
     ctx.fillStyle = '#0f172a';
-    ctx.font = `900 ${isStory ? 28 : 22}px "Outfit", sans-serif`;
-    ctx.fillText(studioState.salesName, textStartX, footY + (isStory ? 60 : 48));
+    ctx.font = `900 ${isStory ? 29 : 23}px "Outfit", sans-serif`;
+    ctx.fillText(studioState.salesName, textStartX, footY + (isStory ? 74 : 60));
 
+    // Sales Role & Branch with Pin
     ctx.fillStyle = '#64748b';
     ctx.font = '700 14px "Inter", sans-serif';
-    ctx.fillText(`${studioState.salesRole} · ${studioState.salesBranch}`, textStartX, footY + (isStory ? 95 : 76));
+    ctx.fillText(`📍 ${studioState.salesRole} · ${studioState.salesBranch}`, textStartX, footY + (isStory ? 104 : 84));
 
-    // WhatsApp Pill Button
-    ctx.fillStyle = '#22c55e';
+    // High-Energy WhatsApp CTA Button
+    const waBtnW = isStory ? 320 : 250;
+    const waBtnH = isStory ? 52 : 44;
+    const waBtnX = textStartX;
+    const waBtnY = footY + (isStory ? 124 : 100);
+
+    ctx.save();
+    const waGrad = ctx.createLinearGradient(waBtnX, waBtnY, waBtnX + waBtnW, waBtnY + waBtnH);
+    waGrad.addColorStop(0, '#22c55e');
+    waGrad.addColorStop(1, '#15803d');
+    ctx.fillStyle = waGrad;
     ctx.beginPath();
-    ctx.roundRect(textStartX, footY + (isStory ? 122 : 98), isStory ? 310 : 240, isStory ? 52 : 42, 26);
+    ctx.roundRect(waBtnX, waBtnY, waBtnW, waBtnH, 26);
+    ctx.fill();
+    ctx.shadowColor = 'rgba(34, 197, 94, 0.45)';
+    ctx.shadowBlur = 14;
+
+    // Button gloss sheen
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.beginPath();
+    ctx.roundRect(waBtnX + 2, waBtnY + 2, waBtnW - 4, waBtnH / 2 - 2, [24, 24, 0, 0]);
     ctx.fill();
 
+    // Button text
     ctx.fillStyle = '#ffffff';
-    ctx.font = `900 ${isStory ? 18 : 14}px "Inter", sans-serif`;
-    ctx.fillText(`✆ WA: ${studioState.salesPhone}`, textStartX + 20, footY + (isStory ? 155 : 124));
+    ctx.font = `900 ${isStory ? 17 : 14}px "Inter", sans-serif`;
+    ctx.fillText(`💬 CHAT WA: ${studioState.salesPhone}`, waBtnX + 20, waBtnY + (isStory ? 32 : 27));
+    ctx.restore();
 
     if (isStory) {
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 12px "Inter", sans-serif';
-        ctx.fillText(studioState.footnote, textStartX, footY + 210);
+        ctx.font = '600 11.5px "Inter", sans-serif';
+        ctx.fillText(studioState.footnote, textStartX, footY + 208);
     }
 
     // QR Code on Far Right
     const qrSize = isStory ? 160 : 120;
-    const qrX = footX + footW - qrSize - 30;
+    const qrX = footX + footW - qrSize - 28;
     const qrY = footY + (footH - qrSize) / 2;
 
     if (qrElement) {
         try {
             ctx.drawImage(qrElement, qrX, qrY, qrSize, qrSize);
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(qrX - 2, qrY - 2, qrSize + 4, qrSize + 4);
+            // Corner brackets around QR code
+            ctx.strokeStyle = studioState.themeAccent;
+            ctx.lineWidth = 2.5;
+            const qrBrk = 18;
+            // Top-left
+            ctx.beginPath(); ctx.moveTo(qrX - 4, qrY + qrBrk); ctx.lineTo(qrX - 4, qrY - 4); ctx.lineTo(qrX + qrBrk, qrY - 4); ctx.stroke();
+            // Top-right
+            ctx.beginPath(); ctx.moveTo(qrX + qrSize + 4 - qrBrk, qrY - 4); ctx.lineTo(qrX + qrSize + 4, qrY - 4); ctx.lineTo(qrX + qrSize + 4, qrY + qrBrk); ctx.stroke();
+            // Bottom-left
+            ctx.beginPath(); ctx.moveTo(qrX - 4, qrY + qrSize + 4 - qrBrk); ctx.lineTo(qrX - 4, qrY + qrSize + 4); ctx.lineTo(qrX + qrBrk, qrY + qrSize + 4); ctx.stroke();
+            // Bottom-right
+            ctx.beginPath(); ctx.moveTo(qrX + qrSize + 4 - qrBrk, qrY + qrSize + 4); ctx.lineTo(qrX + qrSize + 4, qrY + qrSize + 4); ctx.lineTo(qrX + qrSize + 4, qrY + qrSize + 4 - qrBrk); ctx.stroke();
 
             ctx.textAlign = 'center';
             ctx.fillStyle = '#475569';
-            ctx.font = '800 10.5px "Inter", sans-serif';
-            ctx.fillText('SCAN KONSULTASI WA', qrX + qrSize / 2, qrY + qrSize + 14);
+            ctx.font = '800 11px "Inter", sans-serif';
+            ctx.fillText('SCAN KONSULTASI WA', qrX + qrSize / 2, qrY + qrSize + 18);
         } catch(e) {
             console.warn('QR render error:', e);
         }
