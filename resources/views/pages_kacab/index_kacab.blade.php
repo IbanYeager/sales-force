@@ -109,6 +109,17 @@
         </button>
       </div>
     </aside>
+    <script>
+      (function(){
+        try {
+          var sb = document.querySelector('.kcb-sidebar');
+          var st = sessionStorage.getItem('kcb_sidebar_scroll_top');
+          if (sb && st !== null && !isNaN(st)) {
+            sb.scrollTop = parseInt(st, 10);
+          }
+        } catch(e) {}
+      })();
+    </script>
 
     <!-- MAIN CONTENT -->
     <main class="kcb-main">
@@ -594,26 +605,41 @@
         </div>
 
         <!-- ===== PERINGKAT SPV + AKTIVITAS TERBARU ===== -->
-        <div class="grid-2">
-          <section class="kcb-card" style="animation-delay:0.18s;">
-            <h3 class="card-label"><i class="fa-solid fa-ranking-star"></i> Peringkat Kinerja SPV
-              <span class="spacer"></span>
-              <a href="monitoring_spv.html" class="btn btn-ghost btn-sm">Lihat Semua <i
-                  class="fa-solid fa-arrow-right"></i></a>
-            </h3>
+        <div class="dashboard-bottom-grid">
+          <!-- Card 1: Peringkat Kinerja SPV -->
+          <section class="kcb-card spv-leaderboard-card" style="animation-delay:0.18s;">
+            <div class="card-head-bar">
+              <div class="card-head-title">
+                <div class="card-head-icon icon-amber"><i class="fa-solid fa-ranking-star"></i></div>
+                <div>
+                  <h3 class="card-head-h3">Peringkat Kinerja SPV</h3>
+                  <p class="card-head-sub">Realisasi SPK &amp; Delivery Order per Tim Supervisor</p>
+                </div>
+              </div>
+              <a href="monitoring_spv.html" class="card-head-link">Lihat Detail <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
             <div class="spv-board" id="spvBoard">
-              <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data...</p>
+              <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data supervisor...</p>
             </div>
           </section>
 
-          <section class="kcb-card" style="animation-delay:0.22s;">
-            <h3 class="card-label"><i class="fa-solid fa-bolt"></i> Aktivitas Terbaru &amp; Pameran
-              <span class="spacer"></span>
-              <a href="riwayat_foto_aktivitas.html" class="btn btn-ghost btn-sm" style="color:#2563eb; font-weight:700;"><i class="fa-solid fa-images"></i> Galeri Foto</a>
-              <a href="aktivitas.html" class="btn btn-ghost btn-sm">Timeline <i class="fa-solid fa-arrow-right"></i></a>
-            </h3>
+          <!-- Card 2: Aktivitas Terbaru & Pameran -->
+          <section class="kcb-card activity-feed-card" style="animation-delay:0.22s;">
+            <div class="card-head-bar">
+              <div class="card-head-title">
+                <div class="card-head-icon icon-rose"><i class="fa-solid fa-bolt"></i></div>
+                <div>
+                  <h3 class="card-head-h3">Aktivitas Terbaru &amp; Pameran</h3>
+                  <p class="card-head-sub">Laporan lapangan &amp; dokumentasi pameran real-time</p>
+                </div>
+              </div>
+              <div class="card-head-actions">
+                <a href="riwayat_foto_aktivitas.html" class="feed-header-btn btn-photo"><i class="fa-solid fa-images"></i> Galeri Foto</a>
+                <a href="aktivitas.html" class="feed-header-btn btn-timeline">Timeline <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
             <div class="feed-list" id="feedList">
-              <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data...</p>
+              <p class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat aktivitas terkini...</p>
             </div>
           </section>
         </div>

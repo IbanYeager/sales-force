@@ -102,6 +102,7 @@ Terima kasih atas kerja kerasnya! 💪🔥`;
 
 function renderSpvBoard(hierarchy) {
   const board = document.getElementById('spvBoard');
+  if (!board) return;
   const groups = hierarchy.filter(g => g.spv !== 'Tanpa SPV');
 
   if (groups.length === 0) {
@@ -114,41 +115,100 @@ function renderSpvBoard(hierarchy) {
     return;
   }
 
-  board.innerHTML = groups.map((g, i) => {
-    const isSpvOn = g.is_online;
-    const spvDotStyle = isSpvOn
-      ? 'background:#10b981; box-shadow:0 0 6px #10b981;'
-      : 'background:#94a3b8;';
+  // Urutkan peringkat berdasarkan pencapaian DO atau realisasi SPK
+  const sorted = [...groups].sort((a, b) => (b.pct_do - a.pct_do) || (b.real_spk - a.real_spk));
+
+  board.innerHTML = sorted.map((g, i) => {
+    const isSpvOn = !!g.is_online;
     const onlineSalesInTeam = (g.online_sales || 0);
+    const rankNum = i + 1;
+
+    let medalHtml = `${rankNum}`;
+    if (rankNum === 1) {
+      medalHtml = `<i class="fa-solid fa-trophy" style="font-size:11px; margin-right:3px; color:#d97706;"></i> 1`;
+    }
 
     return `
-    <div class="spv-board-row" onclick="location.href='monitoring_spv.html?spv=${encodeURIComponent(g.spv)}'">
-      <div class="rank-no ${i === 0 ? 'r1' : ''}">${i + 1}</div>
-      <div class="who">
-        <div class="nm" style="display:flex; align-items:center; gap:6px;">
-          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; ${spvDotStyle}" title="${isSpvOn ? 'SPV Online Sekarang' : 'SPV Offline'}"></span>
-          ${escapeHtml(g.spv)}
-          ${isSpvOn ? '<span style="font-size:10px; background:#dcfce7; color:#15803d; padding:1px 6px; border-radius:6px; font-weight:800;">Online</span>' : ''}
+    <div class="spv-rank-card rank-${rankNum}" onclick="location.href='monitoring_spv.html?spv=${encodeURIComponent(g.spv)}'" title="Buka performa detail tim ${escapeHtml(g.spv)}">
+      <div class="spv-rank-main">
+        <div class="spv-rank-badge rank-badge-${rankNum}">
+          ${medalHtml}
         </div>
-        <div class="sd">
-          ${g.total_sales} sales &middot; <span style="color:#10b981; font-weight:700;">🟢 ${onlineSalesInTeam} Online</span> &middot; <span style="color:#64748b;">${g.last_active_formatted}</span>
+        <div class="spv-rank-info">
+          <div class="spv-rank-name-row">
+            <span class="spv-rank-name">${escapeHtml(g.spv)}</span>
+            <span class="spv-live-dot ${isSpvOn ? 'online' : 'offline'}" title="${isSpvOn ? 'SPV Online Sekarang' : 'SPV Offline'}"></span>
+            ${isSpvOn ? '<span class="spv-online-tag">Online</span>' : ''}
+          </div>
+          <div class="spv-rank-sub">
+            <span>${g.total_sales} Sales</span>
+            <span class="sub-sep">&bull;</span>
+            <span class="${onlineSalesInTeam > 0 ? 'text-emerald' : 'text-slate'}">${onlineSalesInTeam} Online</span>
+            <span class="sub-sep">&bull;</span>
+            <span class="sub-time">${escapeHtml(g.last_active_formatted || 'Aktif')}</span>
+          </div>
         </div>
       </div>
-      <div class="mini-meter">
-        <div class="mm-head"><span>SPK</span><b>${g.real_spk}/${g.target_spk}</b></div>
-        <div class="track"><div class="fill blue" style="width:${Math.min(g.pct_spk, 100)}%"></div></div>
+
+      <div class="spv-rank-metrics">
+        <!-- SPK Metric Pill -->
+        <div class="spv-metric-pill spk" title="Realisasi SPK: ${g.real_spk} / Target ${g.target_spk}">
+          <div class="pill-head">
+            <span class="pill-lbl">SPK</span>
+            <span class="pill-pct ${pctClass(g.pct_spk)}">${g.pct_spk}%</span>
+          </div>
+          <div class="pill-val">${g.real_spk} <small>/${g.target_spk}</small></div>
+          <div class="pill-bar">
+            <div class="pill-bar-fill fill-blue" style="width:${Math.min(g.pct_spk, 100)}%;"></div>
+          </div>
+        </div>
+
+        <!-- DO Metric Pill -->
+        <div class="spv-metric-pill do" title="Realisasi DO: ${g.real_do} / Target ${g.target_do}">
+          <div class="pill-head">
+            <span class="pill-lbl">DO</span>
+            <span class="pill-pct ${pctClass(g.pct_do)}">${g.pct_do}%</span>
+          </div>
+          <div class="pill-val">${g.real_do} <small>/${g.target_do}</small></div>
+          <div class="pill-bar">
+            <div class="pill-bar-fill fill-red" style="width:${Math.min(g.pct_do, 100)}%;"></div>
+          </div>
+        </div>
+
+        <div class="spv-rank-arrow">
+          <i class="fa-solid fa-chevron-right"></i>
+        </div>
       </div>
-      <div class="mini-meter">
-        <div class="mm-head"><span>DO</span><b>${g.real_do}/${g.target_do}</b></div>
-        <div class="track"><div class="fill red" style="width:${Math.min(g.pct_do, 100)}%"></div></div>
-      </div>
-      <span class="ach-chip ${pctClass(g.pct_do)}"><i class="fa-solid fa-truck-fast"></i> ${g.pct_do}%</span>
     </div>`;
   }).join('');
 }
 
+function getActivityMeta(tipe) {
+  const t = (tipe || '').toLowerCase();
+  if (t.includes('pameran') || t.includes('booth') || t.includes('display')) {
+    return { icon: 'fa-store', bg: '#f5f3ff', border: '#ddd6fe', color: '#6d28d9', label: 'Pameran' };
+  }
+  if (t.includes('gathering') || t.includes('customer')) {
+    return { icon: 'fa-users', bg: '#f0fdf4', border: '#bbf7d0', color: '#15803d', label: 'Gathering' };
+  }
+  if (t.includes('pertemuan') || t.includes('kantor') || t.includes('meeting')) {
+    return { icon: 'fa-briefcase', bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8', label: 'Pertemuan' };
+  }
+  if (t.includes('canvassing') || t.includes('lapangan')) {
+    return { icon: 'fa-location-dot', bg: '#fffbeb', border: '#fef08a', color: '#b45309', label: 'Canvassing' };
+  }
+  if (t.includes('follow') || t.includes('database') || t.includes('telepon')) {
+    return { icon: 'fa-phone-volume', bg: '#f0f9ff', border: '#bae6fd', color: '#0369a1', label: 'Follow-Up' };
+  }
+  if (t.includes('tiktok') || t.includes('live') || t.includes('digital')) {
+    return { icon: 'fa-video', bg: '#fff1f2', border: '#fecdd3', color: '#be123c', label: 'Digital' };
+  }
+  return { icon: 'fa-clipboard-check', bg: '#f8fafc', border: '#e2e8f0', color: '#475569', label: tipe || 'Aktivitas' };
+}
+
 async function loadFeed() {
   const feed = document.getElementById('feedList');
+  if (!feed) return;
   try {
     const res = await fetch('../api/api_aktivitas.php?limit=15');
     const json = await res.json();
@@ -169,27 +229,33 @@ async function loadFeed() {
 
     feed.innerHTML = json.data.map(act => {
       const date = new Date(String(act.created_at).replace(/-/g, '/'));
-      const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-      const dayStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-      const isPameran = (act.tipe_aktivitas || '').toLowerCase().includes('pameran') || !!act.foto_dokumentasi;
-      const pameranBadge = isPameran
-        ? `<span style="background:#eff6ff; color:#2563eb; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px;"><i class="fa-solid fa-camera"></i> Foto</span>`
-        : '';
-      const statusClass = (act.status || '').toLowerCase() === 'selesai' ? '#16a34a' : ((act.status || '').toLowerCase() === 'rencana' ? '#d97706' : '#2563eb');
-      const statusPill = act.status ? `<span style="font-size:10px; font-weight:800; color:${statusClass}; margin-left:4px;">&bull; ${escapeHtml(act.status)}</span>` : '';
+      const timeStr = isNaN(date.getTime()) ? '' : date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      const dayStr = isNaN(date.getTime()) ? '' : date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+      const timeCombined = (dayStr && timeStr) ? `${dayStr}, ${timeStr}` : (dayStr || timeStr || '-');
+
+      const meta = getActivityMeta(act.tipe_aktivitas);
+      const hasPhoto = !!act.foto_dokumentasi || (act.tipe_aktivitas || '').toLowerCase().includes('pameran');
+      const isRencana = (act.status || '').toLowerCase() === 'rencana';
 
       return `
-        <div class="feed-item" onclick="location.href='aktivitas.html'" style="cursor:pointer;" title="Klik untuk rincian aktivitas">
-          <div class="feed-icon"><i class="fa-solid ${activityIcon(act.tipe_aktivitas)}"></i></div>
-          <div class="feed-body">
-            <div class="t" style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
-              <span>${escapeHtml(act.tipe_aktivitas)}</span>
-              ${pameranBadge}
-              ${statusPill}
-            </div>
-            <div class="m"><strong>${escapeHtml(act.nama_sales || 'Sales')}</strong> &middot; ${escapeHtml(act.keterangan || '')}</div>
+        <div class="feed-item" onclick="location.href='aktivitas.html'" title="Klik untuk membuka timeline aktivitas">
+          <div class="feed-icon" style="background:${meta.bg}; border:1px solid ${meta.border}; color:${meta.color};">
+            <i class="fa-solid ${meta.icon}"></i>
           </div>
-          <div class="feed-time">${dayStr}<br>${timeStr}</div>
+          <div class="feed-body">
+            <div class="feed-top-row">
+              <div class="feed-tags-wrap">
+                <span class="feed-sales-name">${escapeHtml(act.nama_sales || 'Wiraniaga')}</span>
+                <span class="feed-type-pill" style="background:${meta.bg}; color:${meta.color}; border:1px solid ${meta.border};">
+                  ${escapeHtml(act.tipe_aktivitas || meta.label)}
+                </span>
+                ${hasPhoto ? `<span class="feed-photo-chip"><i class="fa-solid fa-camera"></i> Foto</span>` : ''}
+                ${isRencana ? `<span class="feed-status-rencana"><i class="fa-regular fa-clock"></i> Rencana</span>` : ''}
+              </div>
+              <div class="feed-time">${timeCombined}</div>
+            </div>
+            <p class="feed-desc">${escapeHtml(act.keterangan || 'Melakukan aktivitas penjualan rutin.')}</p>
+          </div>
         </div>`;
     }).join('');
   } catch (e) {
@@ -283,11 +349,10 @@ async function loadOperationalAktivitasSummary() {
 }
 
 function activityIcon(tipe) {
-  if (tipe === 'Live Tiktok') return 'fa-video';
-  if (tipe === 'Digital Marketing') return 'fa-share-nodes';
-  if (tipe === 'Follow Up Database') return 'fa-phone';
-  if (tipe === 'Pameran Display') return 'fa-store';
-  return 'fa-list-check';
+  if (typeof getActivityMeta === 'function') {
+    return getActivityMeta(tipe).icon;
+  }
+  return 'fa-clipboard-check';
 }
 
 let aiSentinelData = null;

@@ -17,6 +17,84 @@ if (typeof window !== 'undefined') {
   }
 }
 
+// ── Sidebar Scroll Position Persistence across Navigation ───────────
+function initSidebarScrollPersistence() {
+  const sidebar = document.querySelector('.kcb-sidebar, aside.desktop-sidebar');
+  if (!sidebar) return;
+
+  const SCROLL_KEY = 'kcb_sidebar_scroll_top';
+
+  function applyScroll() {
+    try {
+      const saved = sessionStorage.getItem(SCROLL_KEY);
+      if (saved !== null && !isNaN(saved)) {
+        const targetVal = parseInt(saved, 10);
+        if (Math.abs(sidebar.scrollTop - targetVal) > 2) {
+          sidebar.scrollTop = targetVal;
+        }
+      } else {
+        // Jika belum ada posisi tersimpan, pastikan menu aktif terlihat (scrollIntoView)
+        const activeItem = sidebar.querySelector('.kcb-nav a.active, .kcb-sidebar a.active, .sidebar-nav-link.active');
+        if (activeItem) {
+          activeItem.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+          sessionStorage.setItem(SCROLL_KEY, sidebar.scrollTop);
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Terapkan sesegera mungkin
+  applyScroll();
+
+  // Jalankan kembali saat font dan DOM layout sudah stabil
+  requestAnimationFrame(applyScroll);
+  setTimeout(applyScroll, 60);
+  setTimeout(applyScroll, 250);
+
+  // Hindari duplikasi listener jika fungsi dipanggil ulang
+  if (sidebar.dataset.scrollBound === 'true') return;
+  sidebar.dataset.scrollBound = 'true';
+
+  let scrollThrottle = null;
+  sidebar.addEventListener('scroll', () => {
+    if (scrollThrottle) return;
+    scrollThrottle = setTimeout(() => {
+      scrollThrottle = null;
+      try {
+        sessionStorage.setItem(SCROLL_KEY, sidebar.scrollTop);
+      } catch (e) {}
+    }, 70);
+  }, { passive: true });
+
+  // Simpan seketika posisi scroll saat user mengklik tautan menu di sidebar
+  sidebar.addEventListener('click', (e) => {
+    const targetLink = e.target.closest('a, button');
+    if (targetLink) {
+      try {
+        sessionStorage.setItem(SCROLL_KEY, sidebar.scrollTop);
+      } catch (err) {}
+    }
+  }, { capture: true });
+
+  window.addEventListener('beforeunload', () => {
+    try {
+      sessionStorage.setItem(SCROLL_KEY, sidebar.scrollTop);
+    } catch (e) {}
+  });
+
+  window.addEventListener('pagehide', () => {
+    try {
+      sessionStorage.setItem(SCROLL_KEY, sidebar.scrollTop);
+    } catch (e) {}
+  });
+}
+window.initSidebarScrollPersistence = initSidebarScrollPersistence;
+
+// Jalankan persistensi scroll sidebar segera, saat DOMContentLoaded, dan saat pageshow
+initSidebarScrollPersistence();
+document.addEventListener('DOMContentLoaded', initSidebarScrollPersistence);
+window.addEventListener('pageshow', initSidebarScrollPersistence);
+
 function logoutUser() {
   try {
     localStorage.clear();
