@@ -1230,4 +1230,30 @@ async function initFlyerStudioPage() {
     }, 150);
 }
 
+// ── FULLSCREEN ZOOM MODAL HANDLERS ──
+function openFlyerZoomModal() {
+    const previewImg = document.getElementById('flyerCanvasPreviewImg');
+    const modalImg = document.getElementById('flyerZoomModalImg');
+    const modal = document.getElementById('flyerZoomModal');
+    if (previewImg && modalImg && modal) {
+        if (!previewImg.src || previewImg.src === '') {
+            renderFlyerCanvas();
+        }
+        modalImg.src = previewImg.src;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeFlyerZoomModal(event) {
+    const modal = document.getElementById('flyerZoomModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+window.openFlyerZoomModal = openFlyerZoomModal;
+window.closeFlyerZoomModal = closeFlyerZoomModal;
+
 document.addEventListener('DOMContentLoaded', initFlyerStudioPage);

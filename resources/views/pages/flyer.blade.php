@@ -69,16 +69,20 @@
               <i class="fa-solid fa-mobile-screen"></i> Story (9:16)
             </button>
             <button type="button" id="btnRatioSquare" class="ratio-btn" onclick="setFlyerRatio('1:1', this)">
-              <i class="fa-solid fa-square"></i> Feed / Chat (1:1)
+              <i class="fa-solid fa-square"></i> Feed (1:1)
             </button>
           </div>
 
           <!-- Canvas Preview Image Element -->
           <div class="flyer-canvas-wrapper">
-            <img id="flyerCanvasPreviewImg" class="flyer-preview-img" src="" alt="Pratinjau Poster Promo Toyota">
+            <img id="flyerCanvasPreviewImg" class="flyer-preview-img" src="" alt="Pratinjau Poster Promo Toyota" onclick="openFlyerZoomModal()" title="Ketuk untuk perbesar poster">
           </div>
 
-          <!-- Live Resolution Badge -->
+          <!-- Quick Zoom Hint & Live Resolution Badge -->
+          <div class="flyer-zoom-hint" onclick="openFlyerZoomModal()">
+            <i class="fa-solid fa-magnifying-glass-plus"></i> Ketuk poster untuk perbesar layar penuh
+          </div>
+
           <div class="flyer-res-info-tag" id="flyerResInfoTag">
             <i class="fa-solid fa-expand"></i> Resolusi Ekspor: <strong>1080 x 1920 px</strong> (Ultra HD Story)
           </div>
@@ -88,7 +92,7 @@
           <div id="hiddenFlyerQrCode" style="display:none;"></div>
         </div>
 
-        <!-- Action Download & Share Block -->
+        <!-- Action Download & Share Block (Desktop) -->
         <div class="flyer-main-actions">
           <button type="button" class="btn-flyer-download" onclick="downloadFlyerImage('png')">
             <i class="fa-solid fa-download"></i> Unduh Poster Gambar HD (.PNG)
@@ -112,19 +116,29 @@
         <!-- STUDIO NAVIGATION TABS -->
         <nav class="flyer-tabs-nav">
           <button type="button" class="flyer-tab-btn active" onclick="switchFlyerTab('tabLatarWarna', this)">
-            <i class="fa-solid fa-palette"></i> Latar &amp; Tema
+            <i class="fa-solid fa-palette"></i>
+            <span class="tab-label-full">Latar &amp; Tema</span>
+            <span class="tab-label-short">Latar</span>
           </button>
           <button type="button" class="flyer-tab-btn" onclick="switchFlyerTab('tabMobilPromo', this)">
-            <i class="fa-solid fa-car"></i> Mobil Promo (Multi)
+            <i class="fa-solid fa-car"></i>
+            <span class="tab-label-full">Mobil Promo (Multi)</span>
+            <span class="tab-label-short">Mobil</span>
           </button>
           <button type="button" class="flyer-tab-btn" onclick="switchFlyerTab('tabTeksLengkap', this)">
-            <i class="fa-solid fa-font"></i> Kustom Teks
+            <i class="fa-solid fa-font"></i>
+            <span class="tab-label-full">Kustom Teks</span>
+            <span class="tab-label-short">Teks</span>
           </button>
           <button type="button" class="flyer-tab-btn" onclick="switchFlyerTab('tabProfilSales', this)">
-            <i class="fa-solid fa-user-tie"></i> Foto &amp; Sales
+            <i class="fa-solid fa-user-tie"></i>
+            <span class="tab-label-full">Foto &amp; Sales</span>
+            <span class="tab-label-short">Sales</span>
           </button>
           <button type="button" class="flyer-tab-btn" onclick="switchFlyerTab('tabCaptionShare', this)">
-            <i class="fa-solid fa-share-nodes"></i> Caption &amp; Share
+            <i class="fa-solid fa-share-nodes"></i>
+            <span class="tab-label-full">Caption &amp; Share</span>
+            <span class="tab-label-short">Caption</span>
           </button>
         </nav>
 
@@ -819,6 +833,29 @@
       </button>
     </div>
 
+  </div>
+
+  <!-- MODAL ZOOM FULLSCREEN POSTER -->
+  <div id="flyerZoomModal" class="flyer-zoom-modal" style="display: none;" onclick="closeFlyerZoomModal(event)">
+    <div class="flyer-zoom-modal-dialog" onclick="event.stopPropagation()">
+      <div class="flyer-zoom-modal-header">
+        <span class="flyer-zoom-modal-title"><i class="fa-solid fa-expand"></i> Pratinjau Poster Penuh</span>
+        <button type="button" class="flyer-zoom-close-btn" onclick="closeFlyerZoomModal()" aria-label="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="flyer-zoom-modal-body">
+        <img id="flyerZoomModalImg" src="" alt="Poster Full View" class="flyer-zoom-modal-img">
+      </div>
+      <div class="flyer-zoom-modal-footer">
+        <button type="button" class="btn-mobile-action wa" onclick="shareFlyerToWhatsApp()">
+          <i class="fa-brands fa-whatsapp"></i> Bagikan WA
+        </button>
+        <button type="button" class="btn-mobile-action download" onclick="downloadFlyerImage('png')">
+          <i class="fa-solid fa-cloud-arrow-down"></i> Unduh HD
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- QR Code Library & Studio Engine -->
