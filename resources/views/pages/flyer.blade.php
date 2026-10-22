@@ -158,8 +158,8 @@
       }
       .flyer-studio-layout {
         display: grid !important;
-        grid-template-columns: 330px 1fr !important;
-        gap: 16px !important;
+        grid-template-columns: 350px 1fr !important;
+        gap: 18px !important;
         align-items: start !important;
         margin-bottom: 20px !important;
       }
@@ -209,19 +209,27 @@
       .flyer-artboard-column .flyer-main-actions {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 6px !important;
+        gap: 8px !important;
         margin-top: 2px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
       .flyer-artboard-column .btn-flyer-download,
       .flyer-artboard-column .btn-flyer-wa {
         width: 100% !important;
-        padding: 8px 6px !important;
-        font-size: 11px !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        padding: 8px 8px !important;
+        font-size: 11.5px !important;
         font-weight: 800 !important;
         border-radius: 10px !important;
         white-space: nowrap !important;
         text-align: center !important;
         justify-content: center !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
       }
       .flyer-render-note {
@@ -314,10 +322,10 @@
         <!-- Action Download & Share Block (Desktop) -->
         <div class="flyer-main-actions">
           <button type="button" class="btn-flyer-download" onclick="downloadFlyerImage('png')">
-            <i class="fa-solid fa-download"></i> Unduh Poster Gambar HD (.PNG)
+            <i class="fa-solid fa-cloud-arrow-down"></i> Unduh HD
           </button>
           <button type="button" class="btn-flyer-wa" onclick="shareFlyerToWhatsApp()">
-            <i class="fa-brands fa-whatsapp"></i> Bagikan ke WhatsApp Status &amp; Chat
+            <i class="fa-brands fa-whatsapp"></i> Bagikan WA
           </button>
         </div>
 
