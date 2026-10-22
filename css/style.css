@@ -1773,9 +1773,36 @@ select.form-control {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   GLOBAL BODY SCROLL LOCK WHEN MODAL / POPUP IS OPEN
+   ═══════════════════════════════════════════════════════════════ */
+html.modal-open,
+body.modal-open {
+    overflow: hidden !important;
+    height: 100% !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+}
+
+body.modal-open .desktop-content,
+body.modal-open .desktop-shell,
+body.modal-open .mobile-app {
+    touch-action: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MODAL / BOTTOM SHEET
    ═══════════════════════════════════════════════════════════════ */
-.modal-overlay {
+.modal-overlay,
+.popup-overlay,
+.kircon-modal-overlay,
+.olx-modal-overlay,
+.arcade-modal-overlay,
+.flyer-modal-overlay,
+.promo-modal-overlay,
+.ocr-modal-overlay,
+.lightbox-modal,
+.modal-backdrop,
+.bottom-sheet-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -1793,10 +1820,15 @@ select.form-control {
     pointer-events: none !important;
     transition: opacity 0.26s var(--ease), visibility 0.26s var(--ease);
     padding: 16px;
+    overscroll-behavior: contain !important;
+    touch-action: none;
 }
 
 .modal-overlay.show,
-.modal-overlay.active {
+.modal-overlay.active,
+.popup-overlay.show,
+.kircon-modal-overlay.active,
+.olx-modal-overlay.active {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
@@ -1811,7 +1843,18 @@ select.form-control {
     pointer-events: auto !important;
 }
 
-.modal-content {
+.modal-content,
+.modal-sheet,
+.modal-box,
+.modal-body,
+.modal-sheet-body,
+.popup-card,
+.popup-content,
+.olx-modal-box,
+.kircon-modal-box,
+.kircon-modal-body,
+.flyer-zoom-modal-dialog,
+.flyer-zoom-modal-body {
     box-sizing: border-box;
     background: var(--card-bg);
     border-radius: var(--radius-2xl);
@@ -1824,6 +1867,9 @@ select.form-control {
     transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
     position: relative;
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
 }
 
 /* ── Snug High-Clarity PDF Viewer Modal (Fits Brochure Proportions) ── */

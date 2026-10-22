@@ -803,8 +803,8 @@
 
 
                 <!-- ═══ MODAL: SEMUA FITUR (Lengkap & Terorganisir) ═══ -->
-                <div class="modal-overlay" id="featureModal" onclick="closeFeatureModal()">
-                    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 88dvh; max-height: 88vh; display: flex; flex-direction: column;">
+                <div class="modal-overlay" id="featureModal" onclick="closeFeatureModal()" style="overscroll-behavior: contain; touch-action: none;">
+                    <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 88dvh; max-height: 88vh; display: flex; flex-direction: column; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
                         <div class="modal-drag-handle"></div>
                         <div class="modal-header" style="flex-shrink: 0; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
                             <div>
@@ -830,7 +830,7 @@
                             </div>
                         </div>
 
-                        <div class="category-grid feature-modal-grid" style="overflow-y: auto; flex: 1; padding: 10px 14px 24px !important;">
+                        <div class="category-grid feature-modal-grid" style="overflow-y: auto; flex: 1; padding: 10px 14px 24px !important; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
                             <!-- SECTION: MENU UTAMA & OPERASIONAL HARIAN -->
                             <div class="modal-section-header" style="grid-column: 1 / -1; margin-top: 10px; padding: 6px 0 4px; border-bottom: 1px solid #f1f5f9; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
                                 <i class="fa-solid fa-compass" style="color: var(--primary-red);"></i> Menu Utama &amp; Operasional Harian

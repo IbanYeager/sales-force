@@ -1165,6 +1165,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('todayJadwalReminderModal');
         if (modal) {
             modal.classList.add('show');
+            if (typeof window.lockBodyScroll === 'function') {
+                window.lockBodyScroll(modal);
+            }
         }
     };
 
@@ -1172,6 +1175,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('todayJadwalReminderModal');
         if (modal) {
             modal.classList.remove('show');
+            if (typeof window.unlockBodyScroll === 'function') {
+                window.unlockBodyScroll(modal);
+            }
             const todayKey = new Date().toISOString().split('T')[0];
             sessionStorage.setItem('sft_jadwal_popup_dismissed_' + todayKey, 'true');
         }

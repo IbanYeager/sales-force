@@ -342,3 +342,286 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateAllPwaInstallButtons();
 });
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL BODY SCROLL LOCK ENGINE (UNIVERSAL MODAL / POPUP MANAGER)
+   Mencegah halaman di belakang modal/popup ikut ter-scroll di SEMUA halaman.
+   Hanya konten modal/popup yang dapat di-scroll secara halus.
+   Kebal terhadap iOS Safari bounce & Android touch-chaining.
+   ═══════════════════════════════════════════════════════════════ */
+(function initGlobalModalScrollLock() {
+    let scrollPosition = 0;
+    let lockedCount = 0;
+    const activeModals = new Set();
+
+    // 1. Injeksi aturan containment CSS global
+    function injectScrollLockStyles() {
+        if (document.getElementById('sft-global-modal-scroll-lock-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'sft-global-modal-scroll-lock-styles';
+        style.textContent = `
+            html.modal-open,
+            body.modal-open {
+                overflow: hidden !important;
+                height: 100% !important;
+                overscroll-behavior: none !important;
+            }
+            body.modal-open .desktop-content,
+            body.modal-open .desktop-shell,
+            body.modal-open .mobile-app {
+                touch-action: none !important;
+            }
+            .modal-overlay,
+            .popup-overlay,
+            .kircon-modal-overlay,
+            .olx-modal-overlay,
+            .arcade-modal-overlay,
+            .flyer-modal-overlay,
+            .promo-modal-overlay,
+            .ocr-modal-overlay,
+            .lightbox-modal,
+            .modal-backdrop,
+            .bottom-sheet-overlay {
+                overscroll-behavior: contain !important;
+                touch-action: none;
+            }
+            .modal-content,
+            .modal-sheet,
+            .modal-box,
+            .modal-body,
+            .modal-sheet-body,
+            .feature-modal-grid,
+            .popup-card,
+            .popup-content,
+            .olx-modal-box,
+            .kircon-modal-box,
+            .kircon-modal-body,
+            .flyer-zoom-modal-dialog,
+            .flyer-zoom-modal-body,
+            [class*="modal-content"],
+            [class*="modal-body"],
+            [class*="sheet-body"] {
+                overscroll-behavior: contain !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    if (document.head) {
+        injectScrollLockStyles();
+    } else {
+        document.addEventListener('DOMContentLoaded', injectScrollLockStyles);
+    }
+
+    function isModalElement(el) {
+        if (!el || !(el instanceof HTMLElement)) return false;
+        if (el.id === 'modalGpsPermission') return false;
+        const cls = el.className || '';
+        const id = el.id || '';
+        return (
+            (typeof cls === 'string' && (
+                cls.includes('modal-overlay') || 
+                cls.includes('popup-overlay') || 
+                cls.includes('kircon-modal-overlay') || 
+                cls.includes('olx-modal-overlay') || 
+                cls.includes('arcade-modal-overlay') || 
+                cls.includes('flyer-modal-overlay') || 
+                cls.includes('lightbox-modal') ||
+                cls.includes('bottom-sheet')
+            )) ||
+            id.toLowerCase().endsWith('modal') ||
+            id.toLowerCase().includes('popup') ||
+            (el.tagName === 'DIALOG' && el.open)
+        );
+    }
+
+    function isElementVisible(el) {
+        if (!el) return false;
+        if (el.id === 'modalGpsPermission') return false;
+        if (el.tagName === 'DIALOG' && el.open) return true;
+
+        const classList = el.classList;
+        if (
+            classList.contains('show') || 
+            classList.contains('active') || 
+            classList.contains('open') || 
+            classList.contains('visible') || 
+            classList.contains('show-modal') || 
+            classList.contains('active-modal')
+        ) {
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        }
+
+        if (el.style.display && el.style.display !== 'none') {
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+        }
+
+        return false;
+    }
+
+    function lockScroll(modalEl) {
+        if (modalEl) activeModals.add(modalEl);
+        if (lockedCount > 0) {
+            lockedCount++;
+            return;
+        }
+
+        scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+        document.documentElement.classList.add('modal-open');
+        document.body.classList.add('modal-open');
+
+        if (!document.body.dataset.scrollLockPrevOverflow) {
+            document.body.dataset.scrollLockPrevOverflow = document.body.style.overflow || '';
+            document.body.dataset.scrollLockPrevPosition = document.body.style.position || '';
+            document.body.dataset.scrollLockPrevTop = document.body.style.top || '';
+            document.body.dataset.scrollLockPrevWidth = document.body.style.width || '';
+        }
+
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollPosition}px`;
+        document.body.style.width = '100%';
+
+        lockedCount = 1;
+    }
+
+    function unlockScroll(modalEl) {
+        if (modalEl) activeModals.delete(modalEl);
+
+        let stillActive = false;
+        for (const m of activeModals) {
+            if (isElementVisible(m)) {
+                stillActive = true;
+                break;
+            }
+        }
+
+        if (stillActive) return;
+
+        const anyVisible = Array.from(document.querySelectorAll('.modal-overlay.show, .modal-overlay.active, .popup-overlay.show, .popup-overlay.active, .kircon-modal-overlay.active, .olx-modal-overlay.active, .lightbox-modal.show, [id$="Modal"].show'))
+            .some(el => isElementVisible(el));
+        if (anyVisible) return;
+
+        activeModals.clear();
+        lockedCount = 0;
+
+        const savedTop = document.body.style.top;
+        const targetScroll = savedTop ? parseInt(savedTop, 10) * -1 : scrollPosition;
+
+        document.documentElement.classList.remove('modal-open');
+        document.body.classList.remove('modal-open');
+
+        document.body.style.overflow = document.body.dataset.scrollLockPrevOverflow || '';
+        document.body.style.position = document.body.dataset.scrollLockPrevPosition || '';
+        document.body.style.top = document.body.dataset.scrollLockPrevTop || '';
+        document.body.style.width = document.body.dataset.scrollLockPrevWidth || '';
+
+        delete document.body.dataset.scrollLockPrevOverflow;
+        delete document.body.dataset.scrollLockPrevPosition;
+        delete document.body.dataset.scrollLockPrevTop;
+        delete document.body.dataset.scrollLockPrevWidth;
+
+        window.scrollTo(0, isNaN(targetScroll) ? scrollPosition : targetScroll);
+    }
+
+    window.lockBodyScroll = lockScroll;
+    window.unlockBodyScroll = unlockScroll;
+
+    // Cegah sentuhan pada area latar belakang overlay merambat ke halaman
+    document.addEventListener('touchmove', function(e) {
+        if (lockedCount <= 0) return;
+
+        const target = e.target;
+        const overlay = target.closest('.modal-overlay, .popup-overlay, .kircon-modal-overlay, .olx-modal-overlay, .arcade-modal-overlay, .flyer-modal-overlay, .lightbox-modal');
+        if (!overlay) return;
+
+        const scrollable = target.closest('.modal-content, .modal-sheet, .modal-box, .modal-body, .feature-modal-grid, .popup-card, .kircon-modal-box, .olx-modal-box');
+        if (!scrollable) {
+            if (e.cancelable) e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Cegah mouse wheel pada backdrop merambat ke halaman
+    document.addEventListener('wheel', function(e) {
+        if (lockedCount <= 0) return;
+
+        const target = e.target;
+        const overlay = target.closest('.modal-overlay, .popup-overlay, .kircon-modal-overlay, .olx-modal-overlay, .arcade-modal-overlay, .flyer-modal-overlay, .lightbox-modal');
+        if (!overlay) return;
+
+        const scrollable = target.closest('.modal-content, .modal-sheet, .modal-box, .modal-body, .feature-modal-grid, .popup-card, .kircon-modal-box, .olx-modal-box');
+        if (!scrollable) {
+            if (e.cancelable) e.preventDefault();
+        }
+    }, { passive: false });
+
+    function checkAllModalsInDOM() {
+        const candidateSelectors = [
+            '.modal-overlay',
+            '.popup-overlay',
+            '.kircon-modal-overlay',
+            '.olx-modal-overlay',
+            '.arcade-modal-overlay',
+            '.flyer-modal-overlay',
+            '.lightbox-modal',
+            'dialog[open]',
+            '[id$="Modal"]'
+        ];
+        const candidates = document.querySelectorAll(candidateSelectors.join(','));
+        let found = false;
+        candidates.forEach(m => {
+            if (isModalElement(m) && isElementVisible(m)) {
+                found = true;
+                activeModals.add(m);
+            }
+        });
+
+        if (found && lockedCount === 0) {
+            lockScroll();
+        } else if (!found && lockedCount > 0) {
+            unlockScroll();
+        }
+    }
+
+    const modalObserver = new MutationObserver(function(mutations) {
+        let trigger = false;
+        for (let i = 0; i < mutations.length; i++) {
+            const m = mutations[i];
+            if (m.type === 'attributes') {
+                if (m.target === document.body || m.target === document.documentElement) continue;
+                if (m.attributeName === 'class' || m.attributeName === 'style' || m.attributeName === 'open') {
+                    trigger = true;
+                    break;
+                }
+            } else if (m.type === 'childList') {
+                trigger = true;
+                break;
+            }
+        }
+        if (trigger) {
+            checkAllModalsInDOM();
+        }
+    });
+
+    function setupObserver() {
+        if (!document.body) return;
+        modalObserver.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class', 'style', 'open'],
+            childList: true,
+            subtree: true
+        });
+        checkAllModalsInDOM();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupObserver);
+    } else {
+        setupObserver();
+    }
+})();

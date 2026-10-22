@@ -445,6 +445,9 @@ function openFeatureModal(event) {
     const modal = document.getElementById('featureModal');
     if (modal) {
         modal.classList.add('show');
+        if (typeof window.lockBodyScroll === 'function') {
+            window.lockBodyScroll(modal);
+        }
         const searchInput = document.getElementById('featureModalSearchInput');
         if (searchInput) {
             searchInput.value = '';
@@ -456,7 +459,12 @@ function openFeatureModal(event) {
 
 function closeFeatureModal() {
     const modal = document.getElementById('featureModal');
-    if (modal) modal.classList.remove('show');
+    if (modal) {
+        modal.classList.remove('show');
+        if (typeof window.unlockBodyScroll === 'function') {
+            window.unlockBodyScroll(modal);
+        }
+    }
 }
 
 function filterModalFeatures(query) {
@@ -511,12 +519,22 @@ function clearFeatureModalSearch() {
 function openModal(modalId, event) {
     if (event) event.preventDefault();
     const modal = document.getElementById(modalId);
-    if (modal) modal.classList.add('show');
+    if (modal) {
+        modal.classList.add('show');
+        if (typeof window.lockBodyScroll === 'function') {
+            window.lockBodyScroll(modal);
+        }
+    }
 }
 
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) modal.classList.remove('show');
+    if (modal) {
+        modal.classList.remove('show');
+        if (typeof window.unlockBodyScroll === 'function') {
+            window.unlockBodyScroll(modal);
+        }
+    }
 }
 
 // Menutup modal saat klik di luar area card (area overlay yang gelap)
@@ -525,6 +543,9 @@ window.onclick = function (event) {
     modals.forEach(modal => {
         if (event.target === modal) {
             modal.classList.remove('show');
+            if (typeof window.unlockBodyScroll === 'function') {
+                window.unlockBodyScroll(modal);
+            }
         }
     });
 }

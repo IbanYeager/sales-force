@@ -796,6 +796,9 @@
     margin-top: 6px;
     max-height: 55vh;
     padding: 12px 8px 12px 8px !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
 }
 
 @media (max-width: 480px) {
