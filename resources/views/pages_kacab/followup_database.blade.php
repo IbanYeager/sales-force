@@ -99,6 +99,11 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-funnel-dollar"></i> Pipeline & Sales CRM</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Database Follow-Up (CRM)</span>
+          </div>
           <h2>Executive Master Follow-Up &amp; Repurchase CRM</h2>
           <p class="page-sub">Pengawasan analitik eksekutif sesuai Google Spreadsheet, monitoring 7 tahap funnel, serta pembagian database leads wiraniaga cabang</p>
         </div>

@@ -515,6 +515,11 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-warehouse"></i> Stok & Operasional</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">m-Toyota & Service</span>
+          </div>
           <h2 id="pageTitle" style="display:flex; align-items:center; gap:8px;">
             <i class="fa-solid fa-car-on" style="color:#eb0a1e;"></i> Monitoring Input Serah Terima &amp; m-Toyota Cabang
           </h2>

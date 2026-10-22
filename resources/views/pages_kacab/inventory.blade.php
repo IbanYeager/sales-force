@@ -96,6 +96,11 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-warehouse"></i> Stok & Operasional</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Live Stok</span>
+          </div>
           <h2 id="pageTitle">Live Inventory &amp; Stok Toyota</h2>
           <p class="page-sub">Monitoring ketersediaan unit real-time seluruh cabang &amp; gudang pusat terintegrasi</p>
         </div>

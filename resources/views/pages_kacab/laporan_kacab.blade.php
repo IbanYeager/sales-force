@@ -291,8 +291,13 @@
 
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-chart-line"></i> Eksekutif &amp; Dashboard</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Laporan Eksekutif</span>
+          </div>
           <h2 id="pageTitle">Laporan Eksekutif Cabang</h2>
-          <p class="page-sub">Rekapitulasi performa penjualan & analisis metode pembiayaan — <strong id="lblPeriode">Memuat...</strong></p>
+          <p class="page-sub"><i class="fa-regular fa-calendar-days" style="color:#64748b; margin-right:4px;"></i> Rekapitulasi performa penjualan &amp; analisis metode pembiayaan — <strong id="lblPeriode">Memuat...</strong></p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">

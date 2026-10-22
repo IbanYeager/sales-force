@@ -147,6 +147,11 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-users-gear"></i> Monitoring Tim & Sales</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Riwayat Foto Aktivitas</span>
+          </div>
           <h2 id="pageTitle">Galeri Foto Aktivitas</h2>
           <p class="page-sub">Dokumentasi foto kegiatan pameran, event, dan aktivitas lapangan seluruh sales cabang</p>
         </div>

@@ -714,6 +714,11 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-warehouse"></i> Stok & Operasional</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Trade-In & OLX</span>
+          </div>
           <h2 id="pageTitle" style="display:flex; align-items:center; gap:8px;">
             <i class="fa-solid fa-repeat" style="color:#eb0a1e;"></i> Pusat Hasil Trade-In &amp; OLX Mobbi
           </h2>

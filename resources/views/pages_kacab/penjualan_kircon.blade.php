@@ -104,8 +104,13 @@
       <!-- TOPBAR -->
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Sales CRM</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Penjualan Kircon</span>
+          </div>
           <h2 id="pageTitle">Statistik Penjualan Kiara Condong (KC 2026)</h2>
-          <p class="page-sub">Monitoring performa penjualan unit, omset OTR, analisis leasing &amp; seluruh wiraniaga</p>
+          <p class="page-sub"><i class="fa-regular fa-calendar-days" style="color:#64748b; margin-right:4px;"></i> Monitoring performa penjualan unit, omset OTR, analisis leasing &amp; seluruh wiraniaga</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">

@@ -344,6 +344,11 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-users-gear"></i> Monitoring Tim & Sales</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Target & Produktivitas</span>
+          </div>
           <h2 id="pageTitle">Kelola Target Cabang</h2>
           <p class="page-sub">Pengaturan & alokasi kuota target bulanan (SPK & DO) per tim SPV</p>
         </div>

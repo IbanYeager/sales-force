@@ -119,8 +119,13 @@
       <!-- Topbar Header -->
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-gem"></i> Pipeline &amp; Sales CRM</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Penjualan &amp; Polreg TCO</span>
+          </div>
           <h2 id="pageTitle">Monitoring Eksekutif Penjualan &amp; Polreg TCO</h2>
-          <p class="page-sub">Analisis revenue aksesoris Toyota Customization Option dan pemetaan wilayah asal registrasi customer (Polreg).</p>
+          <p class="page-sub"><i class="fa-regular fa-calendar-days" style="color:#64748b; margin-right:4px;"></i> Analisis revenue aksesoris Toyota Customization Option dan pemetaan wilayah asal registrasi customer (Polreg).</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">

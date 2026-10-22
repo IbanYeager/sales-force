@@ -96,8 +96,13 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-chart-line"></i> Eksekutif &amp; Dashboard</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Performa Regional</span>
+          </div>
           <h2 id="pageTitle">Performa Regional Jawa Barat</h2>
-          <p class="page-sub">Komparasi pencapaian target SPK &amp; Retail Sales (RS AFI) seluruh Dealer dan Cabang se-Jawa Barat</p>
+          <p class="page-sub"><i class="fa-regular fa-calendar-days" style="color:#64748b; margin-right:4px;"></i> Komparasi pencapaian target SPK &amp; Retail Sales (RS AFI) seluruh Dealer dan Cabang se-Jawa Barat</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">

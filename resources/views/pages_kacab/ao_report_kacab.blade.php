@@ -122,8 +122,13 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Sales CRM</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">AO Report Cabang</span>
+          </div>
           <h2 id="pageTitle">Papan AO Report (Area Operation)</h2>
-          <p class="page-sub" id="dashPeriode">Pusat Kendali Operasional Cabang, Matching Stok &amp; Proyeksi Closing Bulanan</p>
+          <p class="page-sub" id="dashPeriode"><i class="fa-regular fa-calendar-days" style="color:#64748b; margin-right:4px;"></i> Pusat Kendali Operasional Cabang, Matching Stok &amp; Proyeksi Closing Bulanan</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">

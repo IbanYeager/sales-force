@@ -1389,6 +1389,11 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-users-gear"></i> Monitoring Tim & Sales</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Peta GPS Kunjungan</span>
+          </div>
           <h2 id="pageTitle">Google Maps Peta Kunjungan Lapangan</h2>
           <p class="page-sub">Monitoring geotagging lokasi real-time seluruh Sales Consultant cabang pada Google Maps</p>
         </div>

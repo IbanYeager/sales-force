@@ -115,8 +115,13 @@
       <!-- TOPBAR -->
       <div class="kcb-topbar">
         <div>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-chart-line"></i> Eksekutif &amp; Dashboard</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Dashboard Cabang</span>
+          </div>
           <h2 id="pageTitle">Dashboard Cabang Kiara Condong</h2>
-          <p class="page-sub" id="dashPeriode">Monitoring Kinerja Penjualan 2026 (Jan–Jul) &amp; Operasional Cabang</p>
+          <p class="page-sub" id="dashPeriode"><i class="fa-regular fa-calendar-days" style="color:#64748b; margin-right:4px;"></i> Monitoring Kinerja Penjualan 2026 (Jan–Jul) &amp; Operasional Cabang</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
@@ -133,7 +138,7 @@
       <div id="section-ops-dashboard">
         
         <!-- ===== KPI SUMMARY OPERASIONAL ===== -->
-        <div class="grid-4" style="margin-bottom:18px;">
+        <div class="grid-4" style="margin-bottom:20px;">
           <div class="kpi-card clickable" onclick="location.href='monitoring_spv.html'" style="animation-delay:0.02s;">
             <div class="kpi-head">
               <span class="kpi-title">Total SPV</span>
@@ -163,7 +168,7 @@
               <div class="track">
                 <div class="fill blue" id="kpiSpkBar"></div>
               </div>
-              <div class="pct-row"><span>Pencapaian cabang</span><span id="kpiSpkPct">0%</span></div>
+              <div class="pct-row"><span>Pencapaian cabang</span><span id="kpiSpkPct" class="kpi-pct-badge pct-blue">0%</span></div>
             </div>
           </div>
 
@@ -177,94 +182,90 @@
               <div class="track">
                 <div class="fill red" id="kpiDoBar"></div>
               </div>
-              <div class="pct-row"><span id="kpiDoLabel">Evaluasi 4 bulan</span><span id="kpiDoPct">0%</span></div>
+              <div class="pct-row"><span id="kpiDoLabel">Evaluasi 4 bulan</span><span id="kpiDoPct" class="kpi-pct-badge pct-red">0%</span></div>
             </div>
           </div>
         </div>
 
-                <!-- ===== KAIZEN EVOLVE 2026 STRATEGIC COCKPIT ===== -->
-        <section class="kcb-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:20px 22px; margin-bottom:20px; box-shadow:0 1px 3px rgba(15,23,42,0.05); position:relative;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; border-bottom:1px solid #f1f5f9; padding-bottom:14px; margin-bottom:16px;">
-            <div>
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                <span style="background:rgba(235,10,30,0.08); border:1px solid rgba(235,10,30,0.2); color:#eb0a1e; font-size:10.5px; font-weight:700; padding:2.5px 8px; border-radius:4px;">
+        <!-- ===== KAIZEN EVOLVE 2026 STRATEGIC COCKPIT ===== -->
+        <section class="kcb-card" style="background:#ffffff; border:1px solid #e2e8f0; border-left:3.5px solid #eb0a1e; border-radius:14px; padding:22px 24px; margin-bottom:20px; box-shadow:0 1px 3px rgba(15,23,42,0.04); position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; border-bottom:1px solid #f1f5f9; padding-bottom:16px; margin-bottom:18px;">
+            <div style="max-width:700px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="background:rgba(235,10,30,0.08); border:1px solid rgba(235,10,30,0.2); color:#eb0a1e; font-size:10px; font-weight:800; padding:2.5px 8px; border-radius:5px; letter-spacing:0.04em; text-transform:uppercase;">
                   <i class="fa-solid fa-bullseye"></i> KAIZEN EVOLVE 2026
                 </span>
                 <span style="font-size:12px; color:#64748b; font-weight:600;">
                   Program Strategis Cabang Kiaracondong
                 </span>
               </div>
-              <h2 style="font-size:18px; font-weight:800; margin:4px 0 2px; color:#0f172a;">
+              <h2 style="font-size:19px; font-weight:800; margin:0 0 4px 0; color:#0f172a; letter-spacing:-0.01em;">
                 Implementasi 4 Pilar Kaizen EVOLVE
               </h2>
-              <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.45;">
+              <p style="font-size:12.5px; color:#64748b; margin:0; line-height:1.5;">
                 Eksekusi terarah 4 pilar: Penetrasi 8 Kecamatan Low Share, ReDrive Trade-In ke OLXmobbi, Win-Back 719 Unit Servis (CARE-X), dan Funneling Pameran.
               </p>
             </div>
 
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <button onclick="location.href='peta_kunjungan.html'" style="padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s;">
+              <button type="button" onclick="location.href='peta_kunjungan.html'" class="kaizen-quick-btn" title="Lihat peta penetrasi 8 kecamatan">
                 <i class="fa-solid fa-map-location-dot" style="color:#d97706;"></i> Polreg 8 Kecamatan
               </button>
-              <button onclick="location.href='olx.html'" style="padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s;">
+              <button type="button" onclick="location.href='olx.html'" class="kaizen-quick-btn" title="Buka pipeline trade-in OLX">
                 <i class="fa-solid fa-repeat" style="color:#2563eb;"></i> ReDrive Pipeline
               </button>
-              <button onclick="location.href='after_sales.html'" style="padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s;">
+              <button type="button" onclick="location.href='after_sales.html'" class="kaizen-quick-btn" title="Buka program win-back servis">
                 <i class="fa-solid fa-wrench" style="color:#10b981;"></i> Win-Back 719 Unit
               </button>
             </div>
           </div>
 
           <!-- 4 STRATEGIC SUMMARY CARDS -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
             <!-- CARD 1: 8 KECAMATAN -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='peta_kunjungan.html'" title="Buka Market Matrix">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:700; color:#b45309; text-transform:uppercase;">1. PENETRASI WILAYAH</span>
-                <i class="fa-solid fa-location-crosshairs" style="color:#d97706;"></i>
+            <div class="kaizen-sub-card" onclick="location.href='peta_kunjungan.html'" title="Buka Market Matrix 8 Kecamatan">
+              <div class="sub-card-header">
+                <span class="sub-card-tag tag-amber"><i class="fa-solid fa-location-crosshairs"></i> 1. PENETRASI WILAYAH</span>
               </div>
-              <div style="font-size:20px; font-weight:800; color:#0f172a;">8 Kecamatan</div>
-              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">Bojongloa, Antapani, Buahbatu, dll.</div>
-              <div style="margin-top:8px; font-size:10px; background:#fee2e2; color:#b91c1c; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
+              <div class="sub-card-val">8 Kecamatan</div>
+              <div class="sub-card-desc">Bojongloa, Antapani, Buahbatu, dll.</div>
+              <div class="sub-card-badge badge-amber">
                 Fokus: Veloz HEV &bull; Yaris Cross &bull; Rangga
               </div>
             </div>
 
             <!-- CARD 2: REDRIVE TRADE-IN -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='olx.html'" title="Buka ReDrive Trade-In">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:700; color:#1d4ed8; text-transform:uppercase;">2. REDRIVE TRADE-IN</span>
-                <i class="fa-solid fa-repeat" style="color:#2563eb;"></i>
+            <div class="kaizen-sub-card" onclick="location.href='olx.html'" title="Buka ReDrive Trade-In">
+              <div class="sub-card-header">
+                <span class="sub-card-tag tag-blue"><i class="fa-solid fa-repeat"></i> 2. REDRIVE TRADE-IN</span>
               </div>
-              <div style="font-size:20px; font-weight:800; color:#0f172a;">5 SPK Deal</div>
-              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">dari 14 Unit Servis &gt;2.5 Thn (35.7%)</div>
-              <div style="margin-top:8px; font-size:10px; background:#dbeafe; color:#1e40af; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
+              <div class="sub-card-val">5 SPK Deal</div>
+              <div class="sub-card-desc">dari 14 Unit Servis &gt;2.5 Thn (35.7%)</div>
+              <div class="sub-card-badge badge-blue">
                 SA Brand Ambassador &bull; OLX Spot
               </div>
             </div>
 
             <!-- CARD 3: WIN-BACK 719 -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='after_sales.html'" title="Buka Win-Back 719 Unit">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:700; color:#047857; text-transform:uppercase;">3. AFTER SALES WIN-BACK</span>
-                <i class="fa-solid fa-wrench" style="color:#10b981;"></i>
+            <div class="kaizen-sub-card" onclick="location.href='after_sales.html'" title="Buka Win-Back 719 Unit">
+              <div class="sub-card-header">
+                <span class="sub-card-tag tag-green"><i class="fa-solid fa-wrench"></i> 3. AFTER SALES WIN-BACK</span>
               </div>
-              <div style="font-size:20px; font-weight:800; color:#0f172a;">719 Unit</div>
-              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">P1: 110 Unit &bull; P2: 463 Unit</div>
-              <div style="margin-top:8px; font-size:10px; background:#d1fae5; color:#065f46; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
+              <div class="sub-card-val">719 Unit</div>
+              <div class="sub-card-desc">P1: 110 Unit &bull; P2: 463 Unit</div>
+              <div class="sub-card-badge badge-green">
                 Voucher THS On-Call &bull; CARE-X
               </div>
             </div>
 
             <!-- CARD 4: FUNNELING ACCELERATOR -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.15s;" onclick="location.href='peta_kunjungan.html'" title="Buka Funneling Target">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:10.5px; font-weight:700; color:#4338ca; text-transform:uppercase;">4. FUNNELING TARGET</span>
-                <i class="fa-solid fa-filter-circle-dollar" style="color:#6366f1;"></i>
+            <div class="kaizen-sub-card" onclick="location.href='peta_kunjungan.html'" title="Buka Funneling Target">
+              <div class="sub-card-header">
+                <span class="sub-card-tag tag-indigo"><i class="fa-solid fa-filter-circle-dollar"></i> 4. FUNNELING TARGET</span>
               </div>
-              <div style="font-size:20px; font-weight:800; color:#0f172a;">83 DO Final</div>
-              <div style="font-size:11.5px; color:#64748b; margin-top:2px;">456 Prospek &rarr; 275 Hot &rarr; 110 SPK</div>
-              <div style="margin-top:8px; font-size:10px; background:#e0e7ff; color:#3730a3; padding:2px 7px; border-radius:4px; font-weight:700; display:inline-block;">
+              <div class="sub-card-val">83 DO Final</div>
+              <div class="sub-card-desc">456 Prospek &rarr; 275 Hot &rarr; 110 SPK</div>
+              <div class="sub-card-badge badge-indigo">
                 Target Kontribusi 25% (Now 14%)
               </div>
             </div>
@@ -272,10 +273,10 @@
         </section>
 
         <!-- ===== MONITORING AKTIVITAS LAPANGAN & DOKUMENTASI PAMERAN ===== -->
-        <section class="kcb-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(15,23,42,0.05); margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:38px; height:38px; border-radius:8px; background:rgba(235,10,30,0.08); color:#eb0a1e; display:flex; align-items:center; justify-content:center; font-size:16px;">
+        <section class="kcb-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:20px 22px; box-shadow:0 1px 3px rgba(15,23,42,0.04); margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:16px; border-bottom:1px solid #f1f5f9; padding-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:10px; background:#fef2f2; border:1px solid #fee2e2; color:#eb0a1e; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
                 <i class="fa-solid fa-person-walking-luggage"></i>
               </div>
               <div>
@@ -283,7 +284,7 @@
                   <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">
                     Monitoring Aktivitas Lapangan &amp; Dokumentasi Pameran
                   </h3>
-                  <span id="badgeLiveOpsStatus" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:700; padding:2px 8px; border-radius:6px; font-size:10.5px;">
+                  <span id="badgeLiveOpsStatus" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:700; padding:2px 8px; border-radius:6px; font-size:10.5px; display:inline-flex; align-items:center; gap:5px;">
                     <i class="fa-solid fa-circle" style="font-size:6px; color:#10b981;"></i> Pantauan Real-Time
                   </span>
                 </div>
@@ -294,10 +295,10 @@
             </div>
 
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <button type="button" onclick="location.href='aktivitas.html'" style="background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; font-weight:600; font-size:12px; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+              <button type="button" onclick="location.href='aktivitas.html'" class="btn-ops-secondary">
                 <i class="fa-solid fa-timeline" style="color:#64748b;"></i> Timeline Aktivitas
               </button>
-              <button type="button" onclick="location.href='riwayat_foto_aktivitas.html'" style="background:#0f172a; color:#ffffff; border:none; font-weight:600; font-size:12px; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+              <button type="button" onclick="location.href='riwayat_foto_aktivitas.html'" class="btn-ops-primary">
                 <i class="fa-solid fa-images"></i> Galeri Foto Pameran
               </button>
             </div>
@@ -306,50 +307,50 @@
           <!-- MINI STATS CARDS GRID -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
             <!-- CARD 1: AKTIVITAS HARI INI -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='aktivitas.html'" title="Klik untuk lihat timeline aktivitas">
-              <div style="width:40px; height:40px; border-radius:10px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:18px;">
+            <div class="ops-mini-card" onclick="location.href='aktivitas.html'" title="Klik untuk lihat timeline aktivitas">
+              <div class="ops-mini-icon icon-blue">
                 <i class="fa-solid fa-list-check"></i>
               </div>
-              <div style="flex:1;">
-                <div style="font-size:11px; font-weight:700; color:#64748b;">Aktivitas Hari Ini</div>
-                <div style="font-size:22px; font-weight:900; color:#0f172a;" id="kcbDashActCount">0</div>
-                <div style="font-size:10.5px; font-weight:700; color:#2563eb;" id="kcbDashActSub">Memuat aktivitas...</div>
+              <div style="flex:1; min-width:0;">
+                <div class="ops-mini-lbl">Aktivitas Hari Ini</div>
+                <div class="ops-mini-val" id="kcbDashActCount">0</div>
+                <div class="ops-mini-sub text-blue" id="kcbDashActSub">Memuat aktivitas...</div>
               </div>
             </div>
 
             <!-- CARD 2: SALES SUDAH LAPOR -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='aktivitas.html'" title="Lihat sales yang aktif melapor">
-              <div style="width:40px; height:40px; border-radius:10px; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; font-size:18px;">
+            <div class="ops-mini-card" onclick="location.href='aktivitas.html'" title="Lihat sales yang aktif melapor">
+              <div class="ops-mini-icon icon-green">
                 <i class="fa-solid fa-user-check"></i>
               </div>
-              <div style="flex:1;">
-                <div style="font-size:11px; font-weight:700; color:#64748b;">Sales Aktif Lapor</div>
-                <div style="font-size:22px; font-weight:900; color:#16a34a;" id="kcbDashActSalesReported">0 <span style="font-size:13px; color:#64748b; font-weight:600;">Sales</span></div>
-                <div style="font-size:10.5px; font-weight:700; color:#15803d;" id="kcbDashActSalesPct">0% dari total sales</div>
+              <div style="flex:1; min-width:0;">
+                <div class="ops-mini-lbl">Sales Aktif Lapor</div>
+                <div class="ops-mini-val text-green" id="kcbDashActSalesReported">0 <span style="font-size:13px; color:#64748b; font-weight:600;">Sales</span></div>
+                <div class="ops-mini-sub text-green" id="kcbDashActSalesPct">0% dari total sales</div>
               </div>
             </div>
 
             <!-- CARD 3: SALES BELUM LAPOR -->
-            <div style="background:#fff1f2; border:1px solid #fecdd3; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='aktivitas.html'" title="Klik untuk lihat daftar wiraniaga yang belum melapor">
-              <div style="width:40px; height:40px; border-radius:10px; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:18px;">
+            <div class="ops-mini-card card-alert" onclick="location.href='aktivitas.html'" title="Klik untuk lihat daftar wiraniaga yang belum melapor">
+              <div class="ops-mini-icon icon-red">
                 <i class="fa-solid fa-user-xmark"></i>
               </div>
-              <div style="flex:1;">
-                <div style="font-size:11px; font-weight:700; color:#be123c;">Belum Lapor Hari Ini</div>
-                <div style="font-size:22px; font-weight:900; color:#e11d48;" id="kcbDashActSalesUnreported">0 <span style="font-size:13px; color:#be123c; font-weight:600;">Sales</span></div>
-                <div style="font-size:10.5px; font-weight:700; color:#be123c;" id="kcbDashActSalesUnreportedSub">Perlu follow-up SPV</div>
+              <div style="flex:1; min-width:0;">
+                <div class="ops-mini-lbl text-red-dark">Belum Lapor Hari Ini</div>
+                <div class="ops-mini-val text-red" id="kcbDashActSalesUnreported">0 <span style="font-size:13px; color:#be123c; font-weight:600;">Sales</span></div>
+                <div class="ops-mini-sub text-red" id="kcbDashActSalesUnreportedSub">Perlu follow-up SPV</div>
               </div>
             </div>
 
             <!-- CARD 4: REKAP FOTO PAMERAN -->
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="location.href='riwayat_foto_aktivitas.html'" title="Buka Galeri Foto Pameran & Event">
-              <div style="width:40px; height:40px; border-radius:10px; background:#fdf4ff; color:#9333ea; display:flex; align-items:center; justify-content:center; font-size:18px;">
+            <div class="ops-mini-card" onclick="location.href='riwayat_foto_aktivitas.html'" title="Buka Galeri Foto Pameran & Event">
+              <div class="ops-mini-icon icon-purple">
                 <i class="fa-solid fa-camera-retro"></i>
               </div>
-              <div style="flex:1;">
-                <div style="font-size:11px; font-weight:700; color:#64748b;">Dokumentasi Pameran</div>
-                <div style="font-size:22px; font-weight:900; color:#9333ea;" id="kcbDashFotoCount">0 <span style="font-size:13px; color:#64748b; font-weight:600;">Foto</span></div>
-                <div style="font-size:10.5px; font-weight:700; color:#7e22ce;">Tersinkron Otomatis</div>
+              <div style="flex:1; min-width:0;">
+                <div class="ops-mini-lbl">Dokumentasi Pameran</div>
+                <div class="ops-mini-val text-purple" id="kcbDashFotoCount">0 <span style="font-size:13px; color:#64748b; font-weight:600;">Foto</span></div>
+                <div class="ops-mini-sub text-purple">Tersinkron Otomatis</div>
               </div>
             </div>
           </div>
@@ -787,12 +788,11 @@
     </main>
   </div>
 
-  <!-- Legacy Kacab Scripts -->
-  <script src="../custom_alert.js"></script>
-  <script src="../js/kacab_global.js?v=20260904_sheet_sync_fix"></script>
-  <script src="../js/kacab_index.js?v=20260904_sheet_sync_fix"></script>
-
-  <script src="../js/pwa-app.js?v=20261021_v20"></script>
+  <!-- Kacab Scripts -->
+  <script src="/custom_alert.js"></script>
+  <script src="/js/kacab_global.js?v={{ time() }}"></script>
+  <script src="/js/kacab_index.js?v={{ time() }}"></script>
+  <script src="/js/pwa-app.js?v={{ time() }}"></script>
 </body>
 
 </html>

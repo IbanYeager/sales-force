@@ -96,8 +96,13 @@
     <main class="kcb-main">
       <div class="kcb-topbar">
         <div>
-          <h2 id="pageTitle">Data 50 Wiraniaga Cabang</h2>
-          <p class="page-sub" id="subTitleCount">Memuat data seluruh wiraniaga cabang...</p>
+          <div class="kcb-breadcrumb">
+            <span class="kcb-breadcrumb-item"><i class="fa-solid fa-users-gear"></i> Monitoring Tim &amp; Sales</span>
+            <span class="kcb-breadcrumb-sep">/</span>
+            <span class="kcb-breadcrumb-item active">Data Wiraniaga</span>
+          </div>
+          <h2 id="pageTitle">Data Wiraniaga Cabang</h2>
+          <p class="page-sub" id="subTitleCount"><i class="fa-regular fa-calendar-days" style="color:#64748b; margin-right:4px;"></i> Memuat data seluruh wiraniaga cabang...</p>
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
