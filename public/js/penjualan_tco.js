@@ -4,6 +4,11 @@ let tcoMarkersGroup = null;
 let tcoCirclesGroup = null;
 let tcoOverviewData = null;
 let currentPolregFilter = 'all';
+let tcoTileLayers = {};
+let currentBaseLayer = 'roadmap';
+
+const OFFICE_LAT = -6.944425;
+const OFFICE_LNG = 107.642250;
 
 // Preset Coordinates for Fast Zoom
 const REGION_ZOOM_COORDS = {
@@ -23,12 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
   loadTcoOverview();
 });
 
-// 1. Initialize Leaflet Map
+// 1. Initialize Leaflet Map with Google Maps Tiles (No API key needed)
 function initMap() {
   const mapElement = document.getElementById('tcoPolregMap');
   if (!mapElement) return;
 
-  // Initialize Map with smooth bounds
+  // Initialize Map
   tcoMap = L.map('tcoPolregMap', {
     center: [-6.9250, 107.6350],
     zoom: 11,
@@ -39,15 +44,117 @@ function initMap() {
   // Zoom control top-right
   L.control.zoom({ position: 'topright' }).addTo(tcoMap);
 
-  // CartoDB Voyager tiles - very clean and crisp for vehicle tracking & polreg maps
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  // 1. Google Maps Roadmap Layer (High precision, clear roads & POIs in West Java)
+  tcoTileLayers.roadmap = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+    attribution: '&copy; Google Maps'
+  });
+
+  // 2. Google Maps Satellite / Hybrid Layer
+  tcoTileLayers.satellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+    attribution: '&copy; Google Maps'
+  });
+
+  // 3. OpenStreetMap Fallback Layer
+  tcoTileLayers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    subdomains: 'abcd'
+    attribution: '&copy; OpenStreetMap'
+  });
+
+  // Set default base layer to Google Roadmap
+  tcoTileLayers.roadmap.addTo(tcoMap);
+
+  tcoCirclesGroup = L.layerGroup().addTo(tcoMap);
+  tcoMarkersGroup = L.layerGroup().addTo(tcoMap);
+
+  // Add Dealer HQ permanent marker
+  addOfficeMarker();
+
+  // Invalidate map size after rendering to avoid tile cutoffs
+  setTimeout(() => {
+    if (tcoMap) tcoMap.invalidateSize();
+  }, 200);
+  setTimeout(() => {
+    if (tcoMap) tcoMap.invalidateSize();
+  }, 600);
+
+  window.addEventListener('resize', () => {
+    if (tcoMap) tcoMap.invalidateSize();
+  });
+}
+
+// 1.1 Switch Basemap Layer (Roadmap / Satellite)
+function setBaseLayer(layerName) {
+  if (!tcoMap || !tcoTileLayers[layerName]) return;
+
+  Object.values(tcoTileLayers).forEach(layer => {
+    if (tcoMap.hasLayer(layer)) {
+      tcoMap.removeLayer(layer);
+    }
+  });
+
+  tcoTileLayers[layerName].addTo(tcoMap);
+  currentBaseLayer = layerName;
+
+  const btnRoadmap = document.getElementById('btnTileRoadmap');
+  const btnSatellite = document.getElementById('btnTileSatellite');
+  if (btnRoadmap) btnRoadmap.classList.toggle('active', layerName === 'roadmap');
+  if (btnSatellite) btnSatellite.classList.toggle('active', layerName === 'satellite');
+}
+window.setBaseLayer = setBaseLayer;
+
+// 1.2 Permanent Office / Dealer Marker
+function addOfficeMarker() {
+  if (!tcoMap) return;
+
+  const officeIcon = L.divIcon({
+    className: 'tco-office-marker',
+    html: `
+      <div class="tco-office-pin" title="Dealer Utama: Tunas Toyota Kiara Condong">
+        <i class="fa-solid fa-building-flag"></i>
+      </div>
+    `,
+    iconSize: [38, 38],
+    iconAnchor: [19, 19]
+  });
+
+  const marker = L.marker([OFFICE_LAT, OFFICE_LNG], {
+    icon: officeIcon,
+    zIndexOffset: 3000
   }).addTo(tcoMap);
 
-  tcoMarkersGroup = L.layerGroup().addTo(tcoMap);
-  tcoCirclesGroup = L.layerGroup().addTo(tcoMap);
+  marker.bindPopup(`
+    <div style="font-family:'Inter', sans-serif; padding:4px; min-width:230px;">
+      <div style="font-size:10px; font-weight:800; background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:6px; display:inline-block; margin-bottom:6px;">
+        <i class="fa-solid fa-star"></i> KANTOR CABANG UTAMA
+      </div>
+      <h4 style="margin:0 0 4px; font-size:13.5px; font-weight:800; color:#0f172a;">Tunas Toyota Kiara Condong</h4>
+      <p style="margin:0 0 6px; font-size:11px; color:#64748b;">Jl. Ibrahim Adjie No. 154, Kiara Condong, Bandung</p>
+      <div style="font-size:11px; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #e2e8f0; color:#0f172a; font-weight:600;">
+        <i class="fa-solid fa-gem" style="color:#d7123a;"></i> Pusat Pemasangan &amp; Distribusi TCO
+      </div>
+    </div>
+  `, { maxWidth: 280 });
 }
+
+// 1.3 Jump to Selected Regional Area
+function jumpToArea(areaKey) {
+  document.querySelectorAll('.tco-area-pill').forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.area === areaKey);
+  });
+
+  const target = REGION_ZOOM_COORDS[areaKey] || REGION_ZOOM_COORDS.all;
+  if (tcoMap && target) {
+    tcoMap.flyTo(target.center, target.zoom, {
+      duration: 1.0,
+      easeLinearity: 0.25
+    });
+  }
+}
+window.jumpToArea = jumpToArea;
 
 // 2. Setup Event Listeners
 function setupEventListeners() {
@@ -603,3 +710,16 @@ async function submitNewTransactionForm(event) {
     alert('Terjadi error jaringan: ' + err.message);
   }
 }
+
+// Global window exports for HTML event bindings
+window.jumpToArea = jumpToArea;
+window.setMapMode = setMapMode;
+window.setBaseLayer = setBaseLayer;
+window.selectPolregFilter = selectPolregFilter;
+window.filterByDistrict = filterByDistrict;
+window.resetFilters = resetFilters;
+window.exportTcoCsv = exportTcoCsv;
+window.openInputModal = openInputModal;
+window.closeInputModal = closeInputModal;
+window.submitNewTransactionForm = submitNewTransactionForm;
+window.loadTcoOverview = loadTcoOverview;

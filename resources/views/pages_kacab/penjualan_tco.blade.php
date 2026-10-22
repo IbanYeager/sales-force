@@ -282,6 +282,13 @@
                 <button type="button" class="tco-map-btn" data-mode="heatmap" onclick="setMapMode('heatmap')">
                   <i class="fa-solid fa-fire"></i> Hotspot Radius
                 </button>
+                <span style="width:1px; height:20px; background:#cbd5e1; margin:0 4px;"></span>
+                <button type="button" class="tco-map-btn active" id="btnTileRoadmap" onclick="setBaseLayer('roadmap')">
+                  <i class="fa-solid fa-map"></i> Jalan
+                </button>
+                <button type="button" class="tco-map-btn" id="btnTileSatellite" onclick="setBaseLayer('satellite')">
+                  <i class="fa-solid fa-satellite"></i> Satelit
+                </button>
               </div>
             </div>
 
