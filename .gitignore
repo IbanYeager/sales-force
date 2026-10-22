@@ -103,4 +103,14 @@ public/uploads/dokumen/*
 !public/aktivitas/*.jfif
 !public/aktivitas/*.png
 !public/aktivitas/*.webp
+!uploads/lokasi/*.jpg
+!uploads/lokasi/*.jpeg
+!uploads/lokasi/*.jfif
+!uploads/lokasi/*.png
+!uploads/lokasi/*.webp
+!public/uploads/lokasi/*.jpg
+!public/uploads/lokasi/*.jpeg
+!public/uploads/lokasi/*.jfif
+!public/uploads/lokasi/*.png
+!public/uploads/lokasi/*.webp
 

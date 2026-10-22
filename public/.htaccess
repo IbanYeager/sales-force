@@ -13,6 +13,16 @@ Options -Indexes -MultiViews +FollowSymLinks
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # Fallback missing uploads/lokasi/ images to aktivitas/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{DOCUMENT_ROOT}/aktivitas/$1 -f
+    RewriteRule ^uploads/lokasi/(.+)$ /aktivitas/$1 [L]
+
+    # Fallback missing aktivitas/ images to uploads/lokasi/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{DOCUMENT_ROOT}/uploads/lokasi/$1 -f
+    RewriteRule ^aktivitas/(.+)$ /uploads/lokasi/$1 [L]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f

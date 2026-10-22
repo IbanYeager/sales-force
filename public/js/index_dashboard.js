@@ -425,15 +425,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     // ── Helper: render card HTML
                     const renderCard = (item, fromModal) => {
                         const ts = getTipeStyle(item.tipe_aktivitas);
-                        const fotoList = item.foto ? item.foto.split(',') : [];
-                        const imgSrc = fotoList.length > 0
-                            ? `uploads/lokasi/${fotoList[0]}`
-                            : null;
+                        const fotoList = item.foto ? item.foto.split(',').map(f => f.trim()).filter(Boolean) : [];
+                        let imgSrc = null;
+                        if (fotoList.length > 0) {
+                            const raw = fotoList[0];
+                            if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('/')) {
+                                imgSrc = raw;
+                            } else if (raw.startsWith('uploads/') || raw.startsWith('aktivitas/')) {
+                                imgSrc = raw;
+                            } else {
+                                imgSrc = `uploads/lokasi/${raw}`;
+                            }
+                        }
 
                         // Foto thumbnail
                         let thumbHtml = imgSrc ? `
                                     <div style="position:relative;width:70px;height:70px;flex-shrink:0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.14);">
-                                        <img src="${imgSrc}" alt="${item.tipe_aktivitas}" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.parentElement.style.background='${ts.bg}'; this.parentElement.innerHTML='<div style=\\'width:70px;height:70px;display:flex;align-items:center;justify-content:center;\\'><i class=\\'fa-solid ${ts.icon}\\' style=\\'font-size:22px;color:${ts.color};\\'></i></div>';">
+                                        <img src="${imgSrc}" alt="${item.tipe_aktivitas}" style="width:100%;height:100%;object-fit:cover;" onerror="if (!this.dataset.fallback) { this.dataset.fallback = '1'; this.src = this.src.includes('uploads/lokasi/') ? this.src.replace('uploads/lokasi/', 'aktivitas/') : this.src; } else { this.onerror=null; this.parentElement.style.background='${ts.bg}'; this.parentElement.innerHTML='<div style=\\'width:70px;height:70px;display:flex;align-items:center;justify-content:center;\\'><i class=\\'fa-solid ${ts.icon}\\' style=\\'font-size:22px;color:${ts.color};\\'></i></div>'; }">
                                         ${fotoList.length > 1 ? `<span style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;backdrop-filter:blur(4px);">+${fotoList.length - 1}</span>` : ''}
                                     </div>
                                 ` : `
@@ -538,7 +546,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.openActivityDetail = function (item, fromModal) {
         openedFromModal = !!fromModal;
-        currentPhotoList = item.foto ? item.foto.split(',').map(f => `uploads/lokasi/${f.trim()}`) : [];
+        currentPhotoList = item.foto ? item.foto.split(',').map(f => {
+            f = f.trim();
+            if (!f) return '';
+            if (f.startsWith('http://') || f.startsWith('https://') || f.startsWith('/')) return f;
+            if (f.startsWith('uploads/') || f.startsWith('aktivitas/')) return f;
+            return `uploads/lokasi/${f}`;
+        }).filter(Boolean) : [];
         currentPhotoIndex = 0;
 
         // Jika dibuka dari modal list → tutup aktivitasModal dulu
@@ -629,11 +643,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const counter = document.getElementById('adm-photo-counter');
         const thumbsEl = document.getElementById('adm-thumbnails');
 
+        mainImg.onerror = function() {
+            if (!this.dataset.fallback) {
+                this.dataset.fallback = '1';
+                if (this.src.includes('uploads/lokasi/')) {
+                    this.src = this.src.replace('uploads/lokasi/', 'aktivitas/');
+                }
+            }
+        };
         mainImg.src = currentPhotoList[currentPhotoIndex];
         counter.textContent = `${currentPhotoIndex + 1} / ${currentPhotoList.length}`;
 
         thumbsEl.innerHTML = currentPhotoList.map((src, i) => `
                     <img src="${src}" alt="Foto ${i + 1}" onclick="setPhoto(${i})"
+                        onerror="if (!this.dataset.fallback) { this.dataset.fallback = '1'; if (this.src.includes('uploads/lokasi/')) this.src = this.src.replace('uploads/lokasi/', 'aktivitas/'); }"
                         style="width:54px;height:54px;border-radius:10px;object-fit:cover;flex-shrink:0;
                                cursor:pointer;transition:all 0.2s;
                                border:2.5px solid ${i === currentPhotoIndex ? 'var(--primary-red)' : 'transparent'};
