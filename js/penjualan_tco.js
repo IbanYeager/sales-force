@@ -141,7 +141,29 @@ function addOfficeMarker() {
 }
 
 /**
- * 1.3 Recenter Map to Dealer HQ
+ * 1.3 Toggle All District Labels (Clean Mode vs All Labels Mode)
+ */
+let isLabelsExpanded = false;
+
+function toggleMapLabels() {
+  const mapEl = document.getElementById('tcoPolregMap');
+  const btn = document.getElementById('btnToggleLabels');
+  if (!mapEl) return;
+
+  isLabelsExpanded = !isLabelsExpanded;
+  mapEl.classList.toggle('show-all-labels', isLabelsExpanded);
+
+  if (btn) {
+    btn.classList.toggle('active', isLabelsExpanded);
+    btn.innerHTML = isLabelsExpanded 
+      ? '<i class="fa-solid fa-tags"></i> Label: Semua'
+      : '<i class="fa-solid fa-tag"></i> Label: Bersih';
+  }
+}
+window.toggleMapLabels = toggleMapLabels;
+
+/**
+ * 1.4 Recenter Map to Dealer HQ
  */
 function recenterToDealerHQ() {
   if (!tcoMap) return;

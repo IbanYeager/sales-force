@@ -999,39 +999,94 @@
   gap: 4px;
 }
 
-/* ── Center District Pin Markers ─────────────────────── */
-.tco-district-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+/* ── Center District Pin Markers (Clean & Minimalist, No Crowding) ── */
+.tco-district-label-wrap {
   pointer-events: none;
 }
 
-.tco-district-label .lbl-name {
-  font-size: 10px;
-  font-weight: 800;
-  color: #0f172a;
-  background: rgba(255, 255, 255, 0.94);
-  padding: 1px 6px;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-  border: 1px solid rgba(0,0,0,0.1);
+.tco-district-label {
+  display: none; /* Sembunyikan teks label statis agar peta tetap bersih & tidak bertumpuk */
+  align-items: center;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  font-weight: 700;
   white-space: nowrap;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1000;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
 }
 
-.tco-district-label .lbl-badge {
-  font-size: 9px;
-  font-weight: 800;
-  color: #ffffff;
-  padding: 1px 5px;
-  border-radius: 10px;
-  margin-top: 2px;
+/* Hanya tampilkan label pada kecamatan yang AKTIF (dipilih) atau HOVERED */
+.tco-district-label.active,
+.tco-district-label.hovered {
+  display: inline-flex !important;
 }
-.tco-district-label .lbl-badge.high { background: #10b981; }
-.tco-district-label .lbl-badge.mid { background: #3b82f6; }
-.tco-district-label .lbl-badge.low { background: #ef4444; }
-.tco-district-label .lbl-badge.zero { display: none; }
+
+.tco-district-label.active {
+  background: #d7123a;
+  color: #ffffff;
+  font-weight: 800;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 4px 16px rgba(215, 18, 58, 0.5);
+  transform: translate(-50%, -50%) scale(1.08);
+  z-index: 9999;
+}
+
+.tco-district-label.hovered:not(.active) {
+  background: rgba(15, 23, 42, 0.95);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transform: translate(-50%, -50%) scale(1.04);
+  z-index: 9998;
+}
+
+.tco-district-label .tco-label-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tco-district-label .tco-label-dot.high { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.tco-district-label .tco-label-dot.mid { background: #3b82f6; box-shadow: 0 0 6px #3b82f6; }
+.tco-district-label .tco-label-dot.low { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+.tco-district-label .tco-label-dot.zero { background: #94a3b8; }
+
+.tco-district-label .tco-label-text {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tco-district-label .tco-label-val {
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 1px 5px;
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+/* Jika user mengaktifkan mode Tampilkan Semua Label */
+#tcoPolregMap.show-all-labels .tco-district-label {
+  display: inline-flex;
+  font-size: 9.5px;
+  padding: 1px 5px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+}
+#tcoPolregMap.show-all-labels .tco-district-label .tco-label-val {
+  background: #0f172a;
+  color: #ffffff;
+}
 
 /* ── District Inspector HUD (Right Panel) ────────────── */
 .tco-inspector-hud {

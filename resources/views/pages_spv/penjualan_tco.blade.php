@@ -267,6 +267,10 @@
                   <i class="fa-solid fa-satellite"></i> Satelit
                 </button>
 
+                <button type="button" class="tco-map-btn" id="btnToggleLabels" onclick="toggleMapLabels()" title="Tampilkan / Sembunyikan nama kecamatan di atas peta">
+                  <i class="fa-solid fa-tag"></i> Label: Bersih
+                </button>
+
                 <button type="button" class="tco-map-btn" onclick="recenterToDealerHQ()" title="Pusatkan ke Kantor Tunas Toyota Kiara Condong">
                   <i class="fa-solid fa-building-flag" style="color:#d8a437;"></i> Kantor KC
                 </button>
