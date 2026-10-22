@@ -114,6 +114,7 @@
         if (activeOrderType === 'reguler' && !orderKat.includes('reguler') && !orderKat.includes('regular')) return false;
         if (activeOrderType === 'prime' && !orderKat.includes('prime')) return false;
         if (activeOrderType === 'ntco' && !orderKat.includes('ntco')) return false;
+        if (activeOrderType === 'lux' && !orderKat.includes('lux')) return false;
 
         // Filter by Body Type (MPV, SUV, etc)
         const bodyType = getBodyType(item.model).toLowerCase();

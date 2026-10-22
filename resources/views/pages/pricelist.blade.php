@@ -167,6 +167,7 @@
           <div class="filter-pill active" data-val="reguler" onclick="selectFilterOrder(this)">Reguler</div>
           <div class="filter-pill" data-val="prime" onclick="selectFilterOrder(this)">Prime</div>
           <div class="filter-pill" data-val="ntco" onclick="selectFilterOrder(this)">NTCO</div>
+          <div class="filter-pill" data-val="lux" onclick="selectFilterOrder(this)">LUX</div>
         </div>
       </div>
 
