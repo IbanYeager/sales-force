@@ -105,7 +105,7 @@
         </div>
         <div class="spv-user">
           <div class="avatar-status">
-            <img id="spvAvatar" src="https://ui-avatars.com/api/?name=SPV&background=1c2740&color=ffffff&bold=true" alt="Avatar">
+            <img id="spvAvatar" src="" alt="Avatar">
             <span class="dot"></span>
           </div>
           <div class="meta">
@@ -492,7 +492,6 @@
 
   <!-- Scripts -->
   <script src="../custom_alert.js"></script>
-  <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
   <script src="../js/penjualan_tco.js?v={{ time() }}"></script>
   <script src="../js/spv_global.js"></script>
   <script src="../js/pwa-app.js?v=20261021_v20"></script>

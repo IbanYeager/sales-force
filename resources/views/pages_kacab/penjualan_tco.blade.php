@@ -35,15 +35,16 @@
             alt="Tunas Toyota Logo" class="tunas-logo">
         </div>
         <div class="kcb-brand-title">
-          <span class="panel-tag"><i class="fa-solid fa-building-user"></i> KACAB PANEL</span>
-          <p class="panel-sub">Kepala Cabang</p>
+          <span class="panel-tag"><i class="fa-solid fa-crown"></i> KACAB PANEL</span>
+          <p class="panel-sub"><span class="panel-sub-dot"></span> Cabang Kiara Condong</p>
         </div>
       </div>
 
       <div class="kcb-search-wrap">
         <div class="kcb-search-box">
           <i class="fa-solid fa-magnifying-glass kcb-search-icon"></i>
-          <input type="text" class="kcb-search-input" id="kcbSearchInput" placeholder="Cari menu & fitur..." autocomplete="off" spellcheck="false">
+          <input type="text" class="kcb-search-input" id="kcbSearchInput" placeholder="Cari menu &amp; fitur..." autocomplete="off" spellcheck="false">
+          <kbd class="kcb-search-kbd">Ctrl+K</kbd>
           <button type="button" class="kcb-search-clear" id="kcbSearchClear" style="display:none;" title="Bersihkan pencarian">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -54,50 +55,66 @@
         <!-- Kategori 1: Eksekutif & Dashboard -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-chart-line"></i> Eksekutif &amp; Dashboard</span>
-          <a href="index_kacab.html" id="navDash"><i class="fa-solid fa-gauge-high"></i>Dashboard Cabang</a>
-          <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i>Laporan Eksekutif</a>
-          <a href="performa_regional.html" id="navRegional"><i class="fa-solid fa-earth-asia"></i>Performa Regional Jabar</a>
+          <a href="index_kacab.html" id="navDash"><i class="fa-solid fa-gauge-high"></i> Dashboard Cabang</a>
+          <a href="laporan_kacab.html" id="navLaporan"><i class="fa-solid fa-chart-pie"></i> Laporan Eksekutif</a>
+          <a href="performa_regional.html" id="navRegional"><i class="fa-solid fa-earth-asia"></i> Performa Regional Jabar</a>
         </div>
 
         <!-- Kategori 2: Pipeline & Sales CRM -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-funnel-dollar"></i> Pipeline &amp; Sales CRM</span>
-          <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
-          <a href="penjualan_tco.html" id="navTco" class="active"><i class="fa-solid fa-gem"></i>Penjualan &amp; Polreg TCO</a>
-          <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i>Database Follow-Up (CRM)</a>
-          <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i>Papan AO Report</a>
-          <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i>Otorisasi &amp; Approval</a>
+          <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i> Penjualan Kircon</a>
+          <a href="penjualan_tco.html" id="navTco" class="active"><i class="fa-solid fa-gem"></i> Penjualan &amp; Polreg TCO</a>
+          <a href="followup_database.html" id="navFollowup"><i class="fa-solid fa-bullhorn"></i> Database Follow-Up (CRM)</a>
+          <a href="ao_report_kacab.html" id="navAO"><i class="fa-solid fa-chalkboard-user"></i> AO Report Cabang</a>
+          <a href="approval_kacab.html" id="navApproval"><i class="fa-solid fa-clipboard-check"></i> Otorisasi &amp; Approval</a>
         </div>
 
         <!-- Kategori 3: Monitoring Tim & Sales -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-users-gear"></i> Monitoring Tim &amp; Sales</span>
-          <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i>Monitoring Tim SPV</a>
-          <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Data Wiraniaga</a>
-          <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target &amp; Produktivitas</a>
-          <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Aktivitas &amp; Riwayat Sales</a>
-          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i>Riwayat Foto Aktivitas</a>
-          <a href="peta_kunjungan.html" id="navPeta"><i class="fa-solid fa-map-location-dot"></i>Peta GPS Kunjungan</a>
+          <a href="monitoring_spv.html" id="navMonitoring"><i class="fa-solid fa-sitemap"></i> Monitoring Tim SPV</a>
+          <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i> Data 57 Wiraniaga <span class="kcb-nav-badge badge-gold">57 Sales</span></a>
+          <a href="target_kacab.html" id="navTarget"><i class="fa-solid fa-bullseye"></i> Target &amp; Produktivitas</a>
+          <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i> Aktivitas &amp; Riwayat Sales</a>
+          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i> Riwayat Foto Aktivitas</a>
+          <a href="peta_kunjungan.html" id="navPeta"><i class="fa-solid fa-map-location-dot"></i> Peta GPS Kunjungan</a>
         </div>
 
         <!-- Kategori 4: Stok & Operasional -->
         <div class="kcb-nav-category">
           <span class="kcb-category-title"><i class="fa-solid fa-warehouse"></i> Stok &amp; Operasional</span>
-          <a href="inventory.html" id="navStock"><i class="fa-solid fa-warehouse"></i>Live Stok Unit</a>
-          <a href="after_sales.html" id="navAfterSales"><i class="fa-solid fa-wrench"></i>After Sales</a>
-          <a href="mtoyota_service.html" id="navMtoyota"><i class="fa-solid fa-car-on"></i>m-Toyota &amp; Service</a>
-          <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i>Trade-In &amp; OLX</a>
+          <a href="inventory.html" id="navStock"><i class="fa-solid fa-warehouse"></i> Live Stok (1.638 Unit)</a>
+          <a href="after_sales.html" id="navAfterSales"><i class="fa-solid fa-wrench"></i> After Sales</a>
+          <a href="mtoyota_service.html" id="navMtoyota"><i class="fa-solid fa-car-on"></i> m-Toyota &amp; Service</a>
+          <a href="olx.html" id="navOlx"><i class="fa-solid fa-repeat"></i> Trade-In &amp; OLX</a>
+        </div>
+
+        <div class="kcb-search-empty" id="kcbSearchEmpty" style="display:none;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <p>Menu tidak ditemukan</p>
+          <span>Coba gunakan kata kunci lain</span>
         </div>
       </nav>
 
       <div class="sidebar-footer">
-        <button class="btn btn-danger" style="width:100%;" onclick="logoutUser()">
-          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        <div class="kcb-footer-profile">
+          <div class="kcb-footer-avatar-wrap">
+            <img src="https://ui-avatars.com/api/?name=Dendi+Holius&background=1e1014&color=d8a437&bold=true" alt="Dendi Holius" class="kcb-footer-avatar" id="kcbFooterAvatar">
+            <span class="kcb-footer-dot" title="Sistem Aktif &amp; Terhubung"></span>
+          </div>
+          <div class="kcb-footer-meta">
+            <span class="kcb-footer-name" id="kcbFooterName">Dendi Holius</span>
+            <span class="kcb-footer-role"><i class="fa-solid fa-crown" style="font-size:9px;"></i> Kepala Cabang</span>
+          </div>
+        </div>
+        <button type="button" class="kcb-logout-btn" onclick="logoutUser()">
+          <i class="fa-solid fa-right-from-bracket"></i> <span>Keluar</span>
         </button>
       </div>
     </aside>
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
     <main class="kcb-main">
       <!-- Topbar Header -->
       <div class="kcb-topbar">
@@ -107,27 +124,27 @@
         </div>
         <div class="kcb-user">
           <div class="avatar-status">
-            <img id="kcbAvatar" src="https://ui-avatars.com/api/?name=KC&background=1e1014&color=d8a437&bold=true" alt="Avatar">
-            <span class="dot" style="background:#d8a437;"></span>
+            <img id="kcbAvatar" src="" alt="Avatar">
+            <span class="dot"></span>
           </div>
           <div class="meta">
-            <span class="name" id="kcbNama">Kepala Cabang</span>
-            <span class="role" id="kcbRole" style="color:#d8a437;">Kepala Cabang</span>
+            <span class="name" id="kcbNama">Memuat...</span>
+            <span class="role" id="kcbRole">Kepala Cabang</span>
           </div>
         </div>
       </div>
 
       <div style="margin-top: 14px;">
         <!-- Executive Banner with Filters -->
-        <div class="tco-dashboard-banner" style="background: linear-gradient(135deg, #1e1014 0%, #2b1820 50%, #0d1b3e 100%); border-color: rgba(216, 164, 55, 0.3);">
+        <div class="tco-dashboard-banner" style="background: linear-gradient(135deg, #14080c 0%, #2b111a 45%, #0f172a 100%); border-color: rgba(216, 164, 55, 0.35);">
           <div class="tco-banner-content">
             <div class="tco-banner-title">
               <span class="tco-banner-badge" style="background:rgba(216, 164, 55, 0.2); border-color:#d8a437; color:#fde68a;">
-                <i class="fa-solid fa-award"></i> Executive TCO Analytics
+                <i class="fa-solid fa-crown"></i> EKSEKUTIF KACAB · STRATEGIC TCO INTELLIGENCE
               </span>
-              <h1><i class="fa-solid fa-gem" style="color: #fde68a;"></i> Revenue &amp; Mapping Polreg TCO</h1>
+              <h1><i class="fa-solid fa-gem" style="color: #fde68a;"></i> Penjualan &amp; Pemetaan Polreg TCO</h1>
               <p class="tco-banner-desc">
-                Pantau akselerasi margin aksesoris TCO (Target Rp 350.000 / unit SPK) dan petakan sebaran pelanggan berdasarkan wilayah registrasi pelat nomor (Plat D, Plat Z, Plat E, Plat F) di Jawa Barat.
+                Pantau akselerasi penetrasi aksesoris TCO (Target Rp 350.000 / unit SPK) dan petakan sebaran pelanggan berdasarkan wilayah registrasi pelat nomor (Plat D, Plat Z, Plat E, Plat F) di Bandung Raya &amp; Jawa Barat.
               </p>
             </div>
 
@@ -496,7 +513,6 @@
 
   <!-- Scripts -->
   <script src="../custom_alert.js"></script>
-  <script src="../js/sidebar_desktop.js?v={{ time() }}"></script>
   <script src="../js/penjualan_tco.js?v={{ time() }}"></script>
   <script src="../js/kacab_global.js?v=20260904_sheet_sync_fix"></script>
   <script src="../js/pwa-app.js?v=20261021_v20"></script>

@@ -47,6 +47,7 @@
           <a href="index_spv.html" id="navDash"><i class="fa-solid fa-gauge"></i>Dashboard SPV</a>
           <a href="target.html" id="navTarget"><i class="fa-solid fa-bullseye"></i>Target &amp; Pencapaian</a>
           <a href="penjualan_kircon.html" id="navPenjualan"><i class="fa-solid fa-table-list"></i>Penjualan Kircon</a>
+          <a href="penjualan_tco.html" id="navTco"><i class="fa-solid fa-gem"></i>Penjualan &amp; Polreg TCO</a>
         </div>
 
         <!-- Kategori 2: Pipeline & Approval -->
