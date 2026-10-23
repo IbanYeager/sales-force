@@ -558,7 +558,10 @@ a {
     transform: scale(0.92);
 }
 
-.badge {
+.bell-icon .badge,
+.notif-bell .badge,
+.bell-btn .badge,
+.badge-dot {
     position: absolute;
     top: -5px;
     right: -5px;
@@ -575,6 +578,19 @@ a {
     box-shadow: 0 4px 12px rgba(215, 18, 58, 0.5);
     border: 1.5px solid rgba(255, 255, 255, 0.9);
     animation: scale-in 0.4s var(--spring);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    line-height: normal;
 }
 
 /* ═══════════════════════════════════════════════════════════════

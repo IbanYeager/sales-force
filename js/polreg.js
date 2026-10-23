@@ -1631,11 +1631,11 @@
     tbody.innerHTML = sorted.map((dist, idx) => {
       const shareCls = getShareClass(dist.marketShare);
 
-      let urgencyPill = '<span class="badge" style="background:#ecfdf5; color:#059669; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px;">Solid</span>';
+      let urgencyPill = '<span class="polreg-urgency-pill" style="background:#ecfdf5; color:#059669; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; position:static;">Solid</span>';
       if (dist.urgencyLevel === 'immediate' || dist.marketShare < 30) {
-        urgencyPill = '<span class="badge" style="background:#fef2f2; color:#dc2626; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px;">Low Share 🔥</span>';
+        urgencyPill = '<span class="polreg-urgency-pill" style="background:#fef2f2; color:#dc2626; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; position:static;">Low Share 🔥</span>';
       } else if (dist.urgencyLevel === 'priority') {
-        urgencyPill = '<span class="badge" style="background:#fffbeb; color:#d97706; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px;">Priority</span>';
+        urgencyPill = '<span class="polreg-urgency-pill" style="background:#fffbeb; color:#d97706; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; position:static;">Priority</span>';
       }
 
       let regencyBadge = '<span class="polreg-regency-badge" style="background:#eff6ff; color:#1e40af; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">Kota Bandung</span>';

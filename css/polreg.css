@@ -2348,20 +2348,26 @@
 }
 
 /* --- POLREG BUGFIXES & RESPONSIVE POLISH 2026 --- */
-.polreg-badge-pill {
+.polreg-badge-pill,
+.polreg-urgency-pill,
+.polreg-table .badge,
+.polreg-fullwidth-page .badge:not(.bell-badge) {
   position: static !important;
   display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
   gap: 6px !important;
   width: auto !important;
   height: auto !important;
   border-radius: 8px !important;
-  font-size: 11.5px !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
   line-height: normal !important;
   box-shadow: none !important;
   animation: none !important;
   border: none !important;
+  white-space: nowrap !important;
+  text-transform: none !important;
 }
 
 .polreg-map-header {
