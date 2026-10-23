@@ -769,7 +769,7 @@
     }
   };
 
-  let currentBattleCardMode = 'ranking'; // 'ranking' | 'segment'
+  let currentBattleCardMode = 'segment'; // Default: 'segment' (Opsi 2: Segmen & Harga Setara)
   let currentSelectedSegmentKey = null;
   let currentInspectorDistrict = null;
 
@@ -784,35 +784,133 @@
     sel.innerHTML = html;
   }
 
+  /**
+   * Helper: Dapatkan data mobil #1 terbanyak di kecamatan (dari allDistrictsCars)
+   */
+  function getDistrictTopCar(dist) {
+    if (!dist) return null;
+    const distCars = (allDistrictsCars && dist.id) ? (allDistrictsCars[dist.id] || allDistrictsCars[dist.id.toLowerCase()]) : null;
+    if (distCars && distCars.topCar) {
+      return distCars.topCar;
+    }
+    if (distCars && Array.isArray(distCars.topAggregatedModels) && distCars.topAggregatedModels.length > 0) {
+      return distCars.topAggregatedModels[0];
+    }
+    return null;
+  }
+
+  /**
+   * Helper: Klasifikasi segmen mobil ke SEGMENT_BATTLE_CARDS key
+   */
+  function resolveSegmentForCarModel(modelName, rawType = '', merk = '') {
+    const text = `${modelName || ''} ${rawType || ''} ${merk || ''}`.toLowerCase();
+
+    // 1. City Car & LCGC Hatchback (Agya vs Brio)
+    if (text.includes('brio') || text.includes('agya') || text.includes('ayla') || 
+        text.includes('s-presso') || text.includes('spresso') || text.includes('ignis') || 
+        text.includes('sirion') || text.includes('yaris hatchback')) {
+      return 'agya_brio';
+    }
+
+    // 2. Entry MPV 7-Seater LCGC (Calya vs Sigra)
+    if (text.includes('sigra') || text.includes('calya') || text.includes('formo') || 
+        text.includes('datsun')) {
+      return 'calya_sigra';
+    }
+
+    // 3. Low MPV 7-Seater (Avanza / Veloz vs Xpander / Stargazer)
+    if ((!text.includes('xpander cross') && text.includes('xpander')) || 
+        text.includes('avanza') || text.includes('veloz') || text.includes('stargazer') || 
+        text.includes('confero') || text.includes('ertiga') || text.includes('mobilio') || 
+        text.includes('luxio')) {
+      return 'avanza_xpander';
+    }
+
+    // 4. Low SUV 7-Seater (Rush vs BR-V / Xpander Cross / Terios)
+    if (text.includes('rush') || text.includes('br-v') || text.includes('brv') || 
+        text.includes('xpander cross') || text.includes('terios') || text.includes('xl7') || 
+        text.includes('xl-7')) {
+      return 'rush_brv';
+    }
+
+    // 5. Compact SUV / Crossover (Yaris Cross / Raize vs HR-V / Creta)
+    if (text.includes('hr-v') || text.includes('hrv') || text.includes('wr-v') || 
+        text.includes('wrv') || text.includes('creta') || text.includes('raize') || 
+        text.includes('yaris cross') || text.includes('yariscross') || text.includes('omoda') || 
+        text.includes('alvez') || text.includes('xforce') || text.includes('rocky') || 
+        text.includes('corolla cross')) {
+      return 'yariscross_hrv';
+    }
+
+    // 6. Medium MPV (Innova Zenix vs Cortez / Almaz)
+    if (text.includes('innova') || text.includes('zenix') || text.includes('cortez') || 
+        text.includes('almaz') || text.includes('carens') || text.includes('reborn') || 
+        text.includes('kijang')) {
+      return 'zenix_almaz';
+    }
+
+    // 7. High SUV Ladder Frame (Fortuner vs Pajero Sport)
+    if (text.includes('fortuner') || text.includes('pajero') || text.includes('mu-x') || 
+        text.includes('mux') || text.includes('everest') || text.includes('palisade') || 
+        text.includes('land cruiser')) {
+      return 'fortuner_pajero';
+    }
+
+    // 8. Commercial Pick Up & Niaga (Hilux Rangga vs L300 / Carry / Gran Max)
+    if (text.includes('rangga') || text.includes('hilux') || text.includes('l300') || 
+        text.includes('colt') || text.includes('carry') || text.includes('aev415') || 
+        text.includes('s403') || text.includes('s401') || text.includes('gran max') || 
+        text.includes('granmax') || text.includes('traga') || text.includes('pick up') || 
+        text.includes('pickup') || text.includes('hino') || text.includes('canter') || 
+        text.includes('dyna')) {
+      return 'rangga_l300';
+    }
+
+    // 9. Commercial Van & Minibus (Hiace vs Staria / Elf)
+    if (text.includes('hiace') || text.includes('elf') || text.includes('staria') || 
+        text.includes('sprinter') || text.includes('microbus')) {
+      return 'hiace_elf';
+    }
+
+    return null;
+  }
+
+  /**
+   * Deteksi Segmen Terbaik Berdasarkan Model Terbanyak di Setiap Kecamatan
+   * Contoh: Cibiru model terbanyak Brio -> Rekomendasi Toyota Agya
+   */
   function detectBestSegmentForDistrict(dist) {
     if (!dist) return 'agya_brio';
 
-    const distCars = (allDistrictsCars && dist.id) ? allDistrictsCars[dist.id] : null;
-    let competitorNames = [];
+    // 1. Cek Model #1 Terbanyak di Wilayah (Top Car)
+    const topCar = getDistrictTopCar(dist);
+    if (topCar) {
+      const segKey = resolveSegmentForCarModel(topCar.cleanName || topCar.name, topCar.rawType, topCar.merk);
+      if (segKey && SEGMENT_BATTLE_CARDS[segKey]) {
+        return segKey;
+      }
+    }
+
+    // 2. Cek Model Kompetitor Teratas di Wilayah
+    const distCars = (allDistrictsCars && dist.id) ? (allDistrictsCars[dist.id] || allDistrictsCars[dist.id.toLowerCase()]) : null;
     if (distCars && Array.isArray(distCars.topAggregatedModels)) {
-      competitorNames = distCars.topAggregatedModels.filter(m => !m.isToyota).map(m => (m.name || '').toLowerCase());
+      for (const m of distCars.topAggregatedModels) {
+        const segKey = resolveSegmentForCarModel(m.name, '', m.merk);
+        if (segKey && SEGMENT_BATTLE_CARDS[segKey]) {
+          return segKey;
+        }
+      }
     }
+
+    // 3. Fallback ke metadata kompetitor di dist
     if (dist.competitor) {
-      competitorNames.push(dist.competitor.toLowerCase());
+      const segKey = resolveSegmentForCarModel(dist.competitor);
+      if (segKey && SEGMENT_BATTLE_CARDS[segKey]) return segKey;
     }
 
-    const compText = competitorNames.join(' ');
-
-    for (const [key, seg] of Object.entries(SEGMENT_BATTLE_CARDS)) {
-      for (const kw of seg.matchKeywords) {
-        if (compText.includes(kw)) {
-          return key;
-        }
-      }
-    }
-
-    const recModel = (dist.modelBadge || dist.recommendedModel || '').toLowerCase();
-    for (const [key, seg] of Object.entries(SEGMENT_BATTLE_CARDS)) {
-      for (const kw of seg.matchKeywords) {
-        if (recModel.includes(kw)) {
-          return key;
-        }
-      }
+    if (dist.recommendedModel) {
+      const segKey = resolveSegmentForCarModel(dist.recommendedModel);
+      if (segKey && SEGMENT_BATTLE_CARDS[segKey]) return segKey;
     }
 
     return 'agya_brio';
@@ -826,11 +924,10 @@
     if (btnRanking) btnRanking.classList.toggle('active', mode === 'ranking');
     if (btnSegment) btnSegment.classList.toggle('active', mode === 'segment');
 
-    if (mode === 'segment' && !currentSelectedSegmentKey && currentInspectorDistrict) {
-      currentSelectedSegmentKey = detectBestSegmentForDistrict(currentInspectorDistrict);
-    }
-
     if (currentInspectorDistrict) {
+      if (!currentSelectedSegmentKey || mode === 'segment') {
+        currentSelectedSegmentKey = detectBestSegmentForDistrict(currentInspectorDistrict);
+      }
       renderBattleCardContent(currentInspectorDistrict);
     }
   }
@@ -846,6 +943,7 @@
     if (!dist) return;
     populateSegmentSelect();
 
+    const elBanner = document.getElementById('piBcTopCarBanner');
     const elModel = document.getElementById('inspectorModelBadge');
     const elToyotaPrice = document.getElementById('inspectorToyotaPrice');
     const elCompetitor = document.getElementById('inspectorCompetitorText');
@@ -861,21 +959,58 @@
     if (btnRanking) btnRanking.classList.toggle('active', currentBattleCardMode === 'ranking');
     if (btnSegment) btnSegment.classList.toggle('active', currentBattleCardMode === 'segment');
 
+    // Dapatkan data mobil #1 terbanyak di kecamatan ini
+    const topCar = getDistrictTopCar(dist);
+    const distCars = (allDistrictsCars && dist.id) ? (allDistrictsCars[dist.id] || allDistrictsCars[dist.id.toLowerCase()]) : null;
+
+    if (!currentSelectedSegmentKey || !SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey]) {
+      currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
+    }
+
+    const segData = SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey] || SEGMENT_BATTLE_CARDS.agya_brio;
+
+    // Sinkronisasi dropdown select
+    if (sel && sel.value !== currentSelectedSegmentKey) {
+      sel.value = currentSelectedSegmentKey;
+    }
+
+    // Render Dynamic Top-Car Context Banner
+    if (elBanner) {
+      if (topCar) {
+        elBanner.style.display = 'flex';
+        const isToyota = topCar.isToyota || (topCar.merk && topCar.merk.toUpperCase() === 'TOYOTA');
+        const carName = topCar.cleanName || topCar.name || 'Mobil Populer';
+        const carUnits = topCar.units || 0;
+
+        if (isToyota) {
+          elBanner.className = 'pi-bc-topcar-banner toyota';
+          elBanner.innerHTML = `
+            <div class="pi-bc-tc-icon"><i class="fa-solid fa-crown"></i></div>
+            <div class="pi-bc-tc-content">
+              <div class="pi-bc-tc-top">Mobil #1 Terbanyak di ${escapeHtml(dist.name)}: <strong>${escapeHtml(carName)} (${carUnits} Unit)</strong> — <span style="color:#059669; font-weight:800;">Toyota Memimpin</span></div>
+              <div class="pi-bc-tc-sub">Pertahankan dominasi terhadap rival <strong>${escapeHtml(segData.competitor)}</strong> di segmen setara.</div>
+            </div>
+          `;
+        } else {
+          elBanner.className = 'pi-bc-topcar-banner competitor';
+          elBanner.innerHTML = `
+            <div class="pi-bc-tc-icon"><i class="fa-solid fa-crosshairs"></i></div>
+            <div class="pi-bc-tc-content">
+              <div class="pi-bc-tc-top">Mobil #1 Terbanyak di ${escapeHtml(dist.name)}: <strong>${escapeHtml(carName)} (${carUnits} Unit)</strong></div>
+              <div class="pi-bc-tc-sub">Rekomendasi Toyota Segmen Setara: <strong>${escapeHtml(segData.toyotaModel)}</strong> (${escapeHtml(segData.segment)})</div>
+            </div>
+          `;
+        }
+      } else {
+        elBanner.style.display = 'none';
+      }
+    }
+
     if (currentBattleCardMode === 'segment') {
       // OPSI 2: Berdasarkan Segmen Model & Harga Setara (cth: Agya vs Brio)
       if (elWrap) elWrap.style.display = 'block';
       if (elMeta) elMeta.style.display = 'flex';
       if (elToyotaPrice) elToyotaPrice.style.display = 'inline-block';
-
-      if (!currentSelectedSegmentKey || !SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey]) {
-        currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
-      }
-
-      if (sel && sel.value !== currentSelectedSegmentKey) {
-        sel.value = currentSelectedSegmentKey;
-      }
-
-      const segData = SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey] || SEGMENT_BATTLE_CARDS.agya_brio;
 
       if (elBadge) elBadge.textContent = segData.segment;
       if (elPriceRange) elPriceRange.textContent = `Kelas Harga: ${segData.priceRange}`;
@@ -895,13 +1030,34 @@
       if (elMeta) elMeta.style.display = 'none';
       if (elToyotaPrice) elToyotaPrice.style.display = 'none';
 
-      if (elModel) elModel.textContent = dist.modelBadge || dist.recommendedModel || 'Toyota';
-      if (elCompetitor) {
-        elCompetitor.innerHTML = `Lawan Terberat: <strong>${escapeHtml(dist.competitor || 'Kompetitor')}</strong> (${escapeHtml(dist.competitorSegment || 'LMPV & SUV')})`;
-      }
-
-      if (elUsp && Array.isArray(dist.usp)) {
-        elUsp.innerHTML = dist.usp.map(point => `<li>${escapeHtml(point)}</li>`).join('');
+      if (topCar && (!topCar.isToyota && topCar.merk !== 'TOYOTA')) {
+        // Jika mobil #1 di wilayah ini kompetitor (contoh: Honda Brio di Cibiru)
+        if (elModel) elModel.textContent = `${segData.toyotaModel} (Rekomendasi Kontra Wilayah)`;
+        if (elCompetitor) {
+          const topToyName = distCars && distCars.topToyota ? distCars.topToyota.name : 'Toyota';
+          const topToyUnits = distCars && distCars.topToyota ? distCars.topToyota.units : 0;
+          elCompetitor.innerHTML = `Lawan #1 Wilayah: <strong>${escapeHtml(topCar.cleanName || topCar.name)} (${topCar.units} Unit)</strong><br><span style="font-size:9.5px; color:#64748b; font-weight:600;"><i class="fa-solid fa-trophy" style="color:#d97706;"></i> Toyota Terlaris Wilayah: ${escapeHtml(topToyName)} (${topToyUnits} Unit)</span>`;
+        }
+        if (elUsp && Array.isArray(segData.usp)) {
+          elUsp.innerHTML = segData.usp.map(point => `<li>${escapeHtml(point)}</li>`).join('');
+        }
+      } else if (topCar && (topCar.isToyota || topCar.merk === 'TOYOTA')) {
+        // Jika mobil #1 di wilayah ini Toyota (contoh: Calya di Andir)
+        if (elModel) elModel.textContent = `${topCar.cleanName || topCar.name} (#1 Terbanyak Wilayah)`;
+        if (elCompetitor) {
+          elCompetitor.innerHTML = `Lawan Terdekat: <strong>${escapeHtml(segData.competitor)}</strong> (${escapeHtml(segData.competitorSegment)})`;
+        }
+        if (elUsp && Array.isArray(segData.usp)) {
+          elUsp.innerHTML = segData.usp.map(point => `<li>${escapeHtml(point)}</li>`).join('');
+        }
+      } else {
+        if (elModel) elModel.textContent = dist.modelBadge || dist.recommendedModel || segData.toyotaModel;
+        if (elCompetitor) {
+          elCompetitor.innerHTML = `Lawan Terberat: <strong>${escapeHtml(dist.competitor || segData.competitor)}</strong> (${escapeHtml(dist.competitorSegment || segData.competitorSegment)})`;
+        }
+        if (elUsp && Array.isArray(dist.usp || segData.usp)) {
+          elUsp.innerHTML = (dist.usp || segData.usp).map(point => `<li>${escapeHtml(point)}</li>`).join('');
+        }
       }
     }
   }
@@ -925,9 +1081,7 @@
     if (!elTitle) return;
 
     currentInspectorDistrict = dist;
-    if (currentBattleCardMode === 'segment') {
-      currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
-    }
+    currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
 
     elTitle.textContent = dist.name;
     if (elZone) elZone.textContent = dist.regency ? `${dist.regency} • ${dist.zone}` : `Wilayah: ${dist.zone}`;

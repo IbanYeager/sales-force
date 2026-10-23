@@ -957,6 +957,70 @@
   gap: 5px;
 }
 
+/* Dynamic Top Car Segment Match Banner */
+.pi-bc-topcar-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  margin: 5px 0 7px 0;
+  font-size: 9.5px;
+  line-height: 1.35;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.pi-bc-topcar-banner.competitor {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #881337;
+}
+
+.pi-bc-topcar-banner.competitor .pi-bc-tc-icon {
+  color: #e11d48;
+  font-size: 13px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.pi-bc-topcar-banner.toyota {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #064e3b;
+}
+
+.pi-bc-topcar-banner.toyota .pi-bc-tc-icon {
+  color: #059669;
+  font-size: 13px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.pi-bc-tc-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pi-bc-tc-top {
+  font-weight: 600;
+  margin-bottom: 1.5px;
+}
+
+.pi-bc-tc-top strong {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.pi-bc-tc-sub {
+  font-size: 9px;
+  opacity: 0.95;
+}
+
+.pi-bc-tc-sub strong {
+  font-weight: 800;
+  color: #cc1426;
+}
+
 /* Opsi 1 & 2 Mode Tabs */
 .pi-bc-mode-tabs {
   display: flex;

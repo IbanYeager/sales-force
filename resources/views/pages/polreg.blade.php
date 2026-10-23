@@ -267,12 +267,15 @@
                 <span>Model Rekomendasi &amp; Kontra Kompetitor</span>
               </div>
 
+              <!-- Dynamic Top Car Matching Alert Banner -->
+              <div id="piBcTopCarBanner" class="pi-bc-topcar-banner" style="display: none;"></div>
+
               <!-- Dua Opsi: 1. Peringkat Wilayah (Ranking) | 2. Segmen & Harga Setara -->
               <div class="pi-bc-mode-tabs">
-                <button type="button" class="pi-bc-mode-btn active" id="btnBcModeRanking" onclick="window.PolregMap.setBattleCardMode('ranking')" title="Opsi 1: Rekomendasi berdasarkan volume & ranking model terbanyak di wilayah ini">
+                <button type="button" class="pi-bc-mode-btn" id="btnBcModeRanking" onclick="window.PolregMap.setBattleCardMode('ranking')" title="Opsi 1: Rekomendasi berdasarkan volume & ranking model terbanyak di wilayah ini">
                   <i class="fa-solid fa-ranking-star"></i> Peringkat Wilayah
                 </button>
-                <button type="button" class="pi-bc-mode-btn" id="btnBcModeSegment" onclick="window.PolregMap.setBattleCardMode('segment')" title="Opsi 2: Komparasi head-to-head mobil sekelas & harga setara (contoh: Agya vs Brio)">
+                <button type="button" class="pi-bc-mode-btn active" id="btnBcModeSegment" onclick="window.PolregMap.setBattleCardMode('segment')" title="Opsi 2: Komparasi head-to-head mobil sekelas & harga setara (contoh: Agya vs Brio)">
                   <i class="fa-solid fa-scale-balanced"></i> Segmen &amp; Harga Setara
                 </button>
               </div>
