@@ -508,8 +508,7 @@ function selectDistrict(districtId, flyTo = true) {
   const elTag = document.getElementById('hudZoneTag');
   if (elTag) {
     const regencyName = (dist.regency || 'KOTA BANDUNG').toUpperCase();
-    const platCode = (data && data.polreg_code) ? `PLAT ${data.polreg_code}` : 'PLAT D';
-    elTag.innerText = `${regencyName} • ${platCode}`;
+    elTag.innerText = regencyName;
   }
 
   const elTitle = document.getElementById('hudDistrictTitle');
@@ -724,25 +723,17 @@ function renderPolregLeaderboard(ranking) {
     const qty = parseInt(r.total_qty) || 0;
     const rev = parseFloat(r.total_revenue) || 0;
     const pct = Math.round((qty / maxQty) * 100);
-    const code = (r.polreg_code || 'D').toUpperCase();
+    const cleanName = (r.wilayah_polreg || '').replace(/^Plat\s+[A-Za-z]\s*[-–—]\s*/i, '').trim();
 
-    let badgeClass = 'badge-plat-d';
-    if (code === 'Z') badgeClass = 'badge-plat-z';
-    else if (code === 'E') badgeClass = 'badge-plat-e';
-    else if (code === 'F') badgeClass = 'badge-plat-f';
-    else if (code === 'B') badgeClass = 'badge-plat-b';
-    else if (code === 'T') badgeClass = 'badge-plat-t';
-
-    const isActive = (currentPolregFilter === r.wilayah_polreg) ? ' active' : '';
+    const isActive = (currentPolregFilter === r.wilayah_polreg || currentPolregFilter === cleanName) ? ' active' : '';
 
     return `
-      <div class="tco-polreg-item${isActive}" onclick="selectPolregFilter('${escapeHtml(r.wilayah_polreg)}')" title="Klik untuk fokus wilayah ini">
+      <div class="tco-polreg-item${isActive}" onclick="selectPolregFilter('${escapeHtml(cleanName)}')" title="Klik untuk fokus wilayah ini">
         <div class="tco-polreg-head">
           <div class="tco-polreg-name">
             <span style="color:#64748b; font-size:11px;">#${i + 1}</span>
-            <span>${escapeHtml(r.wilayah_polreg)}</span>
+            <span>${escapeHtml(cleanName)}</span>
           </div>
-          <span class="tco-polreg-badge ${badgeClass}">Plat ${code}</span>
         </div>
         <div class="tco-polreg-meta">
           <span>${qty} Unit Aksesoris (${r.total_spk} SPK)</span>
@@ -887,7 +878,7 @@ function renderTransactionsTable(transactions) {
         </td>
         <td>
           <div style="font-weight:700; color:#0f172a;">${escapeHtml(t.kecamatan || t.kota)}</div>
-          <div style="font-size:10.5px; color:#64748b;">${escapeHtml(t.wilayah_polreg)}</div>
+          <div style="font-size:10.5px; color:#64748b;">${escapeHtml((t.wilayah_polreg || '').replace(/^Plat\s+[A-Za-z]\s*[-–—]\s*/i, '').trim())}</div>
         </td>
         <td style="white-space:nowrap;">
           <div style="font-weight:700; color:#0f172a;">${escapeHtml(t.nama_sales)}</div>
@@ -973,7 +964,7 @@ function exportTcoCsv() {
     `"${t.skema_harga || ''}"`,
     t.qty || 1,
     t.total_harga || 0,
-    `"${t.wilayah_polreg || ''}"`,
+    `"${((t.wilayah_polreg || '').replace(/^Plat\s+[A-Za-z]\s*[-–—]\s*/i, '').trim())}"`,
     `"${t.kota || ''}"`,
     `"${t.kecamatan || ''}"`,
     `"${t.nama_sales || ''}"`,
@@ -1016,20 +1007,25 @@ async function submitNewTransactionForm(event) {
   const model_kendaraan = document.getElementById('inputCarModel').value;
   const item_tco_name = document.getElementById('inputItemName').value.trim();
   const harga_satuan = parseInt(document.getElementById('inputPrice').value) || 0;
-  const wilayah_polreg = document.getElementById('inputPolreg').value;
+  const rawWilayah = document.getElementById('inputPolreg').value;
+  const wilayah_polreg = rawWilayah.replace(/^Plat\s+[A-Za-z]\s*[-–—]\s*/i, '').trim();
   const kecamatan = document.getElementById('inputKecamatan').value.trim();
 
   let polreg_code = 'D';
-  if (wilayah_polreg.includes('Plat Z')) polreg_code = 'Z';
-  else if (wilayah_polreg.includes('Plat E')) polreg_code = 'E';
-  else if (wilayah_polreg.includes('Plat F')) polreg_code = 'F';
+  if (wilayah_polreg.includes('Sumedang') || wilayah_polreg.includes('Garut') || wilayah_polreg.includes('Tasikmalaya')) polreg_code = 'Z';
+  else if (wilayah_polreg.includes('Cirebon')) polreg_code = 'E';
+  else if (wilayah_polreg.includes('Cianjur') || wilayah_polreg.includes('Sukabumi')) polreg_code = 'F';
+  else if (wilayah_polreg.includes('Karawang') || wilayah_polreg.includes('Subang') || wilayah_polreg.includes('Purwakarta')) polreg_code = 'T';
+  else if (wilayah_polreg.includes('Jabodetabek') || wilayah_polreg.includes('Jakarta') || wilayah_polreg.includes('Tangerang')) polreg_code = 'B';
 
   let kota = 'KOTA BANDUNG';
-  if (wilayah_polreg.includes('Kab. Bandung')) kota = 'KAB. BANDUNG';
+  if (wilayah_polreg.includes('Bandung Barat')) kota = 'KAB. BANDUNG BARAT';
+  else if (wilayah_polreg.includes('Kab. Bandung')) kota = 'KAB. BANDUNG';
   else if (wilayah_polreg.includes('Cimahi')) kota = 'KOTA CIMAHI';
-  else if (wilayah_polreg.includes('Bandung Barat')) kota = 'KAB. BANDUNG BARAT';
   else if (wilayah_polreg.includes('Sumedang')) kota = 'KAB. SUMEDANG';
   else if (wilayah_polreg.includes('Garut')) kota = 'KAB. GARUT';
+  else if (wilayah_polreg.includes('Cirebon')) kota = 'KOTA CIREBON';
+  else if (wilayah_polreg.includes('Cianjur')) kota = 'KAB. CIANJUR';
 
   const payload = {
     action: 'add_transaction',

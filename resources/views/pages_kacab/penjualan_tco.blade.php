@@ -150,7 +150,7 @@
               </span>
               <h1>Penjualan &amp; Pemetaan Polreg TCO</h1>
               <p class="tco-banner-desc">
-                Monitoring penetrasi aksesoris Toyota Customization Option dan pemetaan wilayah registrasi customer (Plat D, Plat Z, Plat E, Plat F) di Bandung Raya.
+                Monitoring penetrasi aksesoris Toyota Customization Option dan pemetaan wilayah registrasi customer di Bandung Raya.
               </p>
             </div>
 
@@ -176,16 +176,16 @@
                 <option value="ALPHARD">Alphard / Voxy</option>
               </select>
 
-              <select id="filterPolreg" class="tco-select-filter" title="Filter Wilayah Polreg">
-                <option value="all">Semua Wilayah Polreg</option>
-                <option value="Plat D - Kota Bandung">Plat D - Kota Bandung</option>
-                <option value="Plat D - Kab. Bandung">Plat D - Kab. Bandung</option>
-                <option value="Plat D - Kota Cimahi">Plat D - Kota Cimahi</option>
-                <option value="Plat D - Kab. Bandung Barat">Plat D - Bandung Barat</option>
-                <option value="Plat Z - Sumedang">Plat Z - Kab. Sumedang</option>
-                <option value="Plat Z - Garut">Plat Z - Kab. Garut</option>
-                <option value="Plat E - Cirebon">Plat E - Cirebon</option>
-                <option value="Plat F - Cianjur">Plat F - Cianjur / Sukabumi</option>
+              <select id="filterPolreg" class="tco-select-filter" title="Filter Wilayah Customer">
+                <option value="all">Semua Wilayah</option>
+                <option value="Kota Bandung">Kota Bandung</option>
+                <option value="Kab. Bandung">Kab. Bandung</option>
+                <option value="Kota Cimahi">Kota Cimahi</option>
+                <option value="Kab. Bandung Barat">Kab. Bandung Barat</option>
+                <option value="Sumedang">Kab. Sumedang</option>
+                <option value="Garut">Kab. Garut</option>
+                <option value="Cirebon">Cirebon</option>
+                <option value="Cianjur">Cianjur / Sukabumi</option>
               </select>
 
               <button type="button" class="tco-btn-input-new" onclick="openInputModal()">
@@ -356,7 +356,7 @@
             <!-- District Inspector HUD -->
             <div class="tco-inspector-hud" id="tcoInspectorHud">
               <div class="tco-hud-header">
-                <span class="tco-hud-tag" id="hudZoneTag">KOTA BANDUNG • PLAT D</span>
+                <span class="tco-hud-tag" id="hudZoneTag">KOTA BANDUNG</span>
                 <div class="tco-hud-title-row">
                   <h3 id="hudDistrictTitle">Kiaracondong</h3>
                   <span class="tco-hud-status-badge high" id="hudStatusBadge">
@@ -414,7 +414,7 @@
             <div class="tco-panel-header">
               <h3>
                 <i class="fa-solid fa-ranking-star" style="color: #f59e0b;"></i>
-                Ranking Asal Wilayah Polreg
+                Ranking Asal Wilayah
               </h3>
               <button type="button" onclick="resetFilters()" style="background:none; border:none; font-size:11px; font-weight:700; color:#2563eb; cursor:pointer;">
                 <i class="fa-solid fa-rotate"></i> Reset
@@ -491,7 +491,7 @@
                   <th>Nama Customer</th>
                   <th>Model Kendaraan</th>
                   <th>Item Aksesoris TCO</th>
-                  <th>Wilayah &amp; Polreg</th>
+                  <th>Wilayah Registrasi</th>
                   <th>Salesman / SPV</th>
                   <th style="text-align:right;">Total Nilai</th>
                 </tr>
@@ -568,16 +568,16 @@
 
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
                 <div class="tco-form-group">
-                  <label>Wilayah Registrasi (Polreg)</label>
+                  <label>Wilayah Registrasi Customer</label>
                   <select id="inputPolreg" class="tco-form-select" required>
-                    <option value="Plat D - Kota Bandung">Plat D - Kota Bandung</option>
-                    <option value="Plat D - Kab. Bandung">Plat D - Kab. Bandung</option>
-                    <option value="Plat D - Kota Cimahi">Plat D - Kota Cimahi</option>
-                    <option value="Plat D - Kab. Bandung Barat">Plat D - Kab. Bandung Barat</option>
-                    <option value="Plat Z - Sumedang">Plat Z - Kab. Sumedang</option>
-                    <option value="Plat Z - Garut">Plat Z - Kab. Garut</option>
-                    <option value="Plat E - Cirebon">Plat E - Cirebon</option>
-                    <option value="Plat F - Cianjur">Plat F - Cianjur / Sukabumi</option>
+                    <option value="Kota Bandung">Kota Bandung</option>
+                    <option value="Kab. Bandung">Kab. Bandung</option>
+                    <option value="Kota Cimahi">Kota Cimahi</option>
+                    <option value="Kab. Bandung Barat">Kab. Bandung Barat</option>
+                    <option value="Sumedang">Kab. Sumedang</option>
+                    <option value="Garut">Kab. Garut</option>
+                    <option value="Cirebon">Cirebon</option>
+                    <option value="Cianjur">Cianjur / Sukabumi</option>
                   </select>
                 </div>
                 <div class="tco-form-group">

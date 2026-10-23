@@ -70,79 +70,79 @@ function seedTcoTransactionsIfEmpty($conn) {
 
     // Coordinates dictionary for Bandung & West Java Districts
     $districtCoords = [
-        // Bandung City (Plat D)
-        'Lengkong' => [-6.9315, 107.6250, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Buahbatu' => [-6.9530, 107.6450, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Coblong' => [-6.8850, 107.6150, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Regol' => [-6.9380, 107.6080, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Bandung Kidul' => [-6.9520, 107.6320, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Antapani' => [-6.9180, 107.6620, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Arcamanik' => [-6.9150, 107.6780, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Sumur Bandung' => [-6.9180, 107.6120, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Sukasari' => [-6.8720, 107.5890, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Cicendo' => [-6.9020, 107.5950, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Rancasari' => [-6.9600, 107.6750, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Cinambo' => [-6.9350, 107.6950, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Babakan Ciparay' => [-6.9450, 107.5780, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Kiaracondong' => [-6.9280, 107.6480, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Gedebage' => [-6.9580, 107.6980, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Cibiru' => [-6.9240, 107.7180, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Bojongloa Kaler' => [-6.9350, 107.5900, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Bojongloa Kidul' => [-6.9550, 107.5980, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Cidadap' => [-6.8580, 107.6050, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
-        'Astanaanyar' => [-6.9350, 107.6020, 'KOTA BANDUNG', 'Plat D - Kota Bandung', 'D'],
+        // Bandung City
+        'Lengkong' => [-6.9315, 107.6250, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Buahbatu' => [-6.9530, 107.6450, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Coblong' => [-6.8850, 107.6150, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Regol' => [-6.9380, 107.6080, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Bandung Kidul' => [-6.9520, 107.6320, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Antapani' => [-6.9180, 107.6620, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Arcamanik' => [-6.9150, 107.6780, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Sumur Bandung' => [-6.9180, 107.6120, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Sukasari' => [-6.8720, 107.5890, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Cicendo' => [-6.9020, 107.5950, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Rancasari' => [-6.9600, 107.6750, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Cinambo' => [-6.9350, 107.6950, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Babakan Ciparay' => [-6.9450, 107.5780, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Kiaracondong' => [-6.9280, 107.6480, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Gedebage' => [-6.9580, 107.6980, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Cibiru' => [-6.9240, 107.7180, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Bojongloa Kaler' => [-6.9350, 107.5900, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Bojongloa Kidul' => [-6.9550, 107.5980, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Cidadap' => [-6.8580, 107.6050, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
+        'Astanaanyar' => [-6.9350, 107.6020, 'KOTA BANDUNG', 'Kota Bandung', 'D'],
 
-        // Kab. Bandung (Plat D)
-        'Baleendah' => [-7.0050, 107.6320, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Dayeuhkolot' => [-6.9850, 107.6250, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Soreang' => [-7.0320, 107.5250, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Bojongsoang' => [-6.9750, 107.6400, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Margahayu' => [-6.9720, 107.5850, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Banjaran' => [-7.0450, 107.5880, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Katapang' => [-7.0080, 107.5750, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Cileunyi' => [-6.9420, 107.7480, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Rancaekek' => [-6.9680, 107.7650, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Majalaya' => [-7.0520, 107.7550, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Ciparay' => [-7.0350, 107.7120, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Pangalengan' => [-7.1750, 107.5680, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
-        'Ciwidey' => [-7.0950, 107.4850, 'KAB. BANDUNG', 'Plat D - Kab. Bandung', 'D'],
+        // Kab. Bandung
+        'Baleendah' => [-7.0050, 107.6320, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Dayeuhkolot' => [-6.9850, 107.6250, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Soreang' => [-7.0320, 107.5250, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Bojongsoang' => [-6.9750, 107.6400, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Margahayu' => [-6.9720, 107.5850, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Banjaran' => [-7.0450, 107.5880, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Katapang' => [-7.0080, 107.5750, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Cileunyi' => [-6.9420, 107.7480, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Rancaekek' => [-6.9680, 107.7650, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Majalaya' => [-7.0520, 107.7550, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Ciparay' => [-7.0350, 107.7120, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Pangalengan' => [-7.1750, 107.5680, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
+        'Ciwidey' => [-7.0950, 107.4850, 'KAB. BANDUNG', 'Kab. Bandung', 'D'],
 
-        // Kota Cimahi (Plat D)
-        'Cimahi Utara' => [-6.8680, 107.5520, 'KOTA CIMAHI', 'Plat D - Kota Cimahi', 'D'],
-        'Cimahi Tengah' => [-6.8850, 107.5420, 'KOTA CIMAHI', 'Plat D - Kota Cimahi', 'D'],
-        'Cimahi Selatan' => [-6.9050, 107.5350, 'KOTA CIMAHI', 'Plat D - Kota Cimahi', 'D'],
+        // Kota Cimahi
+        'Cimahi Utara' => [-6.8680, 107.5520, 'KOTA CIMAHI', 'Kota Cimahi', 'D'],
+        'Cimahi Tengah' => [-6.8850, 107.5420, 'KOTA CIMAHI', 'Kota Cimahi', 'D'],
+        'Cimahi Selatan' => [-6.9050, 107.5350, 'KOTA CIMAHI', 'Kota Cimahi', 'D'],
 
-        // Kab. Bandung Barat (Plat D)
-        'Padalarang' => [-6.8380, 107.4780, 'KAB. BANDUNG BARAT', 'Plat D - Kab. Bandung Barat', 'D'],
-        'Ngamprah' => [-6.8520, 107.5050, 'KAB. BANDUNG BARAT', 'Plat D - Kab. Bandung Barat', 'D'],
-        'Parongpong' => [-6.8250, 107.5850, 'KAB. BANDUNG BARAT', 'Plat D - Kab. Bandung Barat', 'D'],
-        'Lembang' => [-6.8180, 107.6180, 'KAB. BANDUNG BARAT', 'Plat D - Kab. Bandung Barat', 'D'],
-        'Batujajar' => [-6.9050, 107.4950, 'KAB. BANDUNG BARAT', 'Plat D - Kab. Bandung Barat', 'D'],
-        'Cisarua' => [-6.8150, 107.5450, 'KAB. BANDUNG BARAT', 'Plat D - Kab. Bandung Barat', 'D'],
-        'Cikalongwetan' => [-6.7450, 107.4250, 'KAB. BANDUNG BARAT', 'Plat D - Kab. Bandung Barat', 'D'],
+        // Kab. Bandung Barat
+        'Padalarang' => [-6.8380, 107.4780, 'KAB. BANDUNG BARAT', 'Kab. Bandung Barat', 'D'],
+        'Ngamprah' => [-6.8520, 107.5050, 'KAB. BANDUNG BARAT', 'Kab. Bandung Barat', 'D'],
+        'Parongpong' => [-6.8250, 107.5850, 'KAB. BANDUNG BARAT', 'Kab. Bandung Barat', 'D'],
+        'Lembang' => [-6.8180, 107.6180, 'KAB. BANDUNG BARAT', 'Kab. Bandung Barat', 'D'],
+        'Batujajar' => [-6.9050, 107.4950, 'KAB. BANDUNG BARAT', 'Kab. Bandung Barat', 'D'],
+        'Cisarua' => [-6.8150, 107.5450, 'KAB. BANDUNG BARAT', 'Kab. Bandung Barat', 'D'],
+        'Cikalongwetan' => [-6.7450, 107.4250, 'KAB. BANDUNG BARAT', 'Kab. Bandung Barat', 'D'],
 
-        // Priangan Timur - Plat Z
-        'Jatinangor' => [-6.9320, 107.7750, 'KAB. SUMEDANG', 'Plat Z - Sumedang', 'Z'],
-        'Tanjungsari' => [-6.9080, 107.8050, 'KAB. SUMEDANG', 'Plat Z - Sumedang', 'Z'],
-        'Sumedang Selatan' => [-6.8620, 107.9220, 'KAB. SUMEDANG', 'Plat Z - Sumedang', 'Z'],
-        'Tarogong Kidul' => [-7.2150, 107.8920, 'KAB. GARUT', 'Plat Z - Garut', 'Z'],
-        'Tarogong Kaler' => [-7.1850, 107.8820, 'KAB. GARUT', 'Plat Z - Garut', 'Z'],
-        'Garut Kota' => [-7.2220, 107.9050, 'KAB. GARUT', 'Plat Z - Garut', 'Z'],
-        'Tasikmalaya Kota' => [-7.3320, 108.2220, 'KOTA TASIKMALAYA', 'Plat Z - Tasikmalaya', 'Z'],
+        // Priangan Timur
+        'Jatinangor' => [-6.9320, 107.7750, 'KAB. SUMEDANG', 'Sumedang', 'Z'],
+        'Tanjungsari' => [-6.9080, 107.8050, 'KAB. SUMEDANG', 'Sumedang', 'Z'],
+        'Sumedang Selatan' => [-6.8620, 107.9220, 'KAB. SUMEDANG', 'Sumedang', 'Z'],
+        'Tarogong Kidul' => [-7.2150, 107.8920, 'KAB. GARUT', 'Garut', 'Z'],
+        'Tarogong Kaler' => [-7.1850, 107.8820, 'KAB. GARUT', 'Garut', 'Z'],
+        'Garut Kota' => [-7.2220, 107.9050, 'KAB. GARUT', 'Garut', 'Z'],
+        'Tasikmalaya Kota' => [-7.3320, 108.2220, 'KOTA TASIKMALAYA', 'Tasikmalaya', 'Z'],
 
-        // Pantura / Ciayumajakuning - Plat E & T
-        'Kejaksan Cirebon' => [-6.7120, 108.5550, 'KOTA CIREBON', 'Plat E - Cirebon', 'E'],
-        'Subang Kota' => [-6.5720, 107.7620, 'KAB. SUBANG', 'Plat T - Subang', 'T'],
-        'Purwakarta Kota' => [-6.5580, 107.4450, 'KAB. PURWAKARTA', 'Plat T - Purwakarta', 'T'],
-        'Karawang Barat' => [-6.3050, 107.3050, 'KAB. KARAWANG', 'Plat T - Karawang', 'T'],
+        // Pantura / Ciayumajakuning
+        'Kejaksan Cirebon' => [-6.7120, 108.5550, 'KOTA CIREBON', 'Cirebon', 'E'],
+        'Subang Kota' => [-6.5720, 107.7620, 'KAB. SUBANG', 'Subang', 'T'],
+        'Purwakarta Kota' => [-6.5580, 107.4450, 'KAB. PURWAKARTA', 'Purwakarta', 'T'],
+        'Karawang Barat' => [-6.3050, 107.3050, 'KAB. KARAWANG', 'Karawang', 'T'],
 
-        // Bogor / Sukabumi / Cianjur - Plat F
-        'Cianjur Kota' => [-6.8220, 107.1420, 'KAB. CIANJUR', 'Plat F - Cianjur', 'F'],
-        'Sukabumi Kota' => [-6.9250, 106.9350, 'KOTA SUKABUMI', 'Plat F - Sukabumi', 'F'],
+        // Bogor / Sukabumi / Cianjur
+        'Cianjur Kota' => [-6.8220, 107.1420, 'KAB. CIANJUR', 'Cianjur', 'F'],
+        'Sukabumi Kota' => [-6.9250, 106.9350, 'KOTA SUKABUMI', 'Sukabumi', 'F'],
 
-        // Jabodetabek - Plat B
-        'Jakarta Selatan' => [-6.2650, 106.8150, 'KOTA JAKARTA SELATAN', 'Plat B - Jabodetabek', 'B'],
-        'Tangerang' => [-6.1820, 106.6350, 'KOTA TANGERANG', 'Plat B - Jabodetabek', 'B']
+        // Jabodetabek
+        'Jakarta Selatan' => [-6.2650, 106.8150, 'KOTA JAKARTA SELATAN', 'Jabodetabek', 'B'],
+        'Tangerang' => [-6.1820, 106.6350, 'KOTA TANGERANG', 'Jabodetabek', 'B']
     ];
 
     $districtKeys = array_keys($districtCoords);
@@ -385,11 +385,14 @@ if ($action === 'get_overview') {
         $types .= "s";
     }
 
-    // Polreg Filter
+    // Polreg / Wilayah Filter
     if ($polregFilter !== 'all' && !empty($polregFilter)) {
-        $whereClauses[] = "wilayah_polreg = ?";
+        $cleanFilter = trim(preg_replace('/^Plat\s+[A-Za-z]\s*[-–—]\s*/i', '', $polregFilter));
+        $whereClauses[] = "(wilayah_polreg = ? OR wilayah_polreg = ? OR wilayah_polreg LIKE ?)";
         $params[] = $polregFilter;
-        $types .= "s";
+        $params[] = $cleanFilter;
+        $params[] = "%{$cleanFilter}%";
+        $types .= "sss";
     }
 
     // Search
@@ -710,9 +713,12 @@ if ($action === 'get_transactions') {
     }
 
     if ($polregFilter !== 'all' && !empty($polregFilter)) {
-        $whereClauses[] = "wilayah_polreg = ?";
+        $cleanFilter = trim(preg_replace('/^Plat\s+[A-Za-z]\s*[-–—]\s*/i', '', $polregFilter));
+        $whereClauses[] = "(wilayah_polreg = ? OR wilayah_polreg = ? OR wilayah_polreg LIKE ?)";
         $params[] = $polregFilter;
-        $types .= "s";
+        $params[] = $cleanFilter;
+        $params[] = "%{$cleanFilter}%";
+        $types .= "sss";
     }
 
     if (!empty($search)) {
@@ -787,7 +793,7 @@ if ($action === 'add_transaction') {
     $qty = max(1, (int)($input['qty'] ?? 1));
     $totalHarga = (int)($input['total_harga'] ?? ($hargaSatuan * $qty));
     $polregCode = trim($input['polreg_code'] ?? 'D');
-    $wilayahPolreg = trim($input['wilayah_polreg'] ?? 'Plat D - Kota Bandung');
+    $wilayahPolreg = trim(preg_replace('/^Plat\s+[A-Za-z]\s*[-–—]\s*/i', '', $input['wilayah_polreg'] ?? 'Kota Bandung'));
     $kota = trim($input['kota'] ?? 'KOTA BANDUNG');
     $kecamatan = trim($input['kecamatan'] ?? 'Lengkong');
     $lat = isset($input['latitude']) ? (float)$input['latitude'] : -6.9315;
