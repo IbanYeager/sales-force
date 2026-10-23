@@ -275,22 +275,12 @@
                 <button type="button" class="pi-bc-mode-btn" id="btnBcModeRanking" onclick="window.PolregMap.setBattleCardMode('ranking')" title="Opsi 1: Rekomendasi berdasarkan volume & ranking model terbanyak di wilayah ini">
                   <i class="fa-solid fa-ranking-star"></i> Peringkat Wilayah
                 </button>
-                <button type="button" class="pi-bc-mode-btn active" id="btnBcModeSegment" onclick="window.PolregMap.setBattleCardMode('segment')" title="Opsi 2: Komparasi head-to-head mobil sekelas & harga setara (contoh: Agya vs Brio)">
+                <button type="button" class="pi-bc-mode-btn active" id="btnBcModeSegment" onclick="window.PolregMap.setBattleCardMode('segment')" title="Opsi 2: Komparasi head-to-head mobil sekelas & harga setara (otomatis sistem)">
                   <i class="fa-solid fa-scale-balanced"></i> Segmen &amp; Harga Setara
                 </button>
               </div>
 
-              <!-- Dropdown Selector Segmen (Khusus Opsi 2) -->
-              <div class="pi-bc-segment-wrap" id="bcSegmentWrap" style="display: none;">
-                <label for="bcSegmentSelect" class="pi-bc-segment-lbl">
-                  <i class="fa-solid fa-sliders"></i> Pilih Komparasi Segmen Mobil:
-                </label>
-                <select id="bcSegmentSelect" class="pi-bc-segment-select" onchange="window.PolregMap.changeBattleCardSegment(this.value)">
-                  <!-- Injected via polreg.js -->
-                </select>
-              </div>
-
-              <!-- Info Segmen & Rentang Harga -->
+              <!-- Info Segmen & Rentang Harga (Otomatis Dihitung Sistem) -->
               <div class="pi-bc-segment-meta" id="bcSegmentMeta" style="display: none;">
                 <span class="badge" id="bcSegmentBadge" style="background:#e0f2fe; color:#0369a1; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:5px;">
                   City Car &amp; LCGC

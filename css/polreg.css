@@ -1060,45 +1060,7 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-/* Segment Dropdown Selector (Opsi 2) */
-.pi-bc-segment-wrap {
-  margin-bottom: 6px;
-  padding: 5px 7px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.pi-bc-segment-lbl {
-  font-size: 9.5px;
-  font-weight: 700;
-  color: #475569;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 3px;
-}
-
-.pi-bc-segment-select {
-  width: 100%;
-  padding: 3.5px 7px;
-  font-size: 10px;
-  font-weight: 700;
-  color: #0f172a;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  outline: none;
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-}
-
-.pi-bc-segment-select:focus {
-  border-color: #cc1426;
-  background: #ffffff;
-}
-
+/* Segment Meta */
 .pi-bc-segment-meta {
   display: flex;
   align-items: center;

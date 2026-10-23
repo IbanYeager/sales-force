@@ -925,15 +925,14 @@
     if (btnSegment) btnSegment.classList.toggle('active', mode === 'segment');
 
     if (currentInspectorDistrict) {
-      if (!currentSelectedSegmentKey || mode === 'segment') {
-        currentSelectedSegmentKey = detectBestSegmentForDistrict(currentInspectorDistrict);
-      }
       renderBattleCardContent(currentInspectorDistrict);
     }
   }
 
   function changeBattleCardSegment(segKey) {
-    currentSelectedSegmentKey = segKey;
+    if (segKey && SEGMENT_BATTLE_CARDS[segKey]) {
+      currentSelectedSegmentKey = segKey;
+    }
     if (currentInspectorDistrict) {
       renderBattleCardContent(currentInspectorDistrict);
     }
@@ -941,18 +940,15 @@
 
   function renderBattleCardContent(dist) {
     if (!dist) return;
-    populateSegmentSelect();
 
     const elBanner = document.getElementById('piBcTopCarBanner');
     const elModel = document.getElementById('inspectorModelBadge');
     const elToyotaPrice = document.getElementById('inspectorToyotaPrice');
     const elCompetitor = document.getElementById('inspectorCompetitorText');
     const elUsp = document.getElementById('inspectorUspList');
-    const elWrap = document.getElementById('bcSegmentWrap');
     const elMeta = document.getElementById('bcSegmentMeta');
     const elBadge = document.getElementById('bcSegmentBadge');
     const elPriceRange = document.getElementById('bcPriceRangeText');
-    const sel = document.getElementById('bcSegmentSelect');
 
     const btnRanking = document.getElementById('btnBcModeRanking');
     const btnSegment = document.getElementById('btnBcModeSegment');
@@ -963,16 +959,9 @@
     const topCar = getDistrictTopCar(dist);
     const distCars = (allDistrictsCars && dist.id) ? (allDistrictsCars[dist.id] || allDistrictsCars[dist.id.toLowerCase()]) : null;
 
-    if (!currentSelectedSegmentKey || !SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey]) {
-      currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
-    }
-
+    // Komparasi otomatis 100% mengikuti mobil #1 di setiap kecamatan
+    currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
     const segData = SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey] || SEGMENT_BATTLE_CARDS.agya_brio;
-
-    // Sinkronisasi dropdown select
-    if (sel && sel.value !== currentSelectedSegmentKey) {
-      sel.value = currentSelectedSegmentKey;
-    }
 
     // Render Dynamic Top-Car Context Banner
     if (elBanner) {
@@ -1007,8 +996,7 @@
     }
 
     if (currentBattleCardMode === 'segment') {
-      // OPSI 2: Berdasarkan Segmen Model & Harga Setara (cth: Agya vs Brio)
-      if (elWrap) elWrap.style.display = 'block';
+      // OPSI 2: Berdasarkan Segmen Model & Harga Setara (Otomatis Komparasi Sistem)
       if (elMeta) elMeta.style.display = 'flex';
       if (elToyotaPrice) elToyotaPrice.style.display = 'inline-block';
 
@@ -1026,7 +1014,6 @@
       }
     } else {
       // OPSI 1: Berdasarkan Peringkat Model Wilayah (Volume Terbanyak)
-      if (elWrap) elWrap.style.display = 'none';
       if (elMeta) elMeta.style.display = 'none';
       if (elToyotaPrice) elToyotaPrice.style.display = 'none';
 
