@@ -1638,13 +1638,13 @@
         urgencyPill = '<span class="badge" style="background:#fffbeb; color:#d97706; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px;">Priority</span>';
       }
 
-      let regencyBadge = '<span class="badge" style="background:#eff6ff; color:#1e40af; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">Kota Bandung</span>';
+      let regencyBadge = '<span class="polreg-regency-badge" style="background:#eff6ff; color:#1e40af; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">Kota Bandung</span>';
       if (dist.regencyId === 'kota_cimahi') {
-        regencyBadge = '<span class="badge" style="background:#f0fdf4; color:#166534; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">Kota Cimahi</span>';
+        regencyBadge = '<span class="polreg-regency-badge" style="background:#f0fdf4; color:#166534; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">Kota Cimahi</span>';
       } else if (dist.regencyId === 'kab_bandung') {
-        regencyBadge = '<span class="badge" style="background:#fefce8; color:#854d0e; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">Kab. Bandung</span>';
+        regencyBadge = '<span class="polreg-regency-badge" style="background:#fefce8; color:#854d0e; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">Kab. Bandung</span>';
       } else if (dist.regencyId === 'kab_bandung_barat') {
-        regencyBadge = '<span class="badge" style="background:#fdf4ff; color:#86198f; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">KBB</span>';
+        regencyBadge = '<span class="polreg-regency-badge" style="background:#fdf4ff; color:#86198f; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px;">KBB</span>';
       }
 
       return `

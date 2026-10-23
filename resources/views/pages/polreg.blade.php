@@ -282,7 +282,7 @@
 
               <!-- Info Segmen & Rentang Harga (Otomatis Dihitung Sistem) -->
               <div class="pi-bc-segment-meta" id="bcSegmentMeta" style="display: none;">
-                <span class="badge" id="bcSegmentBadge" style="background:#e0f2fe; color:#0369a1; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:5px;">
+                <span class="pi-bc-segment-badge" id="bcSegmentBadge">
                   City Car &amp; LCGC
                 </span>
                 <span id="bcPriceRangeText" style="font-size: 9.5px; color:#64748b; font-weight:700;">
