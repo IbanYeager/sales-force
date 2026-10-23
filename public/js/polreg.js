@@ -610,6 +610,303 @@
   }
 
   /**
+   * SEGMENT & EQUIVALENT PRICE BATTLE-CARD DATA (OPSI 2)
+   * Komparasi head-to-head mobil sekelas segmen dan setara harga (cth: Agya vs Brio)
+   */
+  const SEGMENT_BATTLE_CARDS = {
+    agya_brio: {
+      key: 'agya_brio',
+      label: 'City Car & LCGC (Agya vs Brio)',
+      segment: 'City Car & LCGC Hatchback',
+      priceRange: 'Rp 170 Jt – 256 Jt',
+      toyotaModel: 'Toyota All New Agya (1.2 G & GR Sport)',
+      toyotaPrice: 'Rp 170,9 Jt – 256,0 Jt',
+      competitor: 'Honda Brio Satya & Brio RS',
+      competitorSegment: 'LCGC & City Car (Rp 167 Jt – 253 Jt)',
+      matchKeywords: ['brio', 'ayla', 's-presso', 'ignis', 'sirion', 'city car', 'hatchback', 'agya'],
+      usp: [
+        'Platform All-New DNGA: Konstruksi bodi jauh lebih kokoh, handling stabil, dan kabin lebih senyap.',
+        'Mesin 1.2L 3-Silinder WA-VE: Torsi bawah 113 Nm responsif di tanjakan Bandung & konsumsi BBM irit 21 km/liter.',
+        'Radius putar terbaik 4,5 meter, dilengkapi Paddle Shift & Vehicle Stability Control (VSC) pada varian GR.',
+        'Benefit Tunas Toyota KC: Bebas biaya servis & suku cadang berkala hingga 3 tahun / 60.000 km (Program T-Care).'
+      ]
+    },
+    calya_sigra: {
+      key: 'calya_sigra',
+      label: 'Entry MPV 7-Seater (Calya vs Sigra)',
+      segment: 'Entry MPV 7-Seater Ekonomis',
+      priceRange: 'Rp 167 Jt – 190 Jt',
+      toyotaModel: 'Toyota New Calya (1.2 E & G)',
+      toyotaPrice: 'Rp 167,3 Jt – 190,0 Jt',
+      competitor: 'Daihatsu Sigra & Wuling Formo S',
+      competitorSegment: 'LCGC 7-Seater (Rp 140 Jt – 183 Jt)',
+      matchKeywords: ['sigra', 'calya', 'formo', 'datsun', 'entry mpv'],
+      usp: [
+        'Kapasitas 7-seater riil dengan resale value (harga jual kembali) tertinggi dan paling likuid di Bandung Raya.',
+        'Dilengkapi AC Double Blower (Rear Air Circulator) dengan kisi pendingin merata hingga bangku baris ketiga.',
+        'Fitur keselamatan standar: Dual SRS Airbags, ABS + EBD, ISOFIX, dan Rear Parking Camera/Sensor.',
+        'Biaya operasional sangat terjangkau: Konsumsi BBM irit (20 km/L) dan suku cadang melimpah murah di Tunas KC.'
+      ]
+    },
+    avanza_xpander: {
+      key: 'avanza_xpander',
+      label: 'Low MPV (Avanza / Veloz vs Xpander / Stargazer)',
+      segment: 'Low MPV 7-Seater Keluarga',
+      priceRange: 'Rp 239 Jt – 315 Jt',
+      toyotaModel: 'Toyota All New Avanza & Veloz',
+      toyotaPrice: 'Rp 239,7 Jt – 315,3 Jt',
+      competitor: 'Mitsubishi Xpander, Hyundai Stargazer, Wuling Confero S',
+      competitorSegment: 'LMPV 7-Seater (Rp 235 Jt – 320 Jt)',
+      matchKeywords: ['xpander', 'stargazer', 'confero', 'ertiga', 'mobilio', 'avanza', 'veloz', 'lmpv'],
+      usp: [
+        'Fleksibilitas Kabin: Dilengkapi fitur Long Sofa Mode yang bisa diubah jadi kasur santai saat beristirahat.',
+        'Fitur Keselamatan TSS (Toyota Safety Sense): Pre-Collision System, Lane Departure Assist, Pedal Misoperation.',
+        'Fitur modern terlengkap: Electronic Parking Brake (EPB) + Auto Brake Hold, Wireless Charger, 9" Display Audio.',
+        'Layanan Toyota Home Service (THS) Tunas Kiara Condong siap servis on-call ke rumah dalam 30 menit.'
+      ]
+    },
+    rush_brv: {
+      key: 'rush_brv',
+      label: 'Low SUV 7-Seater (Rush vs BR-V / Xpander Cross)',
+      segment: 'Low SUV Tangguh 7-Seater RWD',
+      priceRange: 'Rp 284 Jt – 310 Jt',
+      toyotaModel: 'Toyota All New Rush 1.5 GR Sport',
+      toyotaPrice: 'Rp 284,4 Jt – 310,5 Jt',
+      competitor: 'Honda BR-V, Mitsubishi Xpander Cross, Suzuki XL7 Hybrid',
+      competitorSegment: 'Low SUV 7-Seater (Rp 285 Jt – 345 Jt)',
+      matchKeywords: ['br-v', 'brv', 'xpander cross', 'xl7', 'terios', 'rush', 'lsuv'],
+      usp: [
+        'Penggerak Roda Belakang (RWD) tangguh: Paling handal menaklukkan tanjakan curam & jalan berliku Bandung Raya.',
+        'Ground Clearance tinggi 220 mm: Aman dari genangan air dan jalan bergelombang di jalur pinggiran kota.',
+        '6 Buah SRS Airbags terlengkap di semua sisi kabin untuk perlindungan maksimal seluruh keluarga.',
+        'Tampilan sporty GR Sport aerokit dengan tombol engine Start/Stop & Auto Retractable Mirror.'
+      ]
+    },
+    yariscross_hrv: {
+      key: 'yariscross_hrv',
+      label: 'Compact SUV (Yaris Cross / Raize vs HR-V / Creta)',
+      segment: 'Compact & Medium Crossover SUV',
+      priceRange: 'Rp 255 Jt – 454 Jt',
+      toyotaModel: 'Toyota Yaris Cross (Gasoline & Hybrid EV)',
+      toyotaPrice: 'Rp 353,9 Jt – 454,4 Jt',
+      competitor: 'Honda HR-V, Hyundai Creta, Chery Omoda 5, Wuling Alvez',
+      competitorSegment: 'Compact Crossover (Rp 290 Jt – 440 Jt)',
+      matchKeywords: ['hr-v', 'hrv', 'creta', 'omoda', 'alvez', 'wr-v', 'wrv', 'xforce', 'yaris cross', 'raize', 'crossover'],
+      usp: [
+        'Pelopor Mesin Full Hybrid EV: Efisiensi bahan bakar luar biasa tembus 28–31 km/L dan emisi sangat rendah.',
+        'Panoramic Glass Roof dengan Power Sunshade elektrik & Power Backdoor with Kick Sensor praktis.',
+        'Full Suite TSS 3.0: All-Speed Adaptive Cruise Control (ACC) & Lane Tracing Assist untuk perjalanan santai.',
+        'Garansi Baterai Hybrid 8 Tahun / 160.000 KM didukung teknisi EV bersertifikasi di Tunas Kiara Condong.'
+      ]
+    },
+    zenix_almaz: {
+      key: 'zenix_almaz',
+      label: 'Medium MPV (Innova Zenix vs Cortez / Almaz)',
+      segment: 'Medium MPV Premium Keluarga',
+      priceRange: 'Rp 436 Jt – 633 Jt',
+      toyotaModel: 'Toyota Kijang Innova Zenix (Gasoline & HEV)',
+      toyotaPrice: 'Rp 436,4 Jt – 633,6 Jt',
+      competitor: 'Wuling Cortez, Wuling Almaz RS, Kia Carens',
+      competitorSegment: 'Medium MPV & Crossover (Rp 310 Jt – 450 Jt)',
+      matchKeywords: ['cortez', 'almaz', 'carens', 'innova', 'zenix', 'medium mpv'],
+      usp: [
+        'Platform Global TNGA-C: Kenyamanan suspensi mewah sekelas sedan dengan kestabilan berkendara superior.',
+        'Captain Seat Ottoman dengan legrest elektrik dan Dual Rear Seat Entertainment 10" berfitur konektivitas internet.',
+        'Mesin 2.0L M20A-FXS Hybrid EV bertenaga 186 PS, sangat senyap dan konsumsi bensin sangat hemat (21 km/L).',
+        'Resale value nomor 1 di Indonesia dengan permintaan unit bekas paling stabil dan tinggi.'
+      ]
+    },
+    fortuner_pajero: {
+      key: 'fortuner_pajero',
+      label: 'High SUV Ladder Frame (Fortuner vs Pajero Sport)',
+      segment: 'Ladder Frame Heavy-Duty SUV',
+      priceRange: 'Rp 575 Jt – 764 Jt',
+      toyotaModel: 'Toyota New Fortuner 2.8 GR Sport & VRZ',
+      toyotaPrice: 'Rp 575,7 Jt – 764,2 Jt',
+      competitor: 'Mitsubishi Pajero Sport (Dakar 4x2 / 4x4), Isuzu MU-X',
+      competitorSegment: 'Ladder Frame High SUV (Rp 580 Jt – 750 Jt)',
+      matchKeywords: ['pajero', 'pajero sport', 'mu-x', 'everest', 'fortuner', 'high suv'],
+      usp: [
+        'Mesin Diesel 2.8L 1GD-FTV: Tenaga buas 204 PS & Torsi 500 Nm (terbesar di kelasnya) tanpa jeda turbo.',
+        'Fitur T-Intouch Terintegrasi: Geofencing, Find My Car, E-Care, dan Stolen Vehicle Tracking via smartphone.',
+        'New GR Sport Suspension & Aerokit: Kestabilan menikung optimal dan aura maskulin berkelas di jalan.',
+        'Fasilitas Fast-Track Express Maintenance di Bengkel Resmi Tunas Toyota Kiara Condong.'
+      ]
+    },
+    hiace_elf: {
+      key: 'hiace_elf',
+      label: 'Commercial Van (Hiace vs Staria / Elf / Sprinter)',
+      segment: 'Commercial Van & Minibus Pariwisata',
+      priceRange: 'Rp 562 Jt – 647 Jt',
+      toyotaModel: 'Toyota Hiace Commuter & Hiace Premio',
+      toyotaPrice: 'Rp 562,3 Jt – 647,8 Jt',
+      competitor: 'Hyundai Staria, Isuzu Elf Microbus',
+      competitorSegment: 'Commercial Van & Minibus (Rp 500 Jt – 900 Jt)',
+      matchKeywords: ['hiace', 'elf', 'staria', 'sprinter', 'microbus', 'commercial van', 'minibus'],
+      usp: [
+        'Standar emas armada travel antar-kota (Bandung - Jakarta / Bandara) dan pariwisata eksekutif di Jawa Barat.',
+        'Kapasitas kabin 12 hingga 16 kursi ergonomis dengan distribusi AC Double Blower dingin merata ke tiap baris.',
+        'Mesin 2.8L 1GD (Premio) & 2.5L D-4D (Commuter) terkenal tangguh, minim downtime, dan irit solar.',
+        'Dukungan program Fleet & Prioritas Service Khusus Pengusaha Travel dari Tunas Toyota KC.'
+      ]
+    },
+    rangga_l300: {
+      key: 'rangga_l300',
+      label: 'Pick Up & Niaga (Hilux Rangga vs L300 / Carry)',
+      segment: 'Light Commercial Vehicle Pick Up',
+      priceRange: 'Rp 190 Jt – 305 Jt',
+      toyotaModel: 'Toyota All New Hilux Rangga & Hilux S-Cab',
+      toyotaPrice: 'Rp 190,6 Jt – 305,5 Jt',
+      competitor: 'Mitsubishi Colt L300, Suzuki New Carry, Daihatsu GranMax PU',
+      competitorSegment: 'Pick Up Muatan Niaga (Rp 170 Jt – 250 Jt)',
+      matchKeywords: ['l300', 'colt', 'carry', 'gran max', 'granmax', 'traga', 'rangga', 'hilux', 'pick up', 'pickup'],
+      usp: [
+        'Desain Bonnet (Moncong Depan): Jauh lebih aman (ada crumple zone), posisi duduk rileks tidak pegal di atas mesin.',
+        'Pilihan Mesin Bensin 2.0L 1TR-FE atau Diesel 2.4L 2GD-FTV legendaris bertenaga besar di rute tanjakan muatan.',
+        'Daya angkut muatan hingga 1,2 Ton dengan bak kargo terpanjang dan pilihan bukaan 3-way drop side.',
+        'Fleksibilitas konversi karoseri resmi (Box, Moko, Ambulance, Towing) didukung rekanan resmi Tunas KC.'
+      ]
+    }
+  };
+
+  let currentBattleCardMode = 'ranking'; // 'ranking' | 'segment'
+  let currentSelectedSegmentKey = null;
+  let currentInspectorDistrict = null;
+
+  function populateSegmentSelect() {
+    const sel = document.getElementById('bcSegmentSelect');
+    if (!sel || sel.options.length > 0) return;
+
+    let html = '';
+    for (const [key, seg] of Object.entries(SEGMENT_BATTLE_CARDS)) {
+      html += `<option value="${key}">${escapeHtml(seg.label)}</option>`;
+    }
+    sel.innerHTML = html;
+  }
+
+  function detectBestSegmentForDistrict(dist) {
+    if (!dist) return 'agya_brio';
+
+    const distCars = (allDistrictsCars && dist.id) ? allDistrictsCars[dist.id] : null;
+    let competitorNames = [];
+    if (distCars && Array.isArray(distCars.topAggregatedModels)) {
+      competitorNames = distCars.topAggregatedModels.filter(m => !m.isToyota).map(m => (m.name || '').toLowerCase());
+    }
+    if (dist.competitor) {
+      competitorNames.push(dist.competitor.toLowerCase());
+    }
+
+    const compText = competitorNames.join(' ');
+
+    for (const [key, seg] of Object.entries(SEGMENT_BATTLE_CARDS)) {
+      for (const kw of seg.matchKeywords) {
+        if (compText.includes(kw)) {
+          return key;
+        }
+      }
+    }
+
+    const recModel = (dist.modelBadge || dist.recommendedModel || '').toLowerCase();
+    for (const [key, seg] of Object.entries(SEGMENT_BATTLE_CARDS)) {
+      for (const kw of seg.matchKeywords) {
+        if (recModel.includes(kw)) {
+          return key;
+        }
+      }
+    }
+
+    return 'agya_brio';
+  }
+
+  function setBattleCardMode(mode) {
+    currentBattleCardMode = mode;
+
+    const btnRanking = document.getElementById('btnBcModeRanking');
+    const btnSegment = document.getElementById('btnBcModeSegment');
+    if (btnRanking) btnRanking.classList.toggle('active', mode === 'ranking');
+    if (btnSegment) btnSegment.classList.toggle('active', mode === 'segment');
+
+    if (mode === 'segment' && !currentSelectedSegmentKey && currentInspectorDistrict) {
+      currentSelectedSegmentKey = detectBestSegmentForDistrict(currentInspectorDistrict);
+    }
+
+    if (currentInspectorDistrict) {
+      renderBattleCardContent(currentInspectorDistrict);
+    }
+  }
+
+  function changeBattleCardSegment(segKey) {
+    currentSelectedSegmentKey = segKey;
+    if (currentInspectorDistrict) {
+      renderBattleCardContent(currentInspectorDistrict);
+    }
+  }
+
+  function renderBattleCardContent(dist) {
+    if (!dist) return;
+    populateSegmentSelect();
+
+    const elModel = document.getElementById('inspectorModelBadge');
+    const elToyotaPrice = document.getElementById('inspectorToyotaPrice');
+    const elCompetitor = document.getElementById('inspectorCompetitorText');
+    const elUsp = document.getElementById('inspectorUspList');
+    const elWrap = document.getElementById('bcSegmentWrap');
+    const elMeta = document.getElementById('bcSegmentMeta');
+    const elBadge = document.getElementById('bcSegmentBadge');
+    const elPriceRange = document.getElementById('bcPriceRangeText');
+    const sel = document.getElementById('bcSegmentSelect');
+
+    const btnRanking = document.getElementById('btnBcModeRanking');
+    const btnSegment = document.getElementById('btnBcModeSegment');
+    if (btnRanking) btnRanking.classList.toggle('active', currentBattleCardMode === 'ranking');
+    if (btnSegment) btnSegment.classList.toggle('active', currentBattleCardMode === 'segment');
+
+    if (currentBattleCardMode === 'segment') {
+      // OPSI 2: Berdasarkan Segmen Model & Harga Setara (cth: Agya vs Brio)
+      if (elWrap) elWrap.style.display = 'block';
+      if (elMeta) elMeta.style.display = 'flex';
+      if (elToyotaPrice) elToyotaPrice.style.display = 'inline-block';
+
+      if (!currentSelectedSegmentKey || !SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey]) {
+        currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
+      }
+
+      if (sel && sel.value !== currentSelectedSegmentKey) {
+        sel.value = currentSelectedSegmentKey;
+      }
+
+      const segData = SEGMENT_BATTLE_CARDS[currentSelectedSegmentKey] || SEGMENT_BATTLE_CARDS.agya_brio;
+
+      if (elBadge) elBadge.textContent = segData.segment;
+      if (elPriceRange) elPriceRange.textContent = `Kelas Harga: ${segData.priceRange}`;
+      if (elModel) elModel.textContent = segData.toyotaModel;
+      if (elToyotaPrice) elToyotaPrice.textContent = segData.toyotaPrice;
+
+      if (elCompetitor) {
+        elCompetitor.innerHTML = `Lawan Setara: <strong>${escapeHtml(segData.competitor)}</strong> (${escapeHtml(segData.competitorSegment)})`;
+      }
+
+      if (elUsp && Array.isArray(segData.usp)) {
+        elUsp.innerHTML = segData.usp.map(point => `<li>${escapeHtml(point)}</li>`).join('');
+      }
+    } else {
+      // OPSI 1: Berdasarkan Peringkat Model Wilayah (Volume Terbanyak)
+      if (elWrap) elWrap.style.display = 'none';
+      if (elMeta) elMeta.style.display = 'none';
+      if (elToyotaPrice) elToyotaPrice.style.display = 'none';
+
+      if (elModel) elModel.textContent = dist.modelBadge || dist.recommendedModel || 'Toyota';
+      if (elCompetitor) {
+        elCompetitor.innerHTML = `Lawan Terberat: <strong>${escapeHtml(dist.competitor || 'Kompetitor')}</strong> (${escapeHtml(dist.competitorSegment || 'LMPV & SUV')})`;
+      }
+
+      if (elUsp && Array.isArray(dist.usp)) {
+        elUsp.innerHTML = dist.usp.map(point => `<li>${escapeHtml(point)}</li>`).join('');
+      }
+    }
+  }
+
+  /**
    * Update Floating Inspector HUD (Right Side)
    */
   function updateInspectorCard(dist) {
@@ -620,15 +917,17 @@
     const elTarget = document.getElementById('inspectorTargetVal');
     const elTotalPolreg = document.getElementById('inspectorTotalPolreg');
     const elToyotaVol = document.getElementById('inspectorToyotaVol');
-    const elModel = document.getElementById('inspectorModelBadge');
-    const elCompetitor = document.getElementById('inspectorCompetitorText');
-    const elUsp = document.getElementById('inspectorUspList');
     const elDemografi = document.getElementById('inspectorDemografiText');
     const elVenue = document.getElementById('inspectorVenueText');
     const elHousingCount = document.getElementById('inspectorHousingCount');
     const elHousingChips = document.getElementById('inspectorHousingChips');
 
     if (!elTitle) return;
+
+    currentInspectorDistrict = dist;
+    if (currentBattleCardMode === 'segment') {
+      currentSelectedSegmentKey = detectBestSegmentForDistrict(dist);
+    }
 
     elTitle.textContent = dist.name;
     if (elZone) elZone.textContent = dist.regency ? `${dist.regency} • ${dist.zone}` : `Wilayah: ${dist.zone}`;
@@ -652,14 +951,8 @@
     if (elTotalPolreg) elTotalPolreg.textContent = `${dist.totalPolregMarket} Unit/bln`;
     if (elToyotaVol) elToyotaVol.textContent = `${dist.toyotaVolume} Unit`;
 
-    if (elModel) elModel.textContent = dist.modelBadge || dist.recommendedModel;
-    if (elCompetitor) {
-      elCompetitor.innerHTML = `Lawan Terberat: <strong>${escapeHtml(dist.competitor || 'Kompetitor')}</strong> (${escapeHtml(dist.competitorSegment || 'LMPV & SUV')})`;
-    }
-
-    if (elUsp && Array.isArray(dist.usp)) {
-      elUsp.innerHTML = dist.usp.map(point => `<li>${escapeHtml(point)}</li>`).join('');
-    }
+    // Render Battle-Card Content (Opsi 1 Peringkat Wilayah vs Opsi 2 Segmen & Harga Setara)
+    renderBattleCardContent(dist);
 
     if (elDemografi) elDemografi.textContent = dist.targetSegment || '-';
     if (elVenue) elVenue.textContent = dist.venueRecom || '-';
@@ -1865,9 +2158,14 @@
     exportCsv: exportPolregCsv,
     setInspectorChartMode: setInspectorChartMode,
     setMainChartMode: setMainChartMode,
+    setBattleCardMode: setBattleCardMode,
+    changeBattleCardSegment: changeBattleCardSegment,
     getPolygon: (id) => polygonLayers[id],
     getAllDistricts: () => allDistricts
   };
+
+  window.setBattleCardMode = setBattleCardMode;
+  window.changeBattleCardSegment = changeBattleCardSegment;
 
   // Direct Canvassing Checkin Helper for Sales Force
   window.goToDistrictCanvassing = function (customKec) {

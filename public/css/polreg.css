@@ -957,15 +957,111 @@
   gap: 5px;
 }
 
+/* Opsi 1 & 2 Mode Tabs */
+.pi-bc-mode-tabs {
+  display: flex;
+  gap: 3px;
+  margin: 5px 0 7px 0;
+  background: #e2e8f0;
+  padding: 2.5px;
+  border-radius: 8px;
+}
+
+.pi-bc-mode-btn {
+  flex: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.pi-bc-mode-btn:hover {
+  color: #0f172a;
+}
+
+.pi-bc-mode-btn.active {
+  background: #ffffff;
+  color: #cc1426;
+  font-weight: 800;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Segment Dropdown Selector (Opsi 2) */
+.pi-bc-segment-wrap {
+  margin-bottom: 6px;
+  padding: 5px 7px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.pi-bc-segment-lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.pi-bc-segment-select {
+  width: 100%;
+  padding: 3.5px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #0f172a;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.pi-bc-segment-select:focus {
+  border-color: #cc1426;
+  background: #ffffff;
+}
+
+.pi-bc-segment-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
 .pi-bc-model-chip {
   background: #cc1426;
   color: #ffffff;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 5px;
   font-size: 10px;
   font-weight: 800;
   display: inline-block;
-  margin-bottom: 4px;
+}
+
+.pi-bc-price-chip {
+  font-size: 9.5px;
+  font-weight: 800;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  display: inline-block;
 }
 
 .pi-bc-competitor {

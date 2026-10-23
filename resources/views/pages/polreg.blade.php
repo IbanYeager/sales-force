@@ -266,8 +266,40 @@
                 <i class="fa-solid fa-shield-halved" style="color:#cc1426;"></i>
                 <span>Model Rekomendasi &amp; Kontra Kompetitor</span>
               </div>
-              <div>
+
+              <!-- Dua Opsi: 1. Peringkat Wilayah (Ranking) | 2. Segmen & Harga Setara -->
+              <div class="pi-bc-mode-tabs">
+                <button type="button" class="pi-bc-mode-btn active" id="btnBcModeRanking" onclick="window.PolregMap.setBattleCardMode('ranking')" title="Opsi 1: Rekomendasi berdasarkan volume & ranking model terbanyak di wilayah ini">
+                  <i class="fa-solid fa-ranking-star"></i> Peringkat Wilayah
+                </button>
+                <button type="button" class="pi-bc-mode-btn" id="btnBcModeSegment" onclick="window.PolregMap.setBattleCardMode('segment')" title="Opsi 2: Komparasi head-to-head mobil sekelas & harga setara (contoh: Agya vs Brio)">
+                  <i class="fa-solid fa-scale-balanced"></i> Segmen &amp; Harga Setara
+                </button>
+              </div>
+
+              <!-- Dropdown Selector Segmen (Khusus Opsi 2) -->
+              <div class="pi-bc-segment-wrap" id="bcSegmentWrap" style="display: none;">
+                <label for="bcSegmentSelect" class="pi-bc-segment-lbl">
+                  <i class="fa-solid fa-sliders"></i> Pilih Komparasi Segmen Mobil:
+                </label>
+                <select id="bcSegmentSelect" class="pi-bc-segment-select" onchange="window.PolregMap.changeBattleCardSegment(this.value)">
+                  <!-- Injected via polreg.js -->
+                </select>
+              </div>
+
+              <!-- Info Segmen & Rentang Harga -->
+              <div class="pi-bc-segment-meta" id="bcSegmentMeta" style="display: none;">
+                <span class="badge" id="bcSegmentBadge" style="background:#e0f2fe; color:#0369a1; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:5px;">
+                  City Car &amp; LCGC
+                </span>
+                <span id="bcPriceRangeText" style="font-size: 9.5px; color:#64748b; font-weight:700;">
+                  Kelas Harga: Rp 170 Jt – 256 Jt
+                </span>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
                 <span class="pi-bc-model-chip" id="inspectorModelBadge">Toyota Avanza 1.3/1.5</span>
+                <span class="pi-bc-price-chip" id="inspectorToyotaPrice" style="display:none;">Rp 170 - 256 Jt</span>
               </div>
               <div class="pi-bc-competitor" id="inspectorCompetitorText">
                 Lawan Terberat: <strong>Jaecoo J5 Ev, Honda Brio Satya</strong> (LMPV, LCGC &amp; Compact SUV)
