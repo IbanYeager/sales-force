@@ -146,7 +146,7 @@
               </span>
               <h1>Penjualan Merchandise &amp; Lifestyle Accessories</h1>
               <p class="merch-banner-desc">
-                Pantau realisasi pendapatan merchandise resmi cabang, stok terserap, kontribusi 6 tim SPV, serta distribusi transaksi retail versus bundling SPK unit pengiriman kendaraan.
+                Pantau realisasi pendapatan merchandise resmi cabang, stok terserap, kontribusi 3 tim SPV (Alvin, Feryanto, Caisariva), serta distribusi transaksi retail versus bundling SPK unit pengiriman kendaraan.
               </p>
             </div>
 

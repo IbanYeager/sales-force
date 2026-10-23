@@ -127,28 +127,25 @@ function seedMerchandiseTransactionsIfEmpty($conn) {
         ];
     }
 
-    // Branch SPVs and their Sales Consultants
+    // Branch SPVs (3 SPV Resmi Cabang Kiara Condong) and their Sales Consultants
     $teamStructure = [
         'FERYANTO' => [
-            'NENG IDA WIDIANINGSIH', 'ARIEF SETYAWAN', 'REZA PAHLEVI PUTRA PRIBADI', 
-            'REGYAWAN KURNIA', 'DADI HERYADI', 'SANDY PURNAMA', 'GANI NUGRAHA'
+            'REGYAWAN KURNIA', 'ARIEF SETYAWAN', 'REZA PAHLEVI PUTRA PRIBADI', 
+            'YANI ANDRIYANI', 'DENO', 'ERICK JANUAR LISAPALY', 
+            'NENG IDA WIDIANINGSIH', 'DADI HERYADI', 'SANDY PURNAMA', 'DADAN DARMADI',
+            'DENI ALFIAN', 'TOMMY KUSUMA DASUKI'
         ],
         'ALVIN' => [
             'AHMAD MAULANA', 'INDAH PITALOKA', 'RIZKI RISMAWAN', 
-            'TOPIK HIDAYAT', 'HILMAN PERMANA', 'DONNY KURNIAWAN'
+            'TOPIK HIDAYAT', 'HILMAN PERMANA', 'DONNY KURNIAWAN', 
+            'MUHAMMAD FADIL FAHMI', 'DADI SOBARI', 'YENI', 'LUVITA DAMAYANTI',
+            'CECEP SOLEHUDIN', 'KURNIA YOGA PRATAMA'
         ],
         'MUHAMMAD CAISARIVA' => [
-            'RIDWAN DWI AZHARI', 'SISKA TRISTIANI', 'DERI NURSANDI', 
-            'FAUZAN AZINA', 'YOGA PRATAMA', 'PUTRI RAMADHANI'
-        ],
-        'ADRIAN DWI HARTANTO' => [
-            'ALVIN', 'DIMAS ANGGARA', 'BAGUS SETIAWAN', 'BAYU PRASETYO'
-        ],
-        'JULI HARTANTO' => [
-            'ANTHONY', 'CHANDRA WIJAYA', 'KEVIN TANUWIJAYA'
-        ],
-        'JAMES SITORUS' => [
-            'ROBBY SUGIARTO', 'HENDRA GUNAWAN'
+            'RIDWAN DWI AZHARI', 'DERI NURSANDI', 'SISKA TRISTIANI', 
+            'FAUZAN AZINA', 'YOGA PRATAMA', 'PUTRI RAMADHANI', 
+            'GIYONO', 'ROBBY NUGRAHA', 'JULI', 'TANARO MUHAR BUYUNG',
+            'AGUS SUPARMAN', 'RIANA ROSIANTI'
         ]
     ];
 
@@ -590,11 +587,26 @@ if ($action === 'get_dropdowns') {
         $merchItems[] = $m;
     }
 
-    // 2. Sales & SPV list from TCO/Kircon
-    $salesRes = $conn->query("SELECT DISTINCT nama_sales, nama_spv FROM `tabel_penjualan_tco` WHERE nama_sales IS NOT NULL AND nama_sales != '' ORDER BY nama_sales ASC");
+    // 2. Sales & SPV list from sales_accounts (Mapped to 3 SPVs Kircon)
     $salesList = [];
-    while ($s = $salesRes->fetch_assoc()) {
-        $salesList[] = $s;
+    $salesRes = $conn->query("SELECT nama_lengkap, nama_spv FROM sales_accounts WHERE (is_active = 1 OR is_active IS NULL) AND nama_lengkap != '' ORDER BY nama_lengkap ASC");
+    if ($salesRes && $salesRes->num_rows > 0) {
+        while ($s = $salesRes->fetch_assoc()) {
+            $spv = $s['nama_spv'] ?? '';
+            if (stripos($spv, 'Ryan') !== false || stripos($spv, 'Feryanto') !== false) {
+                $spv = 'FERYANTO';
+            } elseif (stripos($spv, 'Alvin') !== false) {
+                $spv = 'ALVIN';
+            } elseif (stripos($spv, 'Riva') !== false || stripos($spv, 'Caisariva') !== false) {
+                $spv = 'MUHAMMAD CAISARIVA';
+            } else {
+                $spv = 'FERYANTO';
+            }
+            $salesList[] = [
+                'nama_sales' => $s['nama_lengkap'],
+                'nama_spv' => $spv
+            ];
+        }
     }
 
     echo json_encode([
