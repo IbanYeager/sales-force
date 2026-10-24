@@ -109,7 +109,7 @@ $removedSalesPages = [
     'battle_card', 'order_tracker', 'ai_copilot', 'wa_studio', 'digital_card',
     'retention', 'delivery_ceremony', 'approval', 'eco_calculator', 'komparasi',
     'tss-simulator', 'pitstop', 'memory_match', 'game', 'hybrid_flow',
-    'valet_park', 'drag_race'
+    'valet_park', 'drag_race', 'ao_report'
 ];
 
 foreach ($removedSalesPages as $rmPage) {
@@ -124,7 +124,7 @@ Route::get('/pages/{page}', [PageController::class, 'showSalesPage'])->name('sal
 
 // Fallback direct route for common sales pages (e.g. /login, /input, /profil)
 $salesPages = [
-    'login', 'input', 'spk', 'profil', 'customer', 'ao_report', 'deal', 'do',
+    'login', 'input', 'spk', 'profil', 'customer', 'deal', 'do',
     'dokumen', 'balap', 'brosur', 'catalog', 'catur',
     'checkin', 'elibrary', 'inspeksi', 'inventory', 'jadwal_input',
     'kalkulator', 'kecamatan', 'leasing_matrix', 'market_analysis',

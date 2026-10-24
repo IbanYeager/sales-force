@@ -292,7 +292,6 @@
             <div class="sidebar-nav">
                 <p class="sidebar-nav-label">Menu Utama</p>
                 ${navLink('index.html', 'fa-solid fa-house', 'Dashboard', 'home beranda ringkasan')}
-                ${navLink('pages/ao_report.html', 'fa-solid fa-chalkboard-user', 'Papan AO Report', 'ao report leasing finance')}
                 ${navLink('pages/mtoyota_service.html', 'fa-solid fa-mobile-screen-button', 'Booking Service m-Toyota', 'mtoyota m-toyota booking service dec do fs1000 purna jual servis')}
                 ${navLink('pages/input.html', 'fa-solid fa-camera', 'Laporan & Check-in Aktivitas', 'input aktivitas laporan suara mic voice spm checkin gps geotag')}
                 ${navLink('pages/riwayat_foto_aktivitas.html', 'fa-solid fa-images', 'Riwayat Foto Aktivitas', 'galeri foto aktivitas canvassing riwayat')}

@@ -60,9 +60,6 @@
                 <a href="index.html" class="sidebar-nav-link active" data-tags="home beranda ringkasan">
                     <i class="fa-solid fa-house"></i> Dashboard
                 </a>
-                <a href="pages/ao_report.html" class="sidebar-nav-link" data-tags="ao report leasing finance">
-                    <i class="fa-solid fa-chalkboard-user"></i> Papan AO Report
-                </a>
                 <a href="pages/mtoyota_service.html" class="sidebar-nav-link" data-tags="booking service mtoyota m-toyota dec do fs1000 purna jual servis berkala upload foto">
                     <i class="fa-solid fa-mobile-screen-button"></i> Booking Service m-Toyota
                 </a>
@@ -410,51 +407,6 @@
                             </div>
                         </div>
                     </a>
-
-                    <!-- ═══ AREA OPERATION (AO) REPORT BANNER & METRICS ═══ -->
-                    <div class="card ao-preview-card">
-                        <div class="ao-preview-header">
-                            <div class="ao-preview-title-wrap">
-                                <div class="ao-preview-icon">
-                                    <i class="fa-solid fa-chalkboard-user"></i>
-                                </div>
-                                <div>
-                                    <h4 class="ao-preview-title">
-                                        Area Operation (AO) Report Live
-                                        <span class="ao-preview-match-badge">86% MATCH</span>
-                                    </h4>
-                                    <p class="ao-preview-sub">Tunas Toyota Kiara Condong &middot; 10 Agustus 2026</p>
-                                </div>
-                            </div>
-                            <a href="pages/ao_report.html" class="ao-preview-btn">
-                                <span>Buka Papan AO Report</span>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </div>
-
-                        <div class="ao-metrics-grid">
-                            <div style="background:rgba(255,255,255,0.06); padding:10px 8px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
-                                <div style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Matching Ratio</div>
-                                <div style="font-size:18px; font-weight:900; color:#34d399; margin:2px 0;">86%</div>
-                                <div style="font-size:9.5px; color:#6ee7b7; font-weight:700;">Match: 42 Unit</div>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.06); padding:10px 8px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
-                                <div style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Full Stock</div>
-                                <div style="font-size:18px; font-weight:900; color:#38bdf8; margin:2px 0;">124</div>
-                                <div style="font-size:9.5px; color:#7dd3fc; font-weight:700;">Free: 82 Unit</div>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.06); padding:10px 8px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
-                                <div style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;">SPK Aktual</div>
-                                <div style="font-size:18px; font-weight:900; color:#fbbf24; margin:2px 0;">54</div>
-                                <div style="font-size:9.5px; color:#fde68a; font-weight:700;">Ritme +14 Gap</div>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.06); padding:10px 8px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
-                                <div style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Est. Closing</div>
-                                <div style="font-size:18px; font-weight:900; color:#f472b6; margin:2px 0;">104</div>
-                                <div style="font-size:9.5px; color:#fbcfe8; font-weight:700;">+12 Over Tgt</div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- ═══ RINGKASAN ═══ -->
                     <div class="section-header-row">
@@ -854,10 +806,6 @@
                                     <span id="featureModalJadwalBadge" class="feature-notif-badge" style="display: none; position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; background: #c8102e; color: #fff; border-radius: 999px; font-size: 10px; font-weight: 800; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(200,16,46,0.4); line-height: 1;">0</span>
                                 </div>
                                 <span class="category-text">Kalender &amp; Jadwal</span>
-                            </a>
-                            <a href="pages/ao_report.html" class="category-item modal-feature-item" data-tags="ao report live leasing finance match">
-                                <div class="category-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-                                <span class="category-text">AO Report Live</span>
                             </a>
                             <a href="pages/polreg.html" class="category-item modal-feature-item" data-tags="polreg registrasi wilayah peta daerah kuota mobil kota bandung market share">
                                 <div class="category-icon"><i class="fa-solid fa-map-location-dot"></i></div>

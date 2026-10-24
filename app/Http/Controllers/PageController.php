@@ -46,7 +46,7 @@ class PageController extends Controller
             'battle_card', 'order_tracker', 'ai_copilot', 'wa_studio', 'digital_card',
             'retention', 'delivery_ceremony', 'approval', 'eco_calculator', 'komparasi',
             'tss-simulator', 'pitstop', 'memory_match', 'game', 'hybrid_flow',
-            'valet_park', 'drag_race'
+            'valet_park', 'drag_race', 'ao_report'
         ];
         if (in_array($cleanPage, $removedPages)) {
             return redirect('/');
