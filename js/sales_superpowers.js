@@ -118,6 +118,14 @@ const SalesSuperpowers = {
       .radar-landmark-chip:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
       .radar-landmark-chip.dealer-chip { background: #fff1f2; color: #d7123a; border-color: #fecaca; }
       .radar-landmark-chip.dealer-chip:hover { background: #fee2e2; }
+      .radar-zone-container { transition: all 0.2s ease; }
+      .radar-district-select { padding: 6px 12px; border-radius: 9px; border: 1.5px solid #cbd5e1; background: #ffffff; font-size: 12px; font-weight: 700; color: #0f172a; outline: none; cursor: pointer; transition: all 0.18s ease; }
+      .radar-district-select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+      .radar-zone-chips-scroll { display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 2px 0; }
+      .radar-zone-chips-scroll::-webkit-scrollbar { display: none; }
+      .radar-zone-chip { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
+      .radar-zone-chip:hover { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
+      .radar-zone-chip.active { background: #d7123a !important; color: #ffffff !important; border-color: #d7123a !important; box-shadow: 0 2px 6px rgba(215, 18, 58, 0.25); }
       .radar-map-outer { border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; height: 490px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); }
       #radarLeafletMapContainer { cursor: default; }
       .radar-sales-beacon-icon { background: transparent !important; border: none !important; }
@@ -132,6 +140,8 @@ const SalesSuperpowers = {
         .radar-gps-live-badge { width: 100% !important; justify-content: center !important; text-align: center !important; box-sizing: border-box !important; }
         .radar-header-btn-row { display: grid !important; grid-template-columns: 1fr 1fr !important; width: 100% !important; gap: 8px !important; }
         .btn-radar-dealer, .btn-radar-detect { width: 100% !important; justify-content: center !important; padding: 8px 10px !important; font-size: 11px !important; }
+        .radar-zone-container { padding: 10px 10px !important; }
+        .radar-district-select { width: 100% !important; margin-top: 4px; }
         .radar-controls-strip { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
         .radar-radius-section { width: 100% !important; }
         .radar-radius-pill-group { display: flex !important; width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; }
@@ -196,22 +206,134 @@ const SalesSuperpowers = {
     document.head.appendChild(style);
   },
 
-  // Exact Coordinates Dictionary for Dealers and Major Bandung Districts
-  BANDUNG_PRESETS: {
-    'kircon': [-6.9448, 107.6452, 'Tunas Toyota Kiara Condong (Dealer)'],
-    'buahbatu': [-6.9554, 107.6468, 'Buah Batu'],
-    'antapani': [-6.9147, 107.6625, 'Antapani'],
-    'batununggal': [-6.9531, 107.6256, 'Batununggal'],
-    'gedebage': [-6.9589, 107.6953, 'Gedebage'],
-    'dago': [-6.8653, 107.6183, 'Dago'],
-    'ciwastra': [-6.9620, 107.6650, 'Ciwastra / Margacinta'],
-    'soekarno-hatta': [-6.9450, 107.6500, 'Soekarno Hatta']
+  // Comprehensive Coordinates Dictionary for Canvasing Zones & Districts across Bandung Raya
+  ZONE_PRESETS: {
+    'all': { label: 'Semua Wilayah (Bandung Raya)', coords: null, zoom: 12, aliases: ['all'] },
+    'bojongsoang': { label: 'Bojongsoang', coords: [-6.9833, 107.6333], zoom: 14, aliases: ['bojongsoang', 'ciganitri', 'cipagalo', 'buah batu square'] },
+    'buahbatu': { label: 'Buahbatu', coords: [-6.9554, 107.6468], zoom: 14, aliases: ['buahbatu', 'buah batu', 'margacinta', 'ciwastra', 'cijerah'] },
+    'kircon': { label: 'Kiaracondong', coords: [-6.9448, 107.6452], zoom: 14, aliases: ['kiaracondong', 'kircon', 'ibrahim adjie', 'babakan surabaya', 'kebon kangkung'] },
+    'sukajadi': { label: 'Sukajadi', coords: [-6.8856, 107.5925], zoom: 14, aliases: ['sukajadi', 'sukawarna', 'sukagalih', 'sarijadi', 'gegerkalong'] },
+    'pasteur': { label: 'Pasteur', coords: [-6.8944, 107.5889], zoom: 14, aliases: ['pasteur', 'dr djunjunan', 'djunjunan'] },
+    'dago': { label: 'Dago / Coblong', coords: [-6.8653, 107.6183], zoom: 14, aliases: ['dago', 'coblong', 'dipatiukur', 'lebakgede', 'sadang serang', 'sekeloa'] },
+    'baleendah': { label: 'Baleendah', coords: [-7.0069, 107.6319], zoom: 14, aliases: ['baleendah', 'rencong', 'andir baleendah', 'manggahang'] },
+    'cileunyi': { label: 'Cileunyi', coords: [-6.9442, 107.7478], zoom: 14, aliases: ['cileunyi', 'cinunuk', 'jatinangor', 'cibiru'] },
+    'antapani': { label: 'Antapani', coords: [-6.9147, 107.6625], zoom: 14, aliases: ['antapani', 'antapani tengah', 'antapani kidul', 'antapani kulon', 'antapani wetan'] },
+    'arcamanik': { label: 'Arcamanik', coords: [-6.9189, 107.6811], zoom: 14, aliases: ['arcamanik', 'cisaranten', 'sukamiskin'] },
+    'gedebage': { label: 'Gedebage', coords: [-6.9589, 107.6953], zoom: 14, aliases: ['gedebage', 'summarecon', 'rancabolang'] },
+    'rancasari': { label: 'Rancasari', coords: [-6.9625, 107.6722], zoom: 14, aliases: ['rancasari', 'derwati', 'cipamokolan'] },
+    'lengkong': { label: 'Lengkong', coords: [-6.9312, 107.6189], zoom: 14, aliases: ['lengkong', 'turangga', 'malabar', 'burangrang'] },
+    'batununggal': { label: 'Batununggal', coords: [-6.9531, 107.6256], zoom: 14, aliases: ['batununggal', 'mengger', 'kujangsari'] },
+    'kopo': { label: 'Kopo', coords: [-6.9550, 107.5920], zoom: 14, aliases: ['kopo', 'babakan ciparay', 'cirangrang', 'margahayu selatan'] },
+    'cibaduyut': { label: 'Cibaduyut', coords: [-6.9620, 107.5900], zoom: 14, aliases: ['cibaduyut', 'bojongloa kidul'] },
+    'cimahi': { label: 'Cimahi', coords: [-6.8722, 107.5422], zoom: 14, aliases: ['cimahi', 'cibeber', 'leuwigajah', 'baros', 'melong'] },
+    'soreang': { label: 'Soreang', coords: [-7.0319, 107.5186], zoom: 14, aliases: ['soreang', 'katapang', 'kutawaringin', 'pameungpeuk'] },
+    'dayeuhkolot': { label: 'Dayeuhkolot', coords: [-6.9889, 107.6222], zoom: 14, aliases: ['dayeuhkolot', 'citeureup', 'palasari'] },
+    'ujungberung': { label: 'Ujungberung', coords: [-6.9140, 107.6980], zoom: 14, aliases: ['ujungberung', 'pasirwangi', 'cigending'] }
+  },
+
+  getZoneLabel(zoneKey) {
+    if (!zoneKey || zoneKey === 'all') return 'Semua Wilayah';
+    const cleanKey = zoneKey.toLowerCase().trim();
+    if (this.ZONE_PRESETS[cleanKey]) {
+      return this.ZONE_PRESETS[cleanKey].label;
+    }
+    return zoneKey.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  },
+
+  handleZoneChange(zoneKey, containerId) {
+    this.currentDistrict = zoneKey || 'all';
+    this.radarRenderLimit = 48;
+
+    // 1. Update active chips
+    document.querySelectorAll('.radar-zone-chip').forEach(chip => {
+      const z = chip.getAttribute('data-zone') || '';
+      if (z === this.currentDistrict) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
+    // 2. Synchronize dropdown
+    const sel = document.getElementById('radarDistrictSelect');
+    if (sel && sel.value !== this.currentDistrict) {
+      sel.value = this.currentDistrict;
+    }
+
+    // 3. Determine target center coordinates and zoom
+    const cleanKey = (this.currentDistrict || 'all').toLowerCase().trim();
+    let targetCoords = null;
+    let targetZoom = 14;
+
+    if (cleanKey === 'all') {
+      targetCoords = [
+        this.salesCoords ? this.salesCoords.lat : -6.9448,
+        this.salesCoords ? this.salesCoords.lng : 107.6452
+      ];
+      targetZoom = 13;
+    } else if (this.ZONE_PRESETS[cleanKey] && this.ZONE_PRESETS[cleanKey].coords) {
+      targetCoords = this.ZONE_PRESETS[cleanKey].coords;
+      targetZoom = this.ZONE_PRESETS[cleanKey].zoom || 14;
+    } else {
+      // Find matching coordinates from active data
+      const matching = (this.radarData || []).find(c => {
+        const d = (c.district || '').toLowerCase();
+        return (d.includes(cleanKey) || (c.address || '').toLowerCase().includes(cleanKey)) && c.lat && c.lng;
+      });
+      if (matching) {
+        targetCoords = [matching.lat, matching.lng];
+      }
+    }
+
+    // 4. Smooth auto-zoom map if initialized
+    if (this.leafletMap && targetCoords) {
+      this.leafletMap.flyTo(targetCoords, targetZoom, {
+        duration: 1.2,
+        easeLinearity: 0.25
+      });
+    }
+
+    // 5. Fetch radar data for the targeted district
+    const fetchLat = targetCoords ? targetCoords[0] : (this.salesCoords ? this.salesCoords.lat : -6.9448);
+    const fetchLng = targetCoords ? targetCoords[1] : (this.salesCoords ? this.salesCoords.lng : 107.6452);
+    const fetchRadius = cleanKey === 'all' ? (this.currentRadius || 5) : 999;
+
+    this.fetchRadarData(fetchLat, fetchLng, fetchRadius, this.currentDistrict);
+  },
+
+  populateDistrictSelect(districts, selectedDistrict) {
+    const optgroup = document.getElementById('radarOptgroupAllDistricts');
+    if (!optgroup) return;
+
+    if (optgroup.children.length > 0) {
+      const sel = document.getElementById('radarDistrictSelect');
+      if (sel && selectedDistrict) sel.value = selectedDistrict;
+      return;
+    }
+
+    const popularKeys = Object.keys(this.ZONE_PRESETS).filter(k => k !== 'all');
+
+    districts.forEach(d => {
+      const clean = d.toLowerCase().trim();
+      if (popularKeys.includes(clean)) return;
+
+      const opt = document.createElement('option');
+      opt.value = clean;
+      opt.textContent = d;
+      optgroup.appendChild(opt);
+    });
+
+    const sel = document.getElementById('radarDistrictSelect');
+    if (sel && selectedDistrict) {
+      sel.value = selectedDistrict;
+    }
   },
 
   quickSetLocation(key) {
-    const preset = this.BANDUNG_PRESETS[key];
-    if (preset) {
-      const [lat, lng, label] = preset;
+    const preset = this.ZONE_PRESETS[key];
+    if (preset && preset.coords) {
+      const [lat, lng] = preset.coords;
+      const label = preset.label;
       const searchInput = document.getElementById('salesLocationSearchInput');
       if (searchInput) searchInput.value = label;
       this.setManualSalesCoords(lat, lng, label, 10, true);
@@ -231,7 +353,6 @@ const SalesSuperpowers = {
     const isManual = localStorage.getItem('savedSalesIsManual') === 'true';
 
     // If coordinates were saved as a manual pinpoint, restore them.
-    // Otherwise, if it was an inaccurate 25km IP (-6.919...), reset to Dealer Kircon!
     if (savedLat && savedLng && isManual) {
       this.salesCoords = { lat: parseFloat(savedLat), lng: parseFloat(savedLng) };
       this.gpsAccuracy = 10;
@@ -246,7 +367,7 @@ const SalesSuperpowers = {
 
     const currentLocLabel = localStorage.getItem('savedSalesLocLabel') || 'Tunas Toyota Kircon (Dealer)';
 
-    // Render Cockpit Shell with Executive Tactical Radar Interface
+    // Render Cockpit Shell with Executive Tactical Radar Interface & Canvasing Zone Bar
     container.innerHTML = `
       <div class="radar-cockpit-wrapper">
         <!-- Top Row: Title, Radar Sonar Ping & GPS Status -->
@@ -264,7 +385,7 @@ const SalesSuperpowers = {
                 <i class="fa-solid fa-bolt"></i> Live Radar Kanvasing
               </div>
               <h3 class="radar-header-title">Peta Radar Pelanggan &amp; Kanvasing</h3>
-              <p class="radar-header-sub">Memetakan database pelanggan terdekat berdasarkan radius dari posisi Anda.</p>
+              <p class="radar-header-sub">Memetakan database pelanggan terdekat berdasarkan radius &amp; zona kanvasing Anda.</p>
             </div>
           </div>
           
@@ -281,6 +402,100 @@ const SalesSuperpowers = {
                 <i class="fa-solid fa-location-crosshairs"></i> Deteksi Ulang GPS
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- Zona / Wilayah Kanvasing Bar (Paling Direkomendasikan) -->
+        <div class="radar-zone-container" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px 14px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px; background:#d7123a; color:#fff; font-size:12px;">
+                <i class="fa-solid fa-map-location-dot"></i>
+              </span>
+              <div>
+                <span style="font-size:12.5px; font-weight:800; color:#0f172a; letter-spacing:-0.2px;">Zona Kanvasing Harian</span>
+                <span style="font-size:11px; color:#64748b; margin-left:6px;">Pilih wilayah kanvasing agar peta fokus &amp; anti-lag</span>
+              </div>
+            </div>
+
+            <!-- Kecamatan Dropdown -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label for="radarDistrictSelect" style="font-size:11.5px; font-weight:700; color:#475569; white-space:nowrap;">Pilih Wilayah:</label>
+              <select id="radarDistrictSelect" class="radar-district-select" onchange="SalesSuperpowers.handleZoneChange(this.value, '${containerId}')">
+                <option value="all">🌍 Semua Wilayah (Bandung Raya)</option>
+                <optgroup label="Wilayah Populer Kanvasing">
+                  <option value="bojongsoang">Bojongsoang (100+ Customer)</option>
+                  <option value="buahbatu">Buahbatu</option>
+                  <option value="kircon">Kiaracondong</option>
+                  <option value="sukajadi">Sukajadi</option>
+                  <option value="pasteur">Pasteur</option>
+                  <option value="dago">Dago / Coblong</option>
+                  <option value="baleendah">Baleendah</option>
+                  <option value="cileunyi">Cileunyi</option>
+                  <option value="antapani">Antapani</option>
+                  <option value="arcamanik">Arcamanik</option>
+                  <option value="gedebage">Gedebage</option>
+                  <option value="rancasari">Rancasari</option>
+                  <option value="lengkong">Lengkong</option>
+                  <option value="batununggal">Batununggal</option>
+                  <option value="kopo">Kopo</option>
+                  <option value="cibaduyut">Cibaduyut</option>
+                  <option value="cimahi">Cimahi</option>
+                  <option value="soreang">Soreang</option>
+                  <option value="dayeuhkolot">Dayeuhkolot</option>
+                  <option value="ujungberung">Ujungberung</option>
+                </optgroup>
+                <optgroup id="radarOptgroupAllDistricts" label="Semua Kecamatan Lainnya">
+                  <!-- Populated dynamically from API -->
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quick Chips Row -->
+          <div class="radar-zone-chips-scroll">
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'all' ? 'active' : ''}" data-zone="all" onclick="SalesSuperpowers.handleZoneChange('all', '${containerId}')">
+              <i class="fa-solid fa-globe"></i> Semua Wilayah
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'bojongsoang' ? 'active' : ''}" data-zone="bojongsoang" onclick="SalesSuperpowers.handleZoneChange('bojongsoang', '${containerId}')">
+              Bojongsoang
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'buahbatu' ? 'active' : ''}" data-zone="buahbatu" onclick="SalesSuperpowers.handleZoneChange('buahbatu', '${containerId}')">
+              Buahbatu
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'kircon' ? 'active' : ''}" data-zone="kircon" onclick="SalesSuperpowers.handleZoneChange('kircon', '${containerId}')">
+              Kiaracondong
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'sukajadi' ? 'active' : ''}" data-zone="sukajadi" onclick="SalesSuperpowers.handleZoneChange('sukajadi', '${containerId}')">
+              Sukajadi
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'pasteur' ? 'active' : ''}" data-zone="pasteur" onclick="SalesSuperpowers.handleZoneChange('pasteur', '${containerId}')">
+              Pasteur
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'dago' ? 'active' : ''}" data-zone="dago" onclick="SalesSuperpowers.handleZoneChange('dago', '${containerId}')">
+              Dago / Coblong
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'baleendah' ? 'active' : ''}" data-zone="baleendah" onclick="SalesSuperpowers.handleZoneChange('baleendah', '${containerId}')">
+              Baleendah
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'cileunyi' ? 'active' : ''}" data-zone="cileunyi" onclick="SalesSuperpowers.handleZoneChange('cileunyi', '${containerId}')">
+              Cileunyi
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'antapani' ? 'active' : ''}" data-zone="antapani" onclick="SalesSuperpowers.handleZoneChange('antapani', '${containerId}')">
+              Antapani
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'gedebage' ? 'active' : ''}" data-zone="gedebage" onclick="SalesSuperpowers.handleZoneChange('gedebage', '${containerId}')">
+              Gedebage
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'kopo' ? 'active' : ''}" data-zone="kopo" onclick="SalesSuperpowers.handleZoneChange('kopo', '${containerId}')">
+              Kopo
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'cimahi' ? 'active' : ''}" data-zone="cimahi" onclick="SalesSuperpowers.handleZoneChange('cimahi', '${containerId}')">
+              Cimahi
+            </button>
+            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'soreang' ? 'active' : ''}" data-zone="soreang" onclick="SalesSuperpowers.handleZoneChange('soreang', '${containerId}')">
+              Soreang
+            </button>
           </div>
         </div>
 
@@ -579,13 +794,7 @@ const SalesSuperpowers = {
   },
 
   handleDistrictChange(districtVal, containerId) {
-    this.currentDistrict = districtVal;
-    this.fetchRadarData(
-      this.salesCoords ? this.salesCoords.lat : -6.9448,
-      this.salesCoords ? this.salesCoords.lng : 107.6452,
-      this.currentRadius,
-      districtVal
-    );
+    this.handleZoneChange(districtVal, containerId);
   },
 
   async ensureLeafletLoaded() {
@@ -673,14 +882,25 @@ const SalesSuperpowers = {
       const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&district=${encodeURIComponent(district)}&db_source=radar&sales_id=${salesId}&limit=0`);
       const result = await res.json();
 
+      if (result.districts_list && Array.isArray(result.districts_list)) {
+        this.populateDistrictSelect(result.districts_list, district);
+      }
+
       if (result.status !== 'success' || !result.data || result.data.length === 0) {
+        const isZoneSelected = district && district !== 'all';
+        const emptyTitle = isZoneSelected
+          ? `Tidak Ada Customer di Zona ${this.getZoneLabel(district)}`
+          : `Tidak Ada Customer di Ring Radius ${radiusKm < 999 ? radiusKm + ' km' : ''}`;
+        const emptyDesc = isZoneSelected
+          ? 'Belum ada data customer terdaftar di wilayah ini. Silakan pilih zona kanvasing lain.'
+          : 'Coba perluas Ring Radius (misal 5 km atau 10 km) atau pilih zona kanvasing lain di atas.';
         listContainer.innerHTML = `
           <div class="radar-empty-state">
             <div class="radar-empty-icon">
               <i class="fa-solid fa-satellite-dish"></i>
             </div>
-            <h4 class="radar-empty-title">Tidak Ada Customer di Ring Radius ${radiusKm < 999 ? radiusKm + ' km' : ''}</h4>
-            <p class="radar-empty-desc">Coba perluas Ring Radius (misal 5 km atau 10 km) atau pilih lokasi landmark lain di atas.</p>
+            <h4 class="radar-empty-title">${escapeHtml(emptyTitle)}</h4>
+            <p class="radar-empty-desc">${escapeHtml(emptyDesc)}</p>
           </div>
         `;
         this.radarData = [];
@@ -851,13 +1071,26 @@ const SalesSuperpowers = {
     const currentRadiusKm = this.currentRadius || 5;
     const status = this.radarStatusFilter || 'all';
     const query = (this.radarQuery || '').toLowerCase().trim();
+    const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
 
     return (this.radarData || []).filter(c => {
-      // 1. Radius filter
-      if (currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
+      // 1. Canvasing Zone filter (if a specific zone is active)
+      if (currentDist !== 'all' && currentDist !== '') {
+        const itemDist = (c.district || '').toLowerCase();
+        const itemAddr = (c.address || '').toLowerCase();
+        const aliases = (this.ZONE_PRESETS[currentDist] && this.ZONE_PRESETS[currentDist].aliases) 
+          ? this.ZONE_PRESETS[currentDist].aliases 
+          : [currentDist];
+        const matchDist = aliases.some(a => itemDist.includes(a) || itemAddr.includes(a));
+        if (!matchDist) return false;
+      }
+
+      // 2. Radius filter (only applies when "Semua Wilayah" is active)
+      if (currentDist === 'all' && currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
         if (c.distance_km > currentRadiusKm) return false;
       }
-      // 2. Status filter
+
+      // 3. Status filter
       if (status !== 'all') {
         const itemStatus = (c.status || 'Belum Dihubungi').trim();
         if (status === 'Belum Dihubungi') {
@@ -874,13 +1107,15 @@ const SalesSuperpowers = {
           if (itemStatus !== status) return false;
         }
       }
-      // 3. Query filter
+
+      // 4. Query search filter
       if (query) {
         const matchName = (c.name || '').toLowerCase().includes(query);
         const matchCar = (c.car_model || '').toLowerCase().includes(query);
         const matchDistrict = (c.district || '').toLowerCase().includes(query);
+        const matchAddress = (c.address || '').toLowerCase().includes(query);
         const matchPhone = (c.phone || '').includes(query);
-        if (!matchName && !matchCar && !matchDistrict && !matchPhone) return false;
+        if (!matchName && !matchCar && !matchDistrict && !matchAddress && !matchPhone) return false;
       }
       return true;
     });
@@ -901,8 +1136,9 @@ const SalesSuperpowers = {
 
     const pinBadge = document.getElementById('radarMapPinCount');
     if (pinBadge) {
+      const zoneLabel = this.getZoneLabel(this.currentDistrict);
       pinBadge.textContent = filteredLeads.length > 0
-        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Pin Tersebar`
+        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Pin (${zoneLabel})`
         : '0 Customer';
     }
 
@@ -997,6 +1233,18 @@ const SalesSuperpowers = {
     } else {
       markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
     }
+
+    // Auto-fit bounds if a specific territory is selected so all territory markers are nicely framed
+    if (this.currentDistrict && this.currentDistrict !== 'all' && markersToBatch.length > 0 && this.leafletMap) {
+      try {
+        const groupBounds = L.featureGroup(markersToBatch).getBounds();
+        if (groupBounds.isValid()) {
+          this.leafletMap.fitBounds(groupBounds.pad(0.12), { maxZoom: 15 });
+        }
+      } catch (e) {
+        console.warn('fitBounds error', e);
+      }
+    }
   },
 
   handleRadarStatusFilter(statusVal) {
@@ -1036,8 +1284,13 @@ const SalesSuperpowers = {
     const sub = document.getElementById('radarRadiusSubtitle');
     if (sub) {
       const currentRadiusKm = this.currentRadius || 5;
+      const isZoneSelected = this.currentDistrict && this.currentDistrict !== 'all';
+      const zoneLabel = this.getZoneLabel(this.currentDistrict);
       const statusLabel = this.radarStatusFilter === 'all' ? '' : ` • Status: ${this.radarStatusFilter}`;
-      sub.textContent = `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${statusLabel}).`;
+      
+      sub.innerHTML = isZoneSelected
+        ? `Menampilkan customer di Zona Kanvasing <b>${escapeHtml(zoneLabel)}</b> (diurutkan dari titik pusat area${statusLabel}).`
+        : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${statusLabel}).`;
     }
 
     // Update cards grid only
@@ -1076,7 +1329,9 @@ const SalesSuperpowers = {
             <span class="radar-count-badge" id="radarCountBadge">${filtered.length.toLocaleString('id-ID')} Customer</span>
           </h4>
           <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;" id="radarRadiusSubtitle">
-            Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${this.radarStatusFilter !== 'all' ? ' • Status: ' + this.radarStatusFilter : ''}).
+            ${this.currentDistrict && this.currentDistrict !== 'all' 
+              ? `Menampilkan customer di Zona Kanvasing <b>${escapeHtml(this.getZoneLabel(this.currentDistrict))}</b> (diurutkan dari titik pusat area${this.radarStatusFilter !== 'all' ? ' • Status: ' + this.radarStatusFilter : ''}).`
+              : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${this.radarStatusFilter !== 'all' ? ' • Status: ' + this.radarStatusFilter : ''}).`}
           </p>
         </div>
         <div style="position:relative; min-width:200px; flex:1; max-width:280px;">

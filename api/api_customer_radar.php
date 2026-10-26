@@ -52,6 +52,21 @@ try {
 
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
 
+    $districtAliases = [
+        'kircon' => ['kiaracondong', 'kircon', 'ibrahim adjie', 'babakan surabaya', 'kebon kangkung'],
+        'buahbatu' => ['buahbatu', 'buah batu', 'terusan buah batu'],
+        'sukajadi' => ['sukajadi', 'sukawarna', 'sukagalih', 'sarijadi'],
+        'pasteur' => ['pasteur', 'dr djunjunan', 'djunjunan'],
+        'dago' => ['dago', 'coblong', 'dipatiukur', 'lebakgede', 'sadang serang', 'sekeloa'],
+        'kopo' => ['kopo', 'babakan ciparay', 'cirangrang'],
+        'cimahi' => ['cimahi', 'cibeber', 'leuwigajah', 'baros', 'melong'],
+        'soreang' => ['soreang', 'katapang', 'kutawaringin'],
+        'cileunyi' => ['cileunyi', 'cinunuk', 'jatinangor'],
+        'antapani' => ['antapani', 'antapani tengah', 'antapani kidul', 'antapani kulon', 'antapani wetan'],
+    ];
+
+    $searchKeywords = isset($districtAliases[$targetDistrict]) ? $districtAliases[$targetDistrict] : [$targetDistrict];
+
     // Fetch Followup Customers
     $fuRows = followup_query("SELECT id, name, phone, district, car_model, last_car_model, car_age, priority, followup_status, cluster_name, outlet_do, notes, assigned_sales_id, sync_source, visit_photo, reason_followup, plate_number, vin FROM followup_customers $whereSql ORDER BY id DESC", $params);
     
@@ -66,19 +81,28 @@ try {
                 $distNameClean = strtolower($coords[2] ?: '');
                 $rawDistClean = strtolower((string)($row['district'] ?: ''));
                 $notesClean = strtolower((string)($row['notes'] ?: ''));
-                if (strpos($distNameClean, $targetDistrict) === false && strpos($rawDistClean, $targetDistrict) === false && strpos($notesClean, $targetDistrict) === false) {
+                $matched = false;
+                foreach ($searchKeywords as $kw) {
+                    if (strpos($distNameClean, $kw) !== false || strpos($rawDistClean, $kw) !== false || strpos($notesClean, $kw) !== false) {
+                        $matched = true;
+                        break;
+                    }
+                }
+                if (!$matched) {
                     continue;
                 }
             }
 
-            // Fast bounding box check
-            if (abs($coords[0] - $salesLat) > $latDelta) continue;
-            if (abs($coords[1] - $salesLng) > $lngDelta) continue;
+            // Fast bounding box & radius check (only if targetDistrict is 'all')
+            if ($targetDistrict === 'all' || $targetDistrict === '') {
+                if (abs($coords[0] - $salesLat) > $latDelta) continue;
+                if (abs($coords[1] - $salesLng) > $lngDelta) continue;
+            }
 
             $dist = calculateDistance($salesLat, $salesLng, $coords[0], $coords[1]);
 
-            // STRICT RADIUS FILTER
-            if ($dist <= $maxRadius) {
+            // STRICT RADIUS FILTER (bypassed if specific district is selected so all district leads appear)
+            if (($targetDistrict !== 'all' && $targetDistrict !== '') || $dist <= $maxRadius) {
                 $phoneClean = clean_phone_number($row['phone'] ?? '');
                 $car = $row['car_model'] ?: ($row['last_car_model'] ?: 'Toyota Unit');
                 $sid = (int)($row['assigned_sales_id'] ?? 0);
@@ -109,6 +133,18 @@ try {
         }
     }
 
+    // Extract unique available districts for dropdown
+    $districtsList = [];
+    if (!empty($fuRows) && is_array($fuRows)) {
+        foreach ($fuRows as $r) {
+            $d = trim((string)($r['district'] ?? ''));
+            if ($d && strtolower($d) !== 'bandung area') {
+                $districtsList[$d] = true;
+            }
+        }
+        ksort($districtsList);
+    }
+
     // Sort results by nearest distance
     usort($results, function($a, $b) {
         return $a['distance_km'] <=> $b['distance_km'];
@@ -120,6 +156,8 @@ try {
         'status' => 'success',
         'sales_coords' => ['lat' => $salesLat, 'lng' => $salesLng],
         'radius_km' => $maxRadius,
+        'district' => $targetDistrict,
+        'districts_list' => array_keys($districtsList),
         'total_found' => count($results),
         'data' => $sliced
     ]);
