@@ -2767,7 +2767,7 @@ function switchFollowupSubTab(tab) {
     if (radarContainer) {
       radarContainer.style.display = 'block';
       if (window.SalesSuperpowers) {
-        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 5);
+        SalesSuperpowers.renderRadarCockpit('followupRadarContainer', 'all', 999);
       }
     }
   } else {

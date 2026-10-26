@@ -418,8 +418,8 @@ const SalesSuperpowers = {
     }
   },
 
-  async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 5) {
-    this.currentRadius = parseFloat(radiusKm) || 5;
+  async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 999) {
+    this.currentRadius = parseFloat(radiusKm) || 999;
     this.currentDistrict = district;
 
     // Ensure CSS styles are injected
@@ -460,10 +460,10 @@ const SalesSuperpowers = {
             </div>
             <div>
               <div class="radar-micro-badge">
-                <i class="fa-solid fa-bolt"></i> Live Radar Kanvasing
+                <i class="fa-solid fa-bolt"></i> Live Radar Pelanggan
               </div>
-              <h3 class="radar-header-title">Peta Radar Pelanggan &amp; Kanvasing</h3>
-              <p class="radar-header-sub">Memetakan database pelanggan terdekat berdasarkan radius &amp; zona kanvasing Anda.</p>
+              <h3 class="radar-header-title">Peta Radar Seluruh Pelanggan</h3>
+              <p class="radar-header-sub">Memetakan seluruh database pelanggan langsung di peta secara interaktif.</p>
             </div>
           </div>
           
@@ -483,100 +483,6 @@ const SalesSuperpowers = {
           </div>
         </div>
 
-        <!-- Zona / Wilayah Kanvasing Bar (Paling Direkomendasikan) -->
-        <div class="radar-zone-container" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px 14px; margin-bottom:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px; background:#d7123a; color:#fff; font-size:12px;">
-                <i class="fa-solid fa-map-location-dot"></i>
-              </span>
-              <div>
-                <span style="font-size:12.5px; font-weight:800; color:#0f172a; letter-spacing:-0.2px;">Zona Kanvasing Harian</span>
-                <span style="font-size:11px; color:#64748b; margin-left:6px;">Pilih wilayah kanvasing agar peta fokus &amp; anti-lag</span>
-              </div>
-            </div>
-
-            <!-- Kecamatan Dropdown -->
-            <div style="display:flex; align-items:center; gap:6px;">
-              <label for="radarDistrictSelect" style="font-size:11.5px; font-weight:700; color:#475569; white-space:nowrap;">Pilih Wilayah:</label>
-              <select id="radarDistrictSelect" class="radar-district-select" onchange="SalesSuperpowers.handleZoneChange(this.value, '${containerId}')">
-                <option value="all">🌍 Semua Wilayah (Bandung Raya)</option>
-                <optgroup label="Wilayah Populer Kanvasing">
-                  <option value="bojongsoang">Bojongsoang (100+ Customer)</option>
-                  <option value="buahbatu">Buahbatu</option>
-                  <option value="kircon">Kiaracondong</option>
-                  <option value="sukajadi">Sukajadi</option>
-                  <option value="pasteur">Pasteur</option>
-                  <option value="dago">Dago / Coblong</option>
-                  <option value="baleendah">Baleendah</option>
-                  <option value="cileunyi">Cileunyi</option>
-                  <option value="antapani">Antapani</option>
-                  <option value="arcamanik">Arcamanik</option>
-                  <option value="gedebage">Gedebage</option>
-                  <option value="rancasari">Rancasari</option>
-                  <option value="lengkong">Lengkong</option>
-                  <option value="batununggal">Batununggal</option>
-                  <option value="kopo">Kopo</option>
-                  <option value="cibaduyut">Cibaduyut</option>
-                  <option value="cimahi">Cimahi</option>
-                  <option value="soreang">Soreang</option>
-                  <option value="dayeuhkolot">Dayeuhkolot</option>
-                  <option value="ujungberung">Ujungberung</option>
-                </optgroup>
-                <optgroup id="radarOptgroupAllDistricts" label="Semua Kecamatan Lainnya">
-                  <!-- Populated dynamically from API -->
-                </optgroup>
-              </select>
-            </div>
-          </div>
-
-          <!-- Quick Chips Row -->
-          <div class="radar-zone-chips-scroll">
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'all' ? 'active' : ''}" data-zone="all" onclick="SalesSuperpowers.handleZoneChange('all', '${containerId}')">
-              <i class="fa-solid fa-globe"></i> Semua Wilayah
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'bojongsoang' ? 'active' : ''}" data-zone="bojongsoang" onclick="SalesSuperpowers.handleZoneChange('bojongsoang', '${containerId}')">
-              Bojongsoang
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'buahbatu' ? 'active' : ''}" data-zone="buahbatu" onclick="SalesSuperpowers.handleZoneChange('buahbatu', '${containerId}')">
-              Buahbatu
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'kircon' ? 'active' : ''}" data-zone="kircon" onclick="SalesSuperpowers.handleZoneChange('kircon', '${containerId}')">
-              Kiaracondong
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'sukajadi' ? 'active' : ''}" data-zone="sukajadi" onclick="SalesSuperpowers.handleZoneChange('sukajadi', '${containerId}')">
-              Sukajadi
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'pasteur' ? 'active' : ''}" data-zone="pasteur" onclick="SalesSuperpowers.handleZoneChange('pasteur', '${containerId}')">
-              Pasteur
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'dago' ? 'active' : ''}" data-zone="dago" onclick="SalesSuperpowers.handleZoneChange('dago', '${containerId}')">
-              Dago / Coblong
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'baleendah' ? 'active' : ''}" data-zone="baleendah" onclick="SalesSuperpowers.handleZoneChange('baleendah', '${containerId}')">
-              Baleendah
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'cileunyi' ? 'active' : ''}" data-zone="cileunyi" onclick="SalesSuperpowers.handleZoneChange('cileunyi', '${containerId}')">
-              Cileunyi
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'antapani' ? 'active' : ''}" data-zone="antapani" onclick="SalesSuperpowers.handleZoneChange('antapani', '${containerId}')">
-              Antapani
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'gedebage' ? 'active' : ''}" data-zone="gedebage" onclick="SalesSuperpowers.handleZoneChange('gedebage', '${containerId}')">
-              Gedebage
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'kopo' ? 'active' : ''}" data-zone="kopo" onclick="SalesSuperpowers.handleZoneChange('kopo', '${containerId}')">
-              Kopo
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'cimahi' ? 'active' : ''}" data-zone="cimahi" onclick="SalesSuperpowers.handleZoneChange('cimahi', '${containerId}')">
-              Cimahi
-            </button>
-            <button type="button" class="radar-zone-chip ${this.currentDistrict === 'soreang' ? 'active' : ''}" data-zone="soreang" onclick="SalesSuperpowers.handleZoneChange('soreang', '${containerId}')">
-              Soreang
-            </button>
-          </div>
-        </div>
-
         <!-- Controls Row: Radius Filter Pills -->
         <div class="radar-controls-strip" style="margin-bottom: 14px;">
           <!-- Radius Options -->
@@ -587,7 +493,7 @@ const SalesSuperpowers = {
             <div class="radar-radius-pill-group">
               <button type="button" class="radar-radius-pill ${this.currentRadius == 1 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(1, '${containerId}')">1 km</button>
               <button type="button" class="radar-radius-pill ${this.currentRadius == 3 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(3, '${containerId}')">3 km</button>
-              <button type="button" class="radar-radius-pill ${this.currentRadius == 5 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(5, '${containerId}')">5 km ★ Ideal</button>
+              <button type="button" class="radar-radius-pill ${this.currentRadius == 5 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(5, '${containerId}')">5 km</button>
               <button type="button" class="radar-radius-pill ${this.currentRadius == 10 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(10, '${containerId}')">10 km</button>
               <button type="button" class="radar-radius-pill ${this.currentRadius >= 999 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(999, '${containerId}')">Semua Wilayah</button>
             </div>
@@ -1086,26 +992,10 @@ const SalesSuperpowers = {
       </div>
     `);
 
-    // DRAW VISUAL RADIUS CIRCLE (RING RADIUS)
-    const currentRadiusKm = this.currentRadius || 5;
+    // Center map view on sales/dealer coordinates
+    map.setView([salesLat, salesLng], 13);
 
-    if (currentRadiusKm < 500) {
-      const radiusMeters = currentRadiusKm * 1000;
-      const radiusCircle = L.circle([salesLat, salesLng], {
-        color: '#2563eb',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.08,
-        weight: 2,
-        dashArray: '6, 6',
-        radius: radiusMeters
-      }).addTo(map);
-
-      // Fit bounds to circle ring radius so user clearly sees the ring and all customer points inside
-      map.fitBounds(radiusCircle.getBounds(), { padding: [35, 35], maxZoom: 16 });
-    }
-
-    // Initialize or Clear Marker Layer Group
-    // Initialize or Clear Marker Layer Group with MarkerCluster support
+    // Initialize or Clear Marker Layer Group (Direct display without clustering)
     if (this.radarMarkersLayer) {
       this.radarMarkersLayer.clearLayers();
       if (this.leafletMap.hasLayer(this.radarMarkersLayer)) {
@@ -1113,20 +1003,7 @@ const SalesSuperpowers = {
       }
     }
 
-    if (window.L && window.L.markerClusterGroup) {
-      this.radarMarkersLayer = L.markerClusterGroup({
-        chunkedLoading: true,
-        chunkInterval: 100,
-        chunkDelay: 15,
-        maxClusterRadius: 42,
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
-        disableClusteringAtZoom: 17
-      });
-    } else {
-      this.radarMarkersLayer = L.layerGroup();
-    }
+    this.radarMarkersLayer = L.layerGroup();
     this.radarMarkersLayer.addTo(map);
     this.updateRadarMapPins();
 
@@ -1220,19 +1097,15 @@ const SalesSuperpowers = {
 
     const filteredLeads = this.getFilteredRadarLeads();
 
-    // RENDER ALL CUSTOMERS DYNAMICALLY ACROSS ALL DISTRICTS
-    // Menggunakan Leaflet MarkerCluster dengan chunkedLoading aktif,
-    // seluruh data customer (5000+ pin) tersebar merata di setiap kecamatan & jalan
-    // tanpa lag (60 FPS halus), dan mengelompok elegan saat zoom out.
-    const isCluster = typeof this.radarMarkersLayer.addLayers === 'function';
-    const mapPins = isCluster ? filteredLeads : filteredLeads.slice(0, 1000);
+    // RENDER ALL CUSTOMERS DIRECTLY ON MAP (NO CLUSTERING GROUP)
+    const mapPins = filteredLeads;
 
     const pinBadge = document.getElementById('radarMapPinCount');
     if (pinBadge) {
-      const zoneLabel = this.getZoneLabel(this.currentDistrict);
       const carLabel = (this.radarCarFilter && this.radarCarFilter !== 'all') ? ` • ${this.radarCarFilter.toUpperCase()}` : '';
+      const distLabel = (this.currentDistrict && this.currentDistrict !== 'all') ? ` • ${this.getZoneLabel(this.currentDistrict)}` : '';
       pinBadge.textContent = filteredLeads.length > 0
-        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Pin (${zoneLabel}${carLabel})`
+        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer Langsung${distLabel}${carLabel}`
         : '0 Customer';
     }
 
@@ -1322,11 +1195,7 @@ const SalesSuperpowers = {
       markersToBatch.push(marker);
     });
 
-    if (isCluster) {
-      this.radarMarkersLayer.addLayers(markersToBatch);
-    } else {
-      markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
-    }
+    markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
 
     // Auto-fit bounds if a specific territory or car filter is selected so all territory markers are nicely framed
     if ((this.currentDistrict !== 'all' || this.radarCarFilter !== 'all') && markersToBatch.length > 0 && this.leafletMap) {
