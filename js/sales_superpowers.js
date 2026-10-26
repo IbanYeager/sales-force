@@ -1120,11 +1120,11 @@ const SalesSuperpowers = {
         chunkedLoading: true,
         chunkInterval: 50,
         chunkDelay: 10,
-        maxClusterRadius: 45,
-        spiderfyOnMaxZoom: true,
+        maxClusterRadius: 35,
+        spiderfyOnMaxZoom: false,
         showCoverageOnHover: false,
         zoomToBoundsOnClick: true,
-        disableClusteringAtZoom: 16,
+        disableClusteringAtZoom: 15,
         iconCreateFunction: function(cluster) {
           const count = cluster.getChildCount();
           let clusterClass = 'small';

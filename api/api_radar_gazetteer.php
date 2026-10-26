@@ -108,8 +108,6 @@ $bandungDistricts = [
     'cikalong wetan'   => [-6.7450, 107.4450],
 
     // Major Roads, Landmarks & Residential Complexes in Bandung Raya
-    'soekarno hatta'   => [-6.9450, 107.6500],
-    'soekarno-hatta'   => [-6.9450, 107.6500],
     'ibrahim adjie'    => [-6.9290, 107.6440],
     'griya cempaka arum'=>[-6.9589, 107.6953],
     'cempaka arum'     => [-6.9589, 107.6953],
@@ -444,6 +442,79 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
                     $coords = $c;
                     break;
                 }
+            }
+        }
+    }
+
+    // LEVEL 4.5: Arterial Highway Interpolation (Jl. Soekarno Hatta 20km Corridor)
+    // Matches sub-districts along the corridor or parses building numbers to distribute correctly across Bandung
+    if (!$coords && (preg_match('/\b(soekarno[\s\-]hatta|by[\s\-]?pass)\b/i', $cleanAddressLower) || preg_match('/\b(soekarno[\s\-]hatta)\b/i', $rawDistLower))) {
+        $subCorridor = [
+            'pasirluyu'        => [-6.9485, 107.6195],
+            'regol'            => [-6.9392, 107.6084],
+            'cimencrang'       => [-6.9580, 107.7050],
+            'gedebage'         => [-6.9589, 107.6953],
+            'cinambo'          => [-6.9319, 107.6975],
+            'babakan penghulu' => [-6.9319, 107.6975],
+            'sekejati'         => [-6.9490, 107.6580],
+            'kebon kangkung'   => [-6.9250, 107.6430],
+            'buahbatu'         => [-6.9554, 107.6468],
+            'buah batu'        => [-6.9554, 107.6468],
+            'arcamanik'        => [-6.9189, 107.6811],
+            'cisaranten endah' => [-6.9220, 107.6880],
+            'cisaranten kidul' => [-6.9480, 107.6850],
+            'cisaranten'       => [-6.9280, 107.6850],
+            'bandung kidul'    => [-6.9611, 107.6339],
+            'kopo'             => [-6.9550, 107.5920],
+            'bojongloa kaler'  => [-6.9328, 107.5889],
+            'bojongloa kidul'  => [-6.9520, 107.6000],
+            'gumuruh'          => [-6.9340, 107.6330],
+            'batununggal'      => [-6.9531, 107.6256],
+            'cipamokolan'      => [-6.9530, 107.6740],
+            'rancasari'        => [-6.9625, 107.6722],
+            'jatisari'         => [-6.9580, 107.6440],
+            'margahayu raya'   => [-6.9540, 107.6620],
+            'riung bandung'    => [-6.9520, 107.6710],
+            'caringin'         => [-6.9400, 107.5750],
+            'holis'            => [-6.9450, 107.5600],
+            'cibeureum'        => [-6.9080, 107.5680],
+            'babakan ciparay'  => [-6.9420, 107.5780],
+            'cijagra'          => [-6.9515, 107.6288]
+        ];
+        foreach ($subCorridor as $subName => $subCoord) {
+            if (preg_match('/\b' . preg_quote($subName, '/') . '\b/i', $cleanAddressLower)) {
+                $matchedKey = $subName;
+                $coords = $subCoord;
+                break;
+            }
+        }
+
+        // If no kelurahan specified, interpolate based on street number / KM
+        if (!$coords) {
+            if (preg_match('/(?:no\.?|km\.?)\s*([0-9]+)/i', $cleanAddressLower, $numMatch)) {
+                $num = intval($numMatch[1]);
+                if ($num < 200) {
+                    $matchedKey = 'Soekarno Hatta Barat';
+                    $coords = [-6.9360, 107.5700];
+                } elseif ($num < 380) {
+                    $matchedKey = 'Soekarno Hatta Pasirkoja';
+                    $coords = [-6.9420, 107.5920];
+                } elseif ($num < 490) {
+                    $matchedKey = 'Soekarno Hatta Regol';
+                    $coords = [-6.9470, 107.6180];
+                } elseif ($num < 590) {
+                    $matchedKey = 'Soekarno Hatta Batununggal';
+                    $coords = [-6.9460, 107.6420];
+                } elseif ($num < 690) {
+                    $matchedKey = 'Soekarno Hatta Rancasari';
+                    $coords = [-6.9450, 107.6680];
+                } else {
+                    $matchedKey = 'Soekarno Hatta Gedebage';
+                    $coords = [-6.9400, 107.7000];
+                }
+            } else {
+                $matchedKey = 'Soekarno Hatta Batununggal';
+                $coords = [-6.9460, 107.6420];
             }
         }
     }
