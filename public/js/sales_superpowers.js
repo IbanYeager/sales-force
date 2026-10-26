@@ -54,6 +54,7 @@ const SalesSuperpowers = {
   radarData: [],
   currentRadius: 1,
   radarRadiusCircle: null,
+  radarCanvasRenderer: null,
   currentDistrict: 'all',
   radarCarFilter: 'all',
   leafletMap: null,
@@ -63,6 +64,15 @@ const SalesSuperpowers = {
   radarMarkersLayer: null,
   radarRenderLimit: 48,
   selectedPhotoFile: null,
+
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  },
 
   ensureRadarStyles() {
     if (document.getElementById('radarExecutiveStyles')) return;
@@ -549,14 +559,27 @@ const SalesSuperpowers = {
 
     if (badge) badge.innerHTML = badgeHtml;
 
+    if (this.radarData && this.radarData.length > 0) {
+      const sLat = parseFloat(lat);
+      const sLng = parseFloat(lng);
+      this.radarData.forEach(c => {
+        const d = this.calculateDistance(sLat, sLng, c.lat, c.lng);
+        c.distance_km = Math.round(d * 100) / 100;
+        c.formatted_distance = d < 1 ? Math.round(d * 1000) + ' m' : (Math.round(d * 10) / 10) + ' km';
+      });
+      this.radarData.sort((a, b) => a.distance_km - b.distance_km);
+    }
+
     if (this.leafletMap) {
       this.updateRadarRadiusCircle(lat, lng, this.currentRadius);
+      this.applyRadarFilter();
+    } else {
+      this.fetchRadarData(lat, lng, 999, this.currentDistrict);
     }
-    this.fetchRadarData(lat, lng, this.currentRadius, this.currentDistrict);
 
     if (typeof showCustomAlert === 'function' && isExplicitManual) {
       const locText = label ? label : ('(' + parseFloat(lat).toFixed(4) + ', ' + parseFloat(lng).toFixed(4) + ')');
-      showCustomAlert('Lokasi Diperbarui', 'Pusat Radar diset ke ' + locText + detail + '. Data customer terdekat telah diperbarui.', 'success');
+      showCustomAlert('Lokasi Diperbarui', 'Pusat Radar diset ke ' + locText + '. Data customer terdekat telah disesuaikan.', 'success');
     }
   },
 
@@ -779,12 +802,16 @@ const SalesSuperpowers = {
     // Update GPS visual radius circle on the map immediately
     this.updateRadarRadiusCircle(sLat, sLng, this.currentRadius);
 
-    this.fetchRadarData(
-      sLat,
-      sLng,
-      this.currentRadius,
-      this.currentDistrict
-    );
+    if (this.radarData && this.radarData.length > 0) {
+      this.applyRadarFilter();
+    } else {
+      this.fetchRadarData(
+        sLat,
+        sLng,
+        999,
+        this.currentDistrict
+      );
+    }
   },
 
   handleDistrictChange(districtVal, containerId) {
@@ -867,13 +894,13 @@ const SalesSuperpowers = {
     }
   },
 
-  async fetchRadarData(lat, lng, radiusKm, district = 'all') {
+  async fetchRadarData(lat, lng, radiusKm = 999, district = 'all') {
     const listContainer = document.getElementById('radarLeadsContainer');
     if (!listContainer) return;
 
     try {
       const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
-      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=${radiusKm}&district=${encodeURIComponent(district)}&db_source=radar&sales_id=${salesId}&limit=0`);
+      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=999&district=${encodeURIComponent(district)}&db_source=radar&sales_id=${salesId}&limit=0`);
       const result = await res.json();
 
       if (result.districts_list && Array.isArray(result.districts_list)) {
@@ -884,10 +911,10 @@ const SalesSuperpowers = {
         const isZoneSelected = district && district !== 'all';
         const emptyTitle = isZoneSelected
           ? `Tidak Ada Customer di Zona ${this.getZoneLabel(district)}`
-          : `Tidak Ada Customer di Ring Radius ${radiusKm < 999 ? radiusKm + ' km' : ''}`;
+          : `Tidak Ada Customer di Database Radar`;
         const emptyDesc = isZoneSelected
           ? 'Belum ada data customer terdaftar di wilayah ini. Silakan pilih zona kanvasing lain.'
-          : 'Coba perluas Ring Radius (misal 5 km atau 10 km) atau pilih zona kanvasing lain di atas.';
+          : 'Coba perluas radius atau periksa sinkronisasi database customer PKB.';
         listContainer.innerHTML = `
           <div class="radar-empty-state">
             <div class="radar-empty-icon">
@@ -904,7 +931,7 @@ const SalesSuperpowers = {
 
       this.radarData = result.data;
       this.renderRadarLeafletMap(this.radarData, lat, lng);
-      this.renderRadarLeadCards(this.radarData);
+      this.applyRadarFilter();
 
     } catch (e) {
       console.error(e);
@@ -924,9 +951,19 @@ const SalesSuperpowers = {
 
     const r = parseFloat(radiusKm) || 1;
     if (r >= 500) {
-      // "Semua Wilayah" - no bounded circle
+      // "Semua Wilayah" - no bounded circle, smoothly zoom out to frame all leads
+      try {
+        if (this.radarMarkersLayer && this.radarMarkersLayer.getLayers().length > 0) {
+          const group = L.featureGroup(this.radarMarkersLayer.getLayers());
+          const bounds = group.getBounds();
+          if (bounds.isValid()) {
+            this.leafletMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 13 });
+            return;
+          }
+        }
+      } catch (e) {}
       if (this.salesCoords) {
-        this.leafletMap.flyTo([this.salesCoords.lat, this.salesCoords.lng], 12, { duration: 1.0 });
+        this.leafletMap.flyTo([this.salesCoords.lat, this.salesCoords.lng], 11, { duration: 0.8 });
       }
       return;
     }
@@ -972,6 +1009,9 @@ const SalesSuperpowers = {
       preferCanvas: true
     }).setView([salesLat, salesLng], 14);
     this.leafletMap = map;
+
+    // High performance shared canvas renderer for smooth 60fps rendering of thousands of individual points
+    this.radarCanvasRenderer = L.canvas({ padding: 0.5 });
 
     // Google Maps Tile Layers
     const gmapsRoadmap = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
@@ -1047,19 +1087,8 @@ const SalesSuperpowers = {
     // Draw visual GPS radius circle on the map
     this.updateRadarRadiusCircle(salesLat, salesLng, this.currentRadius);
 
-    // Initialize or Clear Marker Layer Group (Direct display without clustering)
-    if (this.radarMarkersLayer) {
-      this.radarMarkersLayer.clearLayers();
-      if (this.leafletMap.hasLayer(this.radarMarkersLayer)) {
-        this.leafletMap.removeLayer(this.radarMarkersLayer);
-      }
-    }
-
-    this.radarMarkersLayer = L.layerGroup();
-    this.radarMarkersLayer.addTo(map);
-    this.updateRadarMapPins();
-
-    // Add Map Legend Overlay
+    // Add Map Legend Overlay BEFORE updateRadarMapPins so pin count badge exists immediately
+    mapEl.querySelectorAll('.radar-map-legend-overlay').forEach(el => el.remove());
     const legendEl = document.createElement('div');
     legendEl.className = 'radar-map-legend-overlay';
     legendEl.innerHTML = `
@@ -1072,6 +1101,18 @@ const SalesSuperpowers = {
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#10b981;"></span> Selesai</span>
     `;
     mapEl.appendChild(legendEl);
+
+    // Initialize Marker Layer Group (Direct canvas display without cluster bubbles)
+    if (this.radarMarkersLayer) {
+      this.radarMarkersLayer.clearLayers();
+      if (this.leafletMap.hasLayer(this.radarMarkersLayer)) {
+        this.leafletMap.removeLayer(this.radarMarkersLayer);
+      }
+    }
+
+    this.radarMarkersLayer = L.layerGroup();
+    this.radarMarkersLayer.addTo(map);
+    this.updateRadarMapPins();
   },
 
   getFilteredRadarLeads() {
@@ -1100,8 +1141,8 @@ const SalesSuperpowers = {
         }
       }
 
-      // 3. Radius filter (only applies when "Semua Wilayah" is active)
-      if (currentDist === 'all' && currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
+      // 3. Strict Radius filter (applies when currentRadius < 500; bypassed for Semua Wilayah)
+      if (currentRadiusKm < 500 && c.distance_km !== undefined && c.distance_km !== null) {
         if (c.distance_km > currentRadiusKm) return false;
       }
 
@@ -1148,51 +1189,34 @@ const SalesSuperpowers = {
     this.radarMarkersLayer.clearLayers();
 
     const filteredLeads = this.getFilteredRadarLeads();
-
-    // RENDER ALL CUSTOMERS DIRECTLY ON MAP (NO CLUSTERING GROUP)
     const mapPins = filteredLeads;
 
     const pinBadge = document.getElementById('radarMapPinCount');
     if (pinBadge) {
       const carLabel = (this.radarCarFilter && this.radarCarFilter !== 'all') ? ` • ${this.radarCarFilter.toUpperCase()}` : '';
       const distLabel = (this.currentDistrict && this.currentDistrict !== 'all') ? ` • ${this.getZoneLabel(this.currentDistrict)}` : '';
+      const rLabel = this.currentRadius < 500 ? ` (Radius ${this.currentRadius} km)` : ' (Semua Wilayah)';
       pinBadge.textContent = filteredLeads.length > 0
-        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer Langsung${distLabel}${carLabel}`
+        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer Langsung${rLabel}${distLabel}${carLabel}`
         : '0 Customer';
     }
 
     const markersToBatch = [];
+    const renderer = this.radarCanvasRenderer || L.canvas({ padding: 0.5 });
 
     mapPins.forEach(c => {
       let pinBg = '#ef4444'; // Belum Dihubungi
-      let pinIcon = 'fa-car';
       if (c.status === 'Deal / Selesai') {
         pinBg = '#10b981';
-        pinIcon = 'fa-check';
       } else if (c.status === 'Tertarik / Jadwal Servis') {
         pinBg = '#8b5cf6';
-        pinIcon = 'fa-calendar';
       } else if (c.status === 'Menunggu Respon') {
         pinBg = '#f59e0b';
-        pinIcon = 'fa-clock';
       }
 
-      const customIcon = L.divIcon({
-        className: 'radar-leaflet-pin-wrap',
-        html: `
-          <div class="radar-map-marker-pin" style="background:${pinBg};">
-            <i class="fa-solid ${pinIcon}"></i>
-          </div>
-        `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-        popupAnchor: [0, -14]
-      });
-
-      const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
       const initials = (c.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
       const distLabel = c.formatted_distance || (c.distance_km + ' km');
-
+      const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
       const waHref = c.phone && c.phone !== '-'
         ? `https://wa.me/${c.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + c.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda kanvasing di sekitar ' + (c.district || 'area Bapak/Ibu') + '. Apakah ada waktu luang sebentar jika saya mampir untuk update info promo atau konsultasi unit Toyota?')}`
         : '';
@@ -1242,8 +1266,27 @@ const SalesSuperpowers = {
         </div>
       `;
 
-      const marker = L.marker([c.lat, c.lng], { icon: customIcon }).bindPopup(popupHtml);
-      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${escapeHtml(c.district)} (${distLabel})`, { direction: 'top', offset: [0, -12] });
+      const marker = L.circleMarker([c.lat, c.lng], {
+        renderer: renderer,
+        radius: 6.5,
+        fillColor: pinBg,
+        color: '#ffffff',
+        weight: 1.8,
+        opacity: 1,
+        fillOpacity: 0.92
+      }).bindPopup(popupHtml);
+
+      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${escapeHtml(c.district)} (${distLabel})`, { direction: 'top', offset: [0, -6] });
+
+      marker.on('mouseover', function () {
+        this.setRadius(9.5);
+        this.setStyle({ weight: 2.8, color: '#0f172a' });
+      });
+      marker.on('mouseout', function () {
+        this.setRadius(6.5);
+        this.setStyle({ weight: 1.8, color: '#ffffff' });
+      });
+
       markersToBatch.push(marker);
     });
 
@@ -1312,7 +1355,7 @@ const SalesSuperpowers = {
 
       sub.innerHTML = filterDesc.length > 0
         ? `Filter Aktif: ${filterDesc.join(' • ')} (${filtered.length.toLocaleString('id-ID')} Customer).`
-        : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}).`;
+        : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 500 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}).`;
     }
 
     // 3. Update status pills counts based on active District + Car + Query segment
@@ -1331,7 +1374,7 @@ const SalesSuperpowers = {
       if (carFilter !== 'all' && carFilter !== '') {
         if (!this.matchCarModel((c.car_model || '') + ' ' + (c.last_car_model || ''), carFilter)) return false;
       }
-      if (currentDist === 'all' && currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
+      if (currentRadiusKm < 500 && c.distance_km !== undefined && c.distance_km !== null) {
         if (c.distance_km > currentRadiusKm) return false;
       }
       if (query) {

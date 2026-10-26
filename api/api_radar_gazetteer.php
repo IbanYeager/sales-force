@@ -437,9 +437,12 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
             if (!empty($candidateKeys)) {
                 $idx = abs(crc32($id . '_' . $cleanPlate)) % count($candidateKeys);
                 $pickKey = $candidateKeys[$idx];
-                if (isset($cityDistrictCoords[$pickKey])) {
+                if (isset($bandungDistricts[$pickKey])) {
                     $matchedKey = $pickKey;
-                    $coords = $cityDistrictCoords[$pickKey];
+                    $coords = $bandungDistricts[$pickKey];
+                } elseif (isset($externalCities[$pickKey])) {
+                    $matchedKey = $pickKey;
+                    $coords = $externalCities[$pickKey];
                 }
             }
         }
