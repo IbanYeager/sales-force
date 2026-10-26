@@ -27,8 +27,8 @@ $salesLat = isset($_GET['lat']) ? floatval($_GET['lat']) : -6.9248; // default T
 $salesLng = isset($_GET['lng']) ? floatval($_GET['lng']) : 107.6472;
 $maxRadius = isset($_GET['radius']) ? floatval($_GET['radius']) : 50.0; // km (allow wide range for map)
 $salesId = isset($_GET['sales_id']) ? intval($_GET['sales_id']) : 0;
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 0; // 0 = unlimited, return all matched database customers
 $targetDistrict = isset($_GET['district']) ? strtolower(trim($_GET['district'])) : 'all';
+$targetCar = isset($_GET['car_model']) ? strtolower(trim($_GET['car_model'])) : 'all';
 $dbSource = isset($_GET['db_source']) ? strtolower(trim($_GET['db_source'])) : 'all';
 
 try {
@@ -93,6 +93,14 @@ try {
                 }
             }
 
+            // Car Model Filter check
+            if ($targetCar !== 'all' && $targetCar !== '') {
+                $carClean = strtolower(($row['car_model'] ?? '') . ' ' . ($row['last_car_model'] ?? ''));
+                if (strpos($carClean, $targetCar) === false) {
+                    continue;
+                }
+            }
+
             // Fast bounding box & radius check (only if targetDistrict is 'all')
             if ($targetDistrict === 'all' || $targetDistrict === '') {
                 if (abs($coords[0] - $salesLat) > $latDelta) continue;
@@ -133,16 +141,22 @@ try {
         }
     }
 
-    // Extract unique available districts for dropdown
+    // Extract unique available districts and car models for dropdown
     $districtsList = [];
+    $carsList = [];
     if (!empty($fuRows) && is_array($fuRows)) {
         foreach ($fuRows as $r) {
             $d = trim((string)($r['district'] ?? ''));
             if ($d && strtolower($d) !== 'bandung area') {
                 $districtsList[$d] = true;
             }
+            $cm = trim((string)($r['car_model'] ?: $r['last_car_model']));
+            if ($cm) {
+                $carsList[$cm] = true;
+            }
         }
         ksort($districtsList);
+        ksort($carsList);
     }
 
     // Sort results by nearest distance
@@ -150,6 +164,7 @@ try {
         return $a['distance_km'] <=> $b['distance_km'];
     });
 
+    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 0;
     $sliced = ($limit > 0 && count($results) > $limit) ? array_slice($results, 0, $limit) : $results;
 
     echo json_encode([
@@ -157,7 +172,9 @@ try {
         'sales_coords' => ['lat' => $salesLat, 'lng' => $salesLng],
         'radius_km' => $maxRadius,
         'district' => $targetDistrict,
+        'car_model' => $targetCar,
         'districts_list' => array_keys($districtsList),
+        'cars_list' => array_keys($carsList),
         'total_found' => count($results),
         'data' => $sliced
     ]);

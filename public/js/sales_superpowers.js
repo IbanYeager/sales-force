@@ -54,6 +54,7 @@ const SalesSuperpowers = {
   radarData: [],
   currentRadius: 5,
   currentDistrict: 'all',
+  radarCarFilter: 'all',
   leafletMap: null,
   leafletMarkers: [],
   radarStatusFilter: 'all',
@@ -126,6 +127,11 @@ const SalesSuperpowers = {
       .radar-zone-chip { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
       .radar-zone-chip:hover { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
       .radar-zone-chip.active { background: #d7123a !important; color: #ffffff !important; border-color: #d7123a !important; box-shadow: 0 2px 6px rgba(215, 18, 58, 0.25); }
+      .radar-filter-panel { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(15,23,42,0.03); }
+      .radar-select-dropdown { padding: 8px 12px; border-radius: 9px; border: 1.5px solid #cbd5e1; font-size: 12px; font-weight: 700; color: #0f172a; outline: none; background: #ffffff; cursor: pointer; transition: all 0.18s ease; }
+      .radar-select-dropdown:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+      .btn-reset-filters { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; background: #fff1f2; color: #d7123a; border: 1.5px solid #fecaca; font-size: 11.5px; font-weight: 800; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; font-family: inherit; }
+      .btn-reset-filters:hover { background: #fee2e2; border-color: #f87171; transform: translateY(-1px); }
       .radar-map-outer { border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; height: 490px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); }
       #radarLeafletMapContainer { cursor: default; }
       .radar-sales-beacon-icon { background: transparent !important; border: none !important; }
@@ -254,10 +260,14 @@ const SalesSuperpowers = {
       }
     });
 
-    // 2. Synchronize dropdown
-    const sel = document.getElementById('radarDistrictSelect');
-    if (sel && sel.value !== this.currentDistrict) {
-      sel.value = this.currentDistrict;
+    // 2. Synchronize dropdowns
+    const sel1 = document.getElementById('radarDistrictSelect');
+    if (sel1 && sel1.value !== this.currentDistrict) {
+      sel1.value = this.currentDistrict;
+    }
+    const sel2 = document.getElementById('radarFilterDistrictSelect');
+    if (sel2 && sel2.value !== this.currentDistrict) {
+      sel2.value = this.currentDistrict;
     }
 
     // 3. Determine target center coordinates and zoom
@@ -302,31 +312,99 @@ const SalesSuperpowers = {
   },
 
   populateDistrictSelect(districts, selectedDistrict) {
-    const optgroup = document.getElementById('radarOptgroupAllDistricts');
-    if (!optgroup) return;
-
-    if (optgroup.children.length > 0) {
-      const sel = document.getElementById('radarDistrictSelect');
-      if (sel && selectedDistrict) sel.value = selectedDistrict;
-      return;
-    }
+    const optgroup1 = document.getElementById('radarOptgroupAllDistricts');
+    const optgroup2 = document.getElementById('radarCardsOptgroupAllDistricts');
 
     const popularKeys = Object.keys(this.ZONE_PRESETS).filter(k => k !== 'all');
 
-    districts.forEach(d => {
-      const clean = d.toLowerCase().trim();
-      if (popularKeys.includes(clean)) return;
+    [optgroup1, optgroup2].forEach(optgroup => {
+      if (!optgroup || optgroup.children.length > 0) return;
+      districts.forEach(d => {
+        const clean = d.toLowerCase().trim();
+        if (popularKeys.includes(clean)) return;
 
-      const opt = document.createElement('option');
-      opt.value = clean;
-      opt.textContent = d;
-      optgroup.appendChild(opt);
+        const opt = document.createElement('option');
+        opt.value = clean;
+        opt.textContent = d;
+        optgroup.appendChild(opt);
+      });
     });
 
-    const sel = document.getElementById('radarDistrictSelect');
-    if (sel && selectedDistrict) {
-      sel.value = selectedDistrict;
+    const sel1 = document.getElementById('radarDistrictSelect');
+    if (sel1 && selectedDistrict) sel1.value = selectedDistrict;
+
+    const sel2 = document.getElementById('radarFilterDistrictSelect');
+    if (sel2 && selectedDistrict) sel2.value = selectedDistrict;
+  },
+
+  handleCarFilter(carVal) {
+    this.radarCarFilter = (carVal || 'all').toLowerCase().trim();
+    this.radarRenderLimit = 48;
+
+    const sel = document.getElementById('radarFilterCarSelect');
+    if (sel && sel.value !== this.radarCarFilter) {
+      sel.value = this.radarCarFilter;
     }
+
+    this.applyRadarFilter();
+  },
+
+  clearRadarQuery() {
+    this.radarQuery = '';
+    const inp = document.getElementById('radarCardFilterInput');
+    if (inp) inp.value = '';
+    this.radarRenderLimit = 48;
+    this.applyRadarFilter();
+  },
+
+  resetAllRadarFilters() {
+    this.currentDistrict = 'all';
+    this.radarCarFilter = 'all';
+    this.radarStatusFilter = 'all';
+    this.radarQuery = '';
+    this.radarRenderLimit = 48;
+
+    const inp = document.getElementById('radarCardFilterInput');
+    if (inp) inp.value = '';
+
+    const distSel1 = document.getElementById('radarDistrictSelect');
+    if (distSel1) distSel1.value = 'all';
+
+    const distSel2 = document.getElementById('radarFilterDistrictSelect');
+    if (distSel2) distSel2.value = 'all';
+
+    const carSel = document.getElementById('radarFilterCarSelect');
+    if (carSel) carSel.value = 'all';
+
+    document.querySelectorAll('.radar-zone-chip').forEach(c => {
+      if (c.getAttribute('data-zone') === 'all') c.classList.add('active');
+      else c.classList.remove('active');
+    });
+
+    if (this.leafletMap && this.salesCoords) {
+      this.leafletMap.flyTo([this.salesCoords.lat, this.salesCoords.lng], 13, { duration: 1.0 });
+    }
+
+    this.fetchRadarData(
+      this.salesCoords ? this.salesCoords.lat : -6.9448,
+      this.salesCoords ? this.salesCoords.lng : 107.6452,
+      this.currentRadius || 5,
+      'all'
+    );
+  },
+
+  matchCarModel(carModelStr, filterValue) {
+    if (!filterValue || filterValue === 'all') return true;
+    const str = (carModelStr || '').toLowerCase();
+    const filter = filterValue.toLowerCase().trim();
+
+    if (filter === 'avanza') return str.includes('avanza');
+    if (filter === 'innova') return str.includes('innova') || str.includes('zenix');
+    if (filter === 'alphard') return str.includes('alphard') || str.includes('vellfire');
+    if (filter === 'altis') return str.includes('altis') || str.includes('corolla');
+    if (filter === 'yaris') return str.includes('yaris');
+
+    return str.includes(filter);
   },
 
   quickSetLocation(key) {
@@ -1072,6 +1150,7 @@ const SalesSuperpowers = {
     const status = this.radarStatusFilter || 'all';
     const query = (this.radarQuery || '').toLowerCase().trim();
     const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
+    const carFilter = (this.radarCarFilter || 'all').toLowerCase().trim();
 
     return (this.radarData || []).filter(c => {
       // 1. Canvasing Zone filter (if a specific zone is active)
@@ -1085,12 +1164,19 @@ const SalesSuperpowers = {
         if (!matchDist) return false;
       }
 
-      // 2. Radius filter (only applies when "Semua Wilayah" is active)
+      // 2. Car Model / Unit filter
+      if (carFilter !== 'all' && carFilter !== '') {
+        if (!this.matchCarModel((c.car_model || '') + ' ' + (c.last_car_model || ''), carFilter)) {
+          return false;
+        }
+      }
+
+      // 3. Radius filter (only applies when "Semua Wilayah" is active)
       if (currentDist === 'all' && currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
         if (c.distance_km > currentRadiusKm) return false;
       }
 
-      // 3. Status filter
+      // 4. Status filter
       if (status !== 'all') {
         const itemStatus = (c.status || 'Belum Dihubungi').trim();
         if (status === 'Belum Dihubungi') {
@@ -1108,14 +1194,21 @@ const SalesSuperpowers = {
         }
       }
 
-      // 4. Query search filter
+      // 5. Comprehensive search filter (Nama, Alamat, Kendaraan, Plat, Telp)
       if (query) {
-        const matchName = (c.name || '').toLowerCase().includes(query);
-        const matchCar = (c.car_model || '').toLowerCase().includes(query);
-        const matchDistrict = (c.district || '').toLowerCase().includes(query);
-        const matchAddress = (c.address || '').toLowerCase().includes(query);
-        const matchPhone = (c.phone || '').includes(query);
-        if (!matchName && !matchCar && !matchDistrict && !matchAddress && !matchPhone) return false;
+        const tokens = query.split(/\s+/).filter(Boolean);
+        const combinedText = [
+          c.name || '',
+          c.address || '',
+          c.district || '',
+          c.car_model || '',
+          c.last_car_model || '',
+          c.plate_number || '',
+          c.phone || ''
+        ].join(' ').toLowerCase();
+
+        const allMatch = tokens.every(tok => combinedText.includes(tok));
+        if (!allMatch) return false;
       }
       return true;
     });
@@ -1137,8 +1230,9 @@ const SalesSuperpowers = {
     const pinBadge = document.getElementById('radarMapPinCount');
     if (pinBadge) {
       const zoneLabel = this.getZoneLabel(this.currentDistrict);
+      const carLabel = (this.radarCarFilter && this.radarCarFilter !== 'all') ? ` • ${this.radarCarFilter.toUpperCase()}` : '';
       pinBadge.textContent = filteredLeads.length > 0
-        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Pin (${zoneLabel})`
+        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Pin (${zoneLabel}${carLabel})`
         : '0 Customer';
     }
 
@@ -1234,8 +1328,8 @@ const SalesSuperpowers = {
       markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
     }
 
-    // Auto-fit bounds if a specific territory is selected so all territory markers are nicely framed
-    if (this.currentDistrict && this.currentDistrict !== 'all' && markersToBatch.length > 0 && this.leafletMap) {
+    // Auto-fit bounds if a specific territory or car filter is selected so all territory markers are nicely framed
+    if ((this.currentDistrict !== 'all' || this.radarCarFilter !== 'all') && markersToBatch.length > 0 && this.leafletMap) {
       try {
         const groupBounds = L.featureGroup(markersToBatch).getBounds();
         if (groupBounds.isValid()) {
@@ -1265,7 +1359,7 @@ const SalesSuperpowers = {
   },
 
   applyRadarFilter() {
-    // Update active class on status pills
+    // 1. Update active class on status pills
     document.querySelectorAll('.radar-status-pill').forEach(pill => {
       const val = pill.getAttribute('data-status') || '';
       if (val === this.radarStatusFilter) {
@@ -1277,7 +1371,7 @@ const SalesSuperpowers = {
 
     const filtered = this.getFilteredRadarLeads();
 
-    // Update count badge & subtitle
+    // 2. Update count badge & subtitle
     const badge = document.getElementById('radarCountBadge');
     if (badge) badge.textContent = `${filtered.length.toLocaleString('id-ID')} Customer`;
 
@@ -1285,18 +1379,73 @@ const SalesSuperpowers = {
     if (sub) {
       const currentRadiusKm = this.currentRadius || 5;
       const isZoneSelected = this.currentDistrict && this.currentDistrict !== 'all';
+      const isCarSelected = this.radarCarFilter && this.radarCarFilter !== 'all';
       const zoneLabel = this.getZoneLabel(this.currentDistrict);
-      const statusLabel = this.radarStatusFilter === 'all' ? '' : ` • Status: ${this.radarStatusFilter}`;
-      
-      sub.innerHTML = isZoneSelected
-        ? `Menampilkan customer di Zona Kanvasing <b>${escapeHtml(zoneLabel)}</b> (diurutkan dari titik pusat area${statusLabel}).`
-        : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${statusLabel}).`;
+      const carLabel = isCarSelected ? (this.radarCarFilter.toUpperCase()) : '';
+
+      let filterDesc = [];
+      if (isZoneSelected) filterDesc.push(`Wilayah: <b>${escapeHtml(zoneLabel)}</b>`);
+      if (isCarSelected) filterDesc.push(`Unit: <b>${escapeHtml(carLabel)}</b>`);
+      if (this.radarStatusFilter !== 'all') filterDesc.push(`Status: <b>${escapeHtml(this.radarStatusFilter)}</b>`);
+      if (this.radarQuery) filterDesc.push(`Cari: "<b>${escapeHtml(this.radarQuery)}</b>"`);
+
+      sub.innerHTML = filterDesc.length > 0
+        ? `Filter Aktif: ${filterDesc.join(' • ')} (${filtered.length.toLocaleString('id-ID')} Customer).`
+        : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}).`;
     }
 
-    // Update cards grid only
+    // 3. Update status pills counts based on active District + Car + Query segment
+    const currentRadiusKm = this.currentRadius || 5;
+    const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
+    const carFilter = (this.radarCarFilter || 'all').toLowerCase().trim();
+    const query = (this.radarQuery || '').toLowerCase().trim();
+
+    const segmentLeads = (this.radarData || []).filter(c => {
+      if (currentDist !== 'all' && currentDist !== '') {
+        const itemDist = (c.district || '').toLowerCase();
+        const itemAddr = (c.address || '').toLowerCase();
+        const aliases = (this.ZONE_PRESETS[currentDist] && this.ZONE_PRESETS[currentDist].aliases) ? this.ZONE_PRESETS[currentDist].aliases : [currentDist];
+        if (!aliases.some(a => itemDist.includes(a) || itemAddr.includes(a))) return false;
+      }
+      if (carFilter !== 'all' && carFilter !== '') {
+        if (!this.matchCarModel((c.car_model || '') + ' ' + (c.last_car_model || ''), carFilter)) return false;
+      }
+      if (currentDist === 'all' && currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
+        if (c.distance_km > currentRadiusKm) return false;
+      }
+      if (query) {
+        const tokens = query.split(/\s+/).filter(Boolean);
+        const combinedText = [c.name||'', c.address||'', c.district||'', c.car_model||'', c.last_car_model||'', c.plate_number||'', c.phone||''].join(' ').toLowerCase();
+        if (!tokens.every(tok => combinedText.includes(tok))) return false;
+      }
+      return true;
+    });
+
+    const countAll = segmentLeads.length;
+    const countBelum = segmentLeads.filter(c => !c.status || c.status === 'Belum Dihubungi' || c.status === 'belum_fu').length;
+    const countMenunggu = segmentLeads.filter(c => c.status === 'Menunggu Respon' || (c.status && c.status.toLowerCase().includes('menunggu'))).length;
+    const countTertarik = segmentLeads.filter(c => c.status === 'Tertarik / Jadwal Servis' || (c.status && c.status.toLowerCase().includes('tertarik'))).length;
+    const countDeal = segmentLeads.filter(c => c.status === 'Deal / Selesai' || (c.status && c.status.toLowerCase().includes('deal'))).length;
+
+    const pillAll = document.querySelector('.radar-status-pill[data-status="all"]');
+    if (pillAll) pillAll.innerHTML = `Semua (${countAll.toLocaleString('id-ID')})`;
+
+    const pillBelum = document.querySelector('.radar-status-pill[data-status="Belum Dihubungi"]');
+    if (pillBelum) pillBelum.innerHTML = `<span class="status-dot dot-red"></span> Belum Dihubungi (${countBelum.toLocaleString('id-ID')})`;
+
+    const pillMenunggu = document.querySelector('.radar-status-pill[data-status="Menunggu Respon"]');
+    if (pillMenunggu) pillMenunggu.innerHTML = `<span class="status-dot dot-yellow"></span> Menunggu Respon (${countMenunggu.toLocaleString('id-ID')})`;
+
+    const pillTertarik = document.querySelector('.radar-status-pill[data-status="Tertarik / Jadwal Servis"]');
+    if (pillTertarik) pillTertarik.innerHTML = `<span class="status-dot dot-purple"></span> Tertarik / Servis (${countTertarik.toLocaleString('id-ID')})`;
+
+    const pillDeal = document.querySelector('.radar-status-pill[data-status="Deal / Selesai"]');
+    if (pillDeal) pillDeal.innerHTML = `<span class="status-dot dot-green"></span> Deal / Selesai (${countDeal.toLocaleString('id-ID')})`;
+
+    // 4. Update cards grid only
     this.renderRadarCardsGrid(filtered);
 
-    // Update map pins
+    // 5. Update map pins
     this.updateRadarMapPins();
   },
 
@@ -1306,22 +1455,54 @@ const SalesSuperpowers = {
 
     this.radarRenderLimit = 48;
     const currentRadiusKm = this.currentRadius || 5;
-    const inRadius = (this.radarData || []).filter(c => {
-      if (c.distance_km === undefined || c.distance_km === null) return true;
-      if (currentRadiusKm >= 999) return true;
-      return c.distance_km <= currentRadiusKm;
+    const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
+    const carFilter = (this.radarCarFilter || 'all').toLowerCase().trim();
+    const query = (this.radarQuery || '').toLowerCase().trim();
+
+    const segmentLeads = (this.radarData || []).filter(c => {
+      if (currentDist !== 'all' && currentDist !== '') {
+        const itemDist = (c.district || '').toLowerCase();
+        const itemAddr = (c.address || '').toLowerCase();
+        const aliases = (this.ZONE_PRESETS[currentDist] && this.ZONE_PRESETS[currentDist].aliases) ? this.ZONE_PRESETS[currentDist].aliases : [currentDist];
+        if (!aliases.some(a => itemDist.includes(a) || itemAddr.includes(a))) return false;
+      }
+      if (carFilter !== 'all' && carFilter !== '') {
+        if (!this.matchCarModel((c.car_model || '') + ' ' + (c.last_car_model || ''), carFilter)) return false;
+      }
+      if (currentDist === 'all' && currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
+        if (c.distance_km > currentRadiusKm) return false;
+      }
+      if (query) {
+        const tokens = query.split(/\s+/).filter(Boolean);
+        const combinedText = [c.name||'', c.address||'', c.district||'', c.car_model||'', c.last_car_model||'', c.plate_number||'', c.phone||''].join(' ').toLowerCase();
+        if (!tokens.every(tok => combinedText.includes(tok))) return false;
+      }
+      return true;
     });
 
-    const countAll = inRadius.length;
-    const countBelum = inRadius.filter(c => !c.status || c.status === 'Belum Dihubungi' || c.status === 'belum_fu').length;
-    const countMenunggu = inRadius.filter(c => c.status === 'Menunggu Respon' || (c.status && c.status.toLowerCase().includes('menunggu'))).length;
-    const countTertarik = inRadius.filter(c => c.status === 'Tertarik / Jadwal Servis' || (c.status && c.status.toLowerCase().includes('tertarik'))).length;
-    const countDeal = inRadius.filter(c => c.status === 'Deal / Selesai' || (c.status && c.status.toLowerCase().includes('deal'))).length;
+    const countAll = segmentLeads.length;
+    const countBelum = segmentLeads.filter(c => !c.status || c.status === 'Belum Dihubungi' || c.status === 'belum_fu').length;
+    const countMenunggu = segmentLeads.filter(c => c.status === 'Menunggu Respon' || (c.status && c.status.toLowerCase().includes('menunggu'))).length;
+    const countTertarik = segmentLeads.filter(c => c.status === 'Tertarik / Jadwal Servis' || (c.status && c.status.toLowerCase().includes('tertarik'))).length;
+    const countDeal = segmentLeads.filter(c => c.status === 'Deal / Selesai' || (c.status && c.status.toLowerCase().includes('deal'))).length;
 
     const filtered = this.getFilteredRadarLeads();
 
+    const isZoneSelected = this.currentDistrict && this.currentDistrict !== 'all';
+    const isCarSelected = this.radarCarFilter && this.radarCarFilter !== 'all';
+    const zoneLabel = this.getZoneLabel(this.currentDistrict);
+    const carLabel = isCarSelected ? (this.radarCarFilter.toUpperCase()) : '';
+
+    let filterDesc = [];
+    if (isZoneSelected) filterDesc.push(`Wilayah: <b>${escapeHtml(zoneLabel)}</b>`);
+    if (isCarSelected) filterDesc.push(`Unit: <b>${escapeHtml(carLabel)}</b>`);
+    if (this.radarStatusFilter !== 'all') filterDesc.push(`Status: <b>${escapeHtml(this.radarStatusFilter)}</b>`);
+    if (this.radarQuery) filterDesc.push(`Cari: "<b>${escapeHtml(this.radarQuery)}</b>"`);
+
+    const hasAnyActiveFilter = isZoneSelected || isCarSelected || this.radarStatusFilter !== 'all' || !!this.radarQuery;
+
     let html = `
-      <div class="radar-leads-header-bar">
+      <div class="radar-leads-header-bar" style="margin-bottom:12px;">
         <div>
           <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
             <i class="fa-solid fa-bullseye" style="color:#d7123a;"></i> 
@@ -1329,14 +1510,93 @@ const SalesSuperpowers = {
             <span class="radar-count-badge" id="radarCountBadge">${filtered.length.toLocaleString('id-ID')} Customer</span>
           </h4>
           <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;" id="radarRadiusSubtitle">
-            ${this.currentDistrict && this.currentDistrict !== 'all' 
-              ? `Menampilkan customer di Zona Kanvasing <b>${escapeHtml(this.getZoneLabel(this.currentDistrict))}</b> (diurutkan dari titik pusat area${this.radarStatusFilter !== 'all' ? ' • Status: ' + this.radarStatusFilter : ''}).`
-              : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}${this.radarStatusFilter !== 'all' ? ' • Status: ' + this.radarStatusFilter : ''}).`}
+            ${filterDesc.length > 0 
+              ? `Filter Aktif: ${filterDesc.join(' • ')} (${filtered.length.toLocaleString('id-ID')} Customer).`
+              : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}).`}
           </p>
         </div>
-        <div style="position:relative; min-width:200px; flex:1; max-width:280px;">
-          <i class="fa-solid fa-filter" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:11px; color:#94a3b8;"></i>
-          <input type="text" id="radarCardFilterInput" placeholder="Cari nama / mobil / area..." class="radar-card-filter-input" value="${escapeHtml(this.radarQuery || '')}" oninput="SalesSuperpowers.filterRadarLeads(this.value)">
+      </div>
+
+      <!-- Comprehensive Multi-Filter Bar: Search + Wilayah + Unit Mobil -->
+      <div class="radar-filter-panel">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Search Input & Reset Button -->
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div style="position:relative; flex:1; min-width:240px;">
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:12px; color:#64748b;"></i>
+              <input type="text" id="radarCardFilterInput" placeholder="Cari nama customer, alamat, jalan, unit mobil (misal: Avanza), plat..." class="radar-card-filter-input" style="padding-left:34px; padding-right:32px; height:38px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:12.5px; width:100%; box-sizing:border-box;" value="${escapeHtml(this.radarQuery || '')}" oninput="SalesSuperpowers.filterRadarLeads(this.value)">
+              ${this.radarQuery ? `
+                <button type="button" onclick="SalesSuperpowers.clearRadarQuery()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:transparent; color:#94a3b8; cursor:pointer; font-size:14px; padding:2px;" title="Hapus pencarian">
+                  <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+              ` : ''}
+            </div>
+
+            <!-- Reset Filter Button -->
+            ${hasAnyActiveFilter ? `
+              <button type="button" class="btn-reset-filters" onclick="SalesSuperpowers.resetAllRadarFilters()" title="Reset semua filter ke default">
+                <i class="fa-solid fa-rotate-left"></i> Reset Filter
+              </button>
+            ` : ''}
+          </div>
+
+          <!-- Dropdowns for Wilayah & Model Kendaraan -->
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <!-- Filter Wilayah Dropdown -->
+            <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:180px;">
+              <span style="font-size:11.5px; font-weight:800; color:#334155; display:inline-flex; align-items:center; gap:5px; white-space:nowrap;">
+                <i class="fa-solid fa-map-location-dot" style="color:#d7123a;"></i> Wilayah:
+              </span>
+              <select id="radarFilterDistrictSelect" class="radar-select-dropdown" onchange="SalesSuperpowers.handleZoneChange(this.value)" style="width:100%;">
+                <option value="all" ${this.currentDistrict === 'all' ? 'selected' : ''}>🌍 Semua Wilayah (Bandung Raya)</option>
+                <optgroup label="Wilayah Populer Kanvasing">
+                  <option value="bojongsoang" ${this.currentDistrict === 'bojongsoang' ? 'selected' : ''}>Bojongsoang (100+ Customer)</option>
+                  <option value="buahbatu" ${this.currentDistrict === 'buahbatu' ? 'selected' : ''}>Buahbatu</option>
+                  <option value="kircon" ${this.currentDistrict === 'kircon' ? 'selected' : ''}>Kiaracondong</option>
+                  <option value="sukajadi" ${this.currentDistrict === 'sukajadi' ? 'selected' : ''}>Sukajadi</option>
+                  <option value="pasteur" ${this.currentDistrict === 'pasteur' ? 'selected' : ''}>Pasteur</option>
+                  <option value="dago" ${this.currentDistrict === 'dago' ? 'selected' : ''}>Dago / Coblong</option>
+                  <option value="baleendah" ${this.currentDistrict === 'baleendah' ? 'selected' : ''}>Baleendah</option>
+                  <option value="cileunyi" ${this.currentDistrict === 'cileunyi' ? 'selected' : ''}>Cileunyi</option>
+                  <option value="antapani" ${this.currentDistrict === 'antapani' ? 'selected' : ''}>Antapani</option>
+                  <option value="gedebage" ${this.currentDistrict === 'gedebage' ? 'selected' : ''}>Gedebage</option>
+                  <option value="kopo" ${this.currentDistrict === 'kopo' ? 'selected' : ''}>Kopo</option>
+                  <option value="cimahi" ${this.currentDistrict === 'cimahi' ? 'selected' : ''}>Cimahi</option>
+                  <option value="soreang" ${this.currentDistrict === 'soreang' ? 'selected' : ''}>Soreang</option>
+                </optgroup>
+                <optgroup id="radarCardsOptgroupAllDistricts" label="Kecamatan Lainnya">
+                  <!-- Populated dynamically from API -->
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Filter Unit / Mobil Dropdown -->
+            <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:180px;">
+              <span style="font-size:11.5px; font-weight:800; color:#334155; display:inline-flex; align-items:center; gap:5px; white-space:nowrap;">
+                <i class="fa-solid fa-car-side" style="color:#2563eb;"></i> Unit Mobil:
+              </span>
+              <select id="radarFilterCarSelect" class="radar-select-dropdown" onchange="SalesSuperpowers.handleCarFilter(this.value)" style="width:100%;">
+                <option value="all" ${this.radarCarFilter === 'all' ? 'selected' : ''}>🚗 Semua Unit Kendaraan</option>
+                <option value="avanza" ${this.radarCarFilter === 'avanza' ? 'selected' : ''}>Toyota Avanza (Semua Tipe)</option>
+                <option value="innova" ${this.radarCarFilter === 'innova' ? 'selected' : ''}>Toyota Innova / Zenix</option>
+                <option value="rush" ${this.radarCarFilter === 'rush' ? 'selected' : ''}>Toyota Rush</option>
+                <option value="calya" ${this.radarCarFilter === 'calya' ? 'selected' : ''}>Toyota Calya</option>
+                <option value="fortuner" ${this.radarCarFilter === 'fortuner' ? 'selected' : ''}>Toyota Fortuner</option>
+                <option value="veloz" ${this.radarCarFilter === 'veloz' ? 'selected' : ''}>Toyota Veloz</option>
+                <option value="agya" ${this.radarCarFilter === 'agya' ? 'selected' : ''}>Toyota Agya</option>
+                <option value="raize" ${this.radarCarFilter === 'raize' ? 'selected' : ''}>Toyota Raize</option>
+                <option value="yaris" ${this.radarCarFilter === 'yaris' ? 'selected' : ''}>Toyota Yaris / Cross</option>
+                <option value="hilux" ${this.radarCarFilter === 'hilux' ? 'selected' : ''}>Toyota Hilux</option>
+                <option value="alphard" ${this.radarCarFilter === 'alphard' ? 'selected' : ''}>Toyota Alphard / Vellfire</option>
+                <option value="sienta" ${this.radarCarFilter === 'sienta' ? 'selected' : ''}>Toyota Sienta</option>
+                <option value="hiace" ${this.radarCarFilter === 'hiace' ? 'selected' : ''}>Toyota Hiace</option>
+                <option value="vios" ${this.radarCarFilter === 'vios' ? 'selected' : ''}>Toyota Vios</option>
+                <option value="camry" ${this.radarCarFilter === 'camry' ? 'selected' : ''}>Toyota Camry</option>
+                <option value="altis" ${this.radarCarFilter === 'altis' ? 'selected' : ''}>Toyota Corolla Altis</option>
+                <option value="voxy" ${this.radarCarFilter === 'voxy' ? 'selected' : ''}>Toyota Voxy</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
