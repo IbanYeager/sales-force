@@ -52,7 +52,8 @@ const SalesSuperpowers = {
   // 1. RADAR PROSPEK TERDEKAT (EXECUTIVE RADAR COCKPIT)
   // =========================================================================
   radarData: [],
-  currentRadius: 5,
+  currentRadius: 1,
+  radarRadiusCircle: null,
   currentDistrict: 'all',
   radarCarFilter: 'all',
   leafletMap: null,
@@ -306,7 +307,7 @@ const SalesSuperpowers = {
     // 5. Fetch radar data for the targeted district
     const fetchLat = targetCoords ? targetCoords[0] : (this.salesCoords ? this.salesCoords.lat : -6.9448);
     const fetchLng = targetCoords ? targetCoords[1] : (this.salesCoords ? this.salesCoords.lng : 107.6452);
-    const fetchRadius = cleanKey === 'all' ? (this.currentRadius || 5) : 999;
+    const fetchRadius = cleanKey === 'all' ? (this.currentRadius || 1) : 999;
 
     this.fetchRadarData(fetchLat, fetchLng, fetchRadius, this.currentDistrict);
   },
@@ -388,7 +389,7 @@ const SalesSuperpowers = {
     this.fetchRadarData(
       this.salesCoords ? this.salesCoords.lat : -6.9448,
       this.salesCoords ? this.salesCoords.lng : 107.6452,
-      this.currentRadius || 5,
+      this.currentRadius || 1,
       'all'
     );
   },
@@ -418,8 +419,8 @@ const SalesSuperpowers = {
     }
   },
 
-  async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 999) {
-    this.currentRadius = parseFloat(radiusKm) || 999;
+  async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 1) {
+    this.currentRadius = parseFloat(radiusKm) || 1;
     this.currentDistrict = district;
 
     // Ensure CSS styles are injected
@@ -548,6 +549,9 @@ const SalesSuperpowers = {
 
     if (badge) badge.innerHTML = badgeHtml;
 
+    if (this.leafletMap) {
+      this.updateRadarRadiusCircle(lat, lng, this.currentRadius);
+    }
     this.fetchRadarData(lat, lng, this.currentRadius, this.currentDistrict);
 
     if (typeof showCustomAlert === 'function' && isExplicitManual) {
@@ -755,7 +759,7 @@ const SalesSuperpowers = {
   },
 
   handleRadiusChange(radiusVal, containerId) {
-    this.currentRadius = parseFloat(radiusVal) || 5;
+    this.currentRadius = parseFloat(radiusVal) || 1;
     this.radarRenderLimit = 48;
     
     // Update active class on pills immediately for snappy responsiveness
@@ -769,9 +773,15 @@ const SalesSuperpowers = {
       }
     });
 
+    const sLat = this.salesCoords ? this.salesCoords.lat : -6.9448;
+    const sLng = this.salesCoords ? this.salesCoords.lng : 107.6452;
+
+    // Update GPS visual radius circle on the map immediately
+    this.updateRadarRadiusCircle(sLat, sLng, this.currentRadius);
+
     this.fetchRadarData(
-      this.salesCoords ? this.salesCoords.lat : -6.9448,
-      this.salesCoords ? this.salesCoords.lng : 107.6452,
+      sLat,
+      sLng,
       this.currentRadius,
       this.currentDistrict
     );
@@ -902,6 +912,48 @@ const SalesSuperpowers = {
     }
   },
 
+  updateRadarRadiusCircle(lat, lng, radiusKm) {
+    if (!this.leafletMap) return;
+
+    if (this.radarRadiusCircle) {
+      if (this.leafletMap.hasLayer(this.radarRadiusCircle)) {
+        this.leafletMap.removeLayer(this.radarRadiusCircle);
+      }
+      this.radarRadiusCircle = null;
+    }
+
+    const r = parseFloat(radiusKm) || 1;
+    if (r >= 500) {
+      // "Semua Wilayah" - no bounded circle
+      if (this.salesCoords) {
+        this.leafletMap.flyTo([this.salesCoords.lat, this.salesCoords.lng], 12, { duration: 1.0 });
+      }
+      return;
+    }
+
+    const radiusMeters = r * 1000;
+    this.radarRadiusCircle = L.circle([lat, lng], {
+      color: '#2563eb',
+      fillColor: '#3b82f6',
+      fillOpacity: 0.08,
+      weight: 2.2,
+      dashArray: '6, 6',
+      radius: radiusMeters
+    }).addTo(this.leafletMap);
+
+    this.radarRadiusCircle.bindTooltip(
+      `<b>📍 Jangkauan Radar: ${r} km</b><br><span style="font-size:10.5px; color:#475569;">Pusat Jangkauan GPS Anda</span>`,
+      { sticky: true, direction: 'top' }
+    );
+
+    // Fit map bounds smoothly to the circle so it is centered and fully visible
+    try {
+      this.leafletMap.fitBounds(this.radarRadiusCircle.getBounds(), { padding: [35, 35], maxZoom: 16 });
+    } catch (e) {
+      this.leafletMap.setView([lat, lng], r <= 1 ? 15 : (r <= 3 ? 14 : 13));
+    }
+  },
+
   renderRadarLeafletMap(leads, centerLat, centerLng) {
     const mapEl = document.getElementById('radarLeafletMapContainer');
     if (!mapEl || !window.L) return;
@@ -992,8 +1044,8 @@ const SalesSuperpowers = {
       </div>
     `);
 
-    // Center map view on sales/dealer coordinates
-    map.setView([salesLat, salesLng], 13);
+    // Draw visual GPS radius circle on the map
+    this.updateRadarRadiusCircle(salesLat, salesLng, this.currentRadius);
 
     // Initialize or Clear Marker Layer Group (Direct display without clustering)
     if (this.radarMarkersLayer) {
@@ -1023,7 +1075,7 @@ const SalesSuperpowers = {
   },
 
   getFilteredRadarLeads() {
-    const currentRadiusKm = this.currentRadius || 5;
+    const currentRadiusKm = this.currentRadius || 1;
     const status = this.radarStatusFilter || 'all';
     const query = (this.radarQuery || '').toLowerCase().trim();
     const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
@@ -1246,7 +1298,7 @@ const SalesSuperpowers = {
 
     const sub = document.getElementById('radarRadiusSubtitle');
     if (sub) {
-      const currentRadiusKm = this.currentRadius || 5;
+      const currentRadiusKm = this.currentRadius || 1;
       const isZoneSelected = this.currentDistrict && this.currentDistrict !== 'all';
       const isCarSelected = this.radarCarFilter && this.radarCarFilter !== 'all';
       const zoneLabel = this.getZoneLabel(this.currentDistrict);
@@ -1264,7 +1316,7 @@ const SalesSuperpowers = {
     }
 
     // 3. Update status pills counts based on active District + Car + Query segment
-    const currentRadiusKm = this.currentRadius || 5;
+    const currentRadiusKm = this.currentRadius || 1;
     const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
     const carFilter = (this.radarCarFilter || 'all').toLowerCase().trim();
     const query = (this.radarQuery || '').toLowerCase().trim();
