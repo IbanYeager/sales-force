@@ -16,6 +16,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 }
 
 require_once __DIR__ . '/api_followup_db.php';
+require_once __DIR__ . '/api_radar_gazetteer.php';
 
 try {
 
@@ -380,6 +381,8 @@ if ($fileExt === 'csv') {
                     $distIdx = $findColIdx(['/customer address/i', '/alamat/i', '/kecamatan/i', '/domisili/i']);
                     $pkbDateIdx = $findColIdx(['/pkb date/i', '/tgl/i']);
                     $opDescIdx = $findColIdx(['/operation description/i', '/deskripsi/i']);
+                    $kmIdx = $findColIdx(['/kilometer/i', '/km/i']);
+                    $saIdx = $findColIdx(['/service advisor/i', '/sa/i']);
 
                     $vinYearMap = [
                         'A'=>2010, 'B'=>2011, 'C'=>2012, 'D'=>2013, 'E'=>2014,
@@ -402,6 +405,8 @@ if ($fileExt === 'csv') {
                         $address = $distIdx !== -1 ? trim((string)($row[$distIdx] ?? '')) : '';
                         $pkbDate = $pkbDateIdx !== -1 ? trim((string)($row[$pkbDateIdx] ?? '')) : '';
                         $opDesc = $opDescIdx !== -1 ? trim((string)($row[$opDescIdx] ?? '')) : '';
+                        $kmVal = $kmIdx !== -1 ? trim((string)($row[$kmIdx] ?? '')) : '';
+                        $saVal = $saIdx !== -1 ? trim((string)($row[$saIdx] ?? '')) : '';
 
                         // Determine vehicle manufacture year & age from VIN
                         $mfgYear = null;
@@ -426,15 +431,8 @@ if ($fileExt === 'csv') {
                             $ageStr = '> 2.5 Tahun';
                         }
 
-                        // Extract district / subdistrict from address text
-                        $district = 'Bandung Area';
-                        if ($address) {
-                            if (preg_match('/kec\.?\s*([a-zA-Z\s]+)/i', $address, $m)) {
-                                $district = trim($m[1]);
-                            } elseif (preg_match('/kel\.?\s*([a-zA-Z\s]+)/i', $address, $m)) {
-                                $district = trim($m[1]);
-                            }
-                        }
+                        // Extract district / subdistrict from address text using comprehensive spatial gazetteer
+                        $district = resolveAddressAndDistrict($address, $plate, $r);
 
                         // Generate phone or extract phone if available
                         $phone = '';
@@ -442,7 +440,7 @@ if ($fileExt === 'csv') {
                             $phone = clean_phone_number($pm[0]);
                         }
 
-                        $notes = 'PKB Date: ' . $pkbDate . ' | Deskripsi: ' . $opDesc . ' | Alamat: ' . substr($address, 0, 120);
+                        $notes = 'PKB Date: ' . $pkbDate . ($kmVal ? ' | KM: ' . $kmVal : '') . ($saVal ? ' | SA: ' . $saVal : '') . ' | Job: ' . $opDesc . ' | Alamat: ' . $address;
 
                         // Strict namespace isolation to avoid colliding with sales database
                         if ($treatAsRadar) {
@@ -645,7 +643,8 @@ if ($is_mysql && $conn) {
         $salesVal = !empty($c['assigned_sales_id']) ? (int)$c['assigned_sales_id'] : "NULL";
         $syncSrc = $conn->real_escape_string($c['sync_source'] ?? ($treatAsRadar ? 'pkb_excel_radar' : 'excel_import'));
 
-        $batchRows[] = "('$code', '$name', '$phone', '$car', '$lastCar', '$age', '$rec1', '$rec2', '$rec3', '$cluster', '$priority', '$dist', '$plate', '$vin', '$outletDo', '$outletSrv', '$srvComp', '$cat', $salesVal, 'Belum Dihubungi', '$syncSrc')";
+        $notesEsc = $conn->real_escape_string($c['notes'] ?? '');
+        $batchRows[] = "('$code', '$name', '$phone', '$car', '$lastCar', '$age', '$rec1', '$rec2', '$rec3', '$cluster', '$priority', '$dist', '$plate', '$vin', '$outletDo', '$outletSrv', '$srvComp', '$cat', $salesVal, 'Belum Dihubungi', '$syncSrc', '$notesEsc')";
     }
 
     $chunks = array_chunk($batchRows, 150);
@@ -654,7 +653,7 @@ if ($is_mysql && $conn) {
             customer_code, name, phone, car_model, last_car_model, car_age,
             recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, plate_number, vin,
             outlet_do, outlet_service, service_compliance,
-            followup_category, assigned_sales_id, followup_status, sync_source
+            followup_category, assigned_sales_id, followup_status, sync_source, notes
         ) VALUES " . implode(',', $chunk) . "
         ON DUPLICATE KEY UPDATE
             name = VALUES(name),
@@ -674,7 +673,8 @@ if ($is_mysql && $conn) {
             outlet_service = VALUES(outlet_service),
             service_compliance = VALUES(service_compliance),
             followup_category = VALUES(followup_category),
-            sync_source = VALUES(sync_source)";
+            sync_source = VALUES(sync_source),
+            notes = VALUES(notes)";
         
         if ($conn->query($sql)) {
             $aff = $conn->affected_rows;
@@ -695,13 +695,13 @@ if ($is_mysql && $conn) {
                 customer_code, name, phone, car_model, last_car_model, car_age,
                 recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, plate_number, vin,
                 outlet_do, outlet_service, service_compliance,
-                followup_category, assigned_sales_id, followup_status, sync_source
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Belum Dihubungi', ?)
+                followup_category, assigned_sales_id, followup_status, sync_source, notes
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Belum Dihubungi', ?, ?)
         ", [
             $code, $c['name'], $c['phone'], $c['car_model'], $c['last_car_model'], $c['car_age'],
             $c['recommended_model'], $c['alt_model_2'], $c['alt_model_3'], $c['cluster_name'], $c['priority'], $c['district'], $c['plate_number'], $c['vin'],
             $c['outlet_do'], $c['outlet_service'], $c['service_compliance'],
-            $c['followup_category'], $salesId, $syncSrc
+            $c['followup_category'], $salesId, $syncSrc, $c['notes'] ?? ''
         ]);
         $inserted++;
     }

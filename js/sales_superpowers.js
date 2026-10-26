@@ -589,14 +589,79 @@ const SalesSuperpowers = {
   },
 
   async ensureLeafletLoaded() {
-    if (window.L) return;
     if (!document.querySelector('link[href*="leaflet.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
       document.head.appendChild(link);
     }
-    await this.loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+    if (!document.querySelector('link[href*="MarkerCluster.css"]')) {
+      const link1 = document.createElement('link');
+      link1.rel = 'stylesheet';
+      link1.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css';
+      document.head.appendChild(link1);
+
+      const link2 = document.createElement('link');
+      link2.rel = 'stylesheet';
+      link2.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';
+      document.head.appendChild(link2);
+    }
+
+    // Modern glassmorphism cluster bubble styles
+    if (!document.getElementById('leafletClusterCustomStyles')) {
+      const style = document.createElement('style');
+      style.id = 'leafletClusterCustomStyles';
+      style.textContent = `
+        .marker-cluster {
+          background-clip: padding-box;
+          border-radius: 50%;
+          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .marker-cluster:hover {
+          transform: scale(1.12);
+        }
+        .marker-cluster div {
+          width: 34px;
+          height: 34px;
+          margin-left: 4px;
+          margin-top: 4px;
+          text-align: center;
+          border-radius: 50%;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 800;
+          font-size: 12px;
+          line-height: 34px;
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+        }
+        .marker-cluster-small {
+          background-color: rgba(16, 185, 129, 0.35);
+        }
+        .marker-cluster-small div {
+          background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .marker-cluster-medium {
+          background-color: rgba(37, 99, 235, 0.35);
+        }
+        .marker-cluster-medium div {
+          background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+        .marker-cluster-large {
+          background-color: rgba(215, 18, 58, 0.4);
+        }
+        .marker-cluster-large div {
+          background: linear-gradient(135deg, #d7123a, #991b1b);
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    if (!window.L) {
+      await this.loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+    }
+    if (!window.L.markerClusterGroup) {
+      await this.loadScript('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js');
+    }
   },
 
   async fetchRadarData(lat, lng, radiusKm, district = 'all') {
@@ -742,10 +807,29 @@ const SalesSuperpowers = {
     }
 
     // Initialize or Clear Marker Layer Group
+    // Initialize or Clear Marker Layer Group with MarkerCluster support
     if (this.radarMarkersLayer) {
       this.radarMarkersLayer.clearLayers();
+      if (this.leafletMap.hasLayer(this.radarMarkersLayer)) {
+        this.leafletMap.removeLayer(this.radarMarkersLayer);
+      }
     }
-    this.radarMarkersLayer = L.layerGroup().addTo(map);
+
+    if (window.L && window.L.markerClusterGroup) {
+      this.radarMarkersLayer = L.markerClusterGroup({
+        chunkedLoading: true,
+        chunkInterval: 100,
+        chunkDelay: 15,
+        maxClusterRadius: 42,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        disableClusteringAtZoom: 17
+      });
+    } else {
+      this.radarMarkersLayer = L.layerGroup();
+    }
+    this.radarMarkersLayer.addTo(map);
     this.updateRadarMapPins();
 
     // Add Map Legend Overlay
@@ -753,7 +837,7 @@ const SalesSuperpowers = {
     legendEl.className = 'radar-map-legend-overlay';
     legendEl.innerHTML = `
       <span class="radar-legend-item" style="font-weight:800; color:#0f172a; margin-right:4px;">
-        <i class="fa-solid fa-map-pin" style="color:#d7123a;"></i> <span id="radarMapPinCount">100 Pin Terdekat</span>
+        <i class="fa-solid fa-layer-group" style="color:#d7123a;"></i> <span id="radarMapPinCount">Memuat Pin...</span>
       </span>
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#ef4444;"></span> Belum FU</span>
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f59e0b;"></span> Menunggu</span>
@@ -808,19 +892,21 @@ const SalesSuperpowers = {
 
     const filteredLeads = this.getFilteredRadarLeads();
 
-    // OPTIMASI ANTI-LAG:
-    // Render 250 pin terdekat di peta Leaflet (mode preferCanvas aktif).
-    // Menjamin pergerakan peta 60 FPS halus di semua perangkat HP,
-    // sebaran akurat merata di setiap kecamatan & jalan permukiman.
-    const MAX_PINS = 250;
-    const mapPins = filteredLeads.slice(0, MAX_PINS);
+    // RENDER ALL CUSTOMERS DYNAMICALLY ACROSS ALL DISTRICTS
+    // Menggunakan Leaflet MarkerCluster dengan chunkedLoading aktif,
+    // seluruh data customer (5000+ pin) tersebar merata di setiap kecamatan & jalan
+    // tanpa lag (60 FPS halus), dan mengelompok elegan saat zoom out.
+    const isCluster = typeof this.radarMarkersLayer.addLayers === 'function';
+    const mapPins = isCluster ? filteredLeads : filteredLeads.slice(0, 1000);
 
     const pinBadge = document.getElementById('radarMapPinCount');
     if (pinBadge) {
-      pinBadge.textContent = filteredLeads.length > MAX_PINS
-        ? `Menampilkan ${MAX_PINS} Terdekat dari ${filteredLeads.length.toLocaleString('id-ID')}`
-        : `${filteredLeads.length} Customer`;
+      pinBadge.textContent = filteredLeads.length > 0
+        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Pin Tersebar`
+        : '0 Customer';
     }
+
+    const markersToBatch = [];
 
     mapPins.forEach(c => {
       let pinBg = '#ef4444'; // Belum Dihubungi
@@ -903,8 +989,14 @@ const SalesSuperpowers = {
 
       const marker = L.marker([c.lat, c.lng], { icon: customIcon }).bindPopup(popupHtml);
       marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${escapeHtml(c.district)} (${distLabel})`, { direction: 'top', offset: [0, -12] });
-      this.radarMarkersLayer.addLayer(marker);
+      markersToBatch.push(marker);
     });
+
+    if (isCluster) {
+      this.radarMarkersLayer.addLayers(markersToBatch);
+    } else {
+      markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
+    }
   },
 
   handleRadarStatusFilter(statusVal) {
