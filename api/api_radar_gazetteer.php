@@ -221,14 +221,56 @@ $bandungDistricts = [
     'margasari'        => [-6.9610, 107.6580],
     'cijawura'         => [-6.9610, 107.6580],
     'cisaranten'       => [-6.9280, 107.6850],
+    'cisaranten kidul' => [-6.9480, 107.6850],
+    'cisaranten kulon' => [-6.9280, 107.6750],
+    'cisaranten endah' => [-6.9220, 107.6880],
     'sukamiskin'       => [-6.9120, 107.6820],
     'sindanglaya'      => [-6.9050, 107.6880],
     'cipadung'         => [-6.9260, 107.7180],
+    'cipadung kidul'   => [-6.9350, 107.7120],
     'cinunuk'          => [-6.9380, 107.7320],
     'cimekar'          => [-6.9480, 107.7380],
     'sayang'           => [-6.9380, 107.7720],
     'parakan muncang'  => [-6.9750, 107.8200],
     'parakanmuncang'   => [-6.9750, 107.8200],
+    'kujangsari'       => [-6.9664, 107.6432],
+    'manjahlega'       => [-6.9450, 107.6690],
+    'cipamokolan'      => [-6.9530, 107.6740],
+    'pasawahan'        => [-6.9740, 107.6080],
+    'mekarjaya'        => [-6.9360, 107.6780],
+    'jatisari'         => [-6.9580, 107.6440],
+    'palasari'         => [-6.9320, 107.6220],
+    'rancabolang'      => [-6.9550, 107.6780],
+    'cipageran'        => [-6.8520, 107.5250],
+    'cigending'        => [-6.9050, 107.7020],
+    'pasir endah'      => [-6.9050, 107.7080],
+    'kebon kangkung'   => [-6.9250, 107.6430],
+    'cicadas'          => [-6.9120, 107.6420],
+    'cicaheum'         => [-6.9060, 107.6560],
+    'padasuka'         => [-6.8980, 107.6520],
+    'rancanumpang'     => [-6.9620, 107.7040],
+    'tanimulya'        => [-6.8620, 107.5220],
+    'campaka'          => [-6.9020, 107.5720],
+    'permata biru'     => [-6.9420, 107.7420],
+    'megabrata'        => [-6.9620, 107.6450],
+    'bumi orange'      => [-6.9450, 107.7350],
+    'bali view'        => [-6.9680, 107.6420],
+    'pratama asri'     => [-6.9520, 107.6620],
+    'gpa'              => [-6.9680, 107.6500],
+    'taman permata palem' => [-6.9630, 107.6550],
+    'd amerta'         => [-6.9720, 107.6620],
+    'buah batu regency'=> [-6.9650, 107.6410],
+    'taman cibaduyut indah' => [-6.9720, 107.5920],
+    'griya winaya'     => [-6.9080, 107.7020],
+    'griya caraka'     => [-6.9180, 107.6820],
+    'astom residence'  => [-6.9540, 107.6620],
+    'kiarasari'        => [-6.9620, 107.6470],
+    'taman mekar agung'=> [-6.9850, 107.6250],
+    'vijaya kusuma'    => [-6.9240, 107.5680],
+    'eastern hills'    => [-6.9620, 107.6480],
+    'bumi asri'        => [-6.9250, 107.5680],
+    'taman holis indah'=> [-6.9450, 107.5600],
+    'puri dago asri'   => [-6.9180, 107.6750],
 ];
 
 // --- STREET DISAMBIGUATION TABLE (Streets named after other cities in Bandung) ---
@@ -317,8 +359,9 @@ uksort($cityDistrictCoords, function($a, $b) {
 });
 
 /**
- * Intelligent geocoding and coordinates resolver for Sales Radar & Customer CRM
- * Handles street disambiguation, Bandung Raya Tier 1 priority, and Samsat regional codes.
+ * Intelligent high-precision geocoding resolver for Sales Radar & Customer CRM
+ * Prioritizes: Housing Complexes > Kelurahan > Streets > Districts > Explicit Cities.
+ * Uses micro-jitter (15-45m) to keep pins exactly on their neighborhood streets.
  */
 function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null, $plateNumber = '', $vin = '') {
     global $bandungDistricts, $bandungStreetToDistrict, $externalCities;
@@ -332,15 +375,43 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $haystack = trim("$rawDistLower $cleanAddressLower");
 
     $isBandungMentioned = (bool)preg_match('/\b(bandung|bdg|kota bandung|kab bandung)\b/i', $haystack);
-    $cleanPlate = strtoupper(trim(preg_replace('/[^A-Za-z0-9]/', '', (string)$plateNumber)));
-    $isPlateBandung = (bool)preg_match('/^D[0-9]/i', $cleanPlate);
 
     $matchedKey = null;
     $coords = null;
 
-    // STEP 1: Street Disambiguation Protection
-    // Handles streets named after cities (e.g. "JL. INDRAMAYU NO.27 - ANTAPANI. BANDUNG", "JL. PURWAKARTA", "JL. JAKARTA")
+    // LEVEL 1: Specific Housing Complex / Komplek / Perumahan / Taman / Griya / Cluster
     if (!empty($cleanAddressLower)) {
+        if (preg_match('/\b(komp\.?|komplek|perum\.?|perumahan|griya|taman|residence|regency)\s+([a-z0-9\s]+?)(?=\s+blok|\s+no|\s+rt|\s+rw|\s+kel|\s+kec|\s*,|\s*$)/i', $cleanAddressLower, $km)) {
+            $kompClean = trim($km[2]);
+            foreach ($bandungDistricts as $k => $c) {
+                if (strlen($k) < 3) continue;
+                if (strpos($kompClean, $k) !== false || strpos($cleanAddressLower, $k) !== false) {
+                    $matchedKey = $k;
+                    $coords = $c;
+                    break;
+                }
+            }
+        }
+    }
+
+    // LEVEL 2: Specific Kelurahan / Desa Pattern (e.g. "KEL. KUJANGSARI", "KEL. SEKEJATI")
+    if (!$coords && !empty($cleanAddressLower)) {
+        if (preg_match('/\b(kel\.?|kelurahan|desa)\s+([a-z\s]+?)(?=\s+kec|\s+kota|\s+kab|\s*rt|\s*rw|\s*,|\s*$)/i', $cleanAddressLower, $km)) {
+            $kelClean = trim($km[2]);
+            foreach ($bandungDistricts as $k => $c) {
+                if (strlen($k) < 3) continue;
+                if (strpos($kelClean, $k) !== false || preg_match('/\b' . preg_quote($k, '/') . '\b/i', $kelClean)) {
+                    $matchedKey = $k;
+                    $coords = $c;
+                    break;
+                }
+            }
+        }
+    }
+
+    // LEVEL 3: Street Disambiguation Protection
+    // Handles streets named after cities in Bandung (e.g. "JL. INDRAMAYU NO.27 - ANTAPANI. BANDUNG", "JL. PURWAKARTA")
+    if (!$coords && !empty($cleanAddressLower)) {
         foreach ($bandungStreetToDistrict as $streetWord => $targetDistrict) {
             if (preg_match('/\b(jl|jln|jalan)\.?\s*' . preg_quote($streetWord, '/') . '\b/i', $cleanAddressLower)) {
                 // If an explicit Bandung district is also written in the address (e.g. "ANTAPANI. BANDUNG")
@@ -352,7 +423,6 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
                         break;
                     }
                 }
-                // If no other district matched, assign to the known district for this street
                 if (!$coords) {
                     $matchedKey = $targetDistrict;
                     $coords = $bandungDistricts[$targetDistrict] ?? [-6.9248, 107.6472];
@@ -362,7 +432,7 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         }
     }
 
-    // STEP 2: Tier 1 Priority - Bandung Raya Districts, Kelurahan, Roads & Complexes
+    // LEVEL 4: Explicit Bandung Raya Districts, Kelurahan, Roads & Complexes
     if (!$coords) {
         $searchHaystacks = array_filter([$cleanAddressLower, $rawDistLower]);
         foreach ($searchHaystacks as $h) {
@@ -378,13 +448,12 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         }
     }
 
-    // STEP 3: Tier 2 - External Regencies & Cities (Strictly ONLY if NOT Bandung & NOT Plat D)
-    if (!$coords && !$isBandungMentioned && !$isPlateBandung) {
+    // LEVEL 5: Explicit External Regencies & Cities (Strictly ONLY if NOT Bandung & explicit city appears)
+    if (!$coords && !$isBandungMentioned) {
         $searchHaystacks = array_filter([$cleanAddressLower, $rawDistLower]);
         foreach ($searchHaystacks as $h) {
             if ($coords) break;
             foreach ($externalCities as $key => $c) {
-                // Prevent matching street names like "jl. subang" as the destination city
                 if (!empty($cleanAddressLower) && preg_match('/\b(jl|jln|jalan)\.?\s*' . preg_quote($key, '/') . '\b/i', $cleanAddressLower)) {
                     continue;
                 }
@@ -397,76 +466,19 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         }
     }
 
-    // STEP 4: Samsat Plat Nomor Regional Code (prefix & letter codes)
-    if (!$coords && !empty($cleanPlate)) {
-        if (preg_match('/^([A-Z]{1,2})([0-9]+)([A-Z]+)$/', $cleanPlate, $m)) {
-            $prefix = $m[1];
-            $suffix = $m[3];
-            $s1 = $suffix[0] ?? '';
-
-            $candidateKeys = [];
-            if ($prefix === 'D') {
-                if (in_array($s1, ['K', 'L', 'M', 'N', 'O', 'P', 'R'])) {
-                    // Samsat Bandung Timur (Antapani, Buahbatu, Kiara Condong, Rancasari, Gedebage, dll)
-                    $candidateKeys = ['antapani', 'buahbatu', 'kiaracondong', 'rancasari', 'arcamanik', 'gedebage', 'cibiru', 'panyileukan', 'cinambo', 'mandalajati'];
-                } elseif (in_array($s1, ['T', 'U', 'V', 'W', 'X', 'Y'])) {
-                    // Samsat Kabupaten Bandung
-                    $candidateKeys = ['bojongsoang', 'dayeuhkolot', 'baleendah', 'cileunyi', 'soreang', 'banjaran', 'rancaekek', 'ciparay', 'majalaya', 'katapang', 'margaasih', 'cangkuang'];
-                } elseif (in_array($s1, ['A', 'B', 'C', 'D', 'E', 'Q'])) {
-                    // Samsat Bandung Barat & Utara
-                    $candidateKeys = ['sukajadi', 'cicendo', 'andir', 'coblong', 'dago', 'pasteur', 'sukasari', 'bandung kulon'];
-                } elseif (in_array($s1, ['F', 'G', 'H', 'I', 'J'])) {
-                    // Samsat Bandung Tengah & Selatan
-                    $candidateKeys = ['lengkong', 'regol', 'astana anyar', 'batununggal', 'bandung kidul', 'bojongloa kidul', 'bojongloa kaler', 'babakan ciparay'];
-                } elseif (in_array($s1, ['S', 'Z'])) {
-                    // Samsat Cimahi & KBB
-                    $candidateKeys = ['cimahi', 'padalarang', 'lembang', 'batujajar', 'ngamprah', 'parongpong'];
-                }
-            } elseif ($prefix === 'B') {
-                $candidateKeys = ['jakarta timur', 'jakarta selatan', 'jakarta barat', 'jakarta pusat', 'bekasi', 'depok', 'tangerang'];
-            } elseif ($prefix === 'F') {
-                $candidateKeys = ['bogor', 'cianjur', 'sukabumi'];
-            } elseif ($prefix === 'E') {
-                $candidateKeys = ['cirebon', 'indramayu', 'majalengka', 'kuningan'];
-            } elseif ($prefix === 'Z') {
-                $candidateKeys = ['garut', 'tasikmalaya', 'sumedang', 'ciamis'];
-            } elseif ($prefix === 'T') {
-                $candidateKeys = ['purwakarta', 'subang', 'karawang'];
-            }
-
-            if (!empty($candidateKeys)) {
-                $idx = abs(crc32($id . '_' . $cleanPlate)) % count($candidateKeys);
-                $pickKey = $candidateKeys[$idx];
-                if (isset($bandungDistricts[$pickKey])) {
-                    $matchedKey = $pickKey;
-                    $coords = $bandungDistricts[$pickKey];
-                } elseif (isset($externalCities[$pickKey])) {
-                    $matchedKey = $pickKey;
-                    $coords = $externalCities[$pickKey];
-                }
-            }
-        }
-    }
-
-    // STEP 5: Fallback - Distribute evenly across Bandung Raya key catchment districts
+    // LEVEL 6: Fallback for local incomplete addresses (Default to Tunas Kircon Bandung Catchment)
     if (!$coords) {
-        $defaultKeys = [
-            'kiaracondong', 'buahbatu', 'batununggal', 'rancasari', 'bandung kidul',
-            'antapani', 'arcamanik', 'gedebage', 'lengkong', 'regol',
-            'bojongsoang', 'dayeuhkolot', 'baleendah', 'cibeunying kidul', 'coblong',
-            'sukajadi', 'cicendo', 'andir', 'soreang', 'cimahi', 'cileunyi', 'rancaekek'
-        ];
-        $pickKey = $defaultKeys[abs(crc32((string)$id)) % count($defaultKeys)];
-        $matchedKey = $pickKey;
-        $coords = $bandungDistricts[$pickKey] ?? [-6.9248, 107.6472];
+        $matchedKey = 'kiaracondong';
+        $coords = [-6.9248, 107.6472];
     }
 
-    // Polar 2D dispersion to scatter points organically along neighborhood streets (no pin stacking!)
+    // High Precision Micro-Jitter (15 to 45 meters only!)
+    // Keeps pin strictly on the actual street/neighborhood block and prevents stacking
     $hash1 = abs(crc32($id . '_' . $matchedKey));
     $hash2 = abs(crc32($matchedKey . '_' . $id));
     $angle = (($hash1 % 360) / 180.0) * M_PI;
-    // 0.20 km to 1.50 km organic neighborhood dispersion
-    $distanceKm = 0.20 + (($hash2 % 1300) / 1000.0);
+    // 0.015 km to 0.045 km (15 to 45 meters)
+    $distanceKm = 0.015 + (($hash2 % 30) / 1000.0);
     $deltaLat = ($distanceKm / 111.0) * cos($angle);
     $deltaLng = ($distanceKm / (111.0 * cos(deg2rad($coords[0])))) * sin($angle);
 
