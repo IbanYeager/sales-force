@@ -837,7 +837,7 @@ const SalesSuperpowers = {
       document.head.appendChild(link2);
     }
 
-    // Modern glassmorphism cluster bubble styles
+    // Modern executive cluster bubble styles with glassmorphism and crisp typography
     if (!document.getElementById('leafletClusterCustomStyles')) {
       const style = document.createElement('style');
       style.id = 'leafletClusterCustomStyles';
@@ -845,42 +845,46 @@ const SalesSuperpowers = {
         .marker-cluster {
           background-clip: padding-box;
           border-radius: 50%;
-          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+          cursor: pointer;
         }
         .marker-cluster:hover {
-          transform: scale(1.12);
+          transform: scale(1.15);
+          z-index: 10000 !important;
         }
         .marker-cluster div {
-          width: 34px;
-          height: 34px;
-          margin-left: 4px;
-          margin-top: 4px;
+          width: 36px;
+          height: 36px;
+          margin-left: 3px;
+          margin-top: 3px;
           text-align: center;
           border-radius: 50%;
-          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
           font-weight: 800;
           font-size: 12px;
-          line-height: 34px;
+          line-height: 36px;
           color: #ffffff;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.35);
+          border: 2px solid rgba(255, 255, 255, 0.95);
         }
         .marker-cluster-small {
-          background-color: rgba(16, 185, 129, 0.35);
+          background-color: rgba(16, 185, 129, 0.3);
         }
         .marker-cluster-small div {
-          background: linear-gradient(135deg, #10b981, #059669);
+          background: linear-gradient(135deg, #10b981, #047857);
         }
         .marker-cluster-medium {
-          background-color: rgba(37, 99, 235, 0.35);
+          background-color: rgba(37, 99, 235, 0.3);
         }
         .marker-cluster-medium div {
-          background: linear-gradient(135deg, #2563eb, #1d4ed8);
+          background: linear-gradient(135deg, #2563eb, #1e40af);
         }
         .marker-cluster-large {
-          background-color: rgba(215, 18, 58, 0.4);
+          background-color: rgba(215, 18, 58, 0.35);
         }
         .marker-cluster-large div {
           background: linear-gradient(135deg, #d7123a, #991b1b);
+          box-shadow: 0 4px 16px rgba(215, 18, 58, 0.5);
         }
       `;
       document.head.appendChild(style);
@@ -1099,10 +1103,11 @@ const SalesSuperpowers = {
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#f59e0b;"></span> Menunggu</span>
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#8b5cf6;"></span> Tertarik</span>
       <span class="radar-legend-item"><span class="radar-legend-dot" style="background:#10b981;"></span> Selesai</span>
+      <span class="radar-legend-item" style="color:#64748b; font-size:10px; margin-left:2px;"><i class="fa-solid fa-circle-nodes" style="color:#2563eb;"></i> Klik angka cluster untuk perbesar</span>
     `;
     mapEl.appendChild(legendEl);
 
-    // Initialize Marker Layer Group (Direct canvas display without cluster bubbles)
+    // Initialize Marker Layer Group with Smart MarkerCluster support
     if (this.radarMarkersLayer) {
       this.radarMarkersLayer.clearLayers();
       if (this.leafletMap.hasLayer(this.radarMarkersLayer)) {
@@ -1110,7 +1115,35 @@ const SalesSuperpowers = {
       }
     }
 
-    this.radarMarkersLayer = L.layerGroup();
+    if (window.L && typeof window.L.markerClusterGroup === 'function') {
+      this.radarMarkersLayer = L.markerClusterGroup({
+        chunkedLoading: true,
+        chunkInterval: 50,
+        chunkDelay: 10,
+        maxClusterRadius: 45,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        disableClusteringAtZoom: 16,
+        iconCreateFunction: function(cluster) {
+          const count = cluster.getChildCount();
+          let clusterClass = 'small';
+          if (count >= 100) {
+            clusterClass = 'large';
+          } else if (count >= 25) {
+            clusterClass = 'medium';
+          }
+          const displayCount = count >= 1000 ? (count / 1000).toFixed(1) + 'k' : count.toLocaleString('id-ID');
+          return L.divIcon({
+            html: `<div><span>${displayCount}</span></div>`,
+            className: `marker-cluster marker-cluster-${clusterClass}`,
+            iconSize: L.point(42, 42)
+          });
+        }
+      });
+    } else {
+      this.radarMarkersLayer = L.layerGroup();
+    }
     this.radarMarkersLayer.addTo(map);
     this.updateRadarMapPins();
   },
@@ -1197,12 +1230,12 @@ const SalesSuperpowers = {
       const distLabel = (this.currentDistrict && this.currentDistrict !== 'all') ? ` • ${this.getZoneLabel(this.currentDistrict)}` : '';
       const rLabel = this.currentRadius < 500 ? ` (Radius ${this.currentRadius} km)` : ' (Semua Wilayah)';
       pinBadge.textContent = filteredLeads.length > 0
-        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer Langsung${rLabel}${distLabel}${carLabel}`
+        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer (Smart Cluster Aktif)${rLabel}${distLabel}${carLabel}`
         : '0 Customer';
     }
 
+    const isCluster = typeof this.radarMarkersLayer.addLayers === 'function';
     const markersToBatch = [];
-    const renderer = this.radarCanvasRenderer || L.canvas({ padding: 0.5 });
 
     mapPins.forEach(c => {
       let pinBg = '#ef4444'; // Belum Dihubungi
@@ -1266,31 +1299,33 @@ const SalesSuperpowers = {
         </div>
       `;
 
-      const marker = L.circleMarker([c.lat, c.lng], {
-        renderer: renderer,
-        radius: 6.5,
-        fillColor: pinBg,
-        color: '#ffffff',
-        weight: 1.8,
-        opacity: 1,
-        fillOpacity: 0.92
-      }).bindPopup(popupHtml);
-
-      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${escapeHtml(c.district)} (${distLabel})`, { direction: 'top', offset: [0, -6] });
-
-      marker.on('mouseover', function () {
-        this.setRadius(9.5);
-        this.setStyle({ weight: 2.8, color: '#0f172a' });
+      const customIcon = L.divIcon({
+        className: 'radar-leaflet-pin-wrap',
+        html: `
+          <div class="radar-map-marker-pin" style="background:${pinBg};" title="${escapeHtml(c.name)}">
+            <i class="fa-solid fa-car"></i>
+          </div>
+        `,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+        popupAnchor: [0, -13]
       });
-      marker.on('mouseout', function () {
-        this.setRadius(6.5);
-        this.setStyle({ weight: 1.8, color: '#ffffff' });
-      });
+
+      const marker = L.marker([c.lat, c.lng], { icon: customIcon }).bindPopup(popupHtml);
+      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${escapeHtml(c.district)} (${distLabel})`, { direction: 'top', offset: [0, -12] });
 
       markersToBatch.push(marker);
     });
 
-    markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
+    if (isCluster) {
+      this.radarMarkersLayer.addLayers(markersToBatch);
+    } else {
+      markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
+    }
+
+    if (this.leafletMap && !this.leafletMap.hasLayer(this.radarMarkersLayer)) {
+      this.leafletMap.addLayer(this.radarMarkersLayer);
+    }
 
     // Auto-fit bounds if a specific territory or car filter is selected so all territory markers are nicely framed
     if ((this.currentDistrict !== 'all' || this.radarCarFilter !== 'all') && markersToBatch.length > 0 && this.leafletMap) {
