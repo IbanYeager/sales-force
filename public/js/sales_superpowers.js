@@ -908,6 +908,7 @@ const SalesSuperpowers = {
       const result = await res.json();
 
       if (result.districts_list && Array.isArray(result.districts_list)) {
+        this.districtsList = result.districts_list;
         this.populateDistrictSelect(result.districts_list, district);
       }
 
@@ -935,7 +936,10 @@ const SalesSuperpowers = {
 
       this.radarData = result.data;
       this.renderRadarLeafletMap(this.radarData, lat, lng);
-      this.applyRadarFilter();
+      this.renderRadarLeadCards(this.radarData);
+      if (this.districtsList && this.districtsList.length > 0) {
+        this.populateDistrictSelect(this.districtsList, district);
+      }
 
     } catch (e) {
       console.error(e);
@@ -1379,6 +1383,12 @@ const SalesSuperpowers = {
   },
 
   applyRadarFilter() {
+    const gridContainer = document.getElementById('radarCardsGridContainer');
+    if (!gridContainer) {
+      this.renderRadarLeadCards(this.radarData || []);
+      return;
+    }
+
     // 1. Update active class on status pills
     document.querySelectorAll('.radar-status-pill').forEach(pill => {
       const val = pill.getAttribute('data-status') || '';
@@ -1474,7 +1484,7 @@ const SalesSuperpowers = {
     if (!listContainer) return;
 
     this.radarRenderLimit = 48;
-    const currentRadiusKm = this.currentRadius || 5;
+    const currentRadiusKm = this.currentRadius || 1;
     const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
     const carFilter = (this.radarCarFilter || 'all').toLowerCase().trim();
     const query = (this.radarQuery || '').toLowerCase().trim();
@@ -1489,7 +1499,7 @@ const SalesSuperpowers = {
       if (carFilter !== 'all' && carFilter !== '') {
         if (!this.matchCarModel((c.car_model || '') + ' ' + (c.last_car_model || ''), carFilter)) return false;
       }
-      if (currentDist === 'all' && currentRadiusKm < 999 && c.distance_km !== undefined && c.distance_km !== null) {
+      if (currentRadiusKm < 500 && c.distance_km !== undefined && c.distance_km !== null) {
         if (c.distance_km > currentRadiusKm) return false;
       }
       if (query) {
@@ -1532,7 +1542,7 @@ const SalesSuperpowers = {
           <p style="font-size:12px; color:#64748b; margin:3px 0 0 0;" id="radarRadiusSubtitle">
             ${filterDesc.length > 0 
               ? `Filter Aktif: ${filterDesc.join(' • ')} (${filtered.length.toLocaleString('id-ID')} Customer).`
-              : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 999 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}).`}
+              : `Diurutkan dari jarak terdekat ke posisi GPS Anda (${currentRadiusKm < 500 ? 'Radius: ' + currentRadiusKm + ' km' : 'Semua Wilayah'}).`}
           </p>
         </div>
       </div>
@@ -1643,6 +1653,9 @@ const SalesSuperpowers = {
     `;
 
     listContainer.innerHTML = html;
+    if (this.districtsList && this.districtsList.length > 0) {
+      this.populateDistrictSelect(this.districtsList, this.currentDistrict);
+    }
     this.renderRadarCardsGrid(filtered);
   },
 
@@ -1933,24 +1946,6 @@ const SalesSuperpowers = {
         btn.innerHTML = origHtml;
       }
     }
-  },
-
-  filterRadarLeads(query) {
-    if (!this.radarData || this.radarData.length === 0) return;
-    const cleanQ = (query || '').toLowerCase().trim();
-    if (!cleanQ) {
-      this.renderRadarLeadCards(this.radarData);
-      return;
-    }
-
-    const filtered = this.radarData.filter(item => {
-      const name = (item.name || '').toLowerCase();
-      const car = (item.car_model || '').toLowerCase();
-      const district = (item.district || '').toLowerCase();
-      return name.includes(cleanQ) || car.includes(cleanQ) || district.includes(cleanQ);
-    });
-
-    this.renderRadarLeadCards(filtered);
   },
 
   scanNearbyLeads(radiusKm = 5, containerId = 'followupDataContainer') {
