@@ -1217,6 +1217,69 @@ const SalesSuperpowers = {
     });
   },
 
+  getRadarPopupHtml(c) {
+    let pinBg = '#ef4444'; // Belum Dihubungi
+    if (c.status === 'Deal / Selesai') {
+      pinBg = '#10b981';
+    } else if (c.status === 'Tertarik / Jadwal Servis') {
+      pinBg = '#8b5cf6';
+    } else if (c.status === 'Menunggu Respon') {
+      pinBg = '#f59e0b';
+    }
+
+    const initials = (c.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    const distLabel = c.formatted_distance || (c.distance_km !== undefined ? c.distance_km + ' km' : '');
+    const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
+    const waHref = c.phone && c.phone !== '-'
+      ? `https://wa.me/${c.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + c.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda kanvasing di sekitar ' + (c.district || 'area Bapak/Ibu') + '. Apakah ada waktu luang sebentar jika saya mampir untuk update info promo atau konsultasi unit Toyota?')}`
+      : '';
+
+    return `
+      <div class="radar-popup-card">
+        <div class="radar-popup-header">
+          <div class="radar-popup-avatar" style="background:${pinBg};">${escapeHtml(initials)}</div>
+          <div>
+            <h4 class="radar-popup-name">${escapeHtml(c.name)}</h4>
+            <div class="radar-popup-dist">
+              <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)} 
+              ${distLabel ? `<span class="radar-popup-dist-pill">${distLabel}</span>` : ''}
+            </div>
+            ${c.address ? `
+              <div style="font-size:10.5px; color:#475569; margin-top:3px; line-height:1.3; max-width:240px;">
+                <i class="fa-solid fa-house-chimney" style="color:#0284c7; font-size:10px;"></i> ${escapeHtml(c.address)}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+        
+        <div class="radar-popup-car-box">
+          <div style="font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+            <i class="fa-solid fa-car-side" style="color:#2563eb;"></i> ${escapeHtml(c.car_model || 'Toyota')}
+            ${c.plate_number ? `<span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; font-weight:700;">${escapeHtml(c.plate_number)}</span>` : ''}
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
+            <span style="color:#64748b;">Status: <b style="color:${pinBg};">${escapeHtml(c.status || 'Belum Dihubungi')}</b></span>
+            <span style="color:#d7123a; font-weight:800;">${escapeHtml(c.priority || 'Warm')}</span>
+          </div>
+        </div>
+
+        <div class="radar-popup-actions">
+          ${waHref ? `
+            <a href="${waHref}" target="_blank" class="btn-popup-wa">
+              <i class="fa-brands fa-whatsapp"></i> WA
+            </a>
+          ` : ''}
+          <a href="${navUrl}" target="_blank" class="btn-popup-maps">
+            <i class="fa-solid fa-diamond-turn-right"></i> Maps
+          </a>
+          <button onclick="SalesSuperpowers.openRadarFollowupModal(${c.id})" class="btn-popup-fu">
+            <i class="fa-solid fa-clipboard-check"></i> FU
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
   updateRadarMapPins() {
     if (!this.leafletMap || !this.radarMarkersLayer) return;
     this.radarMarkersLayer.clearLayers();
@@ -1234,93 +1297,51 @@ const SalesSuperpowers = {
         : '0 Customer';
     }
 
-    const isCluster = typeof this.radarMarkersLayer.addLayers === 'function';
-    const markersToBatch = [];
-
-    mapPins.forEach(c => {
-      let pinBg = '#ef4444'; // Belum Dihubungi
-      if (c.status === 'Deal / Selesai') {
-        pinBg = '#10b981';
-      } else if (c.status === 'Tertarik / Jadwal Servis') {
-        pinBg = '#8b5cf6';
-      } else if (c.status === 'Menunggu Respon') {
-        pinBg = '#f59e0b';
-      }
-
-      const initials = (c.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-      const distLabel = c.formatted_distance || (c.distance_km + ' km');
-      const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
-      const waHref = c.phone && c.phone !== '-'
-        ? `https://wa.me/${c.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + c.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda kanvasing di sekitar ' + (c.district || 'area Bapak/Ibu') + '. Apakah ada waktu luang sebentar jika saya mampir untuk update info promo atau konsultasi unit Toyota?')}`
-        : '';
-
-      const popupHtml = `
-        <div class="radar-popup-card">
-          <div class="radar-popup-header">
-            <div class="radar-popup-avatar" style="background:${pinBg};">${escapeHtml(initials)}</div>
-            <div>
-              <h4 class="radar-popup-name">${escapeHtml(c.name)}</h4>
-              <div class="radar-popup-dist">
-                <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)} 
-                <span class="radar-popup-dist-pill">${distLabel}</span>
-              </div>
-              ${c.address ? `
-                <div style="font-size:10.5px; color:#475569; margin-top:3px; line-height:1.3; max-width:240px;">
-                  <i class="fa-solid fa-house-chimney" style="color:#0284c7; font-size:10px;"></i> ${escapeHtml(c.address)}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-          
-          <div class="radar-popup-car-box">
-            <div style="font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-car-side" style="color:#2563eb;"></i> ${escapeHtml(c.car_model || 'Toyota')}
-              ${c.plate_number ? `<span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; font-weight:700;">${escapeHtml(c.plate_number)}</span>` : ''}
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
-              <span style="color:#64748b;">Status: <b style="color:${pinBg};">${escapeHtml(c.status || 'Belum Dihubungi')}</b></span>
-              <span style="color:#d7123a; font-weight:800;">${escapeHtml(c.priority || 'Warm')}</span>
-            </div>
-          </div>
-
-          <div class="radar-popup-actions">
-            ${waHref ? `
-              <a href="${waHref}" target="_blank" class="btn-popup-wa">
-                <i class="fa-brands fa-whatsapp"></i> WA
-              </a>
-            ` : ''}
-            <a href="${navUrl}" target="_blank" class="btn-popup-maps">
-              <i class="fa-solid fa-diamond-turn-right"></i> Maps
-            </a>
-            <button onclick="SalesSuperpowers.openRadarFollowupModal(${c.id})" class="btn-popup-fu">
-              <i class="fa-solid fa-clipboard-check"></i> FU
-            </button>
-          </div>
-        </div>
-      `;
-
-      const customIcon = L.divIcon({
+    if (!this.cachedRadarIcons) {
+      const makeIcon = (color) => L.divIcon({
         className: 'radar-leaflet-pin-wrap',
-        html: `
-          <div class="radar-map-marker-pin" style="background:${pinBg};" title="${escapeHtml(c.name)}">
-            <i class="fa-solid fa-car"></i>
-          </div>
-        `,
+        html: `<div class="radar-map-marker-pin" style="background:${color};"><i class="fa-solid fa-car"></i></div>`,
         iconSize: [26, 26],
         iconAnchor: [13, 13],
         popupAnchor: [0, -13]
       });
+      this.cachedRadarIcons = {
+        red: makeIcon('#ef4444'),
+        green: makeIcon('#10b981'),
+        purple: makeIcon('#8b5cf6'),
+        yellow: makeIcon('#f59e0b')
+      };
+    }
 
-      const marker = L.marker([c.lat, c.lng], { icon: customIcon }).bindPopup(popupHtml);
-      marker.bindTooltip(`<b>${escapeHtml(c.name)}</b> • ${escapeHtml(c.district)} (${distLabel})`, { direction: 'top', offset: [0, -12] });
+    const isCluster = typeof this.radarMarkersLayer.addLayers === 'function';
+    const markersToBatch = [];
+    const icons = this.cachedRadarIcons;
 
+    for (let i = 0; i < mapPins.length; i++) {
+      const c = mapPins[i];
+      let icon = icons.red;
+      if (c.status === 'Deal / Selesai') {
+        icon = icons.green;
+      } else if (c.status === 'Tertarik / Jadwal Servis') {
+        icon = icons.purple;
+      } else if (c.status === 'Menunggu Respon') {
+        icon = icons.yellow;
+      }
+
+      const marker = L.marker([c.lat, c.lng], {
+        icon: icon,
+        title: `${c.name || 'Customer'} • ${c.district || ''}`
+      });
+      marker.bindPopup(() => this.getRadarPopupHtml(c));
       markersToBatch.push(marker);
-    });
+    }
 
     if (isCluster) {
       this.radarMarkersLayer.addLayers(markersToBatch);
     } else {
-      markersToBatch.forEach(m => this.radarMarkersLayer.addLayer(m));
+      for (let j = 0; j < markersToBatch.length; j++) {
+        this.radarMarkersLayer.addLayer(markersToBatch[j]);
+      }
     }
 
     if (this.leafletMap && !this.leafletMap.hasLayer(this.radarMarkersLayer)) {
