@@ -9573,7 +9573,8 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     }
 
     // LEVEL 4: External Cities & Corporate Hubs (Jabodetabek, Surabaya, Makassar, dll)
-    if (!$matchedCoords && !empty($addrLower)) {
+    // Only check external cities if rawDistrict is NOT already a verified Bandung district!
+    if (!$matchedCoords && !empty($addrLower) && !isset($bandungDistricts[$rawDistLower])) {
         foreach ($externalCitiesAndHubs as $kw => $info) {
             if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
                 $matchedDistrict = $info[0];
