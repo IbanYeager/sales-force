@@ -399,6 +399,19 @@
     border-color: #eb0a1e;
     background: #fff5f5;
   }
+  .bulk-auto-badge {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+  }
   .bulk-progress-box {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -683,9 +696,44 @@
             </label>
           </div>
 
-          <div class="bulk-form-group" style="margin-top: 10px;">
-            <label class="bulk-form-label">Catatan / Keterangan Kegiatan</label>
-            <textarea id="bulkUploadKeterangan" rows="2" class="bulk-form-control" placeholder="Tuliskan catatan aktivitas, interaksi prospek, atau hasil kegiatan..."></textarea>
+          <div class="bulk-form-group" style="margin-top: 14px;">
+            <div class="bulk-form-label">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span>Catatan / Keterangan Kegiatan</span>
+                <span class="bulk-auto-badge" id="bulkAutoKeteranganBadge">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Terisi Otomatis oleh Sistem
+                </span>
+              </div>
+              <button type="button" class="bulk-chip" style="color:#2563eb; background:#eff6ff; border-color:#bfdbfe;" onclick="forceGenerateAutoKeterangan()" title="Reset dan buat keterangan otomatis ulang">
+                <i class="fa-solid fa-rotate"></i> Buat Ulang Otomatis
+              </button>
+            </div>
+
+            <!-- Selector Template Keterangan -->
+            <div style="margin-bottom: 6px;">
+              <select id="bulkUploadTemplateKeterangan" class="bulk-form-control" onchange="onBulkTemplateChange(this.value)" style="font-size: 12px; font-weight: 600; color: #0f172a; background: #f8fafc;">
+                <option value="AUTO" selected>✨ Otomatis dari Sistem (Sesuai Tipe, Lokasi &amp; Sales)</option>
+                <option value="STAND_PAMERAN">🎪 Penjagaan booth pameran &amp; interaksi pengunjung mall</option>
+                <option value="SIMULASI_PROSPEK">📋 Pelayanan informasi unit, simulasi kredit &amp; data prospek</option>
+                <option value="CANVASSING_FLYER">🚶 Canvassing lapangan, door to door &amp; pembagian flyer</option>
+                <option value="TEST_DRIVE">🚗 Pendampingan test drive unit mobil Toyota bersama customer</option>
+                <option value="DELIVERY">🔑 Proses delivery ceremony &amp; serah terima unit kendaraan</option>
+                <option value="GATHERING">🎉 Customer gathering &amp; event promo cabang bersama konsumen</option>
+                <option value="NEGOSIASI">💼 Pertemuan negosiasi &amp; tindak lanjut prospek customer</option>
+                <option value="SHOWROOM">🏛️ Showroom duty &amp; pelayanan konsumen walk-in</option>
+              </select>
+            </div>
+
+            <textarea id="bulkUploadKeterangan" rows="2" class="bulk-form-control" oninput="onKeteranganManualInput()" placeholder="Keterangan otomatis dipilih oleh sistem..."></textarea>
+
+            <div class="bulk-quick-chips">
+              <span class="bulk-chip" onclick="applyQuickKeteranganTemplate('STAND_PAMERAN')">🎪 Penjagaan Booth</span>
+              <span class="bulk-chip" onclick="applyQuickKeteranganTemplate('SIMULASI_PROSPEK')">📋 Simulasi Kredit</span>
+              <span class="bulk-chip" onclick="applyQuickKeteranganTemplate('CANVASSING_FLYER')">🚶 Canvassing</span>
+              <span class="bulk-chip" onclick="applyQuickKeteranganTemplate('TEST_DRIVE')">🚗 Test Drive</span>
+              <span class="bulk-chip" onclick="applyQuickKeteranganTemplate('DELIVERY')">🔑 Delivery Unit</span>
+              <span class="bulk-chip" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;" onclick="applyQuickKeteranganTemplate('AUTO')">✨ Otomatiskan Sistem</span>
+            </div>
           </div>
         </div>
 

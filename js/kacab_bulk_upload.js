@@ -6,6 +6,7 @@
 let bulkUploadSelectedFiles = [];
 let bulkUploadWiraniaga = [];
 let isBulkUploading = false;
+let isKeteranganUserModified = false;
 
 function getBulkUploadApiUrl(endpoint) {
   const isNested = window.location.pathname.includes('/pages/') || 
@@ -81,6 +82,12 @@ async function openBulkUploadModal(prefillData = {}) {
 
   // Reset progress bar
   hideBulkUploadProgress();
+
+  // Reset status modifikasi keterangan & generate otomatis
+  isKeteranganUserModified = false;
+  const templateSel = document.getElementById('bulkUploadTemplateKeterangan');
+  if (templateSel) templateSel.value = 'AUTO';
+  updateAutoKeterangan();
 
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -196,6 +203,19 @@ function initBulkUploadDropzone() {
       e.target.value = ''; // Reset agar bisa memilih file yang sama jika perlu
     }
   });
+
+  // Listener untuk sinkronisasi otomatis teks keterangan saat user memilih form
+  const selSales = document.getElementById('bulkUploadSelectSales');
+  if (selSales) selSales.addEventListener('change', updateAutoKeterangan);
+
+  const tipeSelect = document.getElementById('bulkUploadTipe');
+  if (tipeSelect) tipeSelect.addEventListener('change', updateAutoKeterangan);
+
+  const lokasiInput = document.getElementById('bulkUploadLokasi');
+  if (lokasiInput) lokasiInput.addEventListener('input', updateAutoKeterangan);
+
+  const sesiRadios = document.querySelectorAll('input[name="bulk_sesi_waktu"]');
+  sesiRadios.forEach(r => r.addEventListener('change', updateAutoKeterangan));
 }
 
 /**
@@ -329,6 +349,150 @@ function setBulkUploadLocationChip(locText) {
   if (lokasiInput) {
     lokasiInput.value = locText;
     lokasiInput.focus();
+    updateAutoKeterangan();
+  }
+}
+
+/**
+ * Buat narasi keterangan aktivitas secara cerdas & otomatis dari sistem
+ */
+function generateSystemKeterangan() {
+  const selSales = document.getElementById('bulkUploadSelectSales');
+  let namaSales = '';
+  if (selSales && selSales.value) {
+    namaSales = selSales.value === 'ALL_TEAM' ? 'Tim Sales Cabang' : selSales.value;
+  } else {
+    namaSales = 'Tim Sales Cabang';
+  }
+
+  const tipe = document.getElementById('bulkUploadTipe')?.value || 'Pameran (Exhibition / Booth)';
+  const lokasi = document.getElementById('bulkUploadLokasi')?.value.trim() || 'Bandung & Sekitarnya';
+  const sesiRadio = document.querySelector('input[name="bulk_sesi_waktu"]:checked');
+  const sesi = sesiRadio ? sesiRadio.value : 'Pagi';
+
+  let ket = '';
+  if (tipe.includes('Pameran') || tipe.includes('Exhibition') || tipe.includes('Booth')) {
+    ket = `Dokumentasi kegiatan penjagaan booth pameran unit display Toyota di ${lokasi} sesi ${sesi} oleh ${namaSales}.`;
+  } else if (tipe.includes('Canvassing') || tipe.includes('Door to Door')) {
+    ket = `Dokumentasi aktivitas canvassing lapangan dan prospek calon konsumen di wilayah ${lokasi} sesi ${sesi} oleh ${namaSales}.`;
+  } else if (tipe.includes('Customer Gathering') || tipe.includes('Event')) {
+    ket = `Dokumentasi customer gathering & event semarak promo cabang bersama konsumen di ${lokasi} oleh ${namaSales}.`;
+  } else if (tipe.includes('Test Drive')) {
+    ket = `Dokumentasi pendampingan test drive unit mobil Toyota bersama customer di ${lokasi} oleh ${namaSales}.`;
+  } else if (tipe.includes('Delivery') || tipe.includes('Handover')) {
+    ket = `Dokumentasi proses delivery ceremony dan serah terima unit kendaraan baru Toyota kepada customer di ${lokasi} oleh ${namaSales}.`;
+  } else if (tipe.includes('Pertemuan Prospek') || tipe.includes('Kantor Customer')) {
+    ket = `Dokumentasi pertemuan prospek dan konsultasi produk Toyota bersama calon customer di ${lokasi} oleh ${namaSales}.`;
+  } else if (tipe.includes('Flyering') || tipe.includes('Prospecting')) {
+    ket = `Dokumentasi penyebaran flyer brosur dan prospecting interaktif di area ${lokasi} sesi ${sesi} oleh ${namaSales}.`;
+  } else if (tipe.includes('Showroom')) {
+    ket = `Dokumentasi duty showroom dan pelayanan konsumen walk-in di ${lokasi} sesi ${sesi} oleh ${namaSales}.`;
+  } else {
+    ket = `Dokumentasi kegiatan ${tipe} di ${lokasi} sesi ${sesi} oleh ${namaSales}.`;
+  }
+  return ket;
+}
+
+/**
+ * Update otomatis keterangan ke textarea jika belum dimodifikasi manual
+ */
+function updateAutoKeterangan() {
+  if (isKeteranganUserModified) return;
+  const ketTextarea = document.getElementById('bulkUploadKeterangan');
+  const templateSel = document.getElementById('bulkUploadTemplateKeterangan');
+  if (!ketTextarea) return;
+
+  if (!templateSel || templateSel.value === 'AUTO') {
+    ketTextarea.value = generateSystemKeterangan();
+    updateKeteranganBadge(true);
+  }
+}
+
+/**
+ * Regenerasi paksa keterangan otomatis
+ */
+function forceGenerateAutoKeterangan() {
+  isKeteranganUserModified = false;
+  const templateSel = document.getElementById('bulkUploadTemplateKeterangan');
+  if (templateSel) templateSel.value = 'AUTO';
+  const ketTextarea = document.getElementById('bulkUploadKeterangan');
+  if (ketTextarea) {
+    ketTextarea.value = generateSystemKeterangan();
+  }
+  updateKeteranganBadge(true);
+}
+
+/**
+ * Deteksi saat user mengetik manual di textarea
+ */
+function onKeteranganManualInput() {
+  const ketTextarea = document.getElementById('bulkUploadKeterangan');
+  isKeteranganUserModified = !!(ketTextarea && ketTextarea.value.trim());
+  updateKeteranganBadge(!isKeteranganUserModified);
+}
+
+/**
+ * Update status visual badge
+ */
+function updateKeteranganBadge(isAuto) {
+  const badge = document.getElementById('bulkAutoKeteranganBadge');
+  if (!badge) return;
+  if (isAuto) {
+    badge.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Terisi Otomatis oleh Sistem';
+    badge.style.background = '#dcfce7';
+    badge.style.color = '#166534';
+    badge.style.borderColor = '#bbf7d0';
+  } else {
+    badge.innerHTML = '<i class="fa-solid fa-pen"></i> Kustom Sendiri';
+    badge.style.background = '#fef3c7';
+    badge.style.color = '#92400e';
+    badge.style.borderColor = '#fde68a';
+  }
+}
+
+/**
+ * Handler saat dropdown template dipilih
+ */
+function onBulkTemplateChange(val) {
+  const ketTextarea = document.getElementById('bulkUploadKeterangan');
+  if (!ketTextarea) return;
+
+  if (val === 'AUTO') {
+    forceGenerateAutoKeterangan();
+    return;
+  }
+
+  isKeteranganUserModified = true;
+  updateKeteranganBadge(false);
+
+  const selSales = document.getElementById('bulkUploadSelectSales');
+  const namaSales = (selSales && selSales.value && selSales.value !== 'ALL_TEAM') ? selSales.value : 'Tim Sales Cabang';
+  const lokasi = document.getElementById('bulkUploadLokasi')?.value.trim() || 'Bandung & Sekitarnya';
+
+  const templates = {
+    STAND_PAMERAN: `Penjagaan booth pameran & interaksi pengunjung pameran mobil Toyota di ${lokasi} oleh ${namaSales}.`,
+    SIMULASI_PROSPEK: `Pelayanan informasi unit display, simulasi hitungan kredit, & pengumpulan database prospek di ${lokasi} oleh ${namaSales}.`,
+    CANVASSING_FLYER: `Aktivitas canvassing lapangan, door to door, dan pembagian flyer promo Toyota di wilayah ${lokasi} oleh ${namaSales}.`,
+    TEST_DRIVE: `Pendampingan sesi test drive unit kendaraan Toyota bersama calon konsumen di ${lokasi} oleh ${namaSales}.`,
+    DELIVERY: `Proses delivery ceremony & serah terima unit kendaraan baru Toyota kepada customer di ${lokasi} oleh ${namaSales}.`,
+    GATHERING: `Kegiatan customer gathering cabang & presentasi promo unit Toyota bersama konsumen di ${lokasi} oleh ${namaSales}.`,
+    NEGOSIASI: `Pertemuan konsultasi pembelian mobil Toyota dan tindak lanjut negosiasi SPK konsumen di ${lokasi} oleh ${namaSales}.`,
+    SHOWROOM: `Penjagaan showroom duty cabang dan pelayanan konsumen walk-in Toyota di ${lokasi} oleh ${namaSales}.`
+  };
+
+  if (templates[val]) {
+    ketTextarea.value = templates[val];
+  }
+}
+
+/**
+ * Terapkan quick template dari chip
+ */
+function applyQuickKeteranganTemplate(key) {
+  const sel = document.getElementById('bulkUploadTemplateKeterangan');
+  if (sel) {
+    sel.value = key;
+    onBulkTemplateChange(key);
   }
 }
 
@@ -392,7 +556,7 @@ async function submitBulkUpload(event) {
   const tipeAktivitas = document.getElementById('bulkUploadTipe')?.value || 'Pameran (Exhibition / Booth)';
   const lokasi = document.getElementById('bulkUploadLokasi')?.value.trim() || 'Bandung & Sekitarnya';
   const durasi = document.getElementById('bulkUploadDurasi')?.value || '1 Jam';
-  const keterangan = document.getElementById('bulkUploadKeterangan')?.value.trim() || `Dokumentasi foto aktivitas ${tipeAktivitas} di ${lokasi}`;
+  const keterangan = document.getElementById('bulkUploadKeterangan')?.value.trim() || generateSystemKeterangan();
 
   const modeRadio = document.querySelector('input[name="bulk_mode_upload"]:checked');
   const modeUpload = modeRadio ? modeRadio.value : 'gabung';
