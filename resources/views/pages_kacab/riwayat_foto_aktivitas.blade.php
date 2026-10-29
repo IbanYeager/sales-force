@@ -7,7 +7,7 @@
   <title>Kacab Desktop - Galeri Foto Aktivitas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/css/style_kacab.css?v={{ time() }}">
-  <link rel="stylesheet" href="../css/riwayat_foto_aktivitas.css?v=20260923_kacab_sync">
+  <link rel="stylesheet" href="../css/riwayat_foto_aktivitas.css?v={{ time() }}">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#0f172a">
@@ -249,6 +249,7 @@
               <i class="fa-solid fa-print"></i> Cetak Rekap PDF
             </button>
           </div>
+        </div>
 
         <!-- Loading State -->
         <div id="galleryLoading" style="text-align:center; padding: 50px 20px; font-size: 13px; color: var(--text-muted);">

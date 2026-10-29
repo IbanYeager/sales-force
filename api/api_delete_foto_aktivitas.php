@@ -147,3 +147,4 @@ echo json_encode([
     "deleted_from_db" => $deletedFromDb
 ]);
 exit();
+

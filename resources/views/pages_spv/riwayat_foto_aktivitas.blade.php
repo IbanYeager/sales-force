@@ -7,7 +7,7 @@
   <title>SPV Desktop - Galeri Foto Aktivitas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_perfect">
-  <link rel="stylesheet" href="../css/riwayat_foto_aktivitas.css?v=20261029_spv_sync">
+  <link rel="stylesheet" href="../css/riwayat_foto_aktivitas.css?v={{ time() }}">
 
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#CC0000">
@@ -320,3 +320,4 @@
 </body>
 
 </html>
+
