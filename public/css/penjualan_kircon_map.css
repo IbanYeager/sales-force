@@ -1,0 +1,828 @@
+/* css/penjualan_kircon_map.css - Interactive District Map & Polreg Choropleth for Penjualan Kircon */
+
+:root {
+  --krc-map-crimson: #d7123a;
+  --krc-map-blue: #2563eb;
+  --krc-map-emerald: #10b981;
+  --krc-map-amber: #f59e0b;
+  --krc-map-border: #e2e8f0;
+  --krc-map-card-bg: #ffffff;
+  --krc-map-text: #0f172a;
+  --krc-map-muted: #64748b;
+}
+
+[data-theme="dark"] {
+  --krc-map-border: #334155;
+  --krc-map-card-bg: #1e293b;
+  --krc-map-text: #f8fafc;
+  --krc-map-muted: #94a3b8;
+}
+
+/* ── Container Card ── */
+.kircon-mapping-card {
+  background: var(--krc-map-card-bg);
+  border: 1px solid var(--krc-map-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+  margin-top: 10px;
+  margin-bottom: 24px;
+  width: 100%;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ── Header ── */
+.kircon-map-header {
+  padding: 16px 22px;
+  background: var(--krc-map-card-bg);
+  border-bottom: 1px solid var(--krc-map-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.kircon-map-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kircon-map-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(215, 18, 58, 0.1);
+  color: var(--krc-map-crimson);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.kircon-map-title-wrap h3 {
+  margin: 0 0 3px 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--krc-map-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kircon-map-title-wrap p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--krc-map-muted);
+}
+
+.kircon-map-kpis-mini {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.kircon-mini-kpi-item {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 12px;
+  background: rgba(15, 23, 42, 0.03);
+  border: 1px solid var(--krc-map-border);
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .kircon-mini-kpi-item {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.kircon-mini-kpi-item .lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--krc-map-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kircon-mini-kpi-item .val {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--krc-map-text);
+}
+
+.kircon-mini-kpi-item .val.highlight-do {
+  color: var(--krc-map-emerald);
+}
+
+.kircon-mini-kpi-item .val.highlight-spk {
+  color: var(--krc-map-blue);
+}
+
+/* ── Map Controls Bar ── */
+.kircon-map-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kircon-select-map-filter {
+  background: var(--krc-map-card-bg);
+  color: var(--krc-map-text);
+  border: 1px solid var(--krc-map-border);
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.kircon-select-map-filter:focus {
+  border-color: var(--krc-map-crimson);
+  box-shadow: 0 0 0 2px rgba(215, 18, 58, 0.15);
+}
+
+.kircon-map-btn {
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--krc-map-border);
+  color: var(--krc-map-text);
+  padding: 7px 13px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-theme="dark"] .kircon-map-btn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.kircon-map-btn:hover,
+.kircon-map-btn.active {
+  background: #0d1b3e;
+  color: #ffffff;
+  border-color: #0d1b3e;
+}
+
+[data-theme="dark"] .kircon-map-btn:hover,
+[data-theme="dark"] .kircon-map-btn.active {
+  background: var(--krc-map-crimson);
+  border-color: var(--krc-map-crimson);
+}
+
+/* ── Quick Regency Filter Bar ── */
+.kircon-quick-area-bar {
+  padding: 10px 22px;
+  background: rgba(15, 23, 42, 0.02);
+  border-bottom: 1px solid var(--krc-map-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+[data-theme="dark"] .kircon-quick-area-bar {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.kircon-area-pill {
+  white-space: nowrap;
+  background: var(--krc-map-card-bg);
+  border: 1px solid var(--krc-map-border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--krc-map-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kircon-area-pill:hover,
+.kircon-area-pill.active {
+  background: var(--krc-map-crimson);
+  color: #ffffff;
+  border-color: var(--krc-map-crimson);
+}
+
+/* ── Main Map & Inspector Grid ── */
+.kircon-map-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  min-height: 520px;
+  position: relative;
+}
+
+@media (max-width: 1100px) {
+  .kircon-map-body-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Leaflet Canvas Container ── */
+.kircon-map-canvas-container {
+  height: 520px;
+  width: 100%;
+  position: relative;
+  background: #f1f5f9;
+}
+
+[data-theme="dark"] .kircon-map-canvas-container {
+  background: #0f172a;
+}
+
+#kirconDistrictsMap {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ── Legend Strip ── */
+.kircon-map-legend {
+  padding: 10px 22px;
+  background: var(--krc-map-card-bg);
+  border-top: 1px solid var(--krc-map-border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--krc-map-text);
+}
+
+.kircon-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kircon-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.kircon-legend-dot.high {
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+
+.kircon-legend-dot.mid {
+  background: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.kircon-legend-dot.low {
+  background: #f43f5e;
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.25);
+}
+
+.kircon-legend-dot.zero {
+  background: #94a3b8;
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25);
+}
+
+/* ── Side Panel (Inspector HUD & Leaderboard) ── */
+.kircon-polreg-panel {
+  background: var(--krc-map-card-bg);
+  border-left: 1px solid var(--krc-map-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 520px;
+}
+
+@media (max-width: 1100px) {
+  .kircon-polreg-panel {
+    border-left: none;
+    border-top: 1px solid var(--krc-map-border);
+    max-height: 480px;
+  }
+}
+
+/* ── District Inspector HUD ── */
+.kircon-inspector-hud {
+  padding: 16px 18px;
+  background: rgba(15, 23, 42, 0.02);
+  border-bottom: 1px solid var(--krc-map-border);
+}
+
+[data-theme="dark"] .kircon-inspector-hud {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.kircon-hud-tag {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--krc-map-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.kircon-hud-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.kircon-hud-title-row h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--krc-map-text);
+}
+
+.kircon-hud-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 10.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.kircon-hud-status-badge.high {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.kircon-hud-status-badge.mid {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.kircon-hud-status-badge.low {
+  background: rgba(244, 63, 94, 0.15);
+  color: #e11d48;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.kircon-hud-status-badge.zero {
+  background: rgba(148, 163, 184, 0.15);
+  color: #64748b;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* 4-Stat Box Grid */
+.kircon-hud-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.kircon-hud-stat-box {
+  background: var(--krc-map-card-bg);
+  border: 1px solid var(--krc-map-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kircon-hud-stat-box .lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--krc-map-muted);
+  text-transform: uppercase;
+}
+
+.kircon-hud-stat-box .val {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--krc-map-text);
+  margin: 1px 0;
+}
+
+.kircon-hud-stat-box .sub {
+  font-size: 10px;
+  color: var(--krc-map-muted);
+  font-weight: 600;
+}
+
+/* Highlights Box */
+.kircon-hud-highlights {
+  background: var(--krc-map-card-bg);
+  border: 1px solid var(--krc-map-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kircon-highlight-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.kircon-highlight-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.kircon-highlight-icon.car {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+.kircon-highlight-icon.sales {
+  background: rgba(215, 18, 58, 0.12);
+  color: var(--krc-map-crimson);
+}
+
+.kircon-highlight-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.kircon-highlight-info .lbl {
+  font-size: 10px;
+  color: var(--krc-map-muted);
+  font-weight: 600;
+}
+
+.kircon-highlight-info .val {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--krc-map-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kircon-hud-filter-btn {
+  width: 100%;
+  margin-top: 10px;
+  background: var(--krc-map-crimson);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.kircon-hud-filter-btn:hover {
+  opacity: 0.92;
+}
+
+/* ── Leaderboard List ── */
+.kircon-leaderboard-header {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--krc-map-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kircon-leaderboard-header h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--krc-map-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kircon-leaderboard-list {
+  padding: 10px 14px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kircon-leaderboard-item {
+  background: rgba(15, 23, 42, 0.02);
+  border: 1px solid var(--krc-map-border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .kircon-leaderboard-item {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.kircon-leaderboard-item:hover,
+.kircon-leaderboard-item.active {
+  background: var(--krc-map-card-bg);
+  border-color: var(--krc-map-crimson);
+  box-shadow: 0 4px 12px rgba(215, 18, 58, 0.12);
+  transform: translateX(2px);
+}
+
+.kircon-leaderboard-item .rank-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.kircon-rank-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--krc-map-text);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kircon-leaderboard-item:nth-child(1) .kircon-rank-num {
+  background: #fbbf24;
+  color: #78350f;
+}
+
+.kircon-leaderboard-item:nth-child(2) .kircon-rank-num {
+  background: #cbd5e1;
+  color: #334155;
+}
+
+.kircon-leaderboard-item:nth-child(3) .kircon-rank-num {
+  background: #fdba74;
+  color: #7c2d12;
+}
+
+.kircon-leaderboard-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kircon-leaderboard-info .d-name {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--krc-map-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kircon-leaderboard-info .d-sub {
+  font-size: 10px;
+  color: var(--krc-map-muted);
+}
+
+.kircon-leaderboard-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.kircon-badge-do {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.kircon-badge-spk {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+/* ── Glassmorphic Tooltip ── */
+.polreg-modern-tooltip-wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.polreg-modern-tooltip-wrap .leaflet-tooltip-content {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.polreg-glass-tooltip {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #ffffff;
+  min-width: 220px;
+  max-width: 280px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.polreg-glass-tooltip .tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+  gap: 8px;
+}
+
+.polreg-glass-tooltip .tooltip-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.polreg-glass-tooltip .tooltip-regency {
+  font-size: 10.5px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.polreg-glass-tooltip .tooltip-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 12px;
+}
+
+.polreg-glass-tooltip .tooltip-badge.high {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.polreg-glass-tooltip .tooltip-badge.mid {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.polreg-glass-tooltip .tooltip-badge.low {
+  background: #f43f5e;
+  color: #ffffff;
+}
+
+.polreg-glass-tooltip .tooltip-badge.zero {
+  background: #64748b;
+  color: #ffffff;
+}
+
+.polreg-glass-tooltip .tooltip-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 6px 0;
+}
+
+.polreg-glass-tooltip .tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+
+.polreg-glass-tooltip .tooltip-row span {
+  color: #cbd5e1;
+}
+
+.polreg-glass-tooltip .tooltip-row b {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.polreg-glass-tooltip .tooltip-hint {
+  font-size: 9.5px;
+  color: #94a3b8;
+  margin-top: 6px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* ── Centroid District Label Marker ── */
+.tco-district-label-wrap {
+  background: transparent;
+  border: none;
+}
+
+.tco-district-label {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.show-all-labels .tco-district-label,
+.tco-district-label.active,
+.tco-district-label.hovered {
+  display: inline-flex !important;
+}
+
+.tco-district-label.active {
+  background: #d7123a !important;
+  border-color: #ffffff !important;
+  z-index: 9999;
+}
+
+.tco-label-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.tco-label-dot.high { background: #10b981; }
+.tco-label-dot.mid { background: #3b82f6; }
+.tco-label-dot.low { background: #f43f5e; }
+.tco-label-dot.zero { background: #94a3b8; }
+
+.tco-label-val {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* ── Dealer HQ Permanent Marker ── */
+.tco-office-marker {
+  background: transparent;
+  border: none;
+}
+
+.tco-office-pin {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #d7123a;
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 4px 14px rgba(215, 18, 58, 0.6);
+  cursor: pointer;
+  animation: pulse-dealer 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dealer {
+  0% { box-shadow: 0 0 0 0 rgba(215, 18, 58, 0.7); }
+  70% { box-shadow: 0 0 0 12px rgba(215, 18, 58, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(215, 18, 58, 0); }
+}

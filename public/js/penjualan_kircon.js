@@ -62,6 +62,10 @@ async function loadSalesData() {
             renderCharts(salesSummary);
             renderTable(salesRawData);
 
+            if (window.KirconDistrictMap) {
+                window.KirconDistrictMap.updateData(salesRawData);
+            }
+
             const countBadge = document.getElementById('filteredCountBadge');
             if (countBadge) {
                 countBadge.textContent = `${salesRawData.length} Data Ditampilkan`;

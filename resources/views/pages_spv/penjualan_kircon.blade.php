@@ -8,6 +8,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/style_spv.css?v=20260915_layout_perfect">
   <link rel="stylesheet" href="../css/penjualan_kircon.css">
+  <link rel="stylesheet" href="../css/penjualan_kircon_map.css?v={{ time() }}">
+
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="manifest" href="../manifest.json">
@@ -276,6 +281,176 @@
           </div>
         </div>
 
+        <!-- PETA SEBARAN WILAYAH (DO & SPK PER KECAMATAN BANDUNG RAYA) -->
+        <div class="kircon-mapping-card">
+          <!-- Header Card -->
+          <div class="kircon-map-header">
+            <div class="kircon-map-title-wrap">
+              <div class="kircon-map-icon-badge">
+                <i class="fa-solid fa-map-location-dot"></i>
+              </div>
+              <div>
+                <h3>Peta Sebaran Wilayah &amp; Pemetaan Kecamatan (DO &amp; SPK)</h3>
+                <p>Choropleth 79 kecamatan Bandung Raya, sebaran real-time delivery unit (DO) &amp; pemesanan (SPK)</p>
+              </div>
+            </div>
+
+            <!-- Header Mini Live KPIs -->
+            <div class="kircon-map-kpis-mini">
+              <div class="kircon-mini-kpi-item">
+                <span class="lbl">Unit DO Terkirim</span>
+                <span class="val highlight-do" id="kirconMiniDo">0 Unit</span>
+              </div>
+              <div class="kircon-mini-kpi-item">
+                <span class="lbl">Total SPK</span>
+                <span class="val highlight-spk" id="kirconMiniSpk">0 SPK</span>
+              </div>
+              <div class="kircon-mini-kpi-item">
+                <span class="lbl">Realisasi DO</span>
+                <span class="val" id="kirconMiniRatio">0%</span>
+              </div>
+              <div class="kircon-mini-kpi-item">
+                <span class="lbl">Nilai Omset OTR</span>
+                <span class="val" id="kirconMiniRev">Rp 0</span>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="kircon-map-controls">
+              <select class="kircon-select-map-filter" id="kirconMapFilterStatus" onchange="KirconDistrictMap.filterByStatus(this.value)">
+                <option value="all">Semua Status Penetrasi</option>
+                <option value="Tinggi">🟢 Penetrasi Tinggi (&ge;15 DO)</option>
+                <option value="Sedang">🔵 Penetrasi Sedang (6-14 DO)</option>
+                <option value="Rendah">🔴 Penetrasi Baru (1-5 DO)</option>
+                <option value="Belum Ada">⚪ Belum Ada Transaksi (0 DO)</option>
+              </select>
+
+              <button type="button" class="kircon-map-btn active" id="kirconBtnRoadmap" onclick="KirconDistrictMap.setBaseLayer('roadmap')">
+                <i class="fa-solid fa-map"></i> Roadmap
+              </button>
+              <button type="button" class="kircon-map-btn" id="kirconBtnSatellite" onclick="KirconDistrictMap.setBaseLayer('satellite')">
+                <i class="fa-solid fa-satellite"></i> Satelit
+              </button>
+              <button type="button" class="kircon-map-btn" id="kirconBtnToggleLabels" onclick="KirconDistrictMap.toggleLabels()" title="Tampilkan / Sembunyikan label nama kecamatan">
+                <i class="fa-solid fa-tag"></i> Label: Bersih
+              </button>
+              <button type="button" class="kircon-map-btn" onclick="KirconDistrictMap.recenterHQ()" title="Pusatkan ke Kantor Dealer Tunas Toyota Kiara Condong">
+                <i class="fa-solid fa-building-flag" style="color: #d7123a;"></i> Kantor KC
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Regency Filter Bar -->
+          <div class="kircon-quick-area-bar">
+            <span style="font-size: 11px; font-weight: 800; color: var(--krc-map-muted); white-space: nowrap;">
+              <i class="fa-solid fa-layer-group"></i> Filter Wilayah:
+            </span>
+            <button type="button" class="kircon-area-pill active" data-regency="all" onclick="KirconDistrictMap.filterByRegency('all')">
+              Semua Wilayah (79)
+            </button>
+            <button type="button" class="kircon-area-pill" data-regency="kota_bandung" onclick="KirconDistrictMap.filterByRegency('kota_bandung')">
+              Kota Bandung (30)
+            </button>
+            <button type="button" class="kircon-area-pill" data-regency="kota_cimahi" onclick="KirconDistrictMap.filterByRegency('kota_cimahi')">
+              Kota Cimahi (3)
+            </button>
+            <button type="button" class="kircon-area-pill" data-regency="kab_bandung" onclick="KirconDistrictMap.filterByRegency('kab_bandung')">
+              Kab. Bandung (31)
+            </button>
+            <button type="button" class="kircon-area-pill" data-regency="kab_bandung_barat" onclick="KirconDistrictMap.filterByRegency('kab_bandung_barat')">
+              Kab. Bandung Barat (15)
+            </button>
+          </div>
+
+          <!-- Body Grid: Map Canvas + Inspector HUD / Leaderboard -->
+          <div class="kircon-map-body-grid">
+            <div class="kircon-map-canvas-container">
+              <div id="kirconDistrictsMap"></div>
+            </div>
+
+            <div class="kircon-polreg-panel">
+              <!-- Inspector HUD -->
+              <div class="kircon-inspector-hud" id="kirconInspectorHud">
+                <span class="kircon-hud-tag" id="kirconHudTag">KOTA BANDUNG • BANDUNG TENGAH</span>
+                <div class="kircon-hud-title-row">
+                  <h3 id="kirconHudTitle">Kiaracondong</h3>
+                  <span class="kircon-hud-status-badge high" id="kirconHudBadge">
+                    <i class="fa-solid fa-circle-check"></i> Penetrasi Tinggi
+                  </span>
+                </div>
+
+                <!-- 4-Stat Box Grid -->
+                <div class="kircon-hud-stats-grid">
+                  <div class="kircon-hud-stat-box">
+                    <span class="lbl">Unit DO Terkirim</span>
+                    <div class="val" style="color: #10b981;" id="kirconHudDoVal">0 Unit</div>
+                    <span class="sub" id="kirconHudRatioVal">0% Realisasi</span>
+                  </div>
+                  <div class="kircon-hud-stat-box">
+                    <span class="lbl">Total SPK Terbit</span>
+                    <div class="val" style="color: #2563eb;" id="kirconHudSpkVal">0 Pesanan</div>
+                    <span class="sub" id="kirconHudRevVal">Rp 0</span>
+                  </div>
+                </div>
+
+                <!-- Highlights Box -->
+                <div class="kircon-hud-highlights">
+                  <div class="kircon-highlight-row">
+                    <div class="kircon-highlight-icon car"><i class="fa-solid fa-car"></i></div>
+                    <div class="kircon-highlight-info">
+                      <span class="lbl">Model Terlaris #1:</span>
+                      <strong class="val" id="kirconHudTopModel">Memuat...</strong>
+                    </div>
+                  </div>
+                  <div class="kircon-highlight-row">
+                    <div class="kircon-highlight-icon sales"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="kircon-highlight-info">
+                      <span class="lbl">Sales Kontributor Terbanyak:</span>
+                      <strong class="val" id="kirconHudTopSales">Memuat...</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="button" class="kircon-hud-filter-btn" onclick="KirconDistrictMap.filterTransactionsByDistrict()">
+                  <i class="fa-solid fa-filter"></i> Lihat Transaksi Wilayah Ini
+                </button>
+              </div>
+
+              <!-- Leaderboard Ranking -->
+              <div class="kircon-leaderboard-header">
+                <h4><i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> Top 10 Kecamatan</h4>
+                <span style="font-size: 11px; font-weight: 700; color: var(--krc-map-muted);">DO &amp; SPK</span>
+              </div>
+              <div class="kircon-leaderboard-list" id="kirconLeaderboardList">
+                <!-- Populated dynamically via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Legend Strip -->
+          <div class="kircon-map-legend">
+            <span style="font-size: 11px; font-weight: 800; color: var(--krc-map-muted); margin-right: 4px;">
+              <i class="fa-solid fa-circle-info"></i> Legenda:
+            </span>
+            <div class="kircon-legend-item">
+              <span class="kircon-legend-dot high"></span>
+              <span>Penetrasi Tinggi (&ge;15 Unit DO)</span>
+            </div>
+            <div class="kircon-legend-item">
+              <span class="kircon-legend-dot mid"></span>
+              <span>Penetrasi Sedang (6 - 14 Unit DO)</span>
+            </div>
+            <div class="kircon-legend-item">
+              <span class="kircon-legend-dot low"></span>
+              <span>Penetrasi Baru (1 - 5 Unit DO)</span>
+            </div>
+            <div class="kircon-legend-item">
+              <span class="kircon-legend-dot zero"></span>
+              <span>Belum Ada Transaksi (0 Unit)</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Data Table Section -->
         <div class="kircon-table-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
@@ -334,6 +509,7 @@
   </div>
 
   <script src="../custom_alert.js"></script>
+  <script src="../js/kircon_district_map.js?v={{ time() }}"></script>
   <script src="../js/penjualan_kircon.js"></script>
   <script src="../js/spv_global.js"></script>
   <script src="../js/pwa-app.js?v=20261021_v20"></script>

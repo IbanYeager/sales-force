@@ -276,6 +276,9 @@ const App = (() => {
     // Render tab charts after DOM layout settles
     setTimeout(() => {
       renderCurrentTabCharts();
+      if (tabId === 'demographics' && window.KirconDistrictMap) {
+        window.KirconDistrictMap.invalidateSize();
+      }
       if (window.lucide) window.lucide.createIcons();
     }, 50);
   }
@@ -293,6 +296,11 @@ const App = (() => {
 
     // Update active tab charts & tables
     renderCurrentTabCharts();
+
+    // Update Interactive District Map (DO & SPK per Kecamatan)
+    if (window.KirconDistrictMap) {
+      window.KirconDistrictMap.updateData(filteredData);
+    }
 
     // Update Data Table
     tableState.page = 1;
