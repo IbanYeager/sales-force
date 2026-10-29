@@ -82,7 +82,7 @@ function isPameranOrEvent($tipe, $keterangan = '', $status = '') {
         return false;
     }
 
-    // Keyword pencocokan Pameran & Event
+    // Keyword pencocokan Pameran, Event, & Aktivitas Lapangan Sales
     $allowedKeywords = [
         'pameran',
         'event',
@@ -93,7 +93,15 @@ function isPameranOrEvent($tipe, $keterangan = '', $status = '') {
         'mall',
         'borma',
         'kings',
-        'cimall'
+        'cimall',
+        'canvassing',
+        'lapangan',
+        'test drive',
+        'delivery',
+        'showroom',
+        'prospek',
+        'aktivitas',
+        'kegiatan'
     ];
 
     foreach ($allowedKeywords as $kw) {

@@ -180,6 +180,9 @@
           </div>
 
           <div class="hero-right-actions">
+            <button type="button" class="btn-bulk-upload-trigger" onclick="openBulkUploadModal()" title="Upload Banyak Foto Aktivitas Sekaligus" style="background: linear-gradient(135deg, #eb0a1e, #b30816); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; font-size: 11.5px; font-weight: 800; padding: 6px 16px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; box-shadow: 0 4px 12px rgba(235,10,30,0.35); transition: all 0.2s;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Upload Banyak Foto
+            </button>
             <div style="background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 800; color: #ffffff; border: 1px solid rgba(216,164,55,0.3);">
               <i class="fa-solid fa-camera"></i> <span id="photoTotalCount">...</span> Foto
             </div>
@@ -238,10 +241,14 @@
             </select>
           </div>
 
-          <button type="button" onclick="printGalleryReport()" style="background: #0f172a; color: #ffffff; border: 1px solid #334155; font-weight: 600; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; margin-left: auto;">
-            <i class="fa-solid fa-print"></i> Cetak Rekap PDF
-          </button>
-        </div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
+            <button type="button" onclick="openBulkUploadModal()" style="background: linear-gradient(135deg, #eb0a1e, #b30816); color: #ffffff; border: none; font-weight: 700; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(235,10,30,0.3);">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Upload Foto
+            </button>
+            <button type="button" onclick="printGalleryReport()" style="background: #0f172a; color: #ffffff; border: 1px solid #334155; font-weight: 600; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+              <i class="fa-solid fa-print"></i> Cetak Rekap PDF
+            </button>
+          </div>
 
         <!-- Loading State -->
         <div id="galleryLoading" style="text-align:center; padding: 50px 20px; font-size: 13px; color: var(--text-muted);">
@@ -299,9 +306,13 @@
   <!-- Floating Gallery Toast Notification -->
   <div id="galleryToast" class="gallery-toast-notification"></div>
 
+  <!-- Modal Bulk Upload Foto Aktivitas Kacab -->
+  @include('pages_kacab.modal_upload_banyak_foto')
+
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
   <script src="../js/riwayat_foto_aktivitas.js?v=20260923_kacab_sync"></script>
+  <script src="../js/kacab_bulk_upload.js?v={{ time() }}"></script>
   <script src="../js/pwa-app.js?v=20261021_v20"></script>
 </body>
 

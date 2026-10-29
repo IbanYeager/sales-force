@@ -17,8 +17,8 @@ No,Sales,Target SPK,Target DO,Actual SPK,Actual DO,,Tim Pak Ryan = 35
 15,Hadi,2,1,1,,,Hadi : SPK 1 | DO 
 16,Agus,3,3,1,,,Agus : SPK 1 | DO 
 17,Tama,2,1,1,1,,Tama : SPK 1 | DO 1
-18,Rahma,7,7,3,,,Rahma : SPK 3 | DO 
-Jumlah Keseluruhan,,64,61,21,8,,Total : SPK 21 | DO 8
+18,Rahma,7,7,5,5,,Rahma : SPK 5 | DO 5
+Jumlah Keseluruhan,,64,61,23,13,,Total : SPK 23 | DO 13
 ,,,,,,,
 Pak Alvin,,,,,,,Tim Pak Alvin = 33
 1,Dadi,3,3,1,2,,Dadi : SPK 1 | DO 2
@@ -45,27 +45,25 @@ Jumlah Keseluruhan,,62,61,24,11,,Total : SPK 24 | DO 11
 ,,,,,,,
 Pak Riva,,,,,,,Tim Pak Riva = 25
 1,Galih,5,4,4,2,,Galih : SPK 4 | DO 2
-2,Giyono,6,5,2,5,,Giyono : SPK 2 | DO 5
-,,,,,1,,
+2,Giyono,6,5,3,5,,Giyono : SPK 3 | DO 5
+3,Reny,,,,1,,
 4,Rizal,3,3,1,1,,Rizal : SPK 1 | DO 1
-5,Shovia,3,2,2,,,Shovia : SPK 2 | DO 
+5,Shovia,3,2,4,1,,Shovia : SPK 4 | DO 1
 6,Gugum,3,2,,,,Gugum : SPK  | DO 
 7,Robby,3,3,2,,,Robby : SPK 2 | DO 
 8,Puspa,3,3,3,3,,Puspa : SPK 3 | DO 3
-9,Juli,3,3,,,,Juli : SPK  | DO 
-10,Ophie,4,4,,1,,Ophie : SPK  | DO 1
-11,Faris,2,1,,,,Faris : SPK  | DO 
-Jumlah Keseluruhan,,35,30,14,13,,Total : SPK 14 | DO 13
+9,Ophie,4,4,,1,,Ophie : SPK  | DO 1
+Jumlah Keseluruhan,,30,26,17,14,,Total : SPK 17 | DO 14
 ,,,,,,,
 Bu Rahma,,,,,,,Tim Bu Rahma = 15
-1,Fia,3,3,2,1,,Fia : SPK 2 | DO 1
+1,Fia,3,3,3,2,,Fia : SPK 3 | DO 2
 2,Isna,3,3,1,1,,Isna : SPK 1 | DO 1
-3,Neo,3,3,1,,,Neo : SPK 1 | DO 
+3,Neo,3,3,2,,,Neo : SPK 2 | DO 
 4,Dean,5,2,3,3,,Dean : SPK 3 | DO 3
-5,Tian,2,2,,,,Tian : SPK  | DO 
-6,Firzi,2,3,2,,,Firzi : SPK 2 | DO 
-7,Nuno,2,2,,,,Nuno : SPK  | DO 
-Jumlah Keseluruhan,,20,18,9,5,,Total : SPK 9 | DO 5
+5,Tian,2,2,1,,,Tian : SPK 1 | DO 
+6,Firzi,2,3,4,2,,Firzi : SPK 4 | DO 2
+7,Nuno,2,2,1,,,Nuno : SPK 1 | DO 
+Jumlah Keseluruhan,,20,18,15,8,,Total : SPK 15 | DO 8
 ,,,,,,,
-,,,,,,,Total Keseluruhan SPK : 68
-,,,,,,,Total Keseluruhan DO : 37
+,,,,,,,Total Keseluruhan SPK : 79
+,,,,,,,Total Keseluruhan DO : 46

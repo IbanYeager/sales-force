@@ -1178,7 +1178,11 @@
           <h2 id="pageTitle">Aktivitas Sales</h2>
           <p class="page-sub">Monitoring &amp; timeline aktivitas harian seluruh wiraniaga cabang</p>
         </div>
-        <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn-bulk-upload-kacab" onclick="openBulkUploadModal()" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: all 0.2s;">
+            <i class="fa-solid fa-cloud-arrow-up" style="color: #eb0a1e;"></i>
+            <span>Upload Banyak Foto</span>
+          </button>
           <button type="button" class="btn-input-kacab-primary" onclick="openInputAktivitasModal()">
             <i class="fa-solid fa-circle-plus"></i>
             <span>Input Aktivitas Sales</span>
@@ -1303,6 +1307,9 @@
           </div>
 
           <div class="spacer"></div>
+          <button type="button" class="btn-bulk-upload-toolbar" onclick="openBulkUploadModal()" style="background: #0f172a; color: #ffffff; border: 1px solid #334155; padding: 8px 14px; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: all 0.2s;">
+            <i class="fa-solid fa-cloud-arrow-up" style="color: #eb0a1e;"></i> Upload Banyak Foto
+          </button>
           <button type="button" class="btn-input-kacab-toolbar" onclick="openInputAktivitasModal()">
             <i class="fa-solid fa-plus"></i> Input Aktivitas
           </button>
@@ -1980,9 +1987,13 @@
     </div>
   </div>
 
+  <!-- Modal Bulk Upload Foto Aktivitas Kacab -->
+  @include('pages_kacab.modal_upload_banyak_foto')
+
   <script src="../custom_alert.js"></script>
   <script src="../js/kacab_global.js"></script>
   <script src="../js/kacab_aktivitas.js?v=20261016_v7"></script>
+  <script src="../js/kacab_bulk_upload.js?v={{ time() }}"></script>
   <script src="../js/pwa-app.js?v=20261016_v7"></script>
 </body>
 
