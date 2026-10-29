@@ -420,6 +420,79 @@ function deleteCurrentLightboxPhoto(event) {
   deleteGalleryPhoto(currentLightboxIndex, event);
 }
 
+async function confirmDeleteAllPhotos() {
+  if (!allPhotos || allPhotos.length === 0) {
+    showGalleryToast('<i class="fa-solid fa-circle-info" style="color:#38bdf8; margin-right:6px;"></i> Tidak ada foto aktivitas di galeri untuk dihapus.', 'info', 3000);
+    return;
+  }
+
+  const isFiltered = currentFilteredPhotos.length < allPhotos.length;
+  let deleteMode = 'all';
+
+  if (isFiltered && currentFilteredPhotos.length > 0) {
+    const confirmFiltered = window.confirm(
+      `⚠️ KONFIRMASI PENGHAPUSAN:\n\nSaat ini sedang terfilter ${currentFilteredPhotos.length} foto dari total ${allPhotos.length} foto.\n\nKlik [OK] untuk MENGHAPUS ${currentFilteredPhotos.length} FOTO yang sedang tampil ini secara permanen dari server & database.\nKlik [Batal] untuk membatalkan.`
+    );
+    if (!confirmFiltered) return;
+    deleteMode = 'filtered';
+  } else {
+    const confirmAll = window.confirm(
+      `⚠️ PERINGATAN BESAR:\n\nApakah Anda benar-benar yakin ingin MENGHAPUS SEMUA ${allPhotos.length} FOTO dari sistem?\n\nSeluruh berkas fisik foto dan referensi di database akan DIHAPUS PERMANEN!\nTindakan ini tidak dapat dibatalkan.`
+    );
+    if (!confirmAll) return;
+
+    const doubleCheck = window.prompt(`Ketik "HAPUS" (huruf kapital) untuk mengonfirmasi penghapusan seluruh ${allPhotos.length} foto:`);
+    if (doubleCheck !== 'HAPUS') {
+      showGalleryToast('<i class="fa-solid fa-circle-info" style="color:#38bdf8; margin-right:6px;"></i> Penghapusan dibatalkan.', 'info', 2500);
+      return;
+    }
+    deleteMode = 'all';
+  }
+
+  showGalleryToast('<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px;"></i> Menghapus foto dari server & database...', 'info', 0);
+
+  try {
+    const formData = new FormData();
+    if (deleteMode === 'all') {
+      formData.append('mode', 'all');
+    } else {
+      const fileNames = currentFilteredPhotos.map(p => p.file_name);
+      formData.append('file_names', JSON.stringify(fileNames));
+    }
+
+    const res = await fetch(getApiEndpoint('api_delete_foto_aktivitas.php'), {
+      method: 'POST',
+      body: formData
+    });
+
+    const json = await res.json();
+    if (json.status === 'success') {
+      showGalleryToast('<i class="fa-solid fa-circle-check" style="color:#10b981; margin-right:6px;"></i> ' + (json.message || 'Foto berhasil dihapus.'), 'success', 4000);
+
+      closeGalleryLightbox();
+
+      if (deleteMode === 'all') {
+        allPhotos = [];
+        currentFilteredPhotos = [];
+      } else {
+        const deletedSet = new Set(currentFilteredPhotos.map(p => p.file_name));
+        allPhotos = allPhotos.filter(p => !deletedSet.has(p.file_name));
+        currentFilteredPhotos = [];
+      }
+
+      const countEl = document.getElementById('photoTotalCount');
+      if (countEl) countEl.textContent = allPhotos.length;
+
+      applyFiltersAndRender();
+    } else {
+      showGalleryToast(`<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; margin-right:6px;"></i> Gagal menghapus: ${json.message || 'Terjadi kesalahan'}`, 'error', 4000);
+    }
+  } catch (err) {
+    console.error('Error bulk deleting photos:', err);
+    showGalleryToast('<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; margin-right:6px;"></i> Terjadi gangguan saat menghubungi server.', 'error', 3500);
+  }
+}
+
 function convertBlobToPng(blob) {
   return new Promise((resolve) => {
     if (blob.type === 'image/png') {

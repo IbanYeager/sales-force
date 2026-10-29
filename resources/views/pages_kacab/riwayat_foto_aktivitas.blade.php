@@ -248,6 +248,9 @@
             <button type="button" onclick="printGalleryReport()" style="background: #0f172a; color: #ffffff; border: 1px solid #334155; font-weight: 600; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
               <i class="fa-solid fa-print"></i> Cetak Rekap PDF
             </button>
+            <button type="button" onclick="confirmDeleteAllPhotos()" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700; font-size: 12px; border-radius: 8px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s;" title="Hapus seluruh foto dokumentasi aktivitas dari galeri">
+              <i class="fa-solid fa-trash-can"></i> Hapus Semua Foto
+            </button>
           </div>
         </div>
 
