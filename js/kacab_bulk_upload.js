@@ -84,6 +84,11 @@ async function openBulkUploadModal(prefillData = {}) {
 
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+
+  // Pastikan form scroll posisi di atas saat baru dibuka
+  const bodyEl = modal.querySelector('.bulk-upload-body');
+  if (bodyEl) bodyEl.scrollTop = 0;
 }
 
 /**
@@ -100,6 +105,7 @@ function closeBulkUploadModal() {
   if (modal) {
     modal.classList.remove('open');
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
   }
   isBulkUploading = false;
   hideBulkUploadProgress();
@@ -498,3 +504,4 @@ async function submitBulkUpload(event) {
 document.addEventListener('DOMContentLoaded', () => {
   initBulkUploadDropzone();
 });
+

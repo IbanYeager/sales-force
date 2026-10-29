@@ -14,6 +14,7 @@
     padding: 16px;
     opacity: 0;
     transition: opacity 0.25s ease;
+    overscroll-behavior: contain;
   }
   .bulk-upload-overlay.open {
     display: flex !important;
@@ -23,7 +24,8 @@
     background: #ffffff;
     width: 100%;
     max-width: 760px;
-    max-height: 92vh;
+    height: 90vh;
+    max-height: 90vh;
     border-radius: 20px;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
     border: 1px solid #cbd5e1;
@@ -35,6 +37,13 @@
   @keyframes bulkModalPop {
     from { opacity: 0; transform: scale(0.95) translateY(12px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  #formBulkUploadKacab {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
   .bulk-upload-header {
     background: #0f172a;
@@ -97,12 +106,29 @@
   }
   .bulk-upload-body {
     padding: 20px 24px;
-    overflow-y: auto;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 16px;
     background: #ffffff;
+  }
+  .bulk-upload-body::-webkit-scrollbar {
+    width: 8px;
+  }
+  .bulk-upload-body::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+  }
+  .bulk-upload-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 8px;
+  }
+  .bulk-upload-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
   .bulk-banner-info {
     background: #eff6ff;
@@ -688,3 +714,4 @@
 
   </div>
 </div>
+
