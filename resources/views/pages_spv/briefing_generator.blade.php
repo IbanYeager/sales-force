@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -220,6 +220,7 @@
           <span class="spv-category-title"><i class="fa-solid fa-users-gear"></i> Supervisi Tim Sales</span>
           <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Tim Wiraniaga</a>
           <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Monitoring Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i>Galeri Foto Aktivitas</a>
           <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
           <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-wand-magic-sparkles"></i>Briefing Auto-Gen</a>
           <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
@@ -346,7 +347,7 @@
               </button>
             </div>
             <button type="button" class="btn" style="width:100%; background:linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color:white; font-weight:800; padding:13px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.35); margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="publishBriefingToSalesApp()">
-              <i class="fa-solid fa-cloud-arrow-up"></i> ðŸ“¢ Terbitkan ke Seluruh Sales App (Podcast &amp; Teks)
+              <i class="fa-solid fa-cloud-arrow-up"></i> 📢 Terbitkan ke Seluruh Sales App (Podcast &amp; Teks)
             </button>
 
             <!-- AI VOICE PODCAST PLAYER CARD -->
@@ -440,40 +441,40 @@
         const pctSpk = Math.round((realSpk / targetSpk) * 100) || 0;
         const pctDo = Math.round((realDo / targetDo) * 100) || 0;
 
-        msg = `ðŸŒ… *MORNING HUDDLE & TARGET KICKOFF* ðŸŒ…\n*TUNAS TOYOTA KIARA CONDONG*\nðŸ“… ${today}\n\nSemangat Pagi Tim Sales Juara! ðŸ”¥\nMari kita mulai hari ini dengan energi positif dan fokus pencapaian target cabang:\n\nðŸ“Š *STATUS TARGET TIM BULAN BERJALAN:*
-â€¢ SPK : *${realSpk} / ${targetSpk} Unit* (${pctSpk}%)
-â€¢ DO  : *${realDo} / ${targetDo} Unit* (${pctDo}%)
-â€¢ Sisa Hari Kerja : *${Math.max(1, 30 - new Date().getDate())} Hari*
+        msg = `🌅 *MORNING HUDDLE & TARGET KICKOFF* 🌅\n*TUNAS TOYOTA KIARA CONDONG*\n📅 ${today}\n\nSemangat Pagi Tim Sales Juara! 🔥\nMari kita mulai hari ini dengan energi positif dan fokus pencapaian target cabang:\n\n📊 *STATUS TARGET TIM BULAN BERJALAN:*
+• SPK : *${realSpk} / ${targetSpk} Unit* (${pctSpk}%)
+• DO  : *${realDo} / ${targetDo} Unit* (${pctDo}%)
+• Sisa Hari Kerja : *${Math.max(1, 30 - new Date().getDate())} Hari*
 
-ðŸŽ¯ *FOKUS STRATEGI HARI INI:*
-â€¢ Kegiatan : *${fokus}*
-â€¢ Target Harian : *${targetHarian}*
-â€¢ Segera follow-up seluruh prospek SPK pending dan janji test drive!
+🎯 *FOKUS STRATEGI HARI INI:*
+• Kegiatan : *${fokus}*
+• Target Harian : *${targetHarian}*
+• Segera follow-up seluruh prospek SPK pending dan janji test drive!
 
-ðŸ’¡ *QUOTE OF THE DAY:*
+💡 *QUOTE OF THE DAY:*
 ${motivasi}
 
-_Mari berikan pelayanan terbaik dan closing sebanyak-banyaknya hari ini! Toyota Let's Go Beyond!_ ðŸš€ðŸš—`;
+_Mari berikan pelayanan terbaik dan closing sebanyak-banyaknya hari ini! Toyota Let's Go Beyond!_ 🚀🚗`;
       } else {
         const spkToday = document.getElementById('inSpkToday').value;
         const topSales = document.getElementById('inTopSales').value;
 
-        msg = `ðŸŒ† *EVENING CLOSING & RECAP EVALUATION* ðŸŒ†\n*TUNAS TOYOTA KIARA CONDONG*\nðŸ“… ${today}\n\nSelamat malam rekan-rekan wiraniaga hebat! ðŸ‘\nBerikut adalah rangkuman pencapaian aktivitas dan penjualan tim hari ini:\n\nðŸŽ‰ *SPK MASUK HARI INI:*
-â€¢ Total: *${spkToday}*
+        msg = `🌆 *EVENING CLOSING & RECAP EVALUATION* 🌆\n*TUNAS TOYOTA KIARA CONDONG*\n📅 ${today}\n\nSelamat malam rekan-rekan wiraniaga hebat! 👏\nBerikut adalah rangkuman pencapaian aktivitas dan penjualan tim hari ini:\n\n🎉 *SPK MASUK HARI INI:*
+• Total: *${spkToday}*
 
-ðŸ† *SALES OF THE DAY:*
-â€¢ *${topSales}* (Terima kasih atas kerja keras dan dedikasinya!)
+🏆 *SALES OF THE DAY:*
+• *${topSales}* (Terima kasih atas kerja keras dan dedikasinya!)
 
-ðŸ“ˆ *AKUMULASI PENCAPAIAN CABANG:*
-â€¢ Total SPK : *${realSpk} Unit*
-â€¢ Total DO  : *${realDo} Unit*
+📈 *AKUMULASI PENCAPAIAN CABANG:*
+• Total SPK : *${realSpk} Unit*
+• Total DO  : *${realDo} Unit*
 
-ðŸ“Œ *EVALUASI & TINDAK LANJUT BESOK:*
+📌 *EVALUASI & TINDAK LANJUT BESOK:*
 1. Pastikan seluruh aktivitas lapangan hari ini telah di-submit lengkap dengan foto GPS di Sales App.
 2. Segera susun daftar jadwal kunjungan & follow up untuk esok pagi.
 3. Tetap jaga semangat & optimisme menuju closing target akhir bulan!
 
-_Terima kasih atas perjuangan hari ini. Selamat beristirahat bersama keluarga tercinta!_ ðŸŒŸ`;
+_Terima kasih atas perjuangan hari ini. Selamat beristirahat bersama keluarga tercinta!_ 🌟`;
       }
 
       document.getElementById('waMessagePreview').innerText = msg;
@@ -547,7 +548,7 @@ _Terima kasih atas perjuangan hari ini. Selamat beristirahat bersama keluarga te
             if (json.status === 'success') {
               Swal.fire({
                 icon: 'success',
-                title: 'ðŸŽ‰ Briefing Berhasil Diterbitkan!',
+                title: '🎉 Briefing Berhasil Diterbitkan!',
                 text: 'Seluruh tim sales kini dapat membaca dan mendengarkan podcast suara briefing ini langsung di dashboard mereka.',
                 confirmButtonColor: '#2563eb'
               });
@@ -590,7 +591,7 @@ _Terima kasih atas perjuangan hari ini. Selamat beristirahat bersama keluarga te
     // Initialize
     generateBriefingText();
 
-    // â”€â”€ AI VOICE BRIEFING AUDIO ENGINE (TTS) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── AI VOICE BRIEFING AUDIO ENGINE (TTS) ───────────────────
     let currentSpeechUtterance = null;
     let isSpeaking = false;
     let isPaused = false;
@@ -611,7 +612,7 @@ _Terima kasih atas perjuangan hari ini. Selamat beristirahat bersama keluarga te
       return text
         .replace(/[\*\_~`]/g, '')
         .replace(/[\u{1F600}-\u{1F64F}|\u{1F300}-\u{1F5FF}|\u{1F680}-\u{1F6FF}|\u{2600}-\u{26FF}|\u{2700}-\u{27BF}]/gu, '')
-        .replace(/â€¢/g, 'Poin: ')
+        .replace(/•/g, 'Poin: ')
         .replace(/\n\n+/g, '. ')
         .replace(/\n/g, ', ');
     }

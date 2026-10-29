@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -138,6 +138,7 @@
           <span class="spv-category-title"><i class="fa-solid fa-users-gear"></i> Supervisi Tim Sales</span>
           <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Tim Wiraniaga</a>
           <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Monitoring Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i>Galeri Foto Aktivitas</a>
           <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
           <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-wand-magic-sparkles"></i>Briefing Auto-Gen</a>
           <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
@@ -391,7 +392,7 @@
     function shareCanvassStrategyWa() {
       const z = currentSelectedZone;
       if (!z) return;
-      const text = `ðŸ—ºï¸ *STRATEGI PENUGASAN CANVASSING TIM SALES* ðŸ—ºï¸\nDealer: Tunas Toyota Kiara Condong\n\nðŸ“ *Wilayah Target:* ${z.name} (${z.sub})\nðŸ“Š *Market Share Toyota:* ${z.share}\nðŸš— *Fokus Unit Jualan:* ${(z.models || []).join(', ')}\n\nðŸ“Œ *Rekomendasi Titik Lapangan & Rute Maps:* \n${(z.spots || []).map((s, idx) => `${idx+1}. ${s} (https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s + ', ' + z.name + ', Bandung')})`).join('\n')}\n\nSemua wiraniaga yang ditugaskan wajib check-in GPS dan upload foto di Sales App saat tiba di lokasi. Semangat closing! ðŸ”¥`;
+      const text = `🗺️ *STRATEGI PENUGASAN CANVASSING TIM SALES* 🗺️\nDealer: Tunas Toyota Kiara Condong\n\n📍 *Wilayah Target:* ${z.name} (${z.sub})\n📊 *Market Share Toyota:* ${z.share}\n🚗 *Fokus Unit Jualan:* ${(z.models || []).join(', ')}\n\n📌 *Rekomendasi Titik Lapangan & Rute Maps:* \n${(z.spots || []).map((s, idx) => `${idx+1}. ${s} (https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s + ', ' + z.name + ', Bandung')})`).join('\n')}\n\nSemua wiraniaga yang ditugaskan wajib check-in GPS dan upload foto di Sales App saat tiba di lokasi. Semangat closing! 🔥`;
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
 

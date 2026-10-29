@@ -224,6 +224,7 @@ if ($conn) {
                 }
 
                 $photos[] = [
+                    'id' => intval($row['id']),
                     'file_name' => $fName,
                     'file_url' => $fileRelUrl,
                     'nama_sales' => $row['nama_sales'] ?: 'Sales Consultant',
@@ -425,6 +426,7 @@ foreach (array_keys($allAktivitasFiles) as $f) {
     $keterangan = $meta['keterangan'] ?? ('Dokumentasi foto aktivitas pameran & event cabang (' . date('d/m/Y', $timestamp) . ')');
 
     $photos[] = [
+        'id' => null,
         'file_name' => $f,
         'file_url' => $fileInfo['rel'],
         'nama_sales' => $namaSales,

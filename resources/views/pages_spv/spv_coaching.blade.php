@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -92,6 +92,7 @@
           <span class="spv-category-title"><i class="fa-solid fa-users-gear"></i> Supervisi Tim Sales</span>
           <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Tim Wiraniaga</a>
           <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Monitoring Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i>Galeri Foto Aktivitas</a>
           <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
           <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-wand-magic-sparkles"></i>Briefing Auto-Gen</a>
           <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
@@ -124,7 +125,7 @@
       <div class="spv-topbar">
         <div>
           <h2>SPV Sales Coaching Radar</h2>
-          <p class="page-sub">Analisis rasio konversi tim wiraniaga (Prospek â†’ SPK â†’ DO) &amp; panduan AI Coaching presisi bagi SPV!</p>
+          <p class="page-sub">Analisis rasio konversi tim wiraniaga (Prospek → SPK → DO) &amp; panduan AI Coaching presisi bagi SPV!</p>
         </div>
         <div class="spv-user">
           <div class="avatar-status">

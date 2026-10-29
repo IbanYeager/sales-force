@@ -249,11 +249,14 @@ function renderGalleryTimeline(photos) {
 
     html += `
       <div class="gallery-photo-card" onclick="openLightbox(${globalIndex})" title="Klik untuk perbesar">
-        <img src="${encodedUrl}" alt="${item.tipe_aktivitas || 'Foto Aktivitas'}" loading="lazy">
+        <img src="${encodedUrl}" alt="${escapeHtml(item.tipe_aktivitas || 'Foto Aktivitas')}" loading="lazy">
         <div class="photo-clean-hover">
-          <div class="hover-expand-circle">
+          <div class="hover-expand-circle" title="Perbesar Foto">
             <i class="fa-solid fa-expand"></i>
           </div>
+          <button type="button" class="photo-card-delete-btn" onclick="deleteGalleryPhoto(${globalIndex}, event)" title="Hapus Foto">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
         </div>
       </div>
     `;
@@ -355,9 +358,66 @@ function showGalleryToast(htmlContent, type = 'info', duration = 3500) {
   }
 }
 
-function hideGalleryToast() {
-  const toast = document.getElementById('galleryToast');
-  if (toast) toast.classList.remove('show');
+async function deleteGalleryPhoto(index, event) {
+  if (event && event.stopPropagation) {
+    event.stopPropagation();
+  }
+
+  const item = currentFilteredPhotos[index];
+  if (!item) return;
+
+  const fileName = item.file_name;
+  const aktivitasId = item.id || 0;
+  const salesName = item.nama_sales ? ` (${item.nama_sales})` : '';
+
+  const confirmMsg = `Apakah Anda yakin ingin menghapus foto aktivitas ini${salesName}?\n\nBerkas foto "${fileName}" akan dihapus permanen dari server dan database.`;
+  if (!window.confirm(confirmMsg)) {
+    return;
+  }
+
+  showGalleryToast('<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px;"></i> Menghapus foto dari server...', 'info', 0);
+
+  try {
+    const formData = new FormData();
+    formData.append('file_name', fileName);
+    if (aktivitasId) {
+      formData.append('aktivitas_id', aktivitasId);
+    }
+
+    const res = await fetch(getApiEndpoint('api_delete_foto_aktivitas.php'), {
+      method: 'POST',
+      body: formData
+    });
+
+    const json = await res.json();
+    if (json.status === 'success') {
+      showGalleryToast('<i class="fa-solid fa-circle-check" style="color:#10b981; margin-right:6px;"></i> Foto kegiatan berhasil dihapus.', 'success', 3500);
+
+      // Tutup lightbox jika sedang terbuka
+      closeGalleryLightbox();
+
+      // Hapus item dari data memori
+      allPhotos = allPhotos.filter(p => p.file_name !== fileName);
+      currentFilteredPhotos = currentFilteredPhotos.filter(p => p.file_name !== fileName);
+
+      // Perbarui total counter
+      const countEl = document.getElementById('photoTotalCount');
+      if (countEl) countEl.textContent = currentFilteredPhotos.length;
+
+      // Re-render
+      applyFiltersAndRender();
+    } else {
+      showGalleryToast(`<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; margin-right:6px;"></i> Gagal menghapus: ${json.message || 'Terjadi kesalahan'}`, 'error', 4000);
+    }
+  } catch (err) {
+    console.error('Error deleting photo:', err);
+    showGalleryToast('<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; margin-right:6px;"></i> Terjadi gangguan saat menghubungi server.', 'error', 3500);
+  }
+}
+
+function deleteCurrentLightboxPhoto(event) {
+  if (event && event.stopPropagation) event.stopPropagation();
+  deleteGalleryPhoto(currentLightboxIndex, event);
 }
 
 function convertBlobToPng(blob) {

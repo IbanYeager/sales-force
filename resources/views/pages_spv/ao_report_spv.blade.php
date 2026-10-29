@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -92,6 +92,7 @@
           <span class="spv-category-title"><i class="fa-solid fa-users-gear"></i> Supervisi Tim Sales</span>
           <a href="wiraniaga.html" id="navWiraniaga"><i class="fa-solid fa-users"></i>Tim Wiraniaga</a>
           <a href="aktivitas.html" id="navAktivitas"><i class="fa-solid fa-list-check"></i>Monitoring Aktivitas<span class="nav-badge nav-badge-blue" id="navAktivitasBadge" style="display:none;">0</span></a>
+          <a href="riwayat_foto_aktivitas.html" id="navFotoAktivitas"><i class="fa-solid fa-images"></i>Galeri Foto Aktivitas</a>
           <a href="spv_coaching.html" id="navCoaching"><i class="fa-solid fa-chalkboard-user"></i>Coaching Radar</a>
           <a href="briefing_generator.html" id="navBriefing"><i class="fa-solid fa-wand-magic-sparkles"></i>Briefing Auto-Gen</a>
           <a href="peta_canvassing.html" id="navCanvassing"><i class="fa-solid fa-map-location-dot"></i>Canvassing Heatmap</a>
@@ -151,8 +152,8 @@
             <option value="Semua">Semua Tim (Total Cabang - Tanpa Dobel)</option>
             <optgroup label="Tim Pak Ryan (Induk &amp; Coaching)">
               <option value="Ryan">Tim Pak Ryan (Total: 25 Sales)</option>
-              <option value="Rahma">&nbsp;&nbsp;â†³ Coaching Bu Rahma - Calon SPV (5 Sales)</option>
-              <option value="Ryan_Direct">&nbsp;&nbsp;â†³ Tim Langsung Pak Ryan (20 Sales)</option>
+              <option value="Rahma">&nbsp;&nbsp;↳ Coaching Bu Rahma - Calon SPV (5 Sales)</option>
+              <option value="Ryan_Direct">&nbsp;&nbsp;↳ Tim Langsung Pak Ryan (20 Sales)</option>
             </optgroup>
             <option value="Alvin">Tim Pak Alvin (20 Sales)</option>
             <option value="Riva">Tim Pak Riva (14 Sales)</option>

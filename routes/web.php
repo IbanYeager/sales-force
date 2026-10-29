@@ -34,9 +34,10 @@ Route::prefix('spv')->group(function () {
     Route::get('/mtoyota_service', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
     Route::get('/mtoyota_service.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
     Route::get('/mtoyota', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
-    Route::get('/mtoyota.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
     Route::get('/penjualan_merchandise', function() { return app(PageController::class)->showSpvPage('penjualan_merchandise'); });
     Route::get('/penjualan_merchandise.html', function() { return app(PageController::class)->showSpvPage('penjualan_merchandise'); });
+    Route::get('/riwayat_foto_aktivitas', function() { return app(PageController::class)->showSpvPage('riwayat_foto_aktivitas'); });
+    Route::get('/riwayat_foto_aktivitas.html', function() { return app(PageController::class)->showSpvPage('riwayat_foto_aktivitas'); });
     Route::get('/{page}', [PageController::class, 'showSpvPage'])->name('spv.page');
 });
 Route::get('/pages_spv/sph.html', function() { return redirect('/pages_spv/index_spv.html'); });
@@ -45,6 +46,8 @@ Route::get('/pages_spv/quotation.html', function() { return redirect('/pages_spv
 Route::get('/pages_spv/quotation', function() { return redirect('/pages_spv/index_spv.html'); });
 Route::get('/pages_spv/ao_report.html', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
 Route::get('/pages_spv/ao_report', function() { return app(PageController::class)->showSpvPage('ao_report_spv'); });
+Route::get('/pages_spv/riwayat_foto_aktivitas.html', function() { return app(PageController::class)->showSpvPage('riwayat_foto_aktivitas'); });
+Route::get('/pages_spv/riwayat_foto_aktivitas', function() { return app(PageController::class)->showSpvPage('riwayat_foto_aktivitas'); });
 Route::get('/pages_spv/mtoyota_service.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
 Route::get('/pages_spv/mtoyota_service', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });
 Route::get('/pages_spv/mtoyota.html', function() { return app(PageController::class)->showSpvPage('mtoyota_service'); });

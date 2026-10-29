@@ -289,6 +289,7 @@
 
 .gallery-photo-card:hover .photo-clean-hover {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .hover-expand-circle {
@@ -304,10 +305,38 @@
   transform: scale(0.85);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
 }
 
 .gallery-photo-card:hover .hover-expand-circle {
   transform: scale(1);
+}
+
+.photo-card-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.88);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+}
+
+.photo-card-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
 }
 
 /* Fullscreen Lightbox Modal */

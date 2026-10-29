@@ -275,7 +275,10 @@
         <a id="lightboxDownloadBtn" href="#" download style="background: rgba(255,255,255,0.15); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; text-decoration: none;" title="Unduh Foto">
           <i class="fa-solid fa-download"></i>
         </a>
-        <button type="button" style="background: rgba(239, 68, 68, 0.85); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px;" onclick="closeGalleryLightbox()" title="Tutup">
+        <button type="button" id="lightboxDeleteBtn" style="background: rgba(220, 38, 38, 0.9); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 8px rgba(220,38,38,0.4);" onclick="deleteCurrentLightboxPhoto(event)" title="Hapus Foto">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+        <button type="button" style="background: rgba(100, 116, 139, 0.85); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px;" onclick="closeGalleryLightbox()" title="Tutup">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
