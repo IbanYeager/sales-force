@@ -268,8 +268,8 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
         'galih_riva' => ['target_spk' => 5, 'target_do' => 4],
         'giyono'     => ['target_spk' => 6, 'target_do' => 5],
         'giono'      => ['target_spk' => 6, 'target_do' => 5],
-        'reny'       => ['target_spk' => 3, 'target_do' => 2],
-        'reni'       => ['target_spk' => 3, 'target_do' => 2],
+        'reny'       => ['target_spk' => 0, 'target_do' => 0],
+        'reni'       => ['target_spk' => 0, 'target_do' => 0],
         'rizal'      => ['target_spk' => 3, 'target_do' => 3],
         'shovia'     => ['target_spk' => 3, 'target_do' => 2],
         'shovie'     => ['target_spk' => 3, 'target_do' => 2],
@@ -502,19 +502,22 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
             }
 
             $nama_sales = $col1;
-            $target_spk = intval(trim($cols[2] ?? '0'));
-            $target_do = intval(trim($cols[3] ?? '0'));
+            $raw_tgt_spk = trim($cols[2] ?? '');
+            $raw_tgt_do = trim($cols[3] ?? '');
             $actual_spk = intval(trim($cols[4] ?? '0'));
             $actual_do = intval(trim($cols[5] ?? '0'));
 
-            // Fallback target baseline jika target di sheet kosong atau 0
-            if ($target_spk <= 0) {
-                $wb_key = str_replace(['_', ' '], '', normalizeName($nama_sales));
+            // Fallback target baseline jika target di sheet kosong
+            $wb_key = str_replace(['_', ' '], '', normalizeName($nama_sales));
+            if ($raw_tgt_spk === '') {
                 $target_spk = $whiteboard_targets[$wb_key]['target_spk'] ?? 3;
+            } else {
+                $target_spk = intval($raw_tgt_spk);
             }
-            if ($target_do <= 0) {
-                $wb_key = str_replace(['_', ' '], '', normalizeName($nama_sales));
+            if ($raw_tgt_do === '') {
                 $target_do = $whiteboard_targets[$wb_key]['target_do'] ?? 2;
+            } else {
+                $target_do = intval($raw_tgt_do);
             }
 
             $total_spk += $actual_spk;
@@ -619,7 +622,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     if (!empty($active_sheet_ids) && count($active_sheet_ids) >= 10) {
         $id_list_str = implode(',', $active_sheet_ids);
         
-        $res_orphans = $conn->query("SELECT id, username, nama_lengkap FROM sales_accounts WHERE id NOT IN ($id_list_str)");
+        $res_orphans = $conn->query("SELECT id, username, nama_lengkap FROM sales_accounts WHERE id NOT IN ($id_list_str) AND username NOT IN ('other_alvin', 'other')");
         if ($res_orphans && $res_orphans->num_rows > 0) {
             while ($orphan = $res_orphans->fetch_assoc()) {
                 $orphan_id = intval($orphan['id']);
