@@ -136,7 +136,7 @@ $oktober_items = [
     ],
     [
         'month' => 'Oktober 2026',
-        'sales' => 'Yoni',
+        'sales' => 'Yeni',
         'spv' => 'ALVIN',
         'customer' => 'Ko Albert',
         'merk' => 'Mitsubishi',
@@ -200,7 +200,7 @@ $oktober_items = [
     ],
     [
         'month' => 'Oktober 2026',
-        'sales' => 'Erik',
+        'sales' => 'Erick',
         'spv' => 'FERYANTO',
         'customer' => 'Bayu',
         'merk' => 'Toyota',
@@ -210,15 +210,15 @@ $oktober_items = [
         'harga' => 110000000,
         'km' => '116 rb',
         'pajak' => 'Jul 2027',
-        'ket' => 'Cek Inspeksi',
-        'hasil' => 'Proses',
+        'ket' => 'Deal',
+        'hasil' => 'Deal',
         'cabang' => 'Tunas Toyota - Kiaracondong'
     ],
     [
         'month' => 'Oktober 2026',
         'sales' => 'Dean',
         'spv' => 'FERYANTO',
-        'customer' => 'Deny',
+        'customer' => 'Dery',
         'merk' => 'Nissan',
         'type' => 'Livina XV MT',
         'tahun' => 2008,
@@ -226,8 +226,8 @@ $oktober_items = [
         'harga' => 70000000,
         'km' => '200 rb',
         'pajak' => 'Feb 2027',
-        'ket' => 'Deal',
-        'hasil' => 'Deal',
+        'ket' => 'Cek Inspeksi',
+        'hasil' => 'Proses',
         'cabang' => 'Tunas Toyota - Kiaracondong'
     ],
     [
@@ -258,7 +258,7 @@ $oktober_items = [
         'harga' => 120000000,
         'km' => '9 rb',
         'pajak' => 'Mar 2027',
-        'ket' => 'Cek Inspeksi',
+        'ket' => 'Cek Harga',
         'hasil' => 'Proses',
         'cabang' => 'Tunas Toyota - Kiaracondong'
     ],
@@ -739,7 +739,7 @@ $spv_list = array_values($spv_groups);
 // ════════════════════════════════════════════════════════════════
 // 1. REKAP BULANAN DEAL PER SPV (PAPAN FISIK DEALER MATRIX)
 // Sesuai Report OLX by SPV Periode 2026.xlsx - Kiaracondong
-// Termasuk Rekap Bulan Oktober 2026 (Deal: Denis & Dean = 2 Deal Tim Ryan)
+// Termasuk Rekap Bulan Oktober 2026 (Deal: Denis & Erick = 2 Deal Tim Ryan)
 // ════════════════════════════════════════════════════════════════
 $month_names = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 $matrix_rows = [];
