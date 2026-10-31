@@ -112,9 +112,12 @@ if ($method === 'GET') {
     if (function_exists('syncGoogleSheetsToDb') || file_exists(__DIR__ . '/api_sheets_sync.php')) {
         require_once __DIR__ . '/api_sheets_sync.php';
         if ($conn) {
-            $q_chk = $conn->query("SELECT last_sync_at FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+            $q_chk = $conn->query("SELECT last_sync_at, auto_sync_enabled FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
             $should_sync = true;
             if ($q_chk && $c_row = $q_chk->fetch_assoc()) {
+                if (isset($c_row['auto_sync_enabled']) && intval($c_row['auto_sync_enabled']) === 0) {
+                    $should_sync = false;
+                }
                 $last_time = strtotime($c_row['last_sync_at'] ?? '2000-01-01');
                 if (time() - $last_time < 300) {
                     $should_sync = false;
@@ -224,9 +227,9 @@ if ($method === 'GET') {
         if ($spv !== '' && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master' && !isset($_GET['id_sales'])) {
             $spv_lower = strtolower($spv);
             if ($spv_lower === 'rahma' || $spv_lower === 'bu rahma') {
-                $spv_condition = "(s.nama_spv = 'Pak Ryan' AND (s.coaching_mentor = 'Bu Rahma' OR s.username IN ('fia','isna','neo','firzi','tian')))";
+                $spv_condition = "(s.nama_spv = 'Pak Ryan' AND (s.coaching_mentor = 'Bu Rahma' OR s.username IN ('fia','isna','neo','firzi','tian','dean','nuno','rahma')))";
             } elseif ($spv_lower === 'ryan_direct' || $spv_lower === 'pak ryan direct') {
-                $spv_condition = "(s.nama_spv = 'Pak Ryan' AND (s.coaching_mentor IS NULL OR s.coaching_mentor = '') AND s.username NOT IN ('fia','isna','neo','firzi','tian'))";
+                $spv_condition = "(s.nama_spv = 'Pak Ryan' AND (s.coaching_mentor IS NULL OR s.coaching_mentor = '' OR s.coaching_mentor != 'Bu Rahma') AND s.username NOT IN ('fia','isna','neo','firzi','tian','dean','nuno','rahma'))";
             } elseif ($spv_lower === 'ryan' || $spv_lower === 'pak ryan') {
                 $spv_condition = "(s.nama_spv = 'Pak Ryan' OR s.nama_spv LIKE '%Ryan%')";
             } else {

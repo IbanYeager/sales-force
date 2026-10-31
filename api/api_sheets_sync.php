@@ -81,11 +81,15 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     }
 
     $active_sheet_id = !empty($custom_id) ? $custom_id : $SPREADSHEET_ID;
+    $auto_sync_enabled = 1;
 
     // Ambil URL/ID Spreadsheet dari Database jika ada
     if (empty($custom_id) && $conn) {
-        $res_cfg = $conn->query("SELECT spreadsheet_id FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
+        $res_cfg = $conn->query("SELECT spreadsheet_id, auto_sync_enabled FROM tabel_sheets_sync_config WHERE id = 1 LIMIT 1");
         if ($res_cfg && $c_row = $res_cfg->fetch_assoc()) {
+            if (isset($c_row['auto_sync_enabled'])) {
+                $auto_sync_enabled = intval($c_row['auto_sync_enabled']);
+            }
             $db_sheet_id = trim($c_row['spreadsheet_id']);
             if (!empty($db_sheet_id) && $db_sheet_id !== '1mWrUtYNW5Q8_hiPLMmJzCUlfgP4o-4cB2VsEx8nqqjc' && $db_sheet_id !== '1P7_QcL88DFg7v3arU8m_keOtUNLoiE_4i74t65f6HFQ') {
                 $active_sheet_id = $db_sheet_id;
@@ -98,6 +102,7 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     }
 
     $cache_file = __DIR__ . '/../storage/sheets_target_cache.csv';
+    $force_curl = (isset($_GET['force']) && $_GET['force'] === '1');
     $candidate_urls = [
         "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/export?format=csv",
         "https://docs.google.com/spreadsheets/d/{$active_sheet_id}/gviz/tq?tqx=out:csv"
@@ -106,33 +111,38 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
     $csvData = false;
     $lastErr = '';
 
-    foreach ($candidate_urls as $fetch_url) {
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $fetch_url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_IPRESOLVE => defined('CURL_IPRESOLVE_V4') ? CURL_IPRESOLVE_V4 : 1,
-            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            CURLOPT_CONNECTTIMEOUT => 3,
-            CURLOPT_TIMEOUT => 4
-        ]);
-        $res = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlErr = curl_error($ch);
-        curl_close($ch);
+    // Jika auto_sync dinonaktifkan (misal mode manual papan tulis), prioritaskan cache lokal yang valid
+    if ($auto_sync_enabled === 0 && !$force_curl && file_exists($cache_file)) {
+        $csvData = @file_get_contents($cache_file);
+    } else {
+        foreach ($candidate_urls as $fetch_url) {
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $fetch_url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_IPRESOLVE => defined('CURL_IPRESOLVE_V4') ? CURL_IPRESOLVE_V4 : 1,
+                CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_TIMEOUT => 4
+            ]);
+            $res = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr = curl_error($ch);
+            curl_close($ch);
 
-        if ($httpCode === 200 && !empty($res) && strlen($res) > 200 && stripos($res, 'Tim Pak') !== false) {
-            $csvData = $res;
-            if (!is_dir(dirname($cache_file))) {
-                @mkdir(dirname($cache_file), 0777, true);
+            if ($httpCode === 200 && !empty($res) && strlen($res) > 200 && stripos($res, 'Tim Pak') !== false) {
+                $csvData = $res;
+                if (!is_dir(dirname($cache_file))) {
+                    @mkdir(dirname($cache_file), 0777, true);
+                }
+                @file_put_contents($cache_file, $res);
+                break;
+            } else {
+                $lastErr = $curlErr ?: "HTTP $httpCode";
             }
-            @file_put_contents($cache_file, $res);
-            break;
-        } else {
-            $lastErr = $curlErr ?: "HTTP $httpCode";
         }
     }
 
@@ -203,27 +213,79 @@ function syncGoogleSheetsToDb($conn, $month = null, $year = null) {
 
     // Target baseline default jika belum ada target khusus
     $whiteboard_targets = [
-        'indah' => ['target_spk' => 4, 'target_do' => 3], 'dadi' => ['target_spk' => 3, 'target_do' => 2],
-        'topik' => ['target_spk' => 5, 'target_do' => 4], 'andri' => ['target_spk' => 4, 'target_do' => 3],
-        'abdian' => ['target_spk' => 4, 'target_do' => 3], 'fadhil' => ['target_spk' => 4, 'target_do' => 3],
-        'rizky' => ['target_spk' => 3, 'target_do' => 2], 'udu' => ['target_spk' => 3, 'target_do' => 2],
-        'nova' => ['target_spk' => 4, 'target_do' => 3], 'cici' => ['target_spk' => 3, 'target_do' => 2],
-        'galih_riva' => ['target_spk' => 4, 'target_do' => 3], 'deni_rv' => ['target_spk' => 4, 'target_do' => 3],
-        'mustofa' => ['target_spk' => 4, 'target_do' => 3], 'sinta' => ['target_spk' => 4, 'target_do' => 3],
-        'rizal' => ['target_spk' => 4, 'target_do' => 3], 'reni' => ['target_spk' => 3, 'target_do' => 2],
-        'nuri' => ['target_spk' => 3, 'target_do' => 2], 'egy' => ['target_spk' => 5, 'target_do' => 3],
-        'deno' => ['target_spk' => 4, 'target_do' => 3], 'erik' => ['target_spk' => 4, 'target_do' => 3],
-        'denia' => ['target_spk' => 4, 'target_do' => 3], 'yani' => ['target_spk' => 3, 'target_do' => 2],
-        'jajang' => ['target_spk' => 3, 'target_do' => 2], 'juarna' => ['target_spk' => 3, 'target_do' => 2],
-        'galih_ryan' => ['target_spk' => 3, 'target_do' => 2], 'reza' => ['target_spk' => 3, 'target_do' => 2],
-        'dadan' => ['target_spk' => 3, 'target_do' => 2], 'fani' => ['target_spk' => 3, 'target_do' => 2],
-        'igo' => ['target_spk' => 3, 'target_do' => 2],
-        'fia' => ['target_spk' => 4, 'target_do' => 3],
-        'isna' => ['target_spk' => 4, 'target_do' => 3],
-        'neo' => ['target_spk' => 4, 'target_do' => 3],
-        'firzi' => ['target_spk' => 2, 'target_do' => 2],
-        'tian' => ['target_spk' => 2, 'target_do' => 2],
-        'rahma' => ['target_spk' => 7, 'target_do' => 7]
+        // Tim Pak Alvin
+        'indah'      => ['target_spk' => 5, 'target_do' => 5],
+        'dadi'       => ['target_spk' => 3, 'target_do' => 3],
+        'topik'      => ['target_spk' => 3, 'target_do' => 3],
+        'taufik'     => ['target_spk' => 3, 'target_do' => 3],
+        'andri'      => ['target_spk' => 5, 'target_do' => 5],
+        'abdian'     => ['target_spk' => 4, 'target_do' => 4],
+        'ardian'     => ['target_spk' => 4, 'target_do' => 4],
+        'fadhil'     => ['target_spk' => 3, 'target_do' => 3],
+        'fadil'      => ['target_spk' => 3, 'target_do' => 3],
+        'rizky'      => ['target_spk' => 5, 'target_do' => 5],
+        'rizki'      => ['target_spk' => 5, 'target_do' => 5],
+        'udu'        => ['target_spk' => 3, 'target_do' => 3],
+        'udil'       => ['target_spk' => 3, 'target_do' => 3],
+        'yeni'       => ['target_spk' => 5, 'target_do' => 5],
+        'yenni'      => ['target_spk' => 5, 'target_do' => 5],
+        'nova'       => ['target_spk' => 3, 'target_do' => 3],
+        'deri'       => ['target_spk' => 5, 'target_do' => 5],
+        'dery'       => ['target_spk' => 5, 'target_do' => 5],
+        'rico'       => ['target_spk' => 3, 'target_do' => 3],
+        'cici'       => ['target_spk' => 3, 'target_do' => 3],
+        'aldo'       => ['target_spk' => 2, 'target_do' => 2],
+        'erlan'      => ['target_spk' => 2, 'target_do' => 2],
+        'intan'      => ['target_spk' => 2, 'target_do' => 2],
+        'ahmad'      => ['target_spk' => 2, 'target_do' => 2],
+        'kurnia'     => ['target_spk' => 2, 'target_do' => 2],
+        'thia'       => ['target_spk' => 2, 'target_do' => 2],
+        'luvita'     => ['target_spk' => 2, 'target_do' => 2],
+        'david'      => ['target_spk' => 1, 'target_do' => 1],
+        'maha'       => ['target_spk' => 1, 'target_do' => 1],
+        // Tim Pak Ryan
+        'egy'        => ['target_spk' => 7, 'target_do' => 7],
+        'reza'       => ['target_spk' => 3, 'target_do' => 3],
+        'erick'      => ['target_spk' => 5, 'target_do' => 5],
+        'erik'       => ['target_spk' => 5, 'target_do' => 5],
+        'denia'      => ['target_spk' => 4, 'target_do' => 4],
+        'yani'       => ['target_spk' => 3, 'target_do' => 3],
+        'deno'       => ['target_spk' => 3, 'target_do' => 3],
+        'jajang'     => ['target_spk' => 5, 'target_do' => 5],
+        'galih_ryan' => ['target_spk' => 3, 'target_do' => 3],
+        'fanny'      => ['target_spk' => 3, 'target_do' => 3],
+        'fani'       => ['target_spk' => 3, 'target_do' => 3],
+        'dadan'      => ['target_spk' => 3, 'target_do' => 2],
+        'juarna'     => ['target_spk' => 3, 'target_do' => 3],
+        'wendy'      => ['target_spk' => 3, 'target_do' => 3],
+        'agus'       => ['target_spk' => 3, 'target_do' => 3],
+        'hadi'       => ['target_spk' => 2, 'target_do' => 1],
+        'hady'       => ['target_spk' => 2, 'target_do' => 1],
+        'tama'       => ['target_spk' => 2, 'target_do' => 1],
+        'denis'      => ['target_spk' => 3, 'target_do' => 2],
+        'igo'        => ['target_spk' => 2, 'target_do' => 2],
+        // Tim Pak Riva
+        'galih_riva' => ['target_spk' => 5, 'target_do' => 4],
+        'giyono'     => ['target_spk' => 6, 'target_do' => 5],
+        'giono'      => ['target_spk' => 6, 'target_do' => 5],
+        'reny'       => ['target_spk' => 3, 'target_do' => 2],
+        'reni'       => ['target_spk' => 3, 'target_do' => 2],
+        'rizal'      => ['target_spk' => 3, 'target_do' => 3],
+        'shovia'     => ['target_spk' => 3, 'target_do' => 2],
+        'shovie'     => ['target_spk' => 3, 'target_do' => 2],
+        'gugum'      => ['target_spk' => 3, 'target_do' => 2],
+        'robby'      => ['target_spk' => 3, 'target_do' => 3],
+        'puspa'      => ['target_spk' => 3, 'target_do' => 3],
+        'ophie'      => ['target_spk' => 4, 'target_do' => 3],
+        // Sub-Tim Bu Rahma
+        'fia'        => ['target_spk' => 3, 'target_do' => 3],
+        'isna'       => ['target_spk' => 3, 'target_do' => 3],
+        'neo'        => ['target_spk' => 3, 'target_do' => 3],
+        'dean'       => ['target_spk' => 5, 'target_do' => 2],
+        'tian'       => ['target_spk' => 2, 'target_do' => 2],
+        'firzi'      => ['target_spk' => 2, 'target_do' => 3],
+        'nuno'       => ['target_spk' => 2, 'target_do' => 2],
+        'rahma'      => ['target_spk' => 3, 'target_do' => 2]
     ];
 
     // Cek apakah format spreadsheet adalah Rekap 12-Bulan (Januari - Desember)
