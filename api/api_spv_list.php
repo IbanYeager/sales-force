@@ -8,16 +8,16 @@ function formatRelSpvTime($datetimeStr) {
     if (!$datetimeStr) return "Belum pernah aktif";
     $time = strtotime($datetimeStr);
     $diff = time() - $time;
-    if ($diff < 900) return "Online Sekarang";
-    if ($diff < 3600) return floor($diff / 60) . " mnt lalu";
+    if ($diff < 300) return "Online Sekarang";
+    if ($diff < 3600) return max(1, floor($diff / 60)) . " mnt lalu";
     if ($diff < 86400) return "Hari ini " . date('H:i', $time);
     if ($diff < 172800) return "Kemarin " . date('H:i', $time);
     return date('d M Y H:i', $time);
 }
 
-// Update online threshold (15 minutes)
-$conn->query("UPDATE spv_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
-$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
+// Update online threshold (5 minutes)
+$conn->query("UPDATE spv_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
+$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 5 MINUTE) OR last_active IS NULL");
 
 $spv_names = [];
 $spv_details = [];
@@ -25,7 +25,9 @@ $total_online = 0;
 $total_offline = 0;
 
 // Ambil daftar SPV lengkap (Hanya 3 SPV resmi: Pak Ryan, Pak Alvin, Pak Riva)
-$res1 = $conn->query("SELECT id, username, nama_lengkap, foto, last_active, is_online FROM spv_accounts WHERE nama_lengkap NOT LIKE '%Rahma%' ORDER BY id ASC");
+$res1 = $conn->query("SELECT id, username, nama_lengkap, foto, last_active, 
+                             CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 5 MINUTE) THEN 1 ELSE 0 END as is_online 
+                      FROM spv_accounts WHERE nama_lengkap NOT LIKE '%Rahma%' ORDER BY id ASC");
 if ($res1 && $res1->num_rows > 0) {
     while ($row = $res1->fetch_assoc()) {
         $isOn = intval($row['is_online']) === 1;

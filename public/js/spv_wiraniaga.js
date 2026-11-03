@@ -362,8 +362,18 @@ let listDataWiraniaga = [];
       });
     }
 
-    // Auto-refresh presence every 20 seconds
-    setInterval(loadWiraniaga, 20000);
+    // Auto-refresh presence every 15 seconds
+    setInterval(loadWiraniaga, 15000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        loadWiraniaga();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      loadWiraniaga();
+    });
 
     function filterWiraniaga() {
       renderWiraniagaRows();

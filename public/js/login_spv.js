@@ -65,13 +65,16 @@ function togglePass() {
 
                 localStorage.setItem('loggedIn', 'true');
                 localStorage.setItem('salesId', String(data.sales.id));
+                localStorage.setItem('idSales', String(data.sales.id));
+                localStorage.setItem('id_spv', String(data.sales.id));
+                localStorage.setItem('usernameSales', data.sales.username || username || '');
+                localStorage.setItem('username', data.sales.username || username || '');
                 localStorage.setItem('namaSales', data.sales.name || '');
                 localStorage.setItem('fotoSales', data.sales.foto || '');
                 localStorage.setItem('spvSales', data.sales.spv || '');
                 localStorage.setItem('peranSales', data.sales.peran || 'Supervisor');
                 localStorage.setItem('tingkatanSales', data.sales.tingkatan || '');
                 localStorage.setItem('cabangSales', 'Tunas Toyota Kiara Condong');
-                localStorage.setItem('idSales', data.sales.id);
 
                 setTimeout(() => {
                     const isSubDir = location.pathname.includes('/pages/') || location.pathname.includes('/pages_spv/') || location.pathname.includes('/pages_kacab/');

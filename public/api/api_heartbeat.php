@@ -35,8 +35,8 @@ function formatRelativeTime($datetimeStr) {
     $time = strtotime($datetimeStr);
     $diff = time() - $time;
 
-    if ($diff < 900) return "Online Sekarang";
-    if ($diff < 3600) return floor($diff / 60) . " mnt lalu";
+    if ($diff < 300) return "Online Sekarang";
+    if ($diff < 3600) return max(1, floor($diff / 60)) . " mnt lalu";
     if ($diff < 86400) return "Hari ini " . date('H:i', $time);
     if ($diff < 172800) return "Kemarin " . date('H:i', $time);
     return date('d M Y H:i', $time);
@@ -105,18 +105,18 @@ if ($action === 'ping') {
         $conds = [];
         if ($id_user > 0) $conds[] = "id = $id_user";
         if (!empty($username)) $conds[] = "username = '$username'";
-        if (!empty($nama)) $conds[] = "nama_lengkap LIKE '%$nama%'";
+        if (!empty($nama)) $conds[] = "(nama_lengkap = '$nama' OR nama_lengkap LIKE '%$nama%')";
         $where = !empty($conds) ? implode(" OR ", $conds) : "1=0";
         @$conn->query("UPDATE spv_accounts SET last_active = NOW(), is_online = 1 WHERE $where");
-        @$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
+        @$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 5 MINUTE) OR last_active IS NULL");
     } else {
         $conds = [];
         if ($id_user > 0) $conds[] = "id = $id_user";
         if (!empty($username)) $conds[] = "username = '$username'";
-        if (!empty($nama)) $conds[] = "nama_lengkap LIKE '%$nama%'";
+        if (!empty($nama)) $conds[] = "(nama_lengkap = '$nama' OR nama_lengkap LIKE '%$nama%')";
         $where = !empty($conds) ? implode(" OR ", $conds) : "1=0";
         @$conn->query("UPDATE sales_accounts SET last_active = NOW(), is_online = 1 WHERE $where");
-        @$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
+        @$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 5 MINUTE) OR last_active IS NULL");
     }
 
     checkAndTriggerSentinelWebCron($conn);
@@ -132,22 +132,22 @@ if ($action === 'ping') {
     exit();
 }
 
-// ── 2. OFFLINE SIGNAL KETIKA USER LOGOUT / TUTUP TAB ──
+// ── 2. OFFLINE SIGNAL KETIKA USER LOGOUT SECARA EKSPLISIT ──
 if ($action === 'offline') {
     if (strpos($role, 'spv') !== false || strpos($role, 'supervisor') !== false) {
         $conds = [];
         if ($id_user > 0) $conds[] = "id = $id_user";
         if (!empty($username)) $conds[] = "username = '$username'";
-        if (!empty($nama)) $conds[] = "nama_lengkap LIKE '%$nama%'";
+        if (!empty($nama)) $conds[] = "(nama_lengkap = '$nama' OR nama_lengkap LIKE '%$nama%')";
         $where = !empty($conds) ? implode(" OR ", $conds) : "1=0";
-        @$conn->query("UPDATE spv_accounts SET is_online = 0, last_active = DATE_SUB(NOW(), INTERVAL 20 MINUTE) WHERE $where");
+        @$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE $where");
     } else {
         $conds = [];
         if ($id_user > 0) $conds[] = "id = $id_user";
         if (!empty($username)) $conds[] = "username = '$username'";
-        if (!empty($nama)) $conds[] = "nama_lengkap LIKE '%$nama%'";
+        if (!empty($nama)) $conds[] = "(nama_lengkap = '$nama' OR nama_lengkap LIKE '%$nama%')";
         $where = !empty($conds) ? implode(" OR ", $conds) : "1=0";
-        @$conn->query("UPDATE sales_accounts SET is_online = 0, last_active = DATE_SUB(NOW(), INTERVAL 20 MINUTE) WHERE $where");
+        @$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE $where");
     }
 
     echo json_encode([
@@ -160,13 +160,15 @@ if ($action === 'offline') {
 }
 
 // ── 3. QUERY DAFTAR STATUS SPV & SALES UNTUK KACAB & SPV ──
-@$conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
-@$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
+@$conn->query("UPDATE sales_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
+@$conn->query("UPDATE sales_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 5 MINUTE) OR last_active IS NULL");
 
-@$conn->query("UPDATE spv_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
-@$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR last_active IS NULL");
+@$conn->query("UPDATE spv_accounts SET is_online = 1 WHERE last_active >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
+@$conn->query("UPDATE spv_accounts SET is_online = 0 WHERE last_active < DATE_SUB(NOW(), INTERVAL 5 MINUTE) OR last_active IS NULL");
 
-$spvQuery = @$conn->query("SELECT id, username, nama_lengkap, foto, last_active, is_online FROM spv_accounts ORDER BY id ASC");
+$spvQuery = @$conn->query("SELECT id, username, nama_lengkap, foto, last_active, 
+                                  CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 5 MINUTE) THEN 1 ELSE 0 END as is_online 
+                           FROM spv_accounts ORDER BY id ASC");
 $spv_list = [];
 $spv_online_count = 0;
 $spv_offline_count = 0;
@@ -185,7 +187,9 @@ if ($spvQuery && $spvQuery->num_rows > 0) {
 }
 
 $spv = $conn->real_escape_string(trim($_GET['spv'] ?? ''));
-$salesQuery = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, is_active, last_active, is_online FROM sales_accounts";
+$salesQuery = "SELECT id, username, nama_lengkap, tingkatan, foto, nama_spv, is_active, last_active,
+                      CASE WHEN last_active >= DATE_SUB(NOW(), INTERVAL 5 MINUTE) THEN 1 ELSE 0 END as is_online 
+               FROM sales_accounts";
 if (!empty($spv) && strtolower($spv) !== 'semua' && strtolower($spv) !== 'all' && strtolower($spv) !== 'master') {
     $spv_clean = str_replace('Pak ', '', $spv);
     $salesQuery .= " WHERE (nama_spv = '$spv' OR nama_spv LIKE '%$spv_clean%')";

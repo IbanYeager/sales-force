@@ -71,13 +71,15 @@ async function doLogin() {
         // Simpan sesi autentikasi ke LocalStorage
         localStorage.setItem('loggedIn', 'true');
         localStorage.setItem('salesId', String(data.sales.id || '1'));
+        localStorage.setItem('idSales', String(data.sales.id || '1'));
+        localStorage.setItem('usernameSales', data.sales.username || username || 'kacab');
+        localStorage.setItem('username', data.sales.username || username || 'kacab');
         localStorage.setItem('namaSales', data.sales.name || 'Kepala Cabang');
         localStorage.setItem('fotoSales', data.sales.foto || '');
         localStorage.setItem('spvSales', 'Kepala Cabang');
         localStorage.setItem('peranSales', data.sales.peran || 'Kepala Cabang');
         localStorage.setItem('tingkatanSales', 'Branch Manager');
         localStorage.setItem('cabangSales', data.sales.cabang || 'Tunas Toyota Kiara Condong');
-        localStorage.setItem('idSales', String(data.sales.id || '1'));
 
         setTimeout(() => {
             const isSubDir = location.pathname.includes('/pages/') || location.pathname.includes('/pages_spv/') || location.pathname.includes('/pages_kacab/');

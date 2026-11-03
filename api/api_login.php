@@ -111,11 +111,13 @@ function normalizePhotoUrl($foto) {
                     exit();
                 }
                 if (verifyAndRehashPassword($password, $user['password'], 'sales_accounts', $user['id'], $conn)) {
+                    @$conn->query("UPDATE sales_accounts SET last_active = NOW(), is_online = 1 WHERE id = " . intval($user['id']));
                     echo json_encode([
                         "ok" => true,
                         "message" => "Login berhasil",
                         "sales" => [
                             "id" => $user['id'],
+                            "username" => $user['username'] ?? $username,
                             "name" => $user['nama_lengkap'],
                             "foto" => normalizePhotoUrl($user['foto']),
                             "spv" => $user['nama_spv'],
@@ -246,11 +248,13 @@ function normalizePhotoUrl($foto) {
             if ($result_spv && $result_spv->num_rows > 0) {
                 $spv = $result_spv->fetch_assoc();
                 if (verifyAndRehashPassword($password, $spv['password'], 'spv_accounts', $spv['id'], $conn)) {
+                    @$conn->query("UPDATE spv_accounts SET last_active = NOW(), is_online = 1 WHERE id = " . intval($spv['id']));
                     echo json_encode([
                         "ok" => true,
                         "message" => "Login berhasil sebagai Supervisor",
                         "sales" => [
                             "id" => $spv['id'],
+                            "username" => $spv['username'] ?? $username,
                             "name" => $spv['nama_lengkap'],
                             "foto" => normalizePhotoUrl($spv['foto']),
                             "spv" => $spv['nama_lengkap'],
@@ -302,6 +306,7 @@ function normalizePhotoUrl($foto) {
                     "message" => "Login berhasil sebagai Kepala Cabang",
                     "sales" => [
                         "id" => 1,
+                        "username" => "kacab",
                         "name" => "Dendi Holius",
                         "foto" => "",
                         "spv" => "Kepala Cabang",
@@ -324,6 +329,7 @@ function normalizePhotoUrl($foto) {
                         "message" => "Login berhasil sebagai Kepala Cabang",
                         "sales" => [
                             "id" => $kacab['id'],
+                            "username" => $kacab['username'] ?? $username,
                             "name" => $kacab['nama_lengkap'],
                             "foto" => normalizePhotoUrl($kacab['foto'] ?? ''),
                             "spv" => "Kepala Cabang",

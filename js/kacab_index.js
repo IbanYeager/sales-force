@@ -954,6 +954,21 @@ document.addEventListener('DOMContentLoaded', () => {
   loadFeed();
   loadOperationalAktivitasSummary();
   loadAiSentinelKacab();
+
+  // Auto-refresh real-time online status and dashboard every 15 seconds
+  setInterval(() => {
+    loadDashboard(true);
+  }, 15000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      loadDashboard(true);
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    loadDashboard(true);
+  });
 });
 
 

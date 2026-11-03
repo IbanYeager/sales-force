@@ -878,5 +878,23 @@ Manfaatkan kesempatan ini untuk closing seluruh prospek potensial Anda. Gaspol! 
       loadPipelineFunnelData();
       loadDailyActivityTracker();
       loadSpvEarlyWarningAndRunRate();
+
+      // Auto-refresh checklist, activity tracker, and online presence every 15 seconds
+      setInterval(() => {
+        loadEarlyWarningChecklist();
+        loadDailyActivityTracker();
+      }, 15000);
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          loadEarlyWarningChecklist();
+          loadDailyActivityTracker();
+        }
+      });
+
+      window.addEventListener('focus', () => {
+        loadEarlyWarningChecklist();
+        loadDailyActivityTracker();
+      });
     });
 

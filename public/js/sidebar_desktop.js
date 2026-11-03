@@ -424,13 +424,36 @@
 
         window.logoutUser = function() {
             const role = localStorage.getItem('peranSales');
-            const idSales = localStorage.getItem('idSales') || localStorage.getItem('sales_id');
+            const idSales = localStorage.getItem('idSales') || localStorage.getItem('salesId') || localStorage.getItem('sales_id');
             const username = localStorage.getItem('usernameSales') || localStorage.getItem('userSales') || localStorage.getItem('username');
+            const namaSales = localStorage.getItem('namaSales') || '';
 
-            if (idSales || username) {
+            const isSub = window.location.pathname.includes('/pages/') || window.location.pathname.includes('/pages_spv/') || window.location.pathname.includes('/pages_kacab/');
+            const apiHeartbeat = (isSub ? '../' : '') + 'api/api_heartbeat.php';
+
+            if (idSales || username || namaSales) {
+                const payload = JSON.stringify({ 
+                    action: 'offline', 
+                    role: role || 'Sales', 
+                    id_sales: idSales || 0, 
+                    id_user: idSales || 0, 
+                    username: username || '', 
+                    nama: namaSales 
+                });
                 if (navigator.sendBeacon) {
-                    const blob = new Blob([JSON.stringify({ action: 'offline', id_sales: idSales || 0, username: username || '' })], { type: 'application/json' });
-                    navigator.sendBeacon(prefix + 'api/api_heartbeat.php', blob);
+                    try {
+                        const blob = new Blob([payload], { type: 'application/json' });
+                        navigator.sendBeacon(apiHeartbeat, blob);
+                    } catch(e) {}
+                } else {
+                    try {
+                        fetch(apiHeartbeat, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: payload,
+                            keepalive: true
+                        });
+                    } catch(e) {}
                 }
             }
 
@@ -450,17 +473,15 @@
 
         // ── Real-Time Online Presence / Heartbeat Signal ────────
         (function initOnlineHeartbeat() {
-            const role = localStorage.getItem('peranSales') || 'Sales';
-            const idUser = localStorage.getItem('idSales') || localStorage.getItem('sales_id') || localStorage.getItem('id_spv') || localStorage.getItem('id_user') || 0;
-            const username = localStorage.getItem('usernameSales') || localStorage.getItem('userSales') || localStorage.getItem('username') || '';
-            const nama = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || '';
+            function getOnlinePayload(action = 'ping') {
+                const role = localStorage.getItem('peranSales') || 'Sales';
+                const idUser = localStorage.getItem('idSales') || localStorage.getItem('salesId') || localStorage.getItem('sales_id') || localStorage.getItem('id_spv') || localStorage.getItem('id_user') || 0;
+                const username = localStorage.getItem('usernameSales') || localStorage.getItem('userSales') || localStorage.getItem('username') || '';
+                const nama = localStorage.getItem('namaSales') || localStorage.getItem('spvSales') || '';
 
-            // Hanya kirim heartbeat jika user sedang login
-            if (!idUser && !username && !nama) return;
+                if (!idUser && !username && !nama) return null;
 
-            function sendHeartbeat(action = 'ping') {
-                const apiHeartbeat = prefix + 'api/api_heartbeat.php';
-                const payload = {
+                return {
                     action: action,
                     role: role,
                     id_sales: idUser,
@@ -468,13 +489,30 @@
                     username: username,
                     nama: nama
                 };
+            }
+
+            function getHeartbeatUrl() {
+                const p = window.location.pathname;
+                const isSub = p.includes('/pages/') || p.includes('/pages_spv/') || p.includes('/pages_kacab/');
+                return (isSub ? '../' : '') + 'api/api_heartbeat.php';
+            }
+
+            let lastPingTimestamp = 0;
+            function sendHeartbeat(action = 'ping') {
+                const payload = getOnlinePayload(action);
+                if (!payload) return;
+
+                const apiHeartbeat = getHeartbeatUrl();
 
                 if (action === 'offline' && navigator.sendBeacon) {
-                    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-                    navigator.sendBeacon(apiHeartbeat, blob);
-                    return;
+                    try {
+                        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+                        navigator.sendBeacon(apiHeartbeat, blob);
+                        return;
+                    } catch(e) {}
                 }
 
+                lastPingTimestamp = Date.now();
                 fetch(apiHeartbeat, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -483,25 +521,50 @@
                 }).catch(() => {});
             }
 
-            // Kirim heartbeat saat halaman dimuat
-            sendHeartbeat('ping');
+            // Expose global helper untuk refresh status online instan jika diperlukan modul lain
+            window.sendPresencePing = () => sendHeartbeat('ping');
 
-            // Kirim heartbeat berkala setiap 30 detik untuk memastikan status online stabil
+            // 1. Kirim heartbeat segera saat halaman siap
+            sendHeartbeat('ping');
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => sendHeartbeat('ping'));
+            }
+
+            // 2. Kirim berkala setiap 25 detik agar status online tetap segar dan stabil
             setInterval(() => {
                 sendHeartbeat('ping');
-            }, 30000);
+            }, 25000);
 
-            // Kirim heartbeat saat tab kembali aktif
+            // 3. Tab visibility / PageShow / Focus (misal sales kembali dari WhatsApp atau lock screen)
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
                     sendHeartbeat('ping');
                 }
             });
 
-            // Kirim sinyal offline saat tab/browser ditutup
-            window.addEventListener('beforeunload', () => {
-                sendHeartbeat('offline');
+            window.addEventListener('pageshow', () => {
+                sendHeartbeat('ping');
             });
+
+            window.addEventListener('focus', () => {
+                sendHeartbeat('ping');
+            });
+
+            // 4. Deteksi interaksi pengguna (touch/click/scroll): ping jika > 20s sejak ping terakhir
+            const onUserInteraction = () => {
+                const now = Date.now();
+                if (now - lastPingTimestamp > 20000) {
+                    lastPingTimestamp = now;
+                    sendHeartbeat('ping');
+                }
+            };
+            ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll'].forEach(evt => {
+                window.addEventListener(evt, onUserInteraction, { passive: true });
+            });
+
+            // Catatan arsitektur: JANGAN mengirim 'offline' pada beforeunload!
+            // beforeunload memicu offline palsu setiap kali sales klik menu, ganti halaman, atau lock screen.
+            // Sinyal offline HANYA dikirim saat pengguna menekan tombol Logout (window.logoutUser).
         })();
 
         // ── Visual Notification Toast ──────────────────────────
