@@ -2957,3 +2957,299 @@
     }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIVE CLOSING BELL TICKER & DEAL MOMENTUM
+   ═══════════════════════════════════════════════════════════════════════════ */
+.closing-bell-ticker-card {
+    background: linear-gradient(135deg, #090e18 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 11px 15px;
+    margin-bottom: 14px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.35), 0 0 20px rgba(200, 16, 46, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.closing-bell-ticker-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #c8102e, #f59e0b, #0284c7);
+}
+
+.ticker-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.ticker-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(220, 38, 38, 0.18);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    padding: 3px 9px;
+    border-radius: 20px;
+}
+
+.ticker-pulse-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ef4444;
+    animation: tickerPulse 1.5s infinite;
+}
+
+@keyframes tickerPulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.ticker-live-text {
+    font-size: 10px;
+    font-weight: 800;
+    color: #fca5a5;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.ticker-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-ring-bell {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-ring-bell:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.6);
+}
+
+.ticker-leaderboard-link {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fde047;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.ticker-leaderboard-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.ticker-track-viewport {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    padding: 2px 0;
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+
+.ticker-track-content {
+    display: inline-block;
+    white-space: nowrap;
+    animation: tickerScroll 35s linear infinite;
+}
+
+.ticker-track-content:hover {
+    animation-play-state: paused;
+}
+
+@keyframes tickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #e2e8f0;
+    margin-right: 28px;
+    letter-spacing: -0.1px;
+}
+
+.ticker-item .text-red {
+    color: #ef4444;
+}
+
+.ticker-item .text-gold {
+    color: #f59e0b;
+}
+
+.ticker-item .badge-pill {
+    background: rgba(255, 255, 255, 0.12);
+    color: #38bdf8;
+    padding: 1px 7px;
+    border-radius: 12px;
+    font-size: 9.5px;
+    font-weight: 700;
+}
+
+/* ── MODAL RAYAKAN CLOSING ── */
+.ring-bell-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.ring-bell-modal-dialog {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 440px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    animation: sphSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ring-bell-head {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 24px 20px 20px;
+    text-align: center;
+    position: relative;
+    color: #ffffff;
+}
+
+.ring-bell-icon-glow {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 12px;
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.6);
+    animation: bellRinging 1.2s infinite ease-in-out;
+}
+
+@keyframes bellRinging {
+    0% { transform: rotate(0); }
+    15% { transform: rotate(14deg); }
+    30% { transform: rotate(-14deg); }
+    45% { transform: rotate(10deg); }
+    60% { transform: rotate(-10deg); }
+    75% { transform: rotate(4deg); }
+    100% { transform: rotate(0); }
+}
+
+.ring-bell-title {
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.ring-bell-sub {
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+.ring-bell-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.ring-bell-body {
+    padding: 20px;
+}
+
+.ring-bell-input, .ring-bell-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #0f172a;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.ring-bell-input:focus, .ring-bell-select:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.btn-submit-bell {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-submit-bell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.55);
+}
+

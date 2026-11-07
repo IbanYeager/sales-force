@@ -862,4 +862,237 @@ function renderLeaderboard() {
 }
 
 // ==========================================
-// Service Worker integration handled cleanly via pwa-app.js
+// Service Worker integration handled cleanly via pwa-app.js
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LIVE CLOSING BELL TICKER & REAL-TIME DEAL CELEBRATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+let closingTickerInterval = null;
+
+function initClosingTicker() {
+    const tickerContainer = document.getElementById('closingTickerContent');
+    if (!tickerContainer) return;
+
+    fetchClosingTickerData();
+    if (!closingTickerInterval) {
+        closingTickerInterval = setInterval(fetchClosingTickerData, 60000); // 1 menit refresh
+    }
+}
+
+function fetchClosingTickerData() {
+    const tickerContainer = document.getElementById('closingTickerContent');
+    if (!tickerContainer) return;
+
+    fetch('api/api_closing_ticker.php')
+        .then(r => r.json())
+        .then(res => {
+            if (res.status === 'success' && res.closings && res.closings.length > 0) {
+                renderClosingTicker(res.closings, res.stats);
+            }
+        })
+        .catch(err => {
+            console.warn('Ticker fetch fallback:', err);
+        });
+}
+
+function renderClosingTicker(closings, stats) {
+    const tickerContainer = document.getElementById('closingTickerContent');
+    if (!tickerContainer) return;
+
+    let itemsHtml = '';
+
+    // Branch milestone pill
+    if (stats && stats.total_spk) {
+        itemsHtml += `
+            <span class="ticker-item">
+                <i class="fa-solid fa-flag-checkered text-gold"></i>
+                <strong>TUNAS KIARA CONDONG:</strong> Total <span class="badge-pill" style="background:#dc2626; color:#fff;">${stats.total_spk} SPK</span> &amp; <span class="badge-pill" style="background:#16a34a; color:#fff;">${stats.total_do} DO</span> Bulan Ini! Gaspol kuota! 🚀
+            </span>
+        `;
+    }
+
+    closings.forEach(item => {
+        let icon = '<i class="fa-solid fa-fire text-red"></i>';
+        let badgeClass = 'badge-pill';
+        if (item.type === 'CELEBRATION') {
+            icon = '<i class="fa-solid fa-bell text-gold"></i>';
+        } else if (item.status && item.status.includes('DO')) {
+            icon = '<i class="fa-solid fa-truck text-gold"></i>';
+        }
+
+        itemsHtml += `
+            <span class="ticker-item">
+                ${icon}
+                <strong>${item.sales_nama}</strong> deal <strong>${item.model}</strong>
+                <span class="${badgeClass}">${item.tipe_pembelian}</span>
+                <small style="color:#94a3b8; font-size:10px;">(${item.time})</small>
+            </span>
+        `;
+    });
+
+    // Double the items so the marquee loops seamlessly without blank gaps
+    tickerContainer.innerHTML = itemsHtml + itemsHtml;
+}
+
+// ── CRYSTAL BELL CHIME (SYNTHESIZED WEB AUDIO API) ──
+function playClosingBellChime() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        const now = ctx.currentTime;
+        const freqs = [587.33, 880, 1174.66]; // D5, A5, D6 harmonic chime
+
+        freqs.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + (idx * 0.08));
+
+            gain.gain.setValueAtTime(0.35 / (idx + 1), now + (idx * 0.08));
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8 + (idx * 0.2));
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(now + (idx * 0.08));
+            osc.stop(now + 2.5);
+        });
+    } catch (e) {
+        console.warn('Audio chime unsupported:', e);
+    }
+}
+
+// ── PURE CANVAS CONFETTI BURST ──
+function launchClosingConfetti() {
+    const canvas = document.getElementById('closingConfettiCanvas');
+    if (!canvas) return;
+
+    canvas.style.display = 'block';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const particles = [];
+    const colors = ['#c8102e', '#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#fde047', '#ffffff'];
+
+    for (let i = 0; i < 90; i++) {
+        particles.push({
+            x: canvas.width / 2 + (Math.random() * 200 - 100),
+            y: canvas.height * 0.25,
+            w: Math.random() * 10 + 6,
+            h: Math.random() * 6 + 4,
+            vx: (Math.random() - 0.5) * 14,
+            vy: Math.random() * -12 - 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            vRot: (Math.random() - 0.5) * 12,
+            gravity: 0.38,
+            drag: 0.985,
+            opacity: 1
+        });
+    }
+
+    let frame = 0;
+    function renderConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = 0;
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += p.gravity;
+            p.vx *= p.drag;
+            p.vy *= p.drag;
+            p.rotation += p.vRot;
+            p.opacity -= 0.006;
+
+            if (p.opacity > 0 && p.y < canvas.height + 20) {
+                active++;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.opacity);
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+            }
+        });
+
+        frame++;
+        if (active > 0 && frame < 200) {
+            requestAnimationFrame(renderConfetti);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = 'none';
+        }
+    }
+
+    renderConfetti();
+}
+
+// ── MODAL RAYAKAN CLOSING HANDLERS ──
+window.openRingBellModal = function() {
+    const modal = document.getElementById('ringBellModal');
+    if (!modal) return;
+
+    const salesName = localStorage.getItem('namaSales') || localStorage.getItem('user_nama') || 'Egy Pratama';
+    const inputSales = document.getElementById('ringBellSalesName');
+    if (inputSales) inputSales.value = salesName;
+
+    modal.style.display = 'flex';
+};
+
+window.closeRingBellModal = function() {
+    const modal = document.getElementById('ringBellModal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.submitClosingBell = function() {
+    const salesNama = document.getElementById('ringBellSalesName')?.value || 'Wiraniaga';
+    const model = document.getElementById('ringBellModel')?.value || 'Toyota All New Avanza';
+    const scheme = document.getElementById('ringBellScheme')?.value || 'Kredit';
+    const leasing = document.getElementById('ringBellLeasing')?.value || 'TAF';
+
+    // 1. Play sounds & confetti
+    playClosingBellChime();
+    launchClosingConfetti();
+
+    // 2. Post to ticker API
+    fetch('api/api_closing_ticker.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            sales_nama: salesNama,
+            model: model,
+            tipe_pembelian: scheme,
+            leasing: leasing,
+            lokasi: 'Tunas Toyota Kiara Condong'
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        closeRingBellModal();
+        if (typeof showCustomToast === 'function') {
+            showCustomToast(`🎉 DING! Lonceng Closing Berbunyi! Selamat atas closing ${model}!`, 'success');
+        } else {
+            alert(`🎉 DING! Lonceng Closing Berbunyi!\nSelamat atas closing ${model}! Terus gaspol target kuota bulan ini!`);
+        }
+        fetchClosingTickerData();
+    })
+    .catch(err => {
+        closeRingBellModal();
+        fetchClosingTickerData();
+    });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('closingBellTickerCard')) {
+        initClosingTicker();
+    }
+});

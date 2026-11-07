@@ -1663,3 +1663,361 @@ function copyFlyerPromoCaption() {
         prompt('Salin teks caption berikut:', caption);
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE: INSTANT SURAT PENAWARAN HARGA (SPH) DIGITAL RESMI 1-KLIK
+// ═══════════════════════════════════════════════════════════════════════════
+
+let sphCurrentScheme = 'kredit'; // 'kredit' | 'cash'
+let sphDocumentId = '';
+
+function getSphRomawi(monthIdx) {
+    const romawi = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+    return romawi[monthIdx] || 'I';
+}
+
+function generateSphDocId() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const romawi = getSphRomawi(now.getMonth());
+    const seq = String(Math.floor(100 + Math.random() * 900));
+    return `SPH/TT-KC/${year}${String(now.getMonth() + 1).padStart(2, '0')}/${seq}`;
+}
+
+window.openSphModal = function(autoPrint = false) {
+    const modal = document.getElementById('sphModalOverlay');
+    if (!modal) return;
+
+    if (!sphDocumentId) {
+        sphDocumentId = generateSphDocId();
+    }
+
+    // Sync sales data from storage
+    const salesName = localStorage.getItem('namaSales') || localStorage.getItem('user_nama') || 'Egy Pratama';
+    const salesPhone = localStorage.getItem('noHpSales') || localStorage.getItem('user_telepon') || '0812-2154-1540';
+    const salesRole = localStorage.getItem('peranSales') || localStorage.getItem('user_role') || 'Senior Sales Executive';
+
+    const signNameEl = document.getElementById('sphSignSalesName');
+    if (signNameEl) signNameEl.textContent = salesName;
+    const signPhoneEl = document.getElementById('sphSignSalesPhone');
+    if (signPhoneEl) signPhoneEl.textContent = `${salesRole} • ${salesPhone}`;
+    const signSigEl = document.getElementById('sphSignSalesSignature');
+    if (signSigEl) signSigEl.textContent = salesName;
+    const headerSalesEl = document.getElementById('sphDocSalesHeader');
+    if (headerSalesEl) headerSalesEl.textContent = salesName;
+
+    // Open modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Trigger calculation sync
+    updateSphPreview();
+
+    if (autoPrint) {
+        setTimeout(() => {
+            window.print();
+        }, 300);
+    }
+};
+
+window.closeSphModal = function() {
+    const modal = document.getElementById('sphModalOverlay');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+};
+
+window.setSphScheme = function(scheme) {
+    sphCurrentScheme = scheme;
+    const btnKredit = document.getElementById('sphTabKredit');
+    const btnCash = document.getElementById('sphTabCash');
+    if (scheme === 'cash') {
+        btnCash?.classList.add('active');
+        btnKredit?.classList.remove('active');
+    } else {
+        btnKredit?.classList.add('active');
+        btnCash?.classList.remove('active');
+    }
+    updateSphPreview();
+};
+
+window.updateSphPreview = function() {
+    // 1. Meta Dokumen
+    const docNumEl = document.getElementById('sphDocNumber');
+    if (docNumEl) docNumEl.textContent = sphDocumentId || 'SPH/TT-KC/202611/0482';
+
+    const now = new Date();
+    const strDate = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const docDateEl = document.getElementById('sphDocDate');
+    if (docDateEl) docDateEl.textContent = strDate;
+
+    const validityDays = parseInt(document.getElementById('sphSelectValidity')?.value || '14', 10);
+    const docValEl = document.getElementById('sphDocValidity');
+    if (docValEl) docValEl.textContent = `${validityDays} Hari Kalender`;
+
+    // 2. Data Konsumen
+    const custName = document.getElementById('sphInputCustName')?.value.trim() || 'Bpk/Ibu Calon Konsumen';
+    const company = document.getElementById('sphInputCompany')?.value.trim() || '';
+    const city = document.getElementById('sphInputCity')?.value.trim() || 'Bandung / Jawa Barat';
+
+    const docCustEl = document.getElementById('sphDocCustName');
+    if (docCustEl) docCustEl.textContent = custName;
+
+    const compRow = document.getElementById('sphDocCompanyRow');
+    const docComp = document.getElementById('sphDocCompany');
+    if (company && compRow && docComp) {
+        compRow.style.display = 'block';
+        docComp.textContent = company;
+    } else if (compRow) {
+        compRow.style.display = 'none';
+    }
+
+    const docCityEl = document.getElementById('sphDocCity');
+    if (docCityEl) docCityEl.textContent = city;
+
+    const signCustEl = document.getElementById('sphSignCustName');
+    if (signCustEl) signCustEl.textContent = `( ${custName} )`;
+
+    // 3. Data Mobil dari Kalkulator
+    const modelSelect = document.getElementById('selectModel');
+    let mobilName = modelSelect && modelSelect.selectedIndex > 0 ? modelSelect.options[modelSelect.selectedIndex].text : 'Toyota Unit';
+    if (mobilName.includes('(')) {
+        mobilName = mobilName.split('(')[0].trim();
+    }
+    const colorText = document.getElementById('sphInputColor')?.value.trim() || 'Pilihan Bebas';
+
+    // 4. Data Finansial dari Kalkulator
+    const otr = typeof getHarga === 'function' ? getHarga() : 300000000;
+    const diskon = parseNum(document.getElementById('sphInputDiskon')?.value || '0');
+    const booking = parseNum(document.getElementById('sphInputBooking')?.value || '5000000');
+    const hargaNett = Math.max(0, otr - diskon);
+
+    const tableBody = document.getElementById('sphDocTableBody');
+    if (!tableBody) return;
+
+    if (sphCurrentScheme === 'cash') {
+        const sisaPelunasan = Math.max(0, hargaNett - booking);
+        tableBody.innerHTML = `
+            <tr>
+                <td style="text-align:center;">1</td>
+                <td><strong>Tipe & Model Kendaraan:</strong> ${escapeHtml(mobilName)}<br><small style="color:#64748b;">Warna: ${escapeHtml(colorText)} &bull; OTR Jawa Barat (Plat D/Z/E/F/T)</small></td>
+                <td style="text-align:right;">${formatRp(otr)}</td>
+            </tr>
+            <tr style="background:#fef2f2; color:#b91c1c;">
+                <td style="text-align:center;">2</td>
+                <td><strong>Diskon / Subsidi Khusus Tunas Toyota:</strong> Potongan harga resmi dari dealer</td>
+                <td style="text-align:right; font-weight:800;">- ${formatRp(diskon)}</td>
+            </tr>
+            <tr style="background:#f8fafc; font-weight:700;">
+                <td style="text-align:center;">3</td>
+                <td><strong>Harga Bersih (Netto) Kendaraan OTR:</strong></td>
+                <td style="text-align:right; font-weight:800; color:#0f172a;">${formatRp(hargaNett)}</td>
+            </tr>
+            <tr>
+                <td style="text-align:center;">4</td>
+                <td><strong>Tanda Jadi Pemesanan (Booking Fee):</strong> Alokasi nomor rangka & mesin unit</td>
+                <td style="text-align:right;">${formatRp(booking)}</td>
+            </tr>
+            <tr class="sph-row-hero">
+                <td style="text-align:center;">5</td>
+                <td><strong>SISA PELUNASAN TUNAI (CASH):</strong> Sebelum Delivery Order (DO) & pengiriman unit</td>
+                <td style="text-align:right; font-size:12.5px;">${formatRp(sisaPelunasan)}</td>
+            </tr>
+        `;
+    } else {
+        // Skema Kredit
+        const tdpMurni = typeof getTdp === 'function' ? getTdp() : Math.round(otr * 0.2);
+        const tenorTahun = currentTenor || 3;
+        const tenorBulan = tenorTahun * 12;
+        const leasingSelect = document.getElementById('selectLeasing');
+        const leasingName = leasingSelect ? leasingSelect.options[leasingSelect.selectedIndex].text.split('-')[0].trim() : 'TAF';
+        const cicilanText = document.getElementById('resultAmount')?.innerText || formatRp((otr - tdpMurni) / tenorBulan);
+        const adminVal = typeof getAdmin === 'function' ? getAdmin() : 2500000;
+        const asuransiVal = typeof getAsuransi === 'function' ? getAsuransi() : 0;
+        
+        // Est TDP Total
+        const tdpTotalAwal = tdpMurni + adminVal + asuransiVal - diskon;
+        const sisaTdpPelunasan = Math.max(0, tdpTotalAwal - booking);
+
+        tableBody.innerHTML = `
+            <tr>
+                <td style="text-align:center;">1</td>
+                <td><strong>Unit & Spesifikasi:</strong> ${escapeHtml(mobilName)}<br><small style="color:#64748b;">Warna: ${escapeHtml(colorText)} &bull; Perakitan 2026</small></td>
+                <td style="text-align:right;">${formatRp(otr)}</td>
+            </tr>
+            <tr style="background:#fef2f2; color:#b91c1c;">
+                <td style="text-align:center;">2</td>
+                <td><strong>Subsidi Diskon Cashback Dealer:</strong> Pengurang TDP Konsumen</td>
+                <td style="text-align:right; font-weight:800;">- ${formatRp(diskon)}</td>
+            </tr>
+            <tr>
+                <td style="text-align:center;">3</td>
+                <td><strong>Mitra Pembiayaan & Asuransi:</strong> ${escapeHtml(leasingName)} &bull; All-Risk Comprehensive</td>
+                <td style="text-align:right; font-weight:700;">Paket Resmi</td>
+            </tr>
+            <tr style="background:#eff6ff;">
+                <td style="text-align:center;">4</td>
+                <td><strong>Total Down Payment (TDP Nett Estimasi):</strong> Termasuk DP murni, premi asuransi & admin</td>
+                <td style="text-align:right; font-weight:800; color:#1d4ed8;">${formatRp(tdpTotalAwal)}</td>
+            </tr>
+            <tr>
+                <td style="text-align:center;">5</td>
+                <td><strong>Booking Fee / Tanda Jadi SPK:</strong> Pengurang pembayaran DP</td>
+                <td style="text-align:right;">${formatRp(booking)}</td>
+            </tr>
+            <tr style="background:#f0fdf4; color:#15803d; font-weight:700;">
+                <td style="text-align:center;">6</td>
+                <td><strong>Sisa TDP yang Dibayarkan Setelah Aplikasi Disetujui (ACC):</strong></td>
+                <td style="text-align:right; font-weight:800;">${formatRp(sisaTdpPelunasan)}</td>
+            </tr>
+            <tr class="sph-row-hero">
+                <td style="text-align:center;">7</td>
+                <td><strong>ANGSURAN / CICILAN PER BULAN:</strong> Tenor ${tenorBulan} Bulan (${tenorTahun} Tahun)</td>
+                <td style="text-align:right; font-size:13px;">${cicilanText} /bln</td>
+            </tr>
+        `;
+    }
+
+    // 5. Checklist Bonus
+    const bonusContainer = document.getElementById('sphDocBonusContainer');
+    if (bonusContainer) {
+        const checkedBonuses = document.querySelectorAll('.sph-chk-bonus:checked');
+        let bonusHtml = '';
+        checkedBonuses.forEach(chk => {
+            const label = chk.getAttribute('data-label') || chk.parentElement.textContent.trim();
+            bonusHtml += `<div class="sph-bonus-item"><i class="fa-solid fa-circle-check"></i> <span>${escapeHtml(label)}</span></div>`;
+        });
+        if (!bonusHtml) {
+            bonusHtml = `<div class="sph-bonus-item"><i class="fa-solid fa-circle-check"></i> Standard Factory Equipment & Garansi Resmi Toyota</div>`;
+        }
+        bonusContainer.innerHTML = bonusHtml;
+    }
+};
+
+window.printSphDocument = function() {
+    updateSphPreview();
+    window.print();
+};
+
+window.shareSphWhatsApp = function() {
+    updateSphPreview();
+
+    const custName = document.getElementById('sphInputCustName')?.value.trim() || 'Bpk/Ibu';
+    const custPhone = document.getElementById('sphInputPhone')?.value.trim() || '';
+    const modelSelect = document.getElementById('selectModel');
+    let mobilName = modelSelect && modelSelect.selectedIndex > 0 ? modelSelect.options[modelSelect.selectedIndex].text : 'Toyota All New Unit';
+    if (mobilName.includes('(')) mobilName = mobilName.split('(')[0].trim();
+
+    const otr = typeof getHarga === 'function' ? getHarga() : 0;
+    const diskon = parseNum(document.getElementById('sphInputDiskon')?.value || '0');
+    const booking = parseNum(document.getElementById('sphInputBooking')?.value || '5000000');
+    const hargaNett = Math.max(0, otr - diskon);
+    const validityDays = document.getElementById('sphSelectValidity')?.value || '14';
+
+    const salesName = localStorage.getItem('namaSales') || 'Egy Pratama';
+    const salesPhone = localStorage.getItem('noHpSales') || '0812-2154-1540';
+
+    let msg = `📄 *SURAT PENAWARAN HARGA (SPH) RESMI* 📄\n` +
+              `*PT TUNAS RIDEAN TBK — TUNAS TOYOTA KIARA CONDONG*\n` +
+              `No. Dokumen: *${sphDocumentId}*\n` +
+              `Masa Berlaku: ${validityDays} Hari Kalender\n\n` +
+              `Kepada Yth.\n` +
+              `*${custName}*\n\n` +
+              `Terima kasih atas minat dan kepercayaan Bapak/Ibu kepada Tunas Toyota Kiara Condong Bandung. Bersama surat ini kami sampaikan rincian penawaran harga resmi Toyota:\n\n` +
+              `🚘 *Unit Kendaraan*: *${mobilName}*\n` +
+              `🏷️ *Harga OTR Bandung*: ${formatRp(otr)}\n` +
+              `🎁 *Diskon / Subsidi Dealer*: - ${formatRp(diskon)}\n` +
+              `✨ *Harga Netto Unit*: *${formatRp(hargaNett)}*\n\n`;
+
+    if (sphCurrentScheme === 'cash') {
+        const sisa = Math.max(0, hargaNett - booking);
+        msg += `💳 *SKEMA PEMBELIAN TUNAI (CASH)*:\n` +
+               `• Tanda Jadi Booking Fee: ${formatRp(booking)}\n` +
+               `• Sisa Pelunasan Sebelum Kirim (DO): *${formatRp(sisa)}*\n\n`;
+    } else {
+        const tenorTahun = currentTenor || 3;
+        const cicilanText = document.getElementById('resultAmount')?.innerText || 'Rp 0';
+        const tdpMurni = typeof getTdp === 'function' ? getTdp() : 0;
+        const adminVal = typeof getAdmin === 'function' ? getAdmin() : 2500000;
+        const tdpTotalAwal = tdpMurni + adminVal - diskon;
+        const sisaTdp = Math.max(0, tdpTotalAwal - booking);
+        const leasingSelect = document.getElementById('selectLeasing');
+        const leasingName = leasingSelect ? leasingSelect.options[leasingSelect.selectedIndex].text.split('-')[0].trim() : 'TAF';
+
+        msg += `💳 *SKEMA KREDIT RESMI (${leasingName})*:\n` +
+               `• Estimasi Total DP Nett: *${formatRp(tdpTotalAwal)}*\n` +
+               `• Cicilan per Bulan: *${cicilanText}*\n` +
+               `• Jangka Waktu (Tenor): ${tenorTahun * 12} Bulan (${tenorTahun} Tahun)\n` +
+               `• Tanda Jadi Booking Fee: ${formatRp(booking)}\n` +
+               `• Sisa DP Dibayarkan Saat ACC: *${formatRp(sisaTdp)}*\n\n`;
+    }
+
+    msg += `🎁 *PAKET BONUS & FASILITAS DEALER*:\n` +
+           `✓ Kaca Film 3M / Solar Gard Garansi 5 Thn\n` +
+           `✓ Karpet Beludru Asli Toyota & Talang Air\n` +
+           `✓ Plat Nomor QR Sementara Resmi\n` +
+           `✓ Program T-Care: Free Jasa & Sparepart 3 Tahun / 60.000 KM\n` +
+           `✓ Garansi Mesin TAM 3 Tahun / 100.000 KM\n` +
+           `✓ Derek Darurat Emergency Roadside Assistance (ERA) 24 Jam\n\n` +
+           `🛡️ *JAMINAN KEAMANAN TRANSAKSI (REKENING RESMI DEALER)*:\n` +
+           `Bank: *BCA KCU Sudirman Bandung*\n` +
+           `No. Rekening: *008-303-9999*\n` +
+           `Atas Nama: *PT TUNAS RIDEAN TBK*\n` +
+           `_(Pembayaran hanya sah melalui rekening resmi dealer di atas)_\n\n` +
+           `Untuk proses penguncian alokasi unit dan berkas faktur hari ini, silakan hubungi:\n` +
+           `👤 *${salesName}*\n` +
+           `📞 Telp/WA: ${salesPhone}\n` +
+           `🏢 *Tunas Toyota Kiara Condong — Jl. Terusan Kiara Condong No. 440 Bandung*`;
+
+    let targetUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    if (custPhone && custPhone.replace(/[^0-9]/g, '').length >= 9) {
+        let cleanNumber = custPhone.replace(/[^0-9]/g, '');
+        if (cleanNumber.startsWith('0')) cleanNumber = '62' + cleanNumber.substring(1);
+        targetUrl = `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(msg)}`;
+    }
+
+    window.open(targetUrl, '_blank');
+};
+
+window.copySphSummary = function() {
+    updateSphPreview();
+
+    const custName = document.getElementById('sphInputCustName')?.value.trim() || 'Bpk/Ibu';
+    const modelSelect = document.getElementById('selectModel');
+    let mobilName = modelSelect && modelSelect.selectedIndex > 0 ? modelSelect.options[modelSelect.selectedIndex].text : 'Toyota Unit';
+    if (mobilName.includes('(')) mobilName = mobilName.split('(')[0].trim();
+
+    const otr = typeof getHarga === 'function' ? getHarga() : 0;
+    const diskon = parseNum(document.getElementById('sphInputDiskon')?.value || '0');
+    const cicilanText = document.getElementById('resultAmount')?.innerText || 'Rp 0';
+    const salesName = localStorage.getItem('namaSales') || 'Egy Pratama';
+    const salesPhone = localStorage.getItem('noHpSales') || '0812-2154-1540';
+
+    const text = `SURAT PENAWARAN HARGA RESMI TUNAS TOYOTA KIARA CONDONG\n` +
+                 `No: ${sphDocumentId}\n` +
+                 `Konsumen: ${custName}\n` +
+                 `Unit: ${mobilName}\n` +
+                 `OTR: ${formatRp(otr)} (Diskon: ${formatRp(diskon)})\n` +
+                 `Angsuran: ${cicilanText} /bulan\n` +
+                 `Marketing: ${salesName} (${salesPhone})\n` +
+                 `PT Tunas Ridean Tbk - Jl. Terusan Kiara Condong No. 440 Bandung`;
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✓ Rangkuman Surat Penawaran Harga (SPH) berhasil disalin ke clipboard!');
+        }).catch(() => {
+            prompt('Salin teks SPH berikut:', text);
+        });
+    } else {
+        prompt('Salin teks SPH berikut:', text);
+    }
+};
+
+// Check if URL has ?action=sph or ?sph=1 on load
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'sph' || params.get('sph') === '1') {
+        setTimeout(() => {
+            if (typeof openSphModal === 'function') openSphModal();
+        }, 500);
+    }
+});

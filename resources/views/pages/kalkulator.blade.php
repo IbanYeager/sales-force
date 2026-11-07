@@ -556,6 +556,15 @@
                             <i class="fa-solid fa-arrow-right" style="font-size:11px; opacity:0.8; margin-left:auto;"></i>
                         </button>
 
+                        <!-- ACTION HERO: BUAT SURAT PENAWARAN HARGA RESMI (SPH DIGITAL 1-KLIK) -->
+                        <button type="button" class="btn-action-sph" onclick="openSphModal()" title="Cetak Surat Penawaran Harga (SPH) Resmi Tunas Toyota Kiara Condong">
+                            <div class="btn-sph-content">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                <span>Buat Surat Penawaran Resmi (SPH)</span>
+                            </div>
+                            <span class="badge-sph-hot"><i class="fa-solid fa-stamp"></i> Resmi 1-Klik</span>
+                        </button>
+
                         <!-- ACTION: BUAT FLYER PROMO (FITUR 1) -->
                         <button type="button" class="btn-action-flyer" onclick="openFlyerStudioPage()" title="Buat poster promosi visual beresolusi tinggi di Studio Flyer Baru">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -571,8 +580,8 @@
 
                         <!-- ACTION 3: PRINT & COMPARE -->
                         <div class="res-secondary-actions">
-                            <button type="button" class="btn-action-print" onclick="window.print()" title="Cetak atau Unduh Dokumen PDF">
-                                <i class="fa-solid fa-print"></i> Cetak / PDF
+                            <button type="button" class="btn-action-print" onclick="openSphModal(true)" title="Cetak atau Unduh Dokumen SPH PDF Resmi A4">
+                                <i class="fa-solid fa-print"></i> Cetak SPH / PDF
                             </button>
                             <button type="button" class="btn-action-compare" onclick="addToCompare()" title="Simpan skema ini ke komparasi opsi">
                                 <i class="fa-solid fa-code-compare"></i> Bandingkan
@@ -707,6 +716,246 @@
             <!-- Results Grid -->
             <div class="matchmaker-results-grid" id="mmResultsGrid">
                 <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         MODAL: STUDIO SURAT PENAWARAN HARGA (SPH) DIGITAL RESMI 1-KLIK
+    ══════════════════════════════════════════════════════════════════ -->
+    <div id="sphModalOverlay" class="sph-modal-overlay" style="display:none;" onclick="if(event.target===this) closeSphModal()">
+        <div class="sph-modal-dialog">
+            <!-- Modal Header -->
+            <div class="sph-modal-header">
+                <div class="sph-header-info">
+                    <div class="sph-badge-tag"><i class="fa-solid fa-shield-halved"></i> DOKUMEN RESMI DEALER TUNAS TOYOTA</div>
+                    <h3 class="sph-title">Studio Surat Penawaran Harga (SPH Digital)</h3>
+                    <p class="sph-subtitle">PT Tunas Ridean Tbk — Authorized Toyota Dealer Cabang Kiara Condong Bandung</p>
+                </div>
+                <button type="button" class="sph-close-btn" onclick="closeSphModal()" title="Tutup Modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body: 2 Columns (Form Builder on Left, A4 Sheet on Right) -->
+            <div class="sph-modal-body">
+                <!-- LEFT COLUMN: CONTROLS & CUSTOMER DETAILS -->
+                <div class="sph-controls-panel">
+                    <!-- Scheme Tabs -->
+                    <div class="sph-scheme-tabs">
+                        <button type="button" class="sph-scheme-btn active" id="sphTabKredit" onclick="setSphScheme('kredit')">
+                            <i class="fa-solid fa-calculator"></i> Skema Kredit Resmi
+                        </button>
+                        <button type="button" class="sph-scheme-btn" id="sphTabCash" onclick="setSphScheme('cash')">
+                            <i class="fa-solid fa-money-bill-wave"></i> Skema Tunai (Cash)
+                        </button>
+                    </div>
+
+                    <!-- Customer Info Form -->
+                    <div class="sph-form-card">
+                        <h4 class="sph-form-title"><i class="fa-solid fa-user-check"></i> Data Calon Konsumen</h4>
+                        <div class="sph-input-row">
+                            <label class="sph-label">Nama Lengkap Konsumen / Instansi</label>
+                            <input type="text" id="sphInputCustName" class="sph-input" placeholder="Misal: Bpk. Hendra Gunawan" value="Bpk. Hendra Gunawan" oninput="updateSphPreview()">
+                        </div>
+                        <div class="sph-grid-2">
+                            <div>
+                                <label class="sph-label">Perusahaan / PT (Opsional)</label>
+                                <input type="text" id="sphInputCompany" class="sph-input" placeholder="Misal: PT. Maju Bersama" oninput="updateSphPreview()">
+                            </div>
+                            <div>
+                                <label class="sph-label">Kota / Wilayah Domisili</label>
+                                <input type="text" id="sphInputCity" class="sph-input" value="Kota Bandung / Jawa Barat" oninput="updateSphPreview()">
+                            </div>
+                        </div>
+                        <div class="sph-input-row">
+                            <label class="sph-label">No. WhatsApp Calon Konsumen</label>
+                            <input type="tel" id="sphInputPhone" class="sph-input" placeholder="0812xxxxxxxx (Untuk kirim langsung ke WA)" oninput="updateSphPreview()">
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Deal Adjustment -->
+                    <div class="sph-form-card">
+                        <h4 class="sph-form-title"><i class="fa-solid fa-tags"></i> Penyesuaian Diskon & Tanda Jadi</h4>
+                        <div class="sph-grid-2">
+                            <div>
+                                <label class="sph-label">Diskon / Subsidi Cashback (Rp)</label>
+                                <input type="text" id="sphInputDiskon" class="sph-input" value="10.000.000" oninput="formatInput(this); updateSphPreview();">
+                            </div>
+                            <div>
+                                <label class="sph-label">Tanda Jadi / Booking Fee (Rp)</label>
+                                <input type="text" id="sphInputBooking" class="sph-input" value="5.000.000" oninput="formatInput(this); updateSphPreview();">
+                            </div>
+                        </div>
+                        <div class="sph-grid-2">
+                            <div>
+                                <label class="sph-label">Pilihan Warna Unit</label>
+                                <input type="text" id="sphInputColor" class="sph-input" value="Pilihan Bebas (Putih / Hitam / Silver)" oninput="updateSphPreview()">
+                            </div>
+                            <div>
+                                <label class="sph-label">Masa Berlaku SPH</label>
+                                <select id="sphSelectValidity" class="sph-select" onchange="updateSphPreview()">
+                                    <option value="7">7 Hari Kalender</option>
+                                    <option value="14" selected>14 Hari Kalender</option>
+                                    <option value="30">30 Hari Kalender</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checklist Bonus Dealer -->
+                    <div class="sph-form-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <h4 class="sph-form-title" style="margin:0;"><i class="fa-solid fa-gift"></i> Paket Bonus Resmi Dealer</h4>
+                            <span style="font-size:10px; color:#0284c7; font-weight:700;">Centang bonus yang disetujui</span>
+                        </div>
+                        <div class="sph-bonus-grid">
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Kaca Film 3M / Solar Gard Bergaransi 5 Tahun Resmi"> Kaca Film 3M / Solar Gard (5 Thn)</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Karpet Beludru & Karpet Karet Asli Toyota"> Karpet Beludru Original Toyota</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Talang Air Slim Original Toyota"> Talang Air Slim Original</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Dudukan Plat Nomor QR Resmi Tunas Toyota"> Dudukan Plat Nomor QR Resmi</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Payung Eksklusif Tunas Toyota, Kotak P3K & Segitiga Pengaman"> Payung Tunas & Kotak P3K + Segitiga</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Tool Kit Lengkap & Dongkrak Asli Bawaan Pabrik"> Tool Kit & Dongkrak Pabrik</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Program T-Care: Bebas Biaya Jasa & Suku Cadang Servis Berkala s/d 60.000 KM (3 Tahun)"> T-Care Bebas Jasa & Part 3 Thn / 60rb KM</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Garansi Mesin Resmi Toyota Astra Motor 3 Tahun / 100.000 KM"> Garansi Mesin TAM 3 Thn / 100.000 KM</label>
+                            <label class="sph-bonus-check"><input type="checkbox" class="sph-chk-bonus" checked onchange="updateSphPreview()" data-label="Layanan Derek Darurat Emergency Roadside Assistance (ERA) 24 Jam"> Tunas Emergency Assistance 24 Jam</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: LIVE EXECUTIVE A4 DOCUMENT -->
+                <div class="sph-preview-panel">
+                    <div class="sph-a4-sheet" id="sphOfficialDocument">
+                        <!-- Kop Surat Dealer -->
+                        <div class="sph-doc-header">
+                            <div class="sph-doc-logo-box">
+                                <img src="../image/logo_tunas_toyota.png" alt="Tunas Toyota" class="sph-doc-logo">
+                            </div>
+                            <div class="sph-doc-company-info">
+                                <h2 class="sph-doc-comp-name">PT TUNAS RIDEAN TBK</h2>
+                                <h3 class="sph-doc-branch-name">AUTHORIZED TOYOTA DEALER — CABANG KIARA CONDONG</h3>
+                                <p class="sph-doc-address">Jl. Terusan Kiara Condong No. 440, Kebon Kangkung, Kiaracondong, Kota Bandung 40284</p>
+                                <p class="sph-doc-contact">Telp: (022) 731-5555 | Email: info.kiaracondong@tunasgroup.com | Web: salesforcetunassft.com</p>
+                            </div>
+                        </div>
+
+                        <div class="sph-doc-divider"></div>
+
+                        <!-- Judul Surat & Meta -->
+                        <div class="sph-doc-title-row">
+                            <div class="sph-doc-title-main">SURAT PENAWARAN HARGA (QUOTATION)</div>
+                            <div class="sph-doc-meta-badge" id="sphDocNumber">SPH/TT-KC/202611/0482</div>
+                        </div>
+
+                        <!-- Info Penerima & Tanggal -->
+                        <div class="sph-doc-meta-grid">
+                            <div class="sph-doc-meta-col">
+                                <div class="sph-meta-item"><span class="sph-meta-lbl">Kepada Yth.</span>: <strong id="sphDocCustName">Bpk. Hendra Gunawan</strong></div>
+                                <div class="sph-meta-item" id="sphDocCompanyRow" style="display:none;"><span class="sph-meta-lbl">Perusahaan</span>: <span id="sphDocCompany">-</span></div>
+                                <div class="sph-meta-item"><span class="sph-meta-lbl">Domisili</span>: <span id="sphDocCity">Kota Bandung / Jawa Barat</span></div>
+                                <div class="sph-meta-item"><span class="sph-meta-lbl">Perihal</span>: <strong>Penawaran Resmi Unit Kendaraan Baru Toyota</strong></div>
+                            </div>
+                            <div class="sph-doc-meta-col text-right">
+                                <div class="sph-meta-item"><span class="sph-meta-lbl">Tanggal Penawaran</span>: <strong id="sphDocDate">7 November 2026</strong></div>
+                                <div class="sph-meta-item"><span class="sph-meta-lbl">Masa Berlaku</span>: <span id="sphDocValidity">14 Hari Kalender</span></div>
+                                <div class="sph-meta-item"><span class="sph-meta-lbl">Wiraniaga</span>: <strong id="sphDocSalesHeader">Egy Pratama</strong></div>
+                                <div class="sph-meta-item"><span class="sph-meta-lbl">Kondisi Unit</span>: <span class="sph-tag-green">100% Brand New OTR Jabar</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Opening Statement -->
+                        <p class="sph-doc-paragraph">
+                            Dengan hormat,<br>
+                            Terima kasih atas minat dan kepercayaan Bapak/Ibu kepada Tunas Toyota Kiara Condong. Bersama surat ini, kami bermaksud menyampaikan rincian penawaran harga spesial dan skema pembiayaan resmi untuk unit kendaraan impian Bapak/Ibu sebagai berikut:
+                        </p>
+
+                        <!-- Tabel Spesifikasi & Finansial -->
+                        <table class="sph-doc-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:36px; text-align:center;">No.</th>
+                                    <th>Rincian Deskripsi Penawaran</th>
+                                    <th style="width:220px; text-align:right;">Nilai / Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sphDocTableBody">
+                                <!-- Populated dynamically by updateSphPreview() -->
+                            </tbody>
+                        </table>
+
+                        <!-- Rincian Bonus -->
+                        <div class="sph-doc-bonus-box">
+                            <div class="sph-bonus-title"><i class="fa-solid fa-gift"></i> PAKET FASILITAS &amp; BONUS RESMI DEALER:</div>
+                            <div class="sph-doc-bonus-list" id="sphDocBonusContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Rekening Resmi Keamanan -->
+                        <div class="sph-doc-bank-box">
+                            <div class="sph-bank-title"><i class="fa-solid fa-shield-halved"></i> JAMINAN KEAMANAN TRANSAKSI (REKENING RESMI DEALER):</div>
+                            <div class="sph-bank-desc">
+                                Pembayaran tanda jadi (booking fee) maupun pelunasan hanya sah apabila ditransfer langsung ke rekening resmi perusahaan:
+                                <br><strong>BANK BCA KCU SUDIRMAN BANDUNG</strong> &bull; No. Rekening: <strong>008-303-9999</strong> a/n <strong>PT TUNAS RIDEAN TBK</strong>.
+                                <br><small style="color:#b91c1c; font-weight:600;">*Tunas Toyota tidak bertanggung jawab atas pembayaran di luar rekening resmi terdaftar di atas.</small>
+                            </div>
+                        </div>
+
+                        <!-- Bagian Pengesahan & Tanda Tangan -->
+                        <div class="sph-doc-footer-sign">
+                            <div class="sph-sign-col">
+                                <p class="sph-sign-title">Disetujui Calon Konsumen,</p>
+                                <div class="sph-sign-space"></div>
+                                <p class="sph-sign-name" id="sphSignCustName">( Bpk. Hendra Gunawan )</p>
+                                <p class="sph-sign-role">Pelanggan / Pemohon</p>
+                            </div>
+
+                            <div class="sph-sign-col-center">
+                                <!-- Stempel Dealer Resmi Digital -->
+                                <div class="sph-official-stamp">
+                                    <div class="stamp-inner">
+                                        <span class="stamp-circle-top">PT TUNAS RIDEAN TBK</span>
+                                        <div class="stamp-center">
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            <span>APPROVED</span>
+                                            <small>VERIFIED</small>
+                                        </div>
+                                        <span class="stamp-circle-bot">KIARA CONDONG</span>
+                                    </div>
+                                </div>
+                                <div class="sph-qr-verify">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=VERIFIED-SPH-TUNAS-TOYOTA-KIARACONDONG" alt="QR Validasi" class="sph-qr-img">
+                                    <span class="sph-qr-sub">Scan Validasi Dokumen</span>
+                                </div>
+                            </div>
+
+                            <div class="sph-sign-col text-right">
+                                <p class="sph-sign-title">Hormat Kami, Tunas Toyota</p>
+                                <div class="sph-sign-space">
+                                    <div class="sph-digital-signature-text" id="sphSignSalesSignature">Egy Pratama</div>
+                                </div>
+                                <p class="sph-sign-name" id="sphSignSalesName">Egy Pratama</p>
+                                <p class="sph-sign-role" id="sphSignSalesPhone">Sales Executive &bull; 0812-2154-1540</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Action Footer -->
+            <div class="sph-modal-footer">
+                <button type="button" class="sph-btn-secondary" onclick="closeSphModal()">
+                    <i class="fa-solid fa-xmark"></i> Tutup
+                </button>
+                <button type="button" class="sph-btn-copy" onclick="copySphSummary()">
+                    <i class="fa-regular fa-copy"></i> Salin Rangkuman
+                </button>
+                <button type="button" class="sph-btn-wa" onclick="shareSphWhatsApp()">
+                    <i class="fa-brands fa-whatsapp"></i> Kirim WhatsApp Resmi
+                </button>
+                <button type="button" class="sph-btn-primary" onclick="printSphDocument()">
+                    <i class="fa-solid fa-print"></i> Cetak / Simpan PDF Resmi (A4)
+                </button>
             </div>
         </div>
     </div>

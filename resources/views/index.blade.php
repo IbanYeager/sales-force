@@ -239,6 +239,32 @@
                     <div id="dailyFollowupBriefingContainer"></div>
                     <div id="spvAiVoiceBriefingContainer"></div>
 
+                    <!-- ═══ 🔴 LIVE CLOSING BELL TICKER & DEAL MOMENTUM ═══ -->
+                    <div class="card closing-bell-ticker-card" id="closingBellTickerCard">
+                        <div class="ticker-header-row">
+                            <div class="ticker-live-badge">
+                                <span class="ticker-pulse-dot"></span>
+                                <span class="ticker-live-text">LIVE CLOSING BELL</span>
+                            </div>
+                            <div class="ticker-actions-right">
+                                <button type="button" class="btn-ring-bell" onclick="openRingBellModal()" title="Bunyikan Lonceng & Rayakan Closing Unit Baru!">
+                                    <i class="fa-solid fa-bell"></i>
+                                    <span>Rayakan Closing 🔔</span>
+                                </button>
+                                <a href="#leaderboardSection" class="ticker-leaderboard-link" title="Lihat Papan Peringkat Sales">
+                                    <i class="fa-solid fa-trophy"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Running Marquee Track -->
+                        <div class="ticker-track-viewport">
+                            <div class="ticker-track-content" id="closingTickerContent">
+                                <span class="ticker-item"><i class="fa-solid fa-spinner fa-spin text-red"></i> <strong>Menghubungkan ke jaringan live closing cabang...</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ═══ KARTU TARGET SPK & DO ═══ -->
                     <a href="pages/target.html" class="target-link">
                         <div class="card target-card tgt-card">
@@ -596,7 +622,7 @@
                     </div>
 
                     <!-- ═══ LEADERBOARD ═══ -->
-                    <div class="card leaderboard-card">
+                    <div class="card leaderboard-card" id="leaderboardSection">
                         <div class="leaderboard-head">
                             <div class="leaderboard-title-wrap">
                                 <div class="leaderboard-trophy">
@@ -1374,6 +1400,60 @@
 
         </div><!-- /desktop-content -->
     </div><!-- /desktop-shell -->
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         MODAL: RAYAKAN CLOSING & BUNYIKAN LONCENG DEALER
+    ══════════════════════════════════════════════════════════════════ -->
+    <div id="ringBellModal" class="ring-bell-modal-overlay" style="display:none;" onclick="if(event.target===this) closeRingBellModal()">
+        <div class="ring-bell-modal-dialog">
+            <div class="ring-bell-head">
+                <div class="ring-bell-icon-glow">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <h3 class="ring-bell-title">Bunyikan Lonceng Closing! 🔔</h3>
+                <p class="ring-bell-sub">Rayakan pencapaian SPK / DO unit baru Anda bersama seluruh tim Tunas Toyota Kiara Condong!</p>
+                <button type="button" class="ring-bell-close" onclick="closeRingBellModal()" title="Tutup Modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="ring-bell-body">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Nama Wiraniaga</label>
+                    <input type="text" id="ringBellSalesName" class="ring-bell-input" readonly style="background:#f8fafc; font-weight:700;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Model &amp; Varian Mobil yang Closing</label>
+                    <input type="text" id="ringBellModel" class="ring-bell-input" placeholder="Misal: Innova Zenix 2.0 V CVT / Veloz Q TSS" value="Innova Zenix 2.0 V CVT Gasoline">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Skema Pembelian</label>
+                        <select id="ringBellScheme" class="ring-bell-select">
+                            <option value="Kredit">Kredit Leasing</option>
+                            <option value="Cash">Cash Keras</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Mitra Pembiayaan</label>
+                        <select id="ringBellLeasing" class="ring-bell-select">
+                            <option value="TAF">TAF (Toyota Astra Financial)</option>
+                            <option value="ACC">ACC (Astra Credit Companies)</option>
+                            <option value="BCA Finance">BCA Finance</option>
+                            <option value="Mandiri Tunas Finance">Mandiri Tunas Finance</option>
+                            <option value="Adira Finance">Adira Finance</option>
+                            <option value="Cash">Cash / Tunai</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-submit-bell" onclick="submitClosingBell()">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>BUNYIKAN LONCENG SEKARANG! 🔔</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Confetti Canvas -->
+    <canvas id="closingConfettiCanvas" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:99999; display:none;"></canvas>
 
     <script src="js/sidebar_desktop.js?v={{ time() }}"></script>
     <script src="js/script.js?v=20260908_rank_fix_v19"></script>
