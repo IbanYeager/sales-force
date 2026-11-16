@@ -4793,7 +4793,7 @@ async function confirmBulkDelete() {
 }
 
 function openResetDatabaseModal() {
-  const currentSource = masterState.filters.db_source || 'sales';
+  const currentSource = (masterState && masterState.filters && masterState.filters.db_source) ? masterState.filters.db_source : 'sales';
   document.getElementById('modalResetDb')?.remove();
 
   const isSales = currentSource === 'sales';
@@ -4801,8 +4801,8 @@ function openResetDatabaseModal() {
   const isAll = currentSource === 'all';
 
   const modalHtml = `
-    <div class="modal-overlay" id="modalResetDb" onclick="closeResetDbModal()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.65); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:16px;">
-      <div class="modal-content" style="max-width:540px; width:100%; border-radius:24px; padding:26px; box-shadow:0 30px 60px rgba(0,0,0,0.3); background:#ffffff; border:1px solid rgba(226,232,240,0.8); animation:alertModalSpring 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;" onclick="event.stopPropagation()">
+    <div class="modal-overlay active show" id="modalResetDb" onclick="closeResetDbModal()" style="display:flex !important; opacity:1 !important; visibility:visible !important; pointer-events:auto !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; background:rgba(7,13,34,0.78) !important; backdrop-filter:blur(8px) !important; -webkit-backdrop-filter:blur(8px) !important; align-items:center !important; justify-content:center !important; padding:16px !important; z-index:10000005 !important; box-sizing:border-box !important;">
+      <div class="modal-content" style="max-width:540px; width:100%; border-radius:24px; padding:26px; box-shadow:0 30px 60px rgba(0,0,0,0.3); background:#ffffff; border:1px solid rgba(226,232,240,0.8); position:relative !important; margin:auto !important;" onclick="event.stopPropagation()">
         
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; border-bottom:1.5px solid #f1f5f9; padding-bottom:14px;">
@@ -4935,8 +4935,11 @@ async function executeResetDatabase() {
   const confirmMsg = `Konfirmasi Terakhir:\nApakah Anda YAKIN ingin mengosongkan ${labelText}?${safeNotice}\n\nLanjutkan penghapusan?`;
 
   let isConfirmed = false;
+  const modalEl = document.getElementById('modalResetDb');
   if (typeof customConfirm === 'function') {
+    if (modalEl) modalEl.style.display = 'none';
     isConfirmed = await customConfirm(confirmMsg);
+    if (!isConfirmed && modalEl) modalEl.style.display = 'flex';
   } else {
     isConfirmed = confirm(confirmMsg);
   }

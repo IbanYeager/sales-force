@@ -2154,6 +2154,16 @@ if ($action === 'reset_database') {
         followup_execute("DELETE FROM followup_customers WHERE $whereRadar");
         followup_execute("DELETE FROM followup_logs WHERE customer_id NOT IN (SELECT id FROM followup_customers)");
 
+        // Clear radar cache file if exists
+        $cacheFile = __DIR__ . '/cache_radar_customers.json';
+        if (file_exists($cacheFile)) {
+            @file_put_contents($cacheFile, json_encode([]));
+        }
+        $publicCache = dirname(__DIR__) . '/public/api/cache_radar_customers.json';
+        if (file_exists($publicCache)) {
+            @file_put_contents($publicCache, json_encode([]));
+        }
+
         echo json_encode([
             'success' => true,
             'message' => 'Database Radar GPS (PKB Excel) berhasil dikosongkan. Data Database Khusus Sales tetap aman dan tidak terhapus.'
@@ -2162,6 +2172,16 @@ if ($action === 'reset_database') {
     } else {
         followup_execute("DELETE FROM followup_customers");
         followup_execute("DELETE FROM followup_logs");
+
+        // Clear radar cache file if exists
+        $cacheFile = __DIR__ . '/cache_radar_customers.json';
+        if (file_exists($cacheFile)) {
+            @file_put_contents($cacheFile, json_encode([]));
+        }
+        $publicCache = dirname(__DIR__) . '/public/api/cache_radar_customers.json';
+        if (file_exists($publicCache)) {
+            @file_put_contents($publicCache, json_encode([]));
+        }
 
         echo json_encode([
             'success' => true,

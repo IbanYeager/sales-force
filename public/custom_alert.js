@@ -15,7 +15,7 @@ function injectCustomAlertCSS() {
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            z-index: 999999;
+            z-index: 10000050 !important;
             display: flex;
             align-items: center;
             justify-content: center;
