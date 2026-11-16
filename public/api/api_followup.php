@@ -258,6 +258,7 @@ if ($action === 'customers') {
     $category = isset($_GET['category']) ? trim($_GET['category']) : '';
     $data_type = isset($_GET['data_type']) ? trim($_GET['data_type']) : '';
     $spv = isset($_GET['spv']) ? trim($_GET['spv']) : '';
+    $district = isset($_GET['district']) ? trim($_GET['district']) : '';
     $db_source = isset($_GET['db_source']) ? trim($_GET['db_source']) : 'all';
 
     $where = [];
@@ -331,6 +332,12 @@ if ($action === 'customers') {
     if ($data_type !== '' && $data_type !== 'all') {
         $where[] = "data_type = ?";
         $params[] = $data_type;
+    }
+
+    if ($district !== '' && $district !== 'all') {
+        $where[] = "(LOWER(district) LIKE ? OR LOWER(notes) LIKE ?)";
+        $params[] = '%' . strtolower($district) . '%';
+        $params[] = '%' . strtolower($district) . '%';
     }
 
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";

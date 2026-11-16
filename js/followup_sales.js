@@ -7,6 +7,7 @@ let followupState = {
   templates: [],
   activeCategory: 'all',
   activeStatus: 'all',
+  activeDistrict: 'all',
   searchQuery: '',
   selectedCustomer: null,
   salesInfo: null,
@@ -142,6 +143,11 @@ function initFollowupTabs() {
 
             <!-- Compact Dropdown Filters & Actions -->
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <!-- District / Kecamatan Filter Dropdown -->
+              <select id="followupDistrictSelect" class="fu-select-clean" onchange="handleDistrictFilter(this.value)" style="padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; border:1.5px solid #cbd5e1; background:#f8fafc; color:#0f172a; cursor:pointer;" title="Filter kecamatan customer">
+                <option value="all">📍 Semua Kecamatan</option>
+              </select>
+
               <!-- Category Filter Dropdown -->
               <select id="followupCategorySelect" class="fu-select-clean" onchange="handleCategoryFilter(this.value)" style="padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; border:1.5px solid #cbd5e1; background:#f8fafc; color:#0f172a; cursor:pointer;" title="Filter kategori mobil">
                 <option value="all">Semua Kategori Mobil</option>
@@ -326,6 +332,7 @@ async function loadFollowupCustomers() {
       followupState.customers = data.data || [];
       updateHeroStats();
       renderCategoryPills();
+      renderDistrictFilter();
 
       if (followupState.subTab === 'orphan_pool') {
         loadOrphanLeads();
@@ -718,6 +725,37 @@ function renderCategoryPills() {
   select.value = followupState.activeCategory || 'all';
 }
 
+function renderDistrictFilter() {
+  const select = document.getElementById('followupDistrictSelect');
+  if (!select) return;
+
+  const districtCounts = {};
+  followupState.customers.forEach(c => {
+    let d = (c.district || '').trim();
+    if (!d || d.toLowerCase() === 'bandung area') return;
+    districtCounts[d] = (districtCounts[d] || 0) + 1;
+  });
+
+  const sortedDistricts = Object.keys(districtCounts).sort((a, b) => districtCounts[b] - districtCounts[a]);
+
+  let html = `<option value="all">📍 Semua Kecamatan (${followupState.customers.length})</option>`;
+  sortedDistricts.forEach(dist => {
+    html += `<option value="${escapeHtml(dist)}">📍 ${escapeHtml(dist)} (${districtCounts[dist]})</option>`;
+  });
+
+  select.innerHTML = html;
+  select.value = followupState.activeDistrict || 'all';
+}
+
+function handleDistrictFilter(dist) {
+  followupState.activeDistrict = dist;
+  const select = document.getElementById('followupDistrictSelect');
+  if (select && select.value !== dist) {
+    select.value = dist;
+  }
+  renderCustomerCards();
+}
+
 function handleFollowupSearch(query) {
   followupState.searchQuery = query.toLowerCase().trim();
   if (followupState.subTab === 'orphan_pool') {
@@ -776,6 +814,16 @@ function renderCustomerCards(preserveRenderLimit = false) {
   // Filter Category
   if (followupState.activeCategory !== 'all') {
     list = list.filter(c => c.followup_category === followupState.activeCategory);
+  }
+
+  // Filter District / Kecamatan
+  if (followupState.activeDistrict && followupState.activeDistrict !== 'all') {
+    const qDist = followupState.activeDistrict.toLowerCase().trim();
+    list = list.filter(c => {
+      const d = (c.district || '').toLowerCase();
+      const addr = (c.notes || c.address || '').toLowerCase();
+      return d.includes(qDist) || addr.includes(qDist);
+    });
   }
 
   // Filter Status (All, Belum Dihubungi, Menunggu Respon, Sudah FU, or specific status)
