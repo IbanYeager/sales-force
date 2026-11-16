@@ -531,11 +531,60 @@ if ($fileExt === 'csv') {
                         });
                         $fullAddress = implode(', ', $addrParts);
 
-                        // Extract and resolve district
-                        $district = resolveAddressAndDistrict($fullAddress, '', $r);
-                        if (!$district && $rawDist) {
+                        // Extract and resolve district with 100% precision from Excel Col T (Owner District)
+                        $district = '';
+                        if ($rawDist && $rawDist !== '-' && $rawDist !== 'NO DATA') {
                             $cleanDist = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', $rawDist));
-                            if ($cleanDist) $district = ucwords(strtolower($cleanDist));
+                            $cleanDistLower = strtolower($cleanDist);
+                            
+                            $distAliasMap = [
+                                'buah batu' => 'Buahbatu',
+                                'buahbatu' => 'Buahbatu',
+                                'kiara condong' => 'Kiaracondong',
+                                'kiaracondong' => 'Kiaracondong',
+                                'kircon' => 'Kiaracondong',
+                                'batu nunggal' => 'Batununggal',
+                                'batununggal' => 'Batununggal',
+                                'bojong soang' => 'Bojongsoang',
+                                'bojongsoang' => 'Bojongsoang',
+                                'ujung berung' => 'Ujungberung',
+                                'ujungberung' => 'Ujungberung',
+                                'bandung kidul' => 'Bandung Kidul',
+                                'bandung kulon' => 'Bandung Kulon',
+                                'bandung wetan' => 'Bandung Wetan',
+                                'cibeunying kidul' => 'Cibeunying Kidul',
+                                'cibeunying kaler' => 'Cibeunying Kaler',
+                                'bojongloa kaler' => 'Bojongloa Kaler',
+                                'bojongloa kidul' => 'Bojongloa Kidul',
+                                'babakan ciparay' => 'Babakan Ciparay',
+                                'sumur bandung' => 'Sumur Bandung',
+                                'lengkong' => 'Lengkong',
+                                'arcamanik' => 'Arcamanik',
+                                'antapani' => 'Antapani',
+                                'gedebage' => 'Gedebage',
+                                'rancasari' => 'Rancasari',
+                                'regol' => 'Regol',
+                                'sukasari' => 'Sukasari',
+                                'sukajadi' => 'Sukajadi',
+                                'coblong' => 'Coblong',
+                                'cidadap' => 'Cidadap',
+                                'astana anyar' => 'Astana Anyar',
+                                'andir' => 'Andir',
+                                'cicendo' => 'Cicendo',
+                                'cinambo' => 'Cinambo',
+                                'panyileukan' => 'Panyileukan',
+                                'cibiru' => 'Cibiru'
+                            ];
+                            
+                            if (isset($distAliasMap[$cleanDistLower])) {
+                                $district = $distAliasMap[$cleanDistLower];
+                            } else {
+                                $district = ucwords(strtolower($cleanDist));
+                            }
+                        }
+                        
+                        if (!$district) {
+                            $district = resolveAddressAndDistrict($fullAddress, '', $r);
                         }
 
                         // Resolve Phone number:

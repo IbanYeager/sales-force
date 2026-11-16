@@ -479,6 +479,9 @@ const SalesSuperpowers = {
         duration: 0.8
       });
     } catch (e) {}
+
+    // Ensure map pins and cards are synchronized with this polygon
+    this.updateRadarMapPins();
   },
 
   switchRadarMode(mode, containerId = 'followupRadarContainer') {
@@ -708,6 +711,11 @@ const SalesSuperpowers = {
     this.radarMode = localStorage.getItem('savedRadarMode') || 'radius';
     this.currentRadius = parseFloat(radiusKm) || 1;
     this.currentDistrict = district && district !== 'all' ? district : (this.radarMode === 'polreg' ? 'buahbatu' : 'all');
+
+    // Pre-load Polreg polygon districts data early so geometry is ready for point-in-polygon
+    try {
+      await this.loadPolregDistrictsData();
+    } catch (e) {}
 
     // Ensure CSS styles are injected
     this.ensureRadarStyles();
@@ -1517,17 +1525,17 @@ const SalesSuperpowers = {
     const mode = this.radarMode || 'radius';
 
     return (this.radarData || []).filter(c => {
-      // 1. Polreg Mode: Strict District Filter (Strictly inside the selected polygon!)
+      // 1. Polreg Mode: Strict District Filter (Strictly inside the selected polygon & matching district!)
       if (mode === 'polreg') {
         if (currentDist !== 'all' && currentDist !== '') {
+          // Strictly check customer district matches selected zone
+          if (!this.isCustomerInDistrict(c, currentDist)) {
+            return false;
+          }
           const targetDist = this.findPolregDistrict(currentDist);
           if (targetDist && targetDist.polygon && targetDist.polygon.length > 0) {
             // Strictly enforce Point-In-Polygon: NO pin outside polygon can ever appear!
             if (!this.pointInPolygon([c.lat, c.lng], targetDist.polygon)) {
-              return false;
-            }
-          } else {
-            if (!this.isCustomerInDistrict(c, currentDist)) {
               return false;
             }
           }

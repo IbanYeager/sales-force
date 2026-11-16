@@ -175,7 +175,7 @@ try {
                     'car_model' => $car,
                     'last_car_model' => $row['last_car_model'] ?: '',
                     'car_age' => $row['car_age'] ?: '',
-                    'district' => $coords[2] ?: ($row['district'] ?: 'Bandung Area'),
+                    'district' => ($row['district'] && strtolower($row['district']) !== 'bandung area') ? $row['district'] : ($coords[2] ?: 'Bandung Area'),
                     'address' => $coords[3] ?? '',
                     'plate_number' => $row['plate_number'] ?? '',
                     'priority' => $row['priority'] ?: 'Warm',
@@ -193,14 +193,22 @@ try {
 
                 // District Filter check
                 if ($targetDistrict !== 'all' && $targetDistrict !== '') {
-                    $distNameClean = strtolower($coords[2] ?: '');
+                    $distNameClean = strtolower($formattedItem['district'] ?: '');
                     $rawDistClean = strtolower((string)($row['district'] ?: ''));
-                    $notesClean = strtolower((string)($row['notes'] ?: ''));
                     $matched = false;
                     foreach ($searchKeywords as $kw) {
-                        if (strpos($distNameClean, $kw) !== false || strpos($rawDistClean, $kw) !== false || strpos($notesClean, $kw) !== false) {
+                        if (($distNameClean && strpos($distNameClean, $kw) !== false) || ($rawDistClean && strpos($rawDistClean, $kw) !== false)) {
                             $matched = true;
                             break;
+                        }
+                    }
+                    if (!$matched && (empty($distNameClean) || $distNameClean === 'bandung area') && (empty($rawDistClean) || $rawDistClean === 'bandung area')) {
+                        $notesClean = strtolower((string)($row['notes'] ?: ''));
+                        foreach ($searchKeywords as $kw) {
+                            if (strpos($notesClean, $kw) !== false) {
+                                $matched = true;
+                                break;
+                            }
                         }
                     }
                     if (!$matched) continue;

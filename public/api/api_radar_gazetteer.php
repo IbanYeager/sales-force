@@ -2000,7 +2000,7 @@ $bandungStreets = array (
   ),
   'buah batu regency' => 
   array (
-    0 => 'Buahbatu',
+    0 => 'Bandung Kidul',
     1 => 
     array (
       0 => -6.965,
@@ -9535,6 +9535,17 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $addrLower = strtolower($cleanAddress);
     $rawDistLower = strtolower(trim((string)$rawDistrict));
 
+    // Authoritative rawDistrict canonical resolution
+    $canonicalRawDist = null;
+    $rawDistLookup = strtolower(trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$rawDistrict)));
+    if (!empty($rawDistLookup) && $rawDistLookup !== 'bandung area' && $rawDistLookup !== 'bandung') {
+        if (isset($bandungDistricts[$rawDistLookup])) {
+            $canonicalRawDist = $bandungDistricts[$rawDistLookup][0];
+        } elseif (isset($externalCitiesAndHubs[$rawDistLookup])) {
+            $canonicalRawDist = $externalCitiesAndHubs[$rawDistLookup][0];
+        }
+    }
+
     $matchedDistrict = null;
     $matchedCoords = null;
     $isFallback = false;
@@ -9625,8 +9636,19 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         }
     }
 
-    // LEVEL 5.5: Secondary check on rawDistrict ONLY if address is empty or generic "Bandung"
-    if (!$matchedCoords && !empty($rawDistLower) && $rawDistLower !== 'bandung area' && $rawDistLower !== 'bandung') {
+    // LEVEL 5.5: Enforce authoritative rawDistrict if provided
+    if ($canonicalRawDist) {
+        if (!$matchedCoords || ($matchedDistrict && strcasecmp($matchedDistrict, $canonicalRawDist) !== 0)) {
+            $matchedDistrict = $canonicalRawDist;
+            if (isset($bandungDistricts[$rawDistLookup])) {
+                $matchedCoords = $bandungDistricts[$rawDistLookup][1];
+                $isFallback = false;
+            } elseif (isset($externalCitiesAndHubs[$rawDistLookup])) {
+                $matchedCoords = $externalCitiesAndHubs[$rawDistLookup][1];
+                $isFallback = false;
+            }
+        }
+    } elseif (!$matchedCoords && !empty($rawDistLower) && $rawDistLower !== 'bandung area' && $rawDistLower !== 'bandung') {
         if (isset($bandungDistricts[$rawDistLower])) {
             $matchedDistrict = $bandungDistricts[$rawDistLower][0];
             $matchedCoords = $bandungDistricts[$rawDistLower][1];
