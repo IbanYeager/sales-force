@@ -351,6 +351,21 @@ const SalesSuperpowers = {
       .replace(/[^a-z0-9]/g, '');
   },
 
+  pointInPolygon(point, vs) {
+    if (!point || !Array.isArray(point) || point.length < 2) return false;
+    if (!vs || !Array.isArray(vs) || vs.length < 3) return false;
+    const x = point[0], y = point[1];
+    let inside = false;
+    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+      const xi = vs[i][0], yi = vs[i][1];
+      const xj = vs[j][0], yj = vs[j][1];
+      const intersect = ((yi > y) !== (yj > y))
+          && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  },
+
   isCustomerInDistrict(customer, targetKey) {
     if (!targetKey || targetKey === 'all') return true;
     if (!customer) return false;
@@ -393,10 +408,10 @@ const SalesSuperpowers = {
     const targetDist = this.findPolregDistrict(selectedDistrictKey) || this.findPolregDistrict('buahbatu') || districts[0];
     if (!targetDist || !targetDist.polygon || !Array.isArray(targetDist.polygon) || targetDist.polygon.length === 0) return;
 
-    // Count customers belonging strictly to this 1 selected district
+    // Count customers belonging strictly to this 1 selected district (geometrically inside polygon)
     let custCount = 0;
     (this.radarData || []).forEach(c => {
-      if (this.isCustomerInDistrict(c, targetDist.id)) {
+      if (this.pointInPolygon([c.lat, c.lng], targetDist.polygon)) {
         custCount++;
       }
     });
@@ -1502,11 +1517,19 @@ const SalesSuperpowers = {
     const mode = this.radarMode || 'radius';
 
     return (this.radarData || []).filter(c => {
-      // 1. Polreg Mode: Strict District Filter (ONLY the 1 selected district!)
+      // 1. Polreg Mode: Strict District Filter (Strictly inside the selected polygon!)
       if (mode === 'polreg') {
         if (currentDist !== 'all' && currentDist !== '') {
-          if (!this.isCustomerInDistrict(c, currentDist)) {
-            return false;
+          const targetDist = this.findPolregDistrict(currentDist);
+          if (targetDist && targetDist.polygon && targetDist.polygon.length > 0) {
+            // Strictly enforce Point-In-Polygon: NO pin outside polygon can ever appear!
+            if (!this.pointInPolygon([c.lat, c.lng], targetDist.polygon)) {
+              return false;
+            }
+          } else {
+            if (!this.isCustomerInDistrict(c, currentDist)) {
+              return false;
+            }
           }
         }
       }

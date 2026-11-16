@@ -110,9 +110,18 @@ try {
                     $addrClean = strtolower($row['address'] ?: '');
                     $matched = false;
                     foreach ($searchKeywords as $kw) {
-                        if (strpos($distNameClean, $kw) !== false || strpos($addrClean, $kw) !== false) {
+                        if (strpos($distNameClean, $kw) !== false) {
                             $matched = true;
                             break;
+                        }
+                    }
+                    // Only fallback to address text search if district name is empty or generic
+                    if (!$matched && (empty($distNameClean) || $distNameClean === 'bandung area')) {
+                        foreach ($searchKeywords as $kw) {
+                            if (strpos($addrClean, $kw) !== false) {
+                                $matched = true;
+                                break;
+                            }
                         }
                     }
                     if (!$matched) continue;
