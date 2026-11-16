@@ -343,6 +343,42 @@ const SalesSuperpowers = {
     return match || null;
   },
 
+  normalizeDistrictString(str) {
+    if (!str) return '';
+    return String(str).toLowerCase()
+      .replace(/^kec(\.|\s+)/, '')
+      .replace(/^kecamatan\s+/, '')
+      .replace(/[^a-z0-9]/g, '');
+  },
+
+  isCustomerInDistrict(customer, targetKey) {
+    if (!targetKey || targetKey === 'all') return true;
+    if (!customer) return false;
+
+    const normTarget = this.normalizeDistrictString(targetKey);
+    const itemNorm = this.normalizeDistrictString(customer.district);
+
+    const aliasMap = {
+      'kircon': 'kiaracondong',
+      'kiaracondong': 'kiaracondong',
+      'buahbatu': 'buahbatu',
+      'batununggal': 'batununggal',
+      'ujungberung': 'ujungberung',
+      'bojongsoang': 'bojongsoang',
+      'kopo': 'bojongloakaler',
+      'cibaduyut': 'bojongloakidul'
+    };
+
+    const canonicalTarget = aliasMap[normTarget] || normTarget;
+    const canonicalItem = aliasMap[itemNorm] || itemNorm;
+
+    if (canonicalItem && canonicalItem === canonicalTarget) {
+      return true;
+    }
+
+    return false;
+  },
+
   async renderPolregDistrictPolygons(selectedDistrictKey) {
     if (!this.leafletMap) return;
 
@@ -355,137 +391,79 @@ const SalesSuperpowers = {
     if (!districts || districts.length === 0) return;
 
     const targetDist = this.findPolregDistrict(selectedDistrictKey) || this.findPolregDistrict('buahbatu') || districts[0];
-    const targetId = targetDist ? targetDist.id : '';
+    if (!targetDist || !targetDist.polygon || !Array.isArray(targetDist.polygon) || targetDist.polygon.length === 0) return;
 
-    const getMatchingCustCount = (distObj) => {
-      if (!distObj) return 0;
-      const aliases = [distObj.id, distObj.name.toLowerCase()];
-      if (distObj.id === 'kiaracondong') aliases.push('kircon', 'kiara condong');
-      if (distObj.id === 'buahbatu') aliases.push('buah batu');
-      if (distObj.id === 'batununggal') aliases.push('batu nunggal');
-      if (distObj.id === 'ujungberung') aliases.push('ujung berung');
-      if (distObj.id === 'bojongsoang') aliases.push('bojong soang');
-
-      let count = 0;
-      (this.radarData || []).forEach(c => {
-        const itemDist = (c.district || '').toLowerCase();
-        const itemAddr = (c.address || '').toLowerCase();
-        if (aliases.some(a => itemDist.includes(a) || itemAddr.includes(a))) {
-          count++;
-        }
-      });
-      return count;
-    };
-
-    let targetPolygonLayer = null;
-
-    districts.forEach(d => {
-      if (!d.polygon || !Array.isArray(d.polygon) || d.polygon.length === 0) return;
-      const isSelected = (d.id === targetId);
-      const custCount = isSelected ? getMatchingCustCount(d) : 0;
-
-      const poly = L.polygon(d.polygon, {
-        color: isSelected ? '#cc1426' : '#94a3b8',
-        weight: isSelected ? 3.5 : 1.5,
-        fillColor: isSelected ? '#d7123a' : '#cbd5e1',
-        fillOpacity: isSelected ? 0.32 : 0.08,
-        opacity: isSelected ? 1 : 0.65,
-        smoothFactor: 1
-      });
-
-      poly.bindTooltip(`
-        <div class="polreg-glass-tooltip" style="min-width:170px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; gap:8px;">
-            <b style="color:#ffffff; font-size:13px;">📍 ${escapeHtml(d.name)}</b>
-            <span style="font-size:10px; background:${isSelected ? '#cc1426' : '#2563eb'}; color:#ffffff; padding:2px 6px; border-radius:6px; font-weight:800;">
-              ${isSelected ? 'Terpilih' : (d.marketShare ? d.marketShare + '%' : 'Bandung')}
-            </span>
-          </div>
-          <div style="font-size:10.5px; color:#94a3b8; font-weight:600; margin-bottom:6px;">
-            ${escapeHtml(d.regency || 'Bandung Raya')}${d.zone ? ' • ' + escapeHtml(d.zone) : ''}
-          </div>
-          <div style="height:1px; background:rgba(255, 255, 255, 0.15); margin:6px 0;"></div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#cbd5e1;">
-            <span>Database Customer:</span>
-            <b style="color:#ffffff;">${isSelected ? custCount : getMatchingCustCount(d)} Customer</b>
-          </div>
-          <div style="font-size:9.5px; color:#fbbf24; margin-top:6px; font-weight:600;">
-            <i class="fa-solid fa-arrow-pointer"></i> Klik untuk filter wilayah ini
-          </div>
-        </div>
-      `, {
-        sticky: true,
-        className: 'polreg-modern-tooltip-wrap',
-        direction: 'top',
-        offset: [0, -10]
-      });
-
-      poly.on('mouseover', function () {
-        if (!isSelected) {
-          this.setStyle({
-            color: '#d7123a',
-            weight: 2.5,
-            fillColor: '#d7123a',
-            fillOpacity: 0.22,
-            opacity: 1
-          });
-        }
-      });
-
-      poly.on('mouseout', function () {
-        if (!isSelected) {
-          this.setStyle({
-            color: '#94a3b8',
-            weight: 1.5,
-            fillColor: '#cbd5e1',
-            fillOpacity: 0.08,
-            opacity: 0.65
-          });
-        }
-      });
-
-      poly.on('click', () => {
-        this.handleZoneChange(d.id);
-      });
-
-      poly.addTo(this.polregPolygonGroup);
-
-      if (isSelected) {
-        targetPolygonLayer = poly;
-
-        if (d.center && Array.isArray(d.center) && d.center.length === 2) {
-          const centroidIcon = L.divIcon({
-            className: 'polreg-custom-label-wrap',
-            html: `
-              <div class="polreg-map-marker-label selected" style="position:relative; transform:translate(-50%, -50%); background:#cc1426; color:#ffffff; padding:4px 10px; border-radius:14px; font-weight:800; font-size:11.5px; box-shadow:0 0 0 3px rgba(204,20,38,0.35), 0 4px 14px rgba(0,0,0,0.3); white-space:nowrap; display:inline-flex; align-items:center; gap:6px; border:2px solid #ffffff; z-index:9000;">
-                <span style="width:7px; height:7px; border-radius:50%; background:#ffffff; display:inline-block;"></span>
-                <span>Kecamatan ${escapeHtml(d.name)}</span>
-                <span style="background:rgba(255,255,255,0.25); padding:1px 6px; border-radius:6px; font-size:10px; font-weight:800;">${custCount} Cust</span>
-              </div>
-            `,
-            iconSize: [0, 0],
-            iconAnchor: [0, 0]
-          });
-
-          L.marker(d.center, {
-            icon: centroidIcon,
-            interactive: false
-          }).addTo(this.polregPolygonGroup);
-        }
+    // Count customers belonging strictly to this 1 selected district
+    let custCount = 0;
+    (this.radarData || []).forEach(c => {
+      if (this.isCustomerInDistrict(c, targetDist.id)) {
+        custCount++;
       }
     });
 
-    if (targetPolygonLayer) {
-      targetPolygonLayer.bringToFront();
-      try {
-        this.leafletMap.fitBounds(targetPolygonLayer.getBounds(), {
-          padding: [35, 35],
-          maxZoom: 15,
-          animate: true,
-          duration: 0.8
-        });
-      } catch (e) {}
+    // Render ONLY this 1 selected district polygon!
+    const poly = L.polygon(targetDist.polygon, {
+      color: '#cc1426',
+      weight: 3.5,
+      fillColor: '#d7123a',
+      fillOpacity: 0.28,
+      opacity: 1,
+      smoothFactor: 1
+    }).addTo(this.polregPolygonGroup);
+
+    poly.bindTooltip(`
+      <div class="polreg-glass-tooltip" style="min-width:170px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; gap:8px;">
+          <b style="color:#ffffff; font-size:13.5px;">📍 Kecamatan ${escapeHtml(targetDist.name)}</b>
+          <span style="font-size:10px; background:#cc1426; color:#ffffff; padding:2px 7px; border-radius:6px; font-weight:800;">
+            Wilayah Terpilih
+          </span>
+        </div>
+        <div style="font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:6px;">
+          ${escapeHtml(targetDist.regency || 'Kota Bandung')}${targetDist.zone ? ' • ' + escapeHtml(targetDist.zone) : ''}
+        </div>
+        <div style="height:1px; background:rgba(255, 255, 255, 0.15); margin:6px 0;"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#cbd5e1;">
+          <span>Database Customer:</span>
+          <b style="color:#ffffff; font-size:12px;">${custCount.toLocaleString('id-ID')} Customer</b>
+        </div>
+      </div>
+    `, {
+      sticky: true,
+      className: 'polreg-modern-tooltip-wrap',
+      direction: 'top',
+      offset: [0, -10]
+    });
+
+    // Centroid label badge on the selected district
+    if (targetDist.center && Array.isArray(targetDist.center) && targetDist.center.length === 2) {
+      const centroidIcon = L.divIcon({
+        className: 'polreg-custom-label-wrap',
+        html: `
+          <div class="polreg-map-marker-label selected" style="position:relative; transform:translate(-50%, -50%); background:#cc1426; color:#ffffff; padding:4px 10px; border-radius:14px; font-weight:800; font-size:11.5px; box-shadow:0 0 0 3px rgba(204,20,38,0.35), 0 4px 14px rgba(0,0,0,0.3); white-space:nowrap; display:inline-flex; align-items:center; gap:6px; border:2px solid #ffffff; z-index:9000;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#ffffff; display:inline-block;"></span>
+            <span>Kecamatan ${escapeHtml(targetDist.name)}</span>
+            <span style="background:rgba(255,255,255,0.25); padding:1px 6px; border-radius:6px; font-size:10px; font-weight:800;">${custCount.toLocaleString('id-ID')} Cust</span>
+          </div>
+        `,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      });
+
+      L.marker(targetDist.center, {
+        icon: centroidIcon,
+        interactive: false
+      }).addTo(this.polregPolygonGroup);
     }
+
+    try {
+      this.leafletMap.fitBounds(poly.getBounds(), {
+        padding: [40, 40],
+        maxZoom: 15,
+        animate: true,
+        duration: 0.8
+      });
+    } catch (e) {}
   },
 
   switchRadarMode(mode, containerId = 'followupRadarContainer') {
@@ -1524,21 +1502,12 @@ const SalesSuperpowers = {
     const mode = this.radarMode || 'radius';
 
     return (this.radarData || []).filter(c => {
-      // 1. Polreg Mode: Strict District Filter (Radius circle is ignored)
+      // 1. Polreg Mode: Strict District Filter (ONLY the 1 selected district!)
       if (mode === 'polreg') {
         if (currentDist !== 'all' && currentDist !== '') {
-          const itemDist = (c.district || '').toLowerCase();
-          const itemAddr = (c.address || '').toLowerCase();
-          const aliases = (this.ZONE_PRESETS[currentDist] && this.ZONE_PRESETS[currentDist].aliases) 
-            ? [...this.ZONE_PRESETS[currentDist].aliases] 
-            : [currentDist];
-          if (currentDist === 'buahbatu') aliases.push('buah batu');
-          if (currentDist === 'kircon') aliases.push('kiaracondong', 'kiara condong');
-          if (currentDist === 'batununggal') aliases.push('batu nunggal');
-          if (currentDist === 'ujungberung') aliases.push('ujung berung');
-          if (currentDist === 'bojongsoang') aliases.push('bojong soang');
-          const matchDist = aliases.some(a => itemDist.includes(a) || itemAddr.includes(a));
-          if (!matchDist) return false;
+          if (!this.isCustomerInDistrict(c, currentDist)) {
+            return false;
+          }
         }
       }
 
@@ -1658,7 +1627,38 @@ const SalesSuperpowers = {
   },
 
   updateRadarMapPins() {
-    if (!this.leafletMap || !this.radarMarkersLayer) return;
+    if (!this.leafletMap) return;
+
+    // In Polreg Mode: Strictly NO GROUPING / NO CLUSTERING ("jangan di bikin grup")!
+    // In Radius Mode: Can use cluster if available
+    const isPolregMode = (this.radarMode === 'polreg');
+    const isCurrentlyCluster = this.radarMarkersLayer && typeof this.radarMarkersLayer.addLayers === 'function';
+
+    if (isPolregMode && isCurrentlyCluster) {
+      this.leafletMap.removeLayer(this.radarMarkersLayer);
+      this.radarMarkersLayer = L.layerGroup().addTo(this.leafletMap);
+    } else if (!isPolregMode && !isCurrentlyCluster && window.L && typeof window.L.markerClusterGroup === 'function') {
+      if (this.radarMarkersLayer) {
+        this.leafletMap.removeLayer(this.radarMarkersLayer);
+      }
+      this.radarMarkersLayer = L.markerClusterGroup({
+        chunkedLoading: true,
+        chunkInterval: 50,
+        chunkDelay: 10,
+        maxClusterRadius: 35,
+        spiderfyOnMaxZoom: false,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        disableClusteringAtZoom: 15
+      }).addTo(this.leafletMap);
+    }
+
+    if (!this.radarMarkersLayer) {
+      this.radarMarkersLayer = (isPolregMode || !window.L.markerClusterGroup)
+        ? L.layerGroup().addTo(this.leafletMap)
+        : L.markerClusterGroup().addTo(this.leafletMap);
+    }
+
     this.radarMarkersLayer.clearLayers();
 
     const filteredLeads = this.getFilteredRadarLeads();
@@ -1684,9 +1684,9 @@ const SalesSuperpowers = {
       const makeIcon = (color) => L.divIcon({
         className: 'radar-leaflet-pin-wrap',
         html: `<div class="radar-map-marker-pin" style="background:${color};"><i class="fa-solid fa-car"></i></div>`,
-        iconSize: [26, 26],
-        iconAnchor: [13, 13],
-        popupAnchor: [0, -13]
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
       });
       this.cachedRadarIcons = {
         red: makeIcon('#ef4444'),
@@ -1696,7 +1696,7 @@ const SalesSuperpowers = {
       };
     }
 
-    const isCluster = typeof this.radarMarkersLayer.addLayers === 'function';
+    const isCluster = !isPolregMode && typeof this.radarMarkersLayer.addLayers === 'function';
     const markersToBatch = [];
     const icons = this.cachedRadarIcons;
 
@@ -1716,15 +1716,16 @@ const SalesSuperpowers = {
         title: `${c.name || 'Customer'} • ${c.district || ''}`
       });
       marker.bindPopup(() => this.getRadarPopupHtml(c));
-      markersToBatch.push(marker);
+
+      if (isCluster) {
+        markersToBatch.push(marker);
+      } else {
+        this.radarMarkersLayer.addLayer(marker);
+      }
     }
 
-    if (isCluster) {
+    if (isCluster && markersToBatch.length > 0) {
       this.radarMarkersLayer.addLayers(markersToBatch);
-    } else {
-      for (let j = 0; j < markersToBatch.length; j++) {
-        this.radarMarkersLayer.addLayer(markersToBatch[j]);
-      }
     }
 
     if (this.leafletMap && !this.leafletMap.hasLayer(this.radarMarkersLayer)) {
