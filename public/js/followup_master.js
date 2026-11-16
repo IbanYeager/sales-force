@@ -4090,8 +4090,15 @@ function openAddCustomerModal() {
               </div>
               <div>
                 <label style="font-size:11.5px; font-weight:800; color:#334155; display:block; margin-bottom:4px;">Kecamatan / Domisili</label>
-                <input type="text" id="addCustDistrict" class="fu-input" placeholder="Kiara Condong / Buahbatu">
+                <input type="text" id="addCustDistrict" class="fu-input" placeholder="Contoh: Buahbatu / Kiara Condong">
               </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <label style="font-size:11.5px; font-weight:800; color:#334155; display:block; margin-bottom:4px;">
+                <i class="fa-solid fa-map-location-dot" style="color:#d7123a;"></i> Alamat Lengkap / Nama Jalan (Akurat di Radar GPS & Peta Wilayah)
+              </label>
+              <input type="text" id="addCustAddress" class="fu-input" placeholder="Contoh: Jl. Palem Raya No. 10 / Komp. Buah Batu Regency / Margacinta">
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px;">
@@ -4143,6 +4150,7 @@ async function handleSaveNewCust(e) {
     last_car_model: document.getElementById('addCustLastCar').value,
     car_age: document.getElementById('addCustAge').value,
     district: document.getElementById('addCustDistrict').value,
+    address: document.getElementById('addCustAddress')?.value || '',
     followup_category: document.getElementById('addCustCategory').value || 'Trade-in / Repurchase',
     assigned_sales_id: document.getElementById('addCustSales').value || null
   };

@@ -991,10 +991,25 @@ if ($action === 'create_customer') {
     $name = trim($input['name'] ?? '');
     $phone = clean_phone_number($input['phone'] ?? '');
     $car_model = trim($input['car_model'] ?? 'All New Kijang Innova Zenix');
+    $rawAddress = trim($input['address'] ?? '');
+    $district = trim($input['district'] ?? '');
 
     if (!$name || !$phone) {
         echo json_encode(['success' => false, 'message' => 'Nama dan Nomor WhatsApp wajib diisi']);
         exit;
+    }
+
+    require_once __DIR__ . '/api_radar_gazetteer.php';
+
+    // If address is provided but district is empty, resolve district automatically
+    if ($rawAddress && !$district) {
+        $district = resolveAddressAndDistrict($rawAddress);
+    }
+
+    // Format notes with Alamat if provided
+    $notes = trim($input['notes'] ?? '');
+    if ($rawAddress) {
+        $notes = ($notes ? ($notes . ' | ') : '') . 'Alamat: ' . $rawAddress;
     }
 
     $code = 'CUST-' . substr(time(), -6);
@@ -1010,15 +1025,21 @@ if ($action === 'create_customer') {
         $code, $name, $phone, $input['email'] ?? '', $car_model,
         $input['last_car_model'] ?? '', $input['car_age'] ?? '', $input['recommended_model'] ?? '',
         $input['alt_model_2'] ?? '', $input['alt_model_3'] ?? '',
-        $input['cluster_name'] ?? '', $input['priority'] ?? '', $input['district'] ?? '',
+        $input['cluster_name'] ?? '', $input['priority'] ?? '', $district,
         $input['service_compliance'] ?? '', $input['outlet_do'] ?? '', $input['outlet_service'] ?? '',
         $input['plate_number'] ?? '', $input['vin'] ?? '', $input['purchase_date'] ?? '',
         $input['service_due_date'] ?? '', $input['stnk_due_date'] ?? '', $input['insurance_due_date'] ?? '',
         !empty($input['assigned_sales_id']) ? (int)$input['assigned_sales_id'] : null,
         $input['followup_category'] ?? 'Servis Berkala',
         $input['followup_status'] ?? 'Belum Dihubungi',
-        $input['notes'] ?? ''
+        $notes
     ]);
+
+    // Clear radar cache so the new customer appears immediately with accurate coordinates
+    $cacheFile = __DIR__ . '/cache_radar_customers.json';
+    if (file_exists($cacheFile)) { @unlink($cacheFile); }
+    $pubCache = dirname(__DIR__) . '/public/api/cache_radar_customers.json';
+    if (file_exists($pubCache)) { @unlink($pubCache); }
 
     echo json_encode(['success' => true, 'message' => 'Customer baru berhasil ditambahkan']);
     exit;
@@ -1058,6 +1079,12 @@ if ($action === 'update_customer') {
         $input['notes'] ?? '',
         $id
     ]);
+
+    // Clear radar cache so changes sync immediately on map
+    $cacheFile = __DIR__ . '/cache_radar_customers.json';
+    if (file_exists($cacheFile)) { @unlink($cacheFile); }
+    $pubCache = dirname(__DIR__) . '/public/api/cache_radar_customers.json';
+    if (file_exists($pubCache)) { @unlink($pubCache); }
 
     echo json_encode(['success' => true, 'message' => 'Data customer berhasil diperbarui']);
     exit;
