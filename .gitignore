@@ -35,6 +35,8 @@ polreg/
 TR - Active Inventory*.xlsx
 10. PKB*.xlsx
 TSINDO*.xlsx
+push.bat
+push.ps1
 
 # Keep composer.json local only to prevent Hostinger auto composer trigger
 composer.json
