@@ -64,6 +64,9 @@ const SalesSuperpowers = {
   radarMarkersLayer: null,
   radarRenderLimit: 48,
   selectedPhotoFile: null,
+  radarMode: 'radius', // 'radius' (Opsi 1: Radar Radius GPS) or 'polreg' (Opsi 2: Peta Polreg Wilayah Polygon)
+  polregDistricts: [],
+  polregPolygonGroup: null,
 
   calculateDistance(lat1, lon1, lat2, lon2) {
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -148,7 +151,21 @@ const SalesSuperpowers = {
       .radar-sales-beacon-icon { background: transparent !important; border: none !important; }
       .radar-sales-beacon-wrap { position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
+      /* Mode Switcher: 2 Opsi Terpisah (Radar GPS vs Peta Polreg Wilayah) */
+      .radar-mode-switcher-container { width: 100%; margin-bottom: 14px; }
+      .radar-mode-switcher { display: flex; background: #f1f5f9; padding: 5px; border-radius: 14px; gap: 8px; border: 1.5px solid #e2e8f0; width: 100%; box-sizing: border-box; }
+      .radar-mode-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 10px; border: none; background: transparent; color: #64748b; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); font-family: inherit; white-space: nowrap; }
+      .radar-mode-btn:hover { background: rgba(255, 255, 255, 0.7); color: #0f172a; }
+      .radar-mode-btn.active { background: #ffffff !important; color: #0f172a !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08); border: 1px solid rgba(226, 232, 240, 0.9); }
+      .radar-mode-btn.active.mode-radius { color: #2563eb !important; border-bottom: 2.5px solid #2563eb; }
+      .radar-mode-btn.active.mode-polreg { color: #d7123a !important; border-bottom: 2.5px solid #d7123a; }
+      .leaflet-tooltip.polreg-modern-tooltip-wrap { background: rgba(15, 23, 42, 0.94) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; border-radius: 12px !important; padding: 10px 14px !important; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5) !important; color: #ffffff !important; }
+      .leaflet-tooltip.polreg-modern-tooltip-wrap::before { border-top-color: rgba(15, 23, 42, 0.94) !important; }
+      .polreg-glass-tooltip { min-width: 175px; }
+
       @media (max-width: 640px) {
+        .radar-mode-switcher { flex-direction: column !important; gap: 6px !important; }
+        .radar-mode-btn { width: 100% !important; padding: 9px 12px !important; font-size: 12px !important; }
         .radar-cockpit-wrapper { padding: 14px 12px !important; border-radius: 16px !important; }
         .radar-cockpit-header { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
         .radar-header-left { gap: 10px !important; }
@@ -262,8 +279,263 @@ const SalesSuperpowers = {
     return zoneKey.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   },
 
+  async loadPolregDistrictsData() {
+    if (this.polregDistricts && this.polregDistricts.length > 0) {
+      return this.polregDistricts;
+    }
+    const basePaths = [
+      'data/polreg_districts.json',
+      '/data/polreg_districts.json',
+      '../data/polreg_districts.json',
+      '/public/data/polreg_districts.json',
+      'public/data/polreg_districts.json',
+      '../../data/polreg_districts.json'
+    ];
+    for (const p of basePaths) {
+      try {
+        const res = await fetch(p + '?v=' + Date.now());
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.districts && Array.isArray(json.districts)) {
+            this.polregDistricts = json.districts;
+            return this.polregDistricts;
+          }
+        }
+      } catch (e) {}
+    }
+    return [];
+  },
+
+  findPolregDistrict(keyOrName) {
+    if (!keyOrName || !this.polregDistricts || this.polregDistricts.length === 0) return null;
+    const raw = String(keyOrName).toLowerCase().trim();
+    if (raw === 'all') return null;
+
+    const aliasMap = {
+      'kircon': 'kiaracondong',
+      'kiara condong': 'kiaracondong',
+      'buah batu': 'buahbatu',
+      'batu nunggal': 'batununggal',
+      'ujung berung': 'ujungberung',
+      'bojong soang': 'bojongsoang',
+      'kopo': 'bojongloa_kaler',
+      'cibaduyut': 'bojongloa_kidul',
+      'dago': 'coblong',
+      'pasteur': 'sukajadi'
+    };
+    const target = aliasMap[raw] || raw;
+    const norm = target.replace(/[^a-z0-9]/g, '');
+
+    // 1. Direct match on id
+    let match = this.polregDistricts.find(d => d.id.toLowerCase().replace(/[^a-z0-9]/g, '') === norm);
+    if (match) return match;
+
+    // 2. Direct match on name
+    match = this.polregDistricts.find(d => d.name.toLowerCase().replace(/[^a-z0-9]/g, '') === norm);
+    if (match) return match;
+
+    // 3. Substring match
+    match = this.polregDistricts.find(d => {
+      const dNormId = d.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const dNormName = d.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return dNormId.includes(norm) || norm.includes(dNormId) || dNormName.includes(norm) || norm.includes(dNormName);
+    });
+    return match || null;
+  },
+
+  async renderPolregDistrictPolygons(selectedDistrictKey) {
+    if (!this.leafletMap) return;
+
+    if (!this.polregPolygonGroup) {
+      this.polregPolygonGroup = L.featureGroup().addTo(this.leafletMap);
+    }
+    this.polregPolygonGroup.clearLayers();
+
+    const districts = await this.loadPolregDistrictsData();
+    if (!districts || districts.length === 0) return;
+
+    const targetDist = this.findPolregDistrict(selectedDistrictKey) || this.findPolregDistrict('buahbatu') || districts[0];
+    const targetId = targetDist ? targetDist.id : '';
+
+    const getMatchingCustCount = (distObj) => {
+      if (!distObj) return 0;
+      const aliases = [distObj.id, distObj.name.toLowerCase()];
+      if (distObj.id === 'kiaracondong') aliases.push('kircon', 'kiara condong');
+      if (distObj.id === 'buahbatu') aliases.push('buah batu');
+      if (distObj.id === 'batununggal') aliases.push('batu nunggal');
+      if (distObj.id === 'ujungberung') aliases.push('ujung berung');
+      if (distObj.id === 'bojongsoang') aliases.push('bojong soang');
+
+      let count = 0;
+      (this.radarData || []).forEach(c => {
+        const itemDist = (c.district || '').toLowerCase();
+        const itemAddr = (c.address || '').toLowerCase();
+        if (aliases.some(a => itemDist.includes(a) || itemAddr.includes(a))) {
+          count++;
+        }
+      });
+      return count;
+    };
+
+    let targetPolygonLayer = null;
+
+    districts.forEach(d => {
+      if (!d.polygon || !Array.isArray(d.polygon) || d.polygon.length === 0) return;
+      const isSelected = (d.id === targetId);
+      const custCount = isSelected ? getMatchingCustCount(d) : 0;
+
+      const poly = L.polygon(d.polygon, {
+        color: isSelected ? '#cc1426' : '#94a3b8',
+        weight: isSelected ? 3.5 : 1.5,
+        fillColor: isSelected ? '#d7123a' : '#cbd5e1',
+        fillOpacity: isSelected ? 0.32 : 0.08,
+        opacity: isSelected ? 1 : 0.65,
+        smoothFactor: 1
+      });
+
+      poly.bindTooltip(`
+        <div class="polreg-glass-tooltip" style="min-width:170px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; gap:8px;">
+            <b style="color:#ffffff; font-size:13px;">📍 ${escapeHtml(d.name)}</b>
+            <span style="font-size:10px; background:${isSelected ? '#cc1426' : '#2563eb'}; color:#ffffff; padding:2px 6px; border-radius:6px; font-weight:800;">
+              ${isSelected ? 'Terpilih' : (d.marketShare ? d.marketShare + '%' : 'Bandung')}
+            </span>
+          </div>
+          <div style="font-size:10.5px; color:#94a3b8; font-weight:600; margin-bottom:6px;">
+            ${escapeHtml(d.regency || 'Bandung Raya')}${d.zone ? ' • ' + escapeHtml(d.zone) : ''}
+          </div>
+          <div style="height:1px; background:rgba(255, 255, 255, 0.15); margin:6px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#cbd5e1;">
+            <span>Database Customer:</span>
+            <b style="color:#ffffff;">${isSelected ? custCount : getMatchingCustCount(d)} Customer</b>
+          </div>
+          <div style="font-size:9.5px; color:#fbbf24; margin-top:6px; font-weight:600;">
+            <i class="fa-solid fa-arrow-pointer"></i> Klik untuk filter wilayah ini
+          </div>
+        </div>
+      `, {
+        sticky: true,
+        className: 'polreg-modern-tooltip-wrap',
+        direction: 'top',
+        offset: [0, -10]
+      });
+
+      poly.on('mouseover', function () {
+        if (!isSelected) {
+          this.setStyle({
+            color: '#d7123a',
+            weight: 2.5,
+            fillColor: '#d7123a',
+            fillOpacity: 0.22,
+            opacity: 1
+          });
+        }
+      });
+
+      poly.on('mouseout', function () {
+        if (!isSelected) {
+          this.setStyle({
+            color: '#94a3b8',
+            weight: 1.5,
+            fillColor: '#cbd5e1',
+            fillOpacity: 0.08,
+            opacity: 0.65
+          });
+        }
+      });
+
+      poly.on('click', () => {
+        this.handleZoneChange(d.id);
+      });
+
+      poly.addTo(this.polregPolygonGroup);
+
+      if (isSelected) {
+        targetPolygonLayer = poly;
+
+        if (d.center && Array.isArray(d.center) && d.center.length === 2) {
+          const centroidIcon = L.divIcon({
+            className: 'polreg-custom-label-wrap',
+            html: `
+              <div class="polreg-map-marker-label selected" style="position:relative; transform:translate(-50%, -50%); background:#cc1426; color:#ffffff; padding:4px 10px; border-radius:14px; font-weight:800; font-size:11.5px; box-shadow:0 0 0 3px rgba(204,20,38,0.35), 0 4px 14px rgba(0,0,0,0.3); white-space:nowrap; display:inline-flex; align-items:center; gap:6px; border:2px solid #ffffff; z-index:9000;">
+                <span style="width:7px; height:7px; border-radius:50%; background:#ffffff; display:inline-block;"></span>
+                <span>Kecamatan ${escapeHtml(d.name)}</span>
+                <span style="background:rgba(255,255,255,0.25); padding:1px 6px; border-radius:6px; font-size:10px; font-weight:800;">${custCount} Cust</span>
+              </div>
+            `,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0]
+          });
+
+          L.marker(d.center, {
+            icon: centroidIcon,
+            interactive: false
+          }).addTo(this.polregPolygonGroup);
+        }
+      }
+    });
+
+    if (targetPolygonLayer) {
+      targetPolygonLayer.bringToFront();
+      try {
+        this.leafletMap.fitBounds(targetPolygonLayer.getBounds(), {
+          padding: [35, 35],
+          maxZoom: 15,
+          animate: true,
+          duration: 0.8
+        });
+      } catch (e) {}
+    }
+  },
+
+  switchRadarMode(mode, containerId = 'followupRadarContainer') {
+    this.radarMode = mode;
+    try { localStorage.setItem('savedRadarMode', mode); } catch (e) {}
+
+    // Update switcher buttons active state
+    document.querySelectorAll('.radar-mode-btn').forEach(btn => {
+      const m = btn.getAttribute('data-mode');
+      if (m === mode) {
+        btn.classList.add('active');
+        if (mode === 'radius') btn.classList.add('mode-radius');
+        if (mode === 'polreg') btn.classList.add('mode-polreg');
+      } else {
+        btn.classList.remove('active', 'mode-radius', 'mode-polreg');
+      }
+    });
+
+    const radiusStrip = document.getElementById('radarRadiusControlStrip');
+    const polregStrip = document.getElementById('radarPolregControlStrip');
+    if (radiusStrip) radiusStrip.style.display = (mode === 'radius') ? 'flex' : 'none';
+    if (polregStrip) polregStrip.style.display = (mode === 'polreg') ? 'flex' : 'none';
+
+    if (mode === 'radius') {
+      if (this.polregPolygonGroup) {
+        this.polregPolygonGroup.clearLayers();
+      }
+      const sLat = this.salesCoords ? this.salesCoords.lat : -6.9448;
+      const sLng = this.salesCoords ? this.salesCoords.lng : 107.6452;
+      this.updateRadarRadiusCircle(sLat, sLng, this.currentRadius || 1);
+      this.applyRadarFilter();
+    } else {
+      if (this.radarRadiusCircle && this.leafletMap && this.leafletMap.hasLayer(this.radarRadiusCircle)) {
+        this.leafletMap.removeLayer(this.radarRadiusCircle);
+      }
+      if (!this.currentDistrict || this.currentDistrict === 'all') {
+        this.currentDistrict = 'buahbatu';
+      }
+      this.renderPolregDistrictPolygons(this.currentDistrict);
+      document.querySelectorAll('.radar-zone-chip').forEach(chip => {
+        const z = chip.getAttribute('data-zone') || '';
+        if (z === this.currentDistrict) chip.classList.add('active');
+        else chip.classList.remove('active');
+      });
+      this.applyRadarFilter();
+    }
+  },
+
   handleZoneChange(zoneKey, containerId) {
-    this.currentDistrict = zoneKey || 'all';
+    this.currentDistrict = zoneKey || 'buahbatu';
     this.radarRenderLimit = 48;
 
     // 1. Update active chips
@@ -290,45 +562,34 @@ const SalesSuperpowers = {
       sel2.value = this.currentDistrict;
     }
 
-    // 3. Determine target center coordinates and zoom
-    const cleanKey = (this.currentDistrict || 'all').toLowerCase().trim();
-    let targetCoords = null;
-    let targetZoom = 14;
-
-    if (cleanKey === 'all') {
-      targetCoords = [
-        this.salesCoords ? this.salesCoords.lat : -6.9448,
-        this.salesCoords ? this.salesCoords.lng : 107.6452
-      ];
-      targetZoom = 13;
-    } else if (this.ZONE_PRESETS[cleanKey] && this.ZONE_PRESETS[cleanKey].coords) {
-      targetCoords = this.ZONE_PRESETS[cleanKey].coords;
-      targetZoom = this.ZONE_PRESETS[cleanKey].zoom || 14;
+    // 3. If in Polreg mode, re-render polygons and frame bounds
+    if (this.radarMode === 'polreg') {
+      this.renderPolregDistrictPolygons(this.currentDistrict);
     } else {
-      // Find matching coordinates from active data
-      const matching = (this.radarData || []).find(c => {
-        const d = (c.district || '').toLowerCase();
-        return (d.includes(cleanKey) || (c.address || '').toLowerCase().includes(cleanKey)) && c.lat && c.lng;
-      });
-      if (matching) {
-        targetCoords = [matching.lat, matching.lng];
+      const cleanKey = (this.currentDistrict || 'all').toLowerCase().trim();
+      let targetCoords = null;
+      let targetZoom = 14;
+
+      if (cleanKey === 'all') {
+        targetCoords = [
+          this.salesCoords ? this.salesCoords.lat : -6.9448,
+          this.salesCoords ? this.salesCoords.lng : 107.6452
+        ];
+        targetZoom = 13;
+      } else if (this.ZONE_PRESETS[cleanKey] && this.ZONE_PRESETS[cleanKey].coords) {
+        targetCoords = this.ZONE_PRESETS[cleanKey].coords;
+        targetZoom = this.ZONE_PRESETS[cleanKey].zoom || 14;
+      }
+      if (this.leafletMap && targetCoords) {
+        this.leafletMap.flyTo(targetCoords, targetZoom, {
+          duration: 1.2,
+          easeLinearity: 0.25
+        });
       }
     }
 
-    // 4. Smooth auto-zoom map if initialized
-    if (this.leafletMap && targetCoords) {
-      this.leafletMap.flyTo(targetCoords, targetZoom, {
-        duration: 1.2,
-        easeLinearity: 0.25
-      });
-    }
-
-    // 5. Fetch radar data for the targeted district
-    const fetchLat = targetCoords ? targetCoords[0] : (this.salesCoords ? this.salesCoords.lat : -6.9448);
-    const fetchLng = targetCoords ? targetCoords[1] : (this.salesCoords ? this.salesCoords.lng : 107.6452);
-    const fetchRadius = cleanKey === 'all' ? (this.currentRadius || 1) : 999;
-
-    this.fetchRadarData(fetchLat, fetchLng, fetchRadius, this.currentDistrict);
+    // 4. Instant front-end filter update
+    this.applyRadarFilter();
   },
 
   populateDistrictSelect(districts, selectedDistrict) {
@@ -336,11 +597,19 @@ const SalesSuperpowers = {
     const optgroup1 = document.getElementById('radarOptgroupAllDistricts');
     const optgroup2 = document.getElementById('radarCardsOptgroupAllDistricts');
 
-    const popularKeys = Object.keys(this.ZONE_PRESETS).filter(k => k !== 'all');
+    // Combine districts from API and polregDistricts
+    const allDistrictNames = new Set(districts || []);
+    if (this.polregDistricts && this.polregDistricts.length > 0) {
+      this.polregDistricts.forEach(d => {
+        if (d.name) allDistrictNames.add(d.name);
+      });
+    }
+
+    const sortedDistricts = Array.from(allDistrictNames).sort((a, b) => a.localeCompare(b));
 
     [optgroupTop, optgroup1, optgroup2].forEach(optgroup => {
       if (!optgroup || optgroup.children.length > 0) return;
-      districts.forEach(d => {
+      sortedDistricts.forEach(d => {
         const clean = d.toLowerCase().trim();
         if (clean === 'bandung area' || clean === 'all') return;
 
@@ -443,8 +712,9 @@ const SalesSuperpowers = {
   },
 
   async renderRadarCockpit(containerId = 'followupDataContainer', district = 'all', radiusKm = 1) {
+    this.radarMode = localStorage.getItem('savedRadarMode') || 'radius';
     this.currentRadius = parseFloat(radiusKm) || 1;
-    this.currentDistrict = district;
+    this.currentDistrict = district && district !== 'all' ? district : (this.radarMode === 'polreg' ? 'buahbatu' : 'all');
 
     // Ensure CSS styles are injected
     this.ensureRadarStyles();
@@ -507,10 +777,21 @@ const SalesSuperpowers = {
           </div>
         </div>
 
-        <!-- Controls Row: Radius & Kecamatan Filter -->
-        <div class="radar-controls-strip" style="margin-bottom: 14px; display:flex; flex-direction:column; gap:10px;">
-          <!-- Radius Options -->
-          <div class="radar-radius-section" style="width: 100%;">
+        <!-- Mode Switcher: 2 Opsi Terpisah (Radar GPS vs Peta Polreg Wilayah) -->
+        <div class="radar-mode-switcher-container">
+          <div class="radar-mode-switcher">
+            <button type="button" class="radar-mode-btn ${this.radarMode !== 'polreg' ? 'active mode-radius' : ''}" data-mode="radius" onclick="SalesSuperpowers.switchRadarMode('radius', '${containerId}')">
+              <i class="fa-solid fa-satellite-dish"></i> Opsi 1: Radar Radius GPS
+            </button>
+            <button type="button" class="radar-mode-btn ${this.radarMode === 'polreg' ? 'active mode-polreg' : ''}" data-mode="polreg" onclick="SalesSuperpowers.switchRadarMode('polreg', '${containerId}')">
+              <i class="fa-solid fa-draw-polygon"></i> Opsi 2: Peta Polreg Wilayah (Per-Kecamatan)
+            </button>
+          </div>
+        </div>
+
+        <!-- Controls Row: Radius GPS (Opsi 1) -->
+        <div id="radarRadiusControlStrip" class="radar-controls-strip" style="margin-bottom: 14px; display:${this.radarMode !== 'polreg' ? 'flex' : 'none'}; flex-direction:column; gap:10px;">
+          <div class="radar-radius-section" style="width: 100%; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
             <span class="radar-radius-label">
               <i class="fa-solid fa-bullseye" style="color:#d7123a;"></i> Jangkauan Radius:
             </span>
@@ -521,20 +802,22 @@ const SalesSuperpowers = {
               <button type="button" class="radar-radius-pill ${this.currentRadius == 10 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(10, '${containerId}')">10 km</button>
               <button type="button" class="radar-radius-pill ${this.currentRadius >= 999 ? 'active' : ''}" onclick="SalesSuperpowers.handleRadiusChange(999, '${containerId}')">Semua Wilayah</button>
             </div>
+            <span style="font-size:11.5px; color:#64748b; margin-left:auto; font-weight:600;">
+              <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i> Filter jarak radius lingkaran dari GPS Anda
+            </span>
           </div>
+        </div>
 
-          <!-- Kecamatan / Wilayah Kanvasing Options -->
-          <div class="radar-zone-container" style="width: 100%; display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:#f8fafc; padding:8px 12px; border-radius:12px; border:1px solid #e2e8f0;">
-            <span style="font-size:11.5px; font-weight:800; color:#0f172a; display:inline-flex; align-items:center; gap:5px; white-space:nowrap;">
-              <i class="fa-solid fa-map-location-dot" style="color:#2563eb;"></i> Filter Kecamatan:
+        <!-- Controls Row: Kecamatan / Polreg Polygon (Opsi 2) -->
+        <div id="radarPolregControlStrip" class="radar-controls-strip" style="margin-bottom: 14px; display:${this.radarMode === 'polreg' ? 'flex' : 'none'}; flex-direction:column; gap:10px;">
+          <div class="radar-zone-container" style="width: 100%; display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:#f8fafc; padding:10px 14px; border-radius:12px; border:1.5px solid #e2e8f0;">
+            <span style="font-size:12px; font-weight:800; color:#0f172a; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
+              <i class="fa-solid fa-draw-polygon" style="color:#d7123a;"></i> Filter Kecamatan &amp; Polygon:
             </span>
 
             <!-- Quick District Chips Scroll -->
-            <div class="radar-zone-chips-scroll" style="display:flex; align-items:center; gap:6px; overflow-x:auto; flex:1; min-width:220px; padding:2px 0;">
-              <button type="button" class="radar-zone-chip ${(!this.currentDistrict || this.currentDistrict === 'all') ? 'active' : ''}" data-zone="all" onclick="SalesSuperpowers.handleZoneChange('all', '${containerId}')">
-                🌍 Semua
-              </button>
-              <button type="button" class="radar-zone-chip ${this.currentDistrict === 'buahbatu' ? 'active' : ''}" data-zone="buahbatu" onclick="SalesSuperpowers.handleZoneChange('buahbatu', '${containerId}')" title="667 Customer di Buahbatu">
+            <div class="radar-zone-chips-scroll" style="display:flex; align-items:center; gap:6px; overflow-x:auto; flex:1; min-width:240px; padding:2px 0;">
+              <button type="button" class="radar-zone-chip ${(!this.currentDistrict || this.currentDistrict === 'buahbatu' || this.currentDistrict === 'all') ? 'active' : ''}" data-zone="buahbatu" onclick="SalesSuperpowers.handleZoneChange('buahbatu', '${containerId}')" title="667 Customer di Buahbatu">
                 📍 Buahbatu
               </button>
               <button type="button" class="radar-zone-chip ${this.currentDistrict === 'kircon' ? 'active' : ''}" data-zone="kircon" onclick="SalesSuperpowers.handleZoneChange('kircon', '${containerId}')" title="236 Customer di Kiaracondong">
@@ -568,7 +851,7 @@ const SalesSuperpowers = {
               <select id="radarTopDistrictSelect" class="radar-district-select" onchange="SalesSuperpowers.handleZoneChange(this.value, '${containerId}')" style="font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:8px; border:1.5px solid #cbd5e1; background:#ffffff; color:#0f172a; cursor:pointer;" title="Pilih kecamatan lainnya">
                 <option value="all">Pilih Kecamatan Lainnya...</option>
                 <optgroup id="radarTopOptgroupAllDistricts" label="Semua Kecamatan Terdaftar">
-                  <!-- Dynamically populated from API districts_list -->
+                  <!-- Dynamically populated from API & Polreg dataset -->
                 </optgroup>
               </select>
             </div>
@@ -1021,6 +1304,10 @@ const SalesSuperpowers = {
       this.radarRadiusCircle = null;
     }
 
+    if (this.radarMode === 'polreg') {
+      return;
+    }
+
     const r = parseFloat(radiusKm) || 1;
     if (r >= 500) {
       // "Semua Wilayah" - no bounded circle, smoothly zoom out to frame all leads
@@ -1156,8 +1443,20 @@ const SalesSuperpowers = {
       </div>
     `);
 
-    // Draw visual GPS radius circle on the map
-    this.updateRadarRadiusCircle(salesLat, salesLng, this.currentRadius);
+    // Initialize Polreg polygon layer group
+    if (this.polregPolygonGroup) {
+      this.polregPolygonGroup.clearLayers();
+      if (this.leafletMap.hasLayer(this.polregPolygonGroup)) {
+        this.leafletMap.removeLayer(this.polregPolygonGroup);
+      }
+    }
+    this.polregPolygonGroup = L.featureGroup().addTo(map);
+
+    if (this.radarMode === 'polreg') {
+      this.renderPolregDistrictPolygons(this.currentDistrict || 'buahbatu');
+    } else {
+      this.updateRadarRadiusCircle(salesLat, salesLng, this.currentRadius);
+    }
 
     // Add Map Legend Overlay BEFORE updateRadarMapPins so pin count badge exists immediately
     mapEl.querySelectorAll('.radar-map-legend-overlay').forEach(el => el.remove());
@@ -1222,29 +1521,39 @@ const SalesSuperpowers = {
     const query = (this.radarQuery || '').toLowerCase().trim();
     const currentDist = (this.currentDistrict || 'all').toLowerCase().trim();
     const carFilter = (this.radarCarFilter || 'all').toLowerCase().trim();
+    const mode = this.radarMode || 'radius';
 
     return (this.radarData || []).filter(c => {
-      // 1. Canvasing Zone filter (if a specific zone is active)
-      if (currentDist !== 'all' && currentDist !== '') {
-        const itemDist = (c.district || '').toLowerCase();
-        const itemAddr = (c.address || '').toLowerCase();
-        const aliases = (this.ZONE_PRESETS[currentDist] && this.ZONE_PRESETS[currentDist].aliases) 
-          ? this.ZONE_PRESETS[currentDist].aliases 
-          : [currentDist];
-        const matchDist = aliases.some(a => itemDist.includes(a) || itemAddr.includes(a));
-        if (!matchDist) return false;
+      // 1. Polreg Mode: Strict District Filter (Radius circle is ignored)
+      if (mode === 'polreg') {
+        if (currentDist !== 'all' && currentDist !== '') {
+          const itemDist = (c.district || '').toLowerCase();
+          const itemAddr = (c.address || '').toLowerCase();
+          const aliases = (this.ZONE_PRESETS[currentDist] && this.ZONE_PRESETS[currentDist].aliases) 
+            ? [...this.ZONE_PRESETS[currentDist].aliases] 
+            : [currentDist];
+          if (currentDist === 'buahbatu') aliases.push('buah batu');
+          if (currentDist === 'kircon') aliases.push('kiaracondong', 'kiara condong');
+          if (currentDist === 'batununggal') aliases.push('batu nunggal');
+          if (currentDist === 'ujungberung') aliases.push('ujung berung');
+          if (currentDist === 'bojongsoang') aliases.push('bojong soang');
+          const matchDist = aliases.some(a => itemDist.includes(a) || itemAddr.includes(a));
+          if (!matchDist) return false;
+        }
       }
 
-      // 2. Car Model / Unit filter
+      // 2. Radius GPS Mode: Strict Distance Filter (District is ignored)
+      if (mode === 'radius') {
+        if (currentRadiusKm < 500 && c.distance_km !== undefined && c.distance_km !== null) {
+          if (c.distance_km > currentRadiusKm) return false;
+        }
+      }
+
+      // 3. Car Model / Unit filter
       if (carFilter !== 'all' && carFilter !== '') {
         if (!this.matchCarModel((c.car_model || '') + ' ' + (c.last_car_model || ''), carFilter)) {
           return false;
         }
-      }
-
-      // 3. Strict Radius filter (applies when no specific district is chosen; bypassed when a district or Semua Wilayah is active)
-      if (currentDist === 'all' && currentRadiusKm < 500 && c.distance_km !== undefined && c.distance_km !== null) {
-        if (c.distance_km > currentRadiusKm) return false;
       }
 
       // 4. Status filter
@@ -1358,11 +1667,17 @@ const SalesSuperpowers = {
     const pinBadge = document.getElementById('radarMapPinCount');
     if (pinBadge) {
       const carLabel = (this.radarCarFilter && this.radarCarFilter !== 'all') ? ` • ${this.radarCarFilter.toUpperCase()}` : '';
-      const distLabel = (this.currentDistrict && this.currentDistrict !== 'all') ? ` • Kecamatan: ${this.getZoneLabel(this.currentDistrict)}` : '';
-      const rLabel = (this.currentDistrict === 'all' && this.currentRadius < 500) ? ` (Radius ${this.currentRadius} km)` : '';
-      pinBadge.textContent = filteredLeads.length > 0
-        ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer${rLabel}${distLabel}${carLabel}`
-        : '0 Customer';
+      if (this.radarMode === 'polreg') {
+        const distName = this.getZoneLabel(this.currentDistrict || 'buahbatu');
+        pinBadge.textContent = filteredLeads.length > 0
+          ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer • Kecamatan: ${distName}${carLabel}`
+          : `0 Customer di Kecamatan ${distName}`;
+      } else {
+        const rLabel = this.currentRadius >= 500 ? 'Semua Wilayah' : `${this.currentRadius} km`;
+        pinBadge.textContent = filteredLeads.length > 0
+          ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer (Radius ${rLabel})${carLabel}`
+          : '0 Customer';
+      }
     }
 
     if (!this.cachedRadarIcons) {

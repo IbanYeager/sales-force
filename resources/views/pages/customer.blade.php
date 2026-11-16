@@ -178,6 +178,84 @@
   transform: translateY(-1px);
 }
 
+/* Mode Switcher: 2 Opsi Terpisah (Radar GPS vs Peta Polreg Wilayah) */
+.radar-mode-switcher-container {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.radar-mode-switcher {
+  display: flex;
+  background: #f1f5f9;
+  padding: 5px;
+  border-radius: 14px;
+  gap: 8px;
+  border: 1.5px solid #e2e8f0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.radar-mode-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.radar-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.7);
+  color: #0f172a;
+}
+
+.radar-mode-btn.active {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.radar-mode-btn.active.mode-radius {
+  color: #2563eb !important;
+  border-bottom: 2.5px solid #2563eb;
+}
+
+.radar-mode-btn.active.mode-polreg {
+  color: #d7123a !important;
+  border-bottom: 2.5px solid #d7123a;
+}
+
+/* Glassmorphic Polreg Tooltip */
+.leaflet-tooltip.polreg-modern-tooltip-wrap {
+  background: rgba(15, 23, 42, 0.94) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
+}
+
+.leaflet-tooltip.polreg-modern-tooltip-wrap::before {
+  border-top-color: rgba(15, 23, 42, 0.94) !important;
+}
+
+.polreg-glass-tooltip {
+  min-width: 175px;
+}
+
 /* Controls Bar */
 .radar-controls-strip {
   display: flex;
