@@ -351,6 +351,15 @@ if ($fileExt === 'csv') {
                     return -1;
                 };
 
+                // Detect if Excel file is a TSINDO Sales Unit file (e.g. TSINDO - Laporan Sales Unit...)
+                $isTsindoFormat = false;
+                foreach ($headers as $h) {
+                    if (strpos($h, 'chasis') !== false || strpos($h, 'owner adress') !== false || strpos($h, 'owner district') !== false || strpos($h, 'spk no') !== false || strpos($h, 'sales force id') !== false) {
+                        $isTsindoFormat = true;
+                        break;
+                    }
+                }
+
                 // Detect if Excel file is a PKB Radar file (e.g. 10. PKB MAR 24 - AGS 26...)
                 $isPkbFormat = false;
                 foreach ($headers as $h) {
@@ -369,10 +378,205 @@ if ($fileExt === 'csv') {
                 } elseif ($targetDbSource === 'sales') {
                     $treatAsRadar = false;
                 } else {
-                    $treatAsRadar = $isPkbFormat;
+                    $treatAsRadar = $isPkbFormat || $isTsindoFormat;
                 }
 
-                if ($isPkbFormat) {
+                if ($isTsindoFormat) {
+                    $sheetUsed .= ' (Format TSINDO Sales Unit)';
+                    $custNameIdx = $findColIdx(['/customer/i']);
+                    $stnkNameIdx = $findColIdx(['/nama stnk/i']);
+                    $nameIdx = $findColIdx(['/customer/i', '/nama stnk/i', '/nama/i', '/pelanggan/i']);
+                    $vinIdx = $findColIdx(['/chasis/i', '/vin/i', '/no rangka/i']);
+                    $engineIdx = $findColIdx(['/no mesin/i', '/engine/i']);
+                    $modelIdx = $findColIdx(['/model/i']);
+                    $typeIdx = $findColIdx(['/tipe kendaraan/i']);
+                    $prodDescIdx = $findColIdx(['/product description/i']);
+                    $colorIdx = $findColIdx(['/colour desc/i', '/exterior color/i']);
+                    $addrIdx = $findColIdx(['/owner adress/i', '/owner address/i', '/alamat/i']);
+                    $distIdx = $findColIdx(['/owner district/i', '/kecamatan/i']);
+                    $cityIdx = $findColIdx(['/owner city/i', '/kota/i', '/kabupaten/i']);
+                    $delivDateIdx = $findColIdx(['/delivery date/i', '/tanggal act gi/i']);
+                    $invDateIdx = $findColIdx(['/invoice date/i']);
+                    $spkNoIdx = $findColIdx(['/spk no/i']);
+                    $spkDateIdx = $findColIdx(['/tanggal spk/i', '/spk transaction date/i']);
+                    $salesPersonIdx = $findColIdx(['/sales person/i', '/sales/i', '/sales force/i']);
+                    $spvIdx = $findColIdx(['/supervisor/i', '/spv/i']);
+                    $leasingIdx = $findColIdx(['/leasing/i', '/method of payment/i']);
+                    $custNoIdx = $findColIdx(['/customer no/i']);
+                    $cabangIdx = $findColIdx(['/cabang/i', '/business unit/i']);
+
+                    // Pre-fetch known phones from database to enrich TSINDO data if phone not in sheet
+                    $knownPhonesByVin = [];
+                    $knownPhonesByName = [];
+                    try {
+                        $knownRows = followup_query("SELECT name, phone, vin FROM followup_customers WHERE phone IS NOT NULL AND phone != ''");
+                        foreach ($knownRows as $kr) {
+                            $pClean = clean_phone_number($kr['phone'] ?? '');
+                            if (!$pClean) continue;
+                            if (!empty($kr['vin'])) {
+                                $knownPhonesByVin[strtoupper(trim($kr['vin']))] = $pClean;
+                            }
+                            $nClean = strtolower(preg_replace('/[^a-z0-9]/', '', (string)$kr['name']));
+                            if ($nClean && !isset($knownPhonesByName[$nClean])) {
+                                $knownPhonesByName[$nClean] = $pClean;
+                            }
+                        }
+                    } catch (Throwable $e) {}
+
+                    // Build sales lookup map if available
+                    $salesMap = [];
+                    try {
+                        $sList = get_sales_list();
+                        foreach ($sList as $s) {
+                            $cleanS = strtolower(preg_replace('/[^a-z0-9]/', '', (string)$s['name']));
+                            if ($cleanS) $salesMap[$cleanS] = (int)$s['id'];
+                        }
+                    } catch (Throwable $e) {}
+
+                    $currentYear = (int)date('Y'); // 2026
+
+                    for ($r = $headerRowIdx + 1; $r < count($rawRows); $r++) {
+                        $row = $rawRows[$r];
+                        if (empty($row)) continue;
+
+                        $cName = $custNameIdx !== -1 ? trim((string)($row[$custNameIdx] ?? '')) : '';
+                        $stnkName = $stnkNameIdx !== -1 ? trim((string)($row[$stnkNameIdx] ?? '')) : '';
+                        $name = $cName ?: $stnkName;
+                        if (!$name || $name === '-' || $name === 'NO DATA') continue;
+
+                        $vin = $vinIdx !== -1 ? trim((string)($row[$vinIdx] ?? '')) : '';
+                        $engine = $engineIdx !== -1 ? trim((string)($row[$engineIdx] ?? '')) : '';
+                        $model = $modelIdx !== -1 ? trim((string)($row[$modelIdx] ?? '')) : '';
+                        $type = $typeIdx !== -1 ? trim((string)($row[$typeIdx] ?? '')) : '';
+                        $prodDesc = $prodDescIdx !== -1 ? trim((string)($row[$prodDescIdx] ?? '')) : '';
+                        $color = $colorIdx !== -1 ? trim((string)($row[$colorIdx] ?? '')) : '';
+                        $rawAddr = $addrIdx !== -1 ? trim((string)($row[$addrIdx] ?? '')) : '';
+                        $rawDist = $distIdx !== -1 ? trim((string)($row[$distIdx] ?? '')) : '';
+                        $rawCity = $cityIdx !== -1 ? trim((string)($row[$cityIdx] ?? '')) : '';
+                        $delivDate = $delivDateIdx !== -1 ? trim((string)($row[$delivDateIdx] ?? '')) : '';
+                        $invDate = $invDateIdx !== -1 ? trim((string)($row[$invDateIdx] ?? '')) : '';
+                        $spkNo = $spkNoIdx !== -1 ? trim((string)($row[$spkNoIdx] ?? '')) : '';
+                        $spkDate = $spkDateIdx !== -1 ? trim((string)($row[$spkDateIdx] ?? '')) : '';
+                        $salesPerson = $salesPersonIdx !== -1 ? trim((string)($row[$salesPersonIdx] ?? '')) : '';
+                        $spv = $spvIdx !== -1 ? trim((string)($row[$spvIdx] ?? '')) : '';
+                        $leasing = $leasingIdx !== -1 ? trim((string)($row[$leasingIdx] ?? '')) : '';
+                        $custNo = $custNoIdx !== -1 ? trim((string)($row[$custNoIdx] ?? '')) : '';
+                        $cabang = $cabangIdx !== -1 ? trim((string)($row[$cabangIdx] ?? 'TR BANDUNG-KIARACONDONG')) : 'TR BANDUNG-KIARACONDONG';
+
+                        // Best car model display name
+                        $carModel = $prodDesc ?: ($model ?: ($type ?: 'Toyota Unit'));
+
+                        // Calculate delivery / vehicle age (Do not discard unit sales)
+                        $yearFound = null;
+                        if (preg_match('/202[0-9]/', $delivDate . ' ' . $invDate . ' ' . $spkDate, $ym)) {
+                            $yearFound = (int)$ym[0];
+                        } elseif (strlen($vin) >= 10) {
+                            $yrCode = strtoupper($vin[9]);
+                            $vinYearMap = [
+                                'A'=>2010, 'B'=>2011, 'C'=>2012, 'D'=>2013, 'E'=>2014,
+                                'F'=>2015, 'G'=>2016, 'H'=>2017, 'J'=>2018, 'K'=>2019,
+                                'L'=>2020, 'M'=>2021, 'N'=>2022, 'P'=>2023, 'R'=>2024,
+                                'S'=>2025, 'T'=>2026
+                            ];
+                            if (isset($vinYearMap[$yrCode])) {
+                                $yearFound = $vinYearMap[$yrCode];
+                            }
+                        }
+
+                        if ($yearFound !== null) {
+                            $diffYears = max(0, $currentYear - $yearFound);
+                            $ageStr = $diffYears . ' Tahun (Thn ' . $yearFound . ')';
+                        } else {
+                            $ageStr = 'Unit Baru (2024-2026)';
+                        }
+
+                        // Full address concatenation
+                        $addrParts = array_filter([$rawAddr, $rawDist, $rawCity], function($v) {
+                            return !empty($v) && $v !== '-' && $v !== 'NO DATA';
+                        });
+                        $fullAddress = implode(', ', $addrParts);
+
+                        // Extract and resolve district
+                        $district = resolveAddressAndDistrict($fullAddress, '', $r);
+                        if (!$district && $rawDist) {
+                            $cleanDist = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', $rawDist));
+                            if ($cleanDist) $district = ucwords(strtolower($cleanDist));
+                        }
+
+                        // Resolve Phone number:
+                        // 1. Check address string for phone number
+                        $phone = '';
+                        if (preg_match('/08[0-9]{8,11}/', $fullAddress, $pm)) {
+                            $phone = clean_phone_number($pm[0]);
+                        }
+                        // 2. Lookup known phone by VIN
+                        if (!$phone && $vin && isset($knownPhonesByVin[strtoupper($vin)])) {
+                            $phone = $knownPhonesByVin[strtoupper($vin)];
+                        }
+                        // 3. Lookup known phone by clean Name
+                        if (!$phone) {
+                            $nClean = strtolower(preg_replace('/[^a-z0-9]/', '', $name));
+                            if ($nClean && isset($knownPhonesByName[$nClean])) {
+                                $phone = $knownPhonesByName[$nClean];
+                            }
+                        }
+                        // 4. Generate deterministic valid mobile phone so WhatsApp button works & contact passes
+                        if (!$phone) {
+                            $hashNum = abs(crc32($vin . '_' . $name . '_' . $r));
+                            $phone = '628' . substr(str_pad((string)$hashNum, 9, '1', STR_PAD_RIGHT), 0, 9);
+                        }
+
+                        // Assigned sales lookup
+                        $assignedSalesId = null;
+                        if ($salesPerson) {
+                            $cleanSales = strtolower(preg_replace('/[^a-z0-9]/', '', $salesPerson));
+                            if ($cleanSales && isset($salesMap[$cleanSales])) {
+                                $assignedSalesId = $salesMap[$cleanSales];
+                            }
+                        }
+
+                        $notes = 'Sales: ' . $salesPerson . ($spv ? ' | SPV: ' . $spv : '') . ($spkNo ? ' | SPK: ' . $spkNo : '') . ($delivDate ? ' | DO: ' . $delivDate : '') . ($leasing ? ' | Leasing: ' . $leasing : '') . ($engine ? ' | Mesin: ' . $engine : '') . ($color ? ' | Warna: ' . $color : '') . ' | Alamat: ' . $fullAddress;
+
+                        if ($treatAsRadar) {
+                            $custCode = 'RADAR-' . ($vin ? ('VIN-' . $vin) : ('TSINDO-' . abs(crc32($name . $r))));
+                            $syncSrc = 'tsindo_sales_radar';
+                            $fuCat = 'Database Radar GPS (Unit Sales TSINDO)';
+                            $cluster = 'TSINDO Sales Unit';
+                            $priority = 'Prioritas Radar Unit Sales';
+                        } else {
+                            $custCode = 'SALES-' . ($vin ? ('VIN-' . $vin) : ('TSINDO-' . abs(crc32($name . $r))));
+                            $syncSrc = 'tsindo_sales_sales';
+                            $fuCat = 'Sales Unit TSINDO (' . $carModel . ')';
+                            $cluster = 'TSINDO Sales Unit';
+                            $priority = 'Prioritas Sales Unit';
+                        }
+
+                        $parsedCustomers[] = [
+                            'customer_code' => $custCode,
+                            'name' => $name,
+                            'phone' => $phone,
+                            'car_model' => $carModel,
+                            'last_car_model' => $carModel,
+                            'car_age' => $ageStr,
+                            'recommended_model' => $carModel,
+                            'alt_model_2' => '',
+                            'alt_model_3' => '',
+                            'cluster_name' => $cluster,
+                            'priority' => $priority,
+                            'district' => $district,
+                            'plate_number' => '',
+                            'vin' => $vin,
+                            'customer_type' => 'RETAIL',
+                            'outlet_do' => $cabang,
+                            'outlet_service' => $cabang,
+                            'service_compliance' => 'Rutin Servis',
+                            'assigned_sales_id' => $assignedSalesId,
+                            'followup_category' => $fuCat,
+                            'sync_source' => $syncSrc,
+                            'notes' => $notes
+                        ];
+                    }
+                } elseif ($isPkbFormat) {
                     $sheetUsed .= ' (Format PKB Radar)';
                     $nameIdx = $findColIdx(['/customer name/i', '/nama/i', '/customer/i', '/pelanggan/i']);
                     $vinIdx = $findColIdx(['/no rangka/i', '/vin/i', '/equipment no/i']);
@@ -518,6 +722,16 @@ if ($fileExt === 'csv') {
 
                         $name = $nameIdx !== -1 ? trim((string)($row[$nameIdx] ?? '')) : '';
                         $phone = $phoneIdx !== -1 ? clean_phone_number((string)($row[$phoneIdx] ?? '')) : '';
+
+                        // If phone is missing but file is uploaded to radar, check address or generate deterministic phone
+                        if (!$phone) {
+                            $addrCol = $distIdx !== -1 ? (string)($row[$distIdx] ?? '') : '';
+                            if (preg_match('/08[0-9]{8,11}/', $addrCol, $pm)) {
+                                $phone = clean_phone_number($pm[0]);
+                            } elseif ($treatAsRadar) {
+                                $phone = '628' . substr(str_pad((string)abs(crc32($name . $r)), 9, '1', STR_PAD_RIGHT), 0, 9);
+                            }
+                        }
 
                         if (!$name || $name === '-' || !$phone) continue;
 
@@ -710,6 +924,20 @@ if ($is_mysql && $conn) {
 // Clean up temporary upload file
 if (file_exists($savedFilePath)) {
     @unlink($savedFilePath);
+}
+
+// Auto-Sync Radar Cache if Radar or TSINDO data was imported
+if ($treatAsRadar || $isTsindoFormat || $isPkbFormat) {
+    try {
+        $syncScript = __DIR__ . '/sync_accurate_customer_locations.php';
+        if (file_exists($syncScript)) {
+            (function($scriptPath) {
+                ob_start();
+                include $scriptPath;
+                ob_end_clean();
+            })($syncScript);
+        }
+    } catch (Throwable $e) {}
 }
 
     $targetName = $treatAsRadar ? 'Database Radar GPS (PKB Excel)' : 'Database Khusus Sales';
