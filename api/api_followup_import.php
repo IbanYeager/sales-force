@@ -383,9 +383,33 @@ if ($fileExt === 'csv') {
 
                 if ($isTsindoFormat) {
                     $sheetUsed .= ' (Format TSINDO Sales Unit)';
-                    $custNameIdx = $findColIdx(['/customer/i']);
-                    $stnkNameIdx = $findColIdx(['/nama stnk/i']);
-                    $nameIdx = $findColIdx(['/customer/i', '/nama stnk/i', '/nama/i', '/pelanggan/i']);
+                    $custNoIdx = $findColIdx(['/customer\s*no/i', '/customer\s*id/i', '/no\s*customer/i', '/kode\s*cust/i']);
+
+                    // Find Customer Name column (Strictly exclude Customer No, Customer Class, Customer ID)
+                    $custNameIdx = -1;
+                    foreach ($headers as $idx => $h) {
+                        $hClean = trim($h);
+                        if ($idx === $custNoIdx) continue;
+                        if (preg_match('/^(customer|nama customer|customer name|nama pelanggan)$/i', $hClean)) {
+                            $custNameIdx = $idx;
+                            break;
+                        }
+                    }
+                    if ($custNameIdx === -1) {
+                        foreach ($headers as $idx => $h) {
+                            if ($idx === $custNoIdx) continue;
+                            if (strpos($h, 'customer') !== false && strpos($h, 'no') === false && strpos($h, 'class') === false && strpos($h, 'id') === false && strpos($h, 'type') === false) {
+                                $custNameIdx = $idx;
+                                break;
+                            }
+                        }
+                    }
+                    if ($custNameIdx === -1) {
+                        $custNameIdx = $findColIdx(['/nama lengkap/i', '/nama/i', '/pelanggan/i']);
+                    }
+
+                    $stnkNameIdx = $findColIdx(['/nama stnk/i', '/stnk/i']);
+                    $nameIdx = ($custNameIdx !== -1) ? $custNameIdx : $stnkNameIdx;
                     $vinIdx = $findColIdx(['/chasis/i', '/vin/i', '/no rangka/i']);
                     $engineIdx = $findColIdx(['/no mesin/i', '/engine/i']);
                     $modelIdx = $findColIdx(['/model/i']);
@@ -402,7 +426,7 @@ if ($fileExt === 'csv') {
                     $salesPersonIdx = $findColIdx(['/sales person/i', '/sales/i', '/sales force/i']);
                     $spvIdx = $findColIdx(['/supervisor/i', '/spv/i']);
                     $leasingIdx = $findColIdx(['/leasing/i', '/method of payment/i']);
-                    $custNoIdx = $findColIdx(['/customer no/i']);
+                    if ($custNoIdx === -1) $custNoIdx = $findColIdx(['/customer no/i']);
                     $cabangIdx = $findColIdx(['/cabang/i', '/business unit/i']);
 
                     // Pre-fetch known phones from database to enrich TSINDO data if phone not in sheet
@@ -441,7 +465,18 @@ if ($fileExt === 'csv') {
 
                         $cName = $custNameIdx !== -1 ? trim((string)($row[$custNameIdx] ?? '')) : '';
                         $stnkName = $stnkNameIdx !== -1 ? trim((string)($row[$stnkNameIdx] ?? '')) : '';
-                        $name = $cName ?: $stnkName;
+                        $custNo = $custNoIdx !== -1 ? trim((string)($row[$custNoIdx] ?? '')) : '';
+
+                        // Guard: If cName accidentally equals or contains CST-... customer code, fallback to stnkName
+                        if (preg_match('/^CST-\d+/i', $cName)) {
+                            if ($stnkName && !preg_match('/^CST-\d+/i', $stnkName)) {
+                                $name = $stnkName;
+                            } else {
+                                $name = $cName;
+                            }
+                        } else {
+                            $name = $cName ?: $stnkName;
+                        }
                         if (!$name || $name === '-' || $name === 'NO DATA') continue;
 
                         $vin = $vinIdx !== -1 ? trim((string)($row[$vinIdx] ?? '')) : '';
@@ -535,7 +570,7 @@ if ($fileExt === 'csv') {
                             }
                         }
 
-                        $notes = 'Sales: ' . $salesPerson . ($spv ? ' | SPV: ' . $spv : '') . ($spkNo ? ' | SPK: ' . $spkNo : '') . ($delivDate ? ' | DO: ' . $delivDate : '') . ($leasing ? ' | Leasing: ' . $leasing : '') . ($engine ? ' | Mesin: ' . $engine : '') . ($color ? ' | Warna: ' . $color : '') . ' | Alamat: ' . $fullAddress;
+                        $notes = ($custNo ? ('Cust No: ' . $custNo . ' | ') : '') . 'Sales: ' . $salesPerson . ($spv ? ' | SPV: ' . $spv : '') . ($spkNo ? ' | SPK: ' . $spkNo : '') . ($delivDate ? ' | DO: ' . $delivDate : '') . ($leasing ? ' | Leasing: ' . $leasing : '') . ($engine ? ' | Mesin: ' . $engine : '') . ($color ? ' | Warna: ' . $color : '') . ' | Alamat: ' . $fullAddress;
 
                         if ($treatAsRadar) {
                             $custCode = 'RADAR-' . ($vin ? ('VIN-' . $vin) : ('TSINDO-' . abs(crc32($name . $r))));
@@ -578,7 +613,15 @@ if ($fileExt === 'csv') {
                     }
                 } elseif ($isPkbFormat) {
                     $sheetUsed .= ' (Format PKB Radar)';
-                    $nameIdx = $findColIdx(['/customer name/i', '/nama/i', '/customer/i', '/pelanggan/i']);
+                    $nameIdx = $findColIdx(['/customer name/i', '/nama customer/i', '/nama pelanggan/i', '/nama lengkap/i', '/nama/i', '/pelanggan/i']);
+                    if ($nameIdx === -1) {
+                        foreach ($headers as $idx => $h) {
+                            if (strpos($h, 'customer') !== false && strpos($h, 'no') === false && strpos($h, 'id') === false && strpos($h, 'class') === false) {
+                                $nameIdx = $idx;
+                                break;
+                            }
+                        }
+                    }
                     $vinIdx = $findColIdx(['/no rangka/i', '/vin/i', '/equipment no/i']);
                     $plateIdx = $findColIdx(['/police reg/i', '/no.*polisi/i', '/plat/i']);
                     $carModelIdx = $findColIdx(['/tipe kendaraan/i', '/model/i', '/tipe/i']);
@@ -683,7 +726,15 @@ if ($fileExt === 'csv') {
                         ];
                     }
                 } else {
-                    $nameIdx = $findColIdx(['/nama_customer/i', '/nama by single vin/i', '/nama lengkap/i', '/nama/i', '/customer/i', '/pelanggan/i']);
+                    $nameIdx = $findColIdx(['/nama_customer/i', '/nama by single vin/i', '/nama lengkap/i', '/nama customer/i', '/customer name/i', '/nama/i', '/pelanggan/i']);
+                    if ($nameIdx === -1) {
+                        foreach ($headers as $idx => $h) {
+                            if (strpos($h, 'customer') !== false && strpos($h, 'no') === false && strpos($h, 'id') === false && strpos($h, 'class') === false) {
+                                $nameIdx = $idx;
+                                break;
+                            }
+                        }
+                    }
                     $phoneIdx = $findColIdx(['/no_telepon_customer/i', '/contact person 1/i', '/contact/i', '/wa/i', '/telepon/i', '/phone/i', '/no_hp/i', '/hp/i']);
                     $vFilterIdx = $findColIdx(['/vehicle filter/i']);
                     $rec1Idx = $findColIdx(['/1\.\s*model/i', '/alternative_recommendation_model_1/i', '/model_rekomendasi/i']);
