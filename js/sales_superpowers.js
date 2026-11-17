@@ -1660,6 +1660,7 @@ const SalesSuperpowers = {
             <div class="radar-popup-dist">
               <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(c.district)} 
               ${distLabel ? `<span class="radar-popup-dist-pill">${distLabel}</span>` : ''}
+              ${(c._stackedTotal && c._stackedTotal > 1) ? `<span style="font-size:10px; background:#eff6ff; color:#1d4ed8; padding:1px 6px; border-radius:10px; font-weight:700; margin-left:4px;"><i class="fa-solid fa-layer-group"></i> Unit ${c._stackedIndex}/${c._stackedTotal}</span>` : ''}
             </div>
             ${c.address ? `
               <div style="font-size:10.5px; color:#475569; margin-top:3px; line-height:1.3; max-width:240px;">
@@ -1771,8 +1772,61 @@ const SalesSuperpowers = {
     const markersToBatch = [];
     const icons = this.cachedRadarIcons;
 
-    for (let i = 0; i < mapPins.length; i++) {
-      const c = mapPins[i];
+    // Anti-stacking: Detect coincident coordinates and fan them out smoothly in a clean micro-ring
+    const coordBuckets = {};
+    const ROUND_FACTOR = 100000;
+
+    mapPins.forEach((c, idx) => {
+      const bucketKey = `${Math.round(c.lat * ROUND_FACTOR)},${Math.round(c.lng * ROUND_FACTOR)}`;
+      if (!coordBuckets[bucketKey]) coordBuckets[bucketKey] = [];
+      coordBuckets[bucketKey].push(idx);
+    });
+
+    const positionedPins = mapPins.map(c => ({ ...c }));
+
+    Object.values(coordBuckets).forEach(indices => {
+      if (indices.length <= 1) return;
+      const K = indices.length;
+      indices.forEach((pinIdx, i) => {
+        const c = positionedPins[pinIdx];
+        let ring = 1;
+        let ringCap = 6;
+        let ringIdx = i;
+        let baseRadius = 0.00012; // ~13m
+
+        if (K > 6) {
+          if (i < 5) {
+            ring = 1;
+            ringCap = 5;
+            ringIdx = i;
+            baseRadius = 0.00009;
+          } else if (i < 15) {
+            ring = 2;
+            ringCap = 10;
+            ringIdx = i - 5;
+            baseRadius = 0.00018;
+          } else {
+            ring = 3;
+            ringCap = K - 15;
+            ringIdx = i - 15;
+            baseRadius = 0.00027;
+          }
+        }
+
+        const angle = (2 * Math.PI * ringIdx) / ringCap + (ring * 0.35);
+        const deltaLat = baseRadius * Math.cos(angle);
+        const deltaLng = (baseRadius / Math.cos((c.lat * Math.PI) / 180)) * Math.sin(angle);
+
+        c.displayLat = c.lat + deltaLat;
+        c.displayLng = c.lng + deltaLng;
+        c._isStacked = true;
+        c._stackedTotal = K;
+        c._stackedIndex = i + 1;
+      });
+    });
+
+    for (let i = 0; i < positionedPins.length; i++) {
+      const c = positionedPins[i];
       let icon = icons.red;
       if (c.status === 'Deal / Selesai') {
         icon = icons.green;
@@ -1782,7 +1836,10 @@ const SalesSuperpowers = {
         icon = icons.yellow;
       }
 
-      const marker = L.marker([c.lat, c.lng], {
+      const pLat = c.displayLat !== undefined ? c.displayLat : c.lat;
+      const pLng = c.displayLng !== undefined ? c.displayLng : c.lng;
+
+      const marker = L.marker([pLat, pLng], {
         icon: icon,
         title: `${c.name || 'Customer'} • ${c.district || ''}`
       });
