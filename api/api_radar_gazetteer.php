@@ -11146,6 +11146,20 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     if (empty($cleanAddress) && !empty($rawDistrict)) {
         $cleanAddress = trim((string)$rawDistrict);
     }
+
+    // If the address notes contain an explicit "Kec. <District>", that takes priority!
+    if (preg_match('/Kec\.\s*([^,;\n]+),\s*(KAB\.|KOTA)?\s*([^,;\n]+)/i', $cleanAddress, $km)) {
+        $cleanK = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $km[1]))));
+        $cleanC = ucwords(strtolower(trim(preg_replace('/^(kabupaten|kab\.|kota)\s+/i', '', $km[3] ?? ''))));
+        if ($cleanC && strtolower($cleanC) !== 'bandung') {
+            $rawDistrict = "$cleanK, $cleanC";
+        } else {
+            $rawDistrict = $cleanK;
+        }
+    } elseif (preg_match('/Kec\.\s*([^,;\n]+)/i', $cleanAddress, $km)) {
+        $rawDistrict = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $km[1]))));
+    }
+
     $addrLower = strtolower($cleanAddress);
     $rawDistLower = strtolower(trim((string)$rawDistrict));
 
@@ -11184,6 +11198,46 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
                 return [(float)$hit['lat'], (float)$hit['lng'], $distName, $hit['matched_address'] ?: $cleanAddress];
             }
         } catch (Exception $e) {}
+    }
+
+    // Live ArcGIS World Geocoding Engine fallback for newly added addresses
+    if (!empty($cleanAddress) && strlen($cleanAddress) >= 5) {
+        try {
+            $encodedAddr = urlencode($cleanAddress . ', Indonesia');
+            $esriUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine={$encodedAddr}&maxLocations=1&sourceCountry=IDN";
+            $ctx = stream_context_create([
+                'http' => [
+                    'timeout' => 3,
+                    'header' => "User-Agent: TunasToyotaSFT/1.0\r\n"
+                ]
+            ]);
+            $resp = @file_get_contents($esriUrl, false, $ctx);
+            if ($resp) {
+                $json = json_decode($resp, true);
+                if (!empty($json['candidates'][0]['location'])) {
+                    $loc = $json['candidates'][0]['location'];
+                    $mAddr = $json['candidates'][0]['address'] ?? $cleanAddress;
+                    $score = (float)($json['candidates'][0]['score'] ?? 0);
+                    if ($score >= 70) {
+                        $cLat = (float)$loc['y'];
+                        $cLng = (float)$loc['x'];
+                        $dName = $rawDistrict ?: '';
+                        if (empty($dName) && preg_match('/,\s*([A-Za-z\s]+),\s*(Jawa Barat|DKI Jakarta|Banten|Jawa Tengah|Jawa Timur)/i', $mAddr, $dm)) {
+                            $dName = trim($dm[1]);
+                        }
+                        if (empty($dName)) $dName = 'Kiaracondong';
+                        
+                        if ($sqliteCachePdo) {
+                            try {
+                                $ins = $sqliteCachePdo->prepare("INSERT OR REPLACE INTO geocode_cache (query_text, matched_address, lat, lng, score, updated_at) VALUES (?, ?, ?, ?, ?, ?)");
+                                $ins->execute([$cleanAddress, $mAddr, $cLat, $cLng, $score, date('Y-m-d H:i:s')]);
+                            } catch (Exception $e) {}
+                        }
+                        return [$cLat, $cLng, $dName, $mAddr];
+                    }
+                }
+            }
+        } catch (Throwable $e) {}
     }
 
     // Authoritative rawDistrict canonical resolution

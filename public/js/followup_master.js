@@ -1756,7 +1756,7 @@ function renderCustomerTable() {
                 </div>
               `}
               <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
-                ${c.district ? `<span style="font-size:10.5px; color:#64748b;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; font-size:9.5px;"></i> Kec. ${escapeHtml(c.district)}</span>` : ''}
+                ${c.district ? `<span style="font-size:10.5px; color:#64748b;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; font-size:9.5px;"></i> ${/^(kecamatan|kec\.|kec)/i.test(c.district) ? escapeHtml(c.district) : `Kec. ${escapeHtml(c.district)}`}</span>` : ''}
                 ${c.customer_type ? `<span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:#f1f5f9; color:#475569;">${escapeHtml(c.customer_type)}</span>` : ''}
               </div>
             </div>

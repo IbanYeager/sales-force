@@ -576,10 +576,13 @@ if ($fileExt === 'csv') {
                                 'cibiru' => 'Cibiru'
                             ];
                             
-                            if (isset($distAliasMap[$cleanDistLower])) {
-                                $district = $distAliasMap[$cleanDistLower];
+                            $baseDist = isset($distAliasMap[$cleanDistLower]) ? $distAliasMap[$cleanDistLower] : ucwords(strtolower($cleanDist));
+                            $cleanCity = trim(preg_replace('/^(kabupaten|kab\.|kota)\s+/i', '', (string)$rawCity));
+                            if ($cleanCity && strtolower($cleanCity) !== 'bandung' && strtolower($cleanCity) !== 'kota bandung') {
+                                $cityPrefix = (stripos($rawCity, 'kab') !== false) ? 'Kab. ' : '';
+                                $district = $baseDist . ', ' . $cityPrefix . ucwords(strtolower($cleanCity));
                             } else {
-                                $district = ucwords(strtolower($cleanDist));
+                                $district = $baseDist;
                             }
                         }
                         
