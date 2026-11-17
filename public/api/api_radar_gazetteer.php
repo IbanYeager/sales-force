@@ -1943,6 +1943,87 @@ $bandungKelurahan = array (
   ),
 );
 
+
+$bandungNeighborhoodLandmarks = array(
+  'kawaluyaan indah' => array('Buahbatu', array(-6.9385, 107.6620)),
+  'kawaluyaan' => array('Buahbatu', array(-6.9385, 107.6620)),
+  'pratista raya' => array('Buahbatu', array(-6.9280, 107.6710)),
+  'pratista' => array('Buahbatu', array(-6.9280, 107.6710)),
+  'kiarasari raya' => array('Buahbatu', array(-6.9560, 107.6430)),
+  'kiarasari' => array('Buahbatu', array(-6.9560, 107.6430)),
+  'kiara sari' => array('Buahbatu', array(-6.9560, 107.6430)),
+  'kiara residen' => array('Buahbatu', array(-6.9560, 107.6430)),
+  'sanggar hurip estate' => array('Buahbatu', array(-6.9520, 107.6530)),
+  'sanggar hurip' => array('Buahbatu', array(-6.9520, 107.6530)),
+  'sanggar kencana' => array('Buahbatu', array(-6.9525, 107.6535)),
+  'bahagia permai raya' => array('Buahbatu', array(-6.9535, 107.6410)),
+  'bahagia permai' => array('Buahbatu', array(-6.9535, 107.6410)),
+  'kencana wangi' => array('Buahbatu', array(-6.9590, 107.6500)),
+  'cijawura girang' => array('Buahbatu', array(-6.9630, 107.6560)),
+  'cijawura hilir' => array('Buahbatu', array(-6.9670, 107.6600)),
+  'cijawura' => array('Buahbatu', array(-6.9630, 107.6560)),
+  'ciwastra' => array('Buahbatu', array(-6.9640, 107.6660)),
+  'margacinta' => array('Buahbatu', array(-6.9554, 107.6468)),
+  'margasari' => array('Buahbatu', array(-6.9520, 107.6600)),
+  'sekejati' => array('Buahbatu', array(-6.9480, 107.6550)),
+  'jatisari' => array('Buahbatu', array(-6.9550, 107.6520)),
+  'palem raya' => array('Buahbatu', array(-6.9560, 107.6510)),
+  'irigasi utama' => array('Buahbatu', array(-6.9530, 107.6620)),
+  'bunga bakung' => array('Buahbatu', array(-6.9580, 107.6520)),
+  'logam' => array('Buahbatu', array(-6.9580, 107.6420)),
+  'cidurian selatan' => array('Buahbatu', array(-6.9470, 107.6470)),
+  'cidurian utara' => array('Buahbatu', array(-6.9430, 107.6490)),
+  'cidurian' => array('Buahbatu', array(-6.9450, 107.6480)),
+  'buahbatu regency' => array('Buahbatu', array(-6.9610, 107.6400)),
+  'terusan buah batu' => array('Buahbatu', array(-6.9650, 107.6350)),
+  'terusan buahbatu' => array('Buahbatu', array(-6.9650, 107.6350)),
+  'jembatan hitam' => array('Buahbatu', array(-6.9500, 107.6520)),
+  'sadang asri' => array('Buahbatu', array(-6.9600, 107.6550)),
+  'uranus' => array('Buahbatu', array(-6.9510, 107.6680)),
+  'mars' => array('Buahbatu', array(-6.9520, 107.6690)),
+  'venus' => array('Buahbatu', array(-6.9500, 107.6670)),
+  'pluto' => array('Buahbatu', array(-6.9530, 107.6710)),
+  'jupiter' => array('Buahbatu', array(-6.9490, 107.6660)),
+  'yupiter' => array('Buahbatu', array(-6.9490, 107.6660)),
+  'saturnus' => array('Buahbatu', array(-6.9520, 107.6690)),
+  'staurnus' => array('Buahbatu', array(-6.9520, 107.6690)),
+  'merkurius' => array('Buahbatu', array(-6.9540, 107.6700)),
+  'neptunus' => array('Buahbatu', array(-6.9510, 107.6720)),
+  'derwati' => array('Rancasari', array(-6.9670, 107.6850)),
+  'cipamokolan' => array('Rancasari', array(-6.9540, 107.6770)),
+  'rancabolang' => array('Rancasari', array(-6.9520, 107.6820)),
+  'pinus regensi' => array('Rancasari', array(-6.9570, 107.6810)),
+  'batununggal indah' => array('Batununggal', array(-6.9600, 107.6250)),
+  'batununggal elok' => array('Batununggal', array(-6.9580, 107.6240)),
+  'kembar mas' => array('Batununggal', array(-6.9450, 107.6210)),
+  'mengger' => array('Batununggal', array(-6.9630, 107.6310)),
+  'waas' => array('Batununggal', array(-6.9650, 107.6320)),
+  'ibrahim adjie' => array('Kiaracondong', array(-6.9380, 107.6460)),
+  'babakan surabaya' => array('Kiaracondong', array(-6.9280, 107.6440)),
+  'kebon kangkung' => array('Kiaracondong', array(-6.9340, 107.6450)),
+  'kebon jayanti' => array('Kiaracondong', array(-6.9240, 107.6460)),
+  'babakan sari' => array('Kiaracondong', array(-6.9450, 107.6470)),
+  'sukapura' => array('Kiaracondong', array(-6.9410, 107.6490)),
+  'pindad' => array('Kiaracondong', array(-6.9390, 107.6430)),
+  'cisaranten endah' => array('Arcamanik', array(-6.9180, 107.6850)),
+  'cisaranten kulon' => array('Arcamanik', array(-6.9120, 107.6780)),
+  'sukamiskin' => array('Arcamanik', array(-6.9110, 107.6820)),
+  'pacuan kuda' => array('Arcamanik', array(-6.9150, 107.6790)),
+  'antapani tengah' => array('Antapani', array(-6.9147, 107.6625)),
+  'antapani kidul' => array('Antapani', array(-6.9180, 107.6640)),
+  'antapani kulon' => array('Antapani', array(-6.9120, 107.6580)),
+  'antapani wetan' => array('Antapani', array(-6.9130, 107.6680)),
+  'terusan jakarta' => array('Antapani', array(-6.9150, 107.6550)),
+  'summarecon' => array('Gedebage', array(-6.9650, 107.6980)),
+  'cisaranten kidul' => array('Gedebage', array(-6.9480, 107.6910)),
+  'gedebage selatan' => array('Gedebage', array(-6.9680, 107.7010)),
+  'adipura' => array('Gedebage', array(-6.9620, 107.6940)),
+  'ciganitri' => array('Bojongsoang', array(-6.9750, 107.6480)),
+  'cipagalo' => array('Bojongsoang', array(-6.9690, 107.6420)),
+  'buah batu square' => array('Bojongsoang', array(-6.9680, 107.6360)),
+  'podomoro park' => array('Bojongsoang', array(-6.9850, 107.6450))
+);
+
 $bandungStreets = array (
   'soekarno hatta' => 
   array (
@@ -11053,7 +11134,7 @@ $indonesiaCityDistricts = array(
  * @return array [float $lat, float $lng, string $districtName, string $cleanAddress]
  */
 function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null, $plateNumber = '', $vin = '') {
-    global $bandungDistricts, $bandungKelurahan, $bandungStreets, $bandungComplexes, $externalCitiesAndHubs;
+    global $bandungDistricts, $bandungKelurahan, $bandungStreets, $bandungComplexes, $externalCitiesAndHubs, $bandungNeighborhoodLandmarks;
 
     $cleanAddress = '';
     if (preg_match('/Alamat\s*:\s*(.+)$/i', (string)$notes, $m)) {
@@ -11163,6 +11244,18 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
                 $finalLng = round($matchedCoords[1] + $deltaLng, 6);
 
                 return [$finalLat, $finalLng, $finalDistrict, $cleanAddress];
+            }
+        }
+    }
+
+    // LEVEL 0.5: Local Neighborhood Landmarks & Road Segments
+    if (!empty($addrLower) && !empty($bandungNeighborhoodLandmarks)) {
+        foreach ($bandungNeighborhoodLandmarks as $kw => $info) {
+            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
+                $matchedDistrict = $info[0];
+                $matchedCoords = $info[1];
+                $matchLevel = 1;
+                break;
             }
         }
     }
@@ -11333,6 +11426,48 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $hash1 = abs(crc32($id . '_' . $matchedDistrict));
     $hash2 = abs(crc32($matchedDistrict . '_' . $id));
     $angle = (($hash1 % 360) / 180.0) * M_PI;
+
+    
+    $districtSubClusters = array(
+        'Buahbatu' => array(
+            array(-6.9480, 107.6550),
+            array(-6.9520, 107.6600),
+            array(-6.9630, 107.6560),
+            array(-6.9550, 107.6520),
+            array(-6.9560, 107.6430),
+            array(-6.9610, 107.6400),
+            array(-6.9535, 107.6410)
+        ),
+        'Rancasari' => array(
+            array(-6.9540, 107.6770),
+            array(-6.9620, 107.6830),
+            array(-6.9670, 107.6850),
+            array(-6.9520, 107.6820)
+        ),
+        'Batununggal' => array(
+            array(-6.9400, 107.6250),
+            array(-6.9530, 107.6250),
+            array(-6.9600, 107.6250),
+            array(-6.9630, 107.6310)
+        ),
+        'Kiaracondong' => array(
+            array(-6.9240, 107.6460),
+            array(-6.9340, 107.6450),
+            array(-6.9280, 107.6440),
+            array(-6.9380, 107.6460),
+            array(-6.9450, 107.6470)
+        ),
+        'Arcamanik' => array(
+            array(-6.9120, 107.6780),
+            array(-6.9189, 107.6811),
+            array(-6.9250, 107.6850)
+        ),
+        'Antapani' => array(
+            array(-6.9080, 107.6600),
+            array(-6.9147, 107.6625),
+            array(-6.9200, 107.6650)
+        )
+    );
 
     switch (true) {
         case ($matchLevel <= 1): // Local street gazetteer: 5-20m

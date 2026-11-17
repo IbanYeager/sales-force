@@ -1709,31 +1709,31 @@ const SalesSuperpowers = {
     // In Polreg Mode: Strictly NO GROUPING / NO CLUSTERING ("jangan di bikin grup")!
     // In Radius Mode: Can use cluster if available
     const isPolregMode = (this.radarMode === 'polreg');
-    const isCurrentlyCluster = this.radarMarkersLayer && typeof this.radarMarkersLayer.addLayers === 'function';
 
-    if (isPolregMode && isCurrentlyCluster) {
-      this.leafletMap.removeLayer(this.radarMarkersLayer);
-      this.radarMarkersLayer = L.layerGroup().addTo(this.leafletMap);
-    } else if (!isPolregMode && !isCurrentlyCluster && window.L && typeof window.L.markerClusterGroup === 'function') {
+    if (isPolregMode) {
       if (this.radarMarkersLayer) {
         this.leafletMap.removeLayer(this.radarMarkersLayer);
       }
-      this.radarMarkersLayer = L.markerClusterGroup({
-        chunkedLoading: true,
-        chunkInterval: 50,
-        chunkDelay: 10,
-        maxClusterRadius: 35,
-        spiderfyOnMaxZoom: false,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
-        disableClusteringAtZoom: 15
-      }).addTo(this.leafletMap);
-    }
-
-    if (!this.radarMarkersLayer) {
-      this.radarMarkersLayer = (isPolregMode || !window.L.markerClusterGroup)
-        ? L.layerGroup().addTo(this.leafletMap)
-        : L.markerClusterGroup().addTo(this.leafletMap);
+      this.radarMarkersLayer = L.layerGroup().addTo(this.leafletMap);
+    } else {
+      const isCurrentlyCluster = this.radarMarkersLayer && typeof this.radarMarkersLayer.addLayers === 'function';
+      if (!isCurrentlyCluster && window.L && typeof window.L.markerClusterGroup === 'function') {
+        if (this.radarMarkersLayer) {
+          this.leafletMap.removeLayer(this.radarMarkersLayer);
+        }
+        this.radarMarkersLayer = L.markerClusterGroup({
+          chunkedLoading: true,
+          chunkInterval: 50,
+          chunkDelay: 10,
+          maxClusterRadius: 35,
+          spiderfyOnMaxZoom: false,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          disableClusteringAtZoom: 15
+        }).addTo(this.leafletMap);
+      } else if (!this.radarMarkersLayer) {
+        this.radarMarkersLayer = L.layerGroup().addTo(this.leafletMap);
+      }
     }
 
     this.radarMarkersLayer.clearLayers();
