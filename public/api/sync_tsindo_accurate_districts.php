@@ -173,9 +173,25 @@ if ($reader->open($tempSheet)) {
 
                 $cleanDist = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', $rawDist));
                 $cleanDistLower = strtolower($cleanDist);
-                $district = isset($distAliasMap[$cleanDistLower]) ? $distAliasMap[$cleanDistLower] : ucwords($cleanDistLower);
+                $cleanCityLower = strtolower(trim($rawCity));
 
-                $addrParts = array_filter([$rawAddr, $district, $rawCity]);
+                $isBandung = false;
+                if (preg_match('/(bandung|cimahi)/i', $cleanCityLower)) {
+                    $isBandung = true;
+                }
+
+                if ($isBandung) {
+                    $district = isset($distAliasMap[$cleanDistLower]) ? $distAliasMap[$cleanDistLower] : ucwords($cleanDistLower);
+                } elseif (!empty($cleanCityLower) && $cleanCityLower !== 'no data') {
+                    $simpleCity = trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $cleanCityLower));
+                    $simpleCityTitle = ucwords($simpleCity);
+                    $kecTitle = ucwords($cleanDistLower);
+                    $district = (!empty($kecTitle) && strtolower($kecTitle) !== strtolower($simpleCityTitle)) ? "{$kecTitle}, {$simpleCityTitle}" : $simpleCityTitle;
+                } else {
+                    $district = isset($distAliasMap[$cleanDistLower]) ? $distAliasMap[$cleanDistLower] : ucwords($cleanDistLower);
+                }
+
+                $addrParts = array_filter([$rawAddr, $cleanDist ? "Kec. " . ucwords($cleanDistLower) : '', $rawCity]);
                 $fullAddr = implode(', ', $addrParts);
 
                 $data = [
@@ -219,6 +235,7 @@ foreach ($existingRows as $row) {
     if ($matchedData && !empty($matchedData['district'])) {
         $realName = $matchedData['name'];
         $dist = $matchedData['district'];
+        $addr = $matchedData['address'];
 
         $sqlParts = ["district = ?"];
         $params = [$dist];
@@ -226,6 +243,11 @@ foreach ($existingRows as $row) {
         if ($realName && !preg_match('/^CST-\d+/i', $realName)) {
             $sqlParts[] = "name = ?";
             $params[] = $realName;
+        }
+
+        if ($addr) {
+            $sqlParts[] = "notes = ?";
+            $params[] = "Alamat: " . $addr;
         }
 
         $params[] = $id;

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // api_radar_gazetteer.php - High-Precision Spatial Gazetteer & Address Resolver
 // Generated for Tunas Toyota SFT CRM - 2026
 
@@ -10466,6 +10466,572 @@ $externalCitiesAndHubs = array (
   ),
 );
 
+
+$indonesiaCityDistricts = array(
+  'kota bekasi' => array(
+    'city' => 'Kota Bekasi',
+    'center' => array(-6.2383, 106.9756),
+    'keys' => array('kota bekasi', 'bekasi', 'jatiasih', 'bekasi barat', 'bekasi selatan', 'bekasi timur', 'bekasi utara', 'rawalumbu', 'pondokgede', 'pondok gede', 'pondok melati', 'medan satria', 'mustikajaya', 'mustika jaya', 'bantar gebang', 'bantargebang', 'jatisampurna'),
+    'districts' => array(
+      'jatiasih' => array(-6.2941, 106.9634),
+      'bekasi barat' => array(-6.2366, 106.9806),
+      'bekasi selatan' => array(-6.2625, 106.9839),
+      'bekasi timur' => array(-6.2519, 107.0152),
+      'bekasi utara' => array(-6.2163, 107.0157),
+      'rawalumbu' => array(-6.2753, 107.0093),
+      'pondokgede' => array(-6.2818, 106.9189),
+      'pondok gede' => array(-6.2818, 106.9189),
+      'pondok melati' => array(-6.3079, 106.9298),
+      'medan satria' => array(-6.195, 106.984),
+      'mustikajaya' => array(-6.2952, 107.0378),
+      'mustika jaya' => array(-6.2952, 107.0378),
+      'bantar gebang' => array(-6.3263, 107.0069),
+      'bantargebang' => array(-6.3263, 107.0069),
+      'jatisampurna' => array(-6.3601, 106.9312),
+    ),
+  ),
+  'kab. bekasi' => array(
+    'city' => 'Kab. Bekasi',
+    'center' => array(-6.315, 107.14),
+    'keys' => array('kab. bekasi', 'bekasi', 'cikarang utara', 'cikarang pusat', 'cikarang selatan', 'cikarang barat', 'cikarang timur', 'cibitung', 'tambun utara', 'tambun selatan', 'setu', 'serang baru', 'sukatani', 'babelan', 'tarumajaya'),
+    'districts' => array(
+      'cikarang utara' => array(-6.2789, 107.1524),
+      'cikarang pusat' => array(-6.3639, 107.1725),
+      'cikarang selatan' => array(-6.3278, 107.1264),
+      'cikarang barat' => array(-6.2801, 107.0988),
+      'cikarang timur' => array(-6.309, 107.2144),
+      'cibitung' => array(-6.2536, 107.095),
+      'tambun utara' => array(-6.2081, 107.0573),
+      'tambun selatan' => array(-6.262, 107.0592),
+      'setu' => array(-6.3533, 107.0494),
+      'serang baru' => array(-6.3768, 107.1042),
+      'sukatani' => array(-6.1856, 107.1756),
+      'babelan' => array(-6.175, 107.025),
+      'tarumajaya' => array(-6.135, 106.985),
+    ),
+  ),
+  'kota jakarta selatan' => array(
+    'city' => 'Kota Jakarta Selatan',
+    'center' => array(-6.2615, 106.8106),
+    'keys' => array('kota jakarta selatan', 'jakarta selatan', 'jakarta', 'dki', 'jaksel', 'mampang prapatan', 'mampang', 'cilandak', 'kebayoran lama', 'kebayoran baru', 'pasar minggu', 'jagakarsa', 'tebet', 'pancoran', 'setiabudi', 'pesanggrahan'),
+    'districts' => array(
+      'mampang prapatan' => array(-6.2465, 106.8248),
+      'mampang' => array(-6.2465, 106.8248),
+      'cilandak' => array(-6.295, 106.8),
+      'kebayoran lama' => array(-6.2483, 106.7778),
+      'kebayoran baru' => array(-6.2447, 106.7997),
+      'pasar minggu' => array(-6.2863, 106.8407),
+      'jagakarsa' => array(-6.3312, 106.824),
+      'tebet' => array(-6.23, 106.855),
+      'pancoran' => array(-6.25, 106.845),
+      'setiabudi' => array(-6.2167, 106.8333),
+      'pesanggrahan' => array(-6.255, 106.76),
+    ),
+  ),
+  'kota jakarta pusat' => array(
+    'city' => 'Kota Jakarta Pusat',
+    'center' => array(-6.1805, 106.8284),
+    'keys' => array('kota jakarta pusat', 'jakarta pusat', 'jakarta', 'dki', 'jakpus', 'tanah abang', 'menteng', 'gambir', 'senen', 'cempaka putih', 'kemayoran', 'johar baru', 'sawah besar'),
+    'districts' => array(
+      'tanah abang' => array(-6.1956, 106.816),
+      'menteng' => array(-6.195, 106.833),
+      'gambir' => array(-6.175, 106.83),
+      'senen' => array(-6.185, 106.85),
+      'cempaka putih' => array(-6.18, 106.87),
+      'kemayoran' => array(-6.16, 106.86),
+      'johar baru' => array(-6.185, 106.86),
+      'sawah besar' => array(-6.155, 106.83),
+    ),
+  ),
+  'kota jakarta barat' => array(
+    'city' => 'Kota Jakarta Barat',
+    'center' => array(-6.1683, 106.7589),
+    'keys' => array('kota jakarta barat', 'jakarta barat', 'jakarta', 'dki', 'jakbar', 'cengkareng', 'kalideres', 'kebon jeruk', 'kembangan', 'grogol petamburan', 'pal merah', 'palmerah', 'taman sari', 'tambora'),
+    'districts' => array(
+      'cengkareng' => array(-6.1507, 106.7339),
+      'kalideres' => array(-6.1495, 106.702),
+      'kebon jeruk' => array(-6.195, 106.768),
+      'kembangan' => array(-6.185, 106.735),
+      'grogol petamburan' => array(-6.165, 106.785),
+      'pal merah' => array(-6.195, 106.795),
+      'palmerah' => array(-6.195, 106.795),
+      'taman sari' => array(-6.145, 106.815),
+      'tambora' => array(-6.145, 106.795),
+    ),
+  ),
+  'kota jakarta timur' => array(
+    'city' => 'Kota Jakarta Timur',
+    'center' => array(-6.225, 106.9004),
+    'keys' => array('kota jakarta timur', 'jakarta timur', 'jakarta', 'dki', 'jaktim', 'matraman', 'cakung', 'kramat jati', 'kramatjati', 'duren sawit', 'pulo gadung', 'pulogadung', 'ciracas', 'makasar', 'pasar rebo', 'jatinegara', 'cipayung'),
+    'districts' => array(
+      'matraman' => array(-6.2, 106.86),
+      'cakung' => array(-6.18, 106.95),
+      'kramat jati' => array(-6.275, 106.87),
+      'kramatjati' => array(-6.275, 106.87),
+      'duren sawit' => array(-6.235, 106.915),
+      'pulo gadung' => array(-6.195, 106.895),
+      'pulogadung' => array(-6.195, 106.895),
+      'ciracas' => array(-6.3267, 106.8778),
+      'makasar' => array(-6.275, 106.885),
+      'pasar rebo' => array(-6.315, 106.865),
+      'jatinegara' => array(-6.225, 106.87),
+      'cipayung' => array(-6.315, 106.905),
+    ),
+  ),
+  'kota jakarta utara' => array(
+    'city' => 'Kota Jakarta Utara',
+    'center' => array(-6.1384, 106.864),
+    'keys' => array('kota jakarta utara', 'jakarta utara', 'jakarta', 'dki', 'jakut', 'kelapa gading', 'tanjung priok', 'penjaringan', 'pademangan', 'cilincing', 'koja'),
+    'districts' => array(
+      'kelapa gading' => array(-6.1584, 106.909),
+      'tanjung priok' => array(-6.1321, 106.8715),
+      'penjaringan' => array(-6.125, 106.785),
+      'pademangan' => array(-6.135, 106.835),
+      'cilincing' => array(-6.125, 106.945),
+      'koja' => array(-6.125, 106.895),
+    ),
+  ),
+  'kota tangerang selatan' => array(
+    'city' => 'Kota Tangerang Selatan',
+    'center' => array(-6.2888, 106.7179),
+    'keys' => array('kota tangerang selatan', 'tangerang selatan', 'tangerang', 'tangsel', 'ciputat timur', 'ciputat', 'pamulang', 'pondok aren', 'serpong utara', 'serpong', 'setu'),
+    'districts' => array(
+      'ciputat timur' => array(-6.305, 106.765),
+      'ciputat' => array(-6.315, 106.755),
+      'pamulang' => array(-6.345, 106.735),
+      'pondok aren' => array(-6.27, 106.71),
+      'serpong utara' => array(-6.245, 106.665),
+      'serpong' => array(-6.318, 106.666),
+      'setu' => array(-6.35, 106.68),
+    ),
+  ),
+  'kota tangerang' => array(
+    'city' => 'Kota Tangerang',
+    'center' => array(-6.1783, 106.6319),
+    'keys' => array('kota tangerang', 'tangerang', 'cibodas', 'neglasari', 'cipondoh', 'pinang', 'karawaci', 'karang tengah', 'benda', 'periuk', 'larangan', 'batuceper', 'jatiuwung', 'ciledug'),
+    'districts' => array(
+      'tangerang' => array(-6.1783, 106.63),
+      'cibodas' => array(-6.205, 106.605),
+      'neglasari' => array(-6.155, 106.635),
+      'cipondoh' => array(-6.185, 106.68),
+      'pinang' => array(-6.225, 106.675),
+      'karawaci' => array(-6.195, 106.62),
+      'karang tengah' => array(-6.215, 106.715),
+      'benda' => array(-6.115, 106.695),
+      'periuk' => array(-6.165, 106.595),
+      'larangan' => array(-6.235, 106.735),
+      'batuceper' => array(-6.165, 106.665),
+      'jatiuwung' => array(-6.205, 106.575),
+      'ciledug' => array(-6.23, 106.71),
+    ),
+  ),
+  'kab. tangerang' => array(
+    'city' => 'Kab. Tangerang',
+    'center' => array(-6.2, 106.5),
+    'keys' => array('kab. tangerang', 'tangerang', 'rajeg', 'pasar kemis', 'sepatan', 'cikupa', 'panongan', 'sukamulya', 'sukadiri', 'mauk', 'kemiri', 'kronjo', 'cisauk', 'pagedangan', 'kosambi', 'kelapa dua', 'balaraja', 'curug', 'legok', 'tigaraksa', 'sindang jaya'),
+    'districts' => array(
+      'rajeg' => array(-6.14, 106.51),
+      'pasar kemis' => array(-6.17, 106.54),
+      'sepatan' => array(-6.13, 106.57),
+      'cikupa' => array(-6.23, 106.51),
+      'panongan' => array(-6.26, 106.52),
+      'sukamulya' => array(-6.19, 106.44),
+      'sukadiri' => array(-6.09, 106.55),
+      'mauk' => array(-6.06, 106.52),
+      'kemiri' => array(-6.08, 106.46),
+      'kronjo' => array(-6.05, 106.42),
+      'cisauk' => array(-6.335, 106.645),
+      'pagedangan' => array(-6.3, 106.635),
+      'kosambi' => array(-6.075, 106.685),
+      'kelapa dua' => array(-6.24, 106.62),
+      'balaraja' => array(-6.2, 106.46),
+      'curug' => array(-6.265, 106.565),
+      'legok' => array(-6.305, 106.585),
+      'tigaraksa' => array(-6.28, 106.48),
+      'sindang jaya' => array(-6.17, 106.49),
+    ),
+  ),
+  'kota depok' => array(
+    'city' => 'Kota Depok',
+    'center' => array(-6.4025, 106.7942),
+    'keys' => array('kota depok', 'depok', 'cinere', 'cimanggis', 'cipayung', 'beji', 'limo', 'tapos', 'bojongsari', 'pancoran mas', 'sukmajaya', 'sawangan', 'cilodong'),
+    'districts' => array(
+      'cinere' => array(-6.33, 106.785),
+      'cimanggis' => array(-6.365, 106.865),
+      'cipayung' => array(-6.425, 106.805),
+      'beji' => array(-6.375, 106.82),
+      'limo' => array(-6.365, 106.775),
+      'tapos' => array(-6.425, 106.89),
+      'bojongsari' => array(-6.405, 106.745),
+      'pancoran mas' => array(-6.395, 106.805),
+      'sukmajaya' => array(-6.395, 106.845),
+      'sawangan' => array(-6.415, 106.775),
+      'cilodong' => array(-6.435, 106.845),
+    ),
+  ),
+  'kab. bogor' => array(
+    'city' => 'Kab. Bogor',
+    'center' => array(-6.48, 106.85),
+    'keys' => array('kab. bogor', 'bogor', 'klapanunggal', 'cisarua', 'cileungsi', 'babakan madang', 'gunung putri', 'sukaraja', 'dramaga', 'kemang', 'rumpin', 'cibungbulang', 'jonggol', 'leuwisadeng', 'sukamakmur', 'megamendung', 'cibinong', 'citeureup', 'bojonggede', 'parung', 'ciomas'),
+    'districts' => array(
+      'klapanunggal' => array(-6.475, 106.945),
+      'cisarua' => array(-6.69, 106.945),
+      'cileungsi' => array(-6.395, 106.965),
+      'babakan madang' => array(-6.565, 106.885),
+      'gunung putri' => array(-6.435, 106.905),
+      'sukaraja' => array(-6.575, 106.84),
+      'dramaga' => array(-6.585, 106.735),
+      'kemang' => array(-6.515, 106.745),
+      'rumpin' => array(-6.485, 106.645),
+      'cibungbulang' => array(-6.565, 106.685),
+      'jonggol' => array(-6.485, 107.055),
+      'leuwisadeng' => array(-6.605, 106.595),
+      'sukamakmur' => array(-6.575, 107.035),
+      'megamendung' => array(-6.645, 106.915),
+      'cibinong' => array(-6.48, 106.85),
+      'citeureup' => array(-6.495, 106.88),
+      'bojonggede' => array(-6.495, 106.795),
+      'parung' => array(-6.435, 106.725),
+      'ciomas' => array(-6.605, 106.775),
+    ),
+  ),
+  'kota bogor' => array(
+    'city' => 'Kota Bogor',
+    'center' => array(-6.5971, 106.806),
+    'keys' => array('kota bogor', 'bogor', 'tanah sareal', 'bogor tengah', 'bogor selatan', 'bogor timur', 'bogor utara', 'bogor barat'),
+    'districts' => array(
+      'tanah sareal' => array(-6.555, 106.785),
+      'bogor tengah' => array(-6.595, 106.795),
+      'bogor selatan' => array(-6.635, 106.805),
+      'bogor timur' => array(-6.615, 106.825),
+      'bogor utara' => array(-6.565, 106.815),
+      'bogor barat' => array(-6.585, 106.765),
+    ),
+  ),
+  'kab. purwakarta' => array(
+    'city' => 'Kab. Purwakarta',
+    'center' => array(-6.5417, 107.4458),
+    'keys' => array('kab. purwakarta', 'purwakarta', 'jatiluhur', 'babakancikao', 'plered', 'bungursari', 'wanayasa', 'bojong', 'campaka', 'pasawahan'),
+    'districts' => array(
+      'purwakarta' => array(-6.555, 107.445),
+      'jatiluhur' => array(-6.535, 107.405),
+      'babakancikao' => array(-6.505, 107.435),
+      'plered' => array(-6.645, 107.385),
+      'bungursari' => array(-6.465, 107.475),
+      'wanayasa' => array(-6.695, 107.565),
+      'bojong' => array(-6.675, 107.515),
+      'campaka' => array(-6.505, 107.515),
+      'pasawahan' => array(-6.595, 107.475),
+    ),
+  ),
+  'kab. karawang' => array(
+    'city' => 'Kab. Karawang',
+    'center' => array(-6.3072, 107.3069),
+    'keys' => array('kab. karawang', 'karawang', 'cilamaya wetan', 'telukjambe timur', 'majalaya', 'purwasari', 'karawang barat', 'jayakerta', 'ciampel', 'klari', 'kotabaru', 'cikampek'),
+    'districts' => array(
+      'cilamaya wetan' => array(-6.255, 107.575),
+      'telukjambe timur' => array(-6.335, 107.305),
+      'majalaya' => array(-6.295, 107.365),
+      'purwasari' => array(-6.385, 107.415),
+      'karawang barat' => array(-6.305, 107.295),
+      'jayakerta' => array(-6.145, 107.285),
+      'ciampel' => array(-6.425, 107.325),
+      'klari' => array(-6.355, 107.365),
+      'kotabaru' => array(-6.395, 107.475),
+      'cikampek' => array(-6.415, 107.455),
+    ),
+  ),
+  'kab. subang' => array(
+    'city' => 'Kab. Subang',
+    'center' => array(-6.5686, 107.7583),
+    'keys' => array('kab. subang', 'subang', 'pagaden barat', 'pagaden', 'tanjungsiang', 'ciasem', 'blanakan', 'jalancagak', 'cibogo', 'pamanukan', 'cikaum', 'cijambe', 'ciater', 'binong', 'pusakanagara', 'purwadadi', 'pusakajaya', 'kalijati', 'dawuan', 'pabuaran', 'kasomalang'),
+    'districts' => array(
+      'pagaden barat' => array(-6.515, 107.725),
+      'pagaden' => array(-6.505, 107.775),
+      'tanjungsiang' => array(-6.745, 107.815),
+      'subang' => array(-6.5686, 107.7583),
+      'ciasem' => array(-6.345, 107.695),
+      'blanakan' => array(-6.275, 107.675),
+      'jalancagak' => array(-6.685, 107.685),
+      'cibogo' => array(-6.555, 107.825),
+      'pamanukan' => array(-6.285, 107.815),
+      'cikaum' => array(-6.445, 107.785),
+      'cijambe' => array(-6.645, 107.745),
+      'ciater' => array(-6.735, 107.655),
+      'binong' => array(-6.435, 107.745),
+      'pusakanagara' => array(-6.275, 107.885),
+      'purwadadi' => array(-6.455, 107.695),
+      'pusakajaya' => array(-6.295, 107.925),
+      'kalijati' => array(-6.525, 107.675),
+      'dawuan' => array(-6.565, 107.705),
+      'pabuaran' => array(-6.415, 107.595),
+      'kasomalang' => array(-6.715, 107.745),
+    ),
+  ),
+  'kab. sumedang' => array(
+    'city' => 'Kab. Sumedang',
+    'center' => array(-6.8583, 107.9167),
+    'keys' => array('kab. sumedang', 'sumedang', 'medan', 'jatinangor', 'tanjungsari', 'pamulihan', 'sumedang utara', 'sumedang selatan', 'cibugel', 'wado', 'darmaraja', 'tanjungmedar', 'situraja', 'cimanggung', 'sukasari', 'cisarua', 'paseh', 'rancakalong', 'tomo'),
+    'districts' => array(
+      'jatinangor' => array(-6.935, 107.775),
+      'tanjungsari' => array(-6.905, 107.805),
+      'pamulihan' => array(-6.905, 107.835),
+      'sumedang utara' => array(-6.845, 107.925),
+      'sumedang selatan' => array(-6.875, 107.925),
+      'cibugel' => array(-7.025, 108.015),
+      'wado' => array(-6.955, 108.085),
+      'darmaraja' => array(-6.905, 108.075),
+      'tanjungmedar' => array(-6.795, 107.905),
+      'situraja' => array(-6.865, 108.015),
+      'cimanggung' => array(-6.975, 107.825),
+      'sukasari' => array(-6.895, 107.785),
+      'cisarua' => array(-6.835, 107.965),
+      'paseh' => array(-6.805, 108.005),
+      'rancakalong' => array(-6.865, 107.855),
+      'tomo' => array(-6.765, 108.135),
+    ),
+  ),
+  'kab. garut' => array(
+    'city' => 'Kab. Garut',
+    'center' => array(-7.2167, 107.9),
+    'keys' => array('kab. garut', 'garut', 'tarogong kidul', 'tarogong kaler', 'garut kota', 'karangpawitan', 'samarang', 'leles', 'kadungora', 'balubur limbangan', 'banyuresmi', 'cilawu', 'cikajang', 'cisompet', 'malangbong', 'pangatikan', 'sukaresmi', 'cibalong', 'talegong', 'kersamanah', 'bungbulang', 'cigedug', 'caringin', 'wanaraja', 'cibatu', 'bayongbong'),
+    'districts' => array(
+      'tarogong kidul' => array(-7.215, 107.895),
+      'tarogong kaler' => array(-7.175, 107.895),
+      'garut kota' => array(-7.215, 107.905),
+      'karangpawitan' => array(-7.205, 107.945),
+      'samarang' => array(-7.225, 107.845),
+      'leles' => array(-7.115, 107.905),
+      'kadungora' => array(-7.075, 107.895),
+      'balubur limbangan' => array(-7.015, 107.985),
+      'banyuresmi' => array(-7.145, 107.945),
+      'cilawu' => array(-7.275, 107.925),
+      'cikajang' => array(-7.365, 107.815),
+      'cisompet' => array(-7.555, 107.805),
+      'malangbong' => array(-7.055, 108.085),
+      'pangatikan' => array(-7.165, 108.005),
+      'sukaresmi' => array(-7.255, 107.785),
+      'cibalong' => array(-7.685, 107.775),
+      'talegong' => array(-7.255, 107.555),
+      'kersamanah' => array(-7.045, 108.035),
+      'bungbulang' => array(-7.465, 107.585),
+      'cigedug' => array(-7.315, 107.835),
+      'caringin' => array(-7.505, 107.505),
+      'wanaraja' => array(-7.175, 107.985),
+      'cibatu' => array(-7.095, 108.005),
+      'bayongbong' => array(-7.275, 107.845),
+    ),
+  ),
+  'kab. cianjur' => array(
+    'city' => 'Kab. Cianjur',
+    'center' => array(-6.8206, 107.14),
+    'keys' => array('kab. cianjur', 'cianjur', 'karangtengah', 'cilaku', 'ciranjang', 'bojongpicung', 'cikalongkulon', 'cipanas', 'pacet', 'cugenang', 'warungkondang', 'haurwangi', 'sukaluyu', 'takokak', 'cikadu', 'cidaun', 'sindangbarang', 'pasirkuda', 'kadupandak'),
+    'districts' => array(
+      'cianjur' => array(-6.8206, 107.14),
+      'karangtengah' => array(-6.815, 107.185),
+      'cilaku' => array(-6.865, 107.145),
+      'ciranjang' => array(-6.815, 107.255),
+      'bojongpicung' => array(-6.845, 107.275),
+      'cikalongkulon' => array(-6.715, 107.185),
+      'cipanas' => array(-6.735, 107.04),
+      'pacet' => array(-6.755, 107.075),
+      'cugenang' => array(-6.795, 107.095),
+      'warungkondang' => array(-6.865, 107.095),
+      'haurwangi' => array(-6.825, 107.315),
+      'sukaluyu' => array(-6.865, 107.215),
+      'takokak' => array(-7.075, 107.055),
+      'cikadu' => array(-7.355, 107.255),
+      'cidaun' => array(-7.505, 107.355),
+      'sindangbarang' => array(-7.465, 107.155),
+      'pasirkuda' => array(-7.205, 107.255),
+      'kadupandak' => array(-7.155, 107.055),
+    ),
+  ),
+  'kab. sukabumi' => array(
+    'city' => 'Kab. Sukabumi',
+    'center' => array(-6.9278, 106.93),
+    'keys' => array('kab. sukabumi', 'sukabumi', 'cicurug', 'cibadak', 'cisaat', 'sukaraja', 'gunungguruh', 'kebonpedes', 'warungkiara', 'curugkembar', 'kalibunder', 'ciracap', 'palabuhanratu'),
+    'districts' => array(
+      'sukabumi' => array(-6.9278, 106.93),
+      'cicurug' => array(-6.785, 106.785),
+      'cibadak' => array(-6.885, 106.785),
+      'cisaat' => array(-6.905, 106.885),
+      'sukaraja' => array(-6.925, 106.965),
+      'gunungguruh' => array(-6.955, 106.885),
+      'kebonpedes' => array(-6.955, 106.965),
+      'warungkiara' => array(-7.025, 106.755),
+      'curugkembar' => array(-7.185, 106.985),
+      'kalibunder' => array(-7.255, 106.725),
+      'ciracap' => array(-7.305, 106.505),
+      'palabuhanratu' => array(-6.985, 106.545),
+    ),
+  ),
+  'kota sukabumi' => array(
+    'city' => 'Kota Sukabumi',
+    'center' => array(-6.915, 106.935),
+    'keys' => array('kota sukabumi', 'sukabumi', 'cikole', 'warudoyong', 'baros', 'citamiang', 'gunungpuyuh'),
+    'districts' => array(
+      'cikole' => array(-6.915, 106.935),
+      'warudoyong' => array(-6.925, 106.915),
+      'baros' => array(-6.955, 106.935),
+      'citamiang' => array(-6.935, 106.935),
+      'gunungpuyuh' => array(-6.915, 106.915),
+    ),
+  ),
+  'kab. cirebon' => array(
+    'city' => 'Kab. Cirebon',
+    'center' => array(-6.765, 108.485),
+    'keys' => array('kab. cirebon', 'cirebon', 'sumber', 'depok', 'ciwaringin', 'plumbon'),
+    'districts' => array(
+      'sumber' => array(-6.765, 108.485),
+      'depok' => array(-6.735, 108.435),
+      'ciwaringin' => array(-6.695, 108.385),
+      'plumbon' => array(-6.715, 108.465),
+    ),
+  ),
+  'kota cirebon' => array(
+    'city' => 'Kota Cirebon',
+    'center' => array(-6.732, 108.5523),
+    'keys' => array('kota cirebon', 'cirebon', 'harjamukti', 'lemahwungkuk', 'kesambi', 'kejaksan', 'pekalipan'),
+    'districts' => array(
+      'harjamukti' => array(-6.755, 108.555),
+      'lemahwungkuk' => array(-6.725, 108.575),
+      'kesambi' => array(-6.735, 108.545),
+      'kejaksan' => array(-6.705, 108.555),
+      'pekalipan' => array(-6.72, 108.56),
+    ),
+  ),
+  'kab. tasikmalaya' => array(
+    'city' => 'Kab. Tasikmalaya',
+    'center' => array(-7.355, 108.115),
+    'keys' => array('kab. tasikmalaya', 'tasikmalaya', 'tasik', 'singaparna', 'rajapolah', 'manonjaya', 'sukaratu', 'karangnunggal', 'gunung tanjung'),
+    'districts' => array(
+      'singaparna' => array(-7.355, 108.115),
+      'rajapolah' => array(-7.215, 108.185),
+      'manonjaya' => array(-7.355, 108.305),
+      'sukaratu' => array(-7.265, 108.165),
+      'karangnunggal' => array(-7.655, 108.155),
+      'gunung tanjung' => array(-7.425, 108.265),
+    ),
+  ),
+  'kota tasikmalaya' => array(
+    'city' => 'Kota Tasikmalaya',
+    'center' => array(-7.3274, 108.2207),
+    'keys' => array('kota tasikmalaya', 'tasikmalaya', 'tasik', 'cihideung', 'tamansari', 'purbaratu', 'tawang', 'kawalu', 'mangkubumi', 'indihiang', 'cipedes'),
+    'districts' => array(
+      'cihideung' => array(-7.335, 108.215),
+      'tamansari' => array(-7.375, 108.235),
+      'purbaratu' => array(-7.325, 108.265),
+      'tawang' => array(-7.325, 108.225),
+      'kawalu' => array(-7.385, 108.205),
+      'mangkubumi' => array(-7.355, 108.185),
+      'indihiang' => array(-7.295, 108.195),
+      'cipedes' => array(-7.315, 108.215),
+    ),
+  ),
+  'kab. ciamis' => array(
+    'city' => 'Kab. Ciamis',
+    'center' => array(-7.3256, 108.3531),
+    'keys' => array('kab. ciamis', 'ciamis', 'cihaurbeuti'),
+    'districts' => array(
+      'ciamis' => array(-7.3256, 108.3531),
+      'cihaurbeuti' => array(-7.205, 108.225),
+    ),
+  ),
+  'kota banjar' => array(
+    'city' => 'Kota Banjar',
+    'center' => array(-7.3686, 108.5342),
+    'keys' => array('kota banjar', 'banjar', 'langensari'),
+    'districts' => array(
+      'langensari' => array(-7.365, 108.615),
+      'banjar' => array(-7.3686, 108.5342),
+    ),
+  ),
+  'kab. pangandaran' => array(
+    'city' => 'Kab. Pangandaran',
+    'center' => array(-7.685, 108.655),
+    'keys' => array('kab. pangandaran', 'pangandaran', 'cijulang', 'kalipucang'),
+    'districts' => array(
+      'cijulang' => array(-7.735, 108.485),
+      'kalipucang' => array(-7.655, 108.725),
+      'pangandaran' => array(-7.685, 108.655),
+    ),
+  ),
+  'kab. indramayu' => array(
+    'city' => 'Kab. Indramayu',
+    'center' => array(-6.3264, 108.32),
+    'keys' => array('kab. indramayu', 'indramayu', 'karangampel', 'losarang', 'anjatan', 'bongas'),
+    'districts' => array(
+      'indramayu' => array(-6.3264, 108.32),
+      'karangampel' => array(-6.465, 108.455),
+      'losarang' => array(-6.405, 108.155),
+      'anjatan' => array(-6.345, 107.985),
+      'bongas' => array(-6.355, 108.055),
+    ),
+  ),
+  'kab. majalengka' => array(
+    'city' => 'Kab. Majalengka',
+    'center' => array(-6.835, 108.225),
+    'keys' => array('kab. majalengka', 'majalengka', 'talaga', 'sukahaji'),
+    'districts' => array(
+      'majalengka' => array(-6.835, 108.225),
+      'talaga' => array(-7.005, 108.315),
+      'sukahaji' => array(-6.805, 108.295),
+    ),
+  ),
+  'kab. kuningan' => array(
+    'city' => 'Kab. Kuningan',
+    'center' => array(-6.9764, 108.4842),
+    'keys' => array('kab. kuningan', 'kuningan', 'ciawigebang', 'cilimus'),
+    'districts' => array(
+      'kuningan' => array(-6.9764, 108.4842),
+      'ciawigebang' => array(-6.965, 108.585),
+      'cilimus' => array(-6.885, 108.505),
+    ),
+  ),
+  'kota serang' => array(
+    'city' => 'Kota Serang',
+    'center' => array(-6.115, 106.155),
+    'keys' => array('kota serang', 'serang', 'cipocok jaya'),
+    'districts' => array(
+      'serang' => array(-6.115, 106.155),
+      'cipocok jaya' => array(-6.145, 106.175),
+    ),
+  ),
+  'kab. serang' => array(
+    'city' => 'Kab. Serang',
+    'center' => array(-6.12, 106),
+    'keys' => array('kab. serang', 'serang', 'bandung'),
+    'districts' => array(
+      'bandung' => array(-6.215, 106.275),
+    ),
+  ),
+  'kota surabaya' => array(
+    'city' => 'Kota Surabaya',
+    'center' => array(-7.2575, 112.7521),
+    'keys' => array('kota surabaya', 'surabaya', 'wonocolo'),
+    'districts' => array(
+      'wonocolo' => array(-7.315, 112.735),
+    ),
+  ),
+  'kota medan' => array(
+    'city' => 'Kota Medan',
+    'center' => array(-3.5852, 98.6756),
+    'keys' => array('kota medan', 'medan', 'medan denai'),
+    'districts' => array(
+      'medan denai' => array(-3.585, 98.715),
+    ),
+  ),
+  'kota palembang' => array(
+    'city' => 'Kota Palembang',
+    'center' => array(-2.9761, 104.7754),
+    'keys' => array('kota palembang', 'palembang', 'ilir barat i'),
+    'districts' => array(
+      'ilir barat i' => array(-2.985, 104.735),
+    ),
+  ),
+);
+
 /**
  * Intelligent high-precision geocoding resolver for Sales Radar & Customer CRM
  * Resolves address text with priority:
@@ -10516,6 +11082,90 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $matchedDistrict = null;
     $matchedCoords = null;
     $matchLevel = 0; // Track which level matched for jitter calibration
+
+        // LEVEL 0: Strict Multi-Region Spatial Resolution for Non-Bandung Cities & Subdistricts
+    // (Prevents words like "pemda", "kartini", "melati" in Bekasi, Jakarta, Tangerang, etc. from matching Bandung streets/complexes!)
+    global $bandungDistricts, $indonesiaCityDistricts;
+    
+    $combinedCheck = strtolower($rawDistrict . ' ' . $cleanAddress);
+    $isBandungExplicit = false;
+    
+    // Check if Bandung is explicitly mentioned
+    if (preg_match('/\b(kota bandung|kab\.?\s*bandung|bandung barat|kota cimahi|cimahi)\b/i', $combinedCheck)) {
+        $isBandungExplicit = true;
+    } else {
+        foreach ($bandungDistricts as $bdKey => $bdVal) {
+            if ($bdKey === 'bandung' || $bdKey === 'kota bandung' || $bdKey === 'kab bandung') continue;
+            if (preg_match('/\b(kec\.?|kecamatan\s+)' . preg_quote($bdKey, '/') . '\b/i', $combinedCheck)) {
+                $isBandungExplicit = true;
+                break;
+            }
+        }
+    }
+
+    if (!$isBandungExplicit && !empty($indonesiaCityDistricts)) {
+        foreach ($indonesiaCityDistricts as $cKey => $cData) {
+            $matchesCity = false;
+            foreach ($cData['keys'] as $cKeyWord) {
+                if (preg_match('/\b' . preg_quote($cKeyWord, '/') . '\b/i', $combinedCheck)) {
+                    $matchesCity = true;
+                    break;
+                }
+            }
+
+            if ($matchesCity) {
+                $matchedKec = null;
+                $matchedCoords = null;
+                $citySimple = strtolower(trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $cData['city'])));
+
+                // Sort district candidates: longer names first, and district matching city name last
+                $dEntries = $cData['districts'];
+                uksort($dEntries, function($a, $b) use ($citySimple) {
+                    $aIsCity = ($a === $citySimple);
+                    $bIsCity = ($b === $citySimple);
+                    if ($aIsCity && !$bIsCity) return 1;
+                    if (!$aIsCity && $bIsCity) return -1;
+                    return strlen($b) - strlen($a);
+                });
+
+                foreach ($dEntries as $dName => $dCoords) {
+                    if ($dName === $citySimple) {
+                        if (preg_match('/(?:kec\.?|kecamatan)\s*' . preg_quote($dName, '/') . '\b/i', $combinedCheck)) {
+                            $matchedKec = $dName;
+                            $matchedCoords = $dCoords;
+                            break;
+                        }
+                    } else {
+                        if (preg_match('/\b' . preg_quote($dName, '/') . '\b/i', $combinedCheck)) {
+                            $matchedKec = $dName;
+                            $matchedCoords = $dCoords;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$matchedCoords) {
+                    $matchedCoords = $cData['center'];
+                    $matchedKec = trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $cData['city']));
+                }
+
+                $titleKec = ucwords($matchedKec);
+                $titleCity = trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $cData['city']));
+                $finalDistrict = $titleKec . ', ' . $titleCity;
+
+                $hash = abs(crc32($id . '_' . $finalDistrict));
+                $angle = (($hash % 360) / 180.0) * M_PI;
+                $dispersionKm = 0.015 + (($hash % 30) / 1000.0);
+                $deltaLat = ($dispersionKm / 111.0) * cos($angle);
+                $deltaLng = ($dispersionKm / (111.0 * cos(deg2rad($matchedCoords[0])))) * sin($angle);
+
+                $finalLat = round($matchedCoords[0] + $deltaLat, 6);
+                $finalLng = round($matchedCoords[1] + $deltaLng, 6);
+
+                return [$finalLat, $finalLng, $finalDistrict, $cleanAddress];
+            }
+        }
+    }
 
     // LEVEL 1: Specific Street Landmarks & Neighborhood Roads (Dead-on Street Precision!)
     if (!empty($addrLower)) {

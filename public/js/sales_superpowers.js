@@ -267,7 +267,21 @@ const SalesSuperpowers = {
     'cimahi': { label: 'Cimahi', coords: [-6.8722, 107.5422], zoom: 14, aliases: ['cimahi', 'cibeber', 'leuwigajah', 'baros', 'melong'] },
     'soreang': { label: 'Soreang', coords: [-7.0319, 107.5186], zoom: 14, aliases: ['soreang', 'katapang', 'kutawaringin', 'pameungpeuk'] },
     'dayeuhkolot': { label: 'Dayeuhkolot', coords: [-6.9889, 107.6222], zoom: 14, aliases: ['dayeuhkolot', 'citeureup', 'palasari'] },
-    'ujungberung': { label: 'Ujungberung', coords: [-6.9140, 107.6980], zoom: 14, aliases: ['ujungberung', 'pasirwangi', 'cigending'] }
+    'ujungberung': { label: 'Ujungberung', coords: [-6.9140, 107.6980], zoom: 14, aliases: ['ujungberung', 'pasirwangi', 'cigending'] },
+    'bekasi': { label: 'Bekasi', coords: [-6.2383, 106.9756], zoom: 12, aliases: ['bekasi', 'kota bekasi', 'kab. bekasi', 'cikarang', 'tambun', 'jatiasih', 'cibitung'] },
+    'jakarta': { label: 'DKI Jakarta', coords: [-6.2088, 106.8456], zoom: 12, aliases: ['jakarta', 'jaksel', 'jakbar', 'jaktim', 'jakpus', 'jakut'] },
+    'tangerang': { label: 'Tangerang Raya', coords: [-6.1783, 106.6319], zoom: 12, aliases: ['tangerang', 'tangsel', 'tangerang selatan', 'kab. tangerang'] },
+    'depok': { label: 'Depok', coords: [-6.4025, 106.7942], zoom: 13, aliases: ['depok', 'kota depok'] },
+    'bogor': { label: 'Bogor', coords: [-6.5971, 106.8060], zoom: 12, aliases: ['bogor', 'kota bogor', 'kab. bogor', 'cibinong'] },
+    'purwakarta': { label: 'Purwakarta', coords: [-6.5569, 107.4433], zoom: 13, aliases: ['purwakarta', 'kab. purwakarta', 'jatiluhur', 'babakancikao'] },
+    'karawang': { label: 'Karawang', coords: [-6.3073, 107.3073], zoom: 12, aliases: ['karawang', 'kab. karawang', 'klari', 'cikampek'] },
+    'subang': { label: 'Subang', coords: [-6.5716, 107.7606], zoom: 12, aliases: ['subang', 'kab. subang', 'kalijati', 'pamanukan'] },
+    'sumedang': { label: 'Sumedang', coords: [-6.8586, 107.9269], zoom: 12, aliases: ['sumedang', 'jatinangor', 'tanjungsari'] },
+    'garut': { label: 'Garut', coords: [-7.2278, 107.9086], zoom: 12, aliases: ['garut', 'tarogong'] },
+    'cianjur': { label: 'Cianjur', coords: [-6.8222, 107.1394], zoom: 12, aliases: ['cianjur', 'cipanas'] },
+    'sukabumi': { label: 'Sukabumi', coords: [-6.9277, 106.9297], zoom: 12, aliases: ['sukabumi', 'cibadak'] },
+    'cirebon': { label: 'Cirebon', coords: [-6.7320, 108.5523], zoom: 12, aliases: ['cirebon'] },
+    'tasikmalaya': { label: 'Tasikmalaya', coords: [-7.3274, 108.2207], zoom: 12, aliases: ['tasikmalaya', 'tasik'] }
   },
 
   getZoneLabel(zoneKey) {
@@ -391,6 +405,12 @@ const SalesSuperpowers = {
       return true;
     }
 
+    if (canonicalItem && canonicalTarget && canonicalTarget.length >= 4) {
+      if (canonicalItem.includes(canonicalTarget) || canonicalTarget.includes(canonicalItem)) {
+        return true;
+      }
+    }
+
     return false;
   },
 
@@ -405,8 +425,17 @@ const SalesSuperpowers = {
     const districts = await this.loadPolregDistrictsData();
     if (!districts || districts.length === 0) return;
 
-    const targetDist = this.findPolregDistrict(selectedDistrictKey) || this.findPolregDistrict('buahbatu') || districts[0];
-    if (!targetDist || !targetDist.polygon || !Array.isArray(targetDist.polygon) || targetDist.polygon.length === 0) return;
+    const targetDist = this.findPolregDistrict(selectedDistrictKey);
+    if (!targetDist || !targetDist.polygon || !Array.isArray(targetDist.polygon) || targetDist.polygon.length === 0) {
+      if (this.polregPolygonGroup) this.polregPolygonGroup.clearLayers();
+      const matching = (this.radarData || []).filter(c => this.isCustomerInDistrict(c, selectedDistrictKey));
+      if (matching.length > 0 && this.leafletMap) {
+        const latSum = matching.reduce((s, c) => s + c.lat, 0);
+        const lngSum = matching.reduce((s, c) => s + c.lng, 0);
+        this.leafletMap.flyTo([latSum / matching.length, lngSum / matching.length], 13, { duration: 1.2 });
+      }
+      return;
+    }
 
     // Count customers belonging strictly to this 1 selected district (geometrically inside polygon)
     let custCount = 0;
@@ -575,6 +604,23 @@ const SalesSuperpowers = {
       } else if (this.ZONE_PRESETS[cleanKey] && this.ZONE_PRESETS[cleanKey].coords) {
         targetCoords = this.ZONE_PRESETS[cleanKey].coords;
         targetZoom = this.ZONE_PRESETS[cleanKey].zoom || 14;
+      } else {
+        for (const [pk, pVal] of Object.entries(this.ZONE_PRESETS)) {
+          if (pVal.aliases && pVal.aliases.some(a => cleanKey.includes(a) || a.includes(cleanKey))) {
+            targetCoords = pVal.coords;
+            targetZoom = pVal.zoom || 13;
+            break;
+          }
+        }
+        if (!targetCoords) {
+          const matchingLeads = (this.radarData || []).filter(c => this.isCustomerInDistrict(c, cleanKey));
+          if (matchingLeads.length > 0) {
+            const avgLat = matchingLeads.reduce((acc, c) => acc + c.lat, 0) / matchingLeads.length;
+            const avgLng = matchingLeads.reduce((acc, c) => acc + c.lng, 0) / matchingLeads.length;
+            targetCoords = [avgLat, avgLng];
+            targetZoom = 13;
+          }
+        }
       }
       if (this.leafletMap && targetCoords) {
         this.leafletMap.flyTo(targetCoords, targetZoom, {
