@@ -11260,20 +11260,92 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         }
     }
 
-    // LEVEL 1: Specific Street Landmarks & Neighborhood Roads (Dead-on Street Precision!)
-    if (!empty($addrLower)) {
-        foreach ($bandungStreets as $kw => $info) {
-            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                $matchedDistrict = $info[0];
-                $matchedCoords = $info[1];
-                $matchLevel = 1;
-                break;
+    // LEVEL 1: STREET-FIRST RESOLUTION (STREETS MUST OVERRIDE KELURAHAN & COMPLEXES!)
+    // 1A. Soekarno-Hatta Highway Corridor
+    if (!empty($addrLower) && preg_match('/\b(soekarno[\s\-]hatta|by[\s\-]?pass|soekar)\b/i', $addrLower)) {
+        $numMatch = [];
+        preg_match('/(?:no\.?|km\.?)\s*([0-9]+)/i', $addrLower, $numMatch);
+        $num = !empty($numMatch[1]) ? intval($numMatch[1]) : null;
+
+        if ($num !== null) {
+            if ($num < 150) {
+                $matchedDistrict = 'Bandung Kulon';
+                $matchedCoords = array(-6.9360, 107.5680);
+            } elseif ($num < 300) {
+                $matchedDistrict = 'Bojongloa Kidul';
+                $matchedCoords = array(-6.9425, 107.5925);
+            } elseif ($num < 450) {
+                $matchedDistrict = 'Regol';
+                $matchedCoords = array(-6.9468, 107.6180);
+            } elseif ($num < 550) {
+                $matchedDistrict = 'Batununggal';
+                $matchedCoords = array(-6.9460, 107.6350);
+            } elseif ($num < 650) {
+                $matchedDistrict = 'Kiaracondong';
+                $matchedCoords = array(-6.9458, 107.6515); // Directly on Jl. Soekarno-Hatta near Kircon flyover / Jackal Holidays No. 593
+            } elseif ($num < 750) {
+                $matchedDistrict = 'Rancasari';
+                $matchedCoords = array(-6.9455, 107.6710);
+            } else {
+                $matchedDistrict = 'Gedebage';
+                $matchedCoords = array(-6.9400, 107.7000);
+            }
+        } else {
+            if (stripos($rawDistLower, 'kiaracondong') !== false) {
+                $matchedDistrict = 'Kiaracondong';
+                $matchedCoords = array(-6.9458, 107.6515);
+            } elseif (stripos($rawDistLower, 'buahbatu') !== false) {
+                $matchedDistrict = 'Buahbatu';
+                $matchedCoords = array(-6.9452, 107.6435);
+            } elseif (stripos($rawDistLower, 'batununggal') !== false) {
+                $matchedDistrict = 'Batununggal';
+                $matchedCoords = array(-6.9460, 107.6350);
+            } elseif (stripos($rawDistLower, 'regol') !== false) {
+                $matchedDistrict = 'Regol';
+                $matchedCoords = array(-6.9468, 107.6180);
+            } elseif (stripos($rawDistLower, 'bojongloa') !== false) {
+                $matchedDistrict = 'Bojongloa Kidul';
+                $matchedCoords = array(-6.9425, 107.5925);
+            } elseif (stripos($rawDistLower, 'kulon') !== false) {
+                $matchedDistrict = 'Bandung Kulon';
+                $matchedCoords = array(-6.9360, 107.5680);
+            } elseif (stripos($rawDistLower, 'rancasari') !== false) {
+                $matchedDistrict = 'Rancasari';
+                $matchedCoords = array(-6.9455, 107.6710);
+            } else {
+                $matchedDistrict = 'Kiaracondong';
+                $matchedCoords = array(-6.9458, 107.6515);
+            }
+        }
+        $matchLevel = 1;
+    }
+
+    // 1B. Other Specific Street Names (Streets take absolute precedence over Kelurahan/Complexes)
+    if (!$matchedCoords && !empty($addrLower)) {
+        if (!empty($bandungNeighborhoodLandmarks)) {
+            foreach ($bandungNeighborhoodLandmarks as $kw => $info) {
+                if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
+                    $matchedDistrict = $info[0];
+                    $matchedCoords = $info[1];
+                    $matchLevel = 1;
+                    break;
+                }
+            }
+        }
+        if (!$matchedCoords && !empty($bandungStreets)) {
+            foreach ($bandungStreets as $kw => $info) {
+                if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
+                    $matchedDistrict = $info[0];
+                    $matchedCoords = $info[1];
+                    $matchLevel = 1;
+                    break;
+                }
             }
         }
     }
 
     // LEVEL 2: Housing Complexes & Perumahan
-    if (!$matchedCoords && !empty($addrLower)) {
+    if (!$matchedCoords && !empty($addrLower) && !empty($bandungComplexes)) {
         foreach ($bandungComplexes as $kw => $info) {
             if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
                 $matchedDistrict = $info[0];
@@ -11285,7 +11357,7 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     }
 
     // LEVEL 3: Kelurahan / Desa in Bandung Raya
-    if (!$matchedCoords && !empty($addrLower)) {
+    if (!$matchedCoords && !empty($addrLower) && !empty($bandungKelurahan)) {
         foreach ($bandungKelurahan as $kw => $info) {
             if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
                 $matchedDistrict = $info[0];
@@ -11296,178 +11368,34 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         }
     }
 
-    // LEVEL 4: External Cities & Corporate Hubs (Jabodetabek, Surabaya, Makassar, dll)
-    // Only check external cities if rawDistrict is NOT already a verified Bandung district!
-    if (!$matchedCoords && !empty($addrLower) && !isset($bandungDistricts[$rawDistLower])) {
-        foreach ($externalCitiesAndHubs as $kw => $info) {
-            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                $matchedDistrict = $info[0];
-                $matchedCoords = $info[1];
-                $matchLevel = 4;
-                break;
-            }
-        }
+    // LEVEL 4: Sub-District / Kecamatan Hubs
+    $cleanRawDist = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$rawDistrict));
+    $cleanRawDistLower = strtolower($cleanRawDist);
+    if ($cleanRawDistLower && isset($bandungDistricts[$cleanRawDistLower])) {
+        $canonicalDist = $bandungDistricts[$cleanRawDistLower][0];
+    } else {
+        $canonicalDist = !empty($cleanRawDist) ? ucwords($cleanRawDistLower) : null;
     }
 
-    // LEVEL 4.5: Arterial Highway Corridor (Jl. Soekarno-Hatta 20km)
-    if (!$matchedCoords && !empty($addrLower) && preg_match('/\b(soekarno[\s\-]hatta|by[\s\-]?pass|soekar)\b/i', $addrLower)) {
-        if ($canonicalRawDist) {
-            $distSoekarnoMap = [
-                'Buahbatu' => [-6.9450, 107.6680],
-                'Batununggal' => [-6.9460, 107.6420],
-                'Bandung Kidul' => [-6.9500, 107.6350],
-                'Gedebage' => [-6.9400, 107.7000],
-                'Rancasari' => [-6.9460, 107.6710],
-                'Regol' => [-6.9470, 107.6180],
-                'Bojongloa Kidul' => [-6.9420, 107.5920],
-                'Bandung Kulon' => [-6.9360, 107.5700]
-            ];
-            if (isset($distSoekarnoMap[$canonicalRawDist])) {
-                $matchedDistrict = $canonicalRawDist;
-                $matchedCoords = $distSoekarnoMap[$canonicalRawDist];
-                $matchLevel = 45;
-            }
-        }
+    if ($canonicalDist && $canonicalDist !== 'Bandung' && $canonicalDist !== 'Bandung Area') {
         if (!$matchedCoords) {
-            if (preg_match('/(?:no\.?|km\.?)\s*([0-9]+)/i', $addrLower, $numMatch)) {
-                $num = intval($numMatch[1]);
-                if ($num < 200) {
-                    $matchedDistrict = 'Bandung Kulon';
-                    $matchedCoords = [-6.9360, 107.5700];
-                } elseif ($num < 380) {
-                    $matchedDistrict = 'Bojongloa Kidul';
-                    $matchedCoords = [-6.9420, 107.5920];
-                } elseif ($num < 490) {
-                    $matchedDistrict = 'Regol';
-                    $matchedCoords = [-6.9470, 107.6180];
-                } elseif ($num < 590) {
-                    $matchedDistrict = 'Batununggal';
-                    $matchedCoords = [-6.9460, 107.6420];
-                } elseif ($num < 690) {
-                    $matchedDistrict = 'Buahbatu';
-                    $matchedCoords = [-6.9450, 107.6680];
-                } else {
-                    $matchedDistrict = 'Gedebage';
-                    $matchedCoords = [-6.9400, 107.7000];
-                }
+            $matchedDistrict = $canonicalDist;
+            if (isset($bandungDistricts[strtolower($canonicalDist)])) {
+                $matchedCoords = $bandungDistricts[strtolower($canonicalDist)][1];
             } else {
-                $matchedDistrict = $canonicalRawDist ?: 'Batununggal';
-                $matchedCoords = [-6.9460, 107.6420];
+                $matchedCoords = array(-6.9248, 107.6472);
             }
-            $matchLevel = 45;
-        }
-    }
-
-    // LEVEL 5: Bandung Raya Districts (79 Kecamatan in Polreg)
-    if (!$matchedCoords && !empty($addrLower)) {
-        foreach ($bandungDistricts as $kw => $info) {
-            if (in_array($kw, ['bandung', 'kota bandung', 'kab bandung'])) continue;
-            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                $matchedDistrict = $info[0];
-                $matchedCoords = $info[1];
-                $matchLevel = 5;
-                break;
-            }
-        }
-    }
-
-    // LEVEL 5.5: Enforce authoritative rawDistrict if provided
-    if ($canonicalRawDist) {
-        // If no match was found, or if match was only from generic district level (>=5),
-        // enforce canonical rawDistrict coordinates.
-        if (!$matchedCoords) {
-            $matchedDistrict = $canonicalRawDist;
-            if (isset($bandungDistricts[$rawDistLookup])) {
-                $matchedCoords = $bandungDistricts[$rawDistLookup][1];
-                $matchLevel = 55;
-            } elseif (isset($externalCitiesAndHubs[$rawDistLookup])) {
-                $matchedCoords = $externalCitiesAndHubs[$rawDistLookup][1];
-                $matchLevel = 55;
-            }
-        } elseif ($matchLevel >= 5) {
-            $matchedDistrict = $canonicalRawDist;
-            if (isset($bandungDistricts[$rawDistLookup])) {
-                $matchedCoords = $bandungDistricts[$rawDistLookup][1];
-                $matchLevel = 55;
-            } elseif (isset($externalCitiesAndHubs[$rawDistLookup])) {
-                $matchedCoords = $externalCitiesAndHubs[$rawDistLookup][1];
-                $matchLevel = 55;
-            }
+            $matchLevel = 4;
         } else {
-            // Keep high-precision street/complex coords, but ensure district string reflects rawDistrict
-            $matchedDistrict = $canonicalRawDist;
-        }
-    } elseif (!$matchedCoords && !empty($rawDistLower) && $rawDistLower !== 'bandung area' && $rawDistLower !== 'bandung') {
-        if (isset($bandungDistricts[$rawDistLower])) {
-            $matchedDistrict = $bandungDistricts[$rawDistLower][0];
-            $matchedCoords = $bandungDistricts[$rawDistLower][1];
-            $matchLevel = 55;
-        } elseif (isset($externalCitiesAndHubs[$rawDistLower])) {
-            $matchedDistrict = $externalCitiesAndHubs[$rawDistLower][0];
-            $matchedCoords = $externalCitiesAndHubs[$rawDistLower][1];
-            $matchLevel = 55;
+            $matchedDistrict = $canonicalDist;
         }
     }
 
-    // LEVEL 6: Fallback for local incomplete addresses (Tunas Toyota Kircon Bandung catchment)
     if (!$matchedCoords) {
-        $matchLevel = 6;
         $matchedDistrict = 'Kiaracondong';
-        $matchedCoords = [-6.9248, 107.6472];
+        $matchedCoords = array(-6.9248, 107.6472);
+        $matchLevel = 5;
     }
-
-    // Multi-Level Micro-Jitter System
-    // Each match level gets a calibrated dispersion to reflect its precision:
-    // Street-level: 5-20 meters (stays strictly on the road)
-    // Complex-level: 10-35 meters (stays inside the residential cluster)
-    // Kelurahan-level: 30-80 meters (stays inside the kelurahan)
-    // Highway-level: 15-45 meters (stays on the corridor)
-    // District Centroid fallback: 50-200 meters (stays 100% inside the district polygon!)
-    $hash1 = abs(crc32($id . '_' . $matchedDistrict));
-    $hash2 = abs(crc32($matchedDistrict . '_' . $id));
-    $angle = (($hash1 % 360) / 180.0) * M_PI;
-
-    
-    $districtSubClusters = array(
-        'Buahbatu' => array(
-            array(-6.9480, 107.6550),
-            array(-6.9520, 107.6600),
-            array(-6.9630, 107.6560),
-            array(-6.9550, 107.6520),
-            array(-6.9560, 107.6430),
-            array(-6.9610, 107.6400),
-            array(-6.9535, 107.6410)
-        ),
-        'Rancasari' => array(
-            array(-6.9540, 107.6770),
-            array(-6.9620, 107.6830),
-            array(-6.9670, 107.6850),
-            array(-6.9520, 107.6820)
-        ),
-        'Batununggal' => array(
-            array(-6.9400, 107.6250),
-            array(-6.9530, 107.6250),
-            array(-6.9600, 107.6250),
-            array(-6.9630, 107.6310)
-        ),
-        'Kiaracondong' => array(
-            array(-6.9240, 107.6460),
-            array(-6.9340, 107.6450),
-            array(-6.9280, 107.6440),
-            array(-6.9380, 107.6460),
-            array(-6.9450, 107.6470)
-        ),
-        'Arcamanik' => array(
-            array(-6.9120, 107.6780),
-            array(-6.9189, 107.6811),
-            array(-6.9250, 107.6850)
-        ),
-        'Antapani' => array(
-            array(-6.9080, 107.6600),
-            array(-6.9147, 107.6625),
-            array(-6.9200, 107.6650)
-        )
-    );
 
     switch (true) {
         case ($matchLevel <= 1): // Local street gazetteer: 5-20m
