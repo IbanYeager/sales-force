@@ -11149,6 +11149,43 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $addrLower = strtolower($cleanAddress);
     $rawDistLower = strtolower(trim((string)$rawDistrict));
 
+    // Fast lookup in GIS SQLite geocode_cache table
+    static $sqliteCachePdo = null;
+    static $cacheStmt = null;
+    if ($sqliteCachePdo === null) {
+        $dbPath = __DIR__ . '/followup_database.sqlite';
+        if (file_exists($dbPath)) {
+            try {
+                $sqliteCachePdo = new PDO('sqlite:' . $dbPath);
+                $sqliteCachePdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+                $cacheStmt = $sqliteCachePdo->prepare("SELECT matched_address, lat, lng FROM geocode_cache WHERE query_text = ? OR query_text LIKE ? LIMIT 1");
+            } catch (Exception $e) {
+                $sqliteCachePdo = false;
+            }
+        } else {
+            $sqliteCachePdo = false;
+        }
+    }
+
+    if ($sqliteCachePdo && $cacheStmt && !empty($cleanAddress)) {
+        try {
+            $cacheStmt->execute([$cleanAddress, $cleanAddress . '%']);
+            $hit = $cacheStmt->fetch(PDO::FETCH_ASSOC);
+            if ($hit && isset($hit['lat']) && isset($hit['lng'])) {
+                $distName = !empty($rawDistrict) ? $rawDistrict : '';
+                if (empty($distName) && !empty($hit['matched_address'])) {
+                    if (preg_match('/,\s*([A-Za-z\s]+),\s*(Jawa Barat|DKI Jakarta|Banten)/i', $hit['matched_address'], $dm)) {
+                        $distName = trim($dm[1]);
+                    }
+                }
+                if (empty($distName)) {
+                    $distName = 'Kiaracondong';
+                }
+                return [(float)$hit['lat'], (float)$hit['lng'], $distName, $hit['matched_address'] ?: $cleanAddress];
+            }
+        } catch (Exception $e) {}
+    }
+
     // Authoritative rawDistrict canonical resolution
     $canonicalRawDist = null;
     $rawDistLookup = strtolower(trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$rawDistrict)));
@@ -11431,6 +11468,18 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
  * Address to District String resolver for Import and Migration engines
  */
 function resolveAddressAndDistrict($address, $plateNumber = '', $id = 0) {
+    $text = trim((string)$address);
+    if (preg_match('/Kec\.\s*([^,;\n]+),\s*(KAB\.|KOTA)?\s*([^,;\n]+)/i', $text, $m)) {
+        $kec = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $m[1]))));
+        $city = ucwords(strtolower(trim(preg_replace('/^(kabupaten|kab\.|kota)\s+/i', '', $m[3] ?? ''))));
+        if ($city && strtolower($city) !== 'bandung') {
+            return "$kec, $city";
+        }
+        return $kec;
+    }
+    if (preg_match('/Kec\.\s*([^,;\n]+)/i', $text, $m)) {
+        return ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $m[1]))));
+    }
     $coordsInfo = getAccurateCoords($id, '', "Alamat: $address", null, $plateNumber);
     return $coordsInfo[2];
 }

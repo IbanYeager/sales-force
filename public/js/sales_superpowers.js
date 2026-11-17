@@ -437,10 +437,11 @@ const SalesSuperpowers = {
       return;
     }
 
-    // Count customers belonging strictly to this 1 selected district (geometrically inside polygon)
+    // Count customers belonging to this selected district
     let custCount = 0;
+    const targetKey = targetDist.id || targetDist.name;
     (this.radarData || []).forEach(c => {
-      if (this.pointInPolygon([c.lat, c.lng], targetDist.polygon)) {
+      if (this.isCustomerInDistrict(c, targetKey)) {
         custCount++;
       }
     });
@@ -1571,19 +1572,12 @@ const SalesSuperpowers = {
     const mode = this.radarMode || 'radius';
 
     return (this.radarData || []).filter(c => {
-      // 1. Polreg Mode: Strict District Filter (Strictly inside the selected polygon & matching district!)
+      // 1. Polreg Mode: Strict District Filter (Shows all customers belonging to this district)
       if (mode === 'polreg') {
         if (currentDist !== 'all' && currentDist !== '') {
           // Strictly check customer district matches selected zone
           if (!this.isCustomerInDistrict(c, currentDist)) {
             return false;
-          }
-          const targetDist = this.findPolregDistrict(currentDist);
-          if (targetDist && targetDist.polygon && targetDist.polygon.length > 0) {
-            // Strictly enforce Point-In-Polygon: NO pin outside polygon can ever appear!
-            if (!this.pointInPolygon([c.lat, c.lng], targetDist.polygon)) {
-              return false;
-            }
           }
         }
       }

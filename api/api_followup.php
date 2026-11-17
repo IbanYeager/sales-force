@@ -1001,9 +1001,16 @@ if ($action === 'create_customer') {
 
     require_once __DIR__ . '/api_radar_gazetteer.php';
 
-    // If address is provided but district is empty, resolve district automatically
-    if ($rawAddress && !$district) {
-        $district = resolveAddressAndDistrict($rawAddress);
+    // If address is provided, accurately resolve district and coordinates
+    $coords = null;
+    if ($rawAddress) {
+        if (!$district) {
+            $district = resolveAddressAndDistrict($rawAddress);
+        }
+        $coords = getAccurateCoords(0, $district, "Alamat: $rawAddress", null, $input['plate_number'] ?? '');
+        if ($coords && !empty($coords[2])) {
+            $district = $coords[2];
+        }
     }
 
     // Format notes with Alamat if provided
@@ -1035,11 +1042,47 @@ if ($action === 'create_customer') {
         $notes
     ]);
 
-    // Clear radar cache so the new customer appears immediately with accurate coordinates
-    $cacheFile = __DIR__ . '/cache_radar_customers.json';
-    if (file_exists($cacheFile)) { @unlink($cacheFile); }
-    $pubCache = dirname(__DIR__) . '/public/api/cache_radar_customers.json';
-    if (file_exists($pubCache)) { @unlink($pubCache); }
+    // Append to radar cache so new customer appears instantly on map with verified GIS coordinates
+    $newId = 0;
+    try {
+        global $is_mysql, $conn, $sqlite_db;
+        if ($is_mysql && $conn) { $newId = (int)$conn->insert_id; }
+        elseif ($sqlite_db) { $newId = (int)$sqlite_db->lastInsertId(); }
+    } catch (Throwable $e) {}
+
+    if ($newId && $coords) {
+        $cacheItem = [
+            'id' => $newId,
+            'source' => 'web',
+            'name' => $name,
+            'phone' => $phone,
+            'car_model' => $car_model,
+            'last_car_model' => $input['last_car_model'] ?? '',
+            'car_age' => $input['car_age'] ?? '',
+            'district' => $district,
+            'address' => $coords[3] ?? $rawAddress,
+            'plate_number' => $input['plate_number'] ?? '',
+            'priority' => $input['priority'] ?? 'Prioritas Trade-in (>2.5 Thn)',
+            'status' => 'Belum Dihubungi',
+            'sales_name' => 'Terbuka (Siapa Saja)',
+            'visit_photo' => '',
+            'reason_followup' => '',
+            'lat' => (float)$coords[0],
+            'lng' => (float)$coords[1]
+        ];
+
+        $cachePaths = [
+            __DIR__ . '/cache_radar_customers.json',
+            dirname(__DIR__) . '/public/api/cache_radar_customers.json'
+        ];
+        foreach ($cachePaths as $cp) {
+            if (file_exists($cp)) {
+                $cList = json_decode(file_get_contents($cp), true) ?: [];
+                $cList[] = $cacheItem;
+                @file_put_contents($cp, json_encode($cList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            }
+        }
+    }
 
     echo json_encode(['success' => true, 'message' => 'Customer baru berhasil ditambahkan']);
     exit;
