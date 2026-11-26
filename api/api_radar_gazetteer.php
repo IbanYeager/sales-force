@@ -11263,7 +11263,7 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $isBandungExplicit = false;
     
     // Check if Bandung is explicitly mentioned
-    if (preg_match('/\b(kota bandung|kab\.?\s*bandung|bandung barat|kota cimahi|cimahi)\b/i', $combinedCheck)) {
+    if (preg_match('/\b(kota bandung|(?:kabupaten|kab\.?)\s*bandung|bandung barat|kota cimahi|cimahi)\b/i', $combinedCheck)) {
         $isBandungExplicit = true;
     } else {
         foreach ($bandungDistricts as $bdKey => $bdVal) {
@@ -11487,6 +11487,9 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         $matchedCoords = array(-6.9248, 107.6472);
         $matchLevel = 5;
     }
+
+    $hash2 = abs(crc32($id . '_' . ($matchedDistrict ?? 'bdg') . '_' . $cleanAddress));
+    $angle = (($hash2 % 360) / 180.0) * M_PI;
 
     switch (true) {
         case ($matchLevel <= 1): // Local street gazetteer: 5-20m
