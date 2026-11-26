@@ -121,6 +121,9 @@
             <button class="data-tab active" onclick="switchTab('pricelist', this)">
               <i class="fa-solid fa-car"></i> Pricelist
             </button>
+            <button class="data-tab" onclick="switchTab('promo', this)">
+              <i class="fa-solid fa-tags" style="color:var(--primary-red);"></i> Paket Promo &amp; Cicilan
+            </button>
             <button class="data-tab" onclick="switchTab('polreg', this)">
               <i class="fa-solid fa-chart-pie"></i> Polreg
             </button>
@@ -272,6 +275,59 @@
               <tbody id="tableBiayaIklan">
                 <tr>
                   <td colspan="10" style="text-align:center;">Memuat data biaya iklan...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        
+        <!-- PAKET PROMO & CICILAN CONTENT -->
+        <div id="tab-promo" class="data-content" style="display:none;">
+          <div class="top-action-bar" style="margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: var(--navy);"><i class="fa-solid fa-tags" style="color:var(--primary-red); margin-right:8px;"></i>Kelola Paket Promo &amp; Simulasi Cicilan Kredit</h3>
+              <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Kelola daftar paket pembiayaan promo (Hoki Suka-Suka, Spektakuler, Smart Cash, Low DP) yang tampil di portal sales dan simulasi kredit pelanggan.</p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <div style="position:relative;">
+                <i class="fa-solid fa-search" style="position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--faint); font-size:13px; pointer-events:none;"></i>
+                <input type="text" id="searchPromoInput" class="form-input" placeholder="Cari mobil / paket..." onkeyup="filterPromoSearch(this.value)" style="padding-left:36px; width:200px;">
+              </div>
+              <select id="filterPromoPaket" class="form-input" style="width: 190px;" onchange="filterPromoByPackage(this.value)">
+                <option value="">Semua Nama Paket</option>
+              </select>
+              <select id="filterPromoTenor" class="form-input" style="width: 130px;" onchange="filterPromoByTenor(this.value)">
+                <option value="">Semua Tenor</option>
+                <option value="12">12 Bulan (1 Thn)</option>
+                <option value="24">24 Bulan (2 Thn)</option>
+                <option value="36">36 Bulan (3 Thn)</option>
+                <option value="48">48 Bulan (4 Thn)</option>
+                <option value="60">60 Bulan (5 Thn)</option>
+                <option value="72">72 Bulan (6 Thn)</option>
+              </select>
+              <button class="btn" style="background:#10b981; color:white; border:none;" onclick="openModalImportPromo()"><i class="fa-solid fa-file-excel"></i> Import Excel</button>
+              <button class="btn btn-primary" onclick="openModalPromo()"><i class="fa-solid fa-plus"></i> Tambah Promo</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Paket</th>
+                  <th>Tipe Mobil</th>
+                  <th>OTR (Rp)</th>
+                  <th>Tenor</th>
+                  <th>Skema</th>
+                  <th>TDP / TBP (Rp)</th>
+                  <th>Angsuran/Bln (Rp)</th>
+                  <th>Angsuran Akhir</th>
+                  <th style="width: 100px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tablePromo">
+                <tr>
+                  <td colspan="9" style="text-align:center; padding:20px;">Memuat data promo...</td>
                 </tr>
               </tbody>
             </table>
@@ -1138,6 +1194,121 @@
   <script src="../js/spv_kelola.js?v=2"></script>
   <script src="../js/pwa-app.js?v=20261021_v20"></script>
 <script src="../js/spv_global.js"></script>
+
+  <!-- Modal Tambah / Edit Promo -->
+  <div class="modal-overlay" id="modalPromo">
+    <div class="modal-box" style="max-width: 540px;">
+      <h3 class="modal-title" id="formPromoTitle"><i class="fa-solid fa-tags" style="color:var(--primary-red); margin-right:8px;"></i> Tambah Paket Promo Kredit</h3>
+      <input type="hidden" id="formPromoId">
+
+      <div class="form-group">
+        <label>Nama Paket Promo</label>
+        <input type="text" class="form-control" id="formPromoPaket" placeholder="Cth: PAKET HOKI SUKA-SUKA SPECIAL" required list="listPaketPromo">
+        <datalist id="listPaketPromo">
+          <option value="PAKET HOKI SUKA-SUKA SPECIAL">
+          <option value="Paket Reguler Toyota DP 20%">
+          <option value="Paket Spektakuler Agya, Avanza &amp; Raize DP 20% + Free Asuransi 1 Tahun">
+          <option value="Paket Spektakuler 2th free ALL RISK - DP 20%">
+          <option value="Paket Spektakuler 2th free ALL RISK - DP 25%">
+          <option value="Paket Smart Cash (khusus Zenix Hybrid &amp; Rush)">
+          <option value="PAKET VELOZ HYBRID LOW DP">
+          <option value="Paket Veloz Hybrid Low Installment DP 20%">
+          <option value="Rate 0% 1 Tahun">
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label>Tipe Mobil (Model &amp; Varian)</label>
+        <input type="text" class="form-control" id="formPromoTipeMobil" placeholder="Cth: AVANZA 1.5 G M/T" required>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <div class="form-group" style="flex:1;">
+          <label>Harga OTR (Rp)</label>
+          <input type="number" class="form-control" id="formPromoOtr" placeholder="Cth: 270200000" min="0">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Tenor (Bulan)</label>
+          <select class="form-control" id="formPromoTenor">
+            <option value="12">12 Bulan (1 Tahun)</option>
+            <option value="24">24 Bulan (2 Tahun)</option>
+            <option value="36">36 Bulan (3 Tahun)</option>
+            <option value="48">48 Bulan (4 Tahun)</option>
+            <option value="60">60 Bulan (5 Tahun)</option>
+            <option value="72">72 Bulan (6 Tahun)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <div class="form-group" style="flex:1;">
+          <label>Skema Bayar</label>
+          <select class="form-control" id="formPromoSkema">
+            <option value="REGULER">REGULER</option>
+            <option value="BALLOON">BALLOON</option>
+            <option value="ADDM">ADDM</option>
+            <option value="ADDB">ADDB</option>
+            <option value="SMART CASH">SMART CASH</option>
+            <option value="LOW DP">LOW DP</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Total DP / TBP (Rp)</label>
+          <input type="number" class="form-control" id="formPromoTbp" placeholder="Cth: 63263640" min="0">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <div class="form-group" style="flex:1;">
+          <label>Angsuran per Bulan (Rp)</label>
+          <input type="number" class="form-control" id="formPromoAngsuran" placeholder="Cth: 11550000" min="0" required>
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Angsuran Terakhir / Balloon (Rp)</label>
+          <input type="number" class="form-control" id="formPromoAngsuranAkhir" placeholder="0 (jika bukan balloon)" min="0" value="0">
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn" style="background:#e2e8f0; color:#334155;" onclick="closeModal('modalPromo')">Batal</button>
+        <button type="button" class="btn btn-primary" onclick="savePromo()"><i class="fa-solid fa-floppy-disk"></i> Simpan Promo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Import Excel Promo -->
+  <div class="modal-overlay" id="modalImportPromo">
+    <div class="modal-box" style="max-width: 650px;">
+      <h3 class="modal-title"><i class="fa-solid fa-file-excel" style="color:#10b981; margin-right:8px;"></i> Import Data Paket Promo Kredit</h3>
+      <div class="modal-body" style="background:#f8fafc; padding:20px;">
+        <div class="form-group">
+          <label style="font-weight:700;">Nama Paket Promo (Default jika kolom di Excel kosong):</label>
+          <input type="text" id="importPromoPaketName" class="form-control" placeholder="Cth: PAKET HOKI SUKA-SUKA SPECIAL">
+        </div>
+
+        <div style="background:#fff; border-left:4px solid #10b981; padding:12px 16px; border-radius:6px; margin-bottom:15px; font-size:12px; color:var(--muted); box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+          <strong style="color:var(--text-dark);">Format Kolom Excel (Copy baris dari Excel):</strong>
+          <p style="margin:4px 0 0 0; font-family:monospace; color:#0f172a;">Nama Paket [Tab] Tipe Mobil [Tab] OTR [Tab] Tenor [Tab] Skema [Tab] Angsuran [Tab] TDP/TBP [Tab] Angsuran Akhir</p>
+          <span style="font-size:11px; color:#64748b;">(Atau minimal 6 kolom: Tipe Mobil [Tab] OTR [Tab] Tenor [Tab] Skema [Tab] Angsuran [Tab] TDP/TBP)</span>
+        </div>
+
+        <div style="margin-bottom:15px;">
+          <label style="font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">Paste Baris Excel di Bawah:</label>
+          <textarea id="importPromoData" class="form-input" rows="7" style="font-family:monospace; font-size:12px; white-space:pre; resize:vertical;" placeholder="AVANZA 1.5 G M/T&#9;270200000&#9;12&#9;BALLOON&#9;11550000&#9;63263640&#9;119630000"></textarea>
+        </div>
+
+        <div style="background:#fff; border:1px solid #e2e8f0; padding:12px; border-radius:6px; display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="importPromoOverwrite" style="width:16px; height:16px; accent-color:var(--danger); cursor:pointer;">
+          <label for="importPromoOverwrite" style="font-size:13px; font-weight:600; color:var(--danger); cursor:pointer; margin:0;">Timpa/Hapus data lama pada nama paket ini sebelum import</label>
+        </div>
+      </div>
+      <div class="modal-actions" style="padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; background:white; border-radius: 0 0 16px 16px;">
+        <button class="btn" style="background:var(--bg); color:var(--text-dark); border:1px solid var(--border);" onclick="closeModal('modalImportPromo')">Batal</button>
+        <button class="btn btn-primary" onclick="processImportPromoExcel()" id="btnProcessImportPromo"><i class="fa-solid fa-cloud-arrow-up"></i> Mulai Import Promo</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>

@@ -1,29 +1,39 @@
 // User session check
     const loggedIn = localStorage.getItem('loggedIn') === 'true';
     const peranSales = localStorage.getItem('peranSales');
+    const isKacab = (peranSales === 'Kepala Cabang' || peranSales === 'Kacab');
+    const isSpv = (peranSales === 'Supervisor' || peranSales === 'SPV');
+    const isKacabPage = window.location.pathname.includes('kacab') || document.body.classList.contains('kacab-body');
+
     if (!loggedIn) {
-      window.location.href = '../pages/login_spv.html';
-    } else if (peranSales === 'Kepala Cabang') {
-      window.location.href = '../pages_kacab/index_kacab.html';
+      window.location.href = isKacabPage ? '../pages/login_kacab.html' : '../pages/login_spv.html';
     } else if (peranSales === 'Sales Consultant' || peranSales === 'Sales') {
       window.location.href = '../index.html';
-    } else if (peranSales !== 'Supervisor') {
-      window.location.href = '../pages/login_spv.html';
+    } else if (!isKacab && !isSpv) {
+      window.location.href = isKacabPage ? '../pages/login_kacab.html' : '../pages/login_spv.html';
     } else {
-      const nama = localStorage.getItem('namaSales') || 'SPV';
-      const peran = localStorage.getItem('peranSales') || 'Supervisor';
-      document.getElementById('spvNama').textContent = nama;
-      document.getElementById('spvRole').textContent = peran;
+      const defaultNama = isKacab ? 'Dendi Holius' : 'Pak Ryan';
+      const defaultPeran = isKacab ? 'Kepala Cabang' : 'Supervisor';
+      const nama = localStorage.getItem('namaSales') || defaultNama;
+      const peran = localStorage.getItem('peranSales') || defaultPeran;
+
+      const namaEl = document.getElementById('spvNama') || document.getElementById('kcbNama');
+      const roleEl = document.getElementById('spvRole') || document.getElementById('kcbRole');
+      if (namaEl) namaEl.textContent = nama;
+      if (roleEl) roleEl.textContent = peran;
 
       const avatar = localStorage.getItem('fotoSales');
-      document.getElementById('spvAvatar').src = (avatar && avatar.trim() !== '')
-        ? avatar
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0f172a&color=fff`;
+      const avatarEl = document.getElementById('spvAvatar') || document.getElementById('kcbAvatar');
+      if (avatarEl) {
+        avatarEl.src = (avatar && avatar.trim() !== '')
+          ? avatar
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0f172a&color=fff`;
+      }
     }
 
     async function logoutUser() {
       localStorage.clear();
-      window.location.href = '../pages/login_spv.html';
+      window.location.href = isKacabPage ? '../pages/login_kacab.html' : '../pages/login_spv.html';
     }
 
     let spvLeafletMap = null;
@@ -47,6 +57,9 @@
       }
       if (tabId === 'biaya_iklan') {
         loadBiayaIklan();
+      }
+      if (tabId === 'promo') {
+        loadPromo();
       }
     }
 
@@ -2090,4 +2103,380 @@ function formatRupiahSpv(num) {
 function escapeHtmlSpv(str) {
     if (!str) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ==========================================
+// PAKET PROMO & CICILAN KREDIT MANAGEMENT
+// ==========================================
+let dataPromo = [];
+let promoPackagesList = [];
+let currentFilterPromoPackage = '';
+let currentFilterPromoTenor = '';
+let currentSearchPromo = '';
+
+async function loadPromo() {
+  const tbody = document.getElementById('tablePromo');
+  if (tbody) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#64748b;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data promo paket kredit...</td></tr>';
+  }
+
+  try {
+    let url = '../api/api_spv_manage_promo.php?limit=500';
+    if (currentFilterPromoPackage) url += '&paket=' + encodeURIComponent(currentFilterPromoPackage);
+    if (currentFilterPromoTenor) url += '&tenor=' + encodeURIComponent(currentFilterPromoTenor);
+    if (currentSearchPromo) url += '&search=' + encodeURIComponent(currentSearchPromo);
+
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json.status === 'success') {
+      dataPromo = json.data || [];
+      if (json.packages && json.packages.length > 0) {
+        promoPackagesList = json.packages;
+        populatePromoPackageDropdown(json.packages);
+      }
+      renderPromoTable();
+    } else {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#e11d48; padding:20px;">Gagal memuat: ${json.message || 'Error server'}</td></tr>`;
+    }
+  } catch (err) {
+    console.error('Error loadPromo:', err);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#e11d48; padding:20px;">Gagal terhubung ke API promo.</td></tr>';
+  }
+}
+
+function populatePromoPackageDropdown(packages) {
+  const select = document.getElementById('filterPromoPaket');
+  const modalSelect = document.getElementById('formPromoPaketSelect');
+  if (select && select.options.length <= 1) {
+    packages.forEach(pkg => {
+      const opt = document.createElement('option');
+      opt.value = pkg;
+      opt.textContent = pkg;
+      select.appendChild(opt);
+    });
+  }
+  if (modalSelect && modalSelect.options.length <= 1) {
+    packages.forEach(pkg => {
+      const opt = document.createElement('option');
+      opt.value = pkg;
+      opt.textContent = pkg;
+      modalSelect.appendChild(opt);
+    });
+  }
+}
+
+function renderPromoTable() {
+  const tbody = document.getElementById('tablePromo');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (dataPromo.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:25px; color:#64748b;">Tidak ada data promo yang cocok dengan filter</td></tr>';
+    return;
+  }
+
+  // Group by nama_paket
+  let currentGroup = null;
+  dataPromo.forEach(item => {
+    const pkgName = item.nama_paket || 'Tanpa Nama Paket';
+    const safeId = 'promo-pkg-' + pkgName.replace(/[^a-zA-Z0-9]/g, '');
+
+    if (pkgName !== currentGroup) {
+      const trGroup = document.createElement('tr');
+      trGroup.innerHTML = `<th colspan="9" class="accordion-header" style="background:#f8fafc; border-top:2px solid #e2e8f0; cursor:pointer;" onclick="toggleDataGroup('${safeId}')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>
+            <i class="fa-solid fa-chevron-down" id="icon-${safeId}" style="margin-right:8px; color:var(--primary-red);"></i>
+            <strong>${pkgName}</strong>
+          </span>
+          <button class="btn btn-sm" style="background:#fee2e2; color:#b91c1c; border:none; padding:2px 8px; font-size:11px;" onclick="event.stopPropagation(); deletePromoPackage('${escapeHtmlSpv(pkgName)}')">
+            <i class="fa-solid fa-trash-can"></i> Hapus Paket
+          </button>
+        </div>
+      </th>`;
+      tbody.appendChild(trGroup);
+      currentGroup = pkgName;
+    }
+
+    const tr = document.createElement('tr');
+    tr.className = 'row-' + safeId;
+    
+    const otrNum = Number(item.otr) || 0;
+    const tbpNum = Number(item.tbp) || 0;
+    const angsuranNum = Number(item.angsuran_per_bulan) || 0;
+    const angsuranAkhirNum = Number(item.angsuran_terakhir) || 0;
+
+    const otrStr = otrNum > 0 ? 'Rp ' + otrNum.toLocaleString('id-ID') : '-';
+    const tbpStr = tbpNum > 0 ? 'Rp ' + tbpNum.toLocaleString('id-ID') : '-';
+    const angsuranStr = angsuranNum > 0 ? 'Rp ' + angsuranNum.toLocaleString('id-ID') : '-';
+    const angsuranAkhirStr = angsuranAkhirNum > 0 ? 'Rp ' + angsuranAkhirNum.toLocaleString('id-ID') : '-';
+
+    const skema = item.skema_bayar || 'REGULER';
+    const badgeBg = skema.toUpperCase() === 'BALLOON' ? '#eff6ff' : (skema.toUpperCase().includes('DP') ? '#ecfdf5' : '#f1f5f9');
+    const badgeColor = skema.toUpperCase() === 'BALLOON' ? '#1d4ed8' : (skema.toUpperCase().includes('DP') ? '#047857' : '#475569');
+
+    tr.innerHTML = `
+      <td style="font-size:12px; font-weight:700; color:#334155;">${escapeHtmlSpv(item.nama_paket)}</td>
+      <td style="font-weight:700; color:#0f172a;"><i class="fa-solid fa-car-side" style="color:#94a3b8; margin-right:6px;"></i>${escapeHtmlSpv(item.tipe_mobil)}</td>
+      <td style="font-weight:600; color:#475569;">${otrStr}</td>
+      <td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-weight:800; font-size:11px;">${item.tenor} Bln</span></td>
+      <td><span style="background:${badgeBg}; color:${badgeColor}; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">${escapeHtmlSpv(skema)}</span></td>
+      <td style="font-weight:700; color:#059669;">${tbpStr}</td>
+      <td style="font-weight:800; color:#c8102e;">${angsuranStr}</td>
+      <td style="font-size:12px; color:#64748b;">${angsuranAkhirStr}</td>
+      <td style="white-space:nowrap;">
+        <button class="action-btn btn-edit" onclick="editPromo(${item.id})" title="Edit Promo"><i class="fa-solid fa-pen"></i></button>
+        <button class="action-btn btn-del" onclick="deletePromo(${item.id})" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterPromoSearch(val) {
+  currentSearchPromo = val.trim();
+  clearTimeout(window._promoSearchTimer);
+  window._promoSearchTimer = setTimeout(() => {
+    loadPromo();
+  }, 300);
+}
+
+function filterPromoByPackage(pkg) {
+  currentFilterPromoPackage = pkg;
+  loadPromo();
+}
+
+function filterPromoByTenor(tenor) {
+  currentFilterPromoTenor = tenor;
+  loadPromo();
+}
+
+function openModalPromo() {
+  document.getElementById('formPromoTitle').textContent = 'Tambah Paket Promo Kredit';
+  document.getElementById('formPromoId').value = '';
+  document.getElementById('formPromoPaket').value = '';
+  document.getElementById('formPromoTipeMobil').value = '';
+  document.getElementById('formPromoOtr').value = '';
+  document.getElementById('formPromoTenor').value = '12';
+  document.getElementById('formPromoSkema').value = 'REGULER';
+  document.getElementById('formPromoTbp').value = '';
+  document.getElementById('formPromoAngsuran').value = '';
+  document.getElementById('formPromoAngsuranAkhir').value = '0';
+  document.getElementById('modalPromo').classList.add('show');
+}
+
+function editPromo(id) {
+  const item = dataPromo.find(x => x.id == id);
+  if (!item) return;
+
+  document.getElementById('formPromoTitle').textContent = 'Edit Paket Promo Kredit';
+  document.getElementById('formPromoId').value = item.id;
+  document.getElementById('formPromoPaket').value = item.nama_paket || '';
+  document.getElementById('formPromoTipeMobil').value = item.tipe_mobil || '';
+  document.getElementById('formPromoOtr').value = item.otr || '';
+  document.getElementById('formPromoTenor').value = item.tenor || 12;
+  document.getElementById('formPromoSkema').value = item.skema_bayar || 'REGULER';
+  document.getElementById('formPromoTbp').value = item.tbp || '';
+  document.getElementById('formPromoAngsuran').value = item.angsuran_per_bulan || '';
+  document.getElementById('formPromoAngsuranAkhir').value = item.angsuran_terakhir || '0';
+  document.getElementById('modalPromo').classList.add('show');
+}
+
+async function savePromo(e) {
+  if (e) e.preventDefault();
+  const id = document.getElementById('formPromoId').value;
+  const nama_paket = document.getElementById('formPromoPaket').value.trim();
+  const tipe_mobil = document.getElementById('formPromoTipeMobil').value.trim();
+  const otr = parseInt(document.getElementById('formPromoOtr').value || 0);
+  const tenor = parseInt(document.getElementById('formPromoTenor').value || 12);
+  const skema_bayar = document.getElementById('formPromoSkema').value.trim() || 'REGULER';
+  const tbp = parseInt(document.getElementById('formPromoTbp').value || 0);
+  const angsuran_per_bulan = parseInt(document.getElementById('formPromoAngsuran').value || 0);
+  const angsuran_terakhir = parseInt(document.getElementById('formPromoAngsuranAkhir').value || 0);
+
+  if (!nama_paket || !tipe_mobil || !angsuran_per_bulan) {
+    alert('Mohon lengkapi Nama Paket, Tipe Mobil, dan Angsuran per Bulan!');
+    return;
+  }
+
+  const payload = {
+    id,
+    nama_paket,
+    tipe_mobil,
+    otr,
+    tenor,
+    skema_bayar,
+    tbp,
+    angsuran_per_bulan,
+    angsuran_terakhir
+  };
+
+  const method = id ? 'PUT' : 'POST';
+  try {
+    const res = await fetch('../api/api_spv_manage_promo.php', {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (json.status === 'success') {
+      alert(json.message || 'Promo berhasil disimpan!');
+      closeModal('modalPromo');
+      loadPromo();
+    } else {
+      alert('Gagal: ' + json.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Terjadi kesalahan jaringan.');
+  }
+}
+
+async function deletePromo(id) {
+  const isConfirmed = await (window.customConfirm ? window.customConfirm('Yakin ingin menghapus data promo ini?') : confirm('Yakin ingin menghapus data promo ini?'));
+  if (!isConfirmed) return;
+
+  try {
+    const res = await fetch(`../api/api_spv_manage_promo.php?id=${id}`, {
+      method: 'DELETE'
+    });
+    const json = await res.json();
+    if (json.status === 'success') {
+      loadPromo();
+    } else {
+      alert('Gagal menghapus: ' + json.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+async function deletePromoPackage(pkgName) {
+  const isConfirmed = await (window.customConfirm ? window.customConfirm(`PERINGATAN: Apakah Anda yakin ingin menghapus SELURUH data paket "${pkgName}"?`) : confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus SELURUH data paket "${pkgName}"?`));
+  if (!isConfirmed) return;
+
+  try {
+    const res = await fetch(`../api/api_spv_manage_promo.php?action=delete_package&nama_paket=${encodeURIComponent(pkgName)}`, {
+      method: 'DELETE'
+    });
+    const json = await res.json();
+    if (json.status === 'success') {
+      alert(json.message || 'Paket promo berhasil dihapus!');
+      loadPromo();
+    } else {
+      alert('Gagal: ' + json.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+function openModalImportPromo() {
+  document.getElementById('importPromoPaketName').value = currentFilterPromoPackage || '';
+  document.getElementById('importPromoData').value = '';
+  document.getElementById('importPromoOverwrite').checked = false;
+  document.getElementById('modalImportPromo').classList.add('show');
+}
+
+async function processImportPromoExcel() {
+  const defaultPaket = document.getElementById('importPromoPaketName').value.trim();
+  const rawData = document.getElementById('importPromoData').value.trim();
+  const overwrite = document.getElementById('importPromoOverwrite').checked;
+
+  if (!rawData) {
+    alert('Silakan paste data Excel terlebih dahulu!');
+    return;
+  }
+
+  const rows = rawData.split('\n');
+  const batch = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const line = rows[i].trim();
+    if (!line) continue;
+    const cols = line.split('\t');
+
+    let nama_paket = defaultPaket;
+    let tipe_mobil = '';
+    let otr = 0;
+    let tenor = 12;
+    let skema_bayar = 'REGULER';
+    let angsuran = 0;
+    let tbp = 0;
+    let angsuran_terakhir = 0;
+
+    if (cols.length >= 8) {
+      nama_paket = cols[0].trim() || defaultPaket;
+      tipe_mobil = cols[1].trim();
+      otr = parseInt((cols[2] || '0').replace(/[^0-9]/g, '')) || 0;
+      tenor = parseInt((cols[3] || '12').replace(/[^0-9]/g, '')) || 12;
+      skema_bayar = cols[4].trim() || 'REGULER';
+      angsuran = parseInt((cols[5] || '0').replace(/[^0-9]/g, '')) || 0;
+      tbp = parseInt((cols[6] || '0').replace(/[^0-9]/g, '')) || 0;
+      angsuran_terakhir = parseInt((cols[7] || '0').replace(/[^0-9]/g, '')) || 0;
+    } else if (cols.length >= 6) {
+      tipe_mobil = cols[0].trim();
+      otr = parseInt((cols[1] || '0').replace(/[^0-9]/g, '')) || 0;
+      tenor = parseInt((cols[2] || '12').replace(/[^0-9]/g, '')) || 12;
+      skema_bayar = cols[3].trim() || 'REGULER';
+      angsuran = parseInt((cols[4] || '0').replace(/[^0-9]/g, '')) || 0;
+      tbp = parseInt((cols[5] || '0').replace(/[^0-9]/g, '')) || 0;
+      angsuran_terakhir = cols[6] ? parseInt((cols[6] || '0').replace(/[^0-9]/g, '')) || 0 : 0;
+    }
+
+    if (nama_paket && tipe_mobil && angsuran > 0) {
+      batch.push({
+        nama_paket,
+        tipe_mobil,
+        otr,
+        tenor,
+        skema_bayar,
+        angsuran_per_bulan: angsuran,
+        tbp,
+        angsuran_terakhir
+      });
+    }
+  }
+
+  if (batch.length === 0) {
+    alert('Gagal membaca baris data. Pastikan format kolom sesuai panduan.');
+    return;
+  }
+
+  const isConfirmed = await (window.customConfirm ? window.customConfirm(`Berhasil membaca ${batch.length} baris promo. Lanjutkan proses simpan ke database?`) : confirm(`Berhasil membaca ${batch.length} baris promo. Lanjutkan proses simpan ke database?`));
+  if (!isConfirmed) return;
+
+  const btn = document.getElementById('btnProcessImportPromo');
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('../api/api_spv_manage_promo.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        batch: batch,
+        overwrite: overwrite,
+        target_paket: defaultPaket
+      })
+    });
+    const json = await res.json();
+    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Mulai Import';
+    btn.disabled = false;
+
+    if (json.status === 'success') {
+      closeModal('modalImportPromo');
+      alert(json.message || 'Import data promo berhasil!');
+      loadPromo();
+    } else {
+      alert('Gagal import: ' + json.message);
+    }
+  } catch (err) {
+    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Mulai Import';
+    btn.disabled = false;
+    console.error(err);
+    alert('Terjadi kesalahan jaringan.');
+  }
 }
