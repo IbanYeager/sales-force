@@ -102,7 +102,17 @@ if ($is_mysql && $conn) {
             followup_category, followup_status, last_contacted_at, last_template_used,
             notes, connected, contacted, prospect, spk, remarks, sales_fu_status,
             reason_followup, followup_date, sync_source, created_at, updated_at
-        ) VALUES " . implode(",\n", $values);
+        ) VALUES " . implode(",\n", $values) . "
+        ON DUPLICATE KEY UPDATE 
+            name = VALUES(name),
+            phone = VALUES(phone),
+            district = VALUES(district),
+            followup_status = VALUES(followup_status),
+            sales_fu_status = VALUES(sales_fu_status),
+            assigned_sales_id = VALUES(assigned_sales_id),
+            remarks = VALUES(remarks),
+            notes = VALUES(notes),
+            updated_at = NOW()";
 
         if ($conn->query($sql)) {
             $insertedCount += count($chunk);
