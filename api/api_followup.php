@@ -276,7 +276,7 @@ if ($action === 'customers') {
     }
 
     if ($db_source === 'sales') {
-        $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
+        $where[] = "(sync_source IS NULL OR sync_source = '' OR sync_source = 'google_sheet' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
     } elseif ($db_source === 'radar') {
         $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
     }
@@ -728,7 +728,7 @@ if ($action === 'stats') {
         }
     }
     if ($db_source === 'sales') {
-        $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
+        $where[] = "(sync_source IS NULL OR sync_source = '' OR sync_source = 'google_sheet' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
     } elseif ($db_source === 'radar') {
         $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
     }
@@ -2324,7 +2324,7 @@ if ($action === 'distribute_quota') {
 
     $db_source = trim($input['db_source'] ?? 'all');
     if ($db_source === 'sales') {
-        $where[] = "(sync_source IS NULL OR sync_source = '' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
+        $where[] = "(sync_source IS NULL OR sync_source = '' OR sync_source = 'google_sheet' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
     } elseif ($db_source === 'radar') {
         $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
     }

@@ -818,3 +818,50 @@ if ($action === 'import_database_batch') {
     echo json_encode(['success' => true, 'inserted' => $inserted]);
     exit;
 }
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup_sync.php?action=clean_dummy_followups
+// Hapus seluruh data yang sudah di-follow up dummy & reset agar bersih sinkron dengan Google Spreadsheet
+// -------------------------------------------------------------
+if ($action === 'clean_dummy_followups') {
+    global $is_mysql, $conn, $sqlite_pdo;
+
+    // 1. Hapus data customer yang berstatus sudah difollow up (dummy progress dari demo sebelumnya)
+    $resDel = followup_execute("
+        DELETE FROM followup_customers 
+        WHERE (followup_status != 'Belum Dihubungi' AND followup_status IS NOT NULL AND followup_status != '')
+           OR connected = 'TRUE'
+           OR contacted = 'TRUE'
+           OR prospect = 'TRUE'
+           OR spk = 'TRUE'
+           OR (remarks IS NOT NULL AND remarks != '' AND remarks != '-')
+           OR (reason_followup IS NOT NULL AND reason_followup != '')
+           OR (sales_fu_status IS NOT NULL AND sales_fu_status = 'Closed')
+           OR (followup_date IS NOT NULL AND followup_date != '')
+    ");
+
+    // 2. Reset sisa database yang ada agar semua murni dalam status Belum Dihubungi (sama persis dengan sheet Database)
+    followup_execute("
+        UPDATE followup_customers 
+        SET connected = 'FALSE',
+            contacted = 'FALSE',
+            prospect = 'FALSE',
+            spk = 'FALSE',
+            remarks = '',
+            sales_fu_status = 'Open',
+            reason_followup = '',
+            followup_date = NULL,
+            last_contacted_at = NULL,
+            followup_status = 'Belum Dihubungi'
+        WHERE followup_status IS NULL OR followup_status = '' OR followup_status = 'Belum Dihubungi'
+    ");
+
+    // 3. Bersihkan seluruh log aktivitas dummy
+    followup_execute("DELETE FROM followup_logs");
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Seluruh data follow-up dummy berhasil dihapus. Database kini bersih dan tersinkronkan dengan Google Spreadsheet (semua berstatus Belum Dihubungi).'
+    ]);
+    exit;
+}
