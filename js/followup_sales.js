@@ -1721,6 +1721,7 @@ async function sendSaveSalesFu(customerId, showAlert = true) {
   const payload = {
     id: customerId,
     sales_id: followupState.salesInfo ? followupState.salesInfo.id : null,
+    sales_name: followupState.salesInfo ? followupState.salesInfo.name : '',
     connected: c.connected || '',
     contacted: c.contacted || '',
     prospect: c.prospect || '',

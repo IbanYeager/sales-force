@@ -690,7 +690,7 @@ if ($action === 'dashboard_analytics') {
         $settings[$sr['setting_key']] = $sr['setting_value'];
     }
 
-    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
+    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4/edit?gid=622548953#gid=622548953';
 
     echo json_encode([
         'success' => true,
@@ -1666,7 +1666,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     }
 
     $now = date('Y-m-d H:i:s');
-    $current = followup_query("SELECT followup_status, notes, assigned_sales_id, sales_fu, vin, phone, name FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
+    $current = followup_query("SELECT followup_status, notes, assigned_sales_id, sales_fu, vin, phone, name, plate_number, sheet_row_index FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
     $oldStatus = !empty($current) ? $current[0]['followup_status'] : '';
     $currAssignedId = !empty($current) ? (int)$current[0]['assigned_sales_id'] : 0;
     $currSalesFu = !empty($current) ? trim($current[0]['sales_fu'] ?? '') : '';
@@ -1681,6 +1681,9 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
                 break;
             }
         }
+    }
+    if ($effectiveSalesName === '' && !empty($input['sales_name'])) {
+        $effectiveSalesName = trim($input['sales_name']);
     }
     if ($effectiveSalesName === '' && $currSalesFu !== '') {
         $effectiveSalesName = $currSalesFu;
@@ -1701,7 +1704,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
             last_contacted_at = ?,
             last_template_used = CASE WHEN ? != '' THEN ? ELSE last_template_used END,
             assigned_sales_id = CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) AND ? > 0 THEN ? ELSE assigned_sales_id END,
-            sales_fu = CASE WHEN (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-') AND ? != '' THEN ? ELSE sales_fu END,
+            sales_fu = CASE WHEN ? != '' THEN ? ELSE sales_fu END,
             visit_photo = CASE WHEN ? != '' THEN ? ELSE visit_photo END
         WHERE id = ?
     ", [
@@ -1739,8 +1742,12 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
                 $phone = !empty($current) ? ($current[0]['phone'] ?? '') : '';
 
                 $webhookPayload = [
+                    'sheet_id' => '1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4',
+                    'sheet_name' => 'Database',
+                    'sheet_row_index' => !empty($current) ? (int)($current[0]['sheet_row_index'] ?? 0) : 0,
                     'customer_id' => $id,
                     'vin' => $vin,
+                    'plate_number' => !empty($current) ? ($current[0]['plate_number'] ?? '') : '',
                     'phone' => $phone,
                     'name' => !empty($current) ? ($current[0]['name'] ?? '') : '',
                     'connected' => $connected,
@@ -1762,7 +1769,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
                         'method' => 'POST',
                         'header' => "Content-Type: application/json\r\n",
                         'content' => json_encode($webhookPayload),
-                        'timeout' => 3
+                        'timeout' => 8
                     ],
                     'ssl' => [
                         'verify_peer' => false,

@@ -48,7 +48,7 @@ if ($action === 'get_settings') {
         $settings[$r['setting_key']] = $r['setting_value'];
     }
 
-    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
+    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4/edit?gid=622548953#gid=622548953';
     $defaultScript = 'https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec';
 
     if (empty($settings['google_sheet_url'])) {
@@ -89,7 +89,7 @@ function sync_google_sheet_data($sheetUrl = null) {
         $sheetUrl = !empty($rows) ? $rows[0]['setting_value'] : '';
     }
 
-    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
+    $defaultSheet = 'https://docs.google.com/spreadsheets/d/1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4/edit?gid=622548953#gid=622548953';
     if (!$sheetUrl) {
         $sheetUrl = $defaultSheet;
     }
@@ -98,7 +98,7 @@ function sync_google_sheet_data($sheetUrl = null) {
     $csvUrl = $sheetUrl;
     if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sheetUrl, $matches)) {
         $sheetId = $matches[1];
-        $gid = '1525199412'; // Default data sheet for Tunas Toyota Kiara Condong CRM
+        $gid = '622548953'; // Default Database sheet for Tunas Toyota Kiara Condong CRM
         if (preg_match('/gid=([0-9]+)/', $sheetUrl, $gMatches)) {
             $parsedGid = $gMatches[1];
             if (!empty($parsedGid) && $parsedGid !== '0') {
@@ -175,19 +175,20 @@ function sync_google_sheet_data($sheetUrl = null) {
         return -1;
     };
 
-    $nameIdx = $findIdx(['/nama by single vin/i', '/nama customer/i', '/nama/i', '/customer/i', '/pelanggan/i']);
-    $phone1Idx = $findIdx(['/contact person 1/i', '/no wa/i', '/telepon/i', '/phone/i', '/no_hp/i', '/hp/i']);
-    $phone2Idx = $findIdx(['/contact person 2/i']);
+    $nameIdx = $findIdx(['/^customer name$/i', '/nama by single vin/i', '/nama customer/i', '/nama/i', '/customer/i', '/pelanggan/i']);
+    $phone1Idx = $findIdx(['/^no tlp\/hp$/i', '/^decision maker phone$/i', '/contact person 1/i', '/no wa/i', '/telepon/i', '/phone/i', '/no_hp/i', '/hp/i']);
+    $phone2Idx = $findIdx(['/^contact person phone$/i', '/contact person 2/i']);
     $vehicleFilterIdx = $findIdx(['/vehicle filter/i']);
     $rec1Idx = $findIdx(['/alternative_recommendation_model_1/i', '/1\.\s*model/i']);
     $rec2Idx = $findIdx(['/alternative_recommendation_model_2/i', '/2\.\s*model/i']);
     $rec3Idx = $findIdx(['/alternative_recommendation_model_3/i', '/3\.\s*model/i']);
-    $lastCarIdx = $findIdx(['/latest_model/i', '/model_kendaraan_terakhir/i', '/mobil.*saat ini/i', '/unit.*saat ini/i']);
-    $ageIdx = $findIdx(['/vehicle age/i', '/usia_kendaraan_terakhir/i', '/usia.*kendaraan/i', '/usia/i', '/tahun/i']);
-    $clusterIdx = $findIdx(['/cluster_name/i', '/cluster/i', '/klaster/i']);
-    $priorityIdx = $findIdx(['/priority/i', '/prioritas/i']);
+    $lastCarIdx = $findIdx(['/^tipe kendaraan$/i', '/latest_model/i', '/model_kendaraan_terakhir/i', '/mobil.*saat ini/i', '/unit.*saat ini/i']);
+    $ageIdx = $findIdx(['/^tahun produksi$/i', '/vehicle age/i', '/usia_kendaraan_terakhir/i', '/usia.*kendaraan/i', '/usia/i', '/tahun/i']);
+    $clusterIdx = $findIdx(['/^operation description$/i', '/cluster_name/i', '/cluster/i', '/klaster/i']);
+    $priorityIdx = $findIdx(['/^pkb status$/i', '/priority/i', '/prioritas/i']);
     $districtIdx = $findIdx(['/alamat_kecamatan/i', '/kecamatan/i', '/wilayah/i', '/domisili/i']);
-    $vinIdx = $findIdx(['/latest_vin/i', '/vin_kendaraan_terakhir/i', '/vin/i', '/no_rangka/i']);
+    $vinIdx = $findIdx(['/^no rangka$/i', '/latest_vin/i', '/vin_kendaraan_terakhir/i', '/vin/i', '/no_rangka/i']);
+    $plateIdx = $findIdx(['/^police reg no/i', '/no\.?\s*pol/i', '/plat/i']);
     $custTypeIdx = $findIdx(['/cust\.\s*type/i', '/fleet_or_retail/i', '/tipe.*customer/i']);
     $doOutletIdx = $findIdx(['/do_oleh_tunas/i', '/nama_outlet_do/i', '/outlet.*do/i']);
     $srvOutletIdx = $findIdx(['/service_di_tunas/i', '/nama_outlet_service/i']);
@@ -365,6 +366,8 @@ function sync_google_sheet_data($sheetUrl = null) {
         if ($district === 'NO DATA' || $district === '-') $district = '';
 
         $vin = $vinIdx !== -1 ? trim($row[$vinIdx] ?? '') : '';
+        $plateNumber = $plateIdx !== -1 ? trim($row[$plateIdx] ?? '') : '';
+        $sheetRowIndex = $i + 1;
         $custType = $custTypeIdx !== -1 ? strtoupper(trim($row[$custTypeIdx] ?? 'RETAIL')) : 'RETAIL';
         if ($custType !== 'FLEET') $custType = 'RETAIL';
 
@@ -436,15 +439,16 @@ function sync_google_sheet_data($sheetUrl = null) {
 
         // Deterministic customer code to prevent duplicates on repeated syncs
         $code = $vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone), 0, 12));
+        $isOrphan = (!$assignedSalesId && empty($salesFu)) ? 1 : 0;
 
         $rowsToInsert[] = [
             $code, $name, $phone, $carModel, $lastCar, $age,
-            $targetCar, $rec2, $rec3, $cluster, $priority, $district, $vin,
+            $targetCar, $rec2, $rec3, $cluster, $priority, $district, $vin, $plateNumber, $sheetRowIndex,
             $outletDo, $outletSrv, $srvComp,
             $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
             $category, $status,
             $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo,
-            $assignedSalesId,
+            $assignedSalesId, $isOrphan,
             $dataType, $custMigration, $vehicleModelSpk, $vehicleMatch
         ];
     }
@@ -458,20 +462,20 @@ function sync_google_sheet_data($sheetUrl = null) {
         $sqlite_stmt = $sqlite_pdo->prepare("
             INSERT INTO followup_customers (
                 customer_code, name, phone, car_model, last_car_model, car_age,
-                recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin,
+                recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin, plate_number, sheet_row_index,
                 outlet_do, outlet_service, service_compliance,
                 connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                 followup_category, followup_status, sync_source,
                 vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
-                assigned_sales_id,
+                assigned_sales_id, is_orphan,
                 data_type, customer_migration, vehicle_model_spk, vehicle_match
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(customer_code) DO UPDATE SET
                 name = excluded.name, car_model = excluded.car_model, last_car_model = excluded.last_car_model,
                 car_age = excluded.car_age, recommended_model = excluded.recommended_model,
                 alt_model_2 = excluded.alt_model_2, alt_model_3 = excluded.alt_model_3,
                 cluster_name = excluded.cluster_name, priority = excluded.priority, district = excluded.district,
-                vin = excluded.vin, outlet_do = excluded.outlet_do, outlet_service = excluded.outlet_service,
+                vin = excluded.vin, plate_number = excluded.plate_number, sheet_row_index = excluded.sheet_row_index, outlet_do = excluded.outlet_do, outlet_service = excluded.outlet_service,
                 service_compliance = excluded.service_compliance,
                 connected = CASE WHEN excluded.connected != 'FALSE' THEN excluded.connected ELSE followup_customers.connected END,
                 contacted = CASE WHEN excluded.contacted != 'FALSE' THEN excluded.contacted ELSE followup_customers.contacted END,
@@ -530,7 +534,7 @@ function sync_google_sheet_data($sheetUrl = null) {
             $placeholders = [];
             $flatParams = [];
             foreach ($chunk as $rData) {
-                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 foreach ($rData as $val) {
                     $flatParams[] = $val;
                 }
@@ -539,12 +543,12 @@ function sync_google_sheet_data($sheetUrl = null) {
             $sql = "
                 INSERT INTO followup_customers (
                     customer_code, name, phone, car_model, last_car_model, car_age,
-                    recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin,
+                    recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin, plate_number, sheet_row_index,
                     outlet_do, outlet_service, service_compliance,
                     connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
                     followup_category, followup_status, sync_source,
                     vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
-                    assigned_sales_id,
+                    assigned_sales_id, is_orphan,
                     data_type, customer_migration, vehicle_model_spk, vehicle_match
                 ) VALUES " . implode(', ', $placeholders) . "
                 ON DUPLICATE KEY UPDATE
@@ -552,7 +556,7 @@ function sync_google_sheet_data($sheetUrl = null) {
                     car_age = VALUES(car_age), recommended_model = VALUES(recommended_model),
                     alt_model_2 = VALUES(alt_model_2), alt_model_3 = VALUES(alt_model_3),
                     cluster_name = VALUES(cluster_name), priority = VALUES(priority), district = VALUES(district),
-                    vin = VALUES(vin), outlet_do = VALUES(outlet_do), outlet_service = VALUES(outlet_service),
+                    vin = VALUES(vin), plate_number = VALUES(plate_number), sheet_row_index = VALUES(sheet_row_index), outlet_do = VALUES(outlet_do), outlet_service = VALUES(outlet_service),
                     service_compliance = VALUES(service_compliance),
                     connected = CASE WHEN VALUES(connected) != 'FALSE' THEN VALUES(connected) ELSE connected END,
                     contacted = CASE WHEN VALUES(contacted) != 'FALSE' THEN VALUES(contacted) ELSE contacted END,
@@ -725,5 +729,92 @@ if ($action === 'export_csv') {
     }
 
     fclose($output);
+    exit;
+}
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup_sync.php?action=import_database_batch
+// Fast chunked upsert from Google Sheet "Database" tab
+// -------------------------------------------------------------
+if ($action === 'import_database_batch') {
+    $input = get_json_input();
+    $rows = $input['rows'] ?? [];
+    if (empty($rows) || !is_array($rows)) {
+        echo json_encode(['success' => false, 'message' => 'Tidak ada data rows']);
+        exit;
+    }
+
+    global $is_mysql, $sqlite_pdo, $conn;
+    $inserted = 0;
+
+    if ($is_mysql && $conn) {
+        $chunks = array_chunk($rows, 100);
+        foreach ($chunks as $chunk) {
+            $placeholders = [];
+            $flatParams = [];
+            foreach ($chunk as $r) {
+                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'FALSE', 'FALSE', 'FALSE', 'FALSE', '', 'Open', '', ?, ?, 'google_sheet', 'OTHERS', 'RETAIL', 'MEDIUM', 'TUNAS TOYOTA KIARA CONDONG', ?, ?, ?)";
+                $flatParams[] = $r['customer_code'];
+                $flatParams[] = $r['name'];
+                $flatParams[] = $r['phone'];
+                $flatParams[] = $r['car_model'];
+                $flatParams[] = $r['last_car_model'];
+                $flatParams[] = $r['car_age'];
+                $flatParams[] = $r['recommended_model'];
+                $flatParams[] = $r['cluster_name'];
+                $flatParams[] = $r['priority'];
+                $flatParams[] = $r['district'];
+                $flatParams[] = $r['vin'];
+                $flatParams[] = $r['plate_number'];
+                $flatParams[] = (int)($r['sheet_row_index'] ?? 0);
+                $flatParams[] = $r['outlet_do'] ?? 'TUNAS TOYOTA KIARA CONDONG';
+                $flatParams[] = $r['outlet_service'] ?? 'TUNAS TOYOTA KIARA CONDONG';
+                $flatParams[] = $r['followup_category'];
+                $flatParams[] = $r['followup_status'] ?? 'Belum Dihubungi';
+                $flatParams[] = $r['sales_fu'] ?? '';
+                $flatParams[] = !empty($r['assigned_sales_id']) ? (int)$r['assigned_sales_id'] : null;
+                $flatParams[] = isset($r['is_orphan']) ? (int)$r['is_orphan'] : 1;
+                $inserted++;
+            }
+            $sql = "
+                INSERT INTO followup_customers (
+                    customer_code, name, phone, car_model, last_car_model, car_age,
+                    recommended_model, cluster_name, priority, district, vin, plate_number, sheet_row_index,
+                    outlet_do, outlet_service,
+                    connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup,
+                    followup_category, followup_status, sync_source,
+                    vehicle_filter, cust_type, priority_class, outlet_name,
+                    sales_fu, assigned_sales_id, is_orphan
+                ) VALUES " . implode(', ', $placeholders) . "
+                ON DUPLICATE KEY UPDATE
+                    name = VALUES(name),
+                    phone = VALUES(phone),
+                    car_model = VALUES(car_model),
+                    last_car_model = VALUES(last_car_model),
+                    car_age = VALUES(car_age),
+                    recommended_model = VALUES(recommended_model),
+                    cluster_name = VALUES(cluster_name),
+                    priority = VALUES(priority),
+                    district = VALUES(district),
+                    vin = VALUES(vin),
+                    plate_number = VALUES(plate_number),
+                    sheet_row_index = VALUES(sheet_row_index),
+                    followup_category = VALUES(followup_category),
+                    sync_source = 'google_sheet'
+            ";
+            followup_execute($sql, $flatParams);
+        }
+    }
+
+    if (!empty($input['mark_complete'])) {
+        $now = date('Y-m-d H:i:s');
+        $sheetUrl = 'https://docs.google.com/spreadsheets/d/1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4/edit?gid=622548953#gid=622548953';
+        if ($is_mysql && $conn) {
+            followup_execute("INSERT INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?) ON DUPLICATE KEY UPDATE setting_value = ?", [$now, $now]);
+            followup_execute("INSERT INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?) ON DUPLICATE KEY UPDATE setting_value = ?", [$sheetUrl, $sheetUrl]);
+        }
+    }
+
+    echo json_encode(['success' => true, 'inserted' => $inserted]);
     exit;
 }
