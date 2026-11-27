@@ -11147,17 +11147,24 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
         $cleanAddress = trim((string)$rawDistrict);
     }
 
-    // If the address notes contain an explicit "Kec. <District>", that takes priority!
-    if (preg_match('/Kec\.\s*([^,;\n]+),\s*(KAB\.|KOTA)?\s*([^,;\n]+)/i', $cleanAddress, $km)) {
-        $cleanK = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $km[1]))));
-        $cleanC = ucwords(strtolower(trim(preg_replace('/^(kabupaten|kab\.|kota)\s+/i', '', $km[3] ?? ''))));
-        if ($cleanC && strtolower($cleanC) !== 'bandung') {
-            $rawDistrict = "$cleanK, $cleanC";
-        } else {
+    $origRawDistrict = trim((string)$rawDistrict);
+
+    // If rawDistrict is empty/generic OR address says "DS. <rawDist> KEC. <actualKec>", extract explicit Kec.
+    $isDsMatch = ($origRawDistrict !== '' && preg_match('/\b(?:ds|desa|kel)\.?\s*' . preg_quote($origRawDistrict, '/') . '\b.*?\bkec(?:amatan)?\.?\s*([^,;\n]+)/i', $cleanAddress, $dsM));
+    if ($isDsMatch) {
+        $cleanK = trim(preg_replace('/\s+(?:kota|kab(?:upaten)?\.?|dki|prov(?:insi)?)\b.*$/i', '', trim($dsM[1])));
+        $cleanK = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $cleanK))));
+        if ($cleanK !== '') {
             $rawDistrict = $cleanK;
         }
-    } elseif (preg_match('/Kec\.\s*([^,;\n]+)/i', $cleanAddress, $km)) {
-        $rawDistrict = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $km[1]))));
+    } elseif ($origRawDistrict === '' || $origRawDistrict === '0' || strtolower($origRawDistrict) === 'bandung area' || strtolower($origRawDistrict) === 'bandung') {
+        if (preg_match('/Kec(?:amatan)?\.?\s*([^,;\n]+)/i', $cleanAddress, $km)) {
+            $cleanK = trim(preg_replace('/\s+(?:kota|kab(?:upaten)?\.?|dki|prov(?:insi)?)\b.*$/i', '', trim($km[1])));
+            $cleanK = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $cleanK))));
+            if ($cleanK !== '') {
+                $rawDistrict = $cleanK;
+            }
+        }
     }
 
     $addrLower = strtolower($cleanAddress);
@@ -11463,17 +11470,40 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
 
     // LEVEL 4: Sub-District / Kecamatan Hubs
     $cleanRawDist = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$rawDistrict));
-    $cleanRawDistLower = strtolower($cleanRawDist);
+    $cleanRawDistBase = trim(explode(',', $cleanRawDist)[0]);
+    $cleanRawDistLower = strtolower($cleanRawDistBase);
+    $cleanRawDistNoSpace = str_replace(' ', '', $cleanRawDistLower);
+
+    $canonicalDist = null;
+    $resolvedHubCoords = null;
     if ($cleanRawDistLower && isset($bandungDistricts[$cleanRawDistLower])) {
         $canonicalDist = $bandungDistricts[$cleanRawDistLower][0];
+        $resolvedHubCoords = $bandungDistricts[$cleanRawDistLower][1];
+    } elseif ($cleanRawDistNoSpace && isset($bandungDistricts[$cleanRawDistNoSpace])) {
+        $canonicalDist = $bandungDistricts[$cleanRawDistNoSpace][0];
+        $resolvedHubCoords = $bandungDistricts[$cleanRawDistNoSpace][1];
+    } elseif ($cleanRawDistLower && isset($externalCitiesAndHubs[$cleanRawDistLower])) {
+        $canonicalDist = $externalCitiesAndHubs[$cleanRawDistLower][0];
+        $resolvedHubCoords = $externalCitiesAndHubs[$cleanRawDistLower][1];
     } else {
-        $canonicalDist = !empty($cleanRawDist) ? ucwords($cleanRawDistLower) : null;
+        $origBase = strtolower(trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$origRawDistrict)));
+        if ($origBase && isset($bandungDistricts[$origBase])) {
+            $canonicalDist = $bandungDistricts[$origBase][0];
+            $resolvedHubCoords = $bandungDistricts[$origBase][1];
+        } elseif ($origBase && isset($externalCitiesAndHubs[$origBase])) {
+            $canonicalDist = $externalCitiesAndHubs[$origBase][0];
+            $resolvedHubCoords = $externalCitiesAndHubs[$origBase][1];
+        } else {
+            $canonicalDist = !empty($cleanRawDistBase) ? ucwords($cleanRawDistLower) : null;
+        }
     }
 
     if ($canonicalDist && $canonicalDist !== 'Bandung' && $canonicalDist !== 'Bandung Area') {
         if (!$matchedCoords) {
             $matchedDistrict = $canonicalDist;
-            if (isset($bandungDistricts[strtolower($canonicalDist)])) {
+            if ($resolvedHubCoords) {
+                $matchedCoords = $resolvedHubCoords;
+            } elseif (isset($bandungDistricts[strtolower($canonicalDist)])) {
                 $matchedCoords = $bandungDistricts[strtolower($canonicalDist)][1];
             } else {
                 $matchedCoords = array(-6.9248, 107.6472);
