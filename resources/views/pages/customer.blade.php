@@ -1087,7 +1087,7 @@
   <div class="mobile-app" style="max-width: 1200px;"> <!-- Expanded for kanban -->
     <header class="header-page">
       <a href="../index.html"><i class="fa-solid fa-arrow-left"></i></a>
-      <h2>Customer CRM Pipeline</h2>
+      <h2>Database Pelanggan &amp; Radar GPS</h2>
     </header>
 
     <div class="container" style="margin-top:18px;">

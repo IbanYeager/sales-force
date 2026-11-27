@@ -101,15 +101,7 @@ function initFollowupTabs() {
   // Insert Tab Switcher at the very top of container if not exists
   if (!document.getElementById('followupNavTabs')) {
     const tabsHtml = `
-      <div class="followup-nav-tabs" id="followupNavTabs">
-        <button class="followup-tab-btn active" id="tabBtnFollowup" onclick="switchCustomerTab('followup')">
-          <i class="fa-solid fa-bullhorn"></i> <span>Database Pelanggan</span>
-          <span id="followupBadgeCount" style="display:none; font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; background:#d7123a; color:#fff; box-shadow:0 2px 6px rgba(215,18,58,0.4);">0</span>
-        </button>
-        <button class="followup-tab-btn" id="tabBtnKanban" onclick="switchCustomerTab('kanban')">
-          <i class="fa-solid fa-table-columns"></i> <span>Pipeline Prospek</span>
-        </button>
-      </div>
+      <span id="followupBadgeCount" style="display:none;">0</span>
 
       <!-- CONTAINER UNTUK TAB DATABASE FOLLOW-UP -->
       <div id="followupSectionView" style="display:block;">
