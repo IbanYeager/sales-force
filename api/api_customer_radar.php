@@ -152,9 +152,9 @@ try {
             if ($hasStoredCoords) {
                 $rLat = floatval($row['lat']);
                 $rLng = floatval($row['lng']);
-                $resolvedDist = ($rawDist && $rawDist !== '0' && strtolower($rawDist) !== 'bandung area')
-                    ? $rawDist
-                    : (($row['geo_district'] ?? '') ?: 'Bandung Area');
+                $resolvedDist = !empty($row['geo_district'])
+                    ? $row['geo_district']
+                    : (($rawDist && $rawDist !== '0' && strtolower($rawDist) !== 'bandung area') ? $rawDist : 'Bandung Area');
                 $resolvedAddr = ($rawAddr && $rawAddr !== '0')
                     ? trim($rawAddr . ($rawCity && $rawCity !== '0' ? ', ' . $rawCity : ''))
                     : ($row['geo_address'] ?? '');

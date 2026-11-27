@@ -11111,30 +11111,221 @@ $indonesiaCityDistricts = array(
       'ilir barat i' => array(-2.985, 104.735),
     ),
   ),
+  'kota makassar' => array(
+    'city' => 'Kota Makassar',
+    'center' => array(-5.1477, 119.4327),
+    'keys' => array('kota makassar', 'makassar', 'mariso', 'panakkukang', 'rappocini', 'tamalate', 'biringkanaya'),
+    'districts' => array(
+      'mariso' => array(-5.155, 119.41),
+      'panakkukang' => array(-5.149, 119.448),
+      'rappocini' => array(-5.166, 119.437),
+    ),
+  ),
+  'kota pekanbaru' => array(
+    'city' => 'Kota Pekanbaru',
+    'center' => array(0.5071, 101.4478),
+    'keys' => array('kota pekanbaru', 'pekanbaru', 'payung sekaki', 'marpoyan damai', 'tampan'),
+    'districts' => array(
+      'payung sekaki' => array(0.515, 101.415),
+    ),
+  ),
+  'kota semarang' => array(
+    'city' => 'Kota Semarang',
+    'center' => array(-6.9667, 110.4167),
+    'keys' => array('kota semarang', 'semarang'),
+    'districts' => array(),
+  ),
+  'kab. tegal' => array(
+    'city' => 'Kab. Tegal',
+    'center' => array(-6.985, 109.135),
+    'keys' => array('kabupaten tegal', 'kab. tegal', 'tegal'),
+    'districts' => array(),
+  ),
+  'kota balikpapan' => array(
+    'city' => 'Kota Balikpapan',
+    'center' => array(-1.2379, 116.8529),
+    'keys' => array('kota balikpapan', 'balikpapan'),
+    'districts' => array(),
+  ),
+  'kab. kendal' => array(
+    'city' => 'Kab. Kendal',
+    'center' => array(-6.925, 110.205),
+    'keys' => array('kabupaten kendal', 'kab. kendal', 'kendal'),
+    'districts' => array(),
+  ),
+  'kab. brebes' => array(
+    'city' => 'Kab. Brebes',
+    'center' => array(-6.871, 109.042),
+    'keys' => array('kabupaten brebes', 'kab. brebes', 'brebes'),
+    'districts' => array(),
+  ),
+  'kab. lebak' => array(
+    'city' => 'Kab. Lebak',
+    'center' => array(-6.564, 106.252),
+    'keys' => array('kabupaten lebak', 'kab. lebak', 'lebak', 'rangkasbitung'),
+    'districts' => array(),
+  ),
+  'kab. sukoharjo' => array(
+    'city' => 'Kab. Sukoharjo',
+    'center' => array(-7.683, 110.836),
+    'keys' => array('kabupaten sukoharjo', 'kab. sukoharjo', 'sukoharjo'),
+    'districts' => array(),
+  ),
+  'kab. rembang' => array(
+    'city' => 'Kab. Rembang',
+    'center' => array(-6.709, 111.344),
+    'keys' => array('kabupaten rembang', 'kab. rembang', 'rembang'),
+    'districts' => array(),
+  ),
+  'kota mataram' => array(
+    'city' => 'Kota Mataram',
+    'center' => array(-8.583, 116.116),
+    'keys' => array('kota mataram', 'mataram'),
+    'districts' => array(),
+  ),
+  'kota padang' => array(
+    'city' => 'Kota Padang',
+    'center' => array(-0.947, 100.417),
+    'keys' => array('kota padang', 'padang'),
+    'districts' => array(),
+  ),
 );
 
+require_once __DIR__ . '/api_radar_polygons.php';
+
+function radarPointInPolygon($lat, $lng, $polygon) {
+    $n = count($polygon);
+    if ($n < 3) return false;
+    $inside = false;
+    for ($i = 0, $j = $n - 1; $i < $n; $j = $i++) {
+        $yi = $polygon[$i][0]; $xi = $polygon[$i][1];
+        $yj = $polygon[$j][0]; $xj = $polygon[$j][1];
+        $denom = ($yj - $yi);
+        if (abs($denom) < 1e-12) $denom = 1e-12;
+        $intersect = (($yi > $lat) !== ($yj > $lat)) &&
+            ($lng < ($xj - $xi) * ($lat - $yi) / $denom + $xi);
+        if ($intersect) $inside = !$inside;
+    }
+    return $inside;
+}
+
+function radarHash01($seed) {
+    $h = hash('sha256', (string)$seed);
+    $val = hexdec(substr($h, 0, 8));
+    return $val / 4294967295.0;
+}
+
+function radarDisperseAroundPoint($id, $lat, $lng, $minKm, $maxKm, $salt = '') {
+    $u = radarHash01($id . '|r|' . $salt);
+    $v = radarHash01($id . '|t|' . $salt);
+    $distKm = $minKm + sqrt($u) * ($maxKm - $minKm);
+    $angle = $v * 2.0 * M_PI;
+    $dLat = ($distKm / 111.0) * cos($angle);
+    $dLng = ($distKm / (111.0 * max(0.2, cos(deg2rad($lat))))) * sin($angle);
+    return [round($lat + $dLat, 6), round($lng + $dLng, 6)];
+}
+
+function radarSamplePointInPolygon($id, $polyEntry) {
+    $poly = $polyEntry['polygon'] ?? [];
+    $bbox = $polyEntry['bbox'] ?? null;
+    $center = $polyEntry['center'] ?? [-6.9175, 107.6191];
+    $name = $polyEntry['name'] ?? 'Bandung';
+
+    if ($bbox && count($poly) >= 3) {
+        $minLat = $bbox[0]; $maxLat = $bbox[1];
+        $minLng = $bbox[2]; $maxLng = $bbox[3];
+        $padLat = ($maxLat - $minLat) * 0.05;
+        $padLng = ($maxLng - $minLng) * 0.05;
+        $aLat = $minLat + $padLat;
+        $bLat = $maxLat - $padLat;
+        $aLng = $minLng + $padLng;
+        $bLng = $maxLng - $padLng;
+
+        for ($attempt = 0; $attempt < 40; $attempt++) {
+            $u = radarHash01($id . '|' . $name . '|lat|' . $attempt);
+            $v = radarHash01($id . '|' . $name . '|lng|' . $attempt);
+            $candLat = $aLat + $u * ($bLat - $aLat);
+            $candLng = $aLng + $v * ($bLng - $aLng);
+            if (radarPointInPolygon($candLat, $candLng, $poly)) {
+                return [round($candLat, 6), round($candLng, 6)];
+            }
+        }
+    }
+
+    return radarDisperseAroundPoint($id, $center[0], $center[1], 0.15, 0.55, $name);
+}
+
+function radarLookupBandungPoly($distStr, $isKabBandung = false) {
+    $polygons = $GLOBALS['POLREG_POLYGONS'] ?? [];
+    if (empty($polygons)) return null;
+
+    $clean = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$distStr));
+    $clean = trim(explode(',', $clean)[0]);
+    $low = strtolower($clean);
+    if ($low === '' || $low === '0' || $low === 'bandung' || $low === 'bandung area') return null;
+
+    $noSpace = str_replace(' ', '', $low);
+    $aliases = [
+        'buahbatu' => 'buahbatu',
+        'buah batu' => 'buahbatu',
+        'ujungberung' => 'ujungberung',
+        'ujung berung' => 'ujungberung',
+        'kiaracondong' => 'kiaracondong',
+        'kiara condong' => 'kiaracondong',
+        'kircon' => 'kiaracondong',
+        'astanaanyar' => 'astana anyar',
+        'astana anyar' => 'astana anyar',
+        'batununggal' => 'batununggal',
+        'batu nunggal' => 'batununggal',
+        'bojongsoang' => 'bojongsoang',
+        'bojong soang' => 'bojongsoang',
+        'dayeuhkolot' => 'dayeuhkolot',
+        'dayeuh kolot' => 'dayeuhkolot',
+        'solokanjeruk' => 'solokanjeruk',
+        'solokan jeruk' => 'solokanjeruk',
+        'cikalongwetan' => 'cikalongwetan',
+        'cikalong wetan' => 'cikalongwetan',
+        'babakanciparay' => 'babakan ciparay',
+        'bandungkidul' => 'bandung kidul',
+        'bandungkulon' => 'bandung kulon',
+        'bandungwetan' => 'bandung wetan',
+        'bojongloakaler' => 'bojongloa kaler',
+        'bojongloakidul' => 'bojongloa kidul',
+        'cibeunyingkaler' => 'cibeunying kaler',
+        'cibeunyingkidul' => 'cibeunying kidul',
+        'sumurbandung' => 'sumur bandung',
+        'cimahiselatan' => 'cimahi selatan',
+        'cimahitengah' => 'cimahi tengah',
+        'cimahiutara' => 'cimahi utara',
+        'cimahi' => 'cimahi tengah',
+        'kopo' => 'babakan ciparay',
+        'pasteur' => 'sukajadi',
+        'dago' => 'coblong',
+    ];
+    if ($isKabBandung) {
+        $aliases['citeureup'] = 'dayeuhkolot';
+        $aliases['cikoneng'] = 'bojongsoang';
+        $aliases['warung lobak'] = 'katapang';
+        $aliases['warunglobak'] = 'katapang';
+    }
+
+    if (isset($polygons[$low])) return $polygons[$low];
+    if (isset($aliases[$low]) && isset($polygons[$aliases[$low]])) return $polygons[$aliases[$low]];
+    if (isset($aliases[$noSpace]) && isset($polygons[$aliases[$noSpace]])) return $polygons[$aliases[$noSpace]];
+
+    foreach ($polygons as $pKey => $pVal) {
+        if (str_replace(' ', '', $pKey) === $noSpace) {
+            return $pVal;
+        }
+    }
+    return null;
+}
+
 /**
- * Intelligent high-precision geocoding resolver for Sales Radar & Customer CRM
- * Resolves address text with priority:
- * 1. Street Landmarks & Neighborhood Roads (e.g. "Palem Botol" -> Jatisari/Buahbatu)
- * 2. Housing Complexes & Perumahan (600+ complexes from official RDTR)
- * 3. Kelurahan / Desa in Kota Bandung, Kab Bandung, Cimahi & KBB
- * 3.5. Nominatim OpenStreetMap Geocoding (cached) - Street-level accuracy!
- * 4. External Cities & Corporate Hubs (Jakarta Selatan, Jakarta Timur, Makassar, etc.)
- * 5. Arterial Highway Corridor (Jl. Soekarno-Hatta 20km)
- * 6. Polreg District Names (79 Kecamatan)
- * 7. Dealer Catchment Fallback (1-3 km around Tunas Toyota Kircon with realistic neighborhood scatter)
- *
- * Jitter Precision Levels:
- * - Nominatim street match:  3-10m (pin-point accuracy)
- * - Local street/complex:    15-40m (on the correct road segment)
- * - Kelurahan centroid:      50-150m (within the village)
- * - District centroid:       250-1500m (scattered across the district)
- *
- * @return array [float $lat, float $lng, string $districtName, string $cleanAddress]
+ * Kecamatan-First Polygon-Bounded Geocoding Resolver for Sales Radar & CRM
  */
 function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null, $plateNumber = '', $vin = '') {
-    global $bandungDistricts, $bandungKelurahan, $bandungStreets, $bandungComplexes, $externalCitiesAndHubs, $bandungNeighborhoodLandmarks;
+    global $bandungDistricts, $bandungKelurahan, $bandungStreets, $bandungComplexes, $externalCitiesAndHubs, $bandungNeighborhoodLandmarks, $indonesiaCityDistricts;
 
     $cleanAddress = '';
     if (preg_match('/Alamat\s*:\s*(.+)$/i', (string)$notes, $m)) {
@@ -11149,9 +11340,8 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
 
     $origRawDistrict = trim((string)$rawDistrict);
 
-    // If rawDistrict is empty/generic OR address says "DS. <rawDist> KEC. <actualKec>", extract explicit Kec.
-    $isDsMatch = ($origRawDistrict !== '' && preg_match('/\b(?:ds|desa|kel)\.?\s*' . preg_quote($origRawDistrict, '/') . '\b.*?\bkec(?:amatan)?\.?\s*([^,;\n]+)/i', $cleanAddress, $dsM));
-    if ($isDsMatch) {
+    // Handle "DS. <origRawDistrict> KEC. <actualKec>"
+    if ($origRawDistrict !== '' && preg_match('/\b(?:ds|desa|kel)\.?\s*' . preg_quote($origRawDistrict, '/') . '\b.*?\bkec(?:amatan)?\.?\s*([^,;\n]+)/i', $cleanAddress, $dsM)) {
         $cleanK = trim(preg_replace('/\s+(?:kota|kab(?:upaten)?\.?|dki|prov(?:insi)?)\b.*$/i', '', trim($dsM[1])));
         $cleanK = ucwords(strtolower(trim(preg_replace('/^(kecamatan|kec\.)\s+/i', '', $cleanK))));
         if ($cleanK !== '') {
@@ -11168,139 +11358,102 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     }
 
     $addrLower = strtolower($cleanAddress);
-    $rawDistLower = strtolower(trim((string)$rawDistrict));
+    $rawDistClean = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$rawDistrict));
+    $rawDistLower = strtolower($rawDistClean);
+    $combinedCheck = strtolower($rawDistClean . ' ' . $cleanAddress);
 
-    // Fast lookup in GIS SQLite geocode_cache table
-    static $sqliteCachePdo = null;
-    static $cacheStmt = null;
-    if ($sqliteCachePdo === null) {
-        $dbPath = __DIR__ . '/followup_database.sqlite';
-        if (file_exists($dbPath)) {
-            try {
-                $sqliteCachePdo = new PDO('sqlite:' . $dbPath);
-                $sqliteCachePdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
-                $cacheStmt = $sqliteCachePdo->prepare("SELECT matched_address, lat, lng FROM geocode_cache WHERE query_text = ? OR query_text LIKE ? LIMIT 1");
-            } catch (Exception $e) {
-                $sqliteCachePdo = false;
-            }
-        } else {
-            $sqliteCachePdo = false;
-        }
-    }
+    // Explicit Bandung Raya city detection
+    $isKabBandung = (bool)preg_match('/\b(?:kab(?:upaten)?\.?\s*bandung)\b(?!\s*barat)/i', $combinedCheck);
+    $isBandungBarat = (bool)preg_match('/\bbandung barat\b/i', $combinedCheck);
+    $isKotaBandung = (bool)preg_match('/\bkota bandung\b/i', $combinedCheck);
+    $isCimahi = (bool)preg_match('/\b(?:kota\s+)?cimahi\b/i', $combinedCheck);
+    $isExternalSerang = (bool)preg_match('/kab\.?\s*serang/i', $combinedCheck);
 
-    if ($sqliteCachePdo && $cacheStmt && !empty($cleanAddress)) {
-        try {
-            $cacheStmt->execute([$cleanAddress, $cleanAddress . '%']);
-            $hit = $cacheStmt->fetch(PDO::FETCH_ASSOC);
-            if ($hit && isset($hit['lat']) && isset($hit['lng'])) {
-                $distName = !empty($rawDistrict) ? $rawDistrict : '';
-                if (empty($distName) && !empty($hit['matched_address'])) {
-                    if (preg_match('/,\s*([A-Za-z\s]+),\s*(Jawa Barat|DKI Jakarta|Banten)/i', $hit['matched_address'], $dm)) {
-                        $distName = trim($dm[1]);
-                    }
-                }
-                if (empty($distName)) {
-                    $distName = 'Kiaracondong';
-                }
-                return [(float)$hit['lat'], (float)$hit['lng'], $distName, $hit['matched_address'] ?: $cleanAddress];
-            }
-        } catch (Exception $e) {}
-    }
+    // Step 1: Check explicit Bandung Raya polygon if city is Bandung Raya or not explicitly external
+    $hasExplicitExternalCity = (bool)preg_match(
+        '/\b(kota\s+jakarta|jakarta\s+(?:selatan|timur|pusat|barat|utara)|dki\s+jakarta|kota\s+tangerang|tangerang\s+selatan|kabupaten\s+tangerang|kab\.?\s+tangerang|kota\s+bekasi|kabupaten\s+bekasi|kab\.?\s+bekasi|kota\s+depok|kota\s+bogor|kabupaten\s+bogor|kab\.?\s+bogor|kabupaten\s+purwakarta|kab\.?\s+purwakarta|kabupaten\s+subang|kab\.?\s+subang|kabupaten\s+karawang|kab\.?\s+karawang|kabupaten\s+cirebon|kota\s+cirebon|kabupaten\s+majalengka|kab\.?\s+majalengka|kabupaten\s+sumedang|kab\.?\s+sumedang|kabupaten\s+garut|kab\.?\s+garut|kabupaten\s+cianjur|kab\.?\s+cianjur|kabupaten\s+sukabumi|kota\s+sukabumi|kabupaten\s+tasikmalaya|kota\s+tasikmalaya|kabupaten\s+ciamis|kabupaten\s+pangandaran|kota\s+makassar|kota\s+pekanbaru|kota\s+surabaya|kota\s+semarang|kota\s+balikpapan|kabupaten\s+tegal|kabupaten\s+kendal|kabupaten\s+brebes|kabupaten\s+lebak|kabupaten\s+sukoharjo|kabupaten\s+rembang|kota\s+mataram|kota\s+padang|kab\.?\s+serang|kota\s+serang)\b/i',
+        $combinedCheck
+    );
 
-    // Live ArcGIS World Geocoding Engine fallback for newly added addresses
-    if (empty($GLOBALS['SKIP_REMOTE_GEOCODE']) && !empty($cleanAddress) && strlen($cleanAddress) >= 5) {
-        try {
-            $encodedAddr = urlencode($cleanAddress . ', Indonesia');
-            $esriUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine={$encodedAddr}&maxLocations=1&sourceCountry=IDN";
-            $ctx = stream_context_create([
-                'http' => [
-                    'timeout' => 3,
-                    'header' => "User-Agent: TunasToyotaSFT/1.0\r\n"
-                ]
-            ]);
-            $resp = @file_get_contents($esriUrl, false, $ctx);
-            if ($resp) {
-                $json = json_decode($resp, true);
-                if (!empty($json['candidates'][0]['location'])) {
-                    $loc = $json['candidates'][0]['location'];
-                    $mAddr = $json['candidates'][0]['address'] ?? $cleanAddress;
-                    $score = (float)($json['candidates'][0]['score'] ?? 0);
-                    if ($score >= 70) {
-                        $cLat = (float)$loc['y'];
-                        $cLng = (float)$loc['x'];
-                        $dName = $rawDistrict ?: '';
-                        if (empty($dName) && preg_match('/,\s*([A-Za-z\s]+),\s*(Jawa Barat|DKI Jakarta|Banten|Jawa Tengah|Jawa Timur)/i', $mAddr, $dm)) {
-                            $dName = trim($dm[1]);
+    if (!$hasExplicitExternalCity && !$isExternalSerang) {
+        $polyEntry = radarLookupBandungPoly($rawDistrict, $isKabBandung);
+        if ($polyEntry) {
+            // District matches one of the 79 Bandung Raya Polygons -> Kecamatan-first placement!
+            // Only use street/complex coordinate if it maps to the EXACT SAME kecamatan AND falls inside polygon
+            $streetCoord = null;
+            if (!empty($addrLower)) {
+                $targetPolyNameLower = strtolower($polyEntry['name']);
+                $sources = [$bandungNeighborhoodLandmarks ?? [], $bandungStreets ?? [], $bandungComplexes ?? []];
+                foreach ($sources as $dict) {
+                    foreach ($dict as $kw => $info) {
+                        if (strtolower($info[0] ?? '') === $targetPolyNameLower && preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
+                            if (radarPointInPolygon($info[1][0], $info[1][1], $polyEntry['polygon'] ?? [])) {
+                                $streetCoord = $info[1];
+                                break 2;
+                            }
                         }
-                        if (empty($dName)) $dName = 'Kiaracondong';
-                        
-                        if ($sqliteCachePdo) {
-                            try {
-                                $ins = $sqliteCachePdo->prepare("INSERT OR REPLACE INTO geocode_cache (query_text, matched_address, lat, lng, score, updated_at) VALUES (?, ?, ?, ?, ?, ?)");
-                                $ins->execute([$cleanAddress, $mAddr, $cLat, $cLng, $score, date('Y-m-d H:i:s')]);
-                            } catch (Exception $e) {}
-                        }
-                        return [$cLat, $cLng, $dName, $mAddr];
                     }
                 }
             }
-        } catch (Throwable $e) {}
-    }
-
-    // Authoritative rawDistrict canonical resolution
-    $canonicalRawDist = null;
-    $rawDistLookup = strtolower(trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$rawDistrict)));
-    if (!empty($rawDistLookup) && $rawDistLookup !== 'bandung area' && $rawDistLookup !== 'bandung') {
-        if (isset($bandungDistricts[$rawDistLookup])) {
-            $canonicalRawDist = $bandungDistricts[$rawDistLookup][0];
-        } elseif (isset($externalCitiesAndHubs[$rawDistLookup])) {
-            $canonicalRawDist = $externalCitiesAndHubs[$rawDistLookup][0];
-        }
-    }
-
-    $matchedDistrict = null;
-    $matchedCoords = null;
-    $matchLevel = 0; // Track which level matched for jitter calibration
-
-        // LEVEL 0: Strict Multi-Region Spatial Resolution for Non-Bandung Cities & Subdistricts
-    // (Prevents words like "pemda", "kartini", "melati" in Bekasi, Jakarta, Tangerang, etc. from matching Bandung streets/complexes!)
-    global $bandungDistricts, $indonesiaCityDistricts;
-    
-    $combinedCheck = strtolower($rawDistrict . ' ' . $cleanAddress);
-    $isBandungExplicit = false;
-    
-    // Check if Bandung is explicitly mentioned or district matches a Bandung Raya district
-    if ($canonicalRawDist !== null && isset($bandungDistricts[$rawDistLookup])) {
-        $isBandungExplicit = true;
-    } elseif (preg_match('/\b(bandung|kota bandung|(?:kabupaten|kab\.?)\s*bandung|bandung barat|kota cimahi|cimahi)\b/i', $combinedCheck) && !preg_match('/kab\.?\s*serang/i', $combinedCheck)) {
-        $isBandungExplicit = true;
-    } else {
-        foreach ($bandungDistricts as $bdKey => $bdVal) {
-            if ($bdKey === 'bandung' || $bdKey === 'kota bandung' || $bdKey === 'kab bandung') continue;
-            if (preg_match('/\b(kec\.?|kecamatan\s+)' . preg_quote($bdKey, '/') . '\b/i', $combinedCheck)) {
-                $isBandungExplicit = true;
-                break;
+            if ($streetCoord) {
+                $pt = radarDisperseAroundPoint($id, $streetCoord[0], $streetCoord[1], 0.04, 0.22, $polyEntry['name']);
+            } else {
+                $pt = radarSamplePointInPolygon($id, $polyEntry);
             }
+            return [$pt[0], $pt[1], $polyEntry['name'], $cleanAddress];
         }
     }
 
-    if (!$isBandungExplicit && !empty($indonesiaCityDistricts)) {
+    // Step 2: Check External Cities & Districts with Scored Matching (longest specific city match wins!)
+    $isBandungCityOnly = ($isKabBandung || $isBandungBarat || $isKotaBandung || $isCimahi) && !$hasExplicitExternalCity;
+    if (!$isBandungCityOnly && !empty($indonesiaCityDistricts)) {
+        $bestCityData = null;
+        $bestScore = 0;
+
+        $genericCityWords = ['jakarta', 'dki', 'tangerang', 'bekasi', 'serang', 'bogor', 'cirebon', 'tasikmalaya', 'sukabumi'];
         foreach ($indonesiaCityDistricts as $cKey => $cData) {
-            $matchesCity = false;
-            foreach ($cData['keys'] as $cKeyWord) {
-                if (preg_match('/\b' . preg_quote($cKeyWord, '/') . '\b/i', $combinedCheck)) {
-                    $matchesCity = true;
-                    break;
+            $score = 0;
+            $cityLower = strtolower($cData['city']);
+            $cityNorm = str_replace('kab. ', 'kabupaten ', $cityLower);
+
+            if (preg_match('/\b' . preg_quote($cityLower, '/') . '\b/i', $combinedCheck) ||
+                preg_match('/\b' . preg_quote($cityNorm, '/') . '\b/i', $combinedCheck)) {
+                $score += 200;
+            }
+
+            foreach ($cData['keys'] as $kw) {
+                $kwL = strtolower($kw);
+                if (preg_match('/\b' . preg_quote($kwL, '/') . '\b/i', $combinedCheck)) {
+                    if (in_array($kwL, $genericCityWords, true)) {
+                        $score += 5;
+                    } elseif (strpos($kwL, ' ') !== false) {
+                        $score += 80;
+                    } else {
+                        $score += 40;
+                    }
                 }
             }
 
-            if ($matchesCity) {
-                $matchedKec = null;
-                $matchedCoords = null;
-                $citySimple = strtolower(trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $cData['city'])));
+            if ($rawDistLower !== '' && isset($cData['districts'][$rawDistLower])) {
+                $score += 120;
+            }
 
-                // Sort district candidates: longer names first, and district matching city name last
-                $dEntries = $cData['districts'];
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $bestCityData = $cData;
+            }
+        }
+
+        if ($bestCityData && $bestScore >= 35) {
+            $matchedKec = null;
+            $matchedCoords = null;
+            $citySimple = strtolower(trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $bestCityData['city'])));
+
+            if ($rawDistLower !== '' && isset($bestCityData['districts'][$rawDistLower])) {
+                $matchedKec = $rawDistLower;
+                $matchedCoords = $bestCityData['districts'][$rawDistLower];
+            } else {
+                $dEntries = $bestCityData['districts'] ?? [];
                 uksort($dEntries, function($a, $b) use ($citySimple) {
                     $aIsCity = ($a === $citySimple);
                     $bIsCity = ($b === $citySimple);
@@ -11308,7 +11461,6 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
                     if (!$aIsCity && $bIsCity) return -1;
                     return strlen($b) - strlen($a);
                 });
-
                 foreach ($dEntries as $dName => $dCoords) {
                     if ($dName === $citySimple) {
                         if (preg_match('/(?:kec\.?|kecamatan)\s*' . preg_quote($dName, '/') . '\b/i', $combinedCheck)) {
@@ -11316,241 +11468,113 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
                             $matchedCoords = $dCoords;
                             break;
                         }
-                    } else {
-                        if (preg_match('/\b' . preg_quote($dName, '/') . '\b/i', $combinedCheck)) {
-                            $matchedKec = $dName;
-                            $matchedCoords = $dCoords;
-                            break;
+                    } elseif (preg_match('/\b' . preg_quote($dName, '/') . '\b/i', $combinedCheck)) {
+                        $matchedKec = $dName;
+                        $matchedCoords = $dCoords;
+                        break;
+                    }
+                }
+            }
+
+            if (!$matchedCoords) {
+                $matchedCoords = $bestCityData['center'];
+                $matchedKec = $citySimple;
+            }
+
+            $titleCity = trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $bestCityData['city']));
+            $finalDistrict = ucwords($matchedKec) . ', ' . $titleCity;
+            $pt = radarDisperseAroundPoint($id, $matchedCoords[0], $matchedCoords[1], 0.35, 1.5, $finalDistrict);
+            return [$pt[0], $pt[1], $finalDistrict, $cleanAddress];
+        }
+    }
+
+    // Step 3: Empty / Unrecognized district inside Bandung Raya -> scan address text for Bandung Raya Kecamatan/Kelurahan/Streets
+    $resolvedPoly = null;
+    $streetHintCoords = null;
+
+    if (!empty($addrLower)) {
+        // Explicit "Kec. <Name>" inside address
+        if (preg_match('/kec(?:amatan)?\.?\s*([a-z\s]{3,25})/i', $addrLower, $km)) {
+            $candKec = trim(preg_replace('/\s+(?:kota|kab|kabupaten)\b.*$/i', '', $km[1]));
+            $resolvedPoly = radarLookupBandungPoly($candKec, $isKabBandung);
+        }
+
+        // Check landmarks -> streets -> complexes -> kelurahan -> bandungDistricts names
+        if (!$resolvedPoly) {
+            $sources = [
+                $bandungNeighborhoodLandmarks ?? [],
+                $bandungStreets ?? [],
+                $bandungComplexes ?? [],
+                $bandungKelurahan ?? [],
+                $bandungDistricts ?? []
+            ];
+            foreach ($sources as $dict) {
+                foreach ($dict as $kw => $info) {
+                    if (strlen($kw) < 4 || $kw === 'bandung' || $kw === 'kota bandung' || $kw === 'kab bandung') continue;
+                    if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
+                        $candPoly = radarLookupBandungPoly($info[0] ?? '', $isKabBandung);
+                        if ($candPoly) {
+                            $resolvedPoly = $candPoly;
+                            if (radarPointInPolygon($info[1][0], $info[1][1], $candPoly['polygon'] ?? [])) {
+                                $streetHintCoords = $info[1];
+                            }
+                            break 2;
                         }
                     }
                 }
-
-                if (!$matchedCoords) {
-                    $matchedCoords = $cData['center'];
-                    $matchedKec = trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $cData['city']));
-                }
-
-                $titleKec = ucwords($matchedKec);
-                $titleCity = trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $cData['city']));
-                $finalDistrict = $titleKec . ', ' . $titleCity;
-
-                $hash = abs(crc32($id . '_' . $finalDistrict));
-                $angle = (($hash % 360) / 180.0) * M_PI;
-                $dispersionKm = 0.015 + (($hash % 30) / 1000.0);
-                $deltaLat = ($dispersionKm / 111.0) * cos($angle);
-                $deltaLng = ($dispersionKm / (111.0 * cos(deg2rad($matchedCoords[0])))) * sin($angle);
-
-                $finalLat = round($matchedCoords[0] + $deltaLat, 6);
-                $finalLng = round($matchedCoords[1] + $deltaLng, 6);
-
-                return [$finalLat, $finalLng, $finalDistrict, $cleanAddress];
             }
         }
     }
 
-    // LEVEL 0.5: Local Neighborhood Landmarks & Road Segments
-    if (!empty($addrLower) && !empty($bandungNeighborhoodLandmarks)) {
-        foreach ($bandungNeighborhoodLandmarks as $kw => $info) {
-            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                $matchedDistrict = $info[0];
-                $matchedCoords = $info[1];
-                $matchLevel = 1;
-                break;
-            }
-        }
-    }
-
-    // LEVEL 1: STREET-FIRST RESOLUTION (STREETS MUST OVERRIDE KELURAHAN & COMPLEXES!)
-    // 1A. Soekarno-Hatta Highway Corridor
-    if (!empty($addrLower) && preg_match('/\b(soekarno[\s\-]hatta|by[\s\-]?pass|soekar)\b/i', $addrLower)) {
-        $numMatch = [];
-        preg_match('/(?:no\.?|km\.?)\s*([0-9]+)/i', $addrLower, $numMatch);
-        $num = !empty($numMatch[1]) ? intval($numMatch[1]) : null;
-
-        if ($num !== null) {
-            if ($num < 150) {
-                $matchedDistrict = 'Bandung Kulon';
-                $matchedCoords = array(-6.9360, 107.5680);
-            } elseif ($num < 300) {
-                $matchedDistrict = 'Bojongloa Kidul';
-                $matchedCoords = array(-6.9425, 107.5925);
-            } elseif ($num < 450) {
-                $matchedDistrict = 'Regol';
-                $matchedCoords = array(-6.9468, 107.6180);
-            } elseif ($num < 550) {
-                $matchedDistrict = 'Batununggal';
-                $matchedCoords = array(-6.9460, 107.6350);
-            } elseif ($num < 650) {
-                $matchedDistrict = 'Kiaracondong';
-                $matchedCoords = array(-6.9458, 107.6515); // Directly on Jl. Soekarno-Hatta near Kircon flyover / Jackal Holidays No. 593
-            } elseif ($num < 750) {
-                $matchedDistrict = 'Rancasari';
-                $matchedCoords = array(-6.9455, 107.6710);
-            } else {
-                $matchedDistrict = 'Gedebage';
-                $matchedCoords = array(-6.9400, 107.7000);
-            }
+    if ($resolvedPoly) {
+        if ($streetHintCoords) {
+            $pt = radarDisperseAroundPoint($id, $streetHintCoords[0], $streetHintCoords[1], 0.05, 0.25, $resolvedPoly['name']);
         } else {
-            if (stripos($rawDistLower, 'kiaracondong') !== false) {
-                $matchedDistrict = 'Kiaracondong';
-                $matchedCoords = array(-6.9458, 107.6515);
-            } elseif (stripos($rawDistLower, 'buahbatu') !== false) {
-                $matchedDistrict = 'Buahbatu';
-                $matchedCoords = array(-6.9452, 107.6435);
-            } elseif (stripos($rawDistLower, 'batununggal') !== false) {
-                $matchedDistrict = 'Batununggal';
-                $matchedCoords = array(-6.9460, 107.6350);
-            } elseif (stripos($rawDistLower, 'regol') !== false) {
-                $matchedDistrict = 'Regol';
-                $matchedCoords = array(-6.9468, 107.6180);
-            } elseif (stripos($rawDistLower, 'bojongloa') !== false) {
-                $matchedDistrict = 'Bojongloa Kidul';
-                $matchedCoords = array(-6.9425, 107.5925);
-            } elseif (stripos($rawDistLower, 'kulon') !== false) {
-                $matchedDistrict = 'Bandung Kulon';
-                $matchedCoords = array(-6.9360, 107.5680);
-            } elseif (stripos($rawDistLower, 'rancasari') !== false) {
-                $matchedDistrict = 'Rancasari';
-                $matchedCoords = array(-6.9455, 107.6710);
-            } else {
-                $matchedDistrict = 'Kiaracondong';
-                $matchedCoords = array(-6.9458, 107.6515);
-            }
+            $pt = radarSamplePointInPolygon($id, $resolvedPoly);
         }
-        $matchLevel = 1;
+        return [$pt[0], $pt[1], $resolvedPoly['name'], $cleanAddress];
     }
 
-    // 1B. Other Specific Street Names (Streets take absolute precedence over Kelurahan/Complexes)
-    if (!$matchedCoords && !empty($addrLower)) {
-        if (!empty($bandungNeighborhoodLandmarks)) {
-            foreach ($bandungNeighborhoodLandmarks as $kw => $info) {
-                if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                    $matchedDistrict = $info[0];
-                    $matchedCoords = $info[1];
-                    $matchLevel = 1;
-                    break;
-                }
-            }
+    // Check external city keywords even in empty-city addresses (Delatinos BSD, Cibitung, Simatupang, Sudirman Kav)
+    if (!empty($addrLower)) {
+        if (strpos($addrLower, 'delatinos') !== false || strpos($addrLower, 'bsd') !== false) {
+            $pt = radarDisperseAroundPoint($id, -6.318, 106.666, 0.2, 0.8, 'serpong');
+            return [$pt[0], $pt[1], 'Serpong, Tangerang Selatan', $cleanAddress];
         }
-        if (!$matchedCoords && !empty($bandungStreets)) {
-            foreach ($bandungStreets as $kw => $info) {
-                if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                    $matchedDistrict = $info[0];
-                    $matchedCoords = $info[1];
-                    $matchLevel = 1;
-                    break;
-                }
-            }
+        if (strpos($addrLower, 'cibitung') !== false || strpos($addrLower, 'metland') !== false) {
+            $pt = radarDisperseAroundPoint($id, -6.2536, 107.095, 0.2, 0.8, 'cibitung');
+            return [$pt[0], $pt[1], 'Cibitung, Bekasi', $cleanAddress];
+        }
+        if (strpos($addrLower, 'simatupang') !== false) {
+            $pt = radarDisperseAroundPoint($id, -6.292, 106.825, 0.2, 1.0, 'jaksel');
+            return [$pt[0], $pt[1], 'Cilandak, Jakarta Selatan', $cleanAddress];
+        }
+        if (preg_match('/sudirman\s+kav/i', $addrLower)) {
+            $pt = radarDisperseAroundPoint($id, -6.208, 106.821, 0.2, 0.8, 'tanah_abang');
+            return [$pt[0], $pt[1], 'Tanah Abang, Jakarta Pusat', $cleanAddress];
         }
     }
 
-    // LEVEL 2: Housing Complexes & Perumahan
-    if (!$matchedCoords && !empty($addrLower) && !empty($bandungComplexes)) {
-        foreach ($bandungComplexes as $kw => $info) {
-            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                $matchedDistrict = $info[0];
-                $matchedCoords = $info[1];
-                $matchLevel = 2;
-                break;
-            }
+    // Step 4: Clean Wide-Spread Fallbacks by Regency/City (NEVER pile 2,000+ pins at Kiaracondong!)
+    if ($isKabBandung) {
+        $pt = radarDisperseAroundPoint($id, -7.0150, 107.5850, 1.2, 4.8, 'kab_bandung');
+        return [$pt[0], $pt[1], 'Kabupaten Bandung', $cleanAddress];
+    }
+    if ($isBandungBarat) {
+        $pt = radarDisperseAroundPoint($id, -6.8550, 107.4950, 1.0, 3.8, 'kbb');
+        return [$pt[0], $pt[1], 'Bandung Barat', $cleanAddress];
+    }
+    if ($isCimahi) {
+        $cimahiPoly = radarLookupBandungPoly('cimahi tengah', false);
+        if ($cimahiPoly) {
+            $pt = radarSamplePointInPolygon($id, $cimahiPoly);
+            return [$pt[0], $pt[1], $cimahiPoly['name'], $cleanAddress];
         }
     }
 
-    // LEVEL 3: Kelurahan / Desa in Bandung Raya
-    if (!$matchedCoords && !empty($addrLower) && !empty($bandungKelurahan)) {
-        foreach ($bandungKelurahan as $kw => $info) {
-            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $addrLower)) {
-                $matchedDistrict = $info[0];
-                $matchedCoords = $info[1];
-                $matchLevel = 3;
-                break;
-            }
-        }
-    }
-
-    // LEVEL 4: Sub-District / Kecamatan Hubs
-    $cleanRawDist = trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$rawDistrict));
-    $cleanRawDistBase = trim(explode(',', $cleanRawDist)[0]);
-    $cleanRawDistLower = strtolower($cleanRawDistBase);
-    $cleanRawDistNoSpace = str_replace(' ', '', $cleanRawDistLower);
-
-    $canonicalDist = null;
-    $resolvedHubCoords = null;
-    if ($cleanRawDistLower && isset($bandungDistricts[$cleanRawDistLower])) {
-        $canonicalDist = $bandungDistricts[$cleanRawDistLower][0];
-        $resolvedHubCoords = $bandungDistricts[$cleanRawDistLower][1];
-    } elseif ($cleanRawDistNoSpace && isset($bandungDistricts[$cleanRawDistNoSpace])) {
-        $canonicalDist = $bandungDistricts[$cleanRawDistNoSpace][0];
-        $resolvedHubCoords = $bandungDistricts[$cleanRawDistNoSpace][1];
-    } elseif ($cleanRawDistLower && isset($externalCitiesAndHubs[$cleanRawDistLower])) {
-        $canonicalDist = $externalCitiesAndHubs[$cleanRawDistLower][0];
-        $resolvedHubCoords = $externalCitiesAndHubs[$cleanRawDistLower][1];
-    } else {
-        $origBase = strtolower(trim(preg_replace('/^(kecamatan|kec\.|kec)\s+/i', '', (string)$origRawDistrict)));
-        if ($origBase && isset($bandungDistricts[$origBase])) {
-            $canonicalDist = $bandungDistricts[$origBase][0];
-            $resolvedHubCoords = $bandungDistricts[$origBase][1];
-        } elseif ($origBase && isset($externalCitiesAndHubs[$origBase])) {
-            $canonicalDist = $externalCitiesAndHubs[$origBase][0];
-            $resolvedHubCoords = $externalCitiesAndHubs[$origBase][1];
-        } else {
-            $canonicalDist = !empty($cleanRawDistBase) ? ucwords($cleanRawDistLower) : null;
-        }
-    }
-
-    if ($canonicalDist && $canonicalDist !== 'Bandung' && $canonicalDist !== 'Bandung Area') {
-        if (!$matchedCoords) {
-            $matchedDistrict = $canonicalDist;
-            if ($resolvedHubCoords) {
-                $matchedCoords = $resolvedHubCoords;
-            } elseif (isset($bandungDistricts[strtolower($canonicalDist)])) {
-                $matchedCoords = $bandungDistricts[strtolower($canonicalDist)][1];
-            } else {
-                $matchedCoords = array(-6.9248, 107.6472);
-            }
-            $matchLevel = 4;
-        } else {
-            $matchedDistrict = $canonicalDist;
-        }
-    }
-
-    if (!$matchedCoords) {
-        $matchedDistrict = 'Kiaracondong';
-        $matchedCoords = array(-6.9248, 107.6472);
-        $matchLevel = 5;
-    }
-
-    $hash2 = abs(crc32($id . '_' . ($matchedDistrict ?? 'bdg') . '_' . $cleanAddress));
-    $angle = (($hash2 % 360) / 180.0) * M_PI;
-
-    switch (true) {
-        case ($matchLevel <= 1): // Local street gazetteer: 5-20m
-            $dispersionKm = 0.005 + (($hash2 % 15) / 1000.0);
-            break;
-        case ($matchLevel <= 2): // Housing complex: 10-35m
-            $dispersionKm = 0.010 + (($hash2 % 25) / 1000.0);
-            break;
-        case ($matchLevel <= 3): // Kelurahan centroid: 30-80m
-            $dispersionKm = 0.030 + (($hash2 % 50) / 1000.0);
-            break;
-        case ($matchLevel <= 45): // Highway / external city: 15-45m
-            $dispersionKm = 0.015 + (($hash2 % 30) / 1000.0);
-            break;
-        case ($matchLevel <= 55): // District centroid: 50-200m (strictly inside polygon!)
-            $dispersionKm = 0.050 + (($hash2 % 150) / 1000.0);
-            break;
-        default: // Fallback: 50-200m
-            $dispersionKm = 0.050 + (($hash2 % 150) / 1000.0);
-            break;
-    }
-
-    $deltaLat = ($dispersionKm / 111.0) * cos($angle);
-    $deltaLng = ($dispersionKm / (111.0 * cos(deg2rad($matchedCoords[0])))) * sin($angle);
-
-    $finalLat = round($matchedCoords[0] + $deltaLat, 6);
-    $finalLng = round($matchedCoords[1] + $deltaLng, 6);
-
-    return [$finalLat, $finalLng, ucwords($matchedDistrict), $cleanAddress];
+    // Default Kota Bandung wide urban scatter (Alun-alun / Central Bandung radius 0.8 - 3.6 km)
+    $pt = radarDisperseAroundPoint($id, -6.9175, 107.6191, 0.8, 3.6, 'kota_bandung');
+    return [$pt[0], $pt[1], 'Kota Bandung', $cleanAddress];
 }
 
 /**
