@@ -84,6 +84,133 @@ function get_sales_list($spv = '') {
     return $salesList;
 }
 
+function sft_followup_sync_state_path() {
+    $candidates = [dirname(__DIR__) . '/storage', dirname(__DIR__, 2) . '/storage', __DIR__];
+    foreach ($candidates as $dir) {
+        if (is_dir($dir) && is_writable($dir)) {
+            return $dir . '/sheet_fu_sync_state.json';
+        }
+    }
+    return __DIR__ . '/sheet_fu_sync_state.json';
+}
+
+function push_followup_customers_to_sheet($customerIds, $overrideDate = '') {
+    if (empty($customerIds) || !is_array($customerIds)) return;
+    $ids = array_values(array_unique(array_filter(array_map('intval', $customerIds), fn($v) => $v > 0)));
+    if (empty($ids)) return;
+
+    $defaultScript = 'https://script.google.com/macros/s/AKfycbwIJPz6HNdNIrpNMnGNGS4c5Ojr0mLKoSTx9_fDTMVxmWey6OdGoMHXOxdA5sjvx_-v0w/exec';
+    $scriptUrl = $defaultScript;
+    try {
+        $webhookRows = followup_query("SELECT setting_value FROM followup_settings WHERE setting_key = 'google_apps_script_url' LIMIT 1");
+        if (!empty($webhookRows) && !empty($webhookRows[0]['setting_value']) && filter_var(trim($webhookRows[0]['setting_value']), FILTER_VALIDATE_URL)) {
+            $scriptUrl = trim($webhookRows[0]['setting_value']);
+        }
+    } catch (Throwable $e) {}
+
+    $salesList = get_sales_list();
+    $salesNameById = [];
+    foreach ($salesList as $s) {
+        $salesNameById[(int)$s['id']] = $s['name'];
+    }
+
+    $batchIds = array_slice($ids, 0, 25);
+    $idListSql = implode(',', $batchIds);
+    $rows = followup_query("
+        SELECT id, sheet_row_index, vin, plate_number, pkb_no, phone, name,
+               connected, contacted, prospect, spk, remarks, sales_fu, assigned_sales_id,
+               sales_fu_status, reason_followup, followup_date, followup_status
+        FROM followup_customers
+        WHERE id IN ($idListSql)
+    ");
+    if (empty($rows) || !is_array($rows)) return;
+
+    // Update sync state locks & snapshots so background CSV auto-sync won't clobber fresh pushes
+    $statePath = sft_followup_sync_state_path();
+    $state = [];
+    if (file_exists($statePath)) {
+        $rawS = @file_get_contents($statePath);
+        $dec = $rawS ? @json_decode($rawS, true) : null;
+        if (is_array($dec)) $state = $dec;
+    }
+    if (!isset($state['push_locks']) || !is_array($state['push_locks'])) $state['push_locks'] = [];
+    if (!isset($state['snapshots']) || !is_array($state['snapshots'])) $state['snapshots'] = [];
+
+    $nowTs = time();
+    foreach ($rows as $r) {
+        $cid = (int)$r['id'];
+        $sid = (int)($r['assigned_sales_id'] ?? 0);
+        $sName = trim((string)($r['sales_fu'] ?? ''));
+        if ($sName === '' && $sid > 0 && isset($salesNameById[$sid])) {
+            $sName = $salesNameById[$sid];
+        }
+        $connF = (strtoupper(trim((string)($r['connected'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+        $contF = (strtoupper(trim((string)($r['contacted'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+        $prospF = (strtoupper(trim((string)($r['prospect'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+        $spkF = (strtoupper(trim((string)($r['spk'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+        $rem = trim((string)($r['remarks'] ?? ''));
+        $fuStat = trim((string)($r['sales_fu_status'] ?? 'Open')) ?: 'Open';
+        $reason = trim((string)($r['reason_followup'] ?? ''));
+        $fStatus = trim((string)($r['followup_status'] ?? 'Belum Dihubungi')) ?: 'Belum Dihubungi';
+
+        $state['push_locks'][$cid] = $nowTs;
+        $state['snapshots'][$cid] = [$connF, $contF, $prospF, $spkF, $rem, $fuStat, $reason, $sName, $fStatus];
+    }
+    $state['csv_hash'] = '';
+    @file_put_contents($statePath, json_encode($state), LOCK_EX);
+
+    foreach ($rows as $r) {
+        try {
+            $cid = (int)$r['id'];
+            $sid = (int)($r['assigned_sales_id'] ?? 0);
+            $sName = trim((string)($r['sales_fu'] ?? ''));
+            if ($sName === '' && $sid > 0 && isset($salesNameById[$sid])) {
+                $sName = $salesNameById[$sid];
+            }
+            $fStatus = trim((string)($r['followup_status'] ?? 'Belum Dihubungi')) ?: 'Belum Dihubungi';
+            $isCleared = ($fStatus === 'Belum Dihubungi' && strtoupper(trim((string)($r['connected'] ?? ''))) !== 'TRUE' && trim((string)($r['remarks'] ?? '')) === '');
+
+            $webhookPayload = [
+                'sheet_id' => '1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4',
+                'sheet_name' => 'Database',
+                'sheet_row_index' => (int)($r['sheet_row_index'] ?? 0),
+                'customer_id' => $cid,
+                'pkb_no' => $r['pkb_no'] ?? '',
+                'vin' => $r['vin'] ?? '',
+                'plate_number' => $r['plate_number'] ?? '',
+                'phone' => $r['phone'] ?? '',
+                'name' => $r['name'] ?? '',
+                'connected' => $isCleared ? '' : ($r['connected'] ?? 'FALSE'),
+                'contacted' => $isCleared ? '' : ($r['contacted'] ?? 'FALSE'),
+                'prospect' => $isCleared ? '' : ($r['prospect'] ?? 'FALSE'),
+                'spk' => $isCleared ? '' : ($r['spk'] ?? 'FALSE'),
+                'remarks' => $isCleared ? '' : ($r['remarks'] ?? ''),
+                'sales_fu' => $sName,
+                'sales_name' => $sName,
+                'sales_fu_status' => $isCleared ? '' : ($r['sales_fu_status'] ?? 'Open'),
+                'status_fu' => $isCleared ? '' : ($r['sales_fu_status'] ?? 'Open'),
+                'reason_followup' => $isCleared ? '' : ($r['reason_followup'] ?? ''),
+                'followup_date' => $isCleared ? '' : ($overrideDate ?: ($r['followup_date'] ?? date('Y-m-d H:i:s'))),
+                'status' => $fStatus
+            ];
+
+            $opts = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/json\r\n",
+                    'content' => json_encode($webhookPayload),
+                    'timeout' => count($rows) > 1 ? 3 : 7
+                ],
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false
+                ]
+            ];
+            @file_get_contents($scriptUrl, false, stream_context_create($opts));
+        } catch (Throwable $e) {}
+    }
+}
+
 /**
  * Smart sales filter resolver:
  * Matches companion accounts (e.g. Yani ID 79 active & ID 5 inactive, Egy ID 2 & ID 48)
@@ -1184,6 +1311,7 @@ if ($action === 'bulk_assign') {
             followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ?, is_orphan = 0 WHERE id = ?", [$assignedSales['id'], $assignedSales['name'], $cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', 'Auto-distribusi ke sales (Prioritas Unassigned)')", [$cid, $assignedSales['id'], $assignedSales['name']]);
         }
+        push_followup_customers_to_sheet($customer_ids);
         echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibagi rata ke $numSales wiraniaga (mengutamakan data belum ditugaskan)."]);
         exit;
     }
@@ -1195,6 +1323,7 @@ if ($action === 'bulk_assign') {
             followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE id = ?", [$cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Pembagian database ke sales dibatalkan oleh SPV/Kacab')", [$cid]);
         }
+        push_followup_customers_to_sheet($customer_ids);
         echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibatalkan penugasannya dari sales."]);
         exit;
     }
@@ -1217,6 +1346,7 @@ if ($action === 'bulk_assign') {
         followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ?, is_orphan = 0 WHERE id = ?", [$targetSales['id'], $targetSales['name'], $cid]);
         followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', ?)", [$cid, $targetSales['id'], $targetSales['name'], "Ditugaskan ke " . $targetSales['name']]);
     }
+    push_followup_customers_to_sheet($customer_ids);
 
     echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil ditugaskan ke " . $targetSales['name']]);
     exit;
@@ -1247,6 +1377,7 @@ if ($action === 'unassign_sales' || $action === 'bulk_unassign') {
             followup_execute("UPDATE followup_customers SET assigned_sales_id = 0, sales_fu = '', is_orphan = 1 WHERE id = ?", [$cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, 0, 'Sistem', 'unassigned', 'Pembagian database ke sales dibatalkan oleh SPV/Kacab')", [$cid]);
         }
+        push_followup_customers_to_sheet($customer_ids);
         echo json_encode([
             'success' => true,
             'message' => count($customer_ids) . " data customer berhasil dibatalkan penugasannya dari sales dan dikembalikan ke database unassigned/pool."
@@ -1454,7 +1585,8 @@ if ($action === 'claim_orphan_lead') {
         "Prospek ex-sales berhasil diambil alih oleh $salesName (Pool Rebutan)"
     ]);
 
-    // 4. Return updated customer record
+    // 4. Return updated customer record & sync claiming sales to Google Sheet
+    push_followup_customers_to_sheet([$customer_id]);
     $updatedCust = followup_query("SELECT * FROM followup_customers WHERE id = ? LIMIT 1", [$customer_id]);
 
     echo json_encode([
@@ -1503,8 +1635,11 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         exit;
     }
 
-    $current = followup_query("SELECT followup_status, connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, notes, assigned_sales_id, followup_date FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
+    $current = followup_query("SELECT followup_status, connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, notes, assigned_sales_id, sales_fu, vin, phone, name, plate_number, sheet_row_index, followup_date FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
     $curr = !empty($current) ? $current[0] : [];
+
+    $explicitStatus = isset($input['status']) ? trim((string)$input['status']) : '';
+    $isResetToBelum = ($explicitStatus === 'Belum Dihubungi' && !isset($input['connected']) && !isset($input['contacted']) && !isset($input['prospect']) && !isset($input['spk']));
 
     // 1. Connected (No. Aktif / Tersambung)
     if (isset($input['connected'])) {
@@ -1516,8 +1651,10 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         } else {
             $connected = '';
         }
+    } elseif ($isResetToBelum) {
+        $connected = 'FALSE';
     } else {
-        if (!empty($input['status']) && $input['status'] !== 'Belum Dihubungi') {
+        if ($explicitStatus !== '' && $explicitStatus !== 'Belum Dihubungi') {
             $connected = 'TRUE';
         } else {
             $connected = !empty($curr['connected']) ? $curr['connected'] : '';
@@ -1534,8 +1671,14 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         } else {
             $contacted = '';
         }
+    } elseif ($isResetToBelum) {
+        $contacted = 'FALSE';
     } else {
-        $contacted = !empty($curr['contacted']) ? $curr['contacted'] : '';
+        if ($explicitStatus === 'Deal / Selesai' || $explicitStatus === 'Tertarik / Jadwal Servis' || $explicitStatus === 'Tidak Tertarik') {
+            $contacted = 'TRUE';
+        } else {
+            $contacted = !empty($curr['contacted']) ? $curr['contacted'] : '';
+        }
     }
 
     // 3. Prospect (Minat Beli / Upgrade)
@@ -1548,6 +1691,12 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         } else {
             $prospect = '';
         }
+    } elseif ($isResetToBelum) {
+        $prospect = 'FALSE';
+    } elseif ($explicitStatus === 'Deal / Selesai' || $explicitStatus === 'Tertarik / Jadwal Servis') {
+        $prospect = 'TRUE';
+    } elseif ($explicitStatus === 'Menunggu Respon') {
+        $prospect = 'FALSE';
     } else {
         $prospect = !empty($curr['prospect']) ? $curr['prospect'] : '';
     }
@@ -1562,6 +1711,12 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         } else {
             $spk = '';
         }
+    } elseif ($isResetToBelum) {
+        $spk = 'FALSE';
+    } elseif ($explicitStatus === 'Deal / Selesai') {
+        $spk = 'TRUE';
+    } elseif ($explicitStatus !== '' && $explicitStatus !== 'Deal / Selesai') {
+        $spk = 'FALSE';
     } else {
         $spk = !empty($curr['spk']) ? $curr['spk'] : '';
     }
@@ -1629,7 +1784,12 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     }
 
     $reason_followup = trim($input['reason_followup'] ?? ($input['reason'] ?? ($input['notes'] ?? '')));
-    if ($reason_followup === '') {
+    if ($isResetToBelum && $reason_followup === '') {
+        $reason_followup = '';
+        $remarks = '';
+        $sales_fu_status = 'Open';
+        $status = 'Belum Dihubungi';
+    } elseif ($reason_followup === '' && !$isResetToBelum) {
         $reason_followup = $curr['reason_followup'] ?? '';
     }
 
@@ -1673,7 +1833,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     }
 
     $now = date('Y-m-d H:i:s');
-    $current = followup_query("SELECT followup_status, notes, assigned_sales_id, sales_fu, vin, phone, name, plate_number, sheet_row_index FROM followup_customers WHERE id = ? LIMIT 1", [$id]);
+    $effectiveFuDate = $isResetToBelum ? null : $now;
     $oldStatus = !empty($current) ? $current[0]['followup_status'] : '';
     $currAssignedId = !empty($current) ? (int)$current[0]['assigned_sales_id'] : 0;
     $currSalesFu = !empty($current) ? trim($current[0]['sales_fu'] ?? '') : '';
@@ -1727,10 +1887,10 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         WHERE id = ?
     ", [
         $connected, $contacted, $prospect, $spk, $remarks,
-        $sales_fu_status, $reason_followup, $now,
+        $sales_fu_status, $reason_followup, $effectiveFuDate,
         $status,
         $reason_followup, $reason_followup,
-        $now,
+        $effectiveFuDate,
         $template_used, $template_used,
         $effectiveSalesId, $effectiveSalesId,
         $effectiveSalesName, $effectiveSalesName,
@@ -1751,61 +1911,13 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $visitPhotoUrl
     ]);
 
-    // Push to Google Apps Script Webhook if configured (2-Way Realtime Sync)
-    try {
-        $webhookRows = followup_query("SELECT setting_value FROM followup_settings WHERE setting_key = 'google_apps_script_url' LIMIT 1");
-        if (!empty($webhookRows) && !empty($webhookRows[0]['setting_value'])) {
-            $scriptUrl = trim($webhookRows[0]['setting_value']);
-            if (filter_var($scriptUrl, FILTER_VALIDATE_URL)) {
-                $vin = !empty($current) ? ($current[0]['vin'] ?? '') : '';
-                $phone = !empty($current) ? ($current[0]['phone'] ?? '') : '';
-
-                $webhookPayload = [
-                    'sheet_id' => '1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4',
-                    'sheet_name' => 'Database',
-                    'sheet_row_index' => !empty($current) ? (int)($current[0]['sheet_row_index'] ?? 0) : 0,
-                    'customer_id' => $id,
-                    'vin' => $vin,
-                    'plate_number' => !empty($current) ? ($current[0]['plate_number'] ?? '') : '',
-                    'phone' => $phone,
-                    'name' => !empty($current) ? ($current[0]['name'] ?? '') : '',
-                    'connected' => $connected,
-                    'contacted' => $contacted,
-                    'prospect' => $prospect,
-                    'spk' => $spk,
-                    'remarks' => $remarks,
-                    'sales_fu' => $effectiveSalesName,
-                    'sales_name' => $effectiveSalesName,
-                    'sales_fu_status' => $sales_fu_status,
-                    'status_fu' => $sales_fu_status,
-                    'reason_followup' => $reason_followup,
-                    'followup_date' => $now,
-                    'status' => $status
-                ];
-
-                $opts = [
-                    'http' => [
-                        'method' => 'POST',
-                        'header' => "Content-Type: application/json\r\n",
-                        'content' => json_encode($webhookPayload),
-                        'timeout' => 8
-                    ],
-                    'ssl' => [
-                        'verify_peer' => false,
-                        'verify_peer_name' => false
-                    ]
-                ];
-                @file_get_contents($scriptUrl, false, stream_context_create($opts));
-            }
-        }
-    } catch (Exception $e) {
-        // Silently continue so CRM operation is not blocked
-    }
+    // Push to Google Apps Script Webhook (2-Way Realtime Sync)
+    push_followup_customers_to_sheet([$id], $effectiveFuDate ?: '');
 
     echo json_encode([
         'success' => true,
         'message' => 'Data respon follow-up berhasil disimpan secara otomatis.',
-        'followup_date' => $now,
+        'followup_date' => $effectiveFuDate,
         'status' => $status,
         'sales_fu_status' => $sales_fu_status
     ]);
@@ -1954,12 +2066,16 @@ if ($action === 'batch_update_customers') {
     followup_execute("UPDATE followup_customers SET $updateSql $whereSql", $allParams);
 
     // Log the batch update
+    $targetIds = [];
     foreach ($targets as $t) {
+        $tid = (int)$t['id'];
+        $targetIds[] = $tid;
         followup_execute("
             INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note)
             VALUES (?, NULL, 'SPV/Kacab', 'batch_update', ?)
-        ", [(int)$t['id'], "Pembaruan data massal via CRM Manager ($count customer diperbarui)"]);
+        ", [$tid, "Pembaruan data massal via CRM Manager ($count customer diperbarui)"]);
     }
+    push_followup_customers_to_sheet($targetIds, $now);
 
     echo json_encode([
         'success' => true,

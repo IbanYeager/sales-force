@@ -91,7 +91,7 @@
                     <i class="fa-solid fa-warehouse"></i> Live Inventory (Stock)
                 </a>
                 <a href="pages/customer.html" class="sidebar-nav-link" data-tags="customer crm radar prospek data database">
-                    <i class="fa-solid fa-users"></i> Customer CRM &amp; Radar
+                    <i class="fa-solid fa-users"></i> Database
                 </a>
                 <a href="pages/spk.html" class="sidebar-nav-link" data-tags="spk pesanan form surat tanda jadi">
                     <i class="fa-solid fa-file-signature"></i> Form SPK
@@ -832,7 +832,7 @@
                             </a>
                             <a href="pages/customer.html" class="category-item modal-feature-item" data-tags="customer crm radar prospek data database lead">
                                 <div class="category-icon"><i class="fa-solid fa-users"></i></div>
-                                <span class="category-text">Customer CRM</span>
+                                <span class="category-text">Database</span>
                             </a>
                             <a href="pages/spk.html" class="category-item modal-feature-item" data-tags="spk pesanan form surat tanda jadi">
                                 <div class="category-icon"><i class="fa-solid fa-file-signature"></i></div>

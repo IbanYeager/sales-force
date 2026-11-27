@@ -522,7 +522,8 @@ function init_followup_tables() {
         }
     }
 
-    $defaultSheetUrl = 'https://docs.google.com/spreadsheets/d/1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g/edit?gid=1525199412#gid=1525199412';
+    $defaultSheetUrl = 'https://docs.google.com/spreadsheets/d/1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4/edit?gid=622548953#gid=622548953';
+    $defaultScriptUrl = 'https://script.google.com/macros/s/AKfycbwIJPz6HNdNIrpNMnGNGS4c5Ojr0mLKoSTx9_fDTMVxmWey6OdGoMHXOxdA5sjvx_-v0w/exec';
 
     // Seed default settings if empty or update default sheet url
     $chkSet = followup_query("SELECT setting_key FROM followup_settings LIMIT 1");
@@ -532,7 +533,7 @@ function init_followup_tables() {
             ['dealer_address', 'Jl. Kiaracondong No. 440, Bandung, Jawa Barat'],
             ['dealer_phone', '(022) 731-8888'],
             ['google_sheet_url', $defaultSheetUrl],
-            ['google_apps_script_url', ''],
+            ['google_apps_script_url', $defaultScriptUrl],
             ['auto_sync_interval', '15'],
             ['last_sync_time', ''],
             ['sync_status', 'Siap Digunakan']
@@ -542,7 +543,7 @@ function init_followup_tables() {
         }
     } else {
         $currUrl = followup_query("SELECT setting_value FROM followup_settings WHERE setting_key = 'google_sheet_url' LIMIT 1");
-        if (empty($currUrl) || empty($currUrl[0]['setting_value']) || strpos($currUrl[0]['setting_value'], '1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g') === false) {
+        if (empty($currUrl) || empty($currUrl[0]['setting_value']) || strpos($currUrl[0]['setting_value'], '1pqfrHV6Ycl-5UAJXtEe_9h9Y6XIyvHTicOOraFkbO8g') !== false) {
             if ($is_mysql && $conn) {
                 followup_execute("INSERT INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?) ON DUPLICATE KEY UPDATE setting_value = ?", [$defaultSheetUrl, $defaultSheetUrl]);
             } else {

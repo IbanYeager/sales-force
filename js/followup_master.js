@@ -45,7 +45,61 @@ if (document.readyState !== 'loading') {
   initSearchableFilters();
 }
 
+let masterAutoSyncBusy = false;
+let masterAutoSyncStarted = false;
+
+async function syncMasterSheetAuto(reloadOnChange = true, timeoutMs = 4500) {
+  if (masterAutoSyncBusy) return 0;
+  masterAutoSyncBusy = true;
+  try {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+    const res = await fetch('/api/api_followup_sync.php?action=auto_sync_sheet', controller ? { signal: controller.signal } : {});
+    if (timer) clearTimeout(timer);
+    const data = await res.json();
+    if (data && data.success) {
+      const syncEl = document.getElementById('lastSyncIndicatorText');
+      if (syncEl && data.last_sync) {
+        syncEl.textContent = `Sinkron Terakhir: ${data.last_sync}`;
+      }
+      if ((data.changed || 0) > 0 && reloadOnChange) {
+        await Promise.all([
+          loadExecutiveAnalytics(),
+          loadMasterStats(),
+          loadMasterCustomers(false)
+        ]);
+      }
+      return data.changed || 0;
+    }
+  } catch (e) {
+    // Non-fatal timeout/network error during background auto-sync
+  } finally {
+    masterAutoSyncBusy = false;
+  }
+  return 0;
+}
+
+function startMasterAutoSyncLoop() {
+  if (masterAutoSyncStarted) return;
+  masterAutoSyncStarted = true;
+  setInterval(() => {
+    if (!document.hidden && !masterAutoSyncBusy) {
+      syncMasterSheetAuto(true, 10000);
+    }
+  }, 12000);
+  window.addEventListener('focus', () => {
+    if (!masterAutoSyncBusy) {
+      syncMasterSheetAuto(true, 8000);
+    }
+  });
+}
+
 async function initMasterDashboard() {
+  if (!masterAutoSyncStarted) {
+    // Pull any external Spreadsheet edits/deletions first (bounded 3s timeout so dashboard opens fast)
+    await syncMasterSheetAuto(false, 3500);
+    startMasterAutoSyncLoop();
+  }
   await Promise.all([
     loadExecutiveAnalytics(),
     loadSalesList(),
@@ -2546,12 +2600,19 @@ async function unassignCustomerSingle(customerId, custName, salesName) {
 
 async function inlineUpdateStatus(customerId, status) {
   try {
-    await fetch('/api/api_followup.php?action=update_status', {
+    const res = await fetch('/api/api_followup.php?action=update_status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: customerId, status: status })
     });
-    loadMasterStats();
+    const data = await res.json();
+    if (data && data.success) {
+      await Promise.all([
+        loadExecutiveAnalytics(),
+        loadMasterStats(),
+        loadMasterCustomers(false)
+      ]);
+    }
   } catch (e) {
     console.error('Inline update status error', e);
   }
@@ -4476,8 +4537,8 @@ function closeTemplateModal() {
 // GOOGLE SHEET SYNC MODAL (2-WAY SYNC)
 // -------------------------------------------------------------
 async function openSyncSettingsModal() {
-  let defaultSheetUrl = localStorage.getItem('sft_google_sheet_url') || 'https://docs.google.com/spreadsheets/d/1rAht0x-DgMRIM379r2qwoWjhfVAq6xIm846ZwvHujQs/edit?usp=sharing';
-  let defaultScriptUrl = localStorage.getItem('sft_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec';
+  let defaultSheetUrl = localStorage.getItem('sft_google_sheet_url') || 'https://docs.google.com/spreadsheets/d/1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4/edit?gid=622548953#gid=622548953';
+  let defaultScriptUrl = localStorage.getItem('sft_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwIJPz6HNdNIrpNMnGNGS4c5Ojr0mLKoSTx9_fDTMVxmWey6OdGoMHXOxdA5sjvx_-v0w/exec';
 
   try {
     const res = await fetch('/api/api_followup_sync.php?action=get_settings');
@@ -4696,7 +4757,7 @@ async function executePullGoogleSheet() {
     const res = await fetch('/api/api_followup_sync.php?action=pull_sheet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ google_sheet_url: sheetUrl })
+      body: JSON.stringify({ google_sheet_url: sheetUrl, manual: true, force: true })
     });
     const data = await res.json();
 

@@ -68,7 +68,7 @@ if ($action === 'get_settings') {
     }
 
     $defaultSheet = 'https://docs.google.com/spreadsheets/d/1fvam5FfR1AIKKmv68RGf0dKy2lNpUv-dWc7sbqAe4k4/edit?gid=622548953#gid=622548953';
-    $defaultScript = 'https://script.google.com/macros/s/AKfycbwg7iocmbSQeqHekaheVs3Co4DZ5-azv37f-CmSbOETyQLgFyEGph5_j1CySWbn3IHJ/exec';
+    $defaultScript = 'https://script.google.com/macros/s/AKfycbwIJPz6HNdNIrpNMnGNGS4c5Ojr0mLKoSTx9_fDTMVxmWey6OdGoMHXOxdA5sjvx_-v0w/exec';
 
     if (empty($settings['google_sheet_url'])) {
         $settings['google_sheet_url'] = $defaultSheet;
@@ -99,10 +99,151 @@ if ($action === 'save_settings') {
     exit;
 }
 
+function sft_resolve_storage_dir() {
+    $candidates = [
+        dirname(__DIR__) . '/storage',
+        dirname(__DIR__, 2) . '/storage',
+        __DIR__
+    ];
+    foreach ($candidates as $dir) {
+        if (is_dir($dir) && is_writable($dir)) {
+            return $dir;
+        }
+    }
+    $fallback = dirname(__DIR__) . '/storage';
+    @mkdir($fallback, 0775, true);
+    return is_writable($fallback) ? $fallback : __DIR__;
+}
+
+function sft_get_sync_state_path() {
+    return sft_resolve_storage_dir() . '/sheet_fu_sync_state.json';
+}
+
+function sft_load_sync_state() {
+    $path = sft_get_sync_state_path();
+    if (!file_exists($path)) {
+        return ['csv_hash' => '', 'last_checked_at' => 0, 'last_sync' => '', 'snapshots' => [], 'push_locks' => []];
+    }
+    $raw = @file_get_contents($path);
+    $data = $raw ? @json_decode($raw, true) : null;
+    if (!is_array($data)) {
+        return ['csv_hash' => '', 'last_checked_at' => 0, 'last_sync' => '', 'snapshots' => [], 'push_locks' => []];
+    }
+    $data['snapshots'] = is_array($data['snapshots'] ?? null) ? $data['snapshots'] : [];
+    $data['push_locks'] = is_array($data['push_locks'] ?? null) ? $data['push_locks'] : [];
+    return $data;
+}
+
+function sft_save_sync_state($state) {
+    $path = sft_get_sync_state_path();
+    @file_put_contents($path, json_encode($state), LOCK_EX);
+}
+
+function sft_parse_sheet_bool($val) {
+    $u = strtoupper(trim((string)$val));
+    return in_array($u, ['1', 'TRUE', 'YA', 'IYA', 'YES'], true) ? 'TRUE' : 'FALSE';
+}
+
+function sft_derive_followup_state($connFlag, $contFlag, $prospFlag, $spkFlag, $remarks, $doUnit = 'FALSE') {
+    $remLower = strtolower(trim((string)$remarks));
+    if ($doUnit === 'TRUE' || $spkFlag === 'TRUE' || strpos($remLower, 'spk berhasil') !== false) {
+        return 'Deal / Selesai';
+    }
+    if ($remLower === 'customer tertarik' || $prospFlag === 'TRUE') {
+        return 'Tertarik / Jadwal Servis';
+    }
+    if ($remLower === 'customer menolak' || $remLower === 'customer tidak aktif') {
+        return 'Tidak Tertarik';
+    }
+    if ($remLower === 'customer janjian' || $remLower === 'customer pending' || $remLower === 'menunggu respon' || $remLower === 'customer tidak diangkat' || $contFlag === 'TRUE' || $connFlag === 'TRUE') {
+        return 'Menunggu Respon';
+    }
+    return 'Belum Dihubungi';
+}
+
+function sft_build_sales_matcher() {
+    $salesDbRows = followup_query("SELECT id, username, nama_lengkap, nama_spv, is_active FROM sales_accounts ORDER BY is_active DESC, id ASC");
+    $salesDbRows = is_array($salesDbRows) ? $salesDbRows : [];
+
+    $salesLookup = [];
+    foreach ($salesDbRows as $sAcc) {
+        $sid = (int)$sAcc['id'];
+        $sName = trim($sAcc['nama_lengkap'] ?? '');
+        $uName = trim($sAcc['username'] ?? '');
+        if (!$sName && !$uName) continue;
+        $primaryName = $sName ?: $uName;
+
+        if ($sName !== '') {
+            $lowerFull = strtolower($sName);
+            if (!isset($salesLookup[$lowerFull])) $salesLookup[$lowerFull] = ['id' => $sid, 'name' => $sName];
+            $cleanParen = trim(preg_replace('/\s*\([^)]*\)/', '', $lowerFull));
+            if ($cleanParen !== '' && !isset($salesLookup[$cleanParen])) $salesLookup[$cleanParen] = ['id' => $sid, 'name' => $sName];
+            $words = preg_split('/\s+/', $lowerFull);
+            if (!empty($words[0]) && strlen($words[0]) >= 3 && !isset($salesLookup[$words[0]])) $salesLookup[$words[0]] = ['id' => $sid, 'name' => $sName];
+        }
+        if ($uName !== '') {
+            $lowerUser = strtolower($uName);
+            if (!isset($salesLookup[$lowerUser])) $salesLookup[$lowerUser] = ['id' => $sid, 'name' => $primaryName];
+            $cleanUser = preg_replace('/(_ryan|_alvin|_riva|_kacab|_spv|\d+)$/i', '', $lowerUser);
+            if ($cleanUser !== '' && strlen($cleanUser) >= 3 && !isset($salesLookup[$cleanUser])) $salesLookup[$cleanUser] = ['id' => $sid, 'name' => $primaryName];
+        }
+    }
+
+    if (isset($salesLookup['yenni']) && !isset($salesLookup['yeni'])) $salesLookup['yeni'] = $salesLookup['yenni'];
+    if (isset($salesLookup['yeni']) && !isset($salesLookup['yenni'])) $salesLookup['yenni'] = $salesLookup['yeni'];
+    if (isset($salesLookup['egi']) && !isset($salesLookup['egy'])) $salesLookup['egy'] = $salesLookup['egi'];
+    if (isset($salesLookup['egy']) && !isset($salesLookup['egi'])) $salesLookup['egi'] = $salesLookup['egy'];
+    if (isset($salesLookup['fadil']) && !isset($salesLookup['fadhil'])) $salesLookup['fadhil'] = $salesLookup['fadil'];
+    if (isset($salesLookup['fadhil']) && !isset($salesLookup['fadil'])) $salesLookup['fadil'] = $salesLookup['fadhil'];
+
+    return function($rawSalesName) use ($salesLookup, $salesDbRows) {
+        $raw = trim((string)$rawSalesName);
+        if (!$raw || $raw === '-' || $raw === '0' || strtolower($raw) === 'no data' || strtolower($raw) === 'unassigned' || strtolower($raw) === 'belum ditugaskan') {
+            return [null, ''];
+        }
+        $lower = strtolower($raw);
+        if (isset($salesLookup[$lower])) {
+            return [$salesLookup[$lower]['id'], $salesLookup[$lower]['name']];
+        }
+        foreach ($salesDbRows as $s) {
+            $sName = strtolower(trim($s['nama_lengkap'] ?? ''));
+            if ($sName && (strpos($sName, $lower) !== false || strpos($lower, $sName) !== false)) {
+                return [(int)$s['id'], $s['nama_lengkap']];
+            }
+        }
+        $firstWord = explode(' ', $lower)[0] ?? '';
+        if ($firstWord && strlen($firstWord) >= 3) {
+            foreach ($salesDbRows as $s) {
+                $sFirst = explode(' ', strtolower(trim($s['nama_lengkap'] ?? '')))[0] ?? '';
+                if ($sFirst === $firstWord) {
+                    return [(int)$s['id'], $s['nama_lengkap']];
+                }
+            }
+        }
+        return [null, $raw];
+    };
+}
+
 /**
- * Reusable Google Sheet pull engine for Tunas Toyota Kiara Condong CRM
+ * Reusable Bidirectional Google Sheet -> Salesforce Sync Engine
+ * Supports full sync (manual) and fast throttled hash-diff auto-sync (clears/deletes reflected 100%).
  */
-function sync_google_sheet_data($sheetUrl = null) {
+function sync_google_sheet_data($sheetUrl = null, $forceFull = true, $cooldownSec = 6) {
+    global $is_mysql, $sqlite_pdo, $conn;
+
+    $state = sft_load_sync_state();
+    $nowTs = time();
+    if (!$forceFull && ($nowTs - (int)($state['last_checked_at'] ?? 0)) < $cooldownSec) {
+        return [
+            'success' => true,
+            'changed' => 0,
+            'updated' => 0,
+            'inserted' => 0,
+            'throttled' => true,
+            'last_sync' => $state['last_sync'] ?? ''
+        ];
+    }
+
     if (!$sheetUrl) {
         $rows = followup_query("SELECT setting_value FROM followup_settings WHERE setting_key = 'google_sheet_url' LIMIT 1");
         $sheetUrl = !empty($rows) ? $rows[0]['setting_value'] : '';
@@ -113,11 +254,10 @@ function sync_google_sheet_data($sheetUrl = null) {
         $sheetUrl = $defaultSheet;
     }
 
-    // Convert standard Google Sheet URL to public CSV export URL
     $csvUrl = $sheetUrl;
     if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sheetUrl, $matches)) {
         $sheetId = $matches[1];
-        $gid = '622548953'; // Default Database sheet for Tunas Toyota Kiara Condong CRM
+        $gid = '622548953';
         if (preg_match('/gid=([0-9]+)/', $sheetUrl, $gMatches)) {
             $parsedGid = $gMatches[1];
             if (!empty($parsedGid) && $parsedGid !== '0') {
@@ -127,12 +267,11 @@ function sync_google_sheet_data($sheetUrl = null) {
         $csvUrl = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv&gid={$gid}";
     }
 
-    // Fetch CSV content
     $opts = [
         "http" => [
             "method" => "GET",
             "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\n",
-            "timeout" => 45
+            "timeout" => $forceFull ? 45 : 15
         ],
         "ssl" => [
             "verify_peer" => false,
@@ -142,14 +281,28 @@ function sync_google_sheet_data($sheetUrl = null) {
     $context = stream_context_create($opts);
     $csvContent = @file_get_contents($csvUrl, false, $context);
 
-    if ($csvContent === false) {
+    if ($csvContent === false || (stripos($csvContent, '<html') !== false && stripos($csvContent, 'Customer Name') === false)) {
         return [
             'success' => false,
+            'changed' => 0,
             'message' => 'Gagal mengambil data dari Google Spreadsheet. Pastikan link dapat diakses publik.'
         ];
     }
 
-    // Robust memory stream parsing with fgetcsv (prevents corrupting cells with multiline text)
+    $csvHash = sha1($csvContent);
+    if (!$forceFull && !empty($state['csv_hash']) && $csvHash === $state['csv_hash'] && !empty($state['snapshots'])) {
+        $state['last_checked_at'] = $nowTs;
+        sft_save_sync_state($state);
+        return [
+            'success' => true,
+            'changed' => 0,
+            'updated' => 0,
+            'inserted' => 0,
+            'cached' => true,
+            'last_sync' => $state['last_sync'] ?? ''
+        ];
+    }
+
     $stream = fopen('php://memory', 'r+');
     fwrite($stream, $csvContent);
     rewind($stream);
@@ -161,13 +314,11 @@ function sync_google_sheet_data($sheetUrl = null) {
     fclose($stream);
 
     if (empty($rawRows)) {
-        return ['success' => false, 'message' => 'Google Sheet kosong.'];
+        return ['success' => false, 'changed' => 0, 'message' => 'Google Sheet kosong.'];
     }
 
-    // Find header row
     $headerRowIdx = 0;
     $keywords = ['nama', 'customer', 'contact', 'telepon', 'phone', 'wa', 'vehicle', 'mobil', 'model', 'vin', 'cluster', 'priority'];
-
     for ($r = 0; $r < min(10, count($rawRows)); $r++) {
         $cols = array_map('strtolower', array_map('trim', $rawRows[$r]));
         $matches = 0;
@@ -206,8 +357,11 @@ function sync_google_sheet_data($sheetUrl = null) {
     $clusterIdx = $findIdx(['/^operation description$/i', '/cluster_name/i', '/cluster/i', '/klaster/i']);
     $priorityIdx = $findIdx(['/^pkb status$/i', '/priority/i', '/prioritas/i']);
     $districtIdx = $findIdx(['/alamat_kecamatan/i', '/kecamatan/i', '/wilayah/i', '/domisili/i']);
+    $cityIdx = $findIdx(['/^kota\/kabupaten$/i', '/^kota$/i', '/kabupaten/i']);
+    $addrIdx = $findIdx(['/^customer address$/i', '/alamat/i', '/address/i']);
     $vinIdx = $findIdx(['/^no rangka$/i', '/latest_vin/i', '/vin_kendaraan_terakhir/i', '/vin/i', '/no_rangka/i']);
     $plateIdx = $findIdx(['/^police reg no/i', '/no\.?\s*pol/i', '/plat/i']);
+    $pkbNoIdx = $findIdx(['/^pkb no/i']);
     $custTypeIdx = $findIdx(['/cust\.\s*type/i', '/fleet_or_retail/i', '/tipe.*customer/i']);
     $doOutletIdx = $findIdx(['/do_oleh_tunas/i', '/nama_outlet_do/i', '/outlet.*do/i']);
     $srvOutletIdx = $findIdx(['/service_di_tunas/i', '/nama_outlet_service/i']);
@@ -215,7 +369,6 @@ function sync_google_sheet_data($sheetUrl = null) {
     $tempIdx = $findIdx(['/veloz_hybrid_temperature/i', '/1\.\s*temperatur/i', '/temperatur/i', '/class/i']);
     $outletNameIdx = $findIdx(['/outlet_name/i', '/nama.*outlet/i', '/cabang/i']);
 
-    // TAM standard response columns
     $connIdx = $findIdx(['/^connected/i']);
     $contIdx = $findIdx(['/^contacted/i']);
     $prospIdx = $findIdx(['/^prospect/i']);
@@ -232,106 +385,75 @@ function sync_google_sheet_data($sheetUrl = null) {
     $vehicleModelSpkIdx = $findIdx(['/vehicle\s*model\s*spk/i', '/model.*spk/i']);
     $vehicleMatchIdx = $findIdx(['/vehicle\s*match/i', '/match/i']);
 
-    // Begin SQLite Transaction or MySQL mass insert
-    global $is_mysql, $sqlite_pdo, $conn;
-    if ($sqlite_pdo) {
-        $sqlite_pdo->beginTransaction();
-    }
+    $matchSales = sft_build_sales_matcher();
 
-    // Clean up phantom/blank records from previous syncs
-    try {
-        followup_execute("DELETE FROM followup_customers WHERE name LIKE 'Pelanggan Toyota%' OR name = '-' OR name = 'NO DATA' OR customer_code LIKE 'CUST-KIRCON-%'");
-    } catch (Exception $e) {}
+    // Preload DB rows to match accurately by (PKB + VIN + Plate + OpDesc + Name), (PKB + VIN), (PKB), or fallback customer_code
+    $dbExisting = followup_query("
+        SELECT id, customer_code, sheet_row_index, pkb_no, vin, plate_number, operation_desc, name,
+               connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup,
+               followup_status, followup_date, sales_fu, assigned_sales_id, is_orphan
+        FROM followup_customers
+        ORDER BY id ASC
+    ");
+    $dbExisting = is_array($dbExisting) ? $dbExisting : [];
 
-    // Pre-load all registered sales accounts to accurately map sheet sales_fu to assigned_sales_id
-    // Order by is_active DESC so active sales consultants take highest priority in name matching
-    $salesDbRows = followup_query("SELECT id, username, nama_lengkap, nama_spv, is_active FROM sales_accounts ORDER BY is_active DESC, id ASC");
-    $salesDbRows = is_array($salesDbRows) ? $salesDbRows : [];
+    $dbById = [];
+    $compQ = [];
+    $pkbVinQ = [];
+    $pkbQ = [];
+    $codeMap = [];
 
-    $salesLookup = []; // lowercase key => ['id' => int, 'name' => string]
-    foreach ($salesDbRows as $sAcc) {
-        $sid = (int)$sAcc['id'];
-        $sName = trim($sAcc['nama_lengkap'] ?? '');
-        $uName = trim($sAcc['username'] ?? '');
-        if (!$sName && !$uName) continue;
+    foreach ($dbExisting as $dbr) {
+        $did = (int)$dbr['id'];
+        $dbById[$did] = $dbr;
+        $dPkb = strtoupper(trim((string)($dbr['pkb_no'] ?? '')));
+        $dVin = strtoupper(trim((string)($dbr['vin'] ?? '')));
+        $dPlate = strtoupper(trim((string)($dbr['plate_number'] ?? '')));
+        $dOp = strtoupper(trim((string)($dbr['operation_desc'] ?? '')));
+        $dName = strtoupper(trim((string)($dbr['name'] ?? '')));
+        $dCode = trim((string)($dbr['customer_code'] ?? ''));
 
-        $primaryName = $sName ?: $uName;
-
-        // Exact match on full name
-        if ($sName !== '') {
-            $lowerFull = strtolower($sName);
-            if (!isset($salesLookup[$lowerFull])) {
-                $salesLookup[$lowerFull] = ['id' => $sid, 'name' => $sName];
-            }
-            // Clean parenthesis e.g. "Agus (Ryan)" -> "agus"
-            $cleanParen = trim(preg_replace('/\s*\([^)]*\)/', '', $lowerFull));
-            if ($cleanParen !== '' && !isset($salesLookup[$cleanParen])) {
-                $salesLookup[$cleanParen] = ['id' => $sid, 'name' => $sName];
-            }
-            // First name word e.g. "Yani Andriyani" -> "yani"
-            $words = preg_split('/\s+/', $lowerFull);
-            if (!empty($words[0]) && strlen($words[0]) >= 3 && !isset($salesLookup[$words[0]])) {
-                $salesLookup[$words[0]] = ['id' => $sid, 'name' => $sName];
-            }
+        $cKey = "$dPkb|$dVin|$dPlate|$dOp|$dName";
+        $compQ[$cKey][] = $did;
+        if ($dPkb !== '' && $dVin !== '') {
+            $pkbVinQ["$dPkb|$dVin"][] = $did;
         }
-
-        // Username match
-        if ($uName !== '') {
-            $lowerUser = strtolower($uName);
-            if (!isset($salesLookup[$lowerUser])) {
-                $salesLookup[$lowerUser] = ['id' => $sid, 'name' => $primaryName];
-            }
-            // Clean suffix like "_ryan", "_alvin", "_riva" e.g. "yani_ryan" -> "yani"
-            $cleanUser = preg_replace('/(_ryan|_alvin|_riva|_kacab|_spv|\d+)$/i', '', $lowerUser);
-            if ($cleanUser !== '' && strlen($cleanUser) >= 3 && !isset($salesLookup[$cleanUser])) {
-                $salesLookup[$cleanUser] = ['id' => $sid, 'name' => $primaryName];
-            }
+        if ($dPkb !== '') {
+            $pkbQ[$dPkb][] = $did;
+        }
+        if ($dCode !== '') {
+            $codeMap[$dCode] = $did;
         }
     }
 
-    // Common Indonesian name variations / spelling aliases
-    if (isset($salesLookup['yenni']) && !isset($salesLookup['yeni'])) $salesLookup['yeni'] = $salesLookup['yenni'];
-    if (isset($salesLookup['yeni']) && !isset($salesLookup['yenni'])) $salesLookup['yenni'] = $salesLookup['yeni'];
-    if (isset($salesLookup['egi']) && !isset($salesLookup['egy'])) $salesLookup['egy'] = $salesLookup['egi'];
-    if (isset($salesLookup['egy']) && !isset($salesLookup['egi'])) $salesLookup['egi'] = $salesLookup['egy'];
-    if (isset($salesLookup['fadil']) && !isset($salesLookup['fadhil'])) $salesLookup['fadhil'] = $salesLookup['fadil'];
-    if (isset($salesLookup['fadhil']) && !isset($salesLookup['fadil'])) $salesLookup['fadil'] = $salesLookup['fadhil'];
-
-    $matchSales = function($rawSalesName) use ($salesLookup, $salesDbRows) {
-        $raw = trim($rawSalesName);
-        if (!$raw || $raw === '-' || $raw === '0' || strtolower($raw) === 'no data' || strtolower($raw) === 'unassigned' || strtolower($raw) === 'belum ditugaskan') {
-            return [null, ''];
-        }
-        $lower = strtolower($raw);
-        if (isset($salesLookup[$lower])) {
-            return [$salesLookup[$lower]['id'], $salesLookup[$lower]['name']];
-        }
-
-        // Substring / partial check across registered sales
-        foreach ($salesDbRows as $s) {
-            $sName = strtolower(trim($s['nama_lengkap'] ?? ''));
-            if ($sName && (strpos($sName, $lower) !== false || strpos($lower, $sName) !== false)) {
-                return [(int)$s['id'], $s['nama_lengkap']];
+    $usedIds = [];
+    $popQueue = function(&$qMap, $key) use (&$usedIds) {
+        if (empty($qMap[$key])) return 0;
+        while (!empty($qMap[$key])) {
+            $cand = array_shift($qMap[$key]);
+            if (empty($usedIds[$cand])) {
+                $usedIds[$cand] = true;
+                return $cand;
             }
         }
-
-        // Check first name match
-        $firstWord = explode(' ', $lower)[0] ?? '';
-        if ($firstWord && strlen($firstWord) >= 3) {
-            foreach ($salesDbRows as $s) {
-                $sFirst = explode(' ', strtolower(trim($s['nama_lengkap'] ?? '')))[0] ?? '';
-                if ($sFirst === $firstWord) {
-                    return [(int)$s['id'], $s['nama_lengkap']];
-                }
-            }
-        }
-
-        // Return null ID if no account matched, but preserve the raw text name in sales_fu
-        return [null, $raw];
+        return 0;
     };
 
+    $cleanP = function($p) {
+        if (!$p || $p === '-') return '';
+        if (stripos($p, 'E+') !== false || (stripos($p, 'E') !== false && is_numeric($p))) {
+            $p = sprintf('%.0f', (float)$p);
+        }
+        $c = preg_replace('/[^0-9]/', '', $p);
+        if (str_starts_with($c, '0')) $c = '62' . substr($c, 1);
+        elseif (str_starts_with($c, '8')) $c = '62' . $c;
+        return $c;
+    };
+
+    $updates = [];
     $rowsToInsert = [];
-    $inserted = 0;
+    $newSnapshots = [];
+    $changedFuCount = 0;
 
     for ($i = $headerRowIdx + 1; $i < count($rawRows); $i++) {
         $row = $rawRows[$i];
@@ -340,348 +462,443 @@ function sync_google_sheet_data($sheetUrl = null) {
         $name = $nameIdx !== -1 ? trim($row[$nameIdx] ?? '') : '';
         if (!$name || $name === '-' || $name === 'NO DATA') continue;
 
+        $vin = $vinIdx !== -1 ? trim($row[$vinIdx] ?? '') : '';
+        $plateNumber = $plateIdx !== -1 ? trim($row[$plateIdx] ?? '') : '';
+        $pkbNo = $pkbNoIdx !== -1 ? trim($row[$pkbNoIdx] ?? '') : '';
+        $cluster = $clusterIdx !== -1 ? trim($row[$clusterIdx] ?? '') : '';
+        $sheetRowIndex = $i + 1;
+        $code = 'PKB-ROW-' . $sheetRowIndex;
+
+        $connected = sft_parse_sheet_bool($connIdx !== -1 ? ($row[$connIdx] ?? '') : '');
+        $contacted = sft_parse_sheet_bool($contIdx !== -1 ? ($row[$contIdx] ?? '') : '');
+        $prospect = sft_parse_sheet_bool($prospIdx !== -1 ? ($row[$prospIdx] ?? '') : '');
+        $spk = sft_parse_sheet_bool($spkIdx !== -1 ? ($row[$spkIdx] ?? '') : '');
+
+        $remarks = $remarksIdx !== -1 ? trim($row[$remarksIdx] ?? '') : '';
+        $salesFuStatus = $statusFuIdx !== -1 ? trim($row[$statusFuIdx] ?? '') : '';
+        if ($salesFuStatus === '' || $salesFuStatus === '-') $salesFuStatus = 'Open';
+        $reasonFu = $reasonFuIdx !== -1 ? trim($row[$reasonFuIdx] ?? '') : '';
+        $rawSalesFu = $salesFuIdx !== -1 ? trim($row[$salesFuIdx] ?? '') : '';
+        if ($rawSalesFu === '-' || $rawSalesFu === '0' || strtolower($rawSalesFu) === 'belum ditugaskan') $rawSalesFu = '';
+
+        $allSpk = $allSpkIdx !== -1 ? trim($row[$allSpkIdx] ?? '') : '';
+        $allDo = $allDoIdx !== -1 ? trim($row[$allDoIdx] ?? '') : '';
+        $hasAllDo = (!empty($allDo) && $allDo !== '-' && $allDo !== '0' && stripos($allDo, 'DO') !== false);
+        $doUnit = ($hasAllDo || stripos($remarks, 'DO') !== false) ? 'TRUE' : 'FALSE';
+        $hasAllSpk = (!empty($allSpk) && $allSpk !== '-' && $allSpk !== '0' && stripos($allSpk, 'SPK') !== false);
+        if ($hasAllSpk || stripos($remarks, 'SPK berhasil') !== false) {
+            $spk = 'TRUE';
+        }
+        $fuDate = $fuDateIdx !== -1 ? trim($row[$fuDateIdx] ?? '') : '';
+
+        // If any later stage in Sheet is TRUE, enforce logical upstream TRUE consistency if remarks is not rejecting
+        if ($spk === 'TRUE') {
+            $connected = 'TRUE';
+            $contacted = 'TRUE';
+            $prospect = 'TRUE';
+            if ($remarks === '') $remarks = 'SPK berhasil';
+            $salesFuStatus = 'Closed';
+        } elseif ($prospect === 'TRUE') {
+            $connected = 'TRUE';
+            $contacted = 'TRUE';
+        } elseif ($contacted === 'TRUE') {
+            $connected = 'TRUE';
+        }
+
+        $status = sft_derive_followup_state($connected, $contacted, $prospect, $spk, $remarks, $doUnit);
+
+        $uPkb = strtoupper($pkbNo);
+        $uVin = strtoupper($vin);
+        $uPlate = strtoupper($plateNumber);
+        $uOp = strtoupper($cluster);
+        $uName = strtoupper($name);
+
+        $matchedId = $popQueue($compQ, "$uPkb|$uVin|$uPlate|$uOp|$uName");
+        if (!$matchedId && $uPkb !== '' && $uVin !== '') {
+            $matchedId = $popQueue($pkbVinQ, "$uPkb|$uVin");
+        }
+        if (!$matchedId && $uPkb !== '') {
+            $matchedId = $popQueue($pkbQ, $uPkb);
+        }
+        if (!$matchedId && isset($codeMap[$code]) && empty($usedIds[$codeMap[$code]])) {
+            $candRow = $dbById[$codeMap[$code]];
+            if (strtoupper(trim($candRow['name'] ?? '')) === $uName) {
+                $usedIds[$codeMap[$code]] = true;
+                $matchedId = $codeMap[$code];
+            }
+        }
+
+        list($matchedSalesId, $matchedSalesName) = $matchSales($rawSalesFu);
+        $salesFuVal = $rawSalesFu !== '' ? ($matchedSalesName ?: $rawSalesFu) : '';
+
+        $sheetSig = [$connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $salesFuVal, $status];
+
+        if ($matchedId && isset($dbById[$matchedId])) {
+            $dbRow = $dbById[$matchedId];
+            $prevSnap = $state['snapshots'][$matchedId] ?? null;
+            $pushLockTs = (int)($state['push_locks'][$matchedId] ?? 0);
+
+            // Prevent overwriting a brand-new Salesforce push whose webhook write to Google Sheet hasn't landed in CSV yet
+            if ($pushLockTs > 0 && ($nowTs - $pushLockTs) < 25 && $prevSnap !== null && $sheetSig === $prevSnap) {
+                $newSnapshots[$matchedId] = $prevSnap;
+                continue;
+            }
+
+            $dbConn = (strtoupper(trim((string)($dbRow['connected'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+            $dbCont = (strtoupper(trim((string)($dbRow['contacted'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+            $dbProsp = (strtoupper(trim((string)($dbRow['prospect'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+            $dbSpk = (strtoupper(trim((string)($dbRow['spk'] ?? ''))) === 'TRUE') ? 'TRUE' : 'FALSE';
+            $dbRemarks = trim((string)($dbRow['remarks'] ?? ''));
+            $dbFuStat = trim((string)($dbRow['sales_fu_status'] ?? 'Open')) ?: 'Open';
+            $dbReason = trim((string)($dbRow['reason_followup'] ?? ''));
+            $dbStatus = trim((string)($dbRow['followup_status'] ?? 'Belum Dihubungi')) ?: 'Belum Dihubungi';
+            $dbSalesFu = trim((string)($dbRow['sales_fu'] ?? ''));
+            $dbAssignedId = !empty($dbRow['assigned_sales_id']) ? (int)$dbRow['assigned_sales_id'] : null;
+            $dbIsOrphan = isset($dbRow['is_orphan']) ? (int)$dbRow['is_orphan'] : 0;
+            $dbRowIdx = (int)($dbRow['sheet_row_index'] ?? 0);
+
+            if ($salesFuVal !== '') {
+                $targetAssignedId = $matchedSalesId;
+                $targetSalesFu = $salesFuVal;
+                $targetIsOrphan = (!$targetAssignedId && $targetSalesFu === '') ? 1 : 0;
+            } else {
+                $prevHadSalesFu = ($prevSnap !== null && trim((string)($prevSnap[7] ?? '')) !== '');
+                $wasFollowedNowCleared = ($dbStatus !== 'Belum Dihubungi' && $status === 'Belum Dihubungi');
+                if ($prevHadSalesFu || $wasFollowedNowCleared || $forceFull) {
+                    // When sheet clears a previously filled FU row (or full pull with empty Sales FU), clear sales assignment too unless preserved below
+                    $targetAssignedId = ($prevHadSalesFu || $wasFollowedNowCleared) ? null : $dbAssignedId;
+                    $targetSalesFu = ($prevHadSalesFu || $wasFollowedNowCleared) ? '' : $dbSalesFu;
+                    $targetIsOrphan = ($prevHadSalesFu || $wasFollowedNowCleared) ? 1 : $dbIsOrphan;
+                } else {
+                    $targetAssignedId = $dbAssignedId;
+                    $targetSalesFu = $dbSalesFu;
+                    $targetIsOrphan = $dbIsOrphan;
+                }
+            }
+
+            if ($status === 'Belum Dihubungi' && $connected === 'FALSE' && $remarks === '') {
+                $targetFuDate = null;
+            } elseif ($dbStatus !== $status || $dbSpk !== $spk || $dbConn !== $connected) {
+                $targetFuDate = $fuDate ?: ($dbRow['followup_date'] ?: date('Y-m-d H:i:s'));
+            } else {
+                $targetFuDate = $dbRow['followup_date'] ?: null;
+            }
+
+            $fuChanged = (
+                $dbConn !== $connected ||
+                $dbCont !== $contacted ||
+                $dbProsp !== $prospect ||
+                $dbSpk !== $spk ||
+                $dbRemarks !== $remarks ||
+                $dbFuStat !== $salesFuStatus ||
+                $dbReason !== $reasonFu ||
+                $dbStatus !== $status ||
+                $dbSalesFu !== $targetSalesFu ||
+                $dbAssignedId !== $targetAssignedId
+            );
+            $rowIdxChanged = ($dbRowIdx !== $sheetRowIndex);
+
+            if ($fuChanged) {
+                $changedFuCount++;
+            }
+
+            if ($fuChanged || $rowIdxChanged) {
+                $updates[] = [
+                    $connected, $contacted, $prospect, $spk, $remarks,
+                    $salesFuStatus, $reasonFu, $status, $targetFuDate,
+                    $targetAssignedId, $targetSalesFu, $targetIsOrphan,
+                    $doUnit, $allSpk, $allDo, $sheetRowIndex, $matchedId
+                ];
+            }
+
+            $newSnapshots[$matchedId] = $sheetSig;
+            continue;
+        }
+
+        // Brand-new row added directly inside Google Sheet -> prepare insert
         $rawPhone1 = $phone1Idx !== -1 ? trim($row[$phone1Idx] ?? '') : '';
         $rawPhone2 = $phone2Idx !== -1 ? trim($row[$phone2Idx] ?? '') : '';
-
-        $cleanP = function($p) {
-            if (!$p || $p === '-') return '';
-            if (stripos($p, 'E+') !== false || (stripos($p, 'E') !== false && is_numeric($p))) {
-                $p = sprintf('%.0f', (float)$p);
-            }
-            $c = preg_replace('/[^0-9]/', '', $p);
-            if (str_starts_with($c, '0')) $c = '62' . substr($c, 1);
-            elseif (str_starts_with($c, '8')) $c = '62' . $c;
-            return $c;
-        };
-
-        $phone1 = $cleanP($rawPhone1);
-        $phone2 = $cleanP($rawPhone2);
-        $phone = $phone1 ?: ($phone2 ?: '');
-
-        if (!$phone) $phone = '-';
+        $phone = $cleanP($rawPhone1) ?: ($cleanP($rawPhone2) ?: '-');
 
         $lastCar = $lastCarIdx !== -1 ? trim($row[$lastCarIdx] ?? '') : '';
         if ($lastCar === 'NO DATA' || $lastCar === '-') $lastCar = '';
-
         $vFilter = $vehicleFilterIdx !== -1 ? trim($row[$vehicleFilterIdx] ?? 'OTHERS') : 'OTHERS';
         if (!$vFilter || $vFilter === 'NO DATA') $vFilter = 'OTHERS';
-
         $rec1 = $rec1Idx !== -1 ? trim(str_replace('(Target Repurchase)', '', $row[$rec1Idx] ?? '')) : '';
         if ($rec1 === 'NO DATA' || $rec1 === '-') $rec1 = '';
-
         $rec2 = $rec2Idx !== -1 ? trim($row[$rec2Idx] ?? '') : '';
         if ($rec2 === 'NO DATA' || $rec2 === '-') $rec2 = '';
-
         $rec3 = $rec3Idx !== -1 ? trim($row[$rec3Idx] ?? '') : '';
         if ($rec3 === 'NO DATA' || $rec3 === '-') $rec3 = '';
 
         $age = $ageIdx !== -1 ? trim($row[$ageIdx] ?? '') : '';
         if ($age === 'NO DATA' || $age === '-') $age = '';
-        if ($age && is_numeric($age)) $age = number_format((float)$age, 1) . ' Thn';
-
-        $cluster = $clusterIdx !== -1 ? trim($row[$clusterIdx] ?? '') : '';
         $district = $districtIdx !== -1 ? trim($row[$districtIdx] ?? '') : '';
         if ($district === 'NO DATA' || $district === '-' || $district === '0') $district = '';
+        $city = $cityIdx !== -1 ? trim($row[$cityIdx] ?? '') : '';
+        if ($city === 'NO DATA' || $city === '-' || $city === '0') $city = '';
+        $address = $addrIdx !== -1 ? trim($row[$addrIdx] ?? '') : '';
+        if ($address === 'NO DATA' || $address === '-' || $address === '0') $address = '';
         $priority = get_territory_priority($district);
 
-        $vin = $vinIdx !== -1 ? trim($row[$vinIdx] ?? '') : '';
-        $plateNumber = $plateIdx !== -1 ? trim($row[$plateIdx] ?? '') : '';
-        $sheetRowIndex = $i + 1;
         $custType = $custTypeIdx !== -1 ? strtoupper(trim($row[$custTypeIdx] ?? 'RETAIL')) : 'RETAIL';
         if ($custType !== 'FLEET') $custType = 'RETAIL';
-
         $outletDo = $doOutletIdx !== -1 ? trim($row[$doOutletIdx] ?? '') : '';
         $outletSrv = $srvOutletIdx !== -1 ? trim($row[$srvOutletIdx] ?? '') : '';
         $srvComp = $srvComplianceIdx !== -1 ? trim($row[$srvComplianceIdx] ?? '') : '';
         $temperature = $tempIdx !== -1 ? strtoupper(trim($row[$tempIdx] ?? 'MEDIUM')) : 'MEDIUM';
         if (!in_array($temperature, ['HIGH', 'MEDIUM', 'LOW'])) $temperature = 'MEDIUM';
-
         $outletName = $outletNameIdx !== -1 ? trim($row[$outletNameIdx] ?? 'TUNAS TOYOTA KIARA CONDONG') : 'TUNAS TOYOTA KIARA CONDONG';
 
-        // Response fields
-        $rawConn = $connIdx !== -1 ? trim($row[$connIdx] ?? '') : '';
-        $connected = ($rawConn === '1' || strtoupper($rawConn) === 'TRUE') ? 'TRUE' : 'FALSE';
-
-        $rawCont = $contIdx !== -1 ? trim($row[$contIdx] ?? '') : '';
-        $contacted = ($rawCont === '1' || strtoupper($rawCont) === 'TRUE') ? 'TRUE' : 'FALSE';
-
-        $rawProsp = $prospIdx !== -1 ? trim($row[$prospIdx] ?? '') : '';
-        $prospect = ($rawProsp === '1' || strtoupper($rawProsp) === 'TRUE') ? 'TRUE' : 'FALSE';
-
-        $rawSpk = $spkIdx !== -1 ? trim($row[$spkIdx] ?? '') : '';
-        $spk = ($rawSpk === '1' || strtoupper($rawSpk) === 'TRUE') ? 'TRUE' : 'FALSE';
-
-        $remarks = $remarksIdx !== -1 ? trim($row[$remarksIdx] ?? '') : '';
-        $salesFuStatus = $statusFuIdx !== -1 ? trim($row[$statusFuIdx] ?? 'Open') : 'Open';
-        $reasonFu = $reasonFuIdx !== -1 ? trim($row[$reasonFuIdx] ?? '') : '';
-        
-        $rawSalesFu = $salesFuIdx !== -1 ? trim($row[$salesFuIdx] ?? '') : '';
-        list($matchedSalesId, $matchedSalesName) = $matchSales($rawSalesFu);
-        $assignedSalesId = $matchedSalesId; // int ID if matched to sales_accounts, or null
-        $salesFu = $matchedSalesName ?: $rawSalesFu;
-
-        $fuDate = $fuDateIdx !== -1 ? trim($row[$fuDateIdx] ?? '') : '';
-
-        $allSpk = $allSpkIdx !== -1 ? trim($row[$allSpkIdx] ?? '') : '';
-        $allDo = $allDoIdx !== -1 ? trim($row[$allDoIdx] ?? '') : '';
-
         $dataType = $dataTypeIdx !== -1 ? trim($row[$dataTypeIdx] ?? '') : '';
-        if ($dataType === 'NO DATA' || $dataType === '-' || $dataType === '#N/A' || $dataType === '#REF!') $dataType = '';
-
+        if (in_array($dataType, ['NO DATA', '-', '#N/A', '#REF!'], true)) $dataType = '';
         $custMigration = $custMigrationIdx !== -1 ? trim($row[$custMigrationIdx] ?? '') : '';
-        if ($custMigration === 'NO DATA' || $custMigration === '-' || $custMigration === '#N/A' || $custMigration === '#REF!') $custMigration = '';
-
+        if (in_array($custMigration, ['NO DATA', '-', '#N/A', '#REF!'], true)) $custMigration = '';
         $vehicleModelSpk = $vehicleModelSpkIdx !== -1 ? trim($row[$vehicleModelSpkIdx] ?? '') : '';
-        if ($vehicleModelSpk === 'NO DATA' || $vehicleModelSpk === '-' || $vehicleModelSpk === '#N/A' || $vehicleModelSpk === '#REF!') $vehicleModelSpk = '';
-
+        if (in_array($vehicleModelSpk, ['NO DATA', '-', '#N/A', '#REF!'], true)) $vehicleModelSpk = '';
         $vehicleMatch = $vehicleMatchIdx !== -1 ? trim($row[$vehicleMatchIdx] ?? '') : '';
-        if ($vehicleMatch === 'NO DATA' || $vehicleMatch === '-' || $vehicleMatch === '#N/A' || $vehicleMatch === '#REF!') $vehicleMatch = '';
+        if (in_array($vehicleMatch, ['NO DATA', '-', '#N/A', '#REF!'], true)) $vehicleMatch = '';
 
-        $hasAllDo = (!empty($allDo) && $allDo !== '-' && $allDo !== '0' && stripos($allDo, 'DO') !== false);
-        $doUnit = ($hasAllDo || stripos($remarks, 'DO') !== false) ? 'TRUE' : 'FALSE';
-
-        $hasAllSpk = (!empty($allSpk) && $allSpk !== '-' && $allSpk !== '0' && stripos($allSpk, 'SPK') !== false);
-        if ($hasAllSpk || stripos($remarks, 'SPK berhasil') !== false) {
-            $spk = 'TRUE';
-        }
-
-        // Target Recommended Unit
         $targetCar = $rec1 ?: ($vFilter !== 'OTHERS' ? $vFilter : ($lastCar ?: 'Toyota Unit'));
         $carModel = $targetCar;
-        $category = 'Trade-in / Repurchase (' . $carModel . ')';
+        $category = 'Servis Berkala';
+        $isOrphan = (!$matchedSalesId && $salesFuVal === '') ? 1 : 0;
 
-        $status = 'Belum Dihubungi';
-        if ($doUnit === 'TRUE' || $spk === 'TRUE' || $remarks === 'SPK berhasil') $status = 'Deal / Selesai';
-        elseif ($remarks === 'Customer tertarik' || $prospect === 'TRUE') $status = 'Tertarik / Jadwal Servis';
-        elseif ($remarks === 'Customer menolak' || $remarks === 'Customer tidak aktif') $status = 'Tidak Tertarik';
-        elseif ($remarks === 'Customer janjian' || $remarks === 'Customer pending' || $contacted === 'TRUE' || $connected === 'TRUE') $status = 'Menunggu Respon';
-
-        // Deterministic customer code per sheet row to preserve all 23,682 rows
-        $code = 'PKB-ROW-' . $sheetRowIndex;
-        $isOrphan = (!$assignedSalesId && empty($salesFu)) ? 1 : 0;
+        $insertCode = isset($codeMap[$code]) ? ('PKB-ROW-' . $sheetRowIndex . '-' . substr(md5("$pkbNo|$vin|$sheetRowIndex"), 0, 6)) : $code;
+        $fullAddr = implode(', ', array_filter([$address, $district, $city], fn($v) => $v !== '' && $v !== '0'));
+        $eSeed = radarComputeEntitySeed($sheetRowIndex, $name, $address ?: $district, $district, $city);
+        $GLOBALS['SKIP_REMOTE_GEOCODE'] = true;
+        $gCoords = getAccurateCoords($sheetRowIndex, $district, $fullAddr, null, $plateNumber, $vin, $eSeed);
 
         $rowsToInsert[] = [
-            $code, $name, $phone, $carModel, $lastCar, $age,
-            $targetCar, $rec2, $rec3, $cluster, $priority, $district, $vin, $plateNumber, $sheetRowIndex,
+            $insertCode, $name, $phone, $carModel, $lastCar, $age,
+            $targetCar, $rec2, $rec3, $cluster, $priority, $district, $city, $address, $vin, $plateNumber, $pkbNo, $sheetRowIndex,
             $outletDo, $outletSrv, $srvComp,
-            $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $fuDate ?: null,
+            $connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, ($status === 'Belum Dihubungi' ? null : ($fuDate ?: date('Y-m-d H:i:s'))),
             $category, $status,
-            $vFilter, $custType, $temperature, $outletName, $salesFu, $doUnit, $allSpk, $allDo,
-            $assignedSalesId, $isOrphan,
-            $dataType, $custMigration, $vehicleModelSpk, $vehicleMatch
+            $vFilter, $custType, $temperature, $outletName, $salesFuVal, $doUnit, $allSpk, $allDo,
+            $matchedSalesId, $isOrphan,
+            $dataType, $custMigration, $vehicleModelSpk, $vehicleMatch,
+            (float)$gCoords[0], (float)$gCoords[1], substr((string)($gCoords[2] ?? $district), 0, 145), (string)($gCoords[3] ?? $fullAddr)
         ];
     }
 
-    // Execute in fast chunks of 50 rows
-    $chunkSize = 50;
-    $chunks = array_chunk($rowsToInsert, $chunkSize);
-
-    if ($sqlite_pdo && !$is_mysql) {
-        $sqlite_pdo->beginTransaction();
-        $sqlite_stmt = $sqlite_pdo->prepare("
-            INSERT INTO followup_customers (
-                customer_code, name, phone, car_model, last_car_model, car_age,
-                recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin, plate_number, sheet_row_index,
-                outlet_do, outlet_service, service_compliance,
-                connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
-                followup_category, followup_status, sync_source,
-                vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
-                assigned_sales_id, is_orphan,
-                data_type, customer_migration, vehicle_model_spk, vehicle_match
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(customer_code) DO UPDATE SET
-                name = excluded.name, car_model = excluded.car_model, last_car_model = excluded.last_car_model,
-                car_age = excluded.car_age, recommended_model = excluded.recommended_model,
-                alt_model_2 = excluded.alt_model_2, alt_model_3 = excluded.alt_model_3,
-                cluster_name = excluded.cluster_name, priority = excluded.priority, district = excluded.district,
-                vin = excluded.vin, plate_number = excluded.plate_number, sheet_row_index = excluded.sheet_row_index, outlet_do = excluded.outlet_do, outlet_service = excluded.outlet_service,
-                service_compliance = excluded.service_compliance,
-                connected = CASE WHEN excluded.connected != 'FALSE' THEN excluded.connected ELSE followup_customers.connected END,
-                contacted = CASE WHEN excluded.contacted != 'FALSE' THEN excluded.contacted ELSE followup_customers.contacted END,
-                prospect = CASE WHEN excluded.prospect != 'FALSE' THEN excluded.prospect ELSE followup_customers.prospect END,
-                spk = CASE WHEN excluded.spk != 'FALSE' THEN excluded.spk ELSE followup_customers.spk END,
-                remarks = CASE WHEN excluded.remarks != '' THEN excluded.remarks ELSE followup_customers.remarks END,
-                sales_fu_status = CASE WHEN excluded.sales_fu_status != 'Open' THEN excluded.sales_fu_status ELSE followup_customers.sales_fu_status END,
-                reason_followup = CASE WHEN excluded.reason_followup != '' THEN excluded.reason_followup ELSE followup_customers.reason_followup END,
-                followup_date = CASE WHEN excluded.followup_date IS NOT NULL THEN excluded.followup_date ELSE followup_customers.followup_date END,
-                followup_status = CASE 
-                    WHEN excluded.followup_status != 'Belum Dihubungi' AND excluded.followup_status != '' THEN excluded.followup_status
-                    WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.followup_status != '' THEN followup_customers.followup_status
-                    ELSE excluded.followup_status
-                END,
-                followup_category = excluded.followup_category,
-                sync_source = 'google_sheet',
-                vehicle_filter = excluded.vehicle_filter,
-                cust_type = excluded.cust_type,
-                priority_class = excluded.priority_class,
-                outlet_name = excluded.outlet_name,
-                assigned_sales_id = CASE
-                    WHEN excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-' AND excluded.sales_fu != 'Belum Ditugaskan' AND excluded.assigned_sales_id IS NOT NULL AND excluded.assigned_sales_id > 0
-                        THEN excluded.assigned_sales_id
-                    WHEN followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
-                        THEN followup_customers.assigned_sales_id
-                    ELSE excluded.assigned_sales_id
-                END,
-                sales_fu = CASE
-                    WHEN excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-' AND excluded.sales_fu != 'Belum Ditugaskan'
-                        THEN excluded.sales_fu
-                    WHEN followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan'
-                        THEN followup_customers.sales_fu
-                    ELSE excluded.sales_fu
-                END,
-                is_orphan = CASE
-                    WHEN (excluded.sales_fu IS NOT NULL AND excluded.sales_fu != '' AND excluded.sales_fu != '-' AND excluded.sales_fu != 'Belum Ditugaskan')
-                         OR (followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan')
-                        THEN 0
-                    ELSE followup_customers.is_orphan
-                END,
-                do_unit = excluded.do_unit,
-                all_spk = excluded.all_spk,
-                all_do = excluded.all_do,
-                data_type = excluded.data_type,
-                customer_migration = excluded.customer_migration,
-                vehicle_model_spk = excluded.vehicle_model_spk,
-                vehicle_match = excluded.vehicle_match
-        ");
-        foreach ($rowsToInsert as $rData) {
-            $sqlite_stmt->execute($rData);
-            $inserted++;
+    $updatedCount = 0;
+    if (!empty($updates)) {
+        if ($is_mysql && $conn) {
+            $conn->begin_transaction();
+            $stmt = $conn->prepare("
+                UPDATE followup_customers SET
+                    connected = ?, contacted = ?, prospect = ?, spk = ?, remarks = ?,
+                    sales_fu_status = ?, reason_followup = ?, followup_status = ?, followup_date = ?,
+                    assigned_sales_id = ?, sales_fu = ?, is_orphan = ?,
+                    do_unit = ?, all_spk = ?, all_do = ?, sheet_row_index = ?
+                WHERE id = ?
+            ");
+            foreach ($updates as $u) {
+                $stmt->bind_param(
+                    'sssssssssisisssii',
+                    $u[0], $u[1], $u[2], $u[3], $u[4],
+                    $u[5], $u[6], $u[7], $u[8],
+                    $u[9], $u[10], $u[11],
+                    $u[12], $u[13], $u[14], $u[15], $u[16]
+                );
+                $stmt->execute();
+                $updatedCount++;
+            }
+            $stmt->close();
+            $conn->commit();
+        } else {
+            if ($sqlite_pdo) $sqlite_pdo->beginTransaction();
+            foreach ($updates as $u) {
+                followup_execute("
+                    UPDATE followup_customers SET
+                        connected = ?, contacted = ?, prospect = ?, spk = ?, remarks = ?,
+                        sales_fu_status = ?, reason_followup = ?, followup_status = ?, followup_date = ?,
+                        assigned_sales_id = ?, sales_fu = ?, is_orphan = ?,
+                        do_unit = ?, all_spk = ?, all_do = ?, sheet_row_index = ?
+                    WHERE id = ?
+                ", $u);
+                $updatedCount++;
+            }
+            if ($sqlite_pdo) $sqlite_pdo->commit();
         }
-        $sqlite_pdo->commit();
-    } elseif ($is_mysql && $conn) {
-        foreach ($chunks as $chunk) {
-            $placeholders = [];
-            $flatParams = [];
-            foreach ($chunk as $rData) {
-                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                foreach ($rData as $val) {
-                    $flatParams[] = $val;
+    }
+
+    $insertedCount = 0;
+    if (!empty($rowsToInsert)) {
+        $chunks = array_chunk($rowsToInsert, 50);
+        if ($is_mysql && $conn) {
+            foreach ($chunks as $chunk) {
+                $placeholders = [];
+                $flatParams = [];
+                foreach ($chunk as $rData) {
+                    $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'google_sheet', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    foreach ($rData as $val) $flatParams[] = $val;
+                    $insertedCount++;
                 }
-                $inserted++;
-            }
-            $sql = "
-                INSERT INTO followup_customers (
-                    customer_code, name, phone, car_model, last_car_model, car_age,
-                    recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, vin, plate_number, sheet_row_index,
-                    outlet_do, outlet_service, service_compliance,
-                    connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
-                    followup_category, followup_status, sync_source,
-                    vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
-                    assigned_sales_id, is_orphan,
-                    data_type, customer_migration, vehicle_model_spk, vehicle_match
-                ) VALUES " . implode(', ', $placeholders) . "
-                ON DUPLICATE KEY UPDATE
-                    name = VALUES(name), car_model = VALUES(car_model), last_car_model = VALUES(last_car_model),
-                    car_age = VALUES(car_age), recommended_model = VALUES(recommended_model),
-                    alt_model_2 = VALUES(alt_model_2), alt_model_3 = VALUES(alt_model_3),
-                    cluster_name = VALUES(cluster_name), priority = VALUES(priority), district = VALUES(district),
-                    vin = VALUES(vin), plate_number = VALUES(plate_number), sheet_row_index = VALUES(sheet_row_index), outlet_do = VALUES(outlet_do), outlet_service = VALUES(outlet_service),
-                    service_compliance = VALUES(service_compliance),
-                    connected = CASE WHEN VALUES(connected) != 'FALSE' THEN VALUES(connected) ELSE connected END,
-                    contacted = CASE WHEN VALUES(contacted) != 'FALSE' THEN VALUES(contacted) ELSE contacted END,
-                    prospect = CASE WHEN VALUES(prospect) != 'FALSE' THEN VALUES(prospect) ELSE prospect END,
-                    spk = CASE WHEN VALUES(spk) != 'FALSE' THEN VALUES(spk) ELSE spk END,
-                    remarks = CASE WHEN VALUES(remarks) != '' THEN VALUES(remarks) ELSE remarks END,
-                    sales_fu_status = CASE WHEN VALUES(sales_fu_status) != 'Open' THEN VALUES(sales_fu_status) ELSE sales_fu_status END,
-                    reason_followup = CASE WHEN VALUES(reason_followup) != '' THEN VALUES(reason_followup) ELSE reason_followup END,
-                    followup_date = CASE WHEN VALUES(followup_date) IS NOT NULL THEN VALUES(followup_date) ELSE followup_date END,
-                    followup_status = CASE 
-                        WHEN VALUES(followup_status) != 'Belum Dihubungi' AND VALUES(followup_status) != '' THEN VALUES(followup_status)
-                        WHEN followup_customers.followup_status != 'Belum Dihubungi' AND followup_customers.followup_status != '' THEN followup_customers.followup_status
-                        ELSE VALUES(followup_status)
-                    END,
-                    followup_category = VALUES(followup_category),
-                    sync_source = VALUES(sync_source),
-                    vehicle_filter = VALUES(vehicle_filter),
-                    cust_type = VALUES(cust_type),
-                    priority_class = VALUES(priority_class),
-                    outlet_name = VALUES(outlet_name),
-                    assigned_sales_id = CASE
-                        WHEN VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-' AND VALUES(sales_fu) != 'Belum Ditugaskan' AND VALUES(assigned_sales_id) IS NOT NULL AND VALUES(assigned_sales_id) > 0
-                            THEN VALUES(assigned_sales_id)
-                        WHEN followup_customers.assigned_sales_id IS NOT NULL AND followup_customers.assigned_sales_id > 0
-                            THEN followup_customers.assigned_sales_id
-                        ELSE VALUES(assigned_sales_id)
-                    END,
-                    sales_fu = CASE
-                        WHEN VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-' AND VALUES(sales_fu) != 'Belum Ditugaskan'
-                            THEN VALUES(sales_fu)
-                        WHEN followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan'
-                            THEN followup_customers.sales_fu
-                        ELSE VALUES(sales_fu)
-                    END,
-                    is_orphan = CASE
-                        WHEN (VALUES(sales_fu) IS NOT NULL AND VALUES(sales_fu) != '' AND VALUES(sales_fu) != '-' AND VALUES(sales_fu) != 'Belum Ditugaskan')
-                             OR (followup_customers.sales_fu IS NOT NULL AND followup_customers.sales_fu != '' AND followup_customers.sales_fu != '-' AND followup_customers.sales_fu != 'Belum Ditugaskan')
-                            THEN 0
-                        ELSE followup_customers.is_orphan
-                    END,
-                    do_unit = VALUES(do_unit),
-                    all_spk = VALUES(all_spk),
-                    all_do = VALUES(all_do),
-                    data_type = VALUES(data_type),
-                    customer_migration = VALUES(customer_migration),
-                    vehicle_model_spk = VALUES(vehicle_model_spk),
-                    vehicle_match = VALUES(vehicle_match)
-            ";
-            $execRes = followup_execute($sql, $flatParams);
-            if ($execRes === [] && $conn->error) {
-                echo json_encode(['success' => false, 'message' => 'SQL Error: ' . $conn->error]);
-                exit;
+                $sql = "
+                    INSERT INTO followup_customers (
+                        customer_code, name, phone, car_model, last_car_model, car_age,
+                        recommended_model, alt_model_2, alt_model_3, cluster_name, priority, district, city, address, vin, plate_number, pkb_no, sheet_row_index,
+                        outlet_do, outlet_service, service_compliance,
+                        connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup, followup_date,
+                        followup_category, followup_status, sync_source,
+                        vehicle_filter, cust_type, priority_class, outlet_name, sales_fu, do_unit, all_spk, all_do,
+                        assigned_sales_id, is_orphan,
+                        data_type, customer_migration, vehicle_model_spk, vehicle_match,
+                        lat, lng, geo_district, geo_address
+                    ) VALUES " . implode(', ', $placeholders);
+                followup_execute($sql, $flatParams);
             }
         }
     }
 
-    // Post-sync safety reconciliation:
-    // 1. Ensure any leads having sales_fu string get assigned_sales_id linked correctly & is_orphan reset to 0
-    foreach ($salesLookup as $key => $sData) {
-        $sid = (int)$sData['id'];
-        $sName = $sData['name'];
-        if ($sid > 0) {
-            followup_execute("
-                UPDATE followup_customers 
-                SET assigned_sales_id = ?, is_orphan = 0 
-                WHERE (LOWER(sales_fu) = ? OR LOWER(sales_fu) = ? OR sales_fu = ?)
-            ", [$sid, strtolower($key), strtolower($sName), $sName]);
+    // Prune expired push locks
+    $cleanLocks = [];
+    foreach ($state['push_locks'] as $lid => $ts) {
+        if (($nowTs - (int)$ts) < 60) $cleanLocks[$lid] = (int)$ts;
+    }
+
+    $nowStr = date('Y-m-d H:i:s');
+    $state['csv_hash'] = $csvHash;
+    $state['last_checked_at'] = $nowTs;
+    $state['snapshots'] = $newSnapshots;
+    $state['push_locks'] = $cleanLocks;
+    if ($forceFull || $changedFuCount > 0 || $insertedCount > 0 || empty($state['last_sync'])) {
+        $state['last_sync'] = $nowStr;
+    }
+    sft_save_sync_state($state);
+
+    if ($forceFull || $changedFuCount > 0 || $insertedCount > 0) {
+        if ($is_mysql && $conn) {
+            followup_execute("INSERT INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?) ON DUPLICATE KEY UPDATE setting_value = ?", [$nowStr, $nowStr]);
+            followup_execute("INSERT INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?) ON DUPLICATE KEY UPDATE setting_value = ?", [$sheetUrl, $sheetUrl]);
+        } else {
+            followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?)", [$nowStr]);
+            followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)", [$sheetUrl]);
         }
     }
 
-    // 2. CRITICAL: Ensure any existing leads with assigned_sales_id > 0 (already assigned or followed up) have their sales_fu filled!
-    foreach ($salesDbRows as $sAcc) {
-        $sid = (int)$sAcc['id'];
-        $sName = trim($sAcc['nama_lengkap'] ?? ($sAcc['username'] ?? ''));
-        if ($sid > 0 && $sName !== '') {
-            followup_execute("
-                UPDATE followup_customers 
-                SET sales_fu = ? 
-                WHERE assigned_sales_id = ? 
-                  AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0')
-            ", [$sName, $sid]);
-        }
-    }
-
-    $now = date('Y-m-d H:i:s');
-    if ($is_mysql && $conn) {
-        followup_execute("
-            INSERT INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?)
-            ON DUPLICATE KEY UPDATE setting_value = ?
-        ", [$now, $now]);
-        followup_execute("
-            INSERT INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)
-            ON DUPLICATE KEY UPDATE setting_value = ?
-        ", [$sheetUrl, $sheetUrl]);
-    } else {
-        followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('last_sync_time', ?)", [$now]);
-        followup_execute("INSERT OR REPLACE INTO followup_settings (setting_key, setting_value) VALUES ('google_sheet_url', ?)", [$sheetUrl]);
-    }
-
+    $msgChanged = $changedFuCount + $insertedCount;
     return [
         'success' => true,
-        'message' => "Sinkronisasi Google Spreadsheet berhasil! $inserted data leads customer berhasil disinkronkan ke sistem.",
-        'inserted' => $inserted,
-        'last_sync' => $now,
+        'message' => $msgChanged > 0
+            ? "Sinkronisasi Google Spreadsheet berhasil! $changedFuCount data follow-up diperbarui dan $insertedCount data baru ditambahkan."
+            : "Database sudah sinkron dengan Google Spreadsheet.",
+        'changed' => $changedFuCount + $insertedCount,
+        'updated' => $changedFuCount,
+        'row_index_repaired' => $updatedCount,
+        'inserted' => $insertedCount,
+        'last_sync' => $nowStr,
         'sheet_url' => $sheetUrl
     ];
+}
+
+// -------------------------------------------------------------
+// ROUTE: GET / POST /api_followup_sync.php?action=auto_sync_sheet
+// Differential automatic sync from Google Sheet -> Salesforce
+// -------------------------------------------------------------
+if ($action === 'auto_sync_sheet') {
+    $force = !empty($_GET['force']) || !empty($_POST['force']);
+    $res = sync_google_sheet_data(null, $force, 5);
+    echo json_encode($res);
+    exit;
+}
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup_sync.php?action=webhook_from_sheet
+// Realtime receiver from Google Apps Script onEdit trigger
+// -------------------------------------------------------------
+if ($action === 'webhook_from_sheet') {
+    $input = get_json_input();
+    if (empty($input)) $input = $_POST;
+
+    $sheetRow = (int)($input['sheet_row_index'] ?? ($input['row'] ?? 0));
+    $pkbNo = trim((string)($input['pkb_no'] ?? ''));
+    $vin = trim((string)($input['vin'] ?? ''));
+    $name = trim((string)($input['name'] ?? ''));
+
+    $targetRow = null;
+    if ($pkbNo !== '' && $vin !== '') {
+        $rows = followup_query("SELECT * FROM followup_customers WHERE pkb_no = ? AND vin = ? LIMIT 1", [$pkbNo, $vin]);
+        if (!empty($rows)) $targetRow = $rows[0];
+    }
+    if (!$targetRow && $pkbNo !== '') {
+        $rows = followup_query("SELECT * FROM followup_customers WHERE pkb_no = ? LIMIT 1", [$pkbNo]);
+        if (!empty($rows)) $targetRow = $rows[0];
+    }
+    if (!$targetRow && $sheetRow > 0) {
+        $rows = followup_query("SELECT * FROM followup_customers WHERE sheet_row_index = ? OR customer_code = ? LIMIT 1", [$sheetRow, 'PKB-ROW-' . $sheetRow]);
+        if (!empty($rows)) $targetRow = $rows[0];
+    }
+
+    if (!$targetRow) {
+        echo json_encode(['success' => false, 'message' => 'Baris customer tidak ditemukan']);
+        exit;
+    }
+
+    $cid = (int)$targetRow['id'];
+    $connected = array_key_exists('connected', $input) ? sft_parse_sheet_bool($input['connected']) : ($targetRow['connected'] ?: 'FALSE');
+    $contacted = array_key_exists('contacted', $input) ? sft_parse_sheet_bool($input['contacted']) : ($targetRow['contacted'] ?: 'FALSE');
+    $prospect = array_key_exists('prospect', $input) ? sft_parse_sheet_bool($input['prospect']) : ($targetRow['prospect'] ?: 'FALSE');
+    $spk = array_key_exists('spk', $input) ? sft_parse_sheet_bool($input['spk']) : ($targetRow['spk'] ?: 'FALSE');
+    $remarks = array_key_exists('remarks', $input) ? trim((string)$input['remarks']) : trim((string)($targetRow['remarks'] ?? ''));
+    $salesFuStatus = array_key_exists('status_fu', $input) || array_key_exists('sales_fu_status', $input)
+        ? (trim((string)($input['status_fu'] ?? ($input['sales_fu_status'] ?? 'Open'))) ?: 'Open')
+        : (trim((string)($targetRow['sales_fu_status'] ?? 'Open')) ?: 'Open');
+    $reasonFu = array_key_exists('reason_followup', $input) || array_key_exists('reason', $input)
+        ? trim((string)($input['reason_followup'] ?? ($input['reason'] ?? '')))
+        : trim((string)($targetRow['reason_followup'] ?? ''));
+
+    $matchSales = sft_build_sales_matcher();
+    if (array_key_exists('sales_fu', $input)) {
+        $rawSalesFu = trim((string)$input['sales_fu']);
+        list($assignedId, $salesName) = $matchSales($rawSalesFu);
+        $salesFuVal = $rawSalesFu !== '' ? ($salesName ?: $rawSalesFu) : '';
+        $isOrphan = ($salesFuVal === '' && !$assignedId) ? 1 : 0;
+    } else {
+        $assignedId = !empty($targetRow['assigned_sales_id']) ? (int)$targetRow['assigned_sales_id'] : null;
+        $salesFuVal = trim((string)($targetRow['sales_fu'] ?? ''));
+        $isOrphan = isset($targetRow['is_orphan']) ? (int)$targetRow['is_orphan'] : 0;
+    }
+
+    if ($spk === 'TRUE') {
+        $connected = 'TRUE'; $contacted = 'TRUE'; $prospect = 'TRUE';
+        if ($remarks === '') $remarks = 'SPK berhasil';
+        $salesFuStatus = 'Closed';
+    }
+
+    $status = sft_derive_followup_state($connected, $contacted, $prospect, $spk, $remarks, $targetRow['do_unit'] ?? 'FALSE');
+    $fuDate = ($status === 'Belum Dihubungi' && $connected === 'FALSE' && $remarks === '')
+        ? null
+        : ($targetRow['followup_date'] ?: date('Y-m-d H:i:s'));
+
+    if ($status === 'Belum Dihubungi' && !array_key_exists('sales_fu', $input) && $remarks === '' && $connected === 'FALSE') {
+        // Keep existing assigned sales unless sheet cleared it
+    }
+
+    followup_execute("
+        UPDATE followup_customers SET
+            connected = ?, contacted = ?, prospect = ?, spk = ?,
+            remarks = ?, sales_fu_status = ?, reason_followup = ?, followup_status = ?, followup_date = ?,
+            assigned_sales_id = ?, sales_fu = ?, is_orphan = ?,
+            sheet_row_index = CASE WHEN ? > 0 THEN ? ELSE sheet_row_index END
+        WHERE id = ?
+    ", [
+        $connected, $contacted, $prospect, $spk,
+        $remarks, $salesFuStatus, $reasonFu, $status, $fuDate,
+        $assignedId, $salesFuVal, $isOrphan,
+        $sheetRow, $sheetRow, $cid
+    ]);
+
+    $state = sft_load_sync_state();
+    $state['csv_hash'] = '';
+    $state['snapshots'][$cid] = [$connected, $contacted, $prospect, $spk, $remarks, $salesFuStatus, $reasonFu, $salesFuVal, $status];
+    sft_save_sync_state($state);
+
+    echo json_encode(['success' => true, 'id' => $cid, 'status' => $status, 'spk' => $spk]);
+    exit;
 }
 
 // -------------------------------------------------------------
@@ -690,18 +907,7 @@ function sync_google_sheet_data($sheetUrl = null) {
 if ($action === 'pull_sheet') {
     $input = get_json_input();
     $sheetUrl = trim($input['google_sheet_url'] ?? '');
-    $isManual = !empty($input['manual']) || !empty($input['google_sheet_url']);
-
-    // Block any automated or background calls from cached scripts
-    if (!$isManual) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Sinkronisasi dibatalkan. Sinkronisasi hanya dapat dijalankan secara manual oleh pengguna.'
-        ]);
-        exit;
-    }
-
-    $res = sync_google_sheet_data($sheetUrl);
+    $res = sync_google_sheet_data($sheetUrl ?: null, true, 0);
     echo json_encode($res);
     exit;
 }

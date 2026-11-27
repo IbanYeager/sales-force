@@ -17,11 +17,53 @@ let followupState = {
 };
 
 // Initialize module on page load
-document.addEventListener('DOMContentLoaded', () => {
+let salesAutoSyncBusy = false;
+let salesAutoSyncStarted = false;
+
+async function syncSalesSheetAuto(reloadOnChange = true, timeoutMs = 4500) {
+  if (salesAutoSyncBusy) return 0;
+  salesAutoSyncBusy = true;
+  try {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+    const res = await fetch('../api/api_followup_sync.php?action=auto_sync_sheet', controller ? { signal: controller.signal } : {});
+    if (timer) clearTimeout(timer);
+    const data = await res.json();
+    if (data && data.success && (data.changed || 0) > 0 && reloadOnChange) {
+      await loadFollowupCustomers();
+      if (followupState.subTab === 'radar' && typeof SalesSuperpowers !== 'undefined' && SalesSuperpowers.salesCoords) {
+        SalesSuperpowers.fetchRadarData(SalesSuperpowers.salesCoords.lat, SalesSuperpowers.salesCoords.lng, 999, SalesSuperpowers.currentDistrict || 'all');
+      }
+    }
+    return (data && data.changed) ? data.changed : 0;
+  } catch (e) {
+    // Non-blocking background auto-sync
+  } finally {
+    salesAutoSyncBusy = false;
+  }
+  return 0;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   initFollowupTabs();
   loadSalesProfile();
   loadTemplates();
+  await syncSalesSheetAuto(false, 3000);
   loadFollowupCustomers();
+
+  if (!salesAutoSyncStarted) {
+    salesAutoSyncStarted = true;
+    setInterval(() => {
+      if (!document.hidden && !salesAutoSyncBusy) {
+        syncSalesSheetAuto(true, 10000);
+      }
+    }, 15000);
+    window.addEventListener('focus', () => {
+      if (!salesAutoSyncBusy) {
+        syncSalesSheetAuto(true, 8000);
+      }
+    });
+  }
 });
 
 function renderPriorityBadge(priority) {

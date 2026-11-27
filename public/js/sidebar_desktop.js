@@ -303,7 +303,7 @@
                 ${navLink('pages/pricelist.html', 'fa-solid fa-clipboard-list', 'Pricelist OTR', 'harga pricelist otr brosur daftar')}
                 ${navLink('pages/kalkulator.html', 'fa-solid fa-calculator', 'Kalkulator Finansial', 'kalkulator leasing kredit dp cicilan angsuran tenor quotation pdf penawaran odds matriks bca bsi acc taf')}
                 ${navLink('pages/inventory.html', 'fa-solid fa-warehouse', 'Live Inventory (Stock)', 'stok stock live inventory unit mobil t-stock')}
-                ${navLink('pages/customer.html', 'fa-solid fa-users', 'Customer CRM & Radar', 'customer crm radar prospek data database')}
+                ${navLink('pages/customer.html', 'fa-solid fa-users', 'Database', 'customer crm radar prospek data database')}
                 ${navLink('pages/spk.html', 'fa-solid fa-file-signature', 'Form SPK', 'spk pesanan form surat tanda jadi')}
                 ${navLink('pages/promo.html', 'fa-solid fa-percent', 'Promo & Tenor', 'promo diskon paket kredit tenor program')}
 
