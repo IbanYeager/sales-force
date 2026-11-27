@@ -24,7 +24,8 @@ $dbUpdates = [];
 
 $start = microtime(true);
 foreach ($fuRows as $row) {
-    $coords = getAccurateCoords($row['id'], $row['district'] ?? '', $row['notes'] ?? '', null, $row['plate_number'] ?? '', $row['vin'] ?? '');
+    $entitySeed = radarComputeEntitySeed($row['id'], $row['name'] ?? '', $row['notes'] ?? '', $row['district'] ?? '');
+    $coords = getAccurateCoords($row['id'], $row['district'] ?? '', $row['notes'] ?? '', null, $row['plate_number'] ?? '', $row['vin'] ?? '', $entitySeed);
     $phoneClean = clean_phone_number($row['phone'] ?? '');
     $car = $row['car_model'] ?: ($row['last_car_model'] ?: 'Toyota Unit');
     $sid = (int)($row['assigned_sales_id'] ?? 0);

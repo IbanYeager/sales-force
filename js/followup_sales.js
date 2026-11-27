@@ -101,8 +101,6 @@ function initFollowupTabs() {
   // Insert Tab Switcher at the very top of container if not exists
   if (!document.getElementById('followupNavTabs')) {
     const tabsHtml = `
-      <span id="followupBadgeCount" style="display:none;">0</span>
-
       <!-- CONTAINER UNTUK TAB DATABASE FOLLOW-UP -->
       <div id="followupSectionView" style="display:block;">
 
@@ -366,18 +364,6 @@ async function loadFollowupCustomers() {
 
       // Fetch live orphan count in background
       fetchOrphanCountBadge();
-
-      // Update badge count
-      const pendingCount = followupState.customers.filter(c => c.followup_status === 'Belum Dihubungi').length;
-      const badge = document.getElementById('followupBadgeCount');
-      if (badge) {
-        if (pendingCount > 0) {
-          badge.style.display = 'inline-block';
-          badge.textContent = pendingCount;
-        } else {
-          badge.style.display = 'none';
-        }
-      }
     }
   } catch (e) {
     if (grid) {
@@ -2736,18 +2722,8 @@ function updateSingleCardAfterWhatsApp(customerId, nextStatus, tamData = {}) {
     }, 6000);
   }
 
-  // Update Hero KPI stats & top tab pending badges
+  // Update Hero KPI stats
   updateHeroStats();
-  const pendingCount = followupState.customers.filter(x => x.followup_status === 'Belum Dihubungi').length;
-  const badge = document.getElementById('followupBadgeCount');
-  if (badge) {
-    if (pendingCount > 0) {
-      badge.style.display = 'inline-block';
-      badge.textContent = pendingCount;
-    } else {
-      badge.style.display = 'none';
-    }
-  }
 }
 
 async function executeSendWhatsApp() {

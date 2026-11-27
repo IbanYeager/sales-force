@@ -193,7 +193,14 @@ const SalesSuperpowers = {
       .radar-beacon-core { position: relative; z-index: 2; width: 26px; height: 26px; border-radius: 50%; background: #d7123a; border: 3px solid #ffffff; box-shadow: 0 0 14px rgba(215, 18, 58, 0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 11px; }
       .radar-leaflet-pin-wrap { background: transparent !important; border: none !important; }
       .radar-map-marker-pin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid #ffffff; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 10px; transition: transform 0.15s ease; cursor: pointer; position: relative; }
+      .radar-map-marker-pin.is-group { width: 30px; height: 30px; font-size: 11px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.45); }
+      .radar-pin-count-badge { position: absolute; top: -8px; right: -10px; background: #0f172a; color: #ffffff; font-size: 9.5px; font-weight: 900; padding: 1px 5px; border-radius: 999px; border: 1.5px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); min-width: 16px; text-align: center; line-height: 1.25; white-space: nowrap; }
       .radar-map-marker-pin:hover { transform: scale(1.3); z-index: 9999 !important; }
+      .radar-popup-group-card { font-family: 'Plus Jakarta Sans', sans-serif; padding: 4px; width: 310px; max-width: 82vw; }
+      .radar-popup-group-count-pill { display: inline-flex; align-items: center; gap: 5px; background: #dc2626; color: #ffffff; font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; margin-bottom: 6px; }
+      .radar-popup-group-search { width: 100%; box-sizing: border-box; padding: 6px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 11.5px; margin-bottom: 8px; outline: none; }
+      .radar-popup-group-list { max-height: 210px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 9px; padding-right: 2px; }
+      .radar-popup-group-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 9px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
       .radar-map-legend-overlay { position: absolute; bottom: 14px; left: 14px; z-index: 999; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px); border: 1px solid rgba(226, 232, 240, 0.9); padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 12px; font-size: 11px; font-weight: 700; color: #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
       .radar-legend-item { display: flex; align-items: center; gap: 5px; }
       .radar-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -1777,11 +1784,161 @@ const SalesSuperpowers = {
     `;
   },
 
+  _renderGroupPopupSlice(items, filtered, slice) {
+    const hasMultiCustomers = (new Set(items.map(x => String(x.name || '').toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean))).size > 1;
+    const cards = slice.map((item, idx) => {
+      const st = item.status || 'Belum Dihubungi';
+      let stColor = '#ef4444';
+      if (st === 'Deal / Selesai') stColor = '#10b981';
+      else if (st === 'Tertarik / Jadwal Servis') stColor = '#8b5cf6';
+      else if (st === 'Menunggu Respon') stColor = '#f59e0b';
+
+      const waItemHref = item.phone && item.phone !== '-'
+        ? `https://wa.me/${item.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + item.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong.')}`
+        : '';
+
+      return `
+        <div class="radar-popup-group-item" style="border-left: 3px solid ${stColor};">
+          <div style="min-width:0; flex:1;">
+            ${hasMultiCustomers ? `<div style="font-size:11px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(item.name || '')}</div>` : ''}
+            <div style="font-size:11.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+              <span style="color:#64748b; font-size:10px;">#${idx + 1}</span>
+              <span>${escapeHtml(item.car_model || 'Toyota Unit')}</span>
+              ${item.plate_number ? `<span style="font-size:9.5px; background:#e2e8f0; color:#334155; padding:1px 5px; border-radius:4px; font-weight:800;">${escapeHtml(item.plate_number)}</span>` : ''}
+            </div>
+            <div style="font-size:10px; color:#475569; margin-top:2px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+              <span style="font-weight:700; color:${stColor};">${escapeHtml(st)}</span>
+              ${/^Priority [1-4]$/i.test(item.priority || '') ? `<span style="color:#b91c1c; background:#fee2e2; padding:0 4px; border-radius:3px; font-weight:800;">${escapeHtml(item.priority)}</span>` : ''}
+              <span>• ${escapeHtml(item.sales_name || 'Terbuka (Belum Di-FU)')}</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:4px; flex-shrink:0;">
+            ${waItemHref ? `<a href="${waItemHref}" target="_blank" class="btn-popup-wa" style="padding:4px 7px; font-size:10px;"><i class="fa-brands fa-whatsapp"></i></a>` : ''}
+            <button type="button" onclick="SalesSuperpowers.openRadarFollowupModal(${item.id})" class="btn-popup-fu" style="padding:4px 8px; font-size:10px;">FU</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const remaining = filtered.length - slice.length;
+    const moreBtn = remaining > 0
+      ? `<button type="button" onclick="SalesSuperpowers.showMoreActiveGroupPopup()" style="width:100%; padding:6px; border-radius:8px; border:1px dashed #94a3b8; background:#ffffff; color:#1e293b; font-size:11px; font-weight:800; cursor:pointer;">Tampilkan ${Math.min(40, remaining)} data berikutnya (sisa ${remaining.toLocaleString('id-ID')})</button>`
+      : '';
+
+    return cards + moreBtn;
+  },
+
+  buildGroupedPopupItemsHtml(items, filterText = '', limit = 40) {
+    const q = (filterText || '').toLowerCase().trim();
+    const filtered = q
+      ? items.filter(it => [it.name || '', it.car_model || '', it.plate_number || '', it.status || '', it.sales_name || ''].join(' ').toLowerCase().includes(q))
+      : items;
+
+    if (filtered.length === 0) {
+      return '<div style="text-align:center; padding:12px; font-size:11px; color:#64748b;">Tidak ada unit cocok di titik ini.</div>';
+    }
+
+    const slice = filtered.slice(0, limit);
+    return this._renderGroupPopupSlice(items, filtered, slice);
+  },
+
+  filterActiveGroupPopup(val) {
+    this._activePopupGroupQuery = val || '';
+    this._activePopupGroupLimit = 40;
+    const listEl = document.getElementById('radarGroupPopupList');
+    if (listEl && Array.isArray(this._activePopupGroupItems)) {
+      listEl.innerHTML = this.buildGroupedPopupItemsHtml(this._activePopupGroupItems, this._activePopupGroupQuery, this._activePopupGroupLimit);
+    }
+  },
+
+  showMoreActiveGroupPopup() {
+    this._activePopupGroupLimit = (this._activePopupGroupLimit || 40) + 40;
+    const listEl = document.getElementById('radarGroupPopupList');
+    if (listEl && Array.isArray(this._activePopupGroupItems)) {
+      listEl.innerHTML = this.buildGroupedPopupItemsHtml(this._activePopupGroupItems, this._activePopupGroupQuery || '', this._activePopupGroupLimit);
+    }
+  },
+
+  getGroupedRadarPopupHtml(items) {
+    if (!items || items.length === 0) return '';
+    if (items.length === 1) return this.getRadarPopupHtml(items[0]);
+
+    this._activePopupGroupItems = items;
+    this._activePopupGroupQuery = '';
+    this._activePopupGroupLimit = 40;
+
+    const first = items[0];
+    const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const uniqueCusts = new Set(items.map(x => norm(x.name)).filter(Boolean));
+    const displayTitle = uniqueCusts.size <= 1
+      ? (first.name || 'Customer')
+      : `${first.name || 'Customer'} (+${uniqueCusts.size - 1} Customer Lainnya)`;
+
+    const cntBelum = items.filter(x => !x.status || x.status === 'Belum Dihubungi' || x.status === 'belum_fu').length;
+    const cntMenunggu = items.filter(x => x.status === 'Menunggu Respon').length;
+    const cntTertarik = items.filter(x => x.status === 'Tertarik / Jadwal Servis').length;
+    const cntDeal = items.filter(x => x.status === 'Deal / Selesai').length;
+
+    let pinBg = '#10b981';
+    if (cntBelum > 0) pinBg = '#ef4444';
+    else if (cntMenunggu > 0) pinBg = '#f59e0b';
+    else if (cntTertarik > 0) pinBg = '#8b5cf6';
+
+    const initials = (first.name || 'C').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    const distLabel = first.formatted_distance || (first.distance_km !== undefined ? first.distance_km + ' km' : '');
+    const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${first.lat},${first.lng}`;
+    const validPhoneItem = items.find(x => x.phone && x.phone !== '-');
+    const waHref = validPhoneItem
+      ? `https://wa.me/${validPhoneItem.phone}?text=${encodeURIComponent('Halo Bapak/Ibu ' + validPhoneItem.name + ', perkenalkan saya dari Tunas Toyota Kiara Condong. Kebetulan saya sedang ada agenda kanvasing di sekitar ' + (first.district || 'area Bapak/Ibu') + '.')}`
+      : '';
+
+    return `
+      <div class="radar-popup-group-card">
+        <div class="radar-popup-group-count-pill">
+          <i class="fa-solid fa-layer-group"></i> Ada ${items.length.toLocaleString('id-ID')} Data / Unit di Lokasi Ini
+        </div>
+        <div class="radar-popup-header" style="margin-bottom:6px;">
+          <div class="radar-popup-avatar" style="background:${pinBg};">${escapeHtml(initials)}</div>
+          <div style="min-width:0; flex:1;">
+            <h4 class="radar-popup-name">${escapeHtml(displayTitle)}</h4>
+            <div class="radar-popup-dist">
+              <i class="fa-solid fa-location-dot" style="color:#d7123a;"></i> ${escapeHtml(first.district || '')}
+              ${distLabel ? `<span class="radar-popup-dist-pill">${distLabel}</span>` : ''}
+            </div>
+            ${first.address ? `
+              <div style="font-size:10px; color:#475569; margin-top:2px; line-height:1.3;">
+                <i class="fa-solid fa-house-chimney" style="color:#0284c7; font-size:9.5px;"></i> ${escapeHtml(first.address)}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:7px; font-size:10px; font-weight:700;">
+          ${cntBelum > 0 ? `<span style="background:#fee2e2; color:#b91c1c; padding:1px 6px; border-radius:4px;">Belum FU: ${cntBelum}</span>` : ''}
+          ${cntMenunggu > 0 ? `<span style="background:#fef3c7; color:#b45309; padding:1px 6px; border-radius:4px;">Menunggu: ${cntMenunggu}</span>` : ''}
+          ${cntTertarik > 0 ? `<span style="background:#f3e8ff; color:#7e22ce; padding:1px 6px; border-radius:4px;">Tertarik: ${cntTertarik}</span>` : ''}
+          ${cntDeal > 0 ? `<span style="background:#dcfce7; color:#15803d; padding:1px 6px; border-radius:4px;">Selesai: ${cntDeal}</span>` : ''}
+        </div>
+
+        ${items.length > 5 ? `
+          <input type="text" class="radar-popup-group-search" placeholder="Cari unit / plat nomor dari ${items.length} data..." oninput="SalesSuperpowers.filterActiveGroupPopup(this.value)">
+        ` : ''}
+
+        <div class="radar-popup-group-list" id="radarGroupPopupList">
+          ${this.buildGroupedPopupItemsHtml(items, '', 40)}
+        </div>
+
+        <div class="radar-popup-actions">
+          ${waHref ? `<a href="${waHref}" target="_blank" class="btn-popup-wa"><i class="fa-brands fa-whatsapp"></i> WA Customer</a>` : ''}
+          <a href="${navUrl}" target="_blank" class="btn-popup-maps"><i class="fa-solid fa-diamond-turn-right"></i> Rute Maps</a>
+        </div>
+      </div>
+    `;
+  },
+
   updateRadarMapPins() {
     if (!this.leafletMap) return;
 
-    // In Polreg Mode: Strictly NO GROUPING / NO CLUSTERING ("jangan di bikin grup")!
-    // In Radius Mode: Can use cluster if available
     const isPolregMode = (this.radarMode === 'polreg');
 
     if (isPolregMode) {
@@ -1813,20 +1970,34 @@ const SalesSuperpowers = {
     this.radarMarkersLayer.clearLayers();
 
     const filteredLeads = this.getFilteredRadarLeads();
-    const mapPins = filteredLeads;
+    const ROUND_FACTOR = 100000;
+    const coordBuckets = {};
+
+    for (let i = 0; i < filteredLeads.length; i++) {
+      const c = filteredLeads[i];
+      const bucketKey = `${Math.round(c.lat * ROUND_FACTOR)},${Math.round(c.lng * ROUND_FACTOR)}`;
+      if (!coordBuckets[bucketKey]) coordBuckets[bucketKey] = [];
+      coordBuckets[bucketKey].push(c);
+    }
+
+    const bucketList = Object.values(coordBuckets);
 
     const pinBadge = document.getElementById('radarMapPinCount');
     if (pinBadge) {
       const carLabel = (this.radarCarFilter && this.radarCarFilter !== 'all') ? ` • ${this.radarCarFilter.toUpperCase()}` : '';
+      const countText = bucketList.length < filteredLeads.length
+        ? `${bucketList.length.toLocaleString('id-ID')} Titik Lokasi (${filteredLeads.length.toLocaleString('id-ID')} Data)`
+        : `${filteredLeads.length.toLocaleString('id-ID')} Customer`;
+
       if (this.radarMode === 'polreg') {
         const distName = this.getZoneLabel(this.currentDistrict || 'buahbatu');
         pinBadge.textContent = filteredLeads.length > 0
-          ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer • Kecamatan: ${distName}${carLabel}`
+          ? `Menampilkan ${countText} • Kecamatan: ${distName}${carLabel}`
           : `0 Customer di Kecamatan ${distName}`;
       } else {
         const rLabel = this.currentRadius >= 500 ? 'Semua Wilayah' : `${this.currentRadius} km`;
         pinBadge.textContent = filteredLeads.length > 0
-          ? `Menampilkan ${filteredLeads.length.toLocaleString('id-ID')} Customer (Radius ${rLabel})${carLabel}`
+          ? `Menampilkan ${countText} (Radius ${rLabel})${carLabel}`
           : '0 Customer';
       }
     }
@@ -1846,83 +2017,57 @@ const SalesSuperpowers = {
         yellow: makeIcon('#f59e0b')
       };
     }
+    if (!this.cachedGroupIcons) {
+      this.cachedGroupIcons = {};
+    }
 
     const isCluster = !isPolregMode && typeof this.radarMarkersLayer.addLayers === 'function';
     const markersToBatch = [];
     const icons = this.cachedRadarIcons;
 
-    // Anti-stacking: Detect coincident coordinates and fan them out smoothly in a clean micro-ring
-    const coordBuckets = {};
-    const ROUND_FACTOR = 100000;
+    for (let i = 0; i < bucketList.length; i++) {
+      const items = bucketList[i];
+      const anchor = items[0];
+      let marker;
 
-    mapPins.forEach((c, idx) => {
-      const bucketKey = `${Math.round(c.lat * ROUND_FACTOR)},${Math.round(c.lng * ROUND_FACTOR)}`;
-      if (!coordBuckets[bucketKey]) coordBuckets[bucketKey] = [];
-      coordBuckets[bucketKey].push(idx);
-    });
+      if (items.length === 1) {
+        let icon = icons.red;
+        if (anchor.status === 'Deal / Selesai') icon = icons.green;
+        else if (anchor.status === 'Tertarik / Jadwal Servis') icon = icons.purple;
+        else if (anchor.status === 'Menunggu Respon') icon = icons.yellow;
 
-    const positionedPins = mapPins.map(c => ({ ...c }));
+        marker = L.marker([anchor.lat, anchor.lng], {
+          icon: icon,
+          title: `${anchor.name || 'Customer'} • ${anchor.district || ''}`
+        });
+        marker.bindPopup(() => this.getRadarPopupHtml(anchor));
+      } else {
+        let color = '#10b981';
+        if (items.some(x => !x.status || x.status === 'Belum Dihubungi' || x.status === 'belum_fu')) color = '#ef4444';
+        else if (items.some(x => x.status === 'Menunggu Respon')) color = '#f59e0b';
+        else if (items.some(x => x.status === 'Tertarik / Jadwal Servis')) color = '#8b5cf6';
 
-    Object.values(coordBuckets).forEach(indices => {
-      if (indices.length <= 1) return;
-      const K = indices.length;
-      indices.forEach((pinIdx, i) => {
-        const c = positionedPins[pinIdx];
-        let ring = 1;
-        let ringCap = 6;
-        let ringIdx = i;
-        let baseRadius = 0.00012; // ~13m
+        const countLabel = items.length >= 1000
+          ? (items.length / 1000).toFixed(1).replace(/\.0$/, '') + 'rb'
+          : String(items.length);
 
-        if (K > 6) {
-          if (i < 5) {
-            ring = 1;
-            ringCap = 5;
-            ringIdx = i;
-            baseRadius = 0.00009;
-          } else if (i < 15) {
-            ring = 2;
-            ringCap = 10;
-            ringIdx = i - 5;
-            baseRadius = 0.00018;
-          } else {
-            ring = 3;
-            ringCap = K - 15;
-            ringIdx = i - 15;
-            baseRadius = 0.00027;
-          }
+        const iconKey = `${color}|${countLabel}`;
+        if (!this.cachedGroupIcons[iconKey]) {
+          this.cachedGroupIcons[iconKey] = L.divIcon({
+            className: 'radar-leaflet-pin-wrap',
+            html: `<div class="radar-map-marker-pin is-group" style="background:${color};"><i class="fa-solid fa-car"></i><span class="radar-pin-count-badge">${countLabel}</span></div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            popupAnchor: [0, -16]
+          });
         }
 
-        const angle = (2 * Math.PI * ringIdx) / ringCap + (ring * 0.35);
-        const deltaLat = baseRadius * Math.cos(angle);
-        const deltaLng = (baseRadius / Math.cos((c.lat * Math.PI) / 180)) * Math.sin(angle);
-
-        c.displayLat = c.lat + deltaLat;
-        c.displayLng = c.lng + deltaLng;
-        c._isStacked = true;
-        c._stackedTotal = K;
-        c._stackedIndex = i + 1;
-      });
-    });
-
-    for (let i = 0; i < positionedPins.length; i++) {
-      const c = positionedPins[i];
-      let icon = icons.red;
-      if (c.status === 'Deal / Selesai') {
-        icon = icons.green;
-      } else if (c.status === 'Tertarik / Jadwal Servis') {
-        icon = icons.purple;
-      } else if (c.status === 'Menunggu Respon') {
-        icon = icons.yellow;
+        marker = L.marker([anchor.lat, anchor.lng], {
+          icon: this.cachedGroupIcons[iconKey],
+          title: `${anchor.name || 'Customer'} (${items.length} Data/Unit di lokasi ini)`
+        });
+        marker.bindPopup(() => this.getGroupedRadarPopupHtml(items), { maxWidth: 360 });
       }
-
-      const pLat = c.displayLat !== undefined ? c.displayLat : c.lat;
-      const pLng = c.displayLng !== undefined ? c.displayLng : c.lng;
-
-      const marker = L.marker([pLat, pLng], {
-        icon: icon,
-        title: `${c.name || 'Customer'} • ${c.district || ''}`
-      });
-      marker.bindPopup(() => this.getRadarPopupHtml(c));
 
       if (isCluster) {
         markersToBatch.push(marker);

@@ -989,9 +989,9 @@ if ($action === 'recalculate_radar_coords') {
     $afterId = isset($_GET['after_id']) ? (int)$_GET['after_id'] : 0;
 
     if ($force) {
-        $rows = followup_query("SELECT id, district, address, city, notes, plate_number, vin FROM followup_customers WHERE id > ? ORDER BY id ASC LIMIT $limit", [$afterId]);
+        $rows = followup_query("SELECT id, name, district, address, city, notes, plate_number, vin FROM followup_customers WHERE id > ? ORDER BY id ASC LIMIT $limit", [$afterId]);
     } else {
-        $rows = followup_query("SELECT id, district, address, city, notes, plate_number, vin FROM followup_customers WHERE (lat IS NULL OR lng IS NULL) ORDER BY id ASC LIMIT $limit");
+        $rows = followup_query("SELECT id, name, district, address, city, notes, plate_number, vin FROM followup_customers WHERE (lat IS NULL OR lng IS NULL) ORDER BY id ASC LIMIT $limit");
     }
 
     $processed = 0;
@@ -1003,6 +1003,7 @@ if ($action === 'recalculate_radar_coords') {
             $stmt = $conn->prepare("UPDATE followup_customers SET lat = ?, lng = ?, geo_district = ?, geo_address = ? WHERE id = ?");
             foreach ($rows as $row) {
                 $cid = (int)$row['id'];
+                $rawName = trim((string)($row['name'] ?? ''));
                 $rawDist = trim((string)($row['district'] ?? ''));
                 $rawAddr = trim((string)($row['address'] ?? ''));
                 $rawCity = trim((string)($row['city'] ?? ''));
@@ -1010,8 +1011,10 @@ if ($action === 'recalculate_radar_coords') {
 
                 $fullAddrParts = array_filter([$rawAddr, $rawDist, $rawCity], fn($v) => $v !== '' && $v !== '0');
                 $fullAddr = !empty($fullAddrParts) ? implode(', ', $fullAddrParts) : $rawNotes;
+                $entityAddrSrc = ($rawAddr !== '' && $rawAddr !== '0') ? $rawAddr : $rawNotes;
+                $entitySeed = radarComputeEntitySeed($cid, $rawName, $entityAddrSrc, $rawDist, $rawCity);
 
-                $coords = getAccurateCoords($cid, $rawDist, $fullAddr, null, $row['plate_number'] ?? '', $row['vin'] ?? '');
+                $coords = getAccurateCoords($cid, $rawDist, $fullAddr, null, $row['plate_number'] ?? '', $row['vin'] ?? '', $entitySeed);
                 $latVal = (float)$coords[0];
                 $lngVal = (float)$coords[1];
                 $gDist = substr((string)($coords[2] ?? $rawDist), 0, 145);

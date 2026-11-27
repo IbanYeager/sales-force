@@ -11124,9 +11124,17 @@ $indonesiaCityDistricts = array(
   'kota pekanbaru' => array(
     'city' => 'Kota Pekanbaru',
     'center' => array(0.5071, 101.4478),
-    'keys' => array('kota pekanbaru', 'pekanbaru', 'payung sekaki', 'marpoyan damai', 'tampan'),
+    'keys' => array('kota pekanbaru', 'pekanbaru', 'pekan baru', 'payung sekaki', 'marpoyan damai', 'tampan', 'bukit raya', 'rumbai', 'labuh baru'),
     'districts' => array(
       'payung sekaki' => array(0.515, 101.415),
+      'sukajadi' => array(0.517, 101.441),
+      'bukit raya' => array(0.467, 101.466),
+      'rumbai' => array(0.556, 101.425),
+      'rumbai pesisir' => array(0.567, 101.454),
+      'tampan' => array(0.464, 101.391),
+      'marpoyan damai' => array(0.478, 101.434),
+      'tenayan raya' => array(0.511, 101.505),
+      'limapuluh' => array(0.533, 101.457),
     ),
   ),
   'kota semarang' => array(
@@ -11321,11 +11329,47 @@ function radarLookupBandungPoly($distStr, $isKabBandung = false) {
     return null;
 }
 
+function radarNormalizeAddressKey($addr) {
+    $a = strtolower(trim((string)$addr));
+    if ($a === '' || $a === '0' || $a === '-' || $a === 'null') return '';
+    $a = preg_replace('/\bpekan\s+baru\b/', 'pekanbaru', $a);
+    $a = preg_replace('/\b(?:jalan|jln\.?)\b/', 'jl', $a);
+    $a = preg_replace('/\bno\.?\b/', '', $a);
+    $a = preg_replace('/\bkelurahan\b/', 'kel', $a);
+    $a = preg_replace('/\bkecamatan\b/', 'kec', $a);
+    $a = preg_replace('/\bkabupaten\b/', 'kab', $a);
+    if (preg_match('/\bjl\b/', $a) && preg_match('/\d/', $a)) {
+        $a = preg_replace('#\brt\.?\s*\d+(?:\s*[/\-]\s*\d+)?#', '', $a);
+        $a = preg_replace('/\brw\.?\s*\d+/', '', $a);
+        $a = preg_replace('/\b\d{5}\b/', '', $a);
+    } else {
+        $a = preg_replace('/\b0+(\d+)/', '$1', $a);
+    }
+    $a = preg_replace('/\b(?:jawa\s*barat|riau|dki\s*jakarta|banten|indonesia)\b/', '', $a);
+    $a = preg_replace('/\b(?:kota\s+(?:bandung|pekanbaru|tangerang\s+selatan|tangerang|jakarta\s+(?:selatan|timur|pusat|barat|utara)|bekasi|depok|bogor|cimahi)|kab\.?\s*(?:bandung\s+barat|bandung|tangerang|bekasi|bogor))\b/', '', $a);
+    $a = preg_replace('/[^a-z0-9]/', '', $a);
+    if (in_array($a, ['', '0', 'null', 'none', 'bandung', 'kotabandung', 'kabbandung', 'pekanbaru', 'jakarta'], true)) {
+        return '';
+    }
+    return strlen($a) >= 5 ? $a : '';
+}
+
+function radarComputeEntitySeed($id, $name, $address = '', $district = '', $city = '') {
+    $normName = preg_replace('/[^a-z0-9]/', '', strtolower(trim((string)$name)));
+    $normAddr = radarNormalizeAddressKey($address);
+    if ($normName !== '' && strlen($normName) >= 3 && $normAddr !== '') {
+        $normDist = preg_replace('/[^a-z0-9]/', '', strtolower(trim((string)$district)));
+        return 'ENT|' . $normName . '|' . $normAddr . '|' . $normDist;
+    }
+    return (string)$id;
+}
+
 /**
  * Kecamatan-First Polygon-Bounded Geocoding Resolver for Sales Radar & CRM
  */
-function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null, $plateNumber = '', $vin = '') {
+function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null, $plateNumber = '', $vin = '', $entitySeedKey = '') {
     global $bandungDistricts, $bandungKelurahan, $bandungStreets, $bandungComplexes, $externalCitiesAndHubs, $bandungNeighborhoodLandmarks, $indonesiaCityDistricts;
+    $seedId = ($entitySeedKey !== '' && $entitySeedKey !== null) ? (string)$entitySeedKey : (string)$id;
 
     $cleanAddress = '';
     if (preg_match('/Alamat\s*:\s*(.+)$/i', (string)$notes, $m)) {
@@ -11370,7 +11414,8 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $isExternalSerang = (bool)preg_match('/kab\.?\s*serang/i', $combinedCheck);
 
     // Step 1: Check explicit Bandung Raya polygon if city is Bandung Raya or not explicitly external
-    $hasExplicitExternalCity = (bool)preg_match(
+    $hasExplicitPekanbaru = (bool)preg_match('/\bpekan\s*baru\b/i', $combinedCheck);
+    $hasExplicitExternalCity = $hasExplicitPekanbaru || (bool)preg_match(
         '/\b(kota\s+jakarta|jakarta\s+(?:selatan|timur|pusat|barat|utara)|dki\s+jakarta|kota\s+tangerang|tangerang\s+selatan|kabupaten\s+tangerang|kab\.?\s+tangerang|kota\s+bekasi|kabupaten\s+bekasi|kab\.?\s+bekasi|kota\s+depok|kota\s+bogor|kabupaten\s+bogor|kab\.?\s+bogor|kabupaten\s+purwakarta|kab\.?\s+purwakarta|kabupaten\s+subang|kab\.?\s+subang|kabupaten\s+karawang|kab\.?\s+karawang|kabupaten\s+cirebon|kota\s+cirebon|kabupaten\s+majalengka|kab\.?\s+majalengka|kabupaten\s+sumedang|kab\.?\s+sumedang|kabupaten\s+garut|kab\.?\s+garut|kabupaten\s+cianjur|kab\.?\s+cianjur|kabupaten\s+sukabumi|kota\s+sukabumi|kabupaten\s+tasikmalaya|kota\s+tasikmalaya|kabupaten\s+ciamis|kabupaten\s+pangandaran|kota\s+makassar|kota\s+pekanbaru|kota\s+surabaya|kota\s+semarang|kota\s+balikpapan|kabupaten\s+tegal|kabupaten\s+kendal|kabupaten\s+brebes|kabupaten\s+lebak|kabupaten\s+sukoharjo|kabupaten\s+rembang|kota\s+mataram|kota\s+padang|kab\.?\s+serang|kota\s+serang)\b/i',
         $combinedCheck
     );
@@ -11396,9 +11441,9 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
                 }
             }
             if ($streetCoord) {
-                $pt = radarDisperseAroundPoint($id, $streetCoord[0], $streetCoord[1], 0.04, 0.22, $polyEntry['name']);
+                $pt = radarDisperseAroundPoint($seedId, $streetCoord[0], $streetCoord[1], 0.04, 0.22, $polyEntry['name']);
             } else {
-                $pt = radarSamplePointInPolygon($id, $polyEntry);
+                $pt = radarSamplePointInPolygon($seedId, $polyEntry);
             }
             return [$pt[0], $pt[1], $polyEntry['name'], $cleanAddress];
         }
@@ -11483,7 +11528,7 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
 
             $titleCity = trim(preg_replace('/^(kota|kab\.|kabupaten)\s+/i', '', $bestCityData['city']));
             $finalDistrict = ucwords($matchedKec) . ', ' . $titleCity;
-            $pt = radarDisperseAroundPoint($id, $matchedCoords[0], $matchedCoords[1], 0.35, 1.5, $finalDistrict);
+            $pt = radarDisperseAroundPoint($seedId, $matchedCoords[0], $matchedCoords[1], 0.35, 1.5, $finalDistrict);
             return [$pt[0], $pt[1], $finalDistrict, $cleanAddress];
         }
     }
@@ -11528,9 +11573,9 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
 
     if ($resolvedPoly) {
         if ($streetHintCoords) {
-            $pt = radarDisperseAroundPoint($id, $streetHintCoords[0], $streetHintCoords[1], 0.05, 0.25, $resolvedPoly['name']);
+            $pt = radarDisperseAroundPoint($seedId, $streetHintCoords[0], $streetHintCoords[1], 0.05, 0.25, $resolvedPoly['name']);
         } else {
-            $pt = radarSamplePointInPolygon($id, $resolvedPoly);
+            $pt = radarSamplePointInPolygon($seedId, $resolvedPoly);
         }
         return [$pt[0], $pt[1], $resolvedPoly['name'], $cleanAddress];
     }
@@ -11538,42 +11583,42 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     // Check external city keywords even in empty-city addresses (Delatinos BSD, Cibitung, Simatupang, Sudirman Kav)
     if (!empty($addrLower)) {
         if (strpos($addrLower, 'delatinos') !== false || strpos($addrLower, 'bsd') !== false) {
-            $pt = radarDisperseAroundPoint($id, -6.318, 106.666, 0.2, 0.8, 'serpong');
+            $pt = radarDisperseAroundPoint($seedId, -6.318, 106.666, 0.2, 0.8, 'serpong');
             return [$pt[0], $pt[1], 'Serpong, Tangerang Selatan', $cleanAddress];
         }
         if (strpos($addrLower, 'cibitung') !== false || strpos($addrLower, 'metland') !== false) {
-            $pt = radarDisperseAroundPoint($id, -6.2536, 107.095, 0.2, 0.8, 'cibitung');
+            $pt = radarDisperseAroundPoint($seedId, -6.2536, 107.095, 0.2, 0.8, 'cibitung');
             return [$pt[0], $pt[1], 'Cibitung, Bekasi', $cleanAddress];
         }
         if (strpos($addrLower, 'simatupang') !== false) {
-            $pt = radarDisperseAroundPoint($id, -6.292, 106.825, 0.2, 1.0, 'jaksel');
+            $pt = radarDisperseAroundPoint($seedId, -6.292, 106.825, 0.2, 1.0, 'jaksel');
             return [$pt[0], $pt[1], 'Cilandak, Jakarta Selatan', $cleanAddress];
         }
         if (preg_match('/sudirman\s+kav/i', $addrLower)) {
-            $pt = radarDisperseAroundPoint($id, -6.208, 106.821, 0.2, 0.8, 'tanah_abang');
+            $pt = radarDisperseAroundPoint($seedId, -6.208, 106.821, 0.2, 0.8, 'tanah_abang');
             return [$pt[0], $pt[1], 'Tanah Abang, Jakarta Pusat', $cleanAddress];
         }
     }
 
     // Step 4: Clean Wide-Spread Fallbacks by Regency/City (NEVER pile 2,000+ pins at Kiaracondong!)
     if ($isKabBandung) {
-        $pt = radarDisperseAroundPoint($id, -7.0150, 107.5850, 1.2, 4.8, 'kab_bandung');
+        $pt = radarDisperseAroundPoint($seedId, -7.0150, 107.5850, 1.2, 4.8, 'kab_bandung');
         return [$pt[0], $pt[1], 'Kabupaten Bandung', $cleanAddress];
     }
     if ($isBandungBarat) {
-        $pt = radarDisperseAroundPoint($id, -6.8550, 107.4950, 1.0, 3.8, 'kbb');
+        $pt = radarDisperseAroundPoint($seedId, -6.8550, 107.4950, 1.0, 3.8, 'kbb');
         return [$pt[0], $pt[1], 'Bandung Barat', $cleanAddress];
     }
     if ($isCimahi) {
         $cimahiPoly = radarLookupBandungPoly('cimahi tengah', false);
         if ($cimahiPoly) {
-            $pt = radarSamplePointInPolygon($id, $cimahiPoly);
+            $pt = radarSamplePointInPolygon($seedId, $cimahiPoly);
             return [$pt[0], $pt[1], $cimahiPoly['name'], $cleanAddress];
         }
     }
 
     // Default Kota Bandung wide urban scatter (Alun-alun / Central Bandung radius 0.8 - 3.6 km)
-    $pt = radarDisperseAroundPoint($id, -6.9175, 107.6191, 0.8, 3.6, 'kota_bandung');
+    $pt = radarDisperseAroundPoint($seedId, -6.9175, 107.6191, 0.8, 3.6, 'kota_bandung');
     return [$pt[0], $pt[1], 'Kota Bandung', $cleanAddress];
 }
 

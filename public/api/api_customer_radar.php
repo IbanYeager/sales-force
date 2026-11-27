@@ -161,7 +161,9 @@ try {
             } else {
                 $fullAddrParts = array_filter([$rawAddr, $rawDist, $rawCity], fn($v) => $v !== '' && $v !== '0');
                 $fullAddr = !empty($fullAddrParts) ? implode(', ', $fullAddrParts) : $rawNotes;
-                $coords = getAccurateCoords($row['id'], $rawDist, $fullAddr, null, $row['plate_number'] ?? '', $row['vin'] ?? '');
+                $entityAddrSrc = ($rawAddr !== '' && $rawAddr !== '0') ? $rawAddr : $rawNotes;
+                $entitySeed = radarComputeEntitySeed($row['id'], $row['name'] ?? '', $entityAddrSrc, $rawDist, $rawCity);
+                $coords = getAccurateCoords($row['id'], $rawDist, $fullAddr, null, $row['plate_number'] ?? '', $row['vin'] ?? '', $entitySeed);
                 $rLat = round($coords[0], 6);
                 $rLng = round($coords[1], 6);
                 $resolvedDist = ($rawDist && $rawDist !== '0' && strtolower($rawDist) !== 'bandung area')

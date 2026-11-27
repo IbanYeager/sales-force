@@ -1013,7 +1013,8 @@ if ($action === 'create_customer') {
         if (!$district) {
             $district = resolveAddressAndDistrict($rawAddress);
         }
-        $coords = getAccurateCoords(0, $district, "Alamat: $rawAddress", null, $input['plate_number'] ?? '');
+        $entitySeed = radarComputeEntitySeed(0, $name, $rawAddress, $district);
+        $coords = getAccurateCoords(0, $district, "Alamat: $rawAddress", null, $input['plate_number'] ?? '', $input['vin'] ?? '', $entitySeed);
         if ($coords && !empty($coords[2])) {
             $district = $coords[2];
         }
