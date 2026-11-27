@@ -24,6 +24,24 @@ document.addEventListener('DOMContentLoaded', () => {
   loadFollowupCustomers();
 });
 
+function formatCarAgeDisplay(carYear, carAge) {
+  let year = parseInt(carYear, 10);
+  if (!year || isNaN(year)) {
+    const m = String(carAge || '').match(/\b(19\d\d|20\d\d)\b/);
+    if (m) {
+      year = parseInt(m[1], 10);
+    }
+  }
+  if (year && year >= 1990 && year <= 2030) {
+    const age = 2026 - year;
+    return `Thn ${year} (${age} Thn)`;
+  }
+  if (carAge && String(carAge).trim() !== '' && carAge !== '-') {
+    return String(carAge).replace(/\.0\s*Thn/i, ' Thn');
+  }
+  return '';
+}
+
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -970,7 +988,7 @@ function renderSingleCustomerCardHtml(c, num) {
       <div>
         <!-- Header Row -->
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;">
-          <div style="display:flex; align-items:center; gap:12px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
             <div class="cust-avatar-circle" style="width:44px; height:44px; font-size:15px; flex-shrink:0;">${initials}</div>
             <div>
               <div style="font-size:16.5px; font-weight:900; color:#0d1b3e; line-height:1.2; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -991,6 +1009,17 @@ function renderSingleCustomerCardHtml(c, num) {
                   <i class="fa-solid fa-phone-slash" style="font-size:10px;"></i> Tanpa No. WA
                 </div>
               `}
+              ${(c.decision_maker && c.decision_maker.trim() !== '' && c.decision_maker !== c.name) ? `
+                <div style="font-size:11px; color:#475569; margin-top:3px;">
+                  <i class="fa-solid fa-user-tie" style="color:#64748b; font-size:10px;"></i> DM/CP: <strong>${escapeHtml(c.decision_maker)}</strong>
+                  ${(c.dm_phone && c.dm_phone !== c.phone) ? `<span style="font-family:monospace; color:#059669;">(${escapeHtml(c.dm_phone)})</span>` : ''}
+                </div>
+              ` : ''}
+              ${c.address ? `
+                <div style="font-size:10.5px; color:#64748b; margin-top:3px; max-width:380px; line-height:1.25;" title="${escapeHtml(c.address)}">
+                  <i class="fa-solid fa-map-pin" style="color:#d7123a; font-size:9.5px; margin-right:3px;"></i>${escapeHtml(c.address)}
+                </div>
+              ` : ''}
             </div>
           </div>
 
@@ -1011,8 +1040,23 @@ function renderSingleCustomerCardHtml(c, num) {
             <!-- Left: Current Vehicle -->
             <div class="vehicle-unit-side">
               <div class="sub-lbl" style="font-size:10px;"><i class="fa-solid fa-car-side"></i> Mobil Saat Ini</div>
-              <div class="model-name" style="font-size:13.5px; color:#0f172a;">${c.last_car_model || '-'}</div>
-              ${c.car_age ? `<div style="font-size:10.5px; color:#b45309; font-weight:700; margin-top:2px;"><i class="fa-solid fa-clock"></i> Usia: ${c.car_age}</div>` : ''}
+              <div class="model-name" style="font-size:14px; color:#0f172a; font-weight:800;">${c.last_car_model || '-'}</div>
+              <div style="display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:3px;">
+                ${c.plate_number ? `
+                  <span style="display:inline-flex; align-items:center; gap:3px; background:#0f172a; color:#f8fafc; font-family:monospace; font-weight:800; font-size:10.5px; padding:1px 6px; border-radius:4px;">
+                    <i class="fa-solid fa-id-card" style="color:#38bdf8; font-size:9.5px;"></i> ${escapeHtml(c.plate_number)}
+                  </span>
+                ` : ''}
+                ${c.kilometer ? `
+                  <span style="display:inline-flex; align-items:center; gap:3px; background:#f1f5f9; color:#0f172a; font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid #cbd5e1;">
+                    <i class="fa-solid fa-gauge-high" style="color:#64748b; font-size:9.5px;"></i> ${Number(c.kilometer).toLocaleString('id-ID')} Km
+                  </span>
+                ` : ''}
+              </div>
+              ${(() => {
+                const formattedAge = formatCarAgeDisplay(c.car_year, c.car_age);
+                return formattedAge ? `<div style="font-size:10.5px; color:#b45309; font-weight:700; margin-top:3px;"><i class="fa-solid fa-clock"></i> Usia: ${escapeHtml(formattedAge)}</div>` : '';
+              })()}
             </div>
 
             <!-- Center: Arrow Icon -->
@@ -1023,20 +1067,24 @@ function renderSingleCustomerCardHtml(c, num) {
             <!-- Right: Recommended Target Model -->
             <div class="vehicle-unit-side" style="text-align:right;">
               <div class="sub-lbl" style="color:#d7123a; font-size:10px;"><i class="fa-solid fa-bullseye"></i> Target Upgrade TAM</div>
-              <div class="model-name" style="color:#d7123a; font-size:13.5px; font-weight:900;">${c.recommended_model || c.car_model}</div>
+              <div class="model-name" style="color:#d7123a; font-size:14px; font-weight:900;">${c.recommended_model || c.car_model}</div>
               ${(c.alt_model_2 || c.alt_model_3) ? `<div style="font-size:10px; color:#64748b; margin-top:2px;">Alt: <strong style="color:#334155;">${[c.alt_model_2, c.alt_model_3].filter(Boolean).join(', ')}</strong></div>` : ''}
             </div>
           </div>
         </div>
 
-        <!-- Badges Line: Cluster, Priority, Location & DO -->
+        <!-- Badges Line: PKB, Cluster, Priority, Location & Service -->
         <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px;">
-          ${c.cluster_name ? `<span class="badge-cluster-pill" style="font-size:10.5px;"><i class="fa-solid fa-tag"></i> ${c.cluster_name}</span>` : ''}
-          ${c.priority ? `<span class="badge-priority-pill" style="font-size:10.5px;"><i class="fa-solid fa-bolt"></i> ${c.priority}</span>` : ''}
-          ${c.district ? `<span class="badge-loc-pill" style="font-size:10.5px;"><i class="fa-solid fa-location-dot"></i> Kec. ${c.district}</span>` : ''}
-          ${c.outlet_do ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:10px;"><i class="fa-solid fa-building"></i> ${c.outlet_do}</span>` : ''}
-          ${c.service_compliance ? `<span class="badge-cluster-pill" style="background:#ecfdf5; color:#059669; font-size:10px;"><i class="fa-solid fa-wrench"></i> Servis: ${c.service_compliance}</span>` : ''}
-          ${c.vin ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:9.5px; font-family:monospace;"><i class="fa-solid fa-key"></i> VIN: ${c.vin}</span>` : ''}
+          ${c.pkb_no ? `<span class="badge-cluster-pill" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-size:10.5px; font-weight:700;"><i class="fa-solid fa-file-invoice"></i> PKB: ${escapeHtml(c.pkb_no)} ${c.pkb_date ? `(${escapeHtml(c.pkb_date)})` : ''}</span>` : ''}
+          ${c.operation_desc ? `<span class="badge-cluster-pill" style="background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-size:10px;"><i class="fa-solid fa-wrench"></i> ${escapeHtml(c.operation_desc)}</span>` : ''}
+          ${c.ths_type ? `<span class="badge-cluster-pill" style="background:${c.ths_type.toUpperCase() === 'THS' ? '#f0fdf4; color:#15803d; border-color:#bbf7d0;' : '#f8fafc; color:#475569;'} font-size:10px; font-weight:800;"><i class="fa-solid fa-van-shuttle"></i> ${escapeHtml(c.ths_type)}</span>` : ''}
+          ${c.booking_type ? `<span class="badge-cluster-pill" style="background:${c.booking_type.toLowerCase().includes('booking') ? '#eff6ff; color:#1d4ed8; border-color:#bfdbfe;' : '#fef3c7; color:#b45309; border-color:#fde68a;'} font-size:10px; font-weight:800;"><i class="fa-solid ${c.booking_type.toLowerCase().includes('booking') ? 'fa-calendar-check' : 'fa-person-walking'}"></i> ${escapeHtml(c.booking_type)}</span>` : ''}
+          ${c.service_advisor ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:9.5px;"><i class="fa-solid fa-user-gear"></i> SA: ${escapeHtml(c.service_advisor)} ${c.foreman ? `&middot; FM: ${escapeHtml(c.foreman)}` : ''}</span>` : ''}
+          ${c.cluster_name ? `<span class="badge-cluster-pill" style="font-size:10.5px;"><i class="fa-solid fa-tag"></i> ${escapeHtml(c.cluster_name)}</span>` : ''}
+          ${c.district ? `<span class="badge-loc-pill" style="font-size:10.5px;"><i class="fa-solid fa-location-dot"></i> Kec. ${escapeHtml(c.district)}</span>` : ''}
+          ${c.city ? `<span class="badge-loc-pill" style="font-size:10.5px;"><i class="fa-solid fa-city"></i> ${escapeHtml(c.city)}</span>` : ''}
+          ${c.vin ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:9.5px; font-family:monospace;" title="No Rangka"><i class="fa-solid fa-key"></i> VIN: ${escapeHtml(c.vin)}</span>` : ''}
+          ${c.sheet_row_index ? `<span class="badge-cluster-pill" style="background:#f8fafc; font-size:9.5px; font-family:monospace;"><i class="fa-solid fa-table"></i> Row #${c.sheet_row_index}</span>` : ''}
         </div>
       </div>
 

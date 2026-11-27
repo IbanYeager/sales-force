@@ -747,30 +747,66 @@ if ($action === 'import_database_batch') {
     global $is_mysql, $sqlite_pdo, $conn;
     $inserted = 0;
 
+    if (!empty($input['reset_all'])) {
+        followup_execute("DELETE FROM followup_customers");
+        followup_execute("DELETE FROM followup_logs");
+    }
+
     if ($is_mysql && $conn) {
         $chunks = array_chunk($rows, 100);
         foreach ($chunks as $chunk) {
             $placeholders = [];
             $flatParams = [];
             foreach ($chunk as $r) {
-                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'FALSE', 'FALSE', 'FALSE', 'FALSE', '', 'Open', '', ?, ?, 'google_sheet', 'OTHERS', 'RETAIL', 'MEDIUM', 'TUNAS TOYOTA KIARA CONDONG', ?, ?, ?)";
+                $placeholders[] = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $flatParams[] = $r['customer_code'];
                 $flatParams[] = $r['name'];
                 $flatParams[] = $r['phone'];
                 $flatParams[] = $r['car_model'];
-                $flatParams[] = $r['last_car_model'];
-                $flatParams[] = $r['car_age'];
-                $flatParams[] = $r['recommended_model'];
-                $flatParams[] = $r['cluster_name'];
-                $flatParams[] = $r['priority'];
-                $flatParams[] = $r['district'];
-                $flatParams[] = $r['vin'];
-                $flatParams[] = $r['plate_number'];
+                $flatParams[] = $r['last_car_model'] ?? $r['car_model'];
+                $flatParams[] = $r['car_age'] ?? '';
+                $flatParams[] = $r['car_year'] ?? '';
+                $flatParams[] = $r['recommended_model'] ?? $r['car_model'];
+                $flatParams[] = $r['cluster_name'] ?? '';
+                $flatParams[] = $r['priority'] ?? '';
+                $flatParams[] = $r['district'] ?? '';
+                $flatParams[] = $r['city'] ?? '';
+                $flatParams[] = $r['address'] ?? '';
+                $flatParams[] = $r['vin'] ?? '';
+                $flatParams[] = $r['plate_number'] ?? '';
+                $flatParams[] = $r['kilometer'] ?? '';
+                $flatParams[] = $r['pkb_no'] ?? '';
+                $flatParams[] = $r['pkb_date'] ?? '';
+                $flatParams[] = $r['service_advisor'] ?? '';
+                $flatParams[] = $r['mechanic'] ?? '';
+                $flatParams[] = $r['foreman'] ?? '';
+                $flatParams[] = $r['operation_desc'] ?? '';
+                $flatParams[] = $r['ths_type'] ?? '';
+                $flatParams[] = $r['booking_type'] ?? '';
+                $flatParams[] = $r['order_type'] ?? '';
+                $flatParams[] = $r['decision_maker'] ?? '';
+                $flatParams[] = $r['dm_phone'] ?? '';
+                $flatParams[] = $r['contact_person'] ?? '';
+                $flatParams[] = $r['cp_phone'] ?? '';
+                $flatParams[] = $r['deliver_date'] ?? '';
+                $flatParams[] = $r['pkb_status'] ?? '';
                 $flatParams[] = (int)($r['sheet_row_index'] ?? 0);
                 $flatParams[] = $r['outlet_do'] ?? 'TUNAS TOYOTA KIARA CONDONG';
                 $flatParams[] = $r['outlet_service'] ?? 'TUNAS TOYOTA KIARA CONDONG';
-                $flatParams[] = $r['followup_category'];
+                $flatParams[] = $r['connected'] ?? 'FALSE';
+                $flatParams[] = $r['contacted'] ?? 'FALSE';
+                $flatParams[] = $r['prospect'] ?? 'FALSE';
+                $flatParams[] = $r['spk'] ?? 'FALSE';
+                $flatParams[] = $r['remarks'] ?? '';
+                $flatParams[] = $r['sales_fu_status'] ?? 'Open';
+                $flatParams[] = $r['reason_followup'] ?? '';
+                $flatParams[] = $r['followup_category'] ?? 'Servis Berkala';
                 $flatParams[] = $r['followup_status'] ?? 'Belum Dihubungi';
+                $flatParams[] = 'google_sheet';
+                $flatParams[] = 'OTHERS';
+                $flatParams[] = 'RETAIL';
+                $flatParams[] = 'MEDIUM';
+                $flatParams[] = 'TUNAS TOYOTA KIARA CONDONG';
                 $flatParams[] = $r['sales_fu'] ?? '';
                 $flatParams[] = !empty($r['assigned_sales_id']) ? (int)$r['assigned_sales_id'] : null;
                 $flatParams[] = isset($r['is_orphan']) ? (int)$r['is_orphan'] : 1;
@@ -778,9 +814,12 @@ if ($action === 'import_database_batch') {
             }
             $sql = "
                 INSERT INTO followup_customers (
-                    customer_code, name, phone, car_model, last_car_model, car_age,
-                    recommended_model, cluster_name, priority, district, vin, plate_number, sheet_row_index,
-                    outlet_do, outlet_service,
+                    customer_code, name, phone, car_model, last_car_model, car_age, car_year,
+                    recommended_model, cluster_name, priority, district, city, address,
+                    vin, plate_number, kilometer, pkb_no, pkb_date, service_advisor, mechanic,
+                    foreman, operation_desc, ths_type, booking_type, order_type,
+                    decision_maker, dm_phone, contact_person, cp_phone, deliver_date, pkb_status,
+                    sheet_row_index, outlet_do, outlet_service,
                     connected, contacted, prospect, spk, remarks, sales_fu_status, reason_followup,
                     followup_category, followup_status, sync_source,
                     vehicle_filter, cust_type, priority_class, outlet_name,
@@ -792,13 +831,34 @@ if ($action === 'import_database_batch') {
                     car_model = VALUES(car_model),
                     last_car_model = VALUES(last_car_model),
                     car_age = VALUES(car_age),
+                    car_year = VALUES(car_year),
                     recommended_model = VALUES(recommended_model),
                     cluster_name = VALUES(cluster_name),
                     priority = VALUES(priority),
                     district = VALUES(district),
+                    city = VALUES(city),
+                    address = VALUES(address),
                     vin = VALUES(vin),
                     plate_number = VALUES(plate_number),
+                    kilometer = VALUES(kilometer),
+                    pkb_no = VALUES(pkb_no),
+                    pkb_date = VALUES(pkb_date),
+                    service_advisor = VALUES(service_advisor),
+                    mechanic = VALUES(mechanic),
+                    foreman = VALUES(foreman),
+                    operation_desc = VALUES(operation_desc),
+                    ths_type = VALUES(ths_type),
+                    booking_type = VALUES(booking_type),
+                    order_type = VALUES(order_type),
+                    decision_maker = VALUES(decision_maker),
+                    dm_phone = VALUES(dm_phone),
+                    contact_person = VALUES(contact_person),
+                    cp_phone = VALUES(cp_phone),
+                    deliver_date = VALUES(deliver_date),
+                    pkb_status = VALUES(pkb_status),
                     sheet_row_index = VALUES(sheet_row_index),
+                    outlet_do = VALUES(outlet_do),
+                    outlet_service = VALUES(outlet_service),
                     followup_category = VALUES(followup_category),
                     sync_source = 'google_sheet'
             ";

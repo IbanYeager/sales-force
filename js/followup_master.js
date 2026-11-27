@@ -1739,10 +1739,10 @@ function renderCustomerTable() {
         </td>
 
         <!-- 3. Customer & Kontak -->
-        <td style="min-width:240px;">
-          <div style="display:flex; align-items:center; gap:12px;">
+        <td style="min-width:260px;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
             <div class="cust-avatar-circle">${initials}</div>
-            <div>
+            <div style="flex:1;">
               <div style="font-weight:800; color:#0f172a; font-size:13.5px; line-height:1.25;">${escapeHtml(c.name || '')}</div>
               ${(c.phone && c.phone.trim() !== '' && c.phone !== '-') ? `
                 <div style="font-family:monospace; font-size:11.5px; color:#059669; font-weight:700; margin-top:3px;">
@@ -1755,70 +1755,113 @@ function renderCustomerTable() {
                   <i class="fa-solid fa-phone-slash" style="font-size:10px;"></i> Tanpa No. WA
                 </div>
               `}
+              ${(c.decision_maker && c.decision_maker.trim() !== '' && c.decision_maker !== c.name) ? `
+                <div style="font-size:10px; color:#475569; margin-top:3px; line-height:1.2;">
+                  <i class="fa-solid fa-user-tie" style="color:#64748b; font-size:9.5px;"></i> DM/CP: <strong>${escapeHtml(c.decision_maker)}</strong>
+                  ${(c.dm_phone && c.dm_phone !== c.phone) ? `<span style="font-family:monospace; color:#059669;">(${escapeHtml(c.dm_phone)})</span>` : ''}
+                </div>
+              ` : ''}
               <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
-                ${c.district ? `<span style="font-size:10.5px; color:#64748b;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; font-size:9.5px;"></i> ${/^(kecamatan|kec\.|kec)/i.test(c.district) ? escapeHtml(c.district) : `Kec. ${escapeHtml(c.district)}`}</span>` : ''}
+                ${c.district ? `<span style="font-size:10px; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-location-dot" style="color:#94a3b8; font-size:9px;"></i> ${/^(kecamatan|kec\.|kec)/i.test(c.district) ? escapeHtml(c.district) : `Kec. ${escapeHtml(c.district)}`}</span>` : ''}
+                ${c.city ? `<span style="font-size:10px; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-city" style="color:#94a3b8; font-size:9px;"></i> ${escapeHtml(c.city)}</span>` : ''}
                 ${c.customer_type ? `<span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:#f1f5f9; color:#475569;">${escapeHtml(c.customer_type)}</span>` : ''}
               </div>
+              ${c.address ? `
+                <div style="font-size:10px; color:#64748b; margin-top:3px; max-width:280px; line-height:1.25; background:rgba(248,250,252,0.8); border:1px dashed #e2e8f0; border-radius:4px; padding:3px 6px;" title="${escapeHtml(c.address)}">
+                  <i class="fa-solid fa-map-pin" style="color:#d7123a; font-size:9px; margin-right:3px;"></i>${escapeHtml(c.address.length > 60 ? c.address.substring(0, 60) + '...' : c.address)}
+                </div>
+              ` : ''}
             </div>
           </div>
         </td>
 
-        <!-- 3. Unit Mobil & Usia -->
-        <td style="min-width:230px;">
-          <div style="font-weight:900; color:#d7123a; font-size:13.5px; letter-spacing:-0.2px; display:flex; align-items:center; gap:5px;">
+        <!-- 4. Unit Mobil & Usia -->
+        <td style="min-width:240px;">
+          <div style="font-weight:900; color:#d7123a; font-size:14px; letter-spacing:-0.2px; display:flex; align-items:center; gap:5px;">
             <i class="fa-solid fa-car-side" style="color:#d7123a;"></i> ${escapeHtml(c.recommended_model || c.car_model || '')}
+          </div>
+          <div style="display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:4px;">
+            ${c.plate_number ? `
+              <span style="display:inline-flex; align-items:center; gap:4px; background:#0f172a; color:#f8fafc; font-family:monospace; font-weight:800; font-size:11px; padding:2px 7px; border-radius:5px; border:1px solid #334155;">
+                <i class="fa-solid fa-id-card" style="color:#38bdf8; font-size:10px;"></i> ${escapeHtml(c.plate_number)}
+              </span>
+            ` : ''}
+            ${c.kilometer ? `
+              <span style="display:inline-flex; align-items:center; gap:3px; background:#f1f5f9; color:#0f172a; font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid #cbd5e1;">
+                <i class="fa-solid fa-gauge-high" style="color:#64748b; font-size:9.5px;"></i> ${Number(c.kilometer).toLocaleString('id-ID')} Km
+              </span>
+            ` : ''}
           </div>
           <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
             ${c.last_car_model ? `<span class="badge-last-car">Saat ini: <strong>${escapeHtml(c.last_car_model)}</strong></span>` : ''}
-            ${c.car_age ? `<span class="badge-car-age"><i class="fa-solid fa-clock"></i> ${escapeHtml(c.car_age)}</span>` : ''}
+            ${(() => {
+              const formattedAge = formatCarAgeDisplay(c.car_year, c.car_age);
+              return formattedAge ? `<span class="badge-car-age"><i class="fa-solid fa-clock"></i> ${escapeHtml(formattedAge)}</span>` : '';
+            })()}
           </div>
           ${(c.alt_model_2 || c.alt_model_3) ? `
-            <div style="font-size:10.5px; color:#64748b; margin-top:3px;">
+            <div style="font-size:10px; color:#64748b; margin-top:3px;">
               🔄 Alt: <strong style="color:#334155;">${[c.alt_model_2, c.alt_model_3].filter(Boolean).map(escapeHtml).join(', ')}</strong>
             </div>
           ` : ''}
-          ${c.vin ? `<div style="font-size:9.5px; font-family:monospace; color:#94a3b8; margin-top:2px;">VIN: ${escapeHtml(c.vin)}</div>` : ''}
+          ${c.vin ? `<div style="font-size:9.5px; font-family:monospace; color:#94a3b8; margin-top:2px;" title="Equipment / No Rangka">VIN: ${escapeHtml(c.vin)}</div>` : ''}
         </td>
 
-        <!-- 4. Kategori & Klaster -->
-        <td style="min-width:190px;">
-          <div style="margin-bottom:4px;">
+        <!-- 5. Kategori & Servis PKB -->
+        <td style="min-width:210px;">
+          <div style="margin-bottom:4px; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
             ${c.db_source === 'radar'
-              ? `<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-size:10px; font-weight:800;"><i class="fa-solid fa-satellite-dish"></i> Radar GPS</span>`
-              : `<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800;"><i class="fa-solid fa-user-tag"></i> Khusus Sales</span>`
+              ? `<span style="display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:6px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-size:10px; font-weight:800;"><i class="fa-solid fa-satellite-dish"></i> Radar GPS</span>`
+              : `<span style="display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:6px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800;"><i class="fa-solid fa-user-tag"></i> Khusus Sales</span>`
             }
+            ${c.pkb_status ? `<span style="font-size:9px; font-weight:800; padding:1px 5px; border-radius:3px; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">${escapeHtml(c.pkb_status)}</span>` : ''}
           </div>
-          ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="background:#f8fafc; color:#334155; border-color:#e2e8f0; font-size:10.5px; margin-bottom:3px;"><i class="fa-solid fa-tag"></i> ${escapeHtml(c.cluster_name)}</span></div>` : ''}
-          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:10px; margin-bottom:3px;"><i class="fa-solid fa-bolt"></i> ${escapeHtml(c.priority)}</span></div>` : ''}
-          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
-            ${c.outlet_do ? `<span style="font-size:9.5px; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-building" style="font-size:9px;"></i> DO: ${escapeHtml(c.outlet_do)}</span>` : ''}
-            ${c.service_compliance ? `<span style="font-size:9.5px; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:1px 5px; border-radius:4px;"><i class="fa-solid fa-wrench" style="font-size:9px;"></i> Servis: ${escapeHtml(c.service_compliance)}</span>` : ''}
-          </div>
+          ${c.pkb_no ? `
+            <div style="font-size:11px; font-weight:800; color:#1e293b; display:flex; align-items:center; gap:4px;">
+              <i class="fa-solid fa-file-invoice" style="color:#d7123a; font-size:10px;"></i> ${escapeHtml(c.pkb_no)}
+              ${c.pkb_date ? `<span style="font-size:9.5px; color:#64748b; font-weight:600;">(${escapeHtml(c.pkb_date)})</span>` : ''}
+            </div>
+          ` : ''}
+          ${c.operation_desc ? `
+            <div style="font-size:10.5px; color:#475569; margin-top:2px; font-weight:600; line-height:1.2;">
+              <i class="fa-solid fa-wrench" style="color:#8b5cf6; font-size:9.5px;"></i> ${escapeHtml(c.operation_desc)}
+            </div>
+          ` : (c.cluster_name ? `<div><span class="badge-cluster-pill" style="background:#f8fafc; color:#334155; border-color:#e2e8f0; font-size:10.5px; margin-bottom:3px;"><i class="fa-solid fa-tag"></i> ${escapeHtml(c.cluster_name)}</span></div>` : '')}
+          ${c.service_advisor ? `
+            <div style="font-size:9.5px; color:#64748b; margin-top:3px;">
+              SA: <strong style="color:#334155;">${escapeHtml(c.service_advisor)}</strong>
+              ${c.foreman ? `&middot; FM: <strong style="color:#334155;">${escapeHtml(c.foreman)}</strong>` : ''}
+            </div>
+          ` : ''}
+          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:9.5px; margin-top:3px;"><i class="fa-solid fa-bolt"></i> ${escapeHtml(c.priority)}</span></div>` : ''}
         </td>
 
-        <!-- 5. Tipe & Migrasi -->
+        <!-- 6. Tipe & Order -->
         <td style="min-width:160px;">
-          ${c.data_type ? `
-            <div style="margin-bottom:4px;">
-              <span class="badge-type-pill ${c.data_type.toLowerCase() === 'additional' ? 'badge-type-additional' : 'badge-type-replacement'}">
-                <i class="fa-solid ${c.data_type.toLowerCase() === 'additional' ? 'fa-plus' : 'fa-arrows-rotate'}" style="font-size:9.5px;"></i>
-                ${escapeHtml(c.data_type)}
-              </span>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${c.ths_type ? `<span style="display:inline-flex; align-items:center; gap:3px; font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:${c.ths_type.toUpperCase() === 'THS' ? '#f0fdf4; color:#15803d; border:1px solid #bbf7d0;' : '#f8fafc; color:#475569; border:1px solid #e2e8f0;'}"><i class="fa-solid fa-van-shuttle"></i> ${escapeHtml(c.ths_type)}</span>` : ''}
+              ${c.booking_type ? `<span style="display:inline-flex; align-items:center; gap:3px; font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:${c.booking_type.toLowerCase().includes('booking') ? '#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;' : '#fef3c7; color:#b45309; border:1px solid #fde68a;'}"><i class="fa-solid ${c.booking_type.toLowerCase().includes('booking') ? 'fa-calendar-check' : 'fa-person-walking'}"></i> ${escapeHtml(c.booking_type)}</span>` : ''}
             </div>
-          ` : `<span style="color:#94a3b8; font-size:11px;">-</span>`}
-          ${c.customer_migration ? `
-            <div>
-              <span class="badge-mig-pill">
-                <i class="fa-solid fa-route" style="font-size:9px;"></i>
-                ${escapeHtml(c.customer_migration)}
-              </span>
-            </div>
-          ` : ''}
-          ${c.vehicle_model_spk ? `
-            <div style="font-size:10px; color:#64748b; margin-top:3px;">
-              SPK: <strong style="color:#0f172a;">${escapeHtml(c.vehicle_model_spk)}</strong>
-            </div>
-          ` : ''}
+            ${c.order_type ? `<div style="font-size:9.5px; color:#64748b;">Order: <strong style="color:#334155;">${escapeHtml(c.order_type)}</strong></div>` : ''}
+            ${c.sheet_row_index ? `<div style="font-size:9.5px; font-family:monospace; color:#94a3b8;"><i class="fa-solid fa-table"></i> Row #${c.sheet_row_index}</div>` : ''}
+            ${c.data_type ? `
+              <div>
+                <span class="badge-type-pill ${c.data_type.toLowerCase() === 'additional' ? 'badge-type-additional' : 'badge-type-replacement'}">
+                  <i class="fa-solid ${c.data_type.toLowerCase() === 'additional' ? 'fa-plus' : 'fa-arrows-rotate'}" style="font-size:9px;"></i>
+                  ${escapeHtml(c.data_type)}
+                </span>
+              </div>
+            ` : ''}
+            ${c.customer_migration ? `
+              <div>
+                <span class="badge-mig-pill">
+                  <i class="fa-solid fa-route" style="font-size:9px;"></i>
+                  ${escapeHtml(c.customer_migration)}
+                </span>
+              </div>
+            ` : ''}
+          </div>
         </td>
 
         <!-- 6. Status Terkini -->
@@ -2024,6 +2067,24 @@ function changePerPage(perPage) {
   masterState.pagination.perPage = parseInt(perPage, 10) || 50;
   masterState.pagination.currentPage = 1;
   renderCustomerTable();
+}
+
+function formatCarAgeDisplay(carYear, carAge) {
+  let year = parseInt(carYear, 10);
+  if (!year || isNaN(year)) {
+    const m = String(carAge || '').match(/\b(19\d\d|20\d\d)\b/);
+    if (m) {
+      year = parseInt(m[1], 10);
+    }
+  }
+  if (year && year >= 1990 && year <= 2030) {
+    const age = 2026 - year;
+    return `Thn ${year} (${age} Thn)`;
+  }
+  if (carAge && String(carAge).trim() !== '' && carAge !== '-') {
+    return String(carAge).replace(/\.0\s*Thn/i, ' Thn');
+  }
+  return '';
 }
 
 function escapeHtml(str) {

@@ -240,7 +240,26 @@ function init_followup_tables() {
             'data_type' => "VARCHAR(50) NULL",
             'customer_migration' => "VARCHAR(100) NULL",
             'vehicle_model_spk' => "VARCHAR(100) NULL",
-            'vehicle_match' => "VARCHAR(50) NULL"
+            'vehicle_match' => "VARCHAR(50) NULL",
+            'car_year' => "VARCHAR(50) NULL",
+            'address' => "TEXT NULL",
+            'city' => "VARCHAR(150) NULL",
+            'kilometer' => "VARCHAR(50) NULL",
+            'pkb_no' => "VARCHAR(100) NULL",
+            'pkb_date' => "VARCHAR(50) NULL",
+            'service_advisor' => "VARCHAR(150) NULL",
+            'mechanic' => "VARCHAR(150) NULL",
+            'foreman' => "VARCHAR(150) NULL",
+            'operation_desc' => "TEXT NULL",
+            'ths_type' => "VARCHAR(50) NULL",
+            'booking_type' => "VARCHAR(50) NULL",
+            'order_type' => "VARCHAR(50) NULL",
+            'decision_maker' => "VARCHAR(255) NULL",
+            'dm_phone' => "VARCHAR(50) NULL",
+            'contact_person' => "VARCHAR(255) NULL",
+            'cp_phone' => "VARCHAR(50) NULL",
+            'deliver_date' => "VARCHAR(50) NULL",
+            'pkb_status' => "VARCHAR(100) NULL"
         ];
         foreach ($cols as $colName => $colDef) {
             $check = followup_query("SHOW COLUMNS FROM followup_customers LIKE '$colName'");

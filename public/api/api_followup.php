@@ -340,8 +340,10 @@ if ($action === 'customers') {
         $params[] = '%' . strtolower($district) . '%';
     }
 
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 25000;
+    if ($limit <= 0) $limit = 25000;
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
-    $sql = "SELECT * FROM followup_customers $whereSql ORDER BY id DESC LIMIT 5000";
+    $sql = "SELECT * FROM followup_customers $whereSql ORDER BY id DESC LIMIT $limit";
 
     $customers = followup_query($sql, $params);
     $customers = is_array($customers) ? $customers : [];
