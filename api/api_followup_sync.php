@@ -605,7 +605,11 @@ function sync_google_sheet_data($sheetUrl = null) {
                     vehicle_model_spk = VALUES(vehicle_model_spk),
                     vehicle_match = VALUES(vehicle_match)
             ";
-            followup_execute($sql, $flatParams);
+            $execRes = followup_execute($sql, $flatParams);
+            if ($execRes === [] && $conn->error) {
+                echo json_encode(['success' => false, 'message' => 'SQL Error: ' . $conn->error]);
+                exit;
+            }
         }
     }
 
@@ -862,7 +866,11 @@ if ($action === 'import_database_batch') {
                     followup_category = VALUES(followup_category),
                     sync_source = 'google_sheet'
             ";
-            followup_execute($sql, $flatParams);
+            $execRes = followup_execute($sql, $flatParams);
+            if ($execRes === [] && $conn->error) {
+                echo json_encode(['success' => false, 'message' => 'SQL Error: ' . $conn->error]);
+                exit;
+            }
         }
     }
 

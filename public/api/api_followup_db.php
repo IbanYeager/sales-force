@@ -499,7 +499,7 @@ function init_followup_tables() {
 }
 
 // Run table initialization and column migrations if migration version not up-to-date
-$migration_ver_file = __DIR__ . '/.followup_db_migrated_v4';
+$migration_ver_file = __DIR__ . '/.followup_db_migrated_v5';
 if (!file_exists($migration_ver_file)) {
     try {
         init_followup_tables();
