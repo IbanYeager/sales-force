@@ -357,7 +357,7 @@ function sync_google_sheet_data($sheetUrl = null) {
         $phone2 = $cleanP($rawPhone2);
         $phone = $phone1 ?: ($phone2 ?: '');
 
-        if (!$phone) continue;
+        if (!$phone) $phone = '-';
 
         $lastCar = $lastCarIdx !== -1 ? trim($row[$lastCarIdx] ?? '') : '';
         if ($lastCar === 'NO DATA' || $lastCar === '-') $lastCar = '';
@@ -379,9 +379,9 @@ function sync_google_sheet_data($sheetUrl = null) {
         if ($age && is_numeric($age)) $age = number_format((float)$age, 1) . ' Thn';
 
         $cluster = $clusterIdx !== -1 ? trim($row[$clusterIdx] ?? '') : '';
-        $priority = $priorityIdx !== -1 ? trim($row[$priorityIdx] ?? '') : '';
         $district = $districtIdx !== -1 ? trim($row[$districtIdx] ?? '') : '';
-        if ($district === 'NO DATA' || $district === '-') $district = '';
+        if ($district === 'NO DATA' || $district === '-' || $district === '0') $district = '';
+        $priority = get_territory_priority($district);
 
         $vin = $vinIdx !== -1 ? trim($row[$vinIdx] ?? '') : '';
         $plateNumber = $plateIdx !== -1 ? trim($row[$plateIdx] ?? '') : '';
@@ -455,8 +455,8 @@ function sync_google_sheet_data($sheetUrl = null) {
         elseif ($remarks === 'Customer menolak' || $remarks === 'Customer tidak aktif') $status = 'Tidak Tertarik';
         elseif ($remarks === 'Customer janjian' || $remarks === 'Customer pending' || $contacted === 'TRUE' || $connected === 'TRUE') $status = 'Menunggu Respon';
 
-        // Deterministic customer code to prevent duplicates on repeated syncs
-        $code = $vin ? ('VIN-' . $vin) : ('CUST-' . substr(md5($name . $phone), 0, 12));
+        // Deterministic customer code per sheet row to preserve all 23,682 rows
+        $code = 'PKB-ROW-' . $sheetRowIndex;
         $isOrphan = (!$assignedSalesId && empty($salesFu)) ? 1 : 0;
 
         $rowsToInsert[] = [
