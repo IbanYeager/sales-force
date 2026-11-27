@@ -90,6 +90,7 @@ function get_sales_list($spv = '') {
  * and matches name/alias tokens with word boundaries and case-insensitive equality.
  * Guarantees that sales consultants NEVER lose sight of their followed-up leads.
  */
+if (!function_exists('get_sales_filter_clause')) {
 function get_sales_filter_clause($sales_id, $sales_name_param = '') {
     $salesList = followup_query("SELECT id, username, nama_lengkap, nama_spv, is_active FROM sales_accounts");
     $salesList = is_array($salesList) ? $salesList : [];
@@ -190,6 +191,7 @@ function get_sales_filter_clause($sales_id, $sales_name_param = '') {
     $sql = !empty($clauses) ? "(" . implode(" OR ", $clauses) . ")" : "1=1";
     return [$sql, $params, $targetIds, $likeTokens];
 }
+}
 
 /**
  * Auto-Expiry Engine:
@@ -275,11 +277,7 @@ if ($action === 'customers') {
         }
     }
 
-    if ($db_source === 'sales') {
-        $where[] = "(sync_source IS NULL OR sync_source = '' OR sync_source = 'google_sheet' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
-    } elseif ($db_source === 'radar') {
-        $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
-    }
+    // Unified database: Khusus Sales and Radar GPS share one unified pool
 
     if ($search !== '') {
         $where[] = "(name LIKE ? OR phone LIKE ? OR plate_number LIKE ? OR car_model LIKE ? OR vin LIKE ? OR last_car_model LIKE ? OR district LIKE ?)";
@@ -739,11 +737,7 @@ if ($action === 'stats') {
             $params[] = $sp;
         }
     }
-    if ($db_source === 'sales') {
-        $where[] = "(sync_source IS NULL OR sync_source = '' OR sync_source = 'google_sheet' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
-    } elseif ($db_source === 'radar') {
-        $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
-    }
+    // Unified database: Khusus Sales and Radar GPS share one unified pool
 
     // Clean up phantom/blank records from previous syncs if any
     try {
@@ -1186,7 +1180,7 @@ if ($action === 'bulk_assign') {
         for ($i = 0; $i < count($customer_ids); $i++) {
             $cid = (int)$customer_ids[$i];
             $assignedSales = $salesList[$i % $numSales];
-            followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ? WHERE id = ?", [$assignedSales['id'], $assignedSales['name'], $cid]);
+            followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ?, is_orphan = 0 WHERE id = ?", [$assignedSales['id'], $assignedSales['name'], $cid]);
             followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', 'Auto-distribusi ke sales (Prioritas Unassigned)')", [$cid, $assignedSales['id'], $assignedSales['name']]);
         }
         echo json_encode(['success' => true, 'message' => count($customer_ids) . " customer berhasil dibagi rata ke $numSales wiraniaga (mengutamakan data belum ditugaskan)."]);
@@ -1219,7 +1213,7 @@ if ($action === 'bulk_assign') {
 
     foreach ($customer_ids as $cid) {
         $cid = (int)$cid;
-        followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ? WHERE id = ?", [$targetSales['id'], $targetSales['name'], $cid]);
+        followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ?, is_orphan = 0 WHERE id = ?", [$targetSales['id'], $targetSales['name'], $cid]);
         followup_execute("INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note) VALUES (?, ?, ?, 'assigned', ?)", [$cid, $targetSales['id'], $targetSales['name'], "Ditugaskan ke " . $targetSales['name']]);
     }
 
@@ -1697,6 +1691,16 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
     if ($effectiveSalesName === '' && !empty($input['sales_name'])) {
         $effectiveSalesName = trim($input['sales_name']);
     }
+    if ($effectiveSalesId === 0 && $effectiveSalesName !== '') {
+        $lowerEff = strtolower($effectiveSalesName);
+        foreach ($salesList as $s) {
+            if (strtolower(trim($s['name'])) === $lowerEff) {
+                $effectiveSalesId = (int)$s['id'];
+                $effectiveSalesName = $s['name'];
+                break;
+            }
+        }
+    }
     if ($effectiveSalesName === '' && $currSalesFu !== '') {
         $effectiveSalesName = $currSalesFu;
     }
@@ -1717,6 +1721,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
             last_template_used = CASE WHEN ? != '' THEN ? ELSE last_template_used END,
             assigned_sales_id = CASE WHEN (assigned_sales_id IS NULL OR assigned_sales_id = 0) AND ? > 0 THEN ? ELSE assigned_sales_id END,
             sales_fu = CASE WHEN ? != '' THEN ? ELSE sales_fu END,
+            is_orphan = CASE WHEN (? > 0 OR ? != '') THEN 0 ELSE is_orphan END,
             visit_photo = CASE WHEN ? != '' THEN ? ELSE visit_photo END
         WHERE id = ?
     ", [
@@ -1728,6 +1733,7 @@ if ($action === 'update_status' || $action === 'save_sales_followup') {
         $template_used, $template_used,
         $effectiveSalesId, $effectiveSalesId,
         $effectiveSalesName, $effectiveSalesName,
+        $effectiveSalesId, $effectiveSalesName,
         $visitPhotoUrl, $visitPhotoUrl,
         $id
     ]);
@@ -2335,11 +2341,7 @@ if ($action === 'distribute_quota') {
     $params = [];
 
     $db_source = trim($input['db_source'] ?? 'all');
-    if ($db_source === 'sales') {
-        $where[] = "(sync_source IS NULL OR sync_source = '' OR sync_source = 'google_sheet' OR (sync_source != 'pkb_excel_radar' AND sync_source NOT LIKE '%radar%' AND followup_category NOT LIKE '%radar%'))";
-    } elseif ($db_source === 'radar') {
-        $where[] = "(sync_source = 'pkb_excel_radar' OR sync_source LIKE '%radar%' OR followup_category LIKE '%radar%')";
-    }
+    // Unified database: Khusus Sales and Radar GPS share one unified pool
 
     if ($only_unassigned) {
         $where[] = "(assigned_sales_id IS NULL OR assigned_sales_id = 0) AND (sales_fu IS NULL OR sales_fu = '' OR sales_fu = '-' OR sales_fu = '0' OR sales_fu = 'Belum Ditugaskan')";
@@ -2528,7 +2530,7 @@ if ($action === 'add_more_leads_to_sales') {
 
     foreach ($unassignedLeads as $lead) {
         $leadId = (int)$lead['id'];
-        followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ? WHERE id = ?", [$sales_id, $targetSales['name'], $leadId]);
+        followup_execute("UPDATE followup_customers SET assigned_sales_id = ?, sales_fu = ?, is_orphan = 0 WHERE id = ?", [$sales_id, $targetSales['name'], $leadId]);
         followup_execute("
             INSERT INTO followup_logs (customer_id, sales_id, sales_name, action_type, note)
             VALUES (?, ?, ?, 'quota_refill', ?)

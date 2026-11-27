@@ -161,6 +161,109 @@ if (!function_exists('get_sales_list')) {
     }
 }
 
+if (!function_exists('get_sales_filter_clause')) {
+    function get_sales_filter_clause($sales_id, $sales_name_param = '') {
+        $salesList = followup_query("SELECT id, username, nama_lengkap, nama_spv, is_active FROM sales_accounts");
+        $salesList = is_array($salesList) ? $salesList : [];
+
+        $targetIds = [];
+        $targetNames = [];
+        $likeTokens = [];
+
+        $checkId = (int)$sales_id;
+        if ($checkId > 0) {
+            $targetIds[] = $checkId;
+        }
+
+        $seedNames = [];
+        if (!empty($sales_name_param)) {
+            $seedNames[] = trim($sales_name_param);
+        }
+
+        foreach ($salesList as $s) {
+            if ((int)$s['id'] === $checkId) {
+                if (!empty($s['nama_lengkap'])) $seedNames[] = trim($s['nama_lengkap']);
+                if (!empty($s['username'])) $seedNames[] = trim($s['username']);
+                break;
+            }
+        }
+
+        $coreTokens = [];
+        $ignoredWords = ['tunas', 'toyota', 'kiaracondong', 'sales', 'ryan', 'alvin', 'riva', 'kacab', 'spv', 'admin', 'user'];
+
+        foreach ($seedNames as $sn) {
+            $lower = strtolower($sn);
+            $clean = trim(preg_replace('/(_ryan|_alvin|_riva|_kacab|_spv|\d+|\([^)]*\))/i', '', $lower));
+            $words = preg_split('/[\s_]+/', $clean);
+            $firstWord = $words[0] ?? '';
+            if ($firstWord && strlen($firstWord) >= 3 && !in_array($firstWord, $ignoredWords, true)) {
+                $coreTokens[] = $firstWord;
+            }
+            if (count($words) <= 2 && strlen($clean) >= 3 && !in_array($clean, $ignoredWords, true)) {
+                $coreTokens[] = $clean;
+            }
+        }
+        $coreTokens = array_unique(array_filter($coreTokens));
+
+        foreach ($salesList as $s) {
+            $sId = (int)$s['id'];
+            $sName = strtolower(trim($s['nama_lengkap'] ?? ''));
+            $sUser = strtolower(trim($s['username'] ?? ''));
+            $sWords = array_merge(
+                preg_split('/[\s_]+/', $sName),
+                preg_split('/[\s_]+/', $sUser)
+            );
+            $sWords = array_map('trim', array_filter($sWords));
+
+            $matched = false;
+            foreach ($coreTokens as $token) {
+                if (in_array($token, $sWords, true) || $sName === $token || $sUser === $token) {
+                    $matched = true;
+                    break;
+                }
+            }
+
+            if ($matched) {
+                $targetIds[] = $sId;
+                if (!empty($s['nama_lengkap'])) $targetNames[] = strtolower(trim($s['nama_lengkap']));
+                if (!empty($s['username'])) $targetNames[] = strtolower(trim($s['username']));
+            }
+        }
+
+        foreach ($coreTokens as $token) {
+            $likeTokens[] = $token;
+            $targetNames[] = $token;
+        }
+
+        $targetIds = array_values(array_unique($targetIds));
+        $targetNames = array_values(array_unique(array_filter($targetNames)));
+        $likeTokens = array_values(array_unique(array_filter($likeTokens)));
+
+        $clauses = [];
+        $params = [];
+
+        if (!empty($targetIds)) {
+            $placeholders = implode(',', array_fill(0, count($targetIds), '?'));
+            $clauses[] = "assigned_sales_id IN ($placeholders)";
+            foreach ($targetIds as $tid) $params[] = $tid;
+        }
+
+        if (!empty($targetNames)) {
+            $placeholders = implode(',', array_fill(0, count($targetNames), '?'));
+            $clauses[] = "LOWER(sales_fu) IN ($placeholders)";
+            foreach ($targetNames as $tn) $params[] = $tn;
+        }
+
+        foreach ($likeTokens as $lt) {
+            $clauses[] = "sales_fu LIKE ?";
+            $params[] = "%$lt%";
+        }
+
+        $sql = !empty($clauses) ? "(" . implode(" OR ", $clauses) . ")" : "1=1";
+        return [$sql, $params, $targetIds, $likeTokens];
+    }
+}
+
 /**
  * Auto-initialize database tables
  */
@@ -259,7 +362,11 @@ function init_followup_tables() {
             'contact_person' => "VARCHAR(255) NULL",
             'cp_phone' => "VARCHAR(50) NULL",
             'deliver_date' => "VARCHAR(50) NULL",
-            'pkb_status' => "VARCHAR(100) NULL"
+            'pkb_status' => "VARCHAR(100) NULL",
+            'lat' => "DOUBLE NULL",
+            'lng' => "DOUBLE NULL",
+            'geo_district' => "VARCHAR(150) NULL",
+            'geo_address' => "TEXT NULL"
         ];
         foreach ($cols as $colName => $colDef) {
             $check = followup_query("SHOW COLUMNS FROM followup_customers LIKE '$colName'");
@@ -499,7 +606,7 @@ function init_followup_tables() {
 }
 
 // Run table initialization and column migrations if migration version not up-to-date
-$migration_ver_file = __DIR__ . '/.followup_db_migrated_v5';
+$migration_ver_file = __DIR__ . '/.followup_db_migrated_v6';
 if (!file_exists($migration_ver_file)) {
     try {
         init_followup_tables();

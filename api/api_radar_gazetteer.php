@@ -11082,7 +11082,7 @@ $indonesiaCityDistricts = array(
   'kab. serang' => array(
     'city' => 'Kab. Serang',
     'center' => array(-6.12, 106),
-    'keys' => array('kab. serang', 'serang', 'bandung'),
+    'keys' => array('kab. serang', 'serang'),
     'districts' => array(
       'bandung' => array(-6.215, 106.275),
     ),
@@ -11201,7 +11201,7 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     }
 
     // Live ArcGIS World Geocoding Engine fallback for newly added addresses
-    if (!empty($cleanAddress) && strlen($cleanAddress) >= 5) {
+    if (empty($GLOBALS['SKIP_REMOTE_GEOCODE']) && !empty($cleanAddress) && strlen($cleanAddress) >= 5) {
         try {
             $encodedAddr = urlencode($cleanAddress . ', Indonesia');
             $esriUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine={$encodedAddr}&maxLocations=1&sourceCountry=IDN";
@@ -11262,8 +11262,10 @@ function getAccurateCoords($id, $rawDistrict, $notes, $cityDistrictCoords = null
     $combinedCheck = strtolower($rawDistrict . ' ' . $cleanAddress);
     $isBandungExplicit = false;
     
-    // Check if Bandung is explicitly mentioned
-    if (preg_match('/\b(kota bandung|(?:kabupaten|kab\.?)\s*bandung|bandung barat|kota cimahi|cimahi)\b/i', $combinedCheck)) {
+    // Check if Bandung is explicitly mentioned or district matches a Bandung Raya district
+    if ($canonicalRawDist !== null && isset($bandungDistricts[$rawDistLookup])) {
+        $isBandungExplicit = true;
+    } elseif (preg_match('/\b(bandung|kota bandung|(?:kabupaten|kab\.?)\s*bandung|bandung barat|kota cimahi|cimahi)\b/i', $combinedCheck) && !preg_match('/kab\.?\s*serang/i', $combinedCheck)) {
         $isBandungExplicit = true;
     } else {
         foreach ($bandungDistricts as $bdKey => $bdVal) {

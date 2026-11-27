@@ -14,6 +14,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 }
 
 require_once __DIR__ . '/api_followup_db.php';
+require_once __DIR__ . '/api_radar_gazetteer.php';
 
 // Helper clean phone
 if (!function_exists('clean_phone_number')) {
@@ -971,6 +972,71 @@ if ($action === 'recalculate_territory_priorities') {
         'success' => true,
         'message' => 'Status Priority 1-4 berhasil diperbarui sesuai Mapping Territory Kecamatan.',
         'summary' => $summary
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup_sync.php?action=recalculate_radar_coords
+// Batch geocode seluruh database menggunakan Gazetteer & Alamat Akurat
+// -------------------------------------------------------------
+if ($action === 'recalculate_radar_coords') {
+    global $is_mysql, $conn;
+    $GLOBALS['SKIP_REMOTE_GEOCODE'] = true;
+
+    $limit = isset($_GET['limit']) ? max(100, min(3000, (int)$_GET['limit'])) : 1500;
+    $force = !empty($_GET['force']) || !empty($_POST['force']);
+    $afterId = isset($_GET['after_id']) ? (int)$_GET['after_id'] : 0;
+
+    if ($force) {
+        $rows = followup_query("SELECT id, district, address, city, notes, plate_number, vin FROM followup_customers WHERE id > ? ORDER BY id ASC LIMIT $limit", [$afterId]);
+    } else {
+        $rows = followup_query("SELECT id, district, address, city, notes, plate_number, vin FROM followup_customers WHERE (lat IS NULL OR lng IS NULL) ORDER BY id ASC LIMIT $limit");
+    }
+
+    $processed = 0;
+    $lastId = $afterId;
+
+    if (!empty($rows) && is_array($rows)) {
+        if ($is_mysql && $conn) {
+            $conn->begin_transaction();
+            $stmt = $conn->prepare("UPDATE followup_customers SET lat = ?, lng = ?, geo_district = ?, geo_address = ? WHERE id = ?");
+            foreach ($rows as $row) {
+                $cid = (int)$row['id'];
+                $rawDist = trim((string)($row['district'] ?? ''));
+                $rawAddr = trim((string)($row['address'] ?? ''));
+                $rawCity = trim((string)($row['city'] ?? ''));
+                $rawNotes = trim((string)($row['notes'] ?? ''));
+
+                $fullAddrParts = array_filter([$rawAddr, $rawDist, $rawCity], fn($v) => $v !== '' && $v !== '0');
+                $fullAddr = !empty($fullAddrParts) ? implode(', ', $fullAddrParts) : $rawNotes;
+
+                $coords = getAccurateCoords($cid, $rawDist, $fullAddr, null, $row['plate_number'] ?? '', $row['vin'] ?? '');
+                $latVal = (float)$coords[0];
+                $lngVal = (float)$coords[1];
+                $gDist = substr((string)($coords[2] ?? $rawDist), 0, 145);
+                $gAddr = (string)($coords[3] ?? $fullAddr);
+
+                $stmt->bind_param('ddssi', $latVal, $lngVal, $gDist, $gAddr, $cid);
+                $stmt->execute();
+                $processed++;
+                $lastId = $cid;
+            }
+            $stmt->close();
+            $conn->commit();
+        }
+    }
+
+    $remRows = $force
+        ? followup_query("SELECT COUNT(*) as cnt FROM followup_customers WHERE id > ?", [$lastId])
+        : followup_query("SELECT COUNT(*) as cnt FROM followup_customers WHERE lat IS NULL OR lng IS NULL");
+    $remaining = !empty($remRows) ? (int)$remRows[0]['cnt'] : 0;
+
+    echo json_encode([
+        'success' => true,
+        'processed' => $processed,
+        'remaining' => $remaining,
+        'last_id' => $lastId
     ]);
     exit;
 }

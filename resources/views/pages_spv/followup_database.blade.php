@@ -269,24 +269,18 @@
         </div>
       </div>
 
-      <!-- DATABASE SOURCE SEGMENTED SUB-TABS -->
+      <!-- UNIFIED DATABASE INDICATOR BAR -->
       <div class="fu-db-source-tabs" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; background:#ffffff; padding:10px 16px; border-radius:16px; border:1.5px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <span style="font-size:12.5px; font-weight:800; color:#0f172a; margin-right:6px; display:flex; align-items:center; gap:6px;">
             <i class="fa-solid fa-database" style="color:#d7123a;"></i> Sumber Data:
           </span>
-          <button type="button" class="db-source-tab-btn active" id="tabDbSourceSales" onclick="switchMasterDbSource('sales')" style="padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; background:#d7123a; color:#ffffff; box-shadow:0 4px 12px rgba(215,18,58,0.25);">
-            <i class="fa-solid fa-user-tag"></i> Database Khusus Sales
-          </button>
-          <button type="button" class="db-source-tab-btn" id="tabDbSourceRadar" onclick="switchMasterDbSource('radar')" style="padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; background:#f1f5f9; color:#475569;">
-            <i class="fa-solid fa-satellite-dish"></i> Database Radar GPS
-          </button>
-          <button type="button" class="db-source-tab-btn" id="tabDbSourceAll" onclick="switchMasterDbSource('all')" style="padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; background:#f1f5f9; color:#475569;">
-            <i class="fa-solid fa-layer-group"></i> Semua Database (Gabungan)
-          </button>
+          <span style="padding:7px 14px; border-radius:10px; font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #d7123a 0%, #991b1b 100%); color:#ffffff; box-shadow:0 4px 12px rgba(215,18,58,0.22);">
+            <i class="fa-solid fa-layer-group"></i> Database Terpadu (Penugasan Sales &amp; Radar GPS)
+          </span>
         </div>
         <div style="font-size:11.5px; color:#64748b; font-weight:600;" id="dbSourceSubtitleText">
-          <i class="fa-solid fa-circle-info" style="color:#3b82f6;"></i> Menampilkan database yang khusus ditugaskan ke sales
+          <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i> Seluruh database disatukan dengan Radar GPS — data yang sudah di-FU otomatis terkunci ke Sales terkait
         </div>
       </div>
 
@@ -295,14 +289,6 @@
         <div class="fu-input-with-icon">
           <i class="fa-solid fa-magnifying-glass"></i>
           <input type="text" class="fu-input" placeholder="Cari nama, no WA, plat, atau unit..." oninput="masterState.filters.search = this.value; loadMasterCustomers();">
-        </div>
-
-        <div>
-          <select id="filterDbSourceSelect" class="fu-select" onchange="switchMasterDbSource(this.value);" style="font-weight:800; border-color:#cbd5e1;">
-            <option value="sales">ðŸŽ¯ Database Khusus Sales</option>
-            <option value="radar">ðŸ›°ï¸ Database Radar GPS</option>
-            <option value="all">ðŸŒ Semua Database (Gabungan)</option>
-          </select>
         </div>
 
         <div>
@@ -335,6 +321,17 @@
             <option value="all">Semua Tipe (Additional / Replacement)</option>
             <option value="Additional">Additional (Penambahan Unit)</option>
             <option value="Replacement">Replacement (Penggantian Mobil)</option>
+          </select>
+        </div>
+
+        <div>
+          <select id="filterPrioritySelect" class="fu-select" onchange="masterState.filters.priority = this.value; loadMasterCustomers();">
+            <option value="all">Semua Priority Territory</option>
+            <option value="Priority 1">🔴 Priority 1 Territory</option>
+            <option value="Priority 2">⚪ Priority 2 Territory</option>
+            <option value="Priority 3">🟡 Priority 3 Territory</option>
+            <option value="Priority 4">🟣 Priority 4 Territory</option>
+            <option value="none">➖ Tanpa Priority (Luar Wilayah)</option>
           </select>
         </div>
       </div>

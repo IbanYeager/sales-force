@@ -1299,7 +1299,8 @@ const SalesSuperpowers = {
 
     try {
       const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
-      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=999&district=${encodeURIComponent(district)}&db_source=radar&sales_id=${salesId}&limit=0`);
+      const salesName = localStorage.getItem('namaSales') || localStorage.getItem('salesName') || localStorage.getItem('userName') || '';
+      const res = await fetch(`${this.getApiPrefix()}api_customer_radar.php?lat=${lat}&lng=${lng}&radius=999&district=${encodeURIComponent(district)}&db_source=all&sales_id=${salesId}&sales_name=${encodeURIComponent(salesName)}&limit=0`);
       const result = await res.json();
 
       if (result.districts_list && Array.isArray(result.districts_list)) {
@@ -1675,9 +1676,12 @@ const SalesSuperpowers = {
             <i class="fa-solid fa-car-side" style="color:#2563eb;"></i> ${escapeHtml(c.car_model || 'Toyota')}
             ${c.plate_number ? `<span style="font-size:10px; background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px; font-weight:700;">${escapeHtml(c.plate_number)}</span>` : ''}
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px; gap:6px; flex-wrap:wrap;">
             <span style="color:#64748b;">Status: <b style="color:${pinBg};">${escapeHtml(c.status || 'Belum Dihubungi')}</b></span>
-            <span style="color:#d7123a; font-weight:800;">${escapeHtml(c.priority || 'Warm')}</span>
+            ${/^Priority [1-4]$/i.test(c.priority || '') ? `<span style="color:#b91c1c; background:#fee2e2; padding:1px 6px; border-radius:4px; font-weight:800; font-size:10px;">${escapeHtml(c.priority)}</span>` : ''}
+          </div>
+          <div style="font-size:10.5px; color:#475569; margin-top:4px;">
+            <i class="fa-solid fa-user-tag" style="color:#0284c7;"></i> PIC: <b>${escapeHtml(c.sales_name || 'Terbuka (Belum Di-FU)')}</b>
           </div>
         </div>
 
@@ -2230,9 +2234,16 @@ const SalesSuperpowers = {
                 <span><b>Unit:</b> <span style="font-weight:800; color:#0f172a;">${escapeHtml(item.car_model || 'Toyota')}</span> ${item.plate_number ? `<span style="font-size:10.5px; background:#f1f5f9; color:#334155; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:4px;">${escapeHtml(item.plate_number)}</span>` : ''}</span>
               </div>
               <div class="radar-tags-row">
-                <span class="radar-tag priority-${(item.priority||'').toLowerCase()}">Prioritas: <b>${escapeHtml(item.priority || 'Warm')}</b></span>
+                ${/^Priority [1-4]$/i.test(item.priority || '') ? `<span class="radar-tag" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;"><b>${escapeHtml(item.priority)}</b></span>` : ''}
+                <span class="radar-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;"><i class="fa-solid fa-user-tag"></i> ${escapeHtml(item.sales_name || 'Terbuka')}</span>
                 <span class="radar-tag status-tag" style="color:${statusColor}; background:${statusColor}15; border-color:${statusColor}30;">${escapeHtml(item.status || 'Belum Dihubungi')}</span>
               </div>
+              ${item.kilometer || item.pkb_no ? `
+                <div style="font-size:10.5px; color:#64748b; margin-top:5px; display:flex; gap:8px; flex-wrap:wrap;">
+                  ${item.kilometer ? `<span><i class="fa-solid fa-gauge-high"></i> ${Number(item.kilometer).toLocaleString('id-ID')} Km</span>` : ''}
+                  ${item.pkb_no ? `<span><i class="fa-solid fa-file-invoice"></i> ${escapeHtml(item.pkb_no)}</span>` : ''}
+                </div>
+              ` : ''}
               ${item.visit_photo ? `
                 <div style="margin-top:8px;">
                   <span style="font-size:11px; font-weight:800; color:#059669; display:block; margin-bottom:3px;"><i class="fa-solid fa-camera"></i> Bukti Kunjungan:</span>
@@ -4060,6 +4071,16 @@ _Alamat: Jl. Soekarno-Hatta No. 514, Bandung_`;
     try {
       const form = document.getElementById('radarFollowupForm');
       const formData = new FormData(form);
+      const salesId = localStorage.getItem('idSales') || localStorage.getItem('salesId') || 0;
+      const salesName = localStorage.getItem('namaSales') || localStorage.getItem('salesName') || localStorage.getItem('userName') || '';
+      formData.set('id', customerId);
+      formData.set('sales_id', salesId);
+      formData.set('sales_name', salesName);
+      const stVal = formData.get('status') || '';
+      if (stVal && stVal !== 'Belum Dihubungi') {
+        formData.set('connected', 'TRUE');
+        formData.set('contacted', 'TRUE');
+      }
 
       const res = await fetch(`${this.getApiPrefix()}api_followup.php?action=update_status`, {
         method: 'POST',

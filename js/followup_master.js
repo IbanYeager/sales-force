@@ -21,7 +21,7 @@ let masterState = {
     category: 'all',
     dataType: 'all',
     priority: 'all',
-    db_source: 'sales'
+    db_source: 'all'
   },
   pagination: {
     currentPage: 1,
@@ -1139,59 +1139,8 @@ async function loadTemplates() {
   }
 }
 
-function switchMasterDbSource(source = 'sales') {
-  masterState.filters.db_source = source;
-
-  const btnSales = document.getElementById('tabDbSourceSales');
-  const btnRadar = document.getElementById('tabDbSourceRadar');
-  const btnAll = document.getElementById('tabDbSourceAll');
-  const subtitleText = document.getElementById('dbSourceSubtitleText');
-  const selectFilter = document.getElementById('filterDbSourceSelect');
-
-  if (selectFilter && selectFilter.value !== source) {
-    selectFilter.value = source;
-  }
-
-  if (btnSales) {
-    const isAct = source === 'sales';
-    btnSales.style.background = isAct ? '#d7123a' : '#f1f5f9';
-    btnSales.style.color = isAct ? '#ffffff' : '#475569';
-    btnSales.style.boxShadow = isAct ? '0 4px 12px rgba(215,18,58,0.25)' : 'none';
-  }
-  if (btnRadar) {
-    const isAct = source === 'radar';
-    btnRadar.style.background = isAct ? '#0284c7' : '#f1f5f9';
-    btnRadar.style.color = isAct ? '#ffffff' : '#475569';
-    btnRadar.style.boxShadow = isAct ? '0 4px 12px rgba(2,132,199,0.25)' : 'none';
-  }
-  if (btnAll) {
-    const isAct = source === 'all';
-    btnAll.style.background = isAct ? '#475569' : '#f1f5f9';
-    btnAll.style.color = isAct ? '#ffffff' : '#475569';
-    btnAll.style.boxShadow = isAct ? '0 4px 12px rgba(71,85,105,0.25)' : 'none';
-  }
-
-  if (subtitleText) {
-    if (source === 'sales') {
-      subtitleText.innerHTML = '<i class="fa-solid fa-circle-info" style="color:#d7123a;"></i> Menampilkan database yang <strong>khusus ditugaskan ke sales</strong> (Regular CRM)';
-    } else if (source === 'radar') {
-      subtitleText.innerHTML = '<i class="fa-solid fa-circle-info" style="color:#0284c7;"></i> Menampilkan database dari <strong>Radar GPS & PKB Radar</strong>';
-    } else {
-      subtitleText.innerHTML = '<i class="fa-solid fa-circle-info" style="color:#475569;"></i> Menampilkan <strong>seluruh database gabungan</strong> (Sales + Radar GPS)';
-    }
-  }
-
-  const btnImport = document.getElementById('btnImportExcel');
-  if (btnImport) {
-    if (source === 'radar') {
-      btnImport.title = 'Impor data Excel/CSV ke Database Radar GPS (PKB Excel)';
-    } else if (source === 'sales') {
-      btnImport.title = 'Impor data Excel/CSV ke Database Khusus Sales';
-    } else {
-      btnImport.title = 'Impor data Excel/CSV ke Database CRM';
-    }
-  }
-
+function switchMasterDbSource(source = 'all') {
+  masterState.filters.db_source = 'all';
   loadMasterStats();
   loadMasterCustomers(true);
 }
@@ -1811,10 +1760,7 @@ function renderCustomerTable() {
         <!-- 5. Kategori & Servis PKB -->
         <td style="min-width:210px;">
           <div style="margin-bottom:4px; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
-            ${c.db_source === 'radar'
-              ? `<span style="display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:6px; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-size:10px; font-weight:800;"><i class="fa-solid fa-satellite-dish"></i> Radar GPS</span>`
-              : `<span style="display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:6px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800;"><i class="fa-solid fa-user-tag"></i> Khusus Sales</span>`
-            }
+            <span style="display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:6px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800;"><i class="fa-solid fa-layer-group"></i> Terpadu (Sales &amp; Radar)</span>
             ${c.pkb_status ? `<span style="font-size:9px; font-weight:800; padding:1px 5px; border-radius:3px; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">${escapeHtml(c.pkb_status)}</span>` : ''}
           </div>
           ${c.pkb_no ? `
