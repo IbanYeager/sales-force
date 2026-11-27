@@ -2081,7 +2081,7 @@ function formatCarAgeDisplay(carYear, carAge) {
     const age = 2026 - year;
     return `Thn ${year} (${age} Thn)`;
   }
-  if (carAge && String(carAge).trim() !== '' && carAge !== '-') {
+  if (carAge && String(carAge).trim() !== '' && carAge !== '-' && String(carAge).trim().toUpperCase() !== 'NULL') {
     return String(carAge).replace(/\.0\s*Thn/i, ' Thn');
   }
   return '';
