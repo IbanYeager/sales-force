@@ -702,6 +702,17 @@
               <option value="Replacement">Replacement (Penggantian Mobil)</option>
             </select>
           </div>
+
+          <div>
+            <select id="filterPrioritySelect" class="fu-select" onchange="masterState.filters.priority = this.value; loadMasterCustomers();">
+              <option value="all">Semua Priority Territory</option>
+              <option value="Priority 1">🔴 Priority 1 Territory</option>
+              <option value="Priority 2">⚪ Priority 2 Territory</option>
+              <option value="Priority 3">🟡 Priority 3 Territory</option>
+              <option value="Priority 4">🟣 Priority 4 Territory</option>
+              <option value="none">➖ Tanpa Priority (Luar Wilayah)</option>
+            </select>
+          </div>
         </div>
 
         <!-- DEDICATED SALES PROGRESS SUMMARY STRIP (Appears when a specific sales is selected) -->

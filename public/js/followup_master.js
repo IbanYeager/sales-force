@@ -20,6 +20,7 @@ let masterState = {
     status: 'all',
     category: 'all',
     dataType: 'all',
+    priority: 'all',
     db_source: 'sales'
   },
   pagination: {
@@ -1642,9 +1643,9 @@ async function loadMasterCustomers(resetPage = true) {
   }
 
   try {
-    const { search, sales_id, status, category, dataType, db_source } = masterState.filters;
+    const { search, sales_id, status, category, dataType, priority, db_source } = masterState.filters;
     const spv = getLoggedInSpvName();
-    const url = `/api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&data_type=${encodeURIComponent(dataType || 'all')}&db_source=${db_source || 'sales'}&spv=${encodeURIComponent(spv)}`;
+    const url = `/api/api_followup.php?action=customers&search=${encodeURIComponent(search)}&sales_id=${sales_id}&status=${status}&category=${encodeURIComponent(category)}&data_type=${encodeURIComponent(dataType || 'all')}&priority=${encodeURIComponent(priority || 'all')}&db_source=${db_source || 'sales'}&spv=${encodeURIComponent(spv)}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -1833,7 +1834,7 @@ function renderCustomerTable() {
               ${c.foreman ? `&middot; FM: <strong style="color:#334155;">${escapeHtml(c.foreman)}</strong>` : ''}
             </div>
           ` : ''}
-          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:9.5px; margin-top:3px;"><i class="fa-solid fa-bolt"></i> ${escapeHtml(c.priority)}</span></div>` : ''}
+          ${renderPriorityBadge(c.priority) ? `<div style="margin-top:4px;">${renderPriorityBadge(c.priority)}</div>` : ''}
         </td>
 
         <!-- 6. Tipe & Order -->
@@ -2067,6 +2068,20 @@ function changePerPage(perPage) {
   masterState.pagination.perPage = parseInt(perPage, 10) || 50;
   masterState.pagination.currentPage = 1;
   renderCustomerTable();
+}
+
+function renderPriorityBadge(priority) {
+  const p = String(priority || '').trim();
+  if (!/^Priority [1-4]$/i.test(p)) return '';
+  const styles = {
+    'Priority 1': 'background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;',
+    'Priority 2': 'background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;',
+    'Priority 3': 'background:#fef3c7; color:#b45309; border:1px solid #fcd34d;',
+    'Priority 4': 'background:#f3e8ff; color:#7e22ce; border:1px solid #d8b4fe;'
+  };
+  const key = p.replace(/priority\s*/i, 'Priority ');
+  const st = styles[key] || styles['Priority 4'];
+  return `<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:800; ${st}"><i class="fa-solid fa-bolt"></i> ${escapeHtml(key)}</span>`;
 }
 
 function formatCarAgeDisplay(carYear, carAge) {

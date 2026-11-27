@@ -36,6 +36,24 @@ if (!function_exists('get_json_input')) {
     }
 }
 
+// Helper: Territory Priority mapping by Kecamatan (Phase 1 Apr 2026)
+if (!function_exists('get_territory_priority')) {
+    function get_territory_priority($district) {
+        $clean = preg_replace('/^(kecamatan|kec\.?)\s*/i', '', trim((string)$district));
+        $norm = strtolower(preg_replace('/[^a-z]/i', '', $clean));
+        if ($norm === '') return '';
+        $p1 = ['andir', 'antapani', 'arcamanik', 'bojongloakidul', 'cidadap'];
+        $p2 = ['buahbatu', 'ujungberung', 'kiaracondong'];
+        $p3 = ['bandungkidul', 'bandungkulon', 'regol', 'sumurbandung', 'cibiru', 'batununggal'];
+        $p4 = ['panyileukan', 'cicendo', 'rancasari', 'sukasari', 'coblong', 'lengkong', 'mandalajati', 'cibeunyingkaler', 'cibeunyingkidul', 'bojongloakaler', 'bandungwetan', 'babakanciparay', 'gedebage', 'cinambo', 'astanaanyar', 'sukajadi'];
+        if (in_array($norm, $p1, true)) return 'Priority 1';
+        if (in_array($norm, $p2, true)) return 'Priority 2';
+        if (in_array($norm, $p3, true)) return 'Priority 3';
+        if (in_array($norm, $p4, true)) return 'Priority 4';
+        return '';
+    }
+}
+
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 // -------------------------------------------------------------
@@ -772,7 +790,7 @@ if ($action === 'import_database_batch') {
                 $flatParams[] = $r['car_year'] ?? '';
                 $flatParams[] = $r['recommended_model'] ?? $r['car_model'];
                 $flatParams[] = $r['cluster_name'] ?? '';
-                $flatParams[] = $r['priority'] ?? '';
+                $flatParams[] = get_territory_priority($r['district'] ?? '');
                 $flatParams[] = $r['district'] ?? '';
                 $flatParams[] = $r['city'] ?? '';
                 $flatParams[] = $r['address'] ?? '';
@@ -930,6 +948,29 @@ if ($action === 'clean_dummy_followups') {
     echo json_encode([
         'success' => true,
         'message' => 'Seluruh data follow-up dummy berhasil dihapus. Database kini bersih dan tersinkronkan dengan Google Spreadsheet (semua berstatus Belum Dihubungi).'
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// ROUTE: POST /api_followup_sync.php?action=recalculate_territory_priorities
+// Hitung ulang status Priority 1-4 berdasarkan nama Kecamatan (Mapping Territory Phase 1)
+// -------------------------------------------------------------
+if ($action === 'recalculate_territory_priorities') {
+    $normExpr = "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(TRIM(COALESCE(district, '')), ' ', ''), '.', ''), 'kecamatan', ''), 'kec', ''))";
+
+    followup_execute("UPDATE followup_customers SET priority = ''");
+    followup_execute("UPDATE followup_customers SET priority = 'Priority 1' WHERE $normExpr IN ('andir', 'antapani', 'arcamanik', 'bojongloakidul', 'cidadap')");
+    followup_execute("UPDATE followup_customers SET priority = 'Priority 2' WHERE $normExpr IN ('buahbatu', 'ujungberung', 'kiaracondong')");
+    followup_execute("UPDATE followup_customers SET priority = 'Priority 3' WHERE $normExpr IN ('bandungkidul', 'bandungkulon', 'regol', 'sumurbandung', 'cibiru', 'batununggal')");
+    followup_execute("UPDATE followup_customers SET priority = 'Priority 4' WHERE $normExpr IN ('panyileukan', 'cicendo', 'rancasari', 'sukasari', 'coblong', 'lengkong', 'mandalajati', 'cibeunyingkaler', 'cibeunyingkidul', 'bojongloakaler', 'bandungwetan', 'babakanciparay', 'gedebage', 'cinambo', 'astanaanyar', 'sukajadi')");
+
+    $summary = followup_query("SELECT COALESCE(NULLIF(priority, ''), 'Tanpa Priority') as p, COUNT(*) as cnt FROM followup_customers GROUP BY priority ORDER BY p ASC");
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Status Priority 1-4 berhasil diperbarui sesuai Mapping Territory Kecamatan.',
+        'summary' => $summary
     ]);
     exit;
 }

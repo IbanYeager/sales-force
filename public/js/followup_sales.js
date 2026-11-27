@@ -24,6 +24,20 @@ document.addEventListener('DOMContentLoaded', () => {
   loadFollowupCustomers();
 });
 
+function renderPriorityBadge(priority) {
+  const p = String(priority || '').trim();
+  if (!/^Priority [1-4]$/i.test(p)) return '';
+  const styles = {
+    'Priority 1': 'background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;',
+    'Priority 2': 'background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;',
+    'Priority 3': 'background:#fef3c7; color:#b45309; border:1px solid #fcd34d;',
+    'Priority 4': 'background:#f3e8ff; color:#7e22ce; border:1px solid #d8b4fe;'
+  };
+  const key = p.replace(/priority\s*/i, 'Priority ');
+  const st = styles[key] || styles['Priority 4'];
+  return `<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:800; ${st}"><i class="fa-solid fa-bolt"></i> ${escapeHtml(key)}</span>`;
+}
+
 function formatCarAgeDisplay(carYear, carAge) {
   let year = parseInt(carYear, 10);
   if (!year || isNaN(year)) {
@@ -1075,6 +1089,7 @@ function renderSingleCustomerCardHtml(c, num) {
 
         <!-- Badges Line: PKB, Cluster, Priority, Location & Service -->
         <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px;">
+          ${renderPriorityBadge(c.priority)}
           ${c.pkb_no ? `<span class="badge-cluster-pill" style="background:#fff1f2; color:#be123c; border-color:#fecdd3; font-size:10.5px; font-weight:700;"><i class="fa-solid fa-file-invoice"></i> PKB: ${escapeHtml(c.pkb_no)} ${c.pkb_date ? `(${escapeHtml(c.pkb_date)})` : ''}</span>` : ''}
           ${c.operation_desc ? `<span class="badge-cluster-pill" style="background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-size:10px;"><i class="fa-solid fa-wrench"></i> ${escapeHtml(c.operation_desc)}</span>` : ''}
           ${c.ths_type ? `<span class="badge-cluster-pill" style="background:${c.ths_type.toUpperCase() === 'THS' ? '#f0fdf4; color:#15803d; border-color:#bbf7d0;' : '#f8fafc; color:#475569;'} font-size:10px; font-weight:800;"><i class="fa-solid fa-van-shuttle"></i> ${escapeHtml(c.ths_type)}</span>` : ''}
@@ -1483,7 +1498,7 @@ function renderCustomerTableView(list) {
         <!-- 3. Klaster & Dealer -->
         <td>
           ${c.cluster_name ? `<div><span class="badge-cluster-pill" style="font-size:10px; margin-bottom:2px;"><i class="fa-solid fa-tag"></i> ${c.cluster_name}</span></div>` : ''}
-          ${c.priority ? `<div><span class="badge-priority-pill" style="font-size:9.5px; margin-bottom:2px;"><i class="fa-solid fa-bolt"></i> ${c.priority}</span></div>` : ''}
+          ${renderPriorityBadge(c.priority) ? `<div style="margin-bottom:2px;">${renderPriorityBadge(c.priority)}</div>` : ''}
           ${c.outlet_do ? `<div style="font-size:9.5px; color:#64748b;"><i class="fa-solid fa-building"></i> ${c.outlet_do}</div>` : ''}
         </td>
 

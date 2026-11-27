@@ -340,6 +340,16 @@ if ($action === 'customers') {
         $params[] = '%' . strtolower($district) . '%';
     }
 
+    $priorityFilter = isset($_GET['priority']) ? trim($_GET['priority']) : '';
+    if ($priorityFilter !== '' && $priorityFilter !== 'all') {
+        if ($priorityFilter === 'none') {
+            $where[] = "(priority IS NULL OR priority = '' OR priority NOT LIKE 'Priority %')";
+        } else {
+            $where[] = "priority = ?";
+            $params[] = $priorityFilter;
+        }
+    }
+
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 25000;
     if ($limit <= 0) $limit = 25000;
     $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
